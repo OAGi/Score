@@ -75,11 +75,8 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(getDriver(), optionField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
 

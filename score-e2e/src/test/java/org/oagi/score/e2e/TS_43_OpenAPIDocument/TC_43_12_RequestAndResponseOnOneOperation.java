@@ -371,8 +371,7 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
         assertTrue(editPage.isRowConfirmMessageChipDisplayed(responseRow),
                 "The Response twin should show the ConfirmMessage DEN chip (shared operation)");
 
-        // Persist and reopen; both twins keep the ConfirmMessage body type, and the Response twin's chip
-        // still carries the picked Confirm Message DEN.
+        // Persist and reopen; both twins keep the ConfirmMessage body type and link to the picked BIE.
         editPage.hitUpdateButton();
         editPage.openPage();
 
@@ -382,9 +381,12 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
                 "The Request twin keeps the ConfirmMessage body type across Update + reopen");
         assertEquals("OAGi Confirm Message", editPage.getRowErrorResponseBodyType(reopenedResponse),
                 "The Response twin keeps the ConfirmMessage body type across Update + reopen");
-        assertTrue(editPage.getRowConfirmMessageChipText(reopenedResponse).contains(fixture.confirmBie.getDen()),
-                "The Response twin's chip should carry the picked ConfirmMessage DEN (was: "
-                        + editPage.getRowConfirmMessageChipText(reopenedResponse) + ")");
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(),
+                editPage.getRowConfirmMessagePickedBieId(reopenedRequest),
+                "The Request twin's chip should link to the picked ConfirmMessage BIE across Update + reopen");
+        assertEquals(fixture.confirmBie.getTopLevelAsbiepId(),
+                editPage.getRowConfirmMessagePickedBieId(reopenedResponse),
+                "The Response twin's chip should link to the picked ConfirmMessage BIE across Update + reopen");
     }
 
     @Test

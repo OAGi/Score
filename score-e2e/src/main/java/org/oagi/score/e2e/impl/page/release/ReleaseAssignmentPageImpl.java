@@ -92,11 +92,12 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
     @Override
     public void setOwner(String owner) {
         retry(() -> {
-            click(getTypeSelectField());
-            waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//span[contains(text(), \"" + owner + "\")]//ancestor::mat-option[1]"));
-            click(optionField);
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            WebElement searchField = matSelectSearchField(getDriver(), ownerSelect);
+            clear(searchField);
+            sendKeys(searchField, owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
+            escape(getDriver());
         });
 
     }

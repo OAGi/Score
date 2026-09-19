@@ -303,6 +303,22 @@ public abstract class PageHelper {
         });
     }
 
+    /** Returns an option whose visible text contains the supplied text from the select's panel. */
+    public static WebElement matSelectOptionContaining(WebDriver driver, WebElement select, String optionText) {
+        return defaultWait(driver).until(d -> {
+            WebElement localOption = findMatchingOption(select.findElements(By.cssSelector("mat-option")), optionText, false);
+            if (localOption != null) {
+                return localOption;
+            }
+            WebElement controlledOption = findMatchingOption(
+                    findElementsInControlledPanel(d, select, By.cssSelector("mat-option")), optionText, false);
+            if (controlledOption != null) {
+                return controlledOption;
+            }
+            return null;
+        });
+    }
+
     private static boolean isMatSelectPanelVisible(WebDriver driver, WebElement select) {
         if (hasControlledPanel(select)) {
             return findControlledPanels(driver, select).stream().anyMatch(WebElement::isDisplayed);
@@ -351,9 +367,15 @@ public abstract class PageHelper {
     }
 
     private static WebElement findMatchingOption(List<WebElement> options, String optionText) {
+        return findMatchingOption(options, optionText, true);
+    }
+
+    private static WebElement findMatchingOption(List<WebElement> options, String optionText, boolean exactMatch) {
         return options.stream()
                 .filter(WebElement::isDisplayed)
-                .filter(option -> normalizeVisibleText(option.getText()).equals(optionText))
+                .filter(option -> exactMatch
+                        ? normalizeVisibleText(option.getText()).equals(optionText)
+                        : normalizeVisibleText(option.getText()).contains(optionText))
                 .findFirst()
                 .orElse(null);
     }

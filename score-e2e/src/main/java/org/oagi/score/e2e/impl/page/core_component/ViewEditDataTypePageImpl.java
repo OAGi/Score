@@ -73,7 +73,7 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
             click(getDriver(), getBranchSelectField());
             waitFor(ofSeconds(2L));
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
+                    By.xpath("//mat-option[normalize-space(.) = " + xpathLiteral(branch) + "]"));
             click(getDriver(), optionField);
             escape(getDriver());
         });

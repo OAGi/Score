@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -48,6 +49,7 @@ public class TC_15_14_CreatingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_14_TA_1")
     public void on_the_cc_view_edit_page_where_a_particular_release_branch_is_selected_the_end_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -84,6 +86,7 @@ public class TC_15_14_CreatingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_14_TA_2")
     public void end_user_cannot_create_a_brand_new_bccp_when_the_working_branch_is_selected() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

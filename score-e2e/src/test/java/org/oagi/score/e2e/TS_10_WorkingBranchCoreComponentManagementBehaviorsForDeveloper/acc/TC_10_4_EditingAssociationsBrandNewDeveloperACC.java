@@ -789,10 +789,10 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
         click(getDialogButtonByName(getDriver(), "Proceed anyway"));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
@@ -801,7 +801,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Accrued Amount");
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
@@ -908,6 +908,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_after.getPropertyTerm());
         ACCViewEditPage.BCCPPanel bccp_after_panel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), Duration.ofSeconds(10))
+                .until(driver -> bccp_after.getDen().equals(getText(bccp_after_panel.getDENField())));
         assertEquals(bccp_after.getDen(), getText(bccp_after_panel.getDENField()));
     }
 
@@ -1147,7 +1149,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         ACCObject acc;
-        BCCPObject bccp, bccp_to_append;
+        BCCPObject bccp, bccp_to_append, bccp_for_attribute;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
@@ -1157,6 +1159,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
             bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            bccp_for_attribute = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -1177,9 +1180,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Record Set Total");
+        appendBCCPDialog.selectAssociation(bccp_for_attribute.getDen());
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_for_attribute.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
@@ -1191,7 +1194,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         bccPanel.setDefinition("test");
         accViewEditPage.hitUpdateButton();
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_for_attribute.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("Default Value", getText(bccPanel.getValueConstraintSelectField()));
@@ -1208,7 +1211,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         ACCObject acc;
-        BCCPObject bccp, bccp_to_append;
+        BCCPObject bccp, bccp_to_append, bccp_to_append_again, bccp_with_sc;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
@@ -1218,6 +1221,10 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
             bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            bccp_to_append_again = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            DTObject dataTypeWithSc = coreComponentAPI.getBDTByDENAndReleaseNum(
+                    library, "Acknowledge_ Response_ Code. Type", release.getReleaseNumber()).get(0);
+            bccp_with_sc = coreComponentAPI.createRandomBCCP(release, dataTypeWithSc, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -1238,9 +1245,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Open Invoice Count. Number");
+        appendBCCPDialog.selectAssociation(bccp_to_append_again.getDen());
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append_again.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
@@ -1250,7 +1257,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         bccPanel.setDefinition("test");
         accViewEditPage.hitUpdateButton();
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append_again.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Attribute", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
@@ -1259,9 +1266,9 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Confirmation Code. Code");
+        appendBCCPDialog.selectAssociation(bccp_with_sc.getDen());
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Confirmation Code");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_with_sc.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
@@ -1373,6 +1380,8 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_after.getPropertyTerm());
         ACCViewEditPage.BCCPPanel bccp_after_panel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> bccp_after.getDen().equals(getText(bccp_after_panel.getDENField())));
         assertEquals(bccp_after.getDen(), getText(bccp_after_panel.getDENField()));
     }
 

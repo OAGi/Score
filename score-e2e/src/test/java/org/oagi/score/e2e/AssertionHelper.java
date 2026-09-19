@@ -4,6 +4,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.util.function.Supplier;
+
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
@@ -90,6 +92,7 @@ public class AssertionHelper {
     }
 
     public static void assertEnabled(WebElement element) {
+        assertFalse(isReadOnly(element), "Expected element to be editable");
         try {
             assertEquals("false", element.getAttribute("ng-reflect-disabled"));
         } catch (Error | Exception rerun) {
@@ -99,6 +102,18 @@ public class AssertionHelper {
 
     public static void assertDisabled(WebElement element) {
         waitFor(ofMillis(500L));
+        assertDisabledNow(element);
+    }
+
+    public static void assertDisabled(Supplier<WebElement> elementSupplier) {
+        waitFor(ofMillis(500L));
+        assertDisabledNow(elementSupplier.get());
+    }
+
+    private static void assertDisabledNow(WebElement element) {
+        if (isReadOnly(element)) {
+            return;
+        }
         if ("mat-checkbox".equals(element.getTagName())) {
             try {
                 WebElement inputCheckbox = element.findElement(By.tagName("input"));
@@ -136,12 +151,25 @@ public class AssertionHelper {
                     assertEquals("true", element.getAttribute("disabled"));
                 } catch (Error | Exception e) {
                     try {
-                        assertTrue(element.getAttribute("class").contains("mat-mdc-checkbox-disabled"));
+                        // MDC radio buttons expose disabled state on the host class while
+                        // Selenium still reports the custom element itself as enabled.
+                        String classes = element.getAttribute("class");
+                        assertTrue(classes.contains("mat-mdc-checkbox-disabled")
+                                || classes.contains("mat-mdc-radio-disabled")
+                                || classes.contains("mat-radio-disabled"));
                     } catch (Error rerun3) {
                         assertEquals(false, element.isEnabled());
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Textareas used for definition fields are intentionally rendered as readonly rather than disabled
+     * so their content remains selectable and copyable. Treat both states as non-editable in assertions.
+     */
+    private static boolean isReadOnly(WebElement element) {
+        return element.getAttribute("readonly") != null;
     }
 }

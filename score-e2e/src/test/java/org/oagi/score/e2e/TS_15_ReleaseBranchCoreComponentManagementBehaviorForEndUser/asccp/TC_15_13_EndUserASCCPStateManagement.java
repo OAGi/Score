@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -43,6 +44,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_13_TA_1")
     public void end_user_can_change_the_state_of_asccp_he_owns_from_wip_to_qa() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -92,6 +94,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_13_TA_2")
     public void end_user_can_change_the_state_of_asccp_he_owns_from_qa_back_to_wip() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -148,6 +151,7 @@ public class TC_15_13_EndUserASCCPStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_13_TA_3")
     public void end_user_can_change_the_state_of_asccp_he_owns_from_qa_to_production() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

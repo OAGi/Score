@@ -391,6 +391,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             } catch (ElementClickInterceptedException e) {
                 getDriver().get(href);
             }
+            defaultWait(getDriver()).until(driver -> driver.getCurrentUrl().startsWith(href));
             invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this.parent, topLevelASBIEP);

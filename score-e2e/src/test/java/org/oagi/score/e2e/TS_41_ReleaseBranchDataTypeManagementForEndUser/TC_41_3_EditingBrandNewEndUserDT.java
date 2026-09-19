@@ -11,7 +11,6 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.core_component.DTViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditDataTypePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -65,12 +64,11 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
          * Test Assertion #41.3.1.a
          */
         assertEquals("true", dtViewEditPage.getNamespaceField().getAttribute("aria-required"));
-        List<NamespaceObject> standardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs(library);
-        for (NamespaceObject namespace : standardNamespaces) {
+        List<NamespaceObject> nonStandardNamespaces = getAPIFactory().getNamespaceAPI().getNonStandardNamespacesURIs(library);
+        for (NamespaceObject namespace : nonStandardNamespaces) {
             click(dtViewEditPage.getNamespaceField());
             waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                    "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
+            WebElement option = dtViewEditPage.getNamespaceOption(namespace.getUri());
             assertNotNull(option);
             waitFor(ofMillis(1000L));
             escape(getDriver());

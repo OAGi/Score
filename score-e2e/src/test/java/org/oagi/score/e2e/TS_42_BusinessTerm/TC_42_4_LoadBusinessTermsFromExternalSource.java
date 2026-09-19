@@ -663,10 +663,12 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             txtFile.delete();
         }
 
-        // An unsupported file chosen as the FIRST selection (no valid file yet) shows the inline
-        // drop-zone error instead of a snackbar.
+        // Close the first dialog before opening a fresh one: the selected valid CSV is retained
+        // when navigating back, and an unsupported replacement in that dialog uses a snackbar.
+        uploadBusinessTermsPage.cancelViaCloseButton();
         UploadBusinessTermsPage freshDialog =
                 homePage.getBIEMenu().openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
+        assertFalse(freshDialog.isFileTileVisible(), "A new upload dialog should start without a selected file.");
         File txtFileFirst = new File(new File(System.getProperty("user.home"), "Downloads"),
                 "first-pick_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".txt");
         Files.write(txtFileFirst.toPath(), "just some text".getBytes(StandardCharsets.UTF_8));

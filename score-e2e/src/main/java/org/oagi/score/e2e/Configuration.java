@@ -125,6 +125,9 @@ public class Configuration {
         chromePrefs.put("download.default_directory",
                 new File(System.getProperty("user.home"), "Downloads").getAbsolutePath());
         chromePrefs.put("safebrowsing.enabled", "true");
+        // E2E credentials are test-only values; do not interrupt the run with Chrome's
+        // compromised-password warning after submitting the login form.
+        chromePrefs.put("profile.password_manager_leak_detection", false);
         chromeOptions.setExperimentalOption("prefs", chromePrefs);
         return chromeOptions;
     }
@@ -147,6 +150,9 @@ public class Configuration {
         edgePrefs.put("download.default_directory",
                 new File(System.getProperty("user.home"), "Downloads").getAbsolutePath());
         edgePrefs.put("safebrowsing.enabled", "true");
+        // E2E credentials are test-only values; do not interrupt the run with Edge's
+        // compromised-password warning after submitting the login form.
+        edgePrefs.put("profile.password_manager_leak_detection", false);
         edgeOptions.setExperimentalOption("prefs", edgePrefs);
         return edgeOptions;
     }

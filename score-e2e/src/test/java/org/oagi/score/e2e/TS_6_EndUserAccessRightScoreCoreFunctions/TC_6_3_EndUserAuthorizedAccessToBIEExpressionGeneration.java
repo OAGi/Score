@@ -112,7 +112,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
                 waitFor(ofMillis(1000L));
@@ -198,7 +198,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -243,7 +243,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.selectBIEForExpression(topLevelAsbiep);
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -298,7 +298,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -358,7 +358,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -416,7 +416,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -474,7 +474,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(expressBIEPage.getBasedCCMetaDataCheckbox());
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -612,7 +612,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -667,7 +667,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             assertNotChecked(jsonSchemaExpressionOptions.getIncludePaginationResponseCheckbox());
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -723,7 +723,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File generatedBIEExpression = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 generatedBIEExpression = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -1022,7 +1022,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1089,7 +1089,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1161,7 +1161,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1234,7 +1234,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1451,7 +1451,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             expressBIEPage.toggleBusinessContext();
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -1531,7 +1531,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -1611,7 +1611,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             postOperationOptions.toggleIncludeMetaHeader(metaHeaderASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -1668,7 +1668,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1733,7 +1733,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
             jsonSchemaExpressionOptions.toggleIncludePaginationResponse(paginationResponseASBIEP, context);
             File file = null;
             try {
-                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = topLevelAsbiep.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
                 ObjectMapper mapper = new ObjectMapper();
@@ -1876,7 +1876,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         expressBIEPage.selectXMLSchemaExpression();
         File file = null;
         try {
-            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll(" ", "") + ".xsd";
+            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll("\\s+", "-") + ".xsd";
             file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.XML,
                     (filename) -> expectedFilename.equals(filename));
         } finally {
@@ -1888,7 +1888,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         expressBIEPage.selectJSONSchemaExpression();
         file = null;
         try {
-            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll(" ", "") + ".json";
+            String expectedFilename = reusableBIE.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
             file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                     (filename) -> expectedFilename.equals(filename));
         } finally {
@@ -1940,7 +1940,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2051,7 +2051,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2165,7 +2165,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2287,7 +2287,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2421,7 +2421,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2549,7 +2549,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2670,7 +2670,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2805,7 +2805,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -2951,7 +2951,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".yml";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".yml";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.YML,
                         (filename) -> expectedFilename.equals(filename));
             } finally {
@@ -3101,7 +3101,7 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
 
             File file = null;
             try {
-                String expectedFilename = bie.getPropertyTerm().replaceAll(" ", "") + ".json";
+                String expectedFilename = bie.getPropertyTerm().replaceAll("\\s+", "-") + ".json";
                 file = expressBIEPage.hitGenerateButton(ExpressBIEPage.ExpressionFormat.JSON,
                         (filename) -> expectedFilename.equals(filename));
             } finally {

@@ -25,7 +25,6 @@
                             [class.bt-chip-error]="hasTypeCodeEditError(bt)"
                             [disableRipple]="true"
                             cdkOverlayOrigin #chipOrigin="cdkOverlayOrigin"
-                            (click)="startTypeCodeEdit(bt, editable, $event)"
                             (mouseenter)="onBadgeHover(bt, chipOrigin)" (mouseleave)="onBadgeLeave()">
                 @if (editable) {
                   <mat-icon matChipAvatar class="bt-chip-star" [class.bt-chip-star-on]="bt.primaryIndicator"
@@ -37,7 +36,13 @@
                   <mat-icon matChipAvatar class="bt-chip-star bt-chip-star-on"
                             matTooltip="Preferred business term">star</mat-icon>
                 }
-                <span class="bt-chip-term">{{ bt.businessTerm }}</span>
+                <span class="bt-chip-term"
+                      [attr.role]="editable ? 'button' : null"
+                      [attr.tabindex]="editable ? 0 : null"
+                      [attr.aria-label]="editable ? 'Edit Type Code for ' + bt.businessTerm : null"
+                      (click)="startTypeCodeEdit(bt, editable, $event)"
+                      (keydown.enter)="startTypeCodeEdit(bt, editable, $event)"
+                      (keydown.space)="startTypeCodeEdit(bt, editable, $event)">{{ bt.businessTerm }}</span>
                 @if (isTypeCodeEditing(bt)) {
                   <input class="bt-chip-type-input"
                          [attr.data-assigned-biz-term-id]="bt.assignedBizTermId"
@@ -123,7 +128,7 @@
         </mat-card>
       }
     </ng-template>
-    @if (loading) {
+    @if (loading || isUpdating) {
       <div class="main-content-loading-overlay">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>

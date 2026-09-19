@@ -99,6 +99,8 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
     @Override
     public ACCViewEditPage hitRefactorButton() {
         click(getRefactorButton(true));
+        WebElement snackBar = getSnackBar(getDriver(), "Refactored");
+        assert snackBar.isDisplayed();
         return parent;
     }
 }

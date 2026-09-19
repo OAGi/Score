@@ -19,6 +19,7 @@ import {
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {findPreviousAssociation} from '../domain/association-revision';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
   StateChangeDialogComponent,
@@ -447,6 +448,23 @@ export class ExtensionDetailComponent implements OnInit {
     return !!this.prevAccDetails;
   }
 
+  private getPreviousAssociation(node?: CcFlatNode): AsccSummary | BccSummary | null {
+    node = node || this.selectedNode;
+    if (!node || !node.detail || !this.prevAccDetails || !this.prevAccDetails.associations) {
+      return null;
+    }
+
+    if (node.type === 'ASCCP' && this.isAsccpDetail(node)) {
+      const ascc = this.asAsccpDetail(node).ascc;
+      return findPreviousAssociation('ASCC', ascc.manifestId, ascc.prevAsccManifestId, this.prevAccDetails.associations);
+    }
+    if (node.type === 'BCCP' && this.isBccpDetail(node)) {
+      const bcc = this.asBccpDetail(node).bcc;
+      return findPreviousAssociation('BCC', bcc.manifestId, bcc.prevBccManifestId, this.prevAccDetails.associations);
+    }
+    return null;
+  }
+
   isEditable() {
     return this.state === 'WIP' && this.access === 'CanEdit';
   }
@@ -479,25 +497,7 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   hasRevisionAssociation(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
-      return false;
-    }
-
-    node = node || this.selectedNode;
-
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return true;
-        }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return !!this.getPreviousAssociation(node);
   }
 
   isDeprecateAble(node?: CcFlatNode) {
@@ -510,32 +510,8 @@ export class ExtensionDetailComponent implements OnInit {
       return false;
     }
 
-    // An association is deprecate-able only if it was carried over from the previous revision.
-    // A brand-new association appended during this amendment has no predecessor
-    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
-    // CC the base already references would match a prior association to the same target and
-    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
-    // association is considered, not just the first.
-    if (node.type === 'ASCCP') {
-      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return !(assoc as AsccSummary).deprecated;
-        }
-      }
-    } else if (node.type === 'BCCP') {
-      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return !(assoc as BccSummary).deprecated;
-        }
-      }
-    }
-    return false;
+    const previousAssociation = this.getPreviousAssociation(node);
+    return !!previousAssociation && !previousAssociation.deprecated;
   }
 
   getKey(node: CcFlatNode) {
@@ -1121,27 +1097,15 @@ export class ExtensionDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1165,15 +1129,15 @@ export class ExtensionDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMin === 0) {
+      if (prevRevision.cardinality.min === 0) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
         if (Number(control.value) < 0) {
           return {min: 'Cardinality Min must be bigger than or equals to ' + 0};
         }
-        if (Number(control.value) > prevRevision.cardinalityMin) {
-          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinalityMin};
+        if (Number(control.value) > prevRevision.cardinality.min) {
+          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinality.min};
         }
         if (obj.cardinalityMax >= 0 && Number(control.value) > obj.cardinalityMax) {
           return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
@@ -1212,27 +1176,15 @@ export class ExtensionDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1259,7 +1211,7 @@ export class ExtensionDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMax === -1) {
+      if (prevRevision.cardinality.max === -1) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
@@ -1269,11 +1221,11 @@ export class ExtensionDetailComponent implements OnInit {
         if (controlValue === -1) {
           return null;
         }
-        if (prevRevision.cardinalityMax === -1) {
+        if (prevRevision.cardinality.max === -1) {
           return {max: 'Cardinality Max cannot be changed'};
         }
-        if (controlValue < prevRevision.cardinalityMax) {
-          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinalityMax};
+        if (controlValue < prevRevision.cardinality.max) {
+          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinality.max};
         }
         if (controlValue < obj.cardinalityMin) {
           return {min: 'Cardinality Max must be greater than ' + obj.cardinalityMin};

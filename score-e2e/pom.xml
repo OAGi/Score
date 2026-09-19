@@ -25,7 +25,7 @@
         <db.user>oagi</db.user>
         <db.password>oagi</db.password>
 
-        <selenium.version>4.48.0</selenium.version>
+        <selenium.version>4.49.0</selenium.version>
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>

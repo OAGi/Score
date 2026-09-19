@@ -15,6 +15,7 @@ import org.oagi.score.e2e.page.bie.*;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -285,8 +286,11 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = codeListValueMap.get(cl);
-            assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
-            assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
+            WebElement valueRow = editCodeListPage.getTableRecordByValue(value.getValue());
+            WebElement valueCheckbox = editCodeListPage.getColumnByName(valueRow, "select")
+                    .findElement(By.cssSelector("mat-checkbox"));
+            assertDisabled(valueCheckbox);
+            assertDisabled(editCodeListPage.getRemoveValueButton());
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");
@@ -306,15 +310,12 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
     @Test
     @DisplayName("TC_17_4_TA_5")
     public void the_code_list_value_inherited_from_the_based_code_list_the_values_cannot_be_removed_since_it_is_an_a() {
-        AppUserObject endUserA;
+        AppUserObject endUserB;
         ReleaseObject branch;
         List<CodeListObject> codeListForTesting = new ArrayList<>();
         List<CodeListValueObject> values = new ArrayList<>();
         {
-            endUserA = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
-            thisAccountWillBeDeletedAfterTests(endUserA);
-
-            AppUserObject endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            endUserB = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUserB);
 
             LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
@@ -332,7 +333,7 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
                     createDerivedCodeList(baseCodeList, endUserB, namespaceEUB, branch, "Production");
             codeListForTesting.add(codeList);
         }
-        HomePage homePage = loginPage().signIn(endUserA.getLoginId(), endUserA.getPassword());
+        HomePage homePage = loginPage().signIn(endUserB.getLoginId(), endUserB.getPassword());
 
         for (CodeListObject cl : codeListForTesting) {
             ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
@@ -343,8 +344,11 @@ public class TC_17_4_AmendAnEndUserCodeList extends BaseTest {
             assertEquals(previousRevisionNumber + 1, Integer.parseInt(getText(editCodeListPage.getRevisionField())));
 
             CodeListValueObject value = values.get(0);
-            assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
-            assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
+            WebElement valueRow = editCodeListPage.getTableRecordByValue(value.getValue());
+            WebElement valueCheckbox = editCodeListPage.getColumnByName(valueRow, "select")
+                    .findElement(By.cssSelector("mat-checkbox"));
+            assertDisabled(valueCheckbox);
+            assertDisabled(editCodeListPage.getRemoveValueButton());
             EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
             editCodeListValueDialog.setMeaning("new meaning for value");
             editCodeListValueDialog.setDefinition("new definition for value");

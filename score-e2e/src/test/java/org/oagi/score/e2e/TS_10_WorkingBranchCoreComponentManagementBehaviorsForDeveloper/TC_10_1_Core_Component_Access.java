@@ -1226,12 +1226,30 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             String bccState = getText(bccPanelContainer.getBCCPanel().getStateField());
             if (bccState.equals("WIP")) {
                 accViewEditPage.moveToDraft();
+                accViewEditPage.openPage();
+                bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+                bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+                ACCViewEditPage.BCCPanel panelForWait = bccPanelContainer.getBCCPanel();
+                new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                        .until(driver -> "Draft".equals(getText(panelForWait.getStateField())));
                 assertEquals("Draft", getText(bccPanelContainer.getBCCPanel().getStateField()));
             } else if (bccState.equals("Draft")) {
                 accViewEditPage.moveToCandidate();
+                accViewEditPage.openPage();
+                bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+                bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+                ACCViewEditPage.BCCPanel panelForWait = bccPanelContainer.getBCCPanel();
+                new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                        .until(driver -> "Candidate".equals(getText(panelForWait.getStateField())));
                 assertEquals("Candidate", getText(bccPanelContainer.getBCCPanel().getStateField()));
             } else if (bccState.equals("Candidate")) {
                 accViewEditPage.backToWIP();
+                accViewEditPage.openPage();
+                bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
+                bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
+                ACCViewEditPage.BCCPanel panelForWait = bccPanelContainer.getBCCPanel();
+                new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                        .until(driver -> "WIP".equals(getText(panelForWait.getStateField())));
                 assertEquals("WIP", getText(bccPanelContainer.getBCCPanel().getStateField()));
             }
 

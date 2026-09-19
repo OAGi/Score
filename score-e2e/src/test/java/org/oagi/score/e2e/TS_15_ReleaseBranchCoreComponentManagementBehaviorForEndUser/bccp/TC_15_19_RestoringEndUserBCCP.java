@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -46,6 +47,7 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_19_TA_1")
     public void end_user_can_restore_the_deleted_bccp_whose_bdt_is_still_alive_in_both() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -77,6 +79,7 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_19_TA_1")
     public void end_user_can_restore_the_deleted_bccp_whose_bdt_is_still_alive_in_both_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -111,6 +114,7 @@ public class TC_15_19_RestoringEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_19_TA_2")
     public void end_user_can_restore_a_deleted_bccp_whose_bdt_is_deleted_the_ui_display() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

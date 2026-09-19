@@ -94,16 +94,9 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            WebElement selectField = getBranchSelectField();
-            try {
-                click(getDriver(), selectField.findElement(By.xpath(".//div[contains(@class, \"mat-mdc-select-trigger\")]")));
-            } catch (Exception ignored) {
-                click(getDriver(), selectField);
-            }
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[contains(text(), \"" + branch + "\")]"));
-            click(searchedSelectField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
     }
@@ -382,6 +375,12 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     }
 
     @Override
+    public boolean isDiscardButtonUnavailable() {
+        return getDriver().findElements(DISCARD_BUTTON_LOCATOR).stream()
+                .noneMatch(button -> button.isDisplayed() && button.isEnabled());
+    }
+
+    @Override
     public void discard(TopLevelASBIEPObject topLevelASBIEP) {
         showAdvancedSearchPanel();
         setBranch(topLevelASBIEP.getReleaseNumber());
@@ -405,6 +404,17 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     @Override
     public int getNumberOfOnlyBIEsPerStateAreListed(String state) {
         return getDriver().findElements(By.xpath("//table//*[contains(text(), \"" + state + "\")][@class=\"" + state + " bie-state\"]")).size();
+    }
+
+    @Override
+    public int waitForNumberOfOnlyBIEsPerStateAreListed(String state, int minimumCount) {
+        if (minimumCount < 1) {
+            throw new IllegalArgumentException("minimumCount must be positive.");
+        }
+        return defaultWait(getDriver()).until(driver -> {
+            int count = getNumberOfOnlyBIEsPerStateAreListed(state);
+            return count >= minimumCount ? count : null;
+        });
     }
 
     @Override

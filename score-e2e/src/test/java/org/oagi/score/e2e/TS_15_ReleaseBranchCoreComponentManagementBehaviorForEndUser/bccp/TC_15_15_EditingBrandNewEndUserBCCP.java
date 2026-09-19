@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -48,6 +49,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.a")
     public void fields_property_term_nillable_namespace_value_constraint_default_or_fixed_value_definition() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -79,6 +81,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.b")
     public void field_den_is_automatically_changed_based_on_the_changes_of_the_property_term_field() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -101,6 +104,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.c")
     public void warning_should_be_given_when_the_definition_is_empty() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -129,6 +133,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.d")
     public void fields_guid_and_den_and_deprecated_cannot_be_changed() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -148,6 +153,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.e")
     public void fields_of_the_bdt_and_its_components_cannot_be_changed() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -178,10 +184,11 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
         assertFalse(dtPanel.getQualifierField().isEnabled());
         assertEquals("System Environment", getText(dtPanel.getQualifierField()));
         assertDisabled(dtPanel.getDefinitionSourceField());
-        assertEnabled(dtPanel.getDefinitionField());
+        assertDisabled(dtPanel.getDefinitionField());
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.f")
     public void fields_default_value_and_fixed_value_are_mutually_exclusive() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -211,6 +218,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.g")
     public void fields_fixed_value_and_nillable_are_mutually_exclusive() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -240,6 +248,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_1.h")
     public void property_term_nillable_and_namespace_are_required_only_non_standard_namespace_shall_be_allowed() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -280,6 +289,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_2")
     public void end_user_can_change_the_bdt_to_another_one() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -302,6 +312,7 @@ public class TC_15_15_EditingBrandNewEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_15_TA_3")
     public void when_the_bccp_den_changes_all_bccs_which_uses_the_bccp_and_whose_revision_numbers_are() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

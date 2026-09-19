@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDe
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -134,6 +135,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_2_TA_1")
     public void developer_can_only_search_and_view_details_of_cls_i_e_no_cl_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -165,6 +167,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_2_TA_2")
     public void no_cl_shall_be_listed_for_the_developer_when_state_filter_is_selected_that_is_not() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -186,6 +189,7 @@ public class TC_18_2_CodeListAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_2_TA_3")
     public void end_user_can_only_search_and_view_details_of_cls_i_e_no_cl_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);

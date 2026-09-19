@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_19_ReleaseManagement;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -72,6 +73,7 @@ public class TC_19_2_BieViewOrderReleaseForwarding extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_2_TA_1_and_TA_2")
     public void view_order_forwards_to_a_drafted_release_and_is_removed_when_rolled_back() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

@@ -1,9 +1,9 @@
 package org.oagi.score.e2e.TS_18_DraftReleaseBranchCoreComponentCodeListAccessDevelopersEndUsers;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -39,10 +40,13 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
     AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
     String existingReleaseNum = null;
-    String newReleaseNum = Integer.toString(RandomUtils.secure().randomInt(20230519, 20231231));
+    String newReleaseNum = Long.toString(System.currentTimeMillis());
     CodeListObject codeListCandidate;
     RandomCoreComponentWithStateContainer developerCoreComponentWithStateContainer;
     RandomCoreComponentWithStateContainer euCoreComponentWithStateContainer;
+    ACCObject candidateACCWithNewProperty;
+    String associationDen;
+    String associationPropertyTerm;
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     public void draft_creation() {
@@ -57,13 +61,17 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         ccStates.add("Candidate");
         ccStates.add("Deleted");
         developerCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, workingBranch, namespace, ccStates);
-        ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
+        candidateACCWithNewProperty = getAPIFactory().getCoreComponentAPI()
+                .createRandomACC(developer, workingBranch, namespace, "WIP");
+        ASCCPObject candidateASCCP = developerCoreComponentWithStateContainer.stateASCCPs.get("Candidate");
+        associationDen = candidateASCCP.getDen();
+        associationPropertyTerm = candidateASCCP.getPropertyTerm();
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        homePage.setLibrary("connectSpec");
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
-        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACC.getAccManifestId());
-        accViewEditPage.backToWIP();
-        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACC.getDen());
-        appendAssociationDialog.selectAssociation("Adjusted Total Tax Amount");
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(candidateACCWithNewProperty.getAccManifestId());
+        SelectAssociationDialog appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + candidateACCWithNewProperty.getDen());
+        appendAssociationDialog.selectAssociation(associationDen);
         accViewEditPage.moveToDraft();
         accViewEditPage.moveToCandidate();
 
@@ -94,47 +102,36 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
         createReleasePage.setReleaseNamespace(namespace);
         createReleasePage.hitCreateButton();
         viewEditReleasePage.openPage();
-        viewEditReleasePage.showAdvancedSearchPanel();
-        viewEditReleasePage.setState("Draft");
-        viewEditReleasePage.hitSearchButton();
-        long timeout = Duration.ofSeconds(300L).toMillis();
-        long begin = System.currentTimeMillis();
-        if (viewEditReleasePage.getTotalNumberOfItems() > 0) {
-            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
-            EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPage(tr);
-            String oldDraftRelease = getText(editReleasePage.getReleaseNumberField());
-            editReleasePage.backToInitialized();
-            begin = System.currentTimeMillis();
-            while (System.currentTimeMillis() - begin < timeout) {
-                viewEditReleasePage.openPage();
-                viewEditReleasePage.setReleaseNum(oldDraftRelease);
-                viewEditReleasePage.hitSearchButton();
-                tr = viewEditReleasePage.getTableRecordAtIndex(1);
-                String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
-                if ("Initialized".equals(state)) {
-                    break;
-                }
-            }
-
-        }
         EditReleasePage editReleasePage = viewEditReleasePage.openReleaseViewEditPageByReleaseAndState(newReleaseNum,
                 "Initialized");
         ReleaseAssignmentPage releaseAssignmentPage = editReleasePage.hitCreateDraftButton();
+        releaseAssignmentPage.setOwner(developer.getLoginId());
+        releaseAssignmentPage.hitSearchButton();
         releaseAssignmentPage.hitAssignAllButton();
+        releaseAssignmentPage.hitValidateButton();
+        List<String> validationErrors = getDriver().findElements(By.cssSelector(".errors .message"))
+                .stream().map(WebElement::getText).toList();
+        assertEquals("All components are valid.", getSnackBarMessage(getDriver()),
+                "Only this test user's candidate components should be assigned: " + validationErrors);
         releaseAssignmentPage.hitCreateButton();
-        ReleaseObject newDraftRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, newReleaseNum);
-        timeout = Duration.ofSeconds(300L).toMillis();
-        begin = System.currentTimeMillis();
-        while (System.currentTimeMillis() - begin < timeout) {
-            viewEditReleasePage.openPage();
-            viewEditReleasePage.setReleaseNum(newReleaseNum);
-            viewEditReleasePage.hitSearchButton();
-            WebElement tr = viewEditReleasePage.getTableRecordAtIndex(1);
-            String state = getText(viewEditReleasePage.getColumnByName(tr, "state"));
-            if ("Draft".equals(state)) {
+        if (getDriver().getCurrentUrl().contains("/assign")) {
+            validationErrors = getDriver().findElements(By.cssSelector(".errors .message"))
+                    .stream().map(WebElement::getText).toList();
+            fail("The release draft was rejected by validation: " + validationErrors);
+        }
+        ReleaseObject newDraftRelease = null;
+        long deadline = System.currentTimeMillis() + Duration.ofSeconds(300L).toMillis();
+        while (System.currentTimeMillis() < deadline) {
+            newDraftRelease = getAPIFactory().getReleaseAPI()
+                    .getReleaseByReleaseNumber(library, newReleaseNum);
+            if (newDraftRelease != null && "Draft".equals(newDraftRelease.getState())) {
                 break;
             }
+            waitFor(Duration.ofSeconds(2L));
         }
+        assertTrue(newDraftRelease != null, "The newly created release must exist.");
+        assertEquals("Draft", newDraftRelease.getState(),
+                "The new release must reach Draft before tests select its branch.");
         homePage.logout();
     }
 
@@ -179,6 +176,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_1_TA_1")
     public void developer_can_only_search_and_view_details_of_ccs_i_e_no_cc_creation() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -207,6 +205,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_1_TA_2")
     public void no_cc_shall_be_listed_for_the_developer_when_state_filter_is_selected_that() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -229,6 +228,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_1_TA_3")
     public void end_user_can_only_search_and_view_details_of_ccs_i_e_no_cc() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -256,6 +256,7 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_1_TA_4")
     public void no_cc_shall_be_listed_for_the_end_user_when_state_filter_is_selected() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -279,15 +280,17 @@ public class TC_18_1_CoreComponentAccess extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_18_1_TA_5.a_and_TA_5.b")
     public void core_component_access_new_property_added_to_an_acc_based_acc_changes() {
         thisAccountWillBeDeletedAfterTests(developer);
         thisAccountWillBeDeletedAfterTests(endUser);
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        homePage.setLibrary("connectSpec");
         ViewEditCoreComponentPage viewEditCoreComponentPage = homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.setBranch(newReleaseNum);
-        ACCObject candidateACC = developerCoreComponentWithStateContainer.stateACCs.get("Candidate");
+        ACCObject candidateACC = candidateACCWithNewProperty;
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(candidateACC.getDen(), existingReleaseNum);
-        WebElement asccpNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/Adjusted Total Tax Amount");
+        WebElement asccpNode = accViewEditPage.getNodeByPath("/" + candidateACC.getDen() + "/" + associationPropertyTerm);
         assertTrue(asccpNode.isDisplayed());
 
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();

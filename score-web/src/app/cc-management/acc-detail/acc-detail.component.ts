@@ -20,6 +20,7 @@ import {
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {findPreviousAssociation} from '../domain/association-revision';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
   StateChangeDialogComponent,
@@ -525,26 +526,25 @@ export class AccDetailComponent implements OnInit {
     this.dataSource.toggle(node);
   }
 
-  hasRevisionAssociation(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
-      return false;
-    }
-
+  private getPreviousAssociation(node?: CcFlatNode): AsccSummary | BccSummary | null {
     node = node || this.selectedNode;
-
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return true;
-        }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return true;
-        }
-      }
+    if (!node || !node.detail || !this.prevAccDetails || !this.prevAccDetails.associations) {
+      return null;
     }
 
-    return false;
+    if (node.type === 'ASCCP' && this.isAsccpDetail(node)) {
+      const ascc = this.asAsccpDetail(node).ascc;
+      return findPreviousAssociation('ASCC', ascc.manifestId, ascc.prevAsccManifestId, this.prevAccDetails.associations);
+    }
+    if (node.type === 'BCCP' && this.isBccpDetail(node)) {
+      const bcc = this.asBccpDetail(node).bcc;
+      return findPreviousAssociation('BCC', bcc.manifestId, bcc.prevBccManifestId, this.prevAccDetails.associations);
+    }
+    return null;
+  }
+
+  hasRevisionAssociation(node?: CcFlatNode) {
+    return !!this.getPreviousAssociation(node);
   }
 
   isDeprecateAble(node?: CcFlatNode) {
@@ -557,32 +557,8 @@ export class AccDetailComponent implements OnInit {
       return false;
     }
 
-    // An association is deprecate-able only if it was carried over from the previous revision.
-    // A brand-new association appended during this amendment has no predecessor
-    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
-    // CC the base already references would match a prior association to the same target and
-    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
-    // association is considered, not just the first.
-    if (node.type === 'ASCCP') {
-      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return !(assoc as AsccSummary).deprecated;
-        }
-      }
-    } else if (node.type === 'BCCP') {
-      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return !(assoc as BccSummary).deprecated;
-        }
-      }
-    }
-    return false;
+    const previousAssociation = this.getPreviousAssociation(node);
+    return !!previousAssociation && !previousAssociation.deprecated;
   }
 
   getKey(node: CcFlatNode) {
@@ -1458,23 +1434,11 @@ export class AccDetailComponent implements OnInit {
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1549,23 +1513,11 @@ export class AccDetailComponent implements OnInit {
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {

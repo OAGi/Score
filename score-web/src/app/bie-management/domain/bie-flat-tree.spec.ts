@@ -342,6 +342,46 @@ describe('BieFlatNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', () =>
   });
 });
 
+describe('Association expansion after loading', () => {
+  it.each([AbieFlatNode, AsbiepFlatNode])('caches an empty association after loading', NodeType => {
+    const db = newDb();
+    const node = new NodeType();
+    node.dataSource = {database: db, hideUnused: false} as any;
+    const associations = vi.spyOn(db, 'getAssociations').mockReturnValue([]);
+    expect(node.expandable).toBe(false);
+    expect(node.expandable).toBe(false);
+    expect(associations).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads an initially empty root during initialization and preserves filter changes', () => {
+    const db = newDb();
+    const node = new AbieFlatNode();
+    node.required = true;
+    const child = {used: false, required: false, children: []} as any;
+    vi.spyOn(db, 'rootNode', 'get').mockReturnValue(node);
+    const load = vi.spyOn(db, 'loadChildren').mockImplementation(parent => { parent.children = [child]; });
+    const ds = new BieFlatNodeDataSource<any>(db, null as any, null as any);
+    node.dataSource = ds;
+    ds.init();
+    expect(node.expandable).toBe(true);
+    ds.hideUnused = true;
+    expect(node.expandable).toBe(false);
+    child.used = true;
+    expect(node.expandable).toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not traverse a circular association when checking expansion', () => {
+    const db = newDb();
+    const node = new AsbiepFlatNode();
+    node.isCycle = true;
+    node.dataSource = {database: db} as any;
+    const associations = vi.spyOn(db, 'getAssociations');
+    expect(node.expandable).toBe(false);
+    expect(associations).not.toHaveBeenCalled();
+  });
+});
+
 describe('BBIE supplementary-component expansion', () => {
   it.each(['Attribute', 'Element'])('uses positive SC cardinality for %s BBIEs', entityType => {
     const node = bbiepChild('Field', 1);

@@ -727,7 +727,7 @@
                               <div class="checkbox">
                                 <mat-checkbox color="primary"
                                   [(ngModel)]="asBccpDetail().bccp.nillable"
-                                  [disabled]="!isEditable() || (hasRevision() && (this.prevBccpDetails.nillable || !!this.prevBccpDetails.fixedValue))">
+                                  [disabled]="!isEditable() || (hasRevision() && (this.prevBccpDetails.nillable || !!this.prevBccpDetails.valueConstraint?.fixedValue))">
                                   <span>Nillable</span>
                                 </mat-checkbox>
                               </div>
@@ -757,7 +757,7 @@
                             <div class="col-md-3 col-sm-3">
                               <mat-form-field>
                                 <mat-select [(ngModel)]="asBccpDetail().bccp.fixedOrDefault"
-                                  [disabled]="!isEditable() || hasRevision() && this.prevBccpDetails.fixedValue != null">
+                                  [disabled]="!isEditable() || hasRevision() && this.prevBccpDetails.valueConstraint?.fixedValue != null">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed" [disabled]="hasRevision() && prevBccpDetails.nillable === true">Fixed Value</mat-option>
                                   <mat-option value="default">Default Value</mat-option>
@@ -778,7 +778,7 @@
                                   <mat-label>Fixed Value</mat-label>
                                   <input matInput placeholder="Fixed Value"
                                     [(ngModel)]="asBccpDetail().bccp.fixedValue"
-                                    [disabled]="!isEditable() || hasRevision() && this.prevBccpDetails.fixedValue != null">
+                                    [disabled]="!isEditable() || hasRevision() && this.prevBccpDetails.valueConstraint?.fixedValue != null">
                                 </mat-form-field>
                               }
                               @if (asBccpDetail().bccp.fixedOrDefault == 'default') {
