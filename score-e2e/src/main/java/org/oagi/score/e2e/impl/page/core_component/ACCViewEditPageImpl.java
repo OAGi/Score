@@ -34,6 +34,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    private static final By CONTEXT_MENU_PANEL_LOCATOR =
+            By.cssSelector(".mat-mdc-menu-panel, .mat-menu-panel");
     public static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By REVISE_BUTTON_LOCATOR =
@@ -336,8 +338,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+            if (getDriver().findElements(CONTEXT_MENU_PANEL_LOCATOR).stream().anyMatch(WebElement::isDisplayed)) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -347,7 +348,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                CONTEXT_MENU_PANEL_LOCATOR).isDisplayed();
         return node;
     }
 
@@ -1308,7 +1309,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setCardinalityMaxField(String cardinalityMax) {
-            sendKeys(getCardinalityMaxField(), cardinalityMax);
+            WebElement field = getCardinalityMaxField();
+            clear(field);
+            sendKeys(field, cardinalityMax);
         }
 
         @Override

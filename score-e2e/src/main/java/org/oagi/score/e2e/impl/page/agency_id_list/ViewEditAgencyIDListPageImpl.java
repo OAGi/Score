@@ -1,6 +1,5 @@
 package org.oagi.score.e2e.impl.page.agency_id_list;
 
-import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.AgencyIDListObject;
 import org.oagi.score.e2e.obj.AppUserObject;
@@ -15,18 +14,13 @@ import org.openqa.selenium.WebElement;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import static java.time.Duration.ofMillis;
-import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implements ViewEditAgencyIDListPage {
 
     private static final By NEW_AGENCY_ID_LIST_BUTTON_LOCATOR =
             By.xpath("//button[contains(@mattooltip, \"New Agency ID List\")]");
-
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
@@ -147,11 +141,12 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            waitFor(ofSeconds(2L));
-            WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(getDriver(), optionField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            WebElement searchField = matSelectSearchField(getDriver(), branchSelect);
+            clear(searchField);
+            sendKeys(searchField, branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
+            escape(getDriver());
         });
     }
 
@@ -162,11 +157,11 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setState(String state) {
-        click(getDriver(), getStateSelectField());
-        WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
-                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + state + "\")]"));
-        click(getDriver(), optionField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement stateSelect = openMatSelect(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), stateSelect, state));
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -176,11 +171,11 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setDeprecated(boolean deprecated) {
-        click(getDriver(), getDeprecatedSelectField());
-        WebElement optionField = visibilityOfElementLocated(longWait(getDriver()),
-                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + (deprecated ? "True" : "False") + "\")]"));
-        click(getDriver(), optionField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement deprecatedSelect = openMatSelect(getDriver(), DEPRECATED_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), deprecatedSelect, deprecated ? "True" : "False"));
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -190,12 +185,14 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setOwner(String owner) {
-        click(getDriver(), getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(longWait(getDriver()),
-                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(getDriver(), searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            WebElement searchField = matSelectSearchField(getDriver(), ownerSelect);
+            clear(searchField);
+            sendKeys(searchField, owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -205,12 +202,14 @@ public class ViewEditAgencyIDListPageImpl extends BaseSearchBarPageImpl implemen
 
     @Override
     public void setUpdater(String updater) {
-        click(getDriver(), getUpdaterSelectField());
-        sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-        WebElement searchedSelectField = visibilityOfElementLocated(longWait(getDriver()),
-                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + updater + "\")]"));
-        click(getDriver(), searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement updaterSelect = openMatSelect(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
+            WebElement searchField = matSelectSearchField(getDriver(), updaterSelect);
+            clear(searchField);
+            sendKeys(searchField, updater);
+            click(matSelectOption(getDriver(), updaterSelect, updater));
+            escape(getDriver());
+        });
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
+import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
@@ -158,7 +159,15 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public WebElement getGUIDField() {
-        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+        return defaultWait(getDriver()).until(driver -> {
+            List<WebElement> fields = driver.findElements(GUID_FIELD_LOCATOR);
+            if (fields.isEmpty()) {
+                return null;
+            }
+            WebElement field = fields.get(0);
+            String value = field.getAttribute("value");
+            return field.isDisplayed() && value != null && !value.isBlank() ? field : null;
+        });
     }
 
     @Override
@@ -215,13 +224,15 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setNamespace(NamespaceObject namespace) {
         retry(() -> {
-            click(getDriver(), getNamespaceSelectField());
-            waitFor(ofMillis(1000L));
-            sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
-            WebElement optionField = elementToBeClickable(longWait(getDriver()),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" +
-                            namespace.getUri() + "\")]//ancestor::mat-option[1]"));
-            click(getDriver(), optionField);
+            WebElement namespaceSelect = openMatSelect(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
+            List<WebElement> searchFields = namespaceSelect.findElements(
+                    By.cssSelector("input[aria-label='dropdown search']"));
+            if (!searchFields.isEmpty() && searchFields.get(0).isDisplayed()) {
+                clear(searchFields.get(0));
+                sendKeys(searchFields.get(0), namespace.getUri());
+            }
+            click(matSelectOption(getDriver(), namespaceSelect, namespace.getUri()));
+            escape(getDriver());
         });
     }
 

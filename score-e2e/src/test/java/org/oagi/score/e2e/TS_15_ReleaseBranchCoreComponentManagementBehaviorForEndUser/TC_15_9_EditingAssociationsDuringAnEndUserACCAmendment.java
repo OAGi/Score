@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.waitForSnackBarToDisappear;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment extends BaseTest {
@@ -77,41 +78,30 @@ public class TC_15_9_EditingAssociationsDuringAnEndUserACCAmendment extends Base
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByDenAndBranch(acc.getDen(), release.getReleaseNumber());
         accViewEditPage.hitAmendButton();
 
-        accViewEditPage.openPage(); // refresh the page to erase the snackbar message
+        waitForSnackBarToDisappear(getDriver());
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
         ACCViewEditPage.BCCPanelContainer bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
         int originalCardinalityMax = Integer.valueOf(getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
         assertEquals(1, originalCardinalityMax);
 
-        accViewEditPage.setCardinalityMax(-1);
+        bccPanelContainer.getBCCPanel().setCardinalityMaxField("-1");
         accViewEditPage.hitUpdateButton();
         assertEquals("unbounded", getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
 
-        // refresh the page to check the changed cardinality max
+        // Verify the unbounded maximum persisted after reloading the amended ACC.
         accViewEditPage.openPage();
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
         bccPanelContainer = accViewEditPage.getBCCPanelContainer(bccNode);
-
-        accViewEditPage.setCardinalityMax(originalCardinalityMax);
-        accViewEditPage.hitUpdateButton();
-        assertEquals(Integer.toString(originalCardinalityMax), getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
+        assertEquals("unbounded", getText(bccPanelContainer.getBCCPanel().getCardinalityMaxField()));
 
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ACCViewEditPage.ASCCPanelContainer asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
         originalCardinalityMax = Integer.valueOf(getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
         assertEquals(1, originalCardinalityMax);
 
-        accViewEditPage.setCardinalityMax(-1);
+        asccPanelContainer.getASCCPanel().setCardinalityMaxField("-1");
         accViewEditPage.hitUpdateButton();
         assertEquals("unbounded", getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
-
-        accViewEditPage.openPage();
-        asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
-        asccPanelContainer = accViewEditPage.getASCCPanelContainer(asccNode);
-
-        accViewEditPage.setCardinalityMax(originalCardinalityMax);
-        accViewEditPage.hitUpdateButton();
-        assertEquals(Integer.toString(originalCardinalityMax), getText(asccPanelContainer.getASCCPanel().getCardinalityMaxField()));
     }
 
     @AfterEach

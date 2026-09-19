@@ -5,13 +5,18 @@ import org.openqa.selenium.WebDriver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,16 +43,15 @@ import java.util.Set;
  *
  * <p>Note: when running against a remote Selenium grid, the test JVM resolves {@code baseUrl}
  * itself (it does not borrow the browser container's network view), so {@code baseUrl} must be
- * reachable from the test JVM. If a local dev server binds the loopback to IPv6 only (e.g. an
- * {@code ng serve} listening on {@code [::1]}) while the test JVM prefers IPv4, run the suite with
- * {@code -Djava.net.preferIPv6Addresses=true} so {@code localhost} resolves to the address the dev
- * server is actually listening on.
+ * reachable from the test JVM. For {@code localhost}, a connection failure is retried against the
+ * numeric loopback addresses returned by the JVM, covering dev servers bound to only IPv4 or IPv6.
  */
 public class AuthenticatedApiClient {
 
     private final WebDriver driver;
     private final URI baseUrl;
     private final HttpClient httpClient;
+    private volatile String workingLocalhostAddress;
 
     public AuthenticatedApiClient(WebDriver driver, URI baseUrl) {
         this.driver = driver;
@@ -151,15 +155,117 @@ public class AuthenticatedApiClient {
     }
 
     private ApiResponse send(HttpRequest request) {
+        boolean localhostRequest = isLocalhost(request.uri());
+        String knownAddress = workingLocalhostAddress;
+        if (localhostRequest && knownAddress != null) {
+            request = requestWithUri(request, withHost(request.uri(), knownAddress));
+        }
+
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return new ApiResponse(response.statusCode(), response.body(), response.headers());
         } catch (IOException e) {
+            if (localhostRequest && hasConnectException(e)) {
+                IOException lastFailure = e;
+                workingLocalhostAddress = null;
+                for (String address : localhostAddresses()) {
+                    try {
+                        URI alternateUri = withHost(request.uri(), address);
+                        HttpResponse<String> response = httpClient.send(
+                                requestWithUri(request, alternateUri), HttpResponse.BodyHandlers.ofString());
+                        workingLocalhostAddress = address;
+                        return new ApiResponse(response.statusCode(), response.body(), response.headers());
+                    } catch (IOException retryFailure) {
+                        if (!hasConnectException(retryFailure)) {
+                            throw new RuntimeException(
+                                    "API request failed: " + request.method() + " " + request.uri(), retryFailure);
+                        }
+                        lastFailure.addSuppressed(retryFailure);
+                    } catch (InterruptedException retryInterrupted) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException(
+                                "API request interrupted: " + request.method() + " " + request.uri(),
+                                retryInterrupted);
+                    }
+                }
+                throw new RuntimeException("API request failed: " + request.method() + " " + request.uri(), lastFailure);
+            }
             throw new RuntimeException("API request failed: " + request.method() + " " + request.uri(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("API request interrupted: " + request.method() + " " + request.uri(), e);
         }
+    }
+
+    /**
+     * JDK HttpClient uses the JVM's address ordering for {@code localhost}. If that ordering points
+     * at a loopback family the dev server is not listening on, retry with the resolved numeric
+     * loopback addresses. Retry is limited to connection failures, before an HTTP request is sent.
+     */
+    private static boolean isLocalhost(URI uri) {
+        return "localhost".equalsIgnoreCase(uri.getHost());
+    }
+
+    private static boolean hasConnectException(Throwable error) {
+        for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ConnectException) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<String> localhostAddresses() {
+        List<String> addresses = new ArrayList<>();
+        try {
+            for (InetAddress address : InetAddress.getAllByName("localhost")) {
+                if (address.isLoopbackAddress()) {
+                    String hostAddress = address.getHostAddress();
+                    if (!addresses.contains(hostAddress)) {
+                        addresses.add(hostAddress);
+                    }
+                }
+            }
+        } catch (UnknownHostException ignored) {
+            // The original localhost request already failed; the caller will report that failure.
+        }
+        return addresses;
+    }
+
+    private static URI withHost(URI uri, String host) {
+        StringBuilder result = new StringBuilder()
+                .append(uri.getScheme()).append("://");
+        if (uri.getRawUserInfo() != null) {
+            result.append(uri.getRawUserInfo()).append('@');
+        }
+        if (host.indexOf(':') >= 0) {
+            result.append('[').append(host).append(']');
+        } else {
+            result.append(host);
+        }
+        if (uri.getPort() >= 0) {
+            result.append(':').append(uri.getPort());
+        }
+        if (uri.getRawPath() != null) {
+            result.append(uri.getRawPath());
+        }
+        if (uri.getRawQuery() != null) {
+            result.append('?').append(uri.getRawQuery());
+        }
+        if (uri.getRawFragment() != null) {
+            result.append('#').append(uri.getRawFragment());
+        }
+        return URI.create(result.toString());
+    }
+
+    private static HttpRequest requestWithUri(HttpRequest original, URI uri) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
+                .expectContinue(original.expectContinue());
+        original.timeout().ifPresent(builder::timeout);
+        original.version().ifPresent(builder::version);
+        original.headers().map().forEach((name, values) -> values.forEach(value -> builder.header(name, value)));
+        builder.method(original.method(), original.bodyPublisher().orElse(BodyPublishers.noBody()));
+        return builder.build();
     }
 
     private static byte[] multipartFilePart(String boundary, String name, String filename,

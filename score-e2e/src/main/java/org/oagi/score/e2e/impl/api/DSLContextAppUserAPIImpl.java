@@ -14,6 +14,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.SeqKeyRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -162,30 +163,32 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 dslContext.transaction(conf -> {
                     DSLContext txContext = conf.dsl();
                     txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
+                    try {
+                        deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
+                        deleteBusinessTermByAppUserId(txContext, appUserId);
+                        deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
+                        deleteCoreComponentByAppUserId(txContext, appUserId);
+                        deleteCodeListByAppUserId(txContext, appUserId);
+                        deleteAgencyIDListListByAppUserId(txContext, appUserId);
+                        deleteBusinessContextByAppUserId(txContext, appUserId);
+                        deleteContextSchemeByAppUserId(txContext, appUserId);
+                        deleteContextCategoryByAppUserId(txContext, appUserId);
+                        deleteModuleSetReleaseByAppUserId(txContext, appUserId);
+                        deleteModuleSetByAppUserId(txContext, appUserId);
+                        deleteNamespaceByAppUserId(txContext, appUserId);
+                        deleteReleaseByAppUserId(txContext, appUserId);
 
-                    deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
-                    deleteBusinessTermByAppUserId(txContext, appUserId);
-                    deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
-                    deleteCoreComponentByAppUserId(txContext, appUserId);
-                    deleteCodeListByAppUserId(txContext, appUserId);
-                    deleteAgencyIDListListByAppUserId(txContext, appUserId);
-                    deleteBusinessContextByAppUserId(txContext, appUserId);
-                    deleteContextSchemeByAppUserId(txContext, appUserId);
-                    deleteContextCategoryByAppUserId(txContext, appUserId);
-                    deleteModuleSetReleaseByAppUserId(txContext, appUserId);
-                    deleteModuleSetByAppUserId(txContext, appUserId);
-                    deleteNamespaceByAppUserId(txContext, appUserId);
-                    deleteReleaseByAppUserId(txContext, appUserId);
-
-                    txContext.deleteFrom(APP_USER)
-                            .where(APP_USER.APP_USER_ID.eq(appUserId))
-                            .execute();
-
-                    txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+                        txContext.deleteFrom(APP_USER)
+                                .where(APP_USER.APP_USER_ID.eq(appUserId))
+                                .execute();
+                    } finally {
+                        // FOREIGN_KEY_CHECKS is session-scoped and is not restored by transaction rollback.
+                        txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+                    }
                 });
                 return;
             } catch (DataAccessException e) {
-                if (!isDeadlock(e) || attempts >= DEADLOCK_RETRY_COUNT) {
+                if (!isRetryableTransactionConflict(e) || attempts >= DEADLOCK_RETRY_COUNT) {
                     throw e;
                 }
                 attempts++;
@@ -194,9 +197,12 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         }
     }
 
-    private boolean isDeadlock(DataAccessException e) {
+    private boolean isRetryableTransactionConflict(DataAccessException e) {
         Throwable cause = e;
         while (cause != null) {
+            if (cause instanceof SQLException sqlException && sqlException.getErrorCode() == 1020) {
+                return true;
+            }
             String message = cause.getMessage();
             if (message != null && message.contains("Deadlock found when trying to get lock")) {
                 return true;

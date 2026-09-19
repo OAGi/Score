@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -51,6 +52,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_1")
     public void end_user_can_see_in_the_cc_page_all_ccs_owned_by_any_user_in_any() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -107,6 +109,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_2")
     public void end_user_can_view_and_edit_the_details_of_a_cc_that_is_in_wip_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -186,6 +189,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_3")
     public void access_to_core_component_viewing_editing_and_commenting_the_end_user_can_view_the_detail_of() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -256,6 +260,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_5")
     public void access_to_core_component_viewing_editing_and_commenting_the_end_user_can_view_but_cannot_edit() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -335,6 +340,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_6")
     public void access_to_core_component_viewing_editing_and_commenting() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -402,6 +408,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_8")
     public void end_user_can_see_the_detail_of_developer_ccs_but_cannot_make_any_change_he_can() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -482,6 +489,7 @@ public class TC_15_1_AccessCoreComponentViewingEditingCommenting extends BaseTes
     }
 
     @Test
+    @DisplayName("TC_15_1_TA_9")
     public void end_user_can_move_the_state_of_multiple_ccs_at_once() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

@@ -45,8 +45,6 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
@@ -120,11 +118,9 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(getDriver(), optionField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
     }
@@ -137,10 +133,8 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     @Override
     public void setState(String state) {
         retry(() -> {
-            click(getStateSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
-            click(optionField);
+            WebElement stateSelect = openMatSelect(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), stateSelect, state));
             escape(getDriver());
         });
     }
@@ -152,12 +146,12 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), ownerSelect), owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
+            escape(getDriver());
+        });
     }
 
     @Override

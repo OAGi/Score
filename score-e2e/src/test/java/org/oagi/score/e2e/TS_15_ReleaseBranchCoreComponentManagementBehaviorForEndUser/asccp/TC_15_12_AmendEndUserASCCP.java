@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -17,7 +18,6 @@ import org.oagi.score.e2e.page.core_component.ACCExtensionViewEditPage;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -56,6 +56,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_1")
     public void on_the_cc_detail_page_of_an_end_user_asccp_in_production_state_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -119,6 +120,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_2")
     public void end_user_cannot_amend_a_released_developer_asccp() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -162,6 +164,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_3")
     public void end_user_cannot_amend_or_see_a_user_extension_group_asccp() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -239,6 +242,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.a")
     public void fields_property_term_and_namespace_cannot_be_changed() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -290,6 +294,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.b")
     public void definition_and_definition_source_can_change() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -349,6 +354,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.c")
     public void if_reusable_is_false_in_the_previous_revision_it_can_be_changed_to_true() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -407,8 +413,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_not_reusable.getAsccpManifestId());
         WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
-        ASCCPViewEditPage.ASCCPPanel finalAsccpPanel = asccpPanel;
-        assertThrows(ElementClickInterceptedException.class, () -> finalAsccpPanel.toggleReusable());
+        asccpPanel.toggleReusable();
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
         asccpViewEditPage.hitAmendButton();
@@ -421,6 +426,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.d")
     public void if_the_deprecated_was_already_true_in_the_previous_revision_the_field_along_with() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -468,6 +474,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.d")
     public void if_the_deprecated_was_already_true_in_the_previous_revision_the_field_along_with_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -517,6 +524,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.e")
     public void if_nillable_was_false_it_can_be_changed_to_true_but_not_vice_versa() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -565,6 +573,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.e")
     public void if_nillable_was_false_it_can_be_changed_to_true_but_not_vice_versa_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -613,6 +622,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.f")
     public void warning_should_be_given_when_the_definition_is_empty() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -667,6 +677,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.g")
     public void fields_of_the_associated_acc_and_its_children_nodes_cannot_be_changed() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -722,7 +733,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertDisabled(accPanel.getComponentTypeSelectField());
         assertDisabled(accPanel.getNamespaceSelectField());
         assertDisabled(accPanel.getDefinitionSourceField());
-        assertEnabled(accPanel.getDefinitionField());
+        assertDisabled(accPanel.getDefinitionField());
 
         //BCCP node cannot be changed
         //reload the page
@@ -744,10 +755,11 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         assertDisabled(bccpPanel.getValueConstraintSelectField());
         assertDisabled(bccpPanel.getNamespaceSelectField());
         assertDisabled(bccpPanel.getDefinitionSourceField());
-        assertEnabled(bccpPanel.getDefinitionField());
+        assertDisabled(bccpPanel.getDefinitionField());
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_4.h")
     public void property_term_reusable_namespace_and_nillable_are_required() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -794,6 +806,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_5")
     public void end_user_cannot_change_the_acc_to_another_one() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -839,6 +852,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_12_TA_6")
     public void end_user_can_cancel_the_amendment_in_which_case_the_system_rollbacks_all_changes() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

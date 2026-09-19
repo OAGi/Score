@@ -254,6 +254,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
+    public WebElement getNamespaceOption(String namespaceUri) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//mat-option[normalize-space(.) = " + xpathLiteral(namespaceUri) + "]"));
+    }
+
+    @Override
     public String getNamespaceFieldValue() {
         return getText(getNamespaceField());
     }
@@ -304,11 +310,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainType = getColumnByName(tr, "type");
         click(getDriver(), tdDomainType);
         click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+                "//mat-option[normalize-space(.) = " + xpathLiteral("Code List") + "]")));
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(getDriver(), tdDomainName);
         click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
+                "//mat-option[.//span[normalize-space(.) = " + xpathLiteral(valueDomainName) + "]]")));
     }
 
     @Override
@@ -384,18 +390,17 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainType = getColumnByName(tr, "type");
         click(tdDomainType);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+                "//mat-option[normalize-space(.) = " + xpathLiteral("Code List") + "]")));
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]")));
+                "//mat-option[.//span[normalize-space(.) = " + xpathLiteral(codeListName) + "]]")));
     }
 
     @Override
     public void setDefaultValueDomain(String name) {
-        click(getDriver(), getDefaultValueDomainField());
-        click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
+        WebElement select = openMatSelect(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+        click(getDriver(), matSelectOptionContaining(getDriver(), select, name));
     }
 
     @Override
@@ -407,9 +412,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void setNamespace(NamespaceObject namespace) {
         click(getNamespaceField());
         waitFor(ofMillis(1000L));
-        WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
-        click(option);
+        click(getNamespaceOption(namespace.getUri()));
         waitFor(ofMillis(1000L));
         assert getNamespaceFieldValue().equals(namespace.getUri());
     }
@@ -807,11 +810,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private class SupplementaryComponentPanelImpl implements DTViewEditPage.SupplementaryComponentPanel {
         @Override
         public void setCardinality(String cardinality) {
-            click(getDriver(), getCardinalityField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
-            click(getDriver(), option);
+            WebElement select = openMatSelect(getDriver(), CARDINALITY_FIELD_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, cardinality));
         }
 
         @Override
@@ -821,11 +821,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void setValueConstraintType(String valueConstraintType) {
-            click(getDriver(), getValueConstraintTypeField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
-            click(getDriver(), option);
+            WebElement select = openMatSelect(getDriver(), VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, valueConstraintType));
         }
 
         @Override
@@ -916,9 +913,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void selectRepresentationTerm(String representationTerm) {
-            click(getDriver(), getRepresentationSelectField());
-            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[text() = \"" + representationTerm + "\"]//ancestor::mat-option[1]")));
+            WebElement select = openMatSelect(getDriver(), REPRESENTATION_TERM_SELECTOR_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, representationTerm));
         }
 
         @Override
@@ -944,9 +940,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void setDefaultValueDomain(String valueDomain) {
-            click(getDriver(), getDefaultValueDomainField());
-            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+            WebElement select = openMatSelect(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+            click(getDriver(), matSelectOptionContaining(getDriver(), select, valueDomain));
         }
 
         @Override

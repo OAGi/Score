@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -48,6 +49,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_1")
     public void if_an_acc_revision_number_is_1_the_end_user_owner_can_delete_it_when_it() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -73,6 +75,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_2")
     public void upon_opening_an_acc_that_has_a_descendant_acc_that_has_a_deleted_acc_as_a() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -125,6 +128,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
 
 
     @Test
+    @DisplayName("TC_15_6_TA_3")
     public void upon_opening_an_acc_that_uses_a_deleted_acc_as_a_base_the_system_should_flag() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -186,6 +190,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_4")
     public void upon_opening_an_acc_that_has_an_association_to_an_asccp_that_uses_a_deleted_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -231,6 +236,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_5")
     public void upon_opening_an_acc_that_has_a_descendant_acc_that_was_deleted_earlier_used_in_in() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -268,6 +274,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_6")
     public void upon_opening_an_asccp_that_uses_the_deleted_acc_the_asccp_shall_be_highlighted_or_flagged() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -313,6 +320,7 @@ public class TC_15_6_DeletingEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_6_TA_7")
     public void acc_whose_revision_number_is_more_than_1_and_is_in_any_state_cannot_be_deleted() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

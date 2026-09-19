@@ -7,7 +7,6 @@ import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
@@ -492,7 +491,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectPutAllSchemasInTheSameFile();
 
         assertNotChecked(expressBIEPage.getBIECCTSMetaDataCheckbox());
-        assertThrows(ElementClickInterceptedException.class, () -> expressBIEPage.toggleIncludeCCTSDefinitionTag());
+        assertDisabled(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
         assertNotChecked(expressBIEPage.getIncludeCCTSDefinitionTagCheckbox());
 
         expressBIEPage.toggleBIECCTSMetaData();
@@ -523,7 +522,7 @@ public class TC_5_6_OAGISDeveloperAuthorizedAccessToBIEExpressionGeneration exte
         expressBIEPage.selectPutAllSchemasInTheSameFile();
 
         assertNotChecked(expressBIEPage.getBIEOAGIConnectCenterMetaDataCheckbox());
-        assertThrows(ElementClickInterceptedException.class, () -> expressBIEPage.toggleIncludeWHOColumns());
+        assertDisabled(expressBIEPage.getIncludeWHOColumnsCheckbox());
         assertNotChecked(expressBIEPage.getIncludeWHOColumnsCheckbox());
 
         expressBIEPage.toggleBIEOAGIConnectCenterMetaData();

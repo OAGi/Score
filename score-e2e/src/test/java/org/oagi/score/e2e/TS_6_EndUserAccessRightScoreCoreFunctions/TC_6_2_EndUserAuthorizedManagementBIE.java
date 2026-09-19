@@ -2941,7 +2941,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         ViewEditBIEPage viewEditBIEPage = bieMenu.openViewEditBIESubMenu();
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
         for (BCCPObject bccp : bccpForTesting) {
-            WebElement node = editBIEPage.getNodeByPath("/" + bccp.getPropertyTerm());
+            WebElement node = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
             assertTrue(node.isDisplayed());
             EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
             bbiePanel.toggleUsed();
@@ -3083,7 +3083,7 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(useraBIE);
 
         for (BCCPObject bccp : bccpForTesting) {
-            WebElement node = editBIEPage.getNodeByPath("/" + bccp.getPropertyTerm());
+            WebElement node = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
             assertTrue(node.isDisplayed());
             EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
             bbiePanel.toggleUsed();

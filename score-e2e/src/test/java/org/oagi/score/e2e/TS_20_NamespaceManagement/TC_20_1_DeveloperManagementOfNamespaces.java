@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_20_NamespaceManagement;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -52,6 +53,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_1")
     public void developer_management_of_namespaces() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -84,6 +86,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_2")
     public void developer_who_is_an_owner_of_the_namespace_can_change_details_of_an_existing_namespace_the() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -126,6 +129,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_3_and_TA_5")
     public void developer_management_of_namespaces_the_developer_and_end_user_who_does_not_own_the_namespace() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -169,6 +173,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_4")
     public void developer_who_is_the_owner_of_the_namespace_can_discard_it_if_the_namespace_has_no() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -187,6 +192,7 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_6")
     public void owner_developer_of_the_namespace_can_transfer_ownership_only_to_another_developer() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

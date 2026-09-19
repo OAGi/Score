@@ -235,11 +235,7 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
 
     @Override
     public boolean isFileTileVisible() {
-        try {
-            return visibilityOfElementLocated(getDriver(), FILE_TILE_LOCATOR).isDisplayed();
-        } catch (TimeoutException e) {
-            return false;
-        }
+        return getDriver().findElements(FILE_TILE_LOCATOR).stream().anyMatch(WebElement::isDisplayed);
     }
 
     @Override

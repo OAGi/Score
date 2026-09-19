@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -52,6 +53,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_1")
     public void on_the_cc_detail_page_of_an_end_user_acc_in_production_state_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -100,6 +102,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_2")
     public void end_user_cannot_amend_a_released_developer_acc() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -121,6 +124,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_3")
     public void if_acc_s_component_type_is_user_extension_group_the_end_user_cannot_change() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -175,6 +179,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.a")
     public void component_type_cannot_be_changed() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
@@ -199,6 +204,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.b")
     public void amend_an_end_user_acc_abstract_true_in_original_acc() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
@@ -237,6 +243,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.b")
     public void abstract_can_only_be_changed_from_true_to_false_except_when_the_component_type() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
@@ -266,6 +273,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.c")
     public void object_class_term_can_be_changed_but_namespace_cannot_be_changed() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
@@ -302,6 +310,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.d")
     public void if_the_deprecated_was_already_true_in_the_previous_revision_the_field_along_with() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -328,6 +337,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.d")
     public void if_the_deprecated_was_already_true_in_the_previous_revision_the_field_along_with_scenario_2() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);
@@ -357,6 +367,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_4_TA_4.e")
     public void definition_and_definition_source_can_be_changed_however_a_warning_should_be_given_when() {
         AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(anotherUser);

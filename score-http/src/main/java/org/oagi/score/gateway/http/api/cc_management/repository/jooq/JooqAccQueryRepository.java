@@ -1614,6 +1614,9 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         for (AsccSummaryRecord asccR : asccResult) {
             AccSummaryRecord acc = accManifestMap.get(asccR.fromAccManifestId());
             map.computeIfAbsent(acc.accManifestId(), k -> new ArrayList<>());
+            if (acc.accManifestId().equals(targetAccManifestId)) {
+                map.get(acc.accManifestId()).add("Direct association: Already exists in the selected base ACC.");
+            }
             if (acc.state() != WIP) {
                 map.get(acc.accManifestId()).add("Direct association: 'WIP' state required.");
             }
@@ -1788,6 +1791,9 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         for (BccSummaryRecord bccR : bccResult) {
             AccSummaryRecord acc = accManifestMap.get(bccR.fromAccManifestId());
             map.computeIfAbsent(acc.accManifestId(), k -> new ArrayList<>());
+            if (acc.accManifestId().equals(targetAccManifestId)) {
+                map.get(acc.accManifestId()).add("Direct association: Already exists in the selected base ACC.");
+            }
             if (acc.state() != WIP) {
                 map.get(acc.accManifestId()).add("Direct association: 'WIP' state required.");
             }

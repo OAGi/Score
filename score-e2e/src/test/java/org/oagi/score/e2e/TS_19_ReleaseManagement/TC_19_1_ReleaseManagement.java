@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -62,6 +63,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_1")
     public void developer_can_create_a_release_the_following_information_can_be_specified_release_number_release() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -85,6 +87,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_2")
     public void developer_can_discard_a_release_that_is_in_the_initialized_state_if_there_is() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -226,6 +229,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
     
     @Test
+    @DisplayName("TC_19_1_TA_3.a")
     public void developer_can_add_ccs_in_the_working_branch_that_are_in_the_candidate_state() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -257,6 +261,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.c")
     public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -294,6 +299,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.c")
     public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and_scenario_2() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -328,6 +334,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.c")
     public void validate_references_this_is_an_error_validation_the_system_ensures_that_those_new_and_scenario_3() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -368,6 +375,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.c")
     public void release_management_validate_extension_this_is_a_warning_validation_give_a_warning_warning_this() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -431,6 +439,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.j")
     public void if_the_reference_validation_fails_the_developer_can_cancel_the_release_draft_creation_he() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -494,6 +503,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.k")
     public void if_the_reference_validation_is_successful_the_user_can_hit_the_finish_button_the() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
@@ -557,6 +567,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_4")
     public void initialized_releases_shall_not_show_up_in_the_branch_drop_down_box_in_the() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -593,6 +604,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_3.k_and_TA_6_and_TA_7_and_TA_8")
     public void release_management_the_created_release_draft_shall_show_up_in_the_branch_drop_down() {
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(devx);
@@ -701,6 +713,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_9_and_TA_10")
     public void release_management_a_developer_can_move_a_release_draft_into_the_published_state_there() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
@@ -790,6 +803,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_11")
     public void after_the_release_is_published_no_further_action_can_be_done_to_the_release() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
@@ -857,6 +871,7 @@ public class TC_19_1_ReleaseManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_19_1_TA_12_and_TA_13")
     public void release_management_end_users_cannot_manage_releases_i_e_cannot_initialize_a_release_and() {
         // Only the administrators can publish the draft release.
         AppUserObject devx = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);

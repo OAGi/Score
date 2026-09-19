@@ -12,7 +12,9 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -141,8 +143,10 @@ public class TC_11_5_EditingARevisionOfADeveloperCodeList extends BaseTest {
             assertEquals("WIP", getText(editCodeListPage.getStateField()));
             List<CodeListValueObject> values = codeListCodeListValueMap.get(codeList.getCodeListManifestId());
             for (CodeListValueObject value : values) {
-                assertThrows(Exception.class, () -> editCodeListPage.selectCodeListValue(value.getValue()));
-                assertThrows(Exception.class, () -> editCodeListPage.removeCodeListValue());
+                WebElement valueRow = editCodeListPage.getTableRecordByValue(value.getValue());
+                WebElement selectCheckbox = editCodeListPage.getColumnByName(valueRow, "select")
+                        .findElement(By.tagName("mat-checkbox"));
+                assertDisabled(selectCheckbox);
                 EditCodeListValueDialog editCodeListValueDialog = editCodeListPage.editCodeListValue(value.getValue());
                 editCodeListValueDialog.setMeaning("new meaning for value");
                 editCodeListValueDialog.setDefinition("new definition for value");

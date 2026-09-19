@@ -1192,7 +1192,7 @@
                               <mat-form-field>
                                 <mat-label>Value Constraint</mat-label>
                                 <mat-select [(ngModel)]="asBccpDetail().bcc.fixedOrDefault"
-                                  [disabled]="selectedNode.level !== 1 || !isEditable() || asBccpDetail().bcc.entityType === 1">
+                                  [disabled]="selectedNode.level !== 1 || !isEditable() || asBccpDetail().bcc.entityType === 'Element'">
                                   <mat-option value="none">None</mat-option>
                                   <mat-option value="fixed">Fixed Value</mat-option>
                                   <mat-option value="default">Default Value</mat-option>

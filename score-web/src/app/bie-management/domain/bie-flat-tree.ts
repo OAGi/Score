@@ -389,13 +389,16 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
       this._expandable = false;
       return false;
     }
+    if (this._children.length === 0 && this.dataSource) {
+      this.dataSource.database.loadChildren(this);
+    }
     if (this._children.length > 0) {
       if (this.dataSource && this.dataSource.hideUnused) {
         return this._children.some(e => this.hasVisibleChild(e));
       }
       return true;
     }
-    return true;
+    return false;
   }
 
   set expandable(expandable: boolean) {
@@ -642,10 +645,7 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   get expandable(): boolean {
     // BBIE children are a bounded SC list, not another association subtree.
     // Resolve it before deciding whether the lazy node has anything to expand.
-    if (this.getChildren().length === 0 && this.dataSource) {
-      this.dataSource.database.loadChildren(this);
-    }
-    return this.children.some(child => child.cardinalityMax > 0) && super.expandable;
+    return super.expandable && this.children.some(child => child.cardinalityMax > 0);
   }
 
   set expandable(expandable: boolean) {
@@ -2815,6 +2815,10 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         bbieScNode.reset();
         return bbieScNode;
       }).filter(e => !!e).sort((a, b) => a.name.localeCompare(b.name));
+    }
+    // Cache only structural leaves, never children hidden by view filters.
+    if (node.getChildren().length === 0) {
+      node.expandable = false;
     }
   }
 

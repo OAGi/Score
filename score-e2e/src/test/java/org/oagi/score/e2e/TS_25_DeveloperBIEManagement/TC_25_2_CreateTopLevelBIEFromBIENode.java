@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_25_DeveloperBIEManagement;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -47,6 +48,7 @@ public class TC_25_2_CreateTopLevelBIEFromBIENode extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_2_TA_1.a_and_TA_1.b_and_TA_1.c")
     public void create_a_top_level_bie_from_a_bie_node_a_top_level_bie_is() {
         ASCCPObject asccp, asccp_for_devx, asccp_lv2;
         ACCObject acc, acc_association, acc_association_lv2;

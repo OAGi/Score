@@ -294,7 +294,7 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
 
     @Override
     public WebElement getRemoveValueButton() {
-        return elementToBeClickable(getDriver(), REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR);
+        return visibilityOfElementLocated(getDriver(), REMOVE_CODE_LIST_VALUE_BUTTON_LOCATOR);
     }
 
     @Override

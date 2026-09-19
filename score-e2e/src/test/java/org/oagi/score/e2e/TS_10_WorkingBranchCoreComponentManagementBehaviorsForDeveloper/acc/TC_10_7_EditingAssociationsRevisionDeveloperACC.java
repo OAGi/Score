@@ -1022,10 +1022,10 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         accViewEditPage.hitReviseButton();
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
+        appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
         click(getDialogButtonByName(getDriver(), "Proceed anyway"));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
@@ -1036,7 +1036,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
 
-        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Accrued Amount");
+        WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
         assertEquals("0", getText(bccPanel.getCardinalityMinField()));
@@ -1163,6 +1163,8 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_after.getPropertyTerm());
         ACCViewEditPage.BCCPPanel bccp_after_panel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> bccp_after.getDen().equals(getText(bccp_after_panel.getDENField())));
         assertEquals(bccp_after.getDen(), getText(bccp_after_panel.getDENField()));
     }
 
@@ -1391,6 +1393,13 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
 
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .ignoring(org.openqa.selenium.StaleElementReferenceException.class)
+                .until(driver -> {
+                    WebElement deprecatedCheckbox = bccPanel.getDeprecatedCheckbox();
+                    return "true".equals(deprecatedCheckbox.getAttribute("aria-disabled")) ||
+                            deprecatedCheckbox.getAttribute("class").contains("disabled");
+                });
         assertNotChecked(bccPanel.getDeprecatedCheckbox());
         assertDisabled(bccPanel.getDeprecatedCheckbox());
     }
@@ -1456,7 +1465,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
         NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         ACCObject acc;
-        BCCPObject bccp, bccp_to_append;
+        BCCPObject bccp, bccp_to_append, bccp_with_sc;
         {
             CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
             acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
@@ -1466,6 +1475,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
             bcc.setCardinalityMax(1);
             coreComponentAPI.updateBCC(bcc);
             bccp_to_append = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            DTObject dataTypeWithSc = coreComponentAPI.getBDTByDENAndReleaseNum(
+                    library, "Acknowledge_ Response_ Code. Type", release.getReleaseNumber()).get(0);
+            bccp_with_sc = coreComponentAPI.createRandomBCCP(release, dataTypeWithSc, developer, namespace, "Published");
         }
 
         HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
@@ -1497,9 +1509,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Confirmation Code. Code");
+        appendBCCPDialog.selectAssociation(bccp_with_sc.getDen());
 
-        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Confirmation Code");
+        bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_with_sc.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("Element", getText(bccPanel.getEntityTypeSelectField()));
         assertEquals("None", getText(bccPanel.getValueConstraintSelectField()));
@@ -1604,8 +1616,15 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("2", getText(bccPanel.getRevisionField()));
+        ACCViewEditPage.BCCPanel selectedBccPanel = bccPanel;
+        String expectedBccDen = acc.getObjectClassTerm() + ". " + bccp.getDen();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> expectedBccDen.equals(getText(selectedBccPanel.getDENField())));
         bccPanel.setCardinalityMaxField("50");
-        assertEquals(1, getDriver().findElements(By.xpath("//*[contains(text(), \"Max must be greater than\")]")).size());
+        assertEquals("50", getText(bccPanel.getCardinalityMaxField()));
+        assertTrue(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-form-field[.//mat-label[contains(normalize-space(.), 'Cardinality Max')]]" +
+                        "//mat-error[contains(normalize-space(.), 'greater than 75')]")).isDisplayed());
         assertDisabled(accViewEditPage.getUpdateButton(false));
     }
 
@@ -1640,6 +1659,9 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertEquals("2", getText(bccPanel.getRevisionField()));
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> bccPanel.getDeprecatedCheckbox()
+                        .findElement(By.cssSelector("input[type='checkbox']")).isSelected());
         assertChecked(bccPanel.getDeprecatedCheckbox());
         assertDisabled(bccPanel.getDeprecatedCheckbox());
     }

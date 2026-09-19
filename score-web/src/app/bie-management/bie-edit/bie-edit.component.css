@@ -677,6 +677,16 @@
   max-width: 200px;
 }
 
+.bt-chip-term[role="button"] {
+  cursor: pointer;
+}
+
+.bt-chip-term[role="button"]:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 /* Type Code as a small secondary sub-pill inside the chip. */
 .bt-chip-type {
   margin-left: 6px;

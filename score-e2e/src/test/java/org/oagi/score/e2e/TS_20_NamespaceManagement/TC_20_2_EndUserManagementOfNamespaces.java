@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_20_NamespaceManagement;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -30,7 +31,7 @@ import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
-public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
+public class TC_20_2_EndUserManagementOfNamespaces extends BaseTest {
     private List<AppUserObject> randomAccounts = new ArrayList<>();
 
     @BeforeEach
@@ -53,6 +54,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_2_TA_1")
     public void end_user_management_of_namespaces_uri_is_required_and_unique_this_is_a_text() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -87,6 +89,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_2_TA_2")
     public void end_user_who_is_an_owner_of_the_namespace_can_change_details_of_an_existing_namespace() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -127,6 +130,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
         assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
     }
     @Test
+    @DisplayName("TC_20_2_TA_3_and_TA_5")
     public void developer_and_end_user_who_does_not_own_the_namespace_cannot_update_it() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -161,6 +165,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_2_TA_4")
     public void end_user_who_is_the_owner_of_the_namespace_can_discard_it_if_the_namespace_has() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -179,6 +184,7 @@ public class TC_20_2_EndUserManagementfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_2_TA_6")
     public void owner_end_user_of_the_namespace_can_transfer_ownership_only_to_another_end_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
