@@ -55,12 +55,8 @@ public class ContextSchemeCommandService {
             throw new IllegalArgumentException(
                     "Another context scheme with the triplet (schemeID, AgencyID, Version) already exists.");
         }
-        if (query.hasDuplicateName(request.schemeName(), request.schemeId(),
-                request.schemeAgencyId(), request.schemeVersionId())) {
-            throw new IllegalArgumentException(
-                    "Another context scheme with the same name and triplet (schemeID, AgencyID, Version) already exists.");
-        }
-
+        // A matching scheme ID and agency ID with a different name/version is a soft warning. The UI
+        // lets the user confirm "Create anyway", so it must not be enforced again by this endpoint.
         var command = command(requester);
 
         ContextSchemeId contextSchemeId = command.create(
@@ -96,12 +92,8 @@ public class ContextSchemeCommandService {
             throw new IllegalArgumentException(
                     "Another context scheme with the triplet (schemeID, AgencyID, Version) already exists.");
         }
-        if (query.hasDuplicateNameExcludingCurrent(request.contextSchemeId(), request.schemeName(),
-                request.schemeId(), request.schemeAgencyId(), request.schemeVersionId())) {
-            throw new IllegalArgumentException(
-                    "Another context scheme with the same name and triplet (schemeID, AgencyID, Version) already exists.");
-        }
-
+        // Keep the name/agency warning overridable, just as for create. The request has no confirmation
+        // flag because the UI confirmation is the user's decision to submit this update.
         // Fetch existing values, then determine which ones the request removes.
         Map<ContextSchemeValueId, ContextSchemeValueDetailsRecord> existingValues = query
                 .getContextSchemeValueList(request.contextSchemeId())
