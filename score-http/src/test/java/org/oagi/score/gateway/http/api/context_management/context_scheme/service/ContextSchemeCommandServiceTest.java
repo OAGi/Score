@@ -27,10 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Guards added for the Context Management audit (#1744 sibling class): server-side triplet/name
+ * Guards added for the Context Management audit (#1744 sibling class): server-side triplet
  * uniqueness on create/update, in-use guards on discard, and a value-removal guard on update.
- * These tests mock the repositories (no DB) and assert each guard throws a 4xx-mapped
- * {@link IllegalArgumentException} and does not mutate.
+ * These tests mock the repositories (no DB) and assert hard guards throw a 4xx-mapped
+ * {@link IllegalArgumentException}, while the UI-confirmed soft warning remains writable.
  */
 class ContextSchemeCommandServiceTest {
 
@@ -82,12 +82,13 @@ class ContextSchemeCommandServiceTest {
     }
 
     @Test
-    void create_rejects_a_duplicate_name() {
+    void create_allows_a_name_warning_after_user_confirmation() {
         when(query.hasDuplicate(any(), any(), any())).thenReturn(false);
         when(query.hasDuplicateName(any(), any(), any(), any())).thenReturn(true);
+        when(command.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(SCHEME_ID);
 
-        assertThrows(IllegalArgumentException.class, () -> service.create(requester, createRequest()));
-        verify(command, never()).create(any(), any(), any(), any(), any(), any(), any());
+        assertEquals(SCHEME_ID, service.create(requester, createRequest()));
+        verify(command).create(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -109,6 +110,18 @@ class ContextSchemeCommandServiceTest {
         assertThrows(IllegalArgumentException.class,
                 () -> service.update(requester, updateRequest(List.of())));
         verify(command, never()).update(any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void update_allows_a_name_warning_after_user_confirmation() {
+        when(query.hasDuplicateExcludingCurrent(any(), any(), any(), any())).thenReturn(false);
+        when(query.hasDuplicateNameExcludingCurrent(any(), any(), any(), any(), any())).thenReturn(true);
+        when(query.getContextSchemeValueList(any())).thenReturn(List.of());
+        when(query.findUsedContextSchemeValueIds(any())).thenReturn(Set.of());
+
+        service.update(requester, updateRequest(List.of()));
+
+        verify(command).update(any(), any(), any(), any(), any(), any(), any(), any());
     }
 
     // ----- update: value-removal guard (B3) -----
