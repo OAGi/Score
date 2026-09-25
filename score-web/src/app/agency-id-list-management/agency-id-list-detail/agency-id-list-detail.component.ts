@@ -471,7 +471,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     if (agencyIdListValue.used) {
       return false;
     }
-    if (this.agencyIdList.agencyIdListValue.agencyIdListValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
+    if (this.agencyIdList.agencyIdListValue?.agencyIdListValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
       return false;
     }
     return this.agencyIdList.state === 'WIP';
@@ -578,7 +578,7 @@ export class AgencyIdListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.agencyIdList.namespace) {
+    if (!this.agencyIdList.namespace?.namespaceId) {
       this.snackBar.open('Namespace is required', '', {
         duration: 3000,
       });
@@ -671,7 +671,9 @@ export class AgencyIdListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.agencyIdList.namespace.namespaceId) {
+    const isDelete = state === 'Deleted';
+    const isRestore = this.state === 'Deleted' && state === 'WIP';
+    if (!isDelete && !isRestore && !this.agencyIdList.namespace?.namespaceId) {
       this.snackBar.open('Namespace is required', '', {
         duration: 3000,
       });

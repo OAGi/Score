@@ -349,6 +349,7 @@ export class CodeListDetailComponent implements OnInit {
 
   _doInit(codeList: CodeListDetails) {
     this.hashCode = hashCode(codeList);
+    this.agencyIdList = undefined;
     if (!!codeList.agencyIdListValue) {
       let matchedAgencyIdLists = this.allAgencyIdListValues.filter(e => e.agencyIdListValueManifestId === codeList.agencyIdListValue.agencyIdListValueManifestId);
       if (matchedAgencyIdLists.length === 0) {
@@ -360,8 +361,8 @@ export class CodeListDetailComponent implements OnInit {
         this.agencyIdList = this.agencyIdLists.filter(e => e.agencyIdListManifestId === matchedAgencyIdListManifestId)[0];
       }
     }
-    this.onAgencyIdListChange();
     this.codeList = codeList;
+    this.onAgencyIdListChange();
     setAppTitleIfPresent(this.titleService, codeList.name, 'Code List');
 
     this._updateDataSource(this.codeList.valueList);
@@ -381,6 +382,12 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   onAgencyIdListChange() {
+    const selectedValueId = this.codeList?.agencyIdListValue?.agencyIdListValueManifestId;
+    const isValueInSelectedList = selectedValueId != null &&
+      this.currentAgencyIdListValues.some(value => value.agencyIdListValueManifestId === selectedValueId);
+    if (!isValueInSelectedList && this.codeList) {
+      this.codeList.agencyIdListValue = new AgencyIdListValueSummary();
+    }
     this.filteredAgencyListValues.next(this.currentAgencyIdListValues.slice());
   }
 
@@ -420,10 +427,14 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   isDisabled(codeList: CodeListDetails) {
+    const selectedAgencyIdListValueId = codeList.agencyIdListValue?.agencyIdListValueManifestId;
+    const isAgencyIdListSelectionValid = this.agencyIdList ?
+      !!selectedAgencyIdListValueId && this.currentAgencyIdListValues.some(
+        value => value.agencyIdListValueManifestId === selectedAgencyIdListValueId) : !selectedAgencyIdListValueId;
     return (this.isUpdating) ||
       (codeList.name === undefined || codeList.name === '') ||
       (codeList.listId === undefined || codeList.listId === '') ||
-      (!codeList.agencyIdListValue || codeList.agencyIdListValue.agencyIdListValueManifestId === undefined || codeList.agencyIdListValue.agencyIdListValueManifestId === 0) ||
+      !isAgencyIdListSelectionValid ||
       (codeList.versionId === undefined || codeList.versionId === '');
   }
 
@@ -632,8 +643,10 @@ export class CodeListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.codeList.agencyIdListValue || !this.codeList.agencyIdListValue.agencyIdListValueManifestId) {
-      this.snackBar.open('Agency ID List Value is required', '', {
+    const selectedAgencyIdListValueId = this.codeList.agencyIdListValue?.agencyIdListValueManifestId;
+    if (this.agencyIdList && (!selectedAgencyIdListValueId ||
+        !this.currentAgencyIdListValues.some(value => value.agencyIdListValueManifestId === selectedAgencyIdListValueId))) {
+      this.snackBar.open('Select an Agency ID List Value from the selected Agency ID List', '', {
         duration: 3000,
       });
       return;
@@ -713,6 +726,13 @@ export class CodeListDetailComponent implements OnInit {
 
   updateState(state: string) {
     if (!state) {
+      return;
+    }
+
+    const isDelete = state === 'Deleted';
+    const isRestore = this.state === 'Deleted' && state === 'WIP';
+    if (!isDelete && !isRestore && !this.codeList.namespace?.namespaceId) {
+      this.snackBar.open('Namespace is required', '', { duration: 3000 });
       return;
     }
 

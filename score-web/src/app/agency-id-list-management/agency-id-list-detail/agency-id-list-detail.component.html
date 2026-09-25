@@ -320,7 +320,7 @@
                   <div class="col-6">
                     <mat-form-field>
                       <mat-label>Agency ID List Value</mat-label>
-                      <mat-select data-id="agencyIdList.agencyIdListValueId"
+                      <score-mat-select data-id="agencyIdList.agencyIdListValueId" clearLabel="Clear Agency ID List Value"
                         [(ngModel)]="agencyIdList.agencyIdListValue.agencyIdListValueManifestId"
                         [disabled]="access !== 'CanEdit' || hasRevision">
                         <mat-option>
@@ -333,7 +333,7 @@
                             {{ value.name }} ({{ value.value }})
                           </mat-option>
                         }
-                      </mat-select>
+                      </score-mat-select>
                     </mat-form-field>
                   </div>
                 </div>

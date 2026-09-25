@@ -86,6 +86,9 @@ public class CodeListCommandService {
         if (!codeListDetails.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the code list by the owner.");
         }
+        if (request.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required.");
+        }
 
         var command = command(requester);
 
@@ -159,6 +162,7 @@ public class CodeListCommandService {
             throw new IllegalArgumentException("The code list in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        boolean restore = prevState == Deleted && nextState == WIP;
         if (prevState == Deleted) {
             boolean isOwnerDeveloper = codeListSummary.owner().isDeveloper();
             boolean isRequesterDeveloper = requester.isDeveloper();
@@ -174,6 +178,10 @@ public class CodeListCommandService {
             if (!codeListSummary.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
+        }
+
+        if (!restore && nextState != Deleted && codeListSummary.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required before changing the Code List state.");
         }
 
         ensureBieDependenciesForChangingState(requester, codeListSummary, nextState);

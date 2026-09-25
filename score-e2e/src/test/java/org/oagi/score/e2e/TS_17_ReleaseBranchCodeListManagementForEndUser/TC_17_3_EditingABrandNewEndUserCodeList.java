@@ -49,6 +49,10 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
+        AgencyIDListObject agencyIDList;
+        AgencyIDListValueObject agencyIDListValue;
+        AgencyIDListObject otherAgencyIDList;
+        AgencyIDListValueObject otherAgencyIDListValue;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
@@ -63,18 +67,44 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, namespaceEU, branch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+            agencyIDList = getAPIFactory().getAgencyIDListAPI()
+                    .createRandomAgencyIDList(endUser, namespaceEU, branch, "Production");
+            agencyIDListValue = getAPIFactory().getAgencyIDListValueAPI()
+                    .createRandomAgencyIDListValue(endUser, agencyIDList);
+            otherAgencyIDList = getAPIFactory().getAgencyIDListAPI()
+                    .createRandomAgencyIDList(endUser, namespaceEU, branch, "Production");
+            otherAgencyIDListValue = getAPIFactory().getAgencyIDListValueAPI()
+                    .createRandomAgencyIDListValue(endUser, otherAgencyIDList);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
+        assertEquals("false", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        // Clear any inherited/default pair so the optional empty-pair behavior is explicit.
+        click(editCodeListPage.getAgencyIDListField());
+        click(visibilityOfElementLocated(getDriver(),
+                By.xpath("//mat-option//*[normalize-space(text()) = 'None']/ancestor::mat-option[1]")));
+        assertEquals("false", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"),
+                "Agency ID List Value must be optional while the list is unset (selected list: " +
+                        getText(editCodeListPage.getAgencyIDListField()) + ", required attribute: " +
+                        editCodeListPage.getAgencyIDListValueField().getAttribute("required") + ").");
+        editCodeListPage.setAgencyIDList(agencyIDList);
+        assertEquals("true", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"));
+        click(editCodeListPage.getAgencyIDListValueField());
+        assertTrue(getDriver().findElements(By.xpath("//mat-option//span[contains(text(), \"" + agencyIDListValue.getValue() + "\")]"))
+                .size() > 0, "The selected Agency ID List's values should be available.");
+        assertTrue(getDriver().findElements(By.xpath("//mat-option//span[contains(text(), \"" + otherAgencyIDListValue.getValue() + "\")]"))
+                .isEmpty(), "Values from another Agency ID List must not be available.");
+        escape(getDriver());
+        editCodeListPage.setAgencyIDListValue(agencyIDListValue);
         /**
          * Test Assertion #11.3.1.a
          */
         editCodeListPage.setName("new name");
         editCodeListPage.setVersion("new version");
         editCodeListPage.hitUpdateButton();
-        String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
-        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
+        String agencyIDListText = getText(editCodeListPage.getAgencyIDListField());
+        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDListText));
         /**
          * Test Assertion #11.3.1.b
          * Note: For developer Based Code list is not visible on the UI
@@ -84,7 +114,8 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
          * Test Assertion #11.3.1.c
          */
         assertEquals("true", editCodeListPage.getCodeListNameField().getAttribute("aria-required"));
-        assertEquals("true", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        assertEquals("false", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        assertEquals("true", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getNamespaceSelectField().getAttribute("aria-required"));
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
