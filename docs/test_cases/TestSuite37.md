@@ -282,3 +282,43 @@ The end user can open a deleted end user Agency ID list and restore it without n
 1. Sign in as an end user and open **Core Component > View/Edit Agency ID List** with the target release branch selected and deleted Agency ID Lists visible.
 2. Restore a deleted end user Agency ID List from the detail page or from the list and verify the Agency ID List data and values are restored. (Assertion [#37.7.1](#test-assertion-3771))
 3. Verify the same restore flow works even when the deleted Agency ID List was previously owned by another end user. (Assertion [#37.7.2](#test-assertion-3772))
+
+## Test Case 37.8
+
+**Using a custom end user Agency ID list in a BIE expression**
+
+Pre-condition: A release branch is selected. An end user account can create and manage Agency ID Lists and BIEs in that release. A BIE can be created with both a BBIE and a BBIE_SC whose underlying data types have a Token primitive, and both nodes permit the custom Agency ID Lists used in this test.
+
+
+### Test Assertion:
+
+#### Test Assertion #37.8.1
+The end user can create a custom Agency ID List without a base, add unique Agency ID List values, leave the list-level Agency ID List Value unset, move the list to Production, select it as the Agency ID List value domain of a BBIE_SC in a BIE in the same release, save the BIE, and reopen it with the selected list intact. The list-level Agency ID List Value is optional.
+
+#### Test Assertion #37.8.2
+The XML Schema generated for the BIE has a `Scheme Agency Identifier` attribute whose type is the selected custom Agency ID List type, and that type includes the custom Agency ID List value.
+
+#### Test Assertion #37.8.3
+The end user can generate XML Schema, JSON Schema, OpenAPI, Open Document Spreadsheet (ODS), and Avro expressions for a BIE with a custom Agency ID List assigned to a BBIE_SC, even when the list-level Agency ID List Value is unset. Each format produces a valid non-empty output. XML Schema, JSON Schema, and OpenAPI include the custom Agency ID List values. ODS and Avro include the `Scheme Agency Identifier` BBIE_SC field but do not serialize Agency ID List values as enumerations. OpenAPI is generated with GET and POST operation templates enabled, and its component schema includes the custom value.
+
+This assertion also covers [Issue #1805](https://github.com/OAGi/Score/issues/1805): a newly created end-user Agency ID List with no list-level value selected is assigned to the `Scheme Agency Identifier` of an ID/Code in a BIE, and expression generation must complete without a 500 error.
+
+#### Test Assertion #37.8.4
+Agency ID List Namespace is required to update the list or change its state, except that the list can still be deleted and a deleted list can be restored. Agency ID List Value remains optional; when a value is selected, it must belong to the Agency ID List. An Agency ID List with a missing Namespace cannot move between ordinary states, including a transition back to WIP.
+
+#### Test Assertion #37.8.5
+A custom Agency ID List selected on a BBIE_SC in a base BIE is retained by an inheriting BIE. XML Schema, JSON Schema, and OpenAPI generated for the inherited BIE include the selected custom Agency ID List value; ODS and Avro retain the BBIE_SC field without serializing the list value as an enum.
+
+#### Test Assertion #37.8.6
+A custom Agency ID List selected on a BBIE_SC inside a reused BIE is included when generating an expression for the reusing BIE. The nested reused Party and BOM Item Data BIEs preserve the selected custom Agency ID List value in XML Schema, JSON Schema, and OpenAPI; ODS and Avro retain the nested BBIE_SC field without serializing the list value as an enum.
+
+### Test Step Pre-condition:
+1. A release branch, an end user account, and the BIE permissions needed for this test are available in connectCenter.
+2. A compatible Token-based BBIE_SC is available in the selected release.
+
+### Test Step:
+1. Sign in as an end user and select the target release branch.
+2. Create a custom Agency ID List without a base and add multiple unique values. Leave the list-level Agency ID List Value empty, verify the optional field can be saved, then set Namespace and move the list to `Production`. Verify update and ordinary state changes, including a transition back to WIP, are blocked while Namespace is empty; deletion and restoration remain available. (Assertions [#37.2.1](#test-assertion-3721), [#37.2.2](#test-assertion-3722), [#37.5.2.c](#test-assertion-3752c), [#37.8.4](#test-assertion-3784))
+3. Create an end-user BIE with a compatible Token-based BBIE_SC, assign the custom Agency ID List to `/BOM/BOM Option/Identifier/Scheme Agency Identifier`, save and reopen the BIE, and verify the list remains assigned while the list-level value remains unset. (Assertion [#37.8.1](#test-assertion-3781))
+4. Generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro expressions through the single-BIE flow. Verify every format produces valid non-empty output. Check that XSD, JSON Schema, and OpenAPI schemas include the custom Agency ID List value; verify ODS and Avro contain the `Scheme Agency Identifier` BBIE_SC field and do not serialize the custom value as an enum. Generate OpenAPI with GET and POST operation templates enabled and check its component schema. No format returns a 500 error. This is the Issue #1805 reproduction. (Assertions [#37.8.2](#test-assertion-3782), [#37.8.3](#test-assertion-3783))
+5. Create a second BIE that inherits from the BIE with the custom Agency ID List and generate XSD, JSON Schema, OpenAPI, ODS, and Avro. Verify XSD, JSON Schema, and OpenAPI retain the custom allowed value, while ODS and Avro contain the `Scheme Agency Identifier` BBIE_SC field without the list enum. Then assign a custom Agency ID List to a BBIE_SC in a Party BIE, reuse that Party BIE under `/BOM Item Data/Party`, and reuse the BOM Item Data BIE under `/BOM/BOM Item Data`. Generate the top-level BIE and verify the same value is available through the nested reused subtree in XSD, JSON Schema, and OpenAPI; verify ODS and Avro contain the nested field without the list enum. (Assertions [#37.8.5](#test-assertion-3785), [#37.8.6](#test-assertion-3786))

@@ -79,6 +79,9 @@ public class AgencyIdListCommandService {
         if (!agencyIdListDetails.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        if (request.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required.");
+        }
 
         var command = command(requester);
 
@@ -166,6 +169,7 @@ public class AgencyIdListCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        boolean restore = prevState == Deleted && nextState == WIP;
         if (prevState == Deleted) {
             boolean isOwnerDeveloper = agencyIdListSummary.owner().isDeveloper();
             boolean isRequesterDeveloper = requester.isDeveloper();
@@ -190,6 +194,10 @@ public class AgencyIdListCommandService {
             if (!agencyIdListSummary.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
+        }
+
+        if (!restore && nextState != Deleted && agencyIdListSummary.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required before changing the Agency ID List state.");
         }
 
         var command = command(requester);

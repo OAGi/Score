@@ -215,11 +215,13 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private String key(CodeListSummaryRecord codeList) {
-        return "CodeList" + ID_ATTRIBUTE_PREFIX + codeList.guid();
+        // Values belong to a manifest, so revisions of the same component must
+        // not reuse a type generated from another manifest's value set.
+        return "CodeList" + ID_ATTRIBUTE_PREFIX + codeList.codeListManifestId();
     }
 
     private String key(AgencyIdListSummaryRecord agencyIdList) {
-        return "AgencyIdList" + ID_ATTRIBUTE_PREFIX + agencyIdList.guid();
+        return "AgencyIdList" + ID_ATTRIBUTE_PREFIX + agencyIdList.agencyIdListManifestId();
     }
 
     private boolean isProcessed(BIE bie) {
@@ -1704,22 +1706,24 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             rtNode.addContent(enumeration);
             enumeration.setAttribute("value", agencyIdListValue.value());
 
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", namespace.getURI());
+            if (namespace != null) {
+                Element annotation = newElement("annotation");
+                Element documentation = newElement("documentation");
+                documentation.setAttribute("source", namespace.getURI());
 
-            Element cctsName = new Element("ccts_Name", namespace);
-            String name = agencyIdListValue.name();
-            cctsName.setText(name);
-            documentation.addContent(cctsName);
-            if (agencyIdListValue.definition() != null) {
-                Element cctsDefinition = new Element("ccts_Definition", namespace);
-                cctsDefinition.setText(agencyIdListValue.definition().content());
-                documentation.addContent(cctsDefinition);
+                Element cctsName = new Element("ccts_Name", namespace);
+                String name = agencyIdListValue.name();
+                cctsName.setText(name);
+                documentation.addContent(cctsName);
+                if (agencyIdListValue.definition() != null) {
+                    Element cctsDefinition = new Element("ccts_Definition", namespace);
+                    cctsDefinition.setText(agencyIdListValue.definition().content());
+                    documentation.addContent(cctsDefinition);
+                }
+
+                annotation.addContent(documentation);
+                enumeration.addContent(annotation);
             }
-
-            annotation.addContent(documentation);
-            enumeration.addContent(annotation);
         }
 
         schemaNode.addContent(stNode);

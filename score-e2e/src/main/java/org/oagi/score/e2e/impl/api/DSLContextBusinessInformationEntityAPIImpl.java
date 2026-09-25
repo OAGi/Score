@@ -263,14 +263,14 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     @Override
     public void deleteTopLevelASBIEPByTopLevelASBIEPId(TopLevelASBIEPObject topLevelAsbiep) {
 
+        // Delete dependent BBIE_SC rows before their parent BBIE rows.
+        dslContext.deleteFrom(BBIE_SC).where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
+
         //Delete all BBIEs associated to the provided Top-level ASBIEP
         dslContext.deleteFrom(BBIE).where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
 
         //Delene all BBIEPs associated to the provided Top-level ASBIEP
         dslContext.deleteFrom(BBIEP).where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
-
-        //Delete all BBIE_SC associated to the provided Top-level ASBIEP
-        dslContext.deleteFrom(BBIE_SC).where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
 
         //Delete all ASBIEs associated to the provided Top-level ASBIEP
         updateTopLevelAsbiepWithAsbiepID(topLevelAsbiep, null);
