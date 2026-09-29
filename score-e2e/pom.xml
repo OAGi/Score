@@ -29,18 +29,18 @@
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>
-        <slf4j.version>2.0.17</slf4j.version>
-        <jackson-bom.version>2.21.4</jackson-bom.version>
+        <slf4j.version>2.0.18</slf4j.version>
+        <jackson-bom.version>2.21.6</jackson-bom.version>
         <commons-lang.version>3.20.0</commons-lang.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.21.0</commons-io.version>
         <commons-csv.version>1.14.1</commons-csv.version>
-        <lombok.version>1.18.44</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <snakeyaml.version>2.5</snakeyaml.version>
-        <mariadb-client.version>3.5.7</mariadb-client.version>
+        <snakeyaml.version>2.6</snakeyaml.version>
+        <mariadb-client.version>3.5.10</mariadb-client.version>
         <hikariCP.version>6.3.3</hikariCP.version>
-        <jOOQ.version>3.20.17</jOOQ.version>
+        <jOOQ.version>3.20.20</jOOQ.version>
         <json.version>20250517</json.version>
         <!-- Matches the score-http poi.version: e2e generates multi-worksheet .xlsx upload
              fixtures at runtime with the same library the production parser reads them with. -->
