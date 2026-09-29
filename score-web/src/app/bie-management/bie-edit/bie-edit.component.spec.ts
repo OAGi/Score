@@ -32,6 +32,23 @@ describe('BieEditComponent', () => {
       vi.useRealTimers();
     }
   });
+
+  it('does not allow a max-zero component to be selected, including in Inverse Mode', () => {
+    const isUsable = BieEditComponent.prototype.isUsable;
+    const node: any = {
+      cardinalityMax: 0,
+      required: false,
+      inverseMode: true,
+      used: undefined,
+      inherited: false,
+      locked: false,
+      isCycle: false
+    };
+
+    expect(isUsable.call({canEdit: true, used: () => true}, node)).toBe(false);
+    node.cardinalityMax = -1;
+    expect(isUsable.call({canEdit: true, used: () => true}, node)).toBe(true);
+  });
 });
 
 /**

@@ -42,7 +42,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By VERSION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//*[self::mat-select or self::score-mat-select]");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By DEPRECATED_CHECKBOX_LOCATOR =

@@ -985,6 +985,16 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
     private class TopLevelASBIEPPanelImpl implements TopLevelASBIEPPanel {
         @Override
+        public WebElement getInverseModeCheckbox() {
+            return getCheckboxByName("Inverse Mode");
+        }
+
+        @Override
+        public void toggleInverseMode() {
+            click(getInverseModeCheckbox().findElement(By.tagName("input")));
+        }
+
+        @Override
         public WebElement getReleaseField() {
             return getInputFieldByName("Release");
         }

@@ -88,9 +88,9 @@ public class EditCodeListPageImpl extends BasePageImpl implements EditCodeListPa
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By AGENCY_ID_LIST_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/mat-select");
+            By.xpath("//*[text()= \"Agency ID List\"]//ancestor::div[1]/*[self::mat-select or self::score-mat-select]");
     private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
-            By.xpath("//*[text()= \"Agency ID List Value\"]//ancestor::div[1]/mat-select");
+            By.xpath("//*[text()= \"Agency ID List Value\"]//ancestor::div[1]/*[self::mat-select or self::score-mat-select]");
     private static final By DERIVE_CODE_LIST_BASED_ON_THIS_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Derive Code List based on this\")]//ancestor::button[1]");
     private static final By DEFINITION_EMPTY_WARNING_DIALOG_MESSAGE_LOCATOR =

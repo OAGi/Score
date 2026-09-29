@@ -601,7 +601,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         WebElement asccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         ACCViewEditPage.ASCCPanel asccPanel = accViewEditPage.getASCCPanelContainer(asccNode).getASCCPanel();
         assertNotChecked(asccPanel.getDeprecatedCheckbox());
-        assertDisabled(asccPanel.getDeprecatedCheckbox());
+        assertDisabled(() -> asccPanel.getDeprecatedCheckbox());
     }
 
     @Test

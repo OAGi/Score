@@ -1135,7 +1135,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertNotChecked(bccPanel.getDeprecatedCheckbox());
-        assertDisabled(bccPanel.getDeprecatedCheckbox());
+        assertDisabled(() -> bccPanel.getDeprecatedCheckbox());
     }
 
     @Test

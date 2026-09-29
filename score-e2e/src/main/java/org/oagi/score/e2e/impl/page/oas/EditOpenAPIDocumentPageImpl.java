@@ -333,8 +333,44 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         try {
             return waitForDownloadedYaml(ofMillis(60000L), startedAt, filenameContains);
         } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Generate did not produce a downloadable YAML. " + describeGenerateFailure(startedAt, filenameContains), e);
         }
+    }
+
+    /** Best-effort diagnostics for a generate/download timeout: visible snackbar text and recent Downloads entries. */
+    private String describeGenerateFailure(long startedAt, String filenameContains) {
+        StringBuilder sb = new StringBuilder("expected name containing '").append(filenameContains).append("'. ");
+        try {
+            java.util.List<WebElement> bars = getDriver().findElements(By.xpath("//simple-snack-bar"));
+            sb.append("snackbar=").append(bars.isEmpty() ? "none" : bars.get(0).getText().trim()).append(". ");
+        } catch (Exception ignored) {
+            sb.append("snackbar=unreadable. ");
+        }
+        try {
+            java.util.List<WebElement> dialogs = getDriver().findElements(By.xpath("//mat-dialog-container"));
+            sb.append("dialog=").append(dialogs.isEmpty() ? "none" : dialogs.get(0).getText().trim()).append(". ");
+        } catch (Exception ignored) {
+            sb.append("dialog=unreadable. ");
+        }
+        try {
+            sb.append("browserLog=");
+            for (var entry : getDriver().manage().logs().get(org.openqa.selenium.logging.LogType.BROWSER)) {
+                if (entry.getLevel().intValue() >= java.util.logging.Level.WARNING.intValue()) {
+                    sb.append("[").append(entry.getLevel()).append("] ").append(entry.getMessage()).append(" | ");
+                }
+            }
+            sb.append(". ");
+        } catch (Exception ignored) {
+            sb.append("unavailable. ");
+        }
+        try (var files = Files.list(Paths.get(System.getProperty("user.home"), "Downloads"))) {
+            sb.append("Downloads since start: ");
+            files.filter(f -> f.toFile().lastModified() >= startedAt)
+                    .forEach(f -> sb.append(f.getFileName()).append(" (").append(f.toFile().length()).append(" bytes) "));
+        } catch (Exception ignored) {
+            sb.append("Downloads unreadable.");
+        }
+        return sb.toString();
     }
 
     @Override

@@ -781,6 +781,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (node.required && this.used(node)) {
       return false;
     }
+    if (node.cardinalityMax === 0) {
+      return false;
+    }
     return this.canEdit && !node.inherited && !node.locked && !node.isCycle;
   }
 

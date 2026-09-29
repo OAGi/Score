@@ -794,11 +794,27 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         });
     }
 
+    /**
+     * Association nodes render two detail panels (association and property). If the second one is
+     * missing the click did not select the node yet, so throw to let {@code retry} click it again.
+     */
+    private void awaitAssociationPanels() {
+        By propertyPanel = By.xpath("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+        for (int i = 0; i < 10; i++) {
+            if (!getDriver().findElements(propertyPanel).isEmpty()) {
+                return;
+            }
+            waitFor(ofMillis(300L));
+        }
+        throw new NoSuchElementException("Association detail panels were not rendered");
+    }
+
     @Override
     public ASCCPanelContainer getASCCPanelContainer(WebElement asccNode) {
         return retry(() -> {
             click(asccNode);
             waitFor(ofMillis(500L));
+            awaitAssociationPanels();
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
@@ -818,6 +834,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(bccNode);
             waitFor(ofMillis(500L));
+            awaitAssociationPanels();
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {

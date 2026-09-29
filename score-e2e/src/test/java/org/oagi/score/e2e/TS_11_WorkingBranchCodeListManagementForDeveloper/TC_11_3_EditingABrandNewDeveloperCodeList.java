@@ -87,7 +87,8 @@ public class TC_11_3_EditingABrandNewDeveloperCodeList extends BaseTest {
          * Test Assertion #11.3.1.c
          */
         assertEquals("true", editCodeListPage.getCodeListNameField().getAttribute("aria-required"));
-        assertEquals("true", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        // Agency ID List became optional (custom code lists without an agency), so it is no longer required.
+        assertNotEquals("true", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getNamespaceSelectField().getAttribute("aria-required"));
         assertDisabled(editCodeListPage.getDeprecatedSelectField());

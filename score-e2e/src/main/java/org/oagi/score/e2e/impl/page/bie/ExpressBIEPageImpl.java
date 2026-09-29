@@ -327,7 +327,12 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             try {
                 String str = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
                 JSONObject json = new JSONObject(str);
-                if (!json.has("$schema") || (!json.has("type") && !json.has("$defs") && !json.has("definitions"))) {
+                boolean jsonSchema = json.has("$schema") &&
+                        (json.has("type") || json.has("$defs") || json.has("definitions"));
+                boolean openApiDocument = json.optString("openapi").startsWith("3.") &&
+                        json.opt("info") instanceof JSONObject &&
+                        json.opt("paths") instanceof JSONObject;
+                if (!jsonSchema && !openApiDocument) {
                     return false;
                 }
             } catch (Exception e) {
