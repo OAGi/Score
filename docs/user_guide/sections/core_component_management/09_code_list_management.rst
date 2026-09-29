@@ -70,7 +70,12 @@ This section describes code list editing when its revision number is 1.
       list, `revise the developer Agency ID
       List <#revise-an-agency-id-list>`__ and `add a new
       value <#add-a-brand-new-agency-id-list-value-to-the-agency-id-list>`__.
-      These two fields are required.
+      These two fields are optional as a pair: either both are left
+      empty, or both are specified. Selecting an *Agency ID List*
+      makes *Agency ID List Value* required and limits its choices to
+      the values of the selected list. Changing or clearing the
+      *Agency ID List* (use the clear button in the field) drops an
+      *Agency ID List Value* that no longer belongs to it.
 
    4. *Version*. This field is a freeform text representing the version
       of the code list. The system will validate the combination of
@@ -81,7 +86,10 @@ This section describes code list editing when its revision number is 1.
       See the `Namespace
       Management <#core-component-management-tips-and-tricks>`__ section
       to create a standard namespace if needed or how namespace may be
-      used in connectCenter. *Namespace* is required.
+      used in connectCenter. *Namespace* is required, and the code list
+      cannot be updated or moved to another state (e.g., Draft or
+      Candidate) until a namespace is specified. Deleting or restoring a
+      code list does not require a namespace.
 
    6. *Definition*. Specify the description of the code list.
       *Definition* is optional, but a warning is given if none is
