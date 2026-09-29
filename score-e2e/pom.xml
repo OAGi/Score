@@ -78,6 +78,13 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
+        <!-- avro 1.11.1 drags in commons-compress 1.21, which shadows the newer version POI needs
+             (NoSuchMethodError: ZipArchiveOutputStream.putArchiveEntry). Pin it explicitly. -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.28.0</version>
+        </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>

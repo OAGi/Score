@@ -81,9 +81,10 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         assertEquals("false", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
         // Clear any inherited/default pair so the optional empty-pair behavior is explicit.
-        click(editCodeListPage.getAgencyIDListField());
-        click(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//*[normalize-space(text()) = 'None']/ancestor::mat-option[1]")));
+        if (!getDriver().findElements(By.xpath("//button[@aria-label='Clear Agency ID List']")).isEmpty()) {
+            click(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//button[@aria-label='Clear Agency ID List']")));
+        }
         assertEquals("false", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"),
                 "Agency ID List Value must be optional while the list is unset (selected list: " +
                         getText(editCodeListPage.getAgencyIDListField()) + ", required attribute: " +

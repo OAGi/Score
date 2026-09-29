@@ -11,6 +11,7 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
     private static final String TENANT_ENABLED_CONFIG_NAME = "score.tenant.enabled";
     private static final String BUSINESS_TERM_ENABLED_CONFIG_NAME = "score.business-term.enabled";
     private static final String BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME = "score.browse-standard-mode.enabled";
+    private static final String BIE_INVERSE_MODE_ENABLED_CONFIG_NAME = "score.bie.inverse-mode";
 
     private final DSLContext dslContext;
 
@@ -46,6 +47,16 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
     @Override
     public void setBrowseStandardModeEnable(boolean browseStandardModeEnable) {
         upsertBooleanConfiguration(BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME, browseStandardModeEnable);
+    }
+
+    @Override
+    public boolean isBIEInverseModeEnabled() {
+        return getBooleanConfiguration(BIE_INVERSE_MODE_ENABLED_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBIEInverseModeEnable(boolean bieInverseModeEnable) {
+        upsertBooleanConfiguration(BIE_INVERSE_MODE_ENABLED_CONFIG_NAME, bieInverseModeEnable);
     }
 
     private boolean getBooleanConfiguration(String configurationName) {

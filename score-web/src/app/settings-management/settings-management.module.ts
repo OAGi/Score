@@ -3,7 +3,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {CommonModule} from '@angular/common';
-import {CanActivateUser} from '../authentication/auth.service';
+import {CanActivateAdmin, CanActivateUser} from '../authentication/auth.service';
 import {SettingsAccountComponent} from './settings-account/settings-account.component';
 import {SettingsAccountService} from './settings-account/domain/settings-account.service';
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
@@ -36,7 +36,7 @@ const routes: Routes = [
   {
     path: 'settings/application_settings',
     component: SettingsApplicationSettingsComponent,
-    canActivate: [CanActivateUser],
+    canActivate: [CanActivateAdmin],
     title: 'Application Settings'
   }
 ];

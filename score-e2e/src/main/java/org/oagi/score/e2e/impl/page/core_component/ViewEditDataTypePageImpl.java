@@ -338,8 +338,9 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
     public void hitMoveToQAButton() {
         click(getMoveToQAButton());
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
-        invisibilityOfLoadingContainerElement(getDriver());
+        // The "Updated" snackbar only lives ~3s, so read it before waiting on the list reload.
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -351,8 +352,9 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
     public void hitMoveToProductionButton() {
         click(getMoveToProductionButton());
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
-        invisibilityOfLoadingContainerElement(getDriver());
+        // The "Updated" snackbar only lives ~3s, so read it before waiting on the list reload.
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -364,16 +366,18 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
     public void hitBackToWIPButton() {
         click(getBackToWIPButton());
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
-        invisibilityOfLoadingContainerElement(getDriver());
+        // The "Updated" snackbar only lives ~3s, so read it before waiting on the list reload.
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
     public void hitMoveToDraftButton() {
         click(getMoveToDraftButton());
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
-        invisibilityOfLoadingContainerElement(getDriver());
+        // The "Updated" snackbar only lives ~3s, so read it before waiting on the list reload.
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override
@@ -385,8 +389,9 @@ public class ViewEditDataTypePageImpl extends BaseSearchBarPageImpl implements V
     public void hitMoveToCandidateButton() {
         click(getMoveToCandidateButton());
         click(elementToBeClickable(getDriver(), CONTINUE_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
-        invisibilityOfLoadingContainerElement(getDriver());
+        // The "Updated" snackbar only lives ~3s, so read it before waiting on the list reload.
         assert "Updated".equals(getSnackBarMessage(getDriver()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

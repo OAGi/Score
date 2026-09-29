@@ -2,6 +2,7 @@ package org.oagi.score.e2e;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.util.function.Supplier;
@@ -11,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.impl.PageHelper.waitFor;
 
 public class AssertionHelper {
+
+    private static final int STALE_ELEMENT_RETRY_COUNT = 5;
 
     private AssertionHelper() {
     }
@@ -107,7 +110,19 @@ public class AssertionHelper {
 
     public static void assertDisabled(Supplier<WebElement> elementSupplier) {
         waitFor(ofMillis(500L));
-        assertDisabledNow(elementSupplier.get());
+        // The element supplier re-locates the element on every attempt, so a re-render of the
+        // surrounding Angular panel between lookup and inspection does not fail the assertion.
+        for (int attempt = 1; ; attempt++) {
+            try {
+                assertDisabledNow(elementSupplier.get());
+                return;
+            } catch (StaleElementReferenceException e) {
+                if (attempt >= STALE_ELEMENT_RETRY_COUNT) {
+                    throw e;
+                }
+                waitFor(ofMillis(300L));
+            }
+        }
     }
 
     private static void assertDisabledNow(WebElement element) {

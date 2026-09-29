@@ -47,4 +47,10 @@ public interface ApplicationSettingsAPI {
      */
     void setBrowseStandardModeEnable(boolean browseStandardModeEnable);
 
+    /** Return whether the global BIE Inverse Mode feature is enabled. */
+    boolean isBIEInverseModeEnabled();
+
+    /** Set whether the global BIE Inverse Mode feature is enabled. */
+    void setBIEInverseModeEnable(boolean bieInverseModeEnable);
+
 }

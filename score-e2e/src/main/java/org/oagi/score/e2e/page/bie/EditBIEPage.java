@@ -295,6 +295,12 @@ public interface EditBIEPage extends Page {
      */
     interface TopLevelASBIEPPanel {
 
+        /** Return the root-level Inverse Mode checkbox, when the global feature is enabled. */
+        WebElement getInverseModeCheckbox();
+
+        /** Toggle the root-level Inverse Mode checkbox. */
+        void toggleInverseMode();
+
         /**
          * Return the UI element of the 'Release' field.
          *

@@ -106,6 +106,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                 .set(TOP_LEVEL_ASBIEP.VERSION, topLevelASBIEP.getVersion())
                 .set(TOP_LEVEL_ASBIEP.STATUS, topLevelASBIEP.getStatus())
                 .set(TOP_LEVEL_ASBIEP.STATE, topLevelASBIEP.getState())
+                .set(TOP_LEVEL_ASBIEP.INVERSE_MODE, (byte) (topLevelASBIEP.isInverseMode() ? 1 : 0))
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelASBIEP.getTopLevelAsbiepId())))
                 .execute();
     }
@@ -121,6 +122,8 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
         topLevelASBIEPObject.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
         topLevelASBIEPObject.setStatus(record.get(TOP_LEVEL_ASBIEP.STATUS));
         topLevelASBIEPObject.setState(record.get(TOP_LEVEL_ASBIEP.STATE));
+        topLevelASBIEPObject.setInverseMode(record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) != null &&
+                record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) != 0);
         topLevelASBIEPObject.setLastUpdatedBy(record.get(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY).toBigInteger());
         topLevelASBIEPObject.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
         topLevelASBIEPObject.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));

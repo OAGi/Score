@@ -155,6 +155,15 @@ public abstract class PageHelper {
             case "textarea":
                 s = trim(element.getAttribute("value"));
                 break;
+            case "score-mat-select": {
+                // Exclude the clear button's mat-icon ligature ("cancel") from the selected value text.
+                java.util.List<WebElement> labels = element.findElements(By.cssSelector(".score-select-label"));
+                s = trim(labels.isEmpty() ? element.getText() : labels.get(0).getText());
+                if (isEmpty(s)) {
+                    s = trim(element.getText());
+                }
+                break;
+            }
             default:
                 s = trim(element.getText());
                 if (isEmpty(s)) {
@@ -215,7 +224,7 @@ public abstract class PageHelper {
                 }
                 element.click();
             } catch (ElementClickInterceptedException e) {
-                if ("mat-select".equals(tagName)) {
+                if ("mat-select".equals(tagName) || "score-mat-select".equals(tagName)) {
                     WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-mdc-select-arrow-wrapper"));
                     click(driver, arrowWrapper);
                 } else {

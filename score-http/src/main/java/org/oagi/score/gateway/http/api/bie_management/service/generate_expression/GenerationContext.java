@@ -265,8 +265,8 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     private Map<AbieId, AbieSummaryRecord> findAbieMap;
-    private Map<AbieId, List<BbieSummaryRecord>> findBbieByFromAbieIdAndUsedIsTrueMap;
-    private Map<BbieId, List<BbieScSummaryRecord>> findBbieScByBbieIdAndUsedIsTrueMap;
+    private Map<AbieId, List<BbieSummaryRecord>> findBbieByFromAbieIdMap;
+    private Map<BbieId, List<BbieScSummaryRecord>> findBbieScByBbieIdMap;
     private Map<AbieId, List<AsbieSummaryRecord>> findAsbieByFromAbieIdMap;
     private Map<AsbiepId, AsbiepSummaryRecord> findASBIEPMap;
     private Map<AbieId, AsbiepSummaryRecord> findAsbiepByRoleOfAbieIdMap;
@@ -368,14 +368,14 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
         List<BbieSummaryRecord> bbieList = repositoryFactory.bbieQueryRepository(requester)
                 .getBbieSummaryList(topLevelAsbiepIds);
-        findBbieByFromAbieIdAndUsedIsTrueMap = bbieList.stream()
-                .filter(e -> e.used())
+        // Keep both true and false rows. Inverse Mode uses absence of a row as the default,
+        // while an explicit false row must override that default during expression generation.
+        findBbieByFromAbieIdMap = bbieList.stream()
                 .collect(Collectors.groupingBy(e -> e.fromAbieId()));
 
         List<BbieScSummaryRecord> bbieScList = repositoryFactory.bbieScQueryRepository(requester)
                 .getBbieScSummaryList(topLevelAsbiepIds);
-        findBbieScByBbieIdAndUsedIsTrueMap = bbieScList.stream()
-                .filter(e -> e.used())
+        findBbieScByBbieIdMap = bbieScList.stream()
                 .collect(Collectors.groupingBy(e -> e.bbieId()));
 
         List<AsbieSummaryRecord> asbieList = repositoryFactory.asbieQueryRepository(requester)
@@ -495,13 +495,13 @@ public class GenerationContext implements InitializingBean, CcDocument {
         }
 
         BbieId bbieId = bbie.bbieId();
-        List<BbieScSummaryRecord> storedBbieScSummaryRecords = findBbieScByBbieIdAndUsedIsTrueMap.containsKey(bbieId) ?
-                findBbieScByBbieIdAndUsedIsTrueMap.get(bbieId) :
+        List<BbieScSummaryRecord> storedBbieScSummaryRecords = findBbieScByBbieIdMap.containsKey(bbieId) ?
+                findBbieScByBbieIdMap.get(bbieId) :
                 Collections.emptyList();
 
         TopLevelAsbiepSummaryRecord topLevelAsbiep = this.topLevelAsbiepMap.get(bbie.ownerTopLevelAsbiepId());
         if (!topLevelAsbiep.inverseMode()) {
-            return storedBbieScSummaryRecords;
+            return storedBbieScSummaryRecords.stream().filter(e -> e.used()).collect(Collectors.toList());
         }
 
         Map<DtScManifestId, BbieScSummaryRecord> storedBbieScMap = storedBbieScSummaryRecords.stream()
@@ -539,7 +539,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
             }
         }
 
-        return bbieScList;
+        return bbieScList.stream().filter(e -> e.used()).collect(Collectors.toList());
     }
 
     private List<AsccSummaryRecord> findAsccListByAccManifestId(AccManifestId accManifestId) {
@@ -723,8 +723,8 @@ public class GenerationContext implements InitializingBean, CcDocument {
         List<AsbieSummaryRecord> storedASBIEs = findAsbieByFromAbieIdMap.containsKey(fromAbieId) ?
                 findAsbieByFromAbieIdMap.get(fromAbieId) :
                 Collections.emptyList();
-        List<BbieSummaryRecord> storedBBIEs = findBbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
-                findBbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
+        List<BbieSummaryRecord> storedBBIEs = findBbieByFromAbieIdMap.containsKey(fromAbieId) ?
+                findBbieByFromAbieIdMap.get(fromAbieId) :
                 Collections.emptyList();
 
         TopLevelAsbiepSummaryRecord topLevelAsbiep = this.topLevelAsbiepMap.get(abie.ownerTopLevelAsbiepId());
