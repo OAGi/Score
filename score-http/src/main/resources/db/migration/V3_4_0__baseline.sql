@@ -2133,7 +2133,7 @@ CREATE TABLE `log`
     `revision_tracking_num` int(10) unsigned                                          NOT NULL DEFAULT 1 COMMENT 'This supports the ability to undo changes during a revision (life cycle of a revision is from the component''s WIP state to PUBLISHED state). REVISION_TRACKING_NUM can be 1, 2, and so on.',
     `log_action`            varchar(20)                                                        DEFAULT NULL COMMENT 'This indicates the action associated with the record.',
     `reference`             varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '',
-    `snapshot`              longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin                 DEFAULT NULL CHECK (json_valid(`snapshot`)),
+    `snapshot`              longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin                 DEFAULT NULL,
     `prev_log_id`           bigint(20) unsigned                                                DEFAULT NULL,
     `next_log_id`           bigint(20) unsigned                                                DEFAULT NULL,
     `created_by`            bigint(20) unsigned                                       NOT NULL,
@@ -2145,7 +2145,8 @@ CREATE TABLE `log`
     KEY `log_next_log_id_fk` (`next_log_id`),
     CONSTRAINT `log_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
     CONSTRAINT `log_next_log_id_fk` FOREIGN KEY (`next_log_id`) REFERENCES `log` (`log_id`),
-    CONSTRAINT `log_prev_log_id_fk` FOREIGN KEY (`prev_log_id`) REFERENCES `log` (`log_id`)
+    CONSTRAINT `log_prev_log_id_fk` FOREIGN KEY (`prev_log_id`) REFERENCES `log` (`log_id`),
+    CONSTRAINT `log_chk_1` CHECK (json_valid(`snapshot`))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3
   COLLATE = utf8mb3_general_ci;
