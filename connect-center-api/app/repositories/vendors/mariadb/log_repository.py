@@ -13,7 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.contracts.log import LogRepositoryContract
 from app.repositories.models.core_component import AsccRelationshipInfoRow, BccRelationshipInfoRow
+from app.repositories.vendors.mariadb.models.agency_id_list import AgencyIdListValue, AgencyIdListValueManifest
 from app.repositories.vendors.mariadb.models.app_user import AppUser
+from app.repositories.vendors.mariadb.models.code_list import (
+    CodeList,
+    CodeListManifest,
+    CodeListValue,
+    CodeListValueManifest,
+)
 from app.repositories.vendors.mariadb.models.core_component import (
     Acc,
     AccManifest,
@@ -30,7 +37,14 @@ from app.repositories.vendors.mariadb.models.core_component import (
 from app.repositories.vendors.mariadb.models.data_type import Dt, DtManifest, DtSc, DtScManifest
 from app.repositories.vendors.mariadb.models.log import Log
 from app.repositories.vendors.mariadb.models.namespace import Namespace
-from app.types.identifiers import AccManifestId, AppUserId, AsccpManifestId, BccpManifestId, DataTypeManifestId
+from app.types.identifiers import (
+    AccManifestId,
+    AppUserId,
+    AsccpManifestId,
+    BccpManifestId,
+    CodeListManifestId,
+    DataTypeManifestId,
+)
 from app.utils.core_component_constants import OAGIS_COMPONENT_TYPE_NAMES
 
 
@@ -303,6 +317,38 @@ class MariaDbLogRepository(LogRepositoryContract):
         dt_manifest.log_id = int(log.log_id)
         return int(log.log_id)
 
+    async def append_code_list_log(
+        self,
+        *,
+        code_list_manifest_id: CodeListManifestId,
+        requester_user_id: AppUserId,
+        action: str,
+        timestamp: datetime,
+    ) -> int:
+        """Append a new code list log row, with a snapshot of the current code list state, and update the manifest head."""
+        manifest = await self._session.get(CodeListManifest, int(code_list_manifest_id))
+        if manifest is None:
+            raise LookupError(
+                f"No code list exists with manifest ID {int(code_list_manifest_id)}. Please verify the identifier and try again."
+            )
+        code_list = await self._session.get(CodeList, int(manifest.code_list_id))
+        if code_list is None:
+            raise LookupError(
+                f"No code list exists with manifest ID {int(code_list_manifest_id)}. Please verify the identifier and try again."
+            )
+
+        current_log = await self._session.get(Log, int(manifest.log_id)) if manifest.log_id is not None else None
+        log = await self._create_component_log(
+            reference=str(code_list.guid),
+            current_log=current_log,
+            requester_user_id=requester_user_id,
+            action=action,
+            timestamp=timestamp,
+            snapshot=await self._serialize_code_list_log_snapshot(manifest=manifest, code_list=code_list),
+        )
+        manifest.log_id = int(log.log_id)
+        return int(log.log_id)
+
     async def revert_component_log_to_stable_state(
         self,
         *,
@@ -538,6 +584,121 @@ class MariaDbLogRepository(LogRepositoryContract):
             payload["definition"] = dt.definition
             payload["definitionSource"] = dt.definition_source
         return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+    async def _serialize_code_list_log_snapshot(
+        self,
+        *,
+        manifest: CodeListManifest,
+        code_list: CodeList,
+    ) -> str:
+        """Serialize the current code list state, with its values, using the SCORE log snapshot shape."""
+        value_rows = (
+            await self._session.execute(
+                select(CodeListValueManifest, CodeListValue)
+                .join(CodeListValue, CodeListValue.code_list_value_id == CodeListValueManifest.code_list_value_id)
+                .where(CodeListValueManifest.code_list_manifest_id == int(manifest.code_list_manifest_id))
+                .order_by(CodeListValueManifest.code_list_value_manifest_id)
+            )
+        ).all()
+
+        values: list[dict[str, Any]] = []
+        value_metadata: list[dict[str, Any]] = []
+        for value_manifest, value in value_rows:
+            value_payload: dict[str, Any] = {
+                "component": "codeListValue",
+                "guid": str(value.guid),
+                "value": value.value,
+                "meaning": value.meaning,
+                "deprecated": bool(value.is_deprecated),
+            }
+            if value.definition is not None:
+                value_payload["definition"] = value.definition
+                value_payload["definitionSource"] = value.definition_source
+            values.append(value_payload)
+            value_metadata.append(
+                {
+                    "codeListValueManifest": self._to_log_metadata(value_manifest),
+                    "codeListValue": self._to_log_metadata(value),
+                }
+            )
+
+        agency_id = await self._resolve_log_agency_id_list_value(manifest.agency_id_list_value_manifest_id)
+        payload: dict[str, Any] = {
+            "component": "codeList",
+            "guid": str(code_list.guid),
+            "name": code_list.name,
+            "listId": code_list.list_id,
+            "agencyId": agency_id,
+            "versionId": code_list.version_id,
+            "remark": code_list.remark,
+            "state": code_list.state,
+            "deprecated": bool(code_list.is_deprecated),
+            "extensible": bool(code_list.extensible_indicator),
+            "basedCodeList": await self._resolve_log_based_code_list(manifest.based_code_list_manifest_id, agency_id),
+            "ownerUser": await self._resolve_acc_log_user(code_list.owner_user_id),
+            "namespace": await self._resolve_acc_log_namespace(code_list.namespace_id),
+            "values": values,
+            "_metadata": {
+                "codeListManifest": self._to_log_metadata(manifest),
+                "codeList": self._to_log_metadata(code_list),
+                "values": value_metadata,
+            },
+        }
+        if code_list.definition is not None:
+            payload["definition"] = code_list.definition
+            payload["definitionSource"] = code_list.definition_source
+        return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+    async def _resolve_log_agency_id_list_value(
+        self,
+        agency_id_list_value_manifest_id: int | None,
+    ) -> dict[str, Any]:
+        """Return SCORE-style agency ID list value summary for code list log snapshots."""
+        if agency_id_list_value_manifest_id is None:
+            return {}
+        row = (
+            await self._session.execute(
+                select(AgencyIdListValue)
+                .join(
+                    AgencyIdListValueManifest,
+                    AgencyIdListValueManifest.agency_id_list_value_id == AgencyIdListValue.agency_id_list_value_id,
+                )
+                .where(
+                    AgencyIdListValueManifest.agency_id_list_value_manifest_id == int(agency_id_list_value_manifest_id)
+                )
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return {}
+        return {"guid": str(row.guid), "value": row.value, "name": row.name}
+
+    async def _resolve_log_based_code_list(
+        self,
+        based_code_list_manifest_id: int | None,
+        agency_id: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Return SCORE-style base code list summary for code list log snapshots.
+
+        SCORE embeds the described code list's own agency ID value, not the base code list's, so do the same.
+        """
+        if based_code_list_manifest_id is None:
+            return {}
+        row = (
+            await self._session.execute(
+                select(CodeList)
+                .join(CodeListManifest, CodeListManifest.code_list_id == CodeList.code_list_id)
+                .where(CodeListManifest.code_list_manifest_id == int(based_code_list_manifest_id))
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return {}
+        return {
+            "guid": str(row.guid),
+            "name": row.name,
+            "listId": row.list_id,
+            "agencyIdListValue": agency_id,
+            "versionId": row.version_id,
+        }
 
     async def _resolve_dt_log_based_dt_sc(
         self,

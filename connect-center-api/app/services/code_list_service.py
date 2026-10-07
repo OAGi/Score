@@ -612,7 +612,7 @@ class CodeListService:
         await self._repo.append_code_list_log(
             code_list_manifest_id=code_list_manifest_id,
             requester_user_id=self._requester_user_id,
-            action="Revised" if self._requester_is_developer() else "Amended",
+            action="Revised",
         )
 
     async def cancel_code_list(

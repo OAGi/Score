@@ -765,20 +765,12 @@ class MariaDbCodeListRepository(CodeListRepositoryContract):
         action: str,
     ) -> int:
         """Append a new log row and update the manifest head."""
-        manifest, code_list = await self._get_manifest_and_code_list(code_list_manifest_id)
-        if manifest is None or code_list is None:
-            raise LookupError(
-                f"No code list exists with manifest ID {int(code_list_manifest_id)}. Please verify the identifier and try again."
-            )
-
-        log_id = await self._log_repo.append_component_log(
-            reference=str(code_list.guid),
-            current_log_id=int(manifest.log_id) if manifest.log_id is not None else None,
+        log_id = await self._log_repo.append_code_list_log(
+            code_list_manifest_id=code_list_manifest_id,
             requester_user_id=requester_user_id,
             action=action,
             timestamp=datetime.utcnow(),
         )
-        manifest.log_id = int(log_id)
         await self._session.flush()
         return int(log_id)
 
