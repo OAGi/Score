@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -114,12 +115,13 @@ public class LogRepository {
             return "{}";
         }
 
-        return serializer.deserialize(
+        JsonObject snapshot = serializer.deserialize(
                 dslContext.select(LOG.SNAPSHOT)
                         .from(LOG)
                         .where(LOG.LOG_ID.eq(ULong.valueOf(logId)))
                         .fetchOptionalInto(String.class).orElse(null)
-        ).toString();
+        );
+        return (snapshot != null) ? snapshot.toString() : "{}";
     }
 
     /** The LOG row's identity (reference + revision) and raw snapshot, for diffing two revisions (issue #1533). */
