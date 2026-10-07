@@ -27,10 +27,10 @@ from app.repositories.vendors.mariadb.models.core_component import (
     BccManifest,
     SeqKey,
 )
-from app.repositories.vendors.mariadb.models.data_type import Dt, DtManifest
+from app.repositories.vendors.mariadb.models.data_type import Dt, DtManifest, DtSc, DtScManifest
 from app.repositories.vendors.mariadb.models.log import Log
 from app.repositories.vendors.mariadb.models.namespace import Namespace
-from app.types.identifiers import AccManifestId, AppUserId, AsccpManifestId, BccpManifestId
+from app.types.identifiers import AccManifestId, AppUserId, AsccpManifestId, BccpManifestId, DataTypeManifestId
 from app.utils.core_component_constants import OAGIS_COMPONENT_TYPE_NAMES
 
 
@@ -271,6 +271,38 @@ class MariaDbLogRepository(LogRepositoryContract):
         bccp_manifest.log_id = int(log.log_id)
         return int(log.log_id)
 
+    async def append_dt_log(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        requester_user_id: AppUserId,
+        action: str,
+        timestamp: datetime,
+    ) -> int:
+        """Append a new DT log row, with a snapshot of the current DT state, and update the manifest head."""
+        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
+        if dt_manifest is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
+        if dt is None:
+            raise LookupError(
+                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
+            )
+
+        current_log = await self._session.get(Log, int(dt_manifest.log_id)) if dt_manifest.log_id is not None else None
+        log = await self._create_component_log(
+            reference=str(dt.guid),
+            current_log=current_log,
+            requester_user_id=requester_user_id,
+            action=action,
+            timestamp=timestamp,
+            snapshot=await self._serialize_dt_log_snapshot(dt_manifest=dt_manifest, dt=dt),
+        )
+        dt_manifest.log_id = int(log.log_id)
+        return int(log.log_id)
+
     async def revert_component_log_to_stable_state(
         self,
         *,
@@ -439,6 +471,95 @@ class MariaDbLogRepository(LogRepositoryContract):
             payload["defaultValue"] = bccp.default_value
             payload["fixedValue"] = bccp.fixed_value
         return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+    async def _serialize_dt_log_snapshot(
+        self,
+        *,
+        dt_manifest: DtManifest,
+        dt: Dt,
+    ) -> str:
+        """Serialize the current DT state, with its supplementary components, using the SCORE log snapshot shape."""
+        sc_rows = (
+            await self._session.execute(
+                select(DtScManifest, DtSc)
+                .join(DtSc, DtSc.dt_sc_id == DtScManifest.dt_sc_id)
+                .where(DtScManifest.owner_dt_manifest_id == int(dt_manifest.dt_manifest_id))
+                .order_by(DtScManifest.dt_sc_manifest_id)
+            )
+        ).all()
+
+        supplementary_components: list[dict[str, Any]] = []
+        sc_metadata: list[dict[str, Any]] = []
+        for dt_sc_manifest, dt_sc in sc_rows:
+            sc_payload: dict[str, Any] = {
+                "component": "dtSc",
+                "guid": str(dt_sc.guid),
+                "propertyTerm": dt_sc.property_term,
+                "representationTerm": dt_sc.representation_term,
+                "cardinalityMin": dt_sc.cardinality_min,
+                "cardinalityMax": dt_sc.cardinality_max,
+                "basedDtSc": await self._resolve_dt_log_based_dt_sc(dt_sc_manifest.based_dt_sc_manifest_id),
+            }
+            if dt_sc.default_value is not None or dt_sc.fixed_value is not None:
+                sc_payload["defaultValue"] = dt_sc.default_value
+                sc_payload["fixedValue"] = dt_sc.fixed_value
+            if dt_sc.definition is not None:
+                sc_payload["definition"] = dt_sc.definition
+                sc_payload["definitionSource"] = dt_sc.definition_source
+            supplementary_components.append(sc_payload)
+            sc_metadata.append(
+                {
+                    "dtScManifest": self._to_log_metadata(dt_sc_manifest),
+                    "dtSc": self._to_log_metadata(dt_sc),
+                }
+            )
+
+        payload: dict[str, Any] = {
+            "component": "dt",
+            "guid": str(dt.guid),
+            "representationTerm": dt.representation_term,
+            "dataTypeTerm": dt.data_type_term,
+            "qualifier": dt.qualifier,
+            "contentComponentDefinition": dt.content_component_definition,
+            "sixDigitId": dt.six_digit_id,
+            "state": dt.state,
+            "deprecated": bool(dt.is_deprecated),
+            "basedDt": await self._resolve_bccp_log_dt(dt_manifest.based_dt_manifest_id),
+            "ownerUser": await self._resolve_acc_log_user(dt.owner_user_id),
+            "namespace": await self._resolve_acc_log_namespace(dt.namespace_id),
+            "supplementaryComponents": supplementary_components,
+            "_metadata": {
+                "dtManifest": self._to_log_metadata(dt_manifest),
+                "dt": self._to_log_metadata(dt),
+                "supplementaryComponents": sc_metadata,
+            },
+        }
+        if dt.definition is not None:
+            payload["definition"] = dt.definition
+            payload["definitionSource"] = dt.definition_source
+        return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+    async def _resolve_dt_log_based_dt_sc(
+        self,
+        dt_sc_manifest_id: int | None,
+    ) -> dict[str, Any]:
+        """Return SCORE-style DT SC summary for DT log snapshots."""
+        if dt_sc_manifest_id is None:
+            return {}
+        row = (
+            await self._session.execute(
+                select(DtSc)
+                .join(DtScManifest, DtScManifest.dt_sc_id == DtSc.dt_sc_id)
+                .where(DtScManifest.dt_sc_manifest_id == int(dt_sc_manifest_id))
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return {}
+        return {
+            "guid": str(row.guid),
+            "propertyTerm": row.property_term,
+            "representationTerm": row.representation_term,
+        }
 
     async def _resolve_acc_log_based_acc(
         self,

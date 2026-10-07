@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Protocol
 
 from app.repositories.models.core_component import AsccRelationshipInfoRow, BccRelationshipInfoRow
-from app.types.identifiers import AppUserId, AccManifestId, AsccpManifestId, BccpManifestId
+from app.types.identifiers import AppUserId, AccManifestId, AsccpManifestId, BccpManifestId, DataTypeManifestId
 
 
 class LogRepositoryContract(Protocol):
@@ -54,6 +54,17 @@ class LogRepositoryContract(Protocol):
         timestamp: datetime,
     ) -> int:
         """Append a new BCCP log row and update the manifest head."""
+        pass
+
+    async def append_dt_log(
+        self,
+        *,
+        dt_manifest_id: DataTypeManifestId,
+        requester_user_id: AppUserId,
+        action: str,
+        timestamp: datetime,
+    ) -> int:
+        """Append a new DT log row, with a snapshot of the current DT state, and update the manifest head."""
         pass
 
     async def append_component_log(

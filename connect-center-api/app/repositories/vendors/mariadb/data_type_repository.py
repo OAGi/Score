@@ -1467,26 +1467,13 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         action: str,
         timestamp: datetime,
     ) -> int:
-        """Append a DT log row and update the manifest head."""
-        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
-        if dt_manifest is None:
-            raise LookupError(
-                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
-            )
-        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
-        if dt is None:
-            raise LookupError(
-                f"No DT exists with manifest ID {int(dt_manifest_id)}. Please verify the identifier and try again."
-            )
-        log_id = await self._log_repo.append_component_log(
-            reference=str(dt.guid),
-            current_log_id=int(dt_manifest.log_id) if dt_manifest.log_id is not None else None,
+        """Append a DT log row, with a snapshot of the current DT state, and update the manifest head."""
+        return await self._log_repo.append_dt_log(
+            dt_manifest_id=dt_manifest_id,
             requester_user_id=requester_user_id,
             action=action,
             timestamp=timestamp,
         )
-        dt_manifest.log_id = int(log_id)
-        return int(log_id)
 
     async def _copy_dt_awd_pri_from_manifest(
         self,
