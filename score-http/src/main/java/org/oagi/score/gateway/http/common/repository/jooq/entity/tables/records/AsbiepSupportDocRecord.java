@@ -19,23 +19,23 @@ public class AsbiepSupportDocRecord extends UpdatableRecordImpl<AsbiepSupportDoc
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.asbiep_support_doc.asbiep_support_doc_id</code>.
-     * Primary key. Unique identifier for each supporting documentation.
+     * Setter for <code>asbiep_support_doc.asbiep_support_doc_id</code>. Primary
+     * key. Unique identifier for each supporting documentation.
      */
     public void setAsbiepSupportDocId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.asbiep_support_doc.asbiep_support_doc_id</code>.
-     * Primary key. Unique identifier for each supporting documentation.
+     * Getter for <code>asbiep_support_doc.asbiep_support_doc_id</code>. Primary
+     * key. Unique identifier for each supporting documentation.
      */
     public ULong getAsbiepSupportDocId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.asbiep_support_doc.asbiep_id</code>. Foreign key.
+     * Setter for <code>asbiep_support_doc.asbiep_id</code>. Foreign key.
      * References the related ASBIEP record.
      */
     public void setAsbiepId(ULong value) {
@@ -43,7 +43,7 @@ public class AsbiepSupportDocRecord extends UpdatableRecordImpl<AsbiepSupportDoc
     }
 
     /**
-     * Getter for <code>oagi.asbiep_support_doc.asbiep_id</code>. Foreign key.
+     * Getter for <code>asbiep_support_doc.asbiep_id</code>. Foreign key.
      * References the related ASBIEP record.
      */
     public ULong getAsbiepId() {
@@ -51,23 +51,23 @@ public class AsbiepSupportDocRecord extends UpdatableRecordImpl<AsbiepSupportDoc
     }
 
     /**
-     * Setter for <code>oagi.asbiep_support_doc.content</code>. The main body or
-     * text content of the supporting documentation.
+     * Setter for <code>asbiep_support_doc.content</code>. The main body or text
+     * content of the supporting documentation.
      */
     public void setContent(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.asbiep_support_doc.content</code>. The main body or
-     * text content of the supporting documentation.
+     * Getter for <code>asbiep_support_doc.content</code>. The main body or text
+     * content of the supporting documentation.
      */
     public String getContent() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.asbiep_support_doc.description</code>. Optional
+     * Setter for <code>asbiep_support_doc.description</code>. Optional
      * description, summary, or metadata about the supporting documentation.
      */
     public void setDescription(String value) {
@@ -75,7 +75,7 @@ public class AsbiepSupportDocRecord extends UpdatableRecordImpl<AsbiepSupportDoc
     }
 
     /**
-     * Getter for <code>oagi.asbiep_support_doc.description</code>. Optional
+     * Getter for <code>asbiep_support_doc.description</code>. Optional
      * description, summary, or metadata about the supporting documentation.
      */
     public String getDescription() {

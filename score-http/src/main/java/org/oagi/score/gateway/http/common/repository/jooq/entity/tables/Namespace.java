@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc.AccPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdList.AgencyIdListPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
@@ -56,7 +57,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.namespace</code>
+     * The reference instance of <code>namespace</code>
      */
     public static final Namespace NAMESPACE = new Namespace();
 
@@ -69,72 +70,71 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     }
 
     /**
-     * The column <code>oagi.namespace.namespace_id</code>. Primary, internal
+     * The column <code>namespace.namespace_id</code>. Primary, internal
      * database key.
      */
-    public final TableField<NamespaceRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<NamespaceRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.namespace.library_id</code>. A foreign key pointed
-     * to a library of the current record.
+     * The column <code>namespace.library_id</code>. A foreign key pointed to a
+     * library of the current record.
      */
     public final TableField<NamespaceRecord, ULong> LIBRARY_ID = createField(DSL.name("library_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointed to a library of the current record.");
 
     /**
-     * The column <code>oagi.namespace.uri</code>. This is the URI of the
-     * namespace.
+     * The column <code>namespace.uri</code>. This is the URI of the namespace.
      */
     public final TableField<NamespaceRecord, String> URI = createField(DSL.name("uri"), SQLDataType.VARCHAR(100).nullable(false), this, "This is the URI of the namespace.");
 
     /**
-     * The column <code>oagi.namespace.prefix</code>. This is a default short
-     * name to represent the URI. It may be overridden during the expression
-     * generation. Null or empty means the same thing like the default prefix in
-     * an XML schema.
+     * The column <code>namespace.prefix</code>. This is a default short name to
+     * represent the URI. It may be overridden during the expression generation.
+     * Null or empty means the same thing like the default prefix in an XML
+     * schema.
      */
     public final TableField<NamespaceRecord, String> PREFIX = createField(DSL.name("prefix"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.");
 
     /**
-     * The column <code>oagi.namespace.description</code>. Description or
-     * explanation about the namespace or use of the namespace.
+     * The column <code>namespace.description</code>. Description or explanation
+     * about the namespace or use of the namespace.
      */
     public final TableField<NamespaceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description or explanation about the namespace or use of the namespace.");
 
     /**
-     * The column <code>oagi.namespace.is_std_nmsp</code>. This indicates
-     * whether the namespace is reserved for standard used (i.e., whether it is
-     * an OAGIS namespace). If it is true, then end users cannot user the
-     * namespace for the end user CCs.
+     * The column <code>namespace.is_std_nmsp</code>. This indicates whether the
+     * namespace is reserved for standard use (i.e., whether it is an OAGIS
+     * namespace). If it is true, then end users cannot use the namespace for
+     * the end user CCs.
      */
-    public final TableField<NamespaceRecord, Byte> IS_STD_NMSP = createField(DSL.name("is_std_nmsp"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.");
+    public final TableField<NamespaceRecord, Byte> IS_STD_NMSP = createField(DSL.name("is_std_nmsp"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This indicates whether the namespace is reserved for standard use (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot use the namespace for the end user CCs.");
 
     /**
-     * The column <code>oagi.namespace.owner_user_id</code>. Foreign key to the
+     * The column <code>namespace.owner_user_id</code>. Foreign key to the
      * APP_USER table identifying the user who can update or delete the record.
      */
     public final TableField<NamespaceRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying the user who can update or delete the record.");
 
     /**
-     * The column <code>oagi.namespace.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * The column <code>namespace.created_by</code>. Foreign key to the APP_USER
+     * table identifying user who created the namespace.
      */
     public final TableField<NamespaceRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying user who created the namespace.");
 
     /**
-     * The column <code>oagi.namespace.last_updated_by</code>. Foreign key to
-     * the APP_USER table identifying the user who last updated the record.
+     * The column <code>namespace.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public final TableField<NamespaceRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying the user who last updated the record.");
 
     /**
-     * The column <code>oagi.namespace.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * The column <code>namespace.creation_timestamp</code>. The timestamp when
+     * the record was first created.
      */
     public final TableField<NamespaceRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.namespace.last_update_timestamp</code>. The
-     * timestamp when the record was last updated.
+     * The column <code>namespace.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public final TableField<NamespaceRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
@@ -147,21 +147,21 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.namespace</code> table reference
+     * Create an aliased <code>namespace</code> table reference
      */
     public Namespace(String alias) {
         this(DSL.name(alias), NAMESPACE);
     }
 
     /**
-     * Create an aliased <code>oagi.namespace</code> table reference
+     * Create an aliased <code>namespace</code> table reference
      */
     public Namespace(Name alias) {
         this(alias, NAMESPACE);
     }
 
     /**
-     * Create a <code>oagi.namespace</code> table reference
+     * Create a <code>namespace</code> table reference
      */
     public Namespace() {
         this(DSL.name("namespace"), null);
@@ -202,7 +202,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -228,8 +228,8 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AppUserPath _namespaceCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>namespace_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>namespace_created_by_fk</code> key.
      */
     public AppUserPath namespaceCreatedByFk() {
         if (_namespaceCreatedByFk == null)
@@ -241,8 +241,8 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AppUserPath _namespaceLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>namespace_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>namespace_last_updated_by_fk</code> key.
      */
     public AppUserPath namespaceLastUpdatedByFk() {
         if (_namespaceLastUpdatedByFk == null)
@@ -254,7 +254,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient LibraryPath _library;
 
     /**
-     * Get the implicit join path to the <code>oagi.library</code> table.
+     * Get the implicit join path to the <code>library</code> table.
      */
     public LibraryPath library() {
         if (_library == null)
@@ -266,8 +266,8 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AppUserPath _namespaceOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>namespace_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>namespace_owner_user_id_fk</code> key.
      */
     public AppUserPath namespaceOwnerUserIdFk() {
         if (_namespaceOwnerUserIdFk == null)
@@ -279,7 +279,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AccPath _acc;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.acc</code> table
+     * Get the implicit to-many join path to the <code>acc</code> table
      */
     public AccPath acc() {
         if (_acc == null)
@@ -291,8 +291,8 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AgencyIdListPath _agencyIdList;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list</code> table
+     * Get the implicit to-many join path to the <code>agency_id_list</code>
+     * table
      */
     public AgencyIdListPath agencyIdList() {
         if (_agencyIdList == null)
@@ -304,7 +304,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient AsccpPath _asccp;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asccp</code> table
+     * Get the implicit to-many join path to the <code>asccp</code> table
      */
     public AsccpPath asccp() {
         if (_asccp == null)
@@ -316,7 +316,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient BccpPath _bccp;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp</code> table
+     * Get the implicit to-many join path to the <code>bccp</code> table
      */
     public BccpPath bccp() {
         if (_bccp == null)
@@ -328,8 +328,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient CodeListPath _codeList;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.code_list</code>
-     * table
+     * Get the implicit to-many join path to the <code>code_list</code> table
      */
     public CodeListPath codeList() {
         if (_codeList == null)
@@ -341,7 +340,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient DtPath _dt;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt</code> table
+     * Get the implicit to-many join path to the <code>dt</code> table
      */
     public DtPath dt() {
         if (_dt == null)
@@ -353,7 +352,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient ModulePath _module;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module</code> table
+     * Get the implicit to-many join path to the <code>module</code> table
      */
     public ModulePath module() {
         if (_module == null)
@@ -365,7 +364,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     private transient ReleasePath _release;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.release</code> table
+     * Get the implicit to-many join path to the <code>release</code> table
      */
     public ReleasePath release() {
         if (_release == null)
@@ -418,7 +417,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      */
     @Override
     public Namespace where(Condition condition) {
-        return new Namespace(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Namespace(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -485,7 +484,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Namespace whereExists(Select<?> select) {
+    public Namespace whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -493,7 +492,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Namespace whereNotExists(Select<?> select) {
+    public Namespace whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRule.UsageRulePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.UsageRuleExpressionRecord;
 
@@ -47,7 +48,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.usage_rule_expression</code>
+     * The reference instance of <code>usage_rule_expression</code>
      */
     public static final UsageRuleExpression USAGE_RULE_EXPRESSION = new UsageRuleExpression();
 
@@ -60,32 +61,30 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
     }
 
     /**
-     * The column
-     * <code>oagi.usage_rule_expression.usage_rule_expression_id</code>. Primary
-     * key of the usage rule expression
+     * The column <code>usage_rule_expression.usage_rule_expression_id</code>.
+     * Primary key of the usage rule expression
      */
-    public final TableField<UsageRuleExpressionRecord, ULong> USAGE_RULE_EXPRESSION_ID = createField(DSL.name("usage_rule_expression_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the usage rule expression");
+    public final TableField<UsageRuleExpressionRecord, ULong> USAGE_RULE_EXPRESSION_ID = createField(DSL.name("usage_rule_expression_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key of the usage rule expression");
 
     /**
-     * The column <code>oagi.usage_rule_expression.constraint_type</code>.
-     * Constraint type according to the CC spec. It represents the expression
-     * language (syntax) used in the CONSTRAINT column. It is a value list
-     * column. 0 = 'Unstructured' which is basically a description of the rule,
-     * 1 = 'Schematron'.
+     * The column <code>usage_rule_expression.constraint_type</code>. Constraint
+     * type according to the CC spec. It represents the expression language
+     * (syntax) used in the CONSTRAINT column. It is a value list column. 0 =
+     * 'Unstructured' which is basically a description of the rule, 1 =
+     * 'Schematron'.
      */
     public final TableField<UsageRuleExpressionRecord, Integer> CONSTRAINT_TYPE = createField(DSL.name("constraint_type"), SQLDataType.INTEGER.nullable(false), this, "Constraint type according to the CC spec. It represents the expression language (syntax) used in the CONSTRAINT column. It is a value list column. 0 = 'Unstructured' which is basically a description of the rule, 1 = 'Schematron'.");
 
     /**
-     * The column <code>oagi.usage_rule_expression.constraint_text</code>. This
+     * The column <code>usage_rule_expression.constraint_text</code>. This
      * column capture the constraint expressing the usage rule. In other words,
      * this is the expression.
      */
     public final TableField<UsageRuleExpressionRecord, String> CONSTRAINT_TEXT = createField(DSL.name("constraint_text"), SQLDataType.CLOB(65535).nullable(false), this, "This column capture the constraint expressing the usage rule. In other words, this is the expression.");
 
     /**
-     * The column
-     * <code>oagi.usage_rule_expression.represented_usage_rule_id</code>. The
-     * usage rule which the expression represents
+     * The column <code>usage_rule_expression.represented_usage_rule_id</code>.
+     * The usage rule which the expression represents
      */
     public final TableField<UsageRuleExpressionRecord, ULong> REPRESENTED_USAGE_RULE_ID = createField(DSL.name("represented_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The usage rule which the expression represents");
 
@@ -98,21 +97,21 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.usage_rule_expression</code> table reference
+     * Create an aliased <code>usage_rule_expression</code> table reference
      */
     public UsageRuleExpression(String alias) {
         this(DSL.name(alias), USAGE_RULE_EXPRESSION);
     }
 
     /**
-     * Create an aliased <code>oagi.usage_rule_expression</code> table reference
+     * Create an aliased <code>usage_rule_expression</code> table reference
      */
     public UsageRuleExpression(Name alias) {
         this(alias, USAGE_RULE_EXPRESSION);
     }
 
     /**
-     * Create a <code>oagi.usage_rule_expression</code> table reference
+     * Create a <code>usage_rule_expression</code> table reference
      */
     public UsageRuleExpression() {
         this(DSL.name("usage_rule_expression"), null);
@@ -153,7 +152,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -174,7 +173,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
     private transient UsageRulePath _usageRule;
 
     /**
-     * Get the implicit join path to the <code>oagi.usage_rule</code> table.
+     * Get the implicit join path to the <code>usage_rule</code> table.
      */
     public UsageRulePath usageRule() {
         if (_usageRule == null)
@@ -227,7 +226,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
      */
     @Override
     public UsageRuleExpression where(Condition condition) {
-        return new UsageRuleExpression(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new UsageRuleExpression(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -294,7 +293,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UsageRuleExpression whereExists(Select<?> select) {
+    public UsageRuleExpression whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -302,7 +301,7 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UsageRuleExpression whereNotExists(Select<?> select) {
+    public UsageRuleExpression whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

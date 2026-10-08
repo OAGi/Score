@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc.AccPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevelAsbiep.TopLevelAsbiepPath;
@@ -55,7 +56,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.bie_user_ext_revision</code>
+     * The reference instance of <code>bie_user_ext_revision</code>
      */
     public static final BieUserExtRevision BIE_USER_EXT_REVISION = new BieUserExtRevision();
 
@@ -68,35 +69,33 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     }
 
     /**
-     * The column
-     * <code>oagi.bie_user_ext_revision.bie_user_ext_revision_id</code>.
+     * The column <code>bie_user_ext_revision.bie_user_ext_revision_id</code>.
      * Primary, internal database key.
      */
-    public final TableField<BieUserExtRevisionRecord, ULong> BIE_USER_EXT_REVISION_ID = createField(DSL.name("bie_user_ext_revision_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<BieUserExtRevisionRecord, ULong> BIE_USER_EXT_REVISION_ID = createField(DSL.name("bie_user_ext_revision_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.bie_user_ext_revision.ext_abie_id</code>. This
-     * points to an ABIE record corresponding to the EXTENSION_ACC_ID record.
-     * For example, this column can point to the ApplicationAreaExtension ABIE
-     * which is based on the ApplicationAreaExtension ACC (referred to by the
-     * EXT_ACC_ID column). This column can be NULL only when the extension is
-     * the AllExtension because there is no corresponding ABIE for the
-     * AllExtension ACC.
+     * The column <code>bie_user_ext_revision.ext_abie_id</code>. This points to
+     * an ABIE record corresponding to the EXTENSION_ACC_ID record. For example,
+     * this column can point to the ApplicationAreaExtension ABIE which is based
+     * on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID
+     * column). This column can be NULL only when the extension is the
+     * AllExtension because there is no corresponding ABIE for the AllExtension
+     * ACC.
      */
     public final TableField<BieUserExtRevisionRecord, ULong> EXT_ABIE_ID = createField(DSL.name("ext_abie_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This points to an ABIE record corresponding to the EXTENSION_ACC_ID record. For example, this column can point to the ApplicationAreaExtension ABIE which is based on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID column). This column can be NULL only when the extension is the AllExtension because there is no corresponding ABIE for the AllExtension ACC.");
 
     /**
-     * The column <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
-     * points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID
-     * column is based. E.g. It may point to an ApplicationAreaExtension ACC,
-     * AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that
-     * an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2
-     * (Extension).
+     * The column <code>bie_user_ext_revision.ext_acc_id</code>. This points to
+     * an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is
+     * based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension
+     * ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC
+     * record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).
      */
     public final TableField<BieUserExtRevisionRecord, ULong> EXT_ACC_ID = createField(DSL.name("ext_acc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).");
 
     /**
-     * The column <code>oagi.bie_user_ext_revision.user_ext_acc_id</code>. This
+     * The column <code>bie_user_ext_revision.user_ext_acc_id</code>. This
      * column points to the specific revision of a User Extension ACC (this is
      * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
      * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
@@ -105,8 +104,8 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     public final TableField<BieUserExtRevisionRecord, ULong> USER_EXT_ACC_ID = createField(DSL.name("user_ext_acc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This column points to the specific revision of a User Extension ACC (this is an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of the AllExtension). ");
 
     /**
-     * The column <code>oagi.bie_user_ext_revision.revised_indicator</code>.
-     * This column is a flag indicating to whether the User Extension ACC (as
+     * The column <code>bie_user_ext_revision.revised_indicator</code>. This
+     * column is a flag indicating to whether the User Extension ACC (as
      * identified in the USER_EXT_ACC_ID column) has been revised, i.e., there
      * is a newer version of the user extension ACC than the one currently used
      * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
@@ -115,8 +114,8 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     public final TableField<BieUserExtRevisionRecord, Byte> REVISED_INDICATOR = createField(DSL.name("revised_indicator"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This column is a flag indicating to whether the User Extension ACC (as identified in the USER_EXT_ACC_ID column) has been revised, i.e., there is a newer version of the user extension ACC than the one currently used by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is not current.");
 
     /**
-     * The column <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
-     * This is a foreign key to the top-level ASBIEP.
+     * The column <code>bie_user_ext_revision.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public final TableField<BieUserExtRevisionRecord, ULong> TOP_LEVEL_ASBIEP_ID = createField(DSL.name("top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
@@ -129,21 +128,21 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.bie_user_ext_revision</code> table reference
+     * Create an aliased <code>bie_user_ext_revision</code> table reference
      */
     public BieUserExtRevision(String alias) {
         this(DSL.name(alias), BIE_USER_EXT_REVISION);
     }
 
     /**
-     * Create an aliased <code>oagi.bie_user_ext_revision</code> table reference
+     * Create an aliased <code>bie_user_ext_revision</code> table reference
      */
     public BieUserExtRevision(Name alias) {
         this(alias, BIE_USER_EXT_REVISION);
     }
 
     /**
-     * Create a <code>oagi.bie_user_ext_revision</code> table reference
+     * Create a <code>bie_user_ext_revision</code> table reference
      */
     public BieUserExtRevision() {
         this(DSL.name("bie_user_ext_revision"), null);
@@ -184,7 +183,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -205,7 +204,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
+     * Get the implicit join path to the <code>abie</code> table.
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -217,7 +216,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     private transient AccPath _bieUserExtRevisionExtAccIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc</code> table, via the
+     * Get the implicit join path to the <code>acc</code> table, via the
      * <code>bie_user_ext_revision_ext_acc_id_fk</code> key.
      */
     public AccPath bieUserExtRevisionExtAccIdFk() {
@@ -230,8 +229,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table.
+     * Get the implicit join path to the <code>top_level_asbiep</code> table.
      */
     public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
@@ -243,7 +241,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     private transient AccPath _bieUserExtRevisionUserExtAccIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc</code> table, via the
+     * Get the implicit join path to the <code>acc</code> table, via the
      * <code>bie_user_ext_revision_user_ext_acc_id_fk</code> key.
      */
     public AccPath bieUserExtRevisionUserExtAccIdFk() {
@@ -297,7 +295,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      */
     @Override
     public BieUserExtRevision where(Condition condition) {
-        return new BieUserExtRevision(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new BieUserExtRevision(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -364,7 +362,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BieUserExtRevision whereExists(Select<?> select) {
+    public BieUserExtRevision whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -372,7 +370,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BieUserExtRevision whereNotExists(Select<?> select) {
+    public BieUserExtRevision whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

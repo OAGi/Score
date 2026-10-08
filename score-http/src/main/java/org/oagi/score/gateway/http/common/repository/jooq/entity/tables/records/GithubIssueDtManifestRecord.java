@@ -22,7 +22,7 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
 
     /**
      * Setter for
-     * <code>oagi.github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
+     * <code>github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
      * Primary key column.
      */
     public void setGithubIssueDtManifestId(ULong value) {
@@ -31,7 +31,7 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
 
     /**
      * Getter for
-     * <code>oagi.github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
+     * <code>github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
      * Primary key column.
      */
     public ULong getGithubIssueDtManifestId() {
@@ -39,73 +39,71 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
     }
 
     /**
-     * Setter for <code>oagi.github_issue_dt_manifest.dt_manifest_id</code>.
-     * Foreign key to dt_manifest; the DT (in a given release) linked to a
-     * GitHub issue.
+     * Setter for <code>github_issue_dt_manifest.dt_manifest_id</code>. Foreign
+     * key to dt_manifest; the DT (in a given release) linked to a GitHub issue.
      */
     public void setDtManifestId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_dt_manifest.dt_manifest_id</code>.
-     * Foreign key to dt_manifest; the DT (in a given release) linked to a
-     * GitHub issue.
+     * Getter for <code>github_issue_dt_manifest.dt_manifest_id</code>. Foreign
+     * key to dt_manifest; the DT (in a given release) linked to a GitHub issue.
      */
     public ULong getDtManifestId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_dt_manifest.github_issue_id</code>.
-     * Foreign key to github_issue; the linked GitHub issue.
+     * Setter for <code>github_issue_dt_manifest.github_issue_id</code>. Foreign
+     * key to github_issue; the linked GitHub issue.
      */
     public void setGithubIssueId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_dt_manifest.github_issue_id</code>.
-     * Foreign key to github_issue; the linked GitHub issue.
+     * Getter for <code>github_issue_dt_manifest.github_issue_id</code>. Foreign
+     * key to github_issue; the linked GitHub issue.
      */
     public ULong getGithubIssueId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_dt_manifest.created_by</code>. Foreign
-     * key to app_user; who created the link.
+     * Setter for <code>github_issue_dt_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_dt_manifest.created_by</code>. Foreign
-     * key to app_user; who created the link.
+     * Getter for <code>github_issue_dt_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_dt_manifest.last_updated_by</code>.
-     * Foreign key to app_user; who last updated the link.
+     * Setter for <code>github_issue_dt_manifest.last_updated_by</code>. Foreign
+     * key to app_user; who last updated the link.
      */
     public void setLastUpdatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_dt_manifest.last_updated_by</code>.
-     * Foreign key to app_user; who last updated the link.
+     * Getter for <code>github_issue_dt_manifest.last_updated_by</code>. Foreign
+     * key to app_user; who last updated the link.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_dt_manifest.creation_timestamp</code>.
+     * Setter for <code>github_issue_dt_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -113,7 +111,7 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
     }
 
     /**
-     * Getter for <code>oagi.github_issue_dt_manifest.creation_timestamp</code>.
+     * Getter for <code>github_issue_dt_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -121,8 +119,7 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_dt_manifest.last_update_timestamp</code>.
+     * Setter for <code>github_issue_dt_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -130,8 +127,7 @@ public class GithubIssueDtManifestRecord extends UpdatableRecordImpl<GithubIssue
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_dt_manifest.last_update_timestamp</code>.
+     * Getter for <code>github_issue_dt_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

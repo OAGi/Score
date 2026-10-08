@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocSecurityScopeRecord;
@@ -47,7 +48,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_doc_security_scope</code>
+     * The reference instance of <code>oas_doc_security_scope</code>
      */
     public static final OasDocSecurityScope OAS_DOC_SECURITY_SCOPE = new OasDocSecurityScope();
 
@@ -60,52 +61,50 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     }
 
     /**
-     * The column
-     * <code>oagi.oas_doc_security_scope.oas_doc_security_scope_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_doc_security_scope.oas_doc_security_scope_id</code>.
+     * The primary key of the record.
      */
-    public final TableField<OasDocSecurityScopeRecord, ULong> OAS_DOC_SECURITY_SCOPE_ID = createField(DSL.name("oas_doc_security_scope_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
+    public final TableField<OasDocSecurityScopeRecord, ULong> OAS_DOC_SECURITY_SCOPE_ID = createField(DSL.name("oas_doc_security_scope_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.guid</code>. The GUID of the
+     * The column <code>oas_doc_security_scope.guid</code>. The GUID of the
      * record.
      */
     public final TableField<OasDocSecurityScopeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.oas_doc_security_id</code>.
-     * The owning root-level security entry.
+     * The column <code>oas_doc_security_scope.oas_doc_security_id</code>. The
+     * owning root-level security entry.
      */
     public final TableField<OasDocSecurityScopeRecord, ULong> OAS_DOC_SECURITY_ID = createField(DSL.name("oas_doc_security_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning root-level security entry.");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.scope_name</code>. A scope
-     * name required by this entry (oauth2: from the scheme's flows;
-     * openIdConnect: from the provider).
+     * The column <code>oas_doc_security_scope.scope_name</code>. A scope name
+     * required by this entry (oauth2: from the scheme's flows; openIdConnect:
+     * from the provider).
      */
     public final TableField<OasDocSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider).");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.created_by</code>. The user
-     * who creates the record.
+     * The column <code>oas_doc_security_scope.created_by</code>. The user who
+     * creates the record.
      */
     public final TableField<OasDocSecurityScopeRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.last_updated_by</code>. The
-     * user who last updates the record.
+     * The column <code>oas_doc_security_scope.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public final TableField<OasDocSecurityScopeRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security_scope.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * The column <code>oas_doc_security_scope.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public final TableField<OasDocSecurityScopeRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column
-     * <code>oagi.oas_doc_security_scope.last_update_timestamp</code>. The
+     * The column <code>oas_doc_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasDocSecurityScopeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -119,23 +118,21 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_doc_security_scope</code> table
-     * reference
+     * Create an aliased <code>oas_doc_security_scope</code> table reference
      */
     public OasDocSecurityScope(String alias) {
         this(DSL.name(alias), OAS_DOC_SECURITY_SCOPE);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_doc_security_scope</code> table
-     * reference
+     * Create an aliased <code>oas_doc_security_scope</code> table reference
      */
     public OasDocSecurityScope(Name alias) {
         this(alias, OAS_DOC_SECURITY_SCOPE);
     }
 
     /**
-     * Create a <code>oagi.oas_doc_security_scope</code> table reference
+     * Create a <code>oas_doc_security_scope</code> table reference
      */
     public OasDocSecurityScope() {
         this(DSL.name("oas_doc_security_scope"), null);
@@ -176,7 +173,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -202,8 +199,8 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     private transient AppUserPath _oasDocSecurityScopeCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_doc_security_scope_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_doc_security_scope_created_by_fk</code> key.
      */
     public AppUserPath oasDocSecurityScopeCreatedByFk() {
         if (_oasDocSecurityScopeCreatedByFk == null)
@@ -215,8 +212,8 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     private transient AppUserPath _oasDocSecurityScopeLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_doc_security_scope_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_doc_security_scope_last_updated_by_fk</code> key.
      */
     public AppUserPath oasDocSecurityScopeLastUpdatedByFk() {
         if (_oasDocSecurityScopeLastUpdatedByFk == null)
@@ -228,8 +225,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     private transient OasDocSecurityPath _oasDocSecurity;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_doc_security</code>
-     * table.
+     * Get the implicit join path to the <code>oas_doc_security</code> table.
      */
     public OasDocSecurityPath oasDocSecurity() {
         if (_oasDocSecurity == null)
@@ -282,7 +278,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
      */
     @Override
     public OasDocSecurityScope where(Condition condition) {
-        return new OasDocSecurityScope(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new OasDocSecurityScope(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -349,7 +345,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasDocSecurityScope whereExists(Select<?> select) {
+    public OasDocSecurityScope whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -357,7 +353,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasDocSecurityScope whereNotExists(Select<?> select) {
+    public OasDocSecurityScope whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

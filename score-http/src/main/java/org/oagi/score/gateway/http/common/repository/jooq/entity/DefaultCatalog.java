@@ -26,9 +26,9 @@ public class DefaultCatalog extends CatalogImpl {
     public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
 
     /**
-     * The schema <code>oagi</code>.
+     * The schema <code>DEFAULT_SCHEMA</code>.
      */
-    public final Oagi OAGI = Oagi.OAGI;
+    public final DefaultSchema DEFAULT_SCHEMA = DefaultSchema.DEFAULT_SCHEMA;
 
     /**
      * No further instances allowed
@@ -40,15 +40,15 @@ public class DefaultCatalog extends CatalogImpl {
     @Override
     public final List<Schema> getSchemas() {
         return Arrays.asList(
-            Oagi.OAGI
+            DefaultSchema.DEFAULT_SCHEMA
         );
     }
 
     /**
-     * A reference to the 3.20 minor release of the code generator. If this
+     * A reference to the 3.21 minor release of the code generator. If this
      * doesn't compile, it's because the runtime library uses an older minor
-     * release, namely: 3.20. You can turn off the generation of this reference
+     * release, namely: 3.21. You can turn off the generation of this reference
      * by specifying /configuration/generator/generate/jooqVersionReference
      */
-    private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_20;
+    private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_21;
 }

@@ -263,8 +263,8 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 
 
 /**
- * A class modelling foreign key relationships and constraints of tables in
- * oagi.
+ * A class modelling foreign key relationships and constraints of tables in the
+ * default schema.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
@@ -934,7 +934,6 @@ public class Keys {
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = ForeignKeys0.XBT_LAST_UPDATED_BY_FK;
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = ForeignKeys0.XBT_OWNER_USER_ID_FK;
     public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = ForeignKeys1.XBT_SUBTYPE_OF_XBT_ID_FK;
-    public static final ForeignKey<XbtManifestRecord, CdtPriRecord> XBT_MANIFEST_CDT_PRI_ID_FK = ForeignKeys1.XBT_MANIFEST_CDT_PRI_ID_FK;
     public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = ForeignKeys1.XBT_MANIFEST_LOG_ID_FK;
     public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = ForeignKeys1.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK;
     public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK = ForeignKeys1.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK;
@@ -1450,7 +1449,6 @@ public class Keys {
 
     private static class ForeignKeys1 {
         public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_subtype_of_xbt_id_fk"), new TableField[] { Xbt.XBT.SUBTYPE_OF_XBT_ID }, Keys.KEY_XBT_PRIMARY, new TableField[] { Xbt.XBT.XBT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
-        public static final ForeignKey<XbtManifestRecord, CdtPriRecord> XBT_MANIFEST_CDT_PRI_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_cdt_pri_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.CDT_PRI_ID }, Keys.KEY_CDT_PRI_PRIMARY, new TableField[] { CdtPri.CDT_PRI.CDT_PRI_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_log_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.LOG_ID }, Keys.KEY_LOG_PRIMARY, new TableField[] { Log.LOG.LOG_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_next_xbt_manifest_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.NEXT_XBT_MANIFEST_ID }, Keys.KEY_XBT_MANIFEST_PRIMARY, new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_prev_xbt_manifest_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.PREV_XBT_MANIFEST_ID }, Keys.KEY_XBT_MANIFEST_PRIMARY, new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);

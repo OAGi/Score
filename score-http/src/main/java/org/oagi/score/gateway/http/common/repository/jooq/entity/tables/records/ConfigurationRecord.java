@@ -19,7 +19,7 @@ public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.configuration.configuration_id</code>. Primary key
+     * Setter for <code>configuration.configuration_id</code>. Primary key
      * column.
      */
     public void setConfigurationId(ULong value) {
@@ -27,7 +27,7 @@ public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord
     }
 
     /**
-     * Getter for <code>oagi.configuration.configuration_id</code>. Primary key
+     * Getter for <code>configuration.configuration_id</code>. Primary key
      * column.
      */
     public ULong getConfigurationId() {
@@ -35,48 +35,48 @@ public class ConfigurationRecord extends UpdatableRecordImpl<ConfigurationRecord
     }
 
     /**
-     * Setter for <code>oagi.configuration.name</code>. The name of
-     * configuration property.
+     * Setter for <code>configuration.name</code>. The name of configuration
+     * property.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.configuration.name</code>. The name of
-     * configuration property.
+     * Getter for <code>configuration.name</code>. The name of configuration
+     * property.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.configuration.type</code>. The type of
-     * configuration property.
+     * Setter for <code>configuration.type</code>. The type of configuration
+     * property.
      */
     public void setType(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.configuration.type</code>. The type of
-     * configuration property.
+     * Getter for <code>configuration.type</code>. The type of configuration
+     * property.
      */
     public String getType() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.configuration.value</code>. The value of
-     * configuration property.
+     * Setter for <code>configuration.value</code>. The value of configuration
+     * property.
      */
     public void setValue(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.configuration.value</code>. The value of
-     * configuration property.
+     * Getter for <code>configuration.value</code>. The value of configuration
+     * property.
      */
     public String getValue() {
         return (String) get(3);

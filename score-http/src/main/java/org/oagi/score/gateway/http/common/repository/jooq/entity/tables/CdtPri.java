@@ -20,21 +20,21 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CdtPriRecord;
 
 
@@ -47,7 +47,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.cdt_pri</code>
+     * The reference instance of <code>cdt_pri</code>
      */
     public static final CdtPri CDT_PRI = new CdtPri();
 
@@ -60,14 +60,14 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     }
 
     /**
-     * The column <code>oagi.cdt_pri.cdt_pri_id</code>. Internal, primary
-     * database key.
+     * The column <code>cdt_pri.cdt_pri_id</code>. Internal, primary database
+     * key.
      */
-    public final TableField<CdtPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
+    public final TableField<CdtPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Internal, primary database key.");
 
     /**
-     * The column <code>oagi.cdt_pri.name</code>. Name of the CDT primitive per
-     * the CCTS datatype catalog, e.g., Decimal.
+     * The column <code>cdt_pri.name</code>. Name of the CDT primitive per the
+     * CCTS datatype catalog, e.g., Decimal.
      */
     public final TableField<CdtPriRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).nullable(false), this, "Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.");
 
@@ -80,21 +80,21 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.cdt_pri</code> table reference
+     * Create an aliased <code>cdt_pri</code> table reference
      */
     public CdtPri(String alias) {
         this(DSL.name(alias), CDT_PRI);
     }
 
     /**
-     * Create an aliased <code>oagi.cdt_pri</code> table reference
+     * Create an aliased <code>cdt_pri</code> table reference
      */
     public CdtPri(Name alias) {
         this(alias, CDT_PRI);
     }
 
     /**
-     * Create a <code>oagi.cdt_pri</code> table reference
+     * Create a <code>cdt_pri</code> table reference
      */
     public CdtPri() {
         this(DSL.name("cdt_pri"), null);
@@ -135,7 +135,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -156,8 +156,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     private transient DtAwdPriPath _dtAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
-     * table
+     * Get the implicit to-many join path to the <code>dt_awd_pri</code> table
      */
     public DtAwdPriPath dtAwdPri() {
         if (_dtAwdPri == null)
@@ -169,7 +168,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     private transient DtScAwdPriPath _dtScAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_sc_awd_pri</code>
+     * Get the implicit to-many join path to the <code>dt_sc_awd_pri</code>
      * table
      */
     public DtScAwdPriPath dtScAwdPri() {
@@ -177,19 +176,6 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
             _dtScAwdPri = new DtScAwdPriPath(this, null, Keys.DT_SC_AWD_PRI_CDT_PRI_ID_FK.getInverseKey());
 
         return _dtScAwdPri;
-    }
-
-    private transient XbtManifestPath _xbtManifest;
-
-    /**
-     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
-     * table
-     */
-    public XbtManifestPath xbtManifest() {
-        if (_xbtManifest == null)
-            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_CDT_PRI_ID_FK.getInverseKey());
-
-        return _xbtManifest;
     }
 
     @Override
@@ -236,7 +222,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
      */
     @Override
     public CdtPri where(Condition condition) {
-        return new CdtPri(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new CdtPri(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -303,7 +289,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public CdtPri whereExists(Select<?> select) {
+    public CdtPri whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -311,7 +297,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public CdtPri whereNotExists(Select<?> select) {
+    public CdtPri whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

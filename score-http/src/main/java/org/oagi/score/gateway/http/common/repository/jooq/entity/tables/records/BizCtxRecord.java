@@ -22,23 +22,23 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal
-     * database key.
+     * Setter for <code>biz_ctx.biz_ctx_id</code>. Primary, internal database
+     * key.
      */
     public void setBizCtxId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal
-     * database key.
+     * Getter for <code>biz_ctx.biz_ctx_id</code>. Primary, internal database
+     * key.
      */
     public ULong getBizCtxId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.guid</code>. A globally unique identifier
+     * Setter for <code>biz_ctx.guid</code>. A globally unique identifier
      * (GUID).
      */
     public void setGuid(String value) {
@@ -46,7 +46,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.guid</code>. A globally unique identifier
+     * Getter for <code>biz_ctx.guid</code>. A globally unique identifier
      * (GUID).
      */
     public String getGuid() {
@@ -54,7 +54,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
+     * Setter for <code>biz_ctx.name</code>. Short, descriptive name of the
      * business context.
      */
     public void setName(String value) {
@@ -62,7 +62,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
+     * Getter for <code>biz_ctx.name</code>. Short, descriptive name of the
      * business context.
      */
     public String getName() {
@@ -70,23 +70,23 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * Setter for <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * Getter for <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the
+     * Setter for <code>biz_ctx.last_updated_by</code>. Foreign key to the
      * APP_USER table  referring to the last user who has updated the business
      * context.
      */
@@ -95,7 +95,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the
+     * Getter for <code>biz_ctx.last_updated_by</code>. Foreign key to the
      * APP_USER table  referring to the last user who has updated the business
      * context.
      */
@@ -104,32 +104,32 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when
-     * the business context record was first created. 
+     * Setter for <code>biz_ctx.creation_timestamp</code>. Timestamp when the
+     * business context record was first created. 
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when
-     * the business context record was first created. 
+     * Getter for <code>biz_ctx.creation_timestamp</code>. Timestamp when the
+     * business context record was first created. 
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(5);
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp
-     * when the business context was last updated.
+     * Setter for <code>biz_ctx.last_update_timestamp</code>. The timestamp when
+     * the business context was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp
-     * when the business context was last updated.
+     * Getter for <code>biz_ctx.last_update_timestamp</code>. The timestamp when
+     * the business context was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(6);

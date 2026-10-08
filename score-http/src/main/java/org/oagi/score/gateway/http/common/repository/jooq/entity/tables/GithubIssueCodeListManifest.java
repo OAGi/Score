@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
@@ -48,8 +49,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of
-     * <code>oagi.github_issue_code_list_manifest</code>
+     * The reference instance of <code>github_issue_code_list_manifest</code>
      */
     public static final GithubIssueCodeListManifest GITHUB_ISSUE_CODE_LIST_MANIFEST = new GithubIssueCodeListManifest();
 
@@ -63,49 +63,47 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
 
     /**
      * The column
-     * <code>oagi.github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
      * Primary key column.
      */
-    public final TableField<GithubIssueCodeListManifestRecord, ULong> GITHUB_ISSUE_CODE_LIST_MANIFEST_ID = createField(DSL.name("github_issue_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+    public final TableField<GithubIssueCodeListManifestRecord, ULong> GITHUB_ISSUE_CODE_LIST_MANIFEST_ID = createField(DSL.name("github_issue_code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key column.");
 
     /**
      * The column
-     * <code>oagi.github_issue_code_list_manifest.code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.code_list_manifest_id</code>.
      * Foreign key to code_list_manifest; the code list (in a given release)
      * linked to a GitHub issue.
      */
     public final TableField<GithubIssueCodeListManifestRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to code_list_manifest; the code list (in a given release) linked to a GitHub issue.");
 
     /**
-     * The column
-     * <code>oagi.github_issue_code_list_manifest.github_issue_id</code>.
+     * The column <code>github_issue_code_list_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public final TableField<GithubIssueCodeListManifestRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to github_issue; the linked GitHub issue.");
 
     /**
-     * The column <code>oagi.github_issue_code_list_manifest.created_by</code>.
+     * The column <code>github_issue_code_list_manifest.created_by</code>.
      * Foreign key to app_user; who created the link.
      */
     public final TableField<GithubIssueCodeListManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who created the link.");
 
     /**
-     * The column
-     * <code>oagi.github_issue_code_list_manifest.last_updated_by</code>.
+     * The column <code>github_issue_code_list_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public final TableField<GithubIssueCodeListManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who last updated the link.");
 
     /**
      * The column
-     * <code>oagi.github_issue_code_list_manifest.creation_timestamp</code>.
+     * <code>github_issue_code_list_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public final TableField<GithubIssueCodeListManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
      * The column
-     * <code>oagi.github_issue_code_list_manifest.last_update_timestamp</code>.
+     * <code>github_issue_code_list_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public final TableField<GithubIssueCodeListManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
@@ -119,7 +117,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_code_list_manifest</code> table
+     * Create an aliased <code>github_issue_code_list_manifest</code> table
      * reference
      */
     public GithubIssueCodeListManifest(String alias) {
@@ -127,7 +125,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_code_list_manifest</code> table
+     * Create an aliased <code>github_issue_code_list_manifest</code> table
      * reference
      */
     public GithubIssueCodeListManifest(Name alias) {
@@ -135,8 +133,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     }
 
     /**
-     * Create a <code>oagi.github_issue_code_list_manifest</code> table
-     * reference
+     * Create a <code>github_issue_code_list_manifest</code> table reference
      */
     public GithubIssueCodeListManifest() {
         this(DSL.name("github_issue_code_list_manifest"), null);
@@ -177,7 +174,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -203,8 +200,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     private transient CodeListManifestPath _codeListManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
-     * table.
+     * Get the implicit join path to the <code>code_list_manifest</code> table.
      */
     public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
@@ -216,8 +212,8 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     private transient AppUserPath _githubIssueCodeListManifestCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_code_list_manifest_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_code_list_manifest_created_by_fk</code> key.
      */
     public AppUserPath githubIssueCodeListManifestCreatedByFk() {
         if (_githubIssueCodeListManifestCreatedByFk == null)
@@ -229,7 +225,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     private transient GithubIssuePath _githubIssue;
 
     /**
-     * Get the implicit join path to the <code>oagi.github_issue</code> table.
+     * Get the implicit join path to the <code>github_issue</code> table.
      */
     public GithubIssuePath githubIssue() {
         if (_githubIssue == null)
@@ -241,8 +237,8 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     private transient AppUserPath _githubIssueCodeListManifestLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_code_list_manifest_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_code_list_manifest_last_updated_by_fk</code> key.
      */
     public AppUserPath githubIssueCodeListManifestLastUpdatedByFk() {
         if (_githubIssueCodeListManifestLastUpdatedByFk == null)
@@ -295,7 +291,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
      */
     @Override
     public GithubIssueCodeListManifest where(Condition condition) {
-        return new GithubIssueCodeListManifest(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new GithubIssueCodeListManifest(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -362,7 +358,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssueCodeListManifest whereExists(Select<?> select) {
+    public GithubIssueCodeListManifest whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -370,7 +366,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssueCodeListManifest whereNotExists(Select<?> select) {
+    public GithubIssueCodeListManifest whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOauthScope.OasOauthScopePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasSecurityScheme.OasSecuritySchemePath;
@@ -49,7 +50,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_oauth_flow</code>
+     * The reference instance of <code>oas_oauth_flow</code>
      */
     public static final OasOauthFlow OAS_OAUTH_FLOW = new OasOauthFlow();
 
@@ -62,76 +63,75 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     }
 
     /**
-     * The column <code>oagi.oas_oauth_flow.oas_oauth_flow_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_oauth_flow.oas_oauth_flow_id</code>. The primary key
+     * of the record.
      */
-    public final TableField<OasOauthFlowRecord, ULong> OAS_OAUTH_FLOW_ID = createField(DSL.name("oas_oauth_flow_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
+    public final TableField<OasOauthFlowRecord, ULong> OAS_OAUTH_FLOW_ID = createField(DSL.name("oas_oauth_flow_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.guid</code>. The GUID of the record.
+     * The column <code>oas_oauth_flow.guid</code>. The GUID of the record.
      */
     public final TableField<OasOauthFlowRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.oas_security_scheme_id</code>. The
-     * owning oauth2 security scheme; one entry of that scheme's flows map.
+     * The column <code>oas_oauth_flow.oas_security_scheme_id</code>. The owning
+     * oauth2 security scheme; one entry of that scheme's flows map.
      */
     public final TableField<OasOauthFlowRecord, ULong> OAS_SECURITY_SCHEME_ID = createField(DSL.name("oas_security_scheme_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning oauth2 security scheme; one entry of that scheme's flows map.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.flow_type</code>. REQUIRED. The
-     * OAuth Flows key: implicit | password | clientCredentials |
-     * authorizationCode | deviceAuthorization (deviceAuthorization requires
-     * OpenAPI 3.2+).
+     * The column <code>oas_oauth_flow.flow_type</code>. REQUIRED. The OAuth
+     * Flows key: implicit | password | clientCredentials | authorizationCode |
+     * deviceAuthorization (deviceAuthorization requires OpenAPI 3.2+).
      */
     public final TableField<OasOauthFlowRecord, String> FLOW_TYPE = createField(DSL.name("flow_type"), SQLDataType.VARCHAR(30).nullable(false), this, "REQUIRED. The OAuth Flows key: implicit | password | clientCredentials | authorizationCode | deviceAuthorization (deviceAuthorization requires OpenAPI 3.2+).");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.authorization_url</code>. REQUIRED
-     * for the implicit and authorizationCode flows. MUST be a URL.
+     * The column <code>oas_oauth_flow.authorization_url</code>. REQUIRED for
+     * the implicit and authorizationCode flows. MUST be a URL.
      */
     public final TableField<OasOauthFlowRecord, String> AUTHORIZATION_URL = createField(DSL.name("authorization_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED for the implicit and authorizationCode flows. MUST be a URL.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.token_url</code>. REQUIRED for the
+     * The column <code>oas_oauth_flow.token_url</code>. REQUIRED for the
      * password, clientCredentials, authorizationCode and deviceAuthorization
      * flows. MUST be a URL.
      */
     public final TableField<OasOauthFlowRecord, String> TOKEN_URL = createField(DSL.name("token_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED for the password, clientCredentials, authorizationCode and deviceAuthorization flows. MUST be a URL.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.refresh_url</code>. Optional. The
-     * OAuth refreshUrl for obtaining refresh tokens. MUST be a URL.
+     * The column <code>oas_oauth_flow.refresh_url</code>. Optional. The OAuth
+     * refreshUrl for obtaining refresh tokens. MUST be a URL.
      */
     public final TableField<OasOauthFlowRecord, String> REFRESH_URL = createField(DSL.name("refresh_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Optional. The OAuth refreshUrl for obtaining refresh tokens. MUST be a URL.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.device_authorization_url</code>.
-     * OpenAPI 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST
-     * be a URL.
+     * The column <code>oas_oauth_flow.device_authorization_url</code>. OpenAPI
+     * 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST be a
+     * URL.
      */
     public final TableField<OasOauthFlowRecord, String> DEVICE_AUTHORIZATION_URL = createField(DSL.name("device_authorization_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "OpenAPI 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST be a URL.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.created_by</code>. The user who
-     * creates the record.
+     * The column <code>oas_oauth_flow.created_by</code>. The user who creates
+     * the record.
      */
     public final TableField<OasOauthFlowRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.last_updated_by</code>. The user who
-     * last updates the record.
+     * The column <code>oas_oauth_flow.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public final TableField<OasOauthFlowRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * The column <code>oas_oauth_flow.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public final TableField<OasOauthFlowRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.oas_oauth_flow.last_update_timestamp</code>. The
+     * The column <code>oas_oauth_flow.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasOauthFlowRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -145,21 +145,21 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_oauth_flow</code> table reference
+     * Create an aliased <code>oas_oauth_flow</code> table reference
      */
     public OasOauthFlow(String alias) {
         this(DSL.name(alias), OAS_OAUTH_FLOW);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_oauth_flow</code> table reference
+     * Create an aliased <code>oas_oauth_flow</code> table reference
      */
     public OasOauthFlow(Name alias) {
         this(alias, OAS_OAUTH_FLOW);
     }
 
     /**
-     * Create a <code>oagi.oas_oauth_flow</code> table reference
+     * Create a <code>oas_oauth_flow</code> table reference
      */
     public OasOauthFlow() {
         this(DSL.name("oas_oauth_flow"), null);
@@ -200,7 +200,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -226,8 +226,8 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     private transient AppUserPath _oasOauthFlowCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_oauth_flow_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_oauth_flow_created_by_fk</code> key.
      */
     public AppUserPath oasOauthFlowCreatedByFk() {
         if (_oasOauthFlowCreatedByFk == null)
@@ -239,8 +239,8 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     private transient AppUserPath _oasOauthFlowLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_oauth_flow_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_oauth_flow_last_updated_by_fk</code> key.
      */
     public AppUserPath oasOauthFlowLastUpdatedByFk() {
         if (_oasOauthFlowLastUpdatedByFk == null)
@@ -252,8 +252,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     private transient OasSecuritySchemePath _oasSecurityScheme;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_security_scheme</code>
-     * table.
+     * Get the implicit join path to the <code>oas_security_scheme</code> table.
      */
     public OasSecuritySchemePath oasSecurityScheme() {
         if (_oasSecurityScheme == null)
@@ -265,8 +264,8 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     private transient OasOauthScopePath _oasOauthScope;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_scope</code> table
+     * Get the implicit to-many join path to the <code>oas_oauth_scope</code>
+     * table
      */
     public OasOauthScopePath oasOauthScope() {
         if (_oasOauthScope == null)
@@ -319,7 +318,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
      */
     @Override
     public OasOauthFlow where(Condition condition) {
-        return new OasOauthFlow(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new OasOauthFlow(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -386,7 +385,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasOauthFlow whereExists(Select<?> select) {
+    public OasOauthFlow whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -394,7 +393,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasOauthFlow whereNotExists(Select<?> select) {
+    public OasOauthFlow whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri.CdtPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
@@ -56,7 +57,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.dt_awd_pri</code>
+     * The reference instance of <code>dt_awd_pri</code>
      */
     public static final DtAwdPri DT_AWD_PRI = new DtAwdPri();
 
@@ -69,49 +70,48 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     }
 
     /**
-     * The column <code>oagi.dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
+     * The column <code>dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
      * database key.
      */
-    public final TableField<DtAwdPriRecord, ULong> DT_AWD_PRI_ID = createField(DSL.name("dt_awd_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<DtAwdPriRecord, ULong> DT_AWD_PRI_ID = createField(DSL.name("dt_awd_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.release_id</code>. Foreign key to the
-     * RELEASE table.
+     * The column <code>dt_awd_pri.release_id</code>. Foreign key to the RELEASE
+     * table.
      */
     public final TableField<DtAwdPriRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the RELEASE table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.dt_id</code>. Foreign key to the DT
-     * table.
+     * The column <code>dt_awd_pri.dt_id</code>. Foreign key to the DT table.
      */
     public final TableField<DtAwdPriRecord, ULong> DT_ID = createField(DSL.name("dt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the DT table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.cdt_pri_id</code>. Foreign key to the
-     * CDT_PRI table.
+     * The column <code>dt_awd_pri.cdt_pri_id</code>. Foreign key to the CDT_PRI
+     * table.
      */
     public final TableField<DtAwdPriRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CDT_PRI table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.xbt_manifest_id</code>. This is a
-     * foreign key to the XBT_MANIFEST table.
+     * The column <code>dt_awd_pri.xbt_manifest_id</code>. This is a foreign key
+     * to the XBT_MANIFEST table.
      */
     public final TableField<DtAwdPriRecord, ULong> XBT_MANIFEST_ID = createField(DSL.name("xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the XBT_MANIFEST table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.code_list_manifest_id</code>. Foreign
-     * key to the CODE_LIST_MANIFEST table.
+     * The column <code>dt_awd_pri.code_list_manifest_id</code>. Foreign key to
+     * the CODE_LIST_MANIFEST table.
      */
     public final TableField<DtAwdPriRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the CODE_LIST_MANIFEST table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.agency_id_list_manifest_id</code>. This
-     * is a foreign key to the AGENCY_ID_LIST_MANIFEST table.
+     * The column <code>dt_awd_pri.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table.
      */
     public final TableField<DtAwdPriRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table.");
 
     /**
-     * The column <code>oagi.dt_awd_pri.is_default</code>. It indicates the most
+     * The column <code>dt_awd_pri.is_default</code>. It indicates the most
      * generic primitive for the data type.
      */
     public final TableField<DtAwdPriRecord, Byte> IS_DEFAULT = createField(DSL.name("is_default"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "It indicates the most generic primitive for the data type.");
@@ -125,21 +125,21 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.dt_awd_pri</code> table reference
+     * Create an aliased <code>dt_awd_pri</code> table reference
      */
     public DtAwdPri(String alias) {
         this(DSL.name(alias), DT_AWD_PRI);
     }
 
     /**
-     * Create an aliased <code>oagi.dt_awd_pri</code> table reference
+     * Create an aliased <code>dt_awd_pri</code> table reference
      */
     public DtAwdPri(Name alias) {
         this(alias, DT_AWD_PRI);
     }
 
     /**
-     * Create a <code>oagi.dt_awd_pri</code> table reference
+     * Create a <code>dt_awd_pri</code> table reference
      */
     public DtAwdPri() {
         this(DSL.name("dt_awd_pri"), null);
@@ -180,7 +180,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -201,8 +201,8 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
-     * Get the implicit join path to the
-     * <code>oagi.agency_id_list_manifest</code> table.
+     * Get the implicit join path to the <code>agency_id_list_manifest</code>
+     * table.
      */
     public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
@@ -214,7 +214,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient CdtPriPath _cdtPri;
 
     /**
-     * Get the implicit join path to the <code>oagi.cdt_pri</code> table.
+     * Get the implicit join path to the <code>cdt_pri</code> table.
      */
     public CdtPriPath cdtPri() {
         if (_cdtPri == null)
@@ -226,8 +226,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient CodeListManifestPath _codeListManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
-     * table.
+     * Get the implicit join path to the <code>code_list_manifest</code> table.
      */
     public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
@@ -239,7 +238,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient DtPath _dt;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table.
+     * Get the implicit join path to the <code>dt</code> table.
      */
     public DtPath dt() {
         if (_dt == null)
@@ -251,7 +250,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient ReleasePath _release;
 
     /**
-     * Get the implicit join path to the <code>oagi.release</code> table.
+     * Get the implicit join path to the <code>release</code> table.
      */
     public ReleasePath release() {
         if (_release == null)
@@ -263,7 +262,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     private transient XbtManifestPath _xbtManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table.
+     * Get the implicit join path to the <code>xbt_manifest</code> table.
      */
     public XbtManifestPath xbtManifest() {
         if (_xbtManifest == null)
@@ -316,7 +315,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
      */
     @Override
     public DtAwdPri where(Condition condition) {
-        return new DtAwdPri(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new DtAwdPri(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -383,7 +382,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public DtAwdPri whereExists(Select<?> select) {
+    public DtAwdPri whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -391,7 +390,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public DtAwdPri whereNotExists(Select<?> select) {
+    public DtAwdPri whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

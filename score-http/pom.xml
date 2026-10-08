@@ -65,10 +65,6 @@
         <maven.compiler.release>21</maven.compiler.release>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
-        <db.url>jdbc:mariadb://localhost:3306/oagi</db.url>
-        <db.user>oagi</db.user>
-        <db.password>oagi</db.password>
-
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.25.1</aspectj.version>
         <!-- lettuce/netty versions are managed by the Spring Boot 4 BOM (pins removed for #1750). -->
@@ -449,7 +445,9 @@
 
                         <database>
                             <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
-                            <inputSchema>oagi</inputSchema>
+                            <inputSchema>${db.name}</inputSchema>
+                            <!-- generate into the default schema, so the generated code carries no database name -->
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
                             <includes>.*</includes>
                             <excludes></excludes>
                         </database>

@@ -25,7 +25,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
+     * Setter for <code>dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
      * database key.
      */
     public void setDtAwdPriId(ULong value) {
@@ -33,7 +33,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
+     * Getter for <code>dt_awd_pri.dt_awd_pri_id</code>. Primary, internal
      * database key.
      */
     public ULong getDtAwdPriId() {
@@ -41,103 +41,101 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.release_id</code>. Foreign key to the
-     * RELEASE table.
+     * Setter for <code>dt_awd_pri.release_id</code>. Foreign key to the RELEASE
+     * table.
      */
     public void setReleaseId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.release_id</code>. Foreign key to the
-     * RELEASE table.
+     * Getter for <code>dt_awd_pri.release_id</code>. Foreign key to the RELEASE
+     * table.
      */
     public ULong getReleaseId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.dt_id</code>. Foreign key to the DT
-     * table.
+     * Setter for <code>dt_awd_pri.dt_id</code>. Foreign key to the DT table.
      */
     public void setDtId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.dt_id</code>. Foreign key to the DT
-     * table.
+     * Getter for <code>dt_awd_pri.dt_id</code>. Foreign key to the DT table.
      */
     public ULong getDtId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.cdt_pri_id</code>. Foreign key to the
-     * CDT_PRI table.
+     * Setter for <code>dt_awd_pri.cdt_pri_id</code>. Foreign key to the CDT_PRI
+     * table.
      */
     public void setCdtPriId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.cdt_pri_id</code>. Foreign key to the
-     * CDT_PRI table.
+     * Getter for <code>dt_awd_pri.cdt_pri_id</code>. Foreign key to the CDT_PRI
+     * table.
      */
     public ULong getCdtPriId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.xbt_manifest_id</code>. This is a
-     * foreign key to the XBT_MANIFEST table.
+     * Setter for <code>dt_awd_pri.xbt_manifest_id</code>. This is a foreign key
+     * to the XBT_MANIFEST table.
      */
     public void setXbtManifestId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.xbt_manifest_id</code>. This is a
-     * foreign key to the XBT_MANIFEST table.
+     * Getter for <code>dt_awd_pri.xbt_manifest_id</code>. This is a foreign key
+     * to the XBT_MANIFEST table.
      */
     public ULong getXbtManifestId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.code_list_manifest_id</code>. Foreign
-     * key to the CODE_LIST_MANIFEST table.
+     * Setter for <code>dt_awd_pri.code_list_manifest_id</code>. Foreign key to
+     * the CODE_LIST_MANIFEST table.
      */
     public void setCodeListManifestId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.code_list_manifest_id</code>. Foreign
-     * key to the CODE_LIST_MANIFEST table.
+     * Getter for <code>dt_awd_pri.code_list_manifest_id</code>. Foreign key to
+     * the CODE_LIST_MANIFEST table.
      */
     public ULong getCodeListManifestId() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.agency_id_list_manifest_id</code>. This
-     * is a foreign key to the AGENCY_ID_LIST_MANIFEST table.
+     * Setter for <code>dt_awd_pri.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table.
      */
     public void setAgencyIdListManifestId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.agency_id_list_manifest_id</code>. This
-     * is a foreign key to the AGENCY_ID_LIST_MANIFEST table.
+     * Getter for <code>dt_awd_pri.agency_id_list_manifest_id</code>. This is a
+     * foreign key to the AGENCY_ID_LIST_MANIFEST table.
      */
     public ULong getAgencyIdListManifestId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.dt_awd_pri.is_default</code>. It indicates the most
+     * Setter for <code>dt_awd_pri.is_default</code>. It indicates the most
      * generic primitive for the data type.
      */
     public void setIsDefault(Byte value) {
@@ -145,7 +143,7 @@ public class DtAwdPriRecord extends UpdatableRecordImpl<DtAwdPriRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_awd_pri.is_default</code>. It indicates the most
+     * Getter for <code>dt_awd_pri.is_default</code>. It indicates the most
      * generic primitive for the data type.
      */
     public Byte getIsDefault() {

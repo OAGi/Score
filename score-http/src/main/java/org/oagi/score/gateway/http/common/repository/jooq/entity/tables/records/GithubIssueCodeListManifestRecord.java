@@ -22,7 +22,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Setter for
-     * <code>oagi.github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
      * Primary key column.
      */
     public void setGithubIssueCodeListManifestId(ULong value) {
@@ -31,7 +31,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Getter for
-     * <code>oagi.github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.github_issue_code_list_manifest_id</code>.
      * Primary key column.
      */
     public ULong getGithubIssueCodeListManifestId() {
@@ -40,7 +40,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Setter for
-     * <code>oagi.github_issue_code_list_manifest.code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.code_list_manifest_id</code>.
      * Foreign key to code_list_manifest; the code list (in a given release)
      * linked to a GitHub issue.
      */
@@ -50,7 +50,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Getter for
-     * <code>oagi.github_issue_code_list_manifest.code_list_manifest_id</code>.
+     * <code>github_issue_code_list_manifest.code_list_manifest_id</code>.
      * Foreign key to code_list_manifest; the code list (in a given release)
      * linked to a GitHub issue.
      */
@@ -59,8 +59,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_code_list_manifest.github_issue_id</code>.
+     * Setter for <code>github_issue_code_list_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public void setGithubIssueId(ULong value) {
@@ -68,8 +67,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_code_list_manifest.github_issue_id</code>.
+     * Getter for <code>github_issue_code_list_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public ULong getGithubIssueId() {
@@ -77,7 +75,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Setter for <code>oagi.github_issue_code_list_manifest.created_by</code>.
+     * Setter for <code>github_issue_code_list_manifest.created_by</code>.
      * Foreign key to app_user; who created the link.
      */
     public void setCreatedBy(ULong value) {
@@ -85,7 +83,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Getter for <code>oagi.github_issue_code_list_manifest.created_by</code>.
+     * Getter for <code>github_issue_code_list_manifest.created_by</code>.
      * Foreign key to app_user; who created the link.
      */
     public ULong getCreatedBy() {
@@ -93,8 +91,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_code_list_manifest.last_updated_by</code>.
+     * Setter for <code>github_issue_code_list_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -102,8 +99,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_code_list_manifest.last_updated_by</code>.
+     * Getter for <code>github_issue_code_list_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public ULong getLastUpdatedBy() {
@@ -112,7 +108,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Setter for
-     * <code>oagi.github_issue_code_list_manifest.creation_timestamp</code>.
+     * <code>github_issue_code_list_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -121,7 +117,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Getter for
-     * <code>oagi.github_issue_code_list_manifest.creation_timestamp</code>.
+     * <code>github_issue_code_list_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -130,7 +126,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Setter for
-     * <code>oagi.github_issue_code_list_manifest.last_update_timestamp</code>.
+     * <code>github_issue_code_list_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -139,7 +135,7 @@ public class GithubIssueCodeListManifestRecord extends UpdatableRecordImpl<Githu
 
     /**
      * Getter for
-     * <code>oagi.github_issue_code_list_manifest.last_update_timestamp</code>.
+     * <code>github_issue_code_list_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

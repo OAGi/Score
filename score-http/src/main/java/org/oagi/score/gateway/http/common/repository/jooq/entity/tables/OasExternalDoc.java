@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OasDocPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExternalDocDoc.OasExternalDocDocPath;
@@ -48,7 +49,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_external_doc</code>
+     * The reference instance of <code>oas_external_doc</code>
      */
     public static final OasExternalDoc OAS_EXTERNAL_DOC = new OasExternalDoc();
 
@@ -61,44 +62,44 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     }
 
     /**
-     * The column <code>oagi.oas_external_doc.oas_external_doc_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_external_doc.oas_external_doc_id</code>. The primary
+     * key of the record.
      */
-    public final TableField<OasExternalDocRecord, ULong> OAS_EXTERNAL_DOC_ID = createField(DSL.name("oas_external_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
+    public final TableField<OasExternalDocRecord, ULong> OAS_EXTERNAL_DOC_ID = createField(DSL.name("oas_external_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_external_doc.url</code>. REQUIRED. The URL for
-     * the target documentation. Value MUST be in the format of a URL.
+     * The column <code>oas_external_doc.url</code>. REQUIRED. The URL for the
+     * target documentation. Value MUST be in the format of a URL.
      */
     public final TableField<OasExternalDocRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(250).nullable(false), this, "REQUIRED. The URL for the target documentation. Value MUST be in the format of a URL.");
 
     /**
-     * The column <code>oagi.oas_external_doc.description</code>. A short
-     * description of the target documentation. CommonMark syntax MAY be used
-     * for rich text representation.
+     * The column <code>oas_external_doc.description</code>. A short description
+     * of the target documentation. CommonMark syntax MAY be used for rich text
+     * representation.
      */
     public final TableField<OasExternalDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A short description of the target documentation. CommonMark syntax MAY be used for rich text representation.");
 
     /**
-     * The column <code>oagi.oas_external_doc.created_by</code>. The user who
-     * creates the record.
+     * The column <code>oas_external_doc.created_by</code>. The user who creates
+     * the record.
      */
     public final TableField<OasExternalDocRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_external_doc.last_updated_by</code>. The user
-     * who last updates the record.
+     * The column <code>oas_external_doc.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public final TableField<OasExternalDocRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_external_doc.creation_timestamp</code>. The
+     * The column <code>oas_external_doc.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public final TableField<OasExternalDocRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.oas_external_doc.last_update_timestamp</code>. The
+     * The column <code>oas_external_doc.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasExternalDocRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -112,21 +113,21 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_external_doc</code> table reference
+     * Create an aliased <code>oas_external_doc</code> table reference
      */
     public OasExternalDoc(String alias) {
         this(DSL.name(alias), OAS_EXTERNAL_DOC);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_external_doc</code> table reference
+     * Create an aliased <code>oas_external_doc</code> table reference
      */
     public OasExternalDoc(Name alias) {
         this(alias, OAS_EXTERNAL_DOC);
     }
 
     /**
-     * Create a <code>oagi.oas_external_doc</code> table reference
+     * Create a <code>oas_external_doc</code> table reference
      */
     public OasExternalDoc() {
         this(DSL.name("oas_external_doc"), null);
@@ -167,7 +168,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -188,8 +189,8 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     private transient AppUserPath _oasExternalDocCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_external_doc_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_external_doc_created_by_fk</code> key.
      */
     public AppUserPath oasExternalDocCreatedByFk() {
         if (_oasExternalDocCreatedByFk == null)
@@ -201,8 +202,8 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     private transient AppUserPath _oasExternalDocLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_external_doc_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_external_doc_last_updated_by_fk</code> key.
      */
     public AppUserPath oasExternalDocLastUpdatedByFk() {
         if (_oasExternalDocLastUpdatedByFk == null)
@@ -215,7 +216,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_external_doc_doc</code> table
+     * <code>oas_external_doc_doc</code> table
      */
     public OasExternalDocDocPath oasExternalDocDoc() {
         if (_oasExternalDocDoc == null)
@@ -225,8 +226,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     }
 
     /**
-     * Get the implicit many-to-many join path to the <code>oagi.oas_doc</code>
-     * table
+     * Get the implicit many-to-many join path to the <code>oas_doc</code> table
      */
     public OasDocPath oasDoc() {
         return oasExternalDocDoc().oasDoc();
@@ -276,7 +276,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      */
     @Override
     public OasExternalDoc where(Condition condition) {
-        return new OasExternalDoc(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new OasExternalDoc(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -343,7 +343,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasExternalDoc whereExists(Select<?> select) {
+    public OasExternalDoc whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -351,7 +351,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public OasExternalDoc whereNotExists(Select<?> select) {
+    public OasExternalDoc whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

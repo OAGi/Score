@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
@@ -138,7 +139,7 @@ public class LogRepository {
                         record.get(LOG.REFERENCE),
                         record.get(LOG.REVISION_NUM).intValue(),
                         record.get(LOG.REVISION_TRACKING_NUM).intValue(),
-                        record.get(LOG.SNAPSHOT)));
+                        (record.get(LOG.SNAPSHOT) != null) ? record.get(LOG.SNAPSHOT).data() : null));
     }
 
     private static Field<String> jsonExtract(Field<?> field, String jsonPath) {
@@ -466,7 +467,7 @@ public class LogRepository {
             }
 
             return dslContext.insertInto(LOG)
-                    .set(LOG.SNAPSHOT, content != null ? content.toString() : null)
+                    .set(LOG.SNAPSHOT, content != null ? JSON.json(content.toString()) : null)
                     .set(LOG.PREV_LOG_ID, getPrevLogId())
                     .set(LOG.CREATED_BY, getCreatedBy())
                     .set(LOG.CREATION_TIMESTAMP, getCreationTimestamp())
@@ -523,7 +524,7 @@ public class LogRepository {
             }
 
             dslContext.update(LOG)
-                    .set(LOG.SNAPSHOT, content != null ? content.toString() : null)
+                    .set(LOG.SNAPSHOT, content != null ? JSON.json(content.toString()) : null)
                     .where(LOG.LOG_ID.eq(this.logId))
                     .returning().fetchOne();
         }
