@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Flyway baseline: the connectCenter (Score) 3.4.0 schema plus the built-in users.
+-- Flyway baseline: the connectCenter (Score) 3.4.0 schema, the built-in users, and the primitive/XSD type reference data.
 --
 -- Runs only on an empty schema. Databases already baselined at 3.4.0 (or upgraded
 -- from earlier releases) skip it. Derived from score-repo/scripts/score-schema.sql;
@@ -3578,6 +3578,75 @@ INSERT INTO `app_user` (`app_user_id`, `login_id`, `password`, `name`, `organiza
                         `email_verified_timestamp`, `is_developer`, `is_admin`, `is_enabled`)
 VALUES (0, 'sysadm', '', 'System', 'System', NULL, 0, NULL, 1, 1, 1),
        (1, 'admin', '$2a$10$M/PiICx/PrmrV/MUo/KYLOqXOo1vXfyfX37YwKU8HkGbwEpcpuUba', 'Administrator', NULL, NULL, 0, NULL, 1, 1, 1);
+
+--
+-- Reference data every installation needs: the CCTS primitive types (cdt_pri) and the built-in XSD types (xbt).
+-- Library, release and data type content is not part of the baseline; it is loaded separately. Fixed ids;
+-- foreign key checks are off at this point. xbt.jbt_202012_map and xbt.openapi31_map are filled by later migrations.
+--
+
+-- cdt_pri: the CCTS primitive types (11)
+INSERT INTO `cdt_pri` (`cdt_pri_id`, `name`) VALUES
+  (1, 'Binary'),
+  (2, 'Boolean'),
+  (3, 'Decimal'),
+  (4, 'Double'),
+  (5, 'Float'),
+  (6, 'Integer'),
+  (7, 'NormalizedString'),
+  (8, 'String'),
+  (9, 'TimeDuration'),
+  (10, 'TimePoint'),
+  (11, 'Token');
+
+-- xbt: the built-in XSD types (XBTs), parents before children (46)
+INSERT INTO `xbt` (`xbt_id`, `guid`, `name`, `builtIn_type`, `jbt_draft05_map`, `openapi30_map`, `avro_map`, `subtype_of_xbt_id`, `schema_definition`, `revision_doc`, `state`, `created_by`, `owner_user_id`, `last_updated_by`, `creation_timestamp`, `last_update_timestamp`, `is_deprecated`) VALUES
+  (1, '53e3599ca89e458f97cc649eaaceeba0', 'any type', 'xsd:anyType', '{}', '{}', '{"type":"record"}', NULL, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (2, '7114441198054ad78d2fcf9bcdab2cbf', 'any simple type', 'xsd:anySimpleType', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 1, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (3, 'aa64380f2d954d74a041bec1c327351e', 'duration', 'xsd:duration', '{"type":"string", "pattern":"^[-]?P(?!$)(?:\\\\d+Y)?(?:\\\\d+M)?(?:\\\\d+D)?(?:T(?!$)(?:\\\\d+H)?(?:\\\\d+M)?(?:\\\\d+(?:\\\\.\\\\d+)?S)?)?$"}', '{"type":"string", "pattern":"^[-]?P(?!$)(?:\\\\d+Y)?(?:\\\\d+M)?(?:\\\\d+D)?(?:T(?!$)(?:\\\\d+H)?(?:\\\\d+M)?(?:\\\\d+(?:\\\\.\\\\d+)?S)?)?$"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (4, '88bb4630e9464a44b09b25257e569c56', 'date time', 'xsd:dateTime', '{"type":"string", "format":"date-time"}', '{"type":"string", "format":"date-time"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (5, '28291becfc0b40fa9f429c9d968a30bd', 'time', 'xsd:time', '{"type":"string"}', '{"type":"string", "pattern":"^(?:[01]\\\\d|2[0123]):(?:[012345]\\\\d):(?:[012345]\\\\d)$"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (6, '47189c200a114cf39e911febee2780c0', 'date', 'xsd:date', '{"type":"string"}', '{"type":"string", "format":"date"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (7, '5ce161d6ee8e4c5695e444a515421045', 'gregorian year month', 'xsd:gYearMonth', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (8, 'e56e1fb620e843cca213c2818c802f99', 'gregorian year', 'xsd:gYear', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (9, 'ef9dde341f434aea9a90419b8e815dc1', 'gregorian month day', 'xsd:gMonthDay', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (10, '5671447a22984812ae2c1ddbbb1a0883', 'gregorian day', 'xsd:gDay', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (11, '776ae1eb6642450899b3192088618c28', 'gregorian month', 'xsd:gMonth', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (12, 'e7fe90c1b6a24d4a88ef7582267d57cd', 'string', 'xsd:string', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (13, '75f49858b7554f99bd7fcf7c51b6e92d', 'boolean', 'xsd:boolean', '{"type":"boolean"}', '{"type":"boolean"}', '{"type":"boolean"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (14, 'dd2d06c1ad4447b68285f6902919fcdc', 'base64 binary', 'xsd:base64Binary', '{"type":"string"}', '{"type":"string", "format":"byte"}', '{"type":"bytes"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (15, '9fec44d8855f48eaba7e6466a418db92', 'hex binary', 'xsd:hexBinary', '{"type":"string"}', '{"type":"string", "format":"binary"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (16, '37d18b90accf4d1c833aa7023a2c1ca4', 'float', 'xsd:float', '{"type":"number"}', '{"type":"number", "format": "float"}', '{"type":"float"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (17, '7b6409f8157d4d9c8f5a6b0e69b02015', 'decimal', 'xsd:decimal', '{"type":"number"}', '{"type":"number"}', '{"type":"double"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (18, '73f10f9826ca4645926e8f8d83f33995', 'double', 'xsd:double', '{"type":"number"}', '{"type":"number", "format":"double"}', '{"type":"double"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (19, '89c9230b6ac34e4da2216b17bfab0e43', 'any URI', 'xsd:anyURI', '{"type":"string", "format":"uriref"}', '{"type":"string", "format":"uriref"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (20, '3b2596f3c253432b9e5149a55d79d88c', 'qualified name', 'xsd:QName', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (21, 'f8f4e42af2d0439c9905e746c3fd58a0', 'notation', 'xsd:NOTATION', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 2, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (22, '41cadac404504e02862c97ebdce04002', 'normalized string', 'xsd:normalizedString', '{"type":"string"}', '{"type":"string", "format":"normalizedString"}', '{"type":"string"}', 12, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (23, 'f3bc6f3ca44b47e9a9a66997fc5d3c2b', 'integer', 'xsd:integer', '{"type":"number", "multipleOf":1}', '{"type":"integer"}', '{"type":"int"}', 17, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (24, '0963dd2d22084b4893ff69ff303e57d9', 'token', 'xsd:token', '{"type":"string"}', '{"type":"string", "format":"token"}', '{"type":"string"}', 22, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (25, 'da82a62e6bfd4db88710442a67356ff9', 'non negative integer', 'xsd:nonNegativeInteger', '{"type":"number", "multipleOf":1, "minimum":0, "exclusiveMinimum":false}', '{"type":"integer", "minimum":0, "exclusiveMinimum":false}', '{"type":"int"}', 23, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (26, 'cde3a6544ef046758f81fafd2412fbcd', 'non positive integer', 'xsd:nonPositiveInteger', '{"type":"number", "multipleOf":1, "maximum":0, "exclusiveMaximum":false}', '{"type":"integer", "maximum":0, "exclusiveMaximum":false}', '{"type":"int"}', 23, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (27, 'f03ffbb9cdf049a28d7d94a08be43398', 'long', 'xsd:long', '{"type":"number", "multipleOf":1}', '{"type":"integer"}', '{"type":"int"}', 23, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (28, '155163eb646c463caa263a4ed2d170f3', 'language', 'xsd:language', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 24, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (29, '4313263875ae4a1399737a64379013a6', 'positive integer', 'xsd:positiveInteger', '{"type":"number", "multipleOf":1, "minimum":0, "exclusiveMinimum":true}', '{"type":"integer", "minimum":0, "exclusiveMinimum":true}', '{"type":"int"}', 25, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (30, 'df01213dc7a2416cbb1cee9c36417bd4', 'negative integer', 'xsd:negativeInteger', '{"type":"number", "multipleOf":1, "maximum":0, "exclusiveMaximum":true}', '{"type":"integer", "maximum":0, "exclusiveMaximum":true}', '{"type":"int"}', 26, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (31, 'be7c68a204514b89a85661dcb8eb9276', 'int', 'xsd:int', '{"type":"number", "multipleOf":1, "minimum":-2147483648, "maximum":2147483647}', '{"type":"integer", "minimum":-2147483648, "maximum":2147483647}', '{"type":"int"}', 27, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (32, '55b409dd0f194e4caa29085f7170b088', 'unsigned long', 'xsd:unsignedLong', '{"type":"number", "multipleOf":1, "minimum":0}', '{"type":"integer", "minimum":0}', '{"type":"int"}', 25, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (33, '34b854ba94644e6ca5b0a0fef4a1fa98', 'name', 'xsd:Name', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 24, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (34, '11646467e9b044a7b010a815d7276a14', 'name token', 'xsd:NMTOKEN', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 24, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (35, '713c8f3829f04f8eb52977073bcd250d', 'short', 'xsd:short', '{"type":"number", "multipleOf":1, "minimum":-32768, "maximum":32767}', '{"type":"integer", "minimum":-32768, "maximum":32767}', '{"type":"int"}', 31, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (36, 'fbe50d0ffd7a4ddfaca504312eab3eb5', 'unsigned int', 'xsd:unsignedInt', '{"type":"number", "multipleOf":1, "minimum":0, "maximum":4294967295}', '{"type":"integer", "minimum":0, "maximum":4294967295}', '{"type":"int"}', 32, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (37, '63a692a8087344b2a4e4f3c3712bf71b', 'name tokens', 'xsd:NMTOKENS', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 34, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (38, 'b91b66f3a5d446b89e3d59aa1947f80e', 'non colonized name', 'xsd:NCName', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 33, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (39, '37ddb910e2184816a5f335e7b5f631e2', 'byte', 'xsd:byte', '{"type":"number", "multipleOf":1, "minimum":-128, "maximum":127}', '{"type":"integer", "minimum":-128, "maximum":127}', '{"type":"int"}', 35, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (40, 'cd16b9873aef4d6286f5f0215ad2974e', 'unsigned short', 'xsd:unsignedShort', '{"type":"number", "multipleOf":1, "minimum":0, "maximum":65535}', '{"type":"integer", "minimum":0, "maximum":65535}', '{"type":"int"}', 36, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (41, '8097dc7dd40f43b593a9d4bb36551901', 'identifier', 'xsd:ID', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 38, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (42, 'ac612108bfb04eafba1ad8f045783fdf', 'identifier reference', 'xsd:IDREF', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 38, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (43, 'd221e89d2224488ca30d3c4e2ee06f8b', 'entity', 'xsd:ENTITY', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 38, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (44, 'b240df3d59cd4c949c972eb2d41b64d3', 'unsigned byte', 'xsd:unsignedByte', '{"type":"number", "multipleOf":1, "minimum":0, "maximum":255}', '{"type":"integer", "minimum":0, "maximum":255}', '{"type":"int"}', 40, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (45, '16607035ba2942f5abaf6b420b5a49d7', 'identifier references', 'xsd:IDREFS', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 42, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0),
+  (46, 'ad620dcc21554ed995d861a1b3a1aa2d', 'entities', 'xsd:ENTITIES', '{"type":"string"}', '{"type":"string"}', '{"type":"string"}', 43, NULL, NULL, 3, 0, 1, 0, '2026-10-07 00:00:00.000000', '2026-10-07 00:00:00.000000', 0);
 
 --
 -- Dumping routines
