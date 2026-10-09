@@ -260,6 +260,8 @@ public class AccountCommandService {
 
         // app_webauthn_user refers to app_user, and registering starts creating it before any passkey exists.
         repositoryFactory.passkeyCommandRepository(requester).deletePasskeyDataByUserId(userId);
+        // a message refers to its recipient, and a passkey change sends the user one
+        repositoryFactory.messageCommandRepository(requester).deleteMessagesReceivedBy(userId);
         var command = repositoryFactory.accountCommandRepository(requester, passwordEncoder);
         return command.delete(userId);
     }

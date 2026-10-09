@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oagi.score.gateway.http.api.account_management.controller.payload.UpdateAccountRequest;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
+import org.oagi.score.gateway.http.api.message_management.repository.MessageCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -80,6 +81,7 @@ class AccountCommandServiceTest {
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         AccountCommandRepository command = mock(AccountCommandRepository.class);
         PasskeyCommandRepository passkeyCommand = mock(PasskeyCommandRepository.class);
+        MessageCommandRepository messageCommand = mock(MessageCommandRepository.class);
         UserId target = new UserId(BigInteger.TEN);
         ScoreUser admin = new ScoreUser(new UserId(BigInteger.ONE), "admin", "Admin", null, true,
                 List.of(ScoreRole.ADMINISTRATOR));
@@ -88,13 +90,15 @@ class AccountCommandServiceTest {
         ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
         when(repositoryFactory.accountCommandRepository(admin, passwordEncoder)).thenReturn(command);
         when(repositoryFactory.passkeyCommandRepository(admin)).thenReturn(passkeyCommand);
+        when(repositoryFactory.messageCommandRepository(admin)).thenReturn(messageCommand);
         when(command.delete(target)).thenReturn(true);
 
         assertThat(service.discard(admin, target)).isTrue();
 
         // app_webauthn_user refers to app_user, so deleting the account first would fail on the foreign key
-        InOrder inOrder = inOrder(passkeyCommand, command);
+        InOrder inOrder = inOrder(passkeyCommand, messageCommand, command);
         inOrder.verify(passkeyCommand).deletePasskeyDataByUserId(target);
+        inOrder.verify(messageCommand).deleteMessagesReceivedBy(target);
         inOrder.verify(command).delete(target);
     }
 
