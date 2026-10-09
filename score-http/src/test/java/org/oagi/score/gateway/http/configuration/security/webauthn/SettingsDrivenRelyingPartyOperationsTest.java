@@ -3,6 +3,11 @@ package org.oagi.score.gateway.http.configuration.security.webauthn;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.application_management.model.PasskeySettingsInfo;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialRequestOptions;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.webauthn.api.PublicKeyCredentialCreationOptions;
+import org.springframework.security.web.webauthn.api.PublicKeyCredentialParameters;
+import org.springframework.security.web.webauthn.api.ResidentKeyRequirement;
 import org.springframework.security.web.webauthn.api.UserVerificationRequirement;
 import org.springframework.security.web.webauthn.management.ImmutablePublicKeyCredentialRequestOptionsRequest;
 import org.springframework.security.web.webauthn.management.MapPublicKeyCredentialUserEntityRepository;
@@ -49,6 +54,23 @@ class SettingsDrivenRelyingPartyOperationsTest {
 
         assertEquals("score.example.org", options.getRpId());
         assertEquals(UserVerificationRequirement.REQUIRED, options.getUserVerification());
+    }
+
+    @Test
+    void registrationRequiresAResidentKeyAndUserVerificationAndListsEs256First() {
+        // Spring's default asks for user verification only as "preferred", which lets an assertion without the
+        // user-verified flag through; both registration and sign-in must require it.
+        AtomicReference<PasskeySettingsInfo> current =
+                new AtomicReference<>(settings("score.example.org", "https://score.example.org"));
+        Authentication alice = new TestingAuthenticationToken("alice", "x", "ROLE_END_USER");
+
+        PublicKeyCredentialCreationOptions options =
+                operations(current).createPublicKeyCredentialCreationOptions(() -> alice);
+
+        assertEquals(UserVerificationRequirement.REQUIRED, options.getAuthenticatorSelection().getUserVerification());
+        assertEquals(ResidentKeyRequirement.REQUIRED, options.getAuthenticatorSelection().getResidentKey());
+        assertEquals(PublicKeyCredentialParameters.ES256, options.getPubKeyCredParams().get(0));
+        assertEquals("score.example.org", options.getRp().getId());
     }
 
     @Test

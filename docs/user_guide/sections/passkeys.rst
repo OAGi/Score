@@ -79,6 +79,10 @@ Removing a passkey deletes it from connectCenter, so it can no longer be used to
 It does not delete the passkey from your device, and connectCenter cannot do that for you; if you want it gone there too, delete it in your device or password manager settings.
 Likewise, if you delete a passkey from your device, connectCenter does not find out, so remove it from the list as well.
 
+Whenever a passkey is added to or removed from your account, connectCenter sends you a message (see your messages) that says how many passkeys you have now.
+This includes passkeys removed by an administrator.
+If you get a message about a passkey you did not add, open the Passkeys page and remove it, change your password, and tell an administrator.
+
 You cannot remove your only sign-in method: an account without a password keeps at least one passkey.
 
 A passkey marked "Cannot be used here" was added for a different RP ID than the one connectCenter now uses (for example after the server moved to a new domain).
@@ -185,6 +189,11 @@ Security notes for administrators:
   A list such as ``X-Forwarded-For`` is read from the right, skipping trusted proxies, so addresses a client adds itself are not believed.
   The setting affects only these limits, not the rest of the application.
 * The username lookup does not tell whether a username exists: for a name that has no account it gives a made-up answer, so asking about a name proves nothing.
+* Adding a passkey does not ask for the password again.
+  This is deliberate: a user without a passkey signs in with the password and is then offered one, and asking for the password a second time would get in the way.
+  The consequence is that anyone who gets hold of a signed-in session, for example from a user's compromised computer, can add a passkey to that account, and that passkey keeps working after the session ends and after the password is changed.
+  Two things limit this: the user gets a message each time a passkey is added or removed, saying how many passkeys the account has now, and an administrator can remove all of a user's passkeys and end their sessions (see *Removing a user's passkeys* below).
+  Tell users to remove a passkey they did not add and to change their password.
 * Signing in with a passkey starts a new session, as signing in with a password does.
 * Passkey sign-in applies the same account checks as a password sign-in.
 

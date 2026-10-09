@@ -35,6 +35,9 @@ public class PasskeyCommandService {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private PasskeyNotifier passkeyNotifier;
+
     /**
      * Renames one of the requester's own passkeys.
      */
@@ -58,6 +61,7 @@ public class PasskeyCommandService {
                     "This is your only sign-in method. Set a password before removing your last passkey.");
         }
         repositoryFactory.passkeyCommandRepository(requester).deleteCredential(credential.credentialId());
+        passkeyNotifier.passkeyRemoved(requester.userId());
     }
 
     /**
@@ -74,6 +78,7 @@ public class PasskeyCommandService {
         if (invalidateSessions) {
             sessionService.invalidateByUsername(loginId);
         }
+        passkeyNotifier.passkeysRemovedByAdministrator(userId, removed);
         return removed;
     }
 

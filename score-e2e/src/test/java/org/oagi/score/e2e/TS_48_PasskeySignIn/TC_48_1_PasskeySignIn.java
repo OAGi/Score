@@ -346,6 +346,22 @@ public class TC_48_1_PasskeySignIn extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_48_1_TA_11")
+    public void user_is_told_in_a_message_that_a_passkey_was_added_and_how_many_there_are() {
+        requirePasskeysConfigured();
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        addPasskeyInAccountSettings(homePage);
+
+        AuthenticatedApiClient api = new AuthenticatedApiClient(driver, getConfig().getBaseUrl());
+        // The message is sent in the background, so give it a moment.
+        String messages = wait(20).until(d -> {
+            String body = api.getJson("/api/messages?pageIndex=0&pageSize=20").body();
+            return body.contains("A passkey was added to your account") ? body : null;
+        });
+        assertTrue(messages.contains("You have 1 passkey now."), messages);
+    }
+
     /** Reads the signed-in account from the menu in the page header. */
     private static class HomePageProbe {
         private final WebDriver driver;

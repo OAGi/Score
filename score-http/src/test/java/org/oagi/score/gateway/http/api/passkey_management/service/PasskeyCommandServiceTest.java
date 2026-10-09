@@ -49,6 +49,7 @@ class PasskeyCommandServiceTest {
     private PasskeyCommandRepository command;
     private SessionService sessionService;
     private PasskeyProperties passkeyProperties;
+    private PasskeyNotifier notifier;
     private PasskeyCommandService service;
 
     @BeforeEach
@@ -60,7 +61,10 @@ class PasskeyCommandServiceTest {
         when(repositoryFactory.passkeyQueryRepository(any())).thenReturn(query);
         when(repositoryFactory.passkeyCommandRepository(any())).thenReturn(command);
 
+        notifier = mock(PasskeyNotifier.class);
+
         service = new PasskeyCommandService();
+        ReflectionTestUtils.setField(service, "passkeyNotifier", notifier);
         ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
         ReflectionTestUtils.setField(service, "sessionService", sessionService);
     }
@@ -127,6 +131,27 @@ class PasskeyCommandServiceTest {
     }
 
     @Test
+    void ownerIsToldThatAPasskeyWasRemoved() {
+        aliceOwnsThePasskey();
+        when(query.countCredentialsByUserId(ALICE)).thenReturn(2);
+
+        service.deleteMyPasskey(alice, ID);
+
+        verify(notifier).passkeyRemoved(ALICE);
+    }
+
+    @Test
+    void nobodyIsToldWhenTheRemovalIsRefused() {
+        aliceOwnsThePasskey();
+        when(query.countCredentialsByUserId(ALICE)).thenReturn(1);
+        when(query.hasPassword(ALICE)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> service.deleteMyPasskey(alice, ID));
+
+        verify(notifier, never()).passkeyRemoved(any());
+    }
+
+    @Test
     void ownerWithAPasswordMayRemoveTheLastPasskey() {
         aliceOwnsThePasskey();
         when(query.countCredentialsByUserId(ALICE)).thenReturn(1);
@@ -158,6 +183,7 @@ class PasskeyCommandServiceTest {
 
         assertEquals(2, removed);
         verify(sessionService).invalidateByUsername("alice");
+        verify(notifier).passkeysRemovedByAdministrator(ALICE, 2);
     }
 
     @Test

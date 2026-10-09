@@ -42,6 +42,9 @@ Signing in with a passkey replaces the session ID the sign-in page was using bef
 #### Test Assertion #48.1.10
 An Admin can delete an account that has a passkey. The account, its passkeys and its WebAuthn identity are all gone afterwards.
 
+#### Test Assertion #48.1.11
+Adding a passkey sends the user a message, "A passkey was added to your account", that says how many passkeys the user has now ("You have 1 passkey now.").
+
 ### Test Step Pre-condition:
 1. Passkey sign-in is configured on the instance (except for step 4).
 2. A virtual authenticator is attached to the browser, and the test account can sign in with its password.
@@ -58,6 +61,7 @@ An Admin can delete an account that has a passkey. The account, its passkeys and
 8. Create a passkey from the offer, sign out and sign in with the password again. Verify no offer appears. (Assertion [#8](#test-assertion-4818))
 9. Sign out so that the sign-in page has started a session, note the session cookie, sign in with the passkey and note the cookie again. Verify they differ. (Assertion [#9](#test-assertion-4819))
 10. Add a passkey, sign out, sign in as an Admin and delete the user's account. Verify the account and its passkey records no longer exist. (Assertion [#10](#test-assertion-48110))
+11. Sign in with the password and add a passkey. Verify that the user's messages include "A passkey was added to your account" with the number of passkeys. (Assertion [#11](#test-assertion-48111))
 
 ## Test Case 48.2
 
@@ -98,4 +102,5 @@ A non-Admin cannot remove passkeys through `DELETE /passkey-admin/users/{appUser
 - A disabled or locked account being refused at passkey sign-in is covered by a unit test only. The application does not yet refuse such accounts at password sign-in either, so there is no end-to-end behavior to assert.
 - The made-up answer for unknown usernames is covered by unit tests. An end-to-end check would need many accounts to see the answer track the share of accounts with a passkey.
 - The per-address limit is not exercised end to end, because a shared instance would let other tests trip it; it is covered by unit tests.
-- Adding a passkey from a signed-in session still needs no fresh sign-in. The origin check stops other sites, but a stolen session could add one.
+- The messages sent when a passkey is removed by the user or by an administrator are covered by unit tests only.
+- Adding a passkey from a signed-in session needs no fresh sign-in, by decision (see the user guide, "Passkey Sign-in"). The origin check stops other sites, and the message sent on every addition makes a rogue passkey visible, but a stolen session can still add one. The origin check stops other sites, but a stolen session could add one.

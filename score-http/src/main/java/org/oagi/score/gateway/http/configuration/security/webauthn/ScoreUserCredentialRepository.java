@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.configuration.security.webauthn;
 import org.oagi.score.gateway.http.api.passkey_management.model.PasskeyCredential;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyQueryRepository;
+import org.oagi.score.gateway.http.api.passkey_management.service.PasskeyNotifier;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -43,6 +44,9 @@ public class ScoreUserCredentialRepository implements UserCredentialRepository {
     @Autowired
     private PasskeyProperties passkeyProperties;
 
+    @Autowired
+    private PasskeyNotifier passkeyNotifier;
+
     private ScoreUser system() {
         return sessionService.getScoreSystemUser();
     }
@@ -75,7 +79,7 @@ public class ScoreUserCredentialRepository implements UserCredentialRepository {
         }
 
         String rpId = passkeyProperties.current().getRpId();
-        command.insertCredential(new PasskeyCredential(
+        PasskeyCredential credential = new PasskeyCredential(
                 credentialId,
                 record.getUserEntityUserId().getBytes(),
                 null,
@@ -93,7 +97,13 @@ public class ScoreUserCredentialRepository implements UserCredentialRepository {
                 null,
                 null,
                 null,
-                null));
+                null);
+        command.insertCredential(credential);
+
+        // Spring's registration filter offers no hook of its own, and this is where a new passkey is stored.
+        repositoryFactory.passkeyQueryRepository(system())
+                .findPasskeyUserByHandle(credential.userHandle())
+                .ifPresent(user -> passkeyNotifier.passkeyAdded(user.userId()));
     }
 
     @Override
