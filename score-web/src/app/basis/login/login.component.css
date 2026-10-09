@@ -1,42 +1,133 @@
-.auth-box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  transform: translate(-50%, -50%);
+.login-page {
+  display: grid;
+  grid-template-columns: minmax(320px, 5fr) 6fr;
+  min-height: 100vh;
+}
+
+.login-hero {
+  background-color: #1f3a5f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  justify-content: center;
+  padding: 48px 56px;
+  position: relative;
+}
+
+.login-hero-title {
+  color: inherit;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.3em;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.login-hero-product {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-hero-former {
+  color: inherit;
+  opacity: 0.7;
+  display: block;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+
+.login-version {
+  bottom: 24px;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 12px;
+  left: 56px;
+  position: absolute;
+}
+
+.login-panel {
+  align-items: center;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 32px;
 }
 
 .auth-form {
-  width: 370px;
-  margin: 0 auto;
+  max-width: 100%;
+  width: 380px;
 }
 
-.auth-form-header {
-  margin-bottom: 15px;
-  color: #333;
-  text-align: center;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-  margin: 0;
-  border-radius: 3px 3px 0 0;
-  padding: 0 0 12px 0 !important;
+.auth-form-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  line-height: 1.15;
+  margin: 0 0 6px;
 }
 
-.auth-form-header h1 {
-  font-size: 24px;
-  font-weight: 300;
-  letter-spacing: -0.5px;
+.auth-form-subtitle {
+  color: #5b6877;
+  font-size: 14px;
+  margin: 0 0 20px;
 }
 
 .auth-form-body, .oauth2-form-body {
-  margin-top: 16px !important;
-  padding: 20px;
   font-size: 14px;
-  background-color: #fff;
-  border: 1px solid #d8dee2;
-  border-top: 1px solid #d8dee2;
-  border-radius: 5px;
+}
+
+.statement-container {
+  color: #5b6877;
+  font-size: 13px;
+  margin-top: 28px;
+  max-width: 380px;
+}
+
+@media (max-width: 767px) {
+  .login-page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+  }
+
+  .login-hero {
+    padding: 24px 20px;
+  }
+
+  /* One line: the former name sits to the right of connectCenter. */
+  .login-hero-title {
+    align-items: baseline;
+    flex-wrap: nowrap;
+    font-size: clamp(15px, 4.7vw, 22px);
+    white-space: nowrap;
+  }
+
+  .login-hero-product {
+    align-items: baseline;
+    flex-direction: row;
+    gap: 0.4em;
+  }
+
+  .login-hero-former {
+    font-size: 0.6em;
+    margin-top: 0;
+  }
+
+  .login-version {
+    display: none;
+  }
+
+  .login-panel {
+    padding: 28px 20px;
+  }
 }
 
 .auth-form label {
@@ -110,4 +201,86 @@ label {
 
 .auth-form .passkey-choice-grid .btn {
   margin-top: 0;
+}
+
+.login-page, .login-page input, .login-page button, .login-page .btn {
+  font-family: "DM Sans", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.auth-form .form-control,
+.auth-form .btn {
+  border-radius: 8px;
+  height: 44px;
+}
+
+.auth-form .form-control {
+  border-color: #dfe3e8;
+}
+
+.auth-form .form-control:focus {
+  border-color: #1f3a5f;
+  box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.18);
+}
+
+.auth-form .btn-primary {
+  background-color: #1f3a5f;
+  border-color: #1f3a5f;
+  font-weight: 600;
+}
+
+.auth-form .btn-primary:hover:not(:disabled),
+.auth-form .btn-primary:focus-visible {
+  background-color: #2a4a77;
+  border-color: #2a4a77;
+}
+
+.auth-form .btn-outline-secondary {
+  background-color: #fff;
+  border-color: #dfe3e8;
+  color: #1f2d3d;
+}
+
+.auth-form .btn-outline-secondary:hover {
+  background-color: #f4f6f9;
+  border-color: #c5ccd5;
+  color: #1f2d3d;
+}
+
+.passkey-login-button {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.passkey-login-button mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.auth-form .or-container {
+  color: #8a94a1;
+  font-size: 12px;
+  margin: 20px 0;
+}
+
+.auth-form .line-separator {
+  background-color: #dfe3e8;
+}
+
+.oauth2-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oauth2-form-body .btn {
+  margin-top: 0;
+}
+
+/* A provider colour is also the border colour, so a white button would vanish on the white page. */
+.oauth2-login-link {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+  line-height: 32px;
 }

@@ -10,6 +10,7 @@ import {Observable} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WebPageInfo} from '../about/domain/about';
 import {WebPageInfoService} from '../basis.service';
+import {projectVersion} from '../../../environments/version';
 
 @Component({
   standalone: false,
@@ -29,6 +30,8 @@ export class LoginComponent implements OnDestroy {
   private passkeyOffer = inject(PasskeyOfferService);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
+
+  version = projectVersion;
 
   credentials = {username: '', password: ''};
   next = '';

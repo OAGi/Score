@@ -1,12 +1,18 @@
-<div class="auth-box">
-  @if ((oauth2AppInfos | async); as oAuth2AppInfos) {
-    <div class="auth-form">
-      @if (!roles.includes('pending') && !roles.includes('reject')) {
+<div class="login-page">
+  <div class="login-hero">
+    <h1 class="login-hero-title">
+      <span>NIST/OAGi</span>
+      <span class="login-hero-product">connectCenter<span class="login-hero-former">(formerly Score)</span></span>
+    </h1>
+    <div class="login-version">Version {{ version }}</div>
+  </div>
+  <div class="login-panel">
+    @if ((oauth2AppInfos | async); as oAuth2AppInfos) {
+      <div class="auth-form">
+        @if (!roles.includes('pending') && !roles.includes('reject')) {
         <form role="form" autocomplete="on" (submit)="onSubmit()">
-          <div class="auth-form-header">
-            <h1>Sign in to NIST/OAGi connectCenter</h1>
-            <h4 class="pt-1 pe-3 text-align-end">(formerly "Score")</h4>
-          </div>
+          <h2 class="auth-form-title">Welcome</h2>
+          <p class="auth-form-subtitle">Sign in to your account</p>
           <div [hidden]="err === undefined && !passkeyError" class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ errorMessage }}
             <button type="button" class="btn-close" aria-label="Close" (click)="onClose()"></button>
@@ -15,7 +21,7 @@
             <label for="login_field">
               Username
             </label>
-            <input type="text" name="login" id="login_field" class="form-control input-block" tabindex="1"
+            <input type="text" name="login" id="login_field" class="form-control input-block" tabindex="1" placeholder="Your username"
               autocapitalize="off" autocorrect="off" [attr.autocomplete]="showPasskey ? 'username webauthn' : 'username'"
               autofocus="autofocus" [ngModel]="credentials.username" (ngModelChange)="onUsernameChange($event)">
             @if (showPasswordFields) {
@@ -61,6 +67,7 @@
                   <div>
                     <button type="button" class="btn btn-outline-secondary w-100 passkey-login-button"
                       tabindex="3" (click)="loginWithPasskey()">
+                      <mat-icon aria-hidden="true">fingerprint</mat-icon>
                       Sign in with a passkey
                     </button>
                   </div>
@@ -81,19 +88,20 @@
             }
           </div>
         </form>
-      }
-    </div>
-  } @else {
-  }
+        }
+      </div>
+    } @else {
+    }
 
-  @if ((webPageInfo | async); as webPageInfo) {
-    <div class="row mt-2 justify-content-center">
-      <div class="col-12">
-        <div class="statement-container">
-          <markdown [data]="webPageInfo.signInStatement"></markdown>
+    @if ((webPageInfo | async); as webPageInfo) {
+      <div class="row mt-2 justify-content-center">
+        <div class="col-12">
+          <div class="statement-container">
+            <markdown [data]="webPageInfo.signInStatement"></markdown>
+          </div>
         </div>
       </div>
-    </div>
-  } @else {
-  }
+    } @else {
+    }
+  </div>
 </div>
