@@ -1,6 +1,9 @@
 package org.oagi.score.gateway.http.api.passkey_management.service;
 
 import org.junit.jupiter.api.Test;
+import org.oagi.score.gateway.http.security.secret.ApplicationSecretCrypto;
+import org.oagi.score.gateway.http.security.secret.ApplicationSecretKeys;
+import org.oagi.score.gateway.http.security.secret.SecretEncryptionProperties;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.passkey_management.model.PasskeyCredential;
 import org.oagi.score.gateway.http.api.passkey_management.model.PasskeySummary;
@@ -137,6 +140,55 @@ class PasskeyQueryServiceTest {
         when(everyone.findUserIdByLoginId(any())).thenReturn(Optional.empty());
         when(everyone.passkeyAdoption("score.example.org")).thenReturn(1.0);
         assertTrue(lookupService("score.example.org", everyone).hasUsablePasskey(null, "ghost"));
+    }
+
+    private static final String APP_SECRET =
+            java.util.Base64.getEncoder().encodeToString(new byte[32]);
+
+    private static ApplicationSecretKeys keysWith(String activeKeyId, String base64Key) {
+        SecretEncryptionProperties properties = new SecretEncryptionProperties();
+        properties.setActiveKeyId(activeKeyId);
+        properties.setKeys(java.util.Map.of(activeKeyId, base64Key));
+        return new ApplicationSecretKeys(properties, new ApplicationSecretCrypto(properties));
+    }
+
+    @Test
+    void withoutAnApplicationSecretTheServiceStillStartsWithARandomKey() {
+        PasskeyQueryService service = lookupService("score.example.org", mock(PasskeyQueryRepository.class));
+        service.afterPropertiesSet();
+        // no secret and no key ring: the answers still work, they just are not stable across restarts
+        assertFalse(service.hasUsablePasskey(null, " "));
+    }
+
+    @Test
+    void theSameSecretGivesTheSameAnswersAfterARestart() {
+        PasskeyQueryRepository repository = mock(PasskeyQueryRepository.class);
+        when(repository.findUserIdByLoginId(any())).thenReturn(Optional.empty());
+        when(repository.passkeyAdoption("score.example.org")).thenReturn(0.5);
+
+        java.util.List<Boolean> before = new java.util.ArrayList<>();
+        java.util.List<Boolean> after = new java.util.ArrayList<>();
+        for (java.util.List<Boolean> answers : java.util.List.of(before, after)) {
+            // a new service each time, as after a restart
+            PasskeyQueryService service = lookupService("score.example.org", repository);
+            ReflectionTestUtils.setField(service, "applicationSecretKeys", keysWith("primary", APP_SECRET));
+            service.afterPropertiesSet();
+            for (int i = 0; i < 200; i++) {
+                answers.add(service.hasUsablePasskey(null, "ghost" + i));
+            }
+        }
+        assertEquals(before, after);
+        assertTrue(before.contains(true) && before.contains(false));
+    }
+
+    @Test
+    void anUnknownNameCostsTheSameKindOfQueryAsARealOne() {
+        PasskeyQueryRepository repository = mock(PasskeyQueryRepository.class);
+        when(repository.findUserIdByLoginId(any())).thenReturn(Optional.empty());
+
+        lookupService("score.example.org", repository).hasUsablePasskey(null, "ghost");
+
+        org.mockito.Mockito.verify(repository).findCredentialsByUserId(any());
     }
 
 }

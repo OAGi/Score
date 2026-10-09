@@ -1,17 +1,23 @@
 package org.oagi.score.gateway.http.api.passkey_management.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.passkey_management.model.PasskeyCredential;
 import org.oagi.score.gateway.http.api.passkey_management.model.PasskeySummary;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyProperties;
+import org.oagi.score.gateway.http.security.secret.ApplicationSecretKeys;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
@@ -19,6 +25,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +33,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
-public class PasskeyQueryService {
+public class PasskeyQueryService implements InitializingBean {
+
+    private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -39,7 +48,18 @@ public class PasskeyQueryService {
     private record Adoption(double share, long at) {
     }
 
-    private final byte[] decoyKey = randomKey();
+    private static final UserId NO_ACCOUNT = new UserId(BigInteger.ZERO);
+
+    private static final String DECOY_KEY_PURPOSE = "passkey-lookup-decoy";
+
+    /**
+     * Where the key of the made-up answers comes from: the application secret key (SCORE_APP_SECRET_KEY). Optional
+     * here: without it the key is random for each run.
+     */
+    @Autowired(required = false)
+    private ApplicationSecretKeys applicationSecretKeys;
+
+    private byte[] decoyKey = randomKey();
 
     private volatile Adoption adoption;
 
@@ -61,7 +81,9 @@ public class PasskeyQueryService {
      * A login ID that does not exist gets a made-up answer instead of {@code false}: {@code true} for the same share
      * of names as the share of real accounts that have a passkey, chosen by a keyed hash so that a name always gets
      * the same answer. A {@code true} therefore does not prove the account exists, and neither does a {@code false}.
-     * (The key is random per backend instance, so with several instances a name may be answered differently by each.)
+     * The key comes from SCORE_APP_SECRET_KEY, so every instance gives the same answer and a restart changes nothing.
+     * Without it the key is random per run, and an attacker who probes before and after a restart can tell the names
+     * whose answer changed (unknown) from the ones that did not.
      */
     public boolean hasUsablePasskey(ScoreUser systemUser, String loginId) {
         String currentRpId = passkeyProperties.current().getRpId();
@@ -72,7 +94,23 @@ public class PasskeyQueryService {
         return repository.findUserIdByLoginId(loginId.trim())
                 .map(userId -> repository.findCredentialsByUserId(userId).stream()
                         .anyMatch(e -> toSummary(e, currentRpId).usable()))
-                .orElseGet(() -> decoy(decoyKey, loginId, adoption(repository, currentRpId)));
+                .orElseGet(() -> {
+                    // the same kind of query a real account costs, so the two paths take about as long
+                    repository.findCredentialsByUserId(NO_ACCOUNT);
+                    return decoy(decoyKey, loginId, adoption(repository, currentRpId));
+                });
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        Optional<byte[]> derived = (applicationSecretKeys == null)
+                ? Optional.empty() : applicationSecretKeys.derive(DECOY_KEY_PURPOSE);
+        if (derived.isPresent()) {
+            this.decoyKey = derived.get();
+        } else {
+            logger.warn("SCORE_APP_SECRET_KEY is not set: the made-up answers of the passkey lookup change whenever the "
+                    + "backend restarts, which lets someone who probes before and after tell unknown names from real ones.");
+        }
     }
 
     private double adoption(PasskeyQueryRepository repository, String rpId) {

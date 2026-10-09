@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,9 +20,9 @@ public class PasskeyRateLimitFilter extends OncePerRequestFilter {
 
     private static final PathPatternRequestMatcher.Builder MATCHERS = PathPatternRequestMatcher.withDefaults();
 
-    private final RequestMatcher limited = new OrRequestMatcher(
-            MATCHERS.matcher(HttpMethod.POST, "/webauthn/authenticate/options"),
-            MATCHERS.matcher(HttpMethod.POST, "/info/passkey/lookup"));
+    private final RequestMatcher lookup = MATCHERS.matcher(HttpMethod.POST, "/info/passkey/lookup");
+
+    private final RequestMatcher options = MATCHERS.matcher(HttpMethod.POST, "/webauthn/authenticate/options");
 
     private final PasskeyRateLimiter limiter;
     private final Function<HttpServletRequest, String> clientAddress;
@@ -36,7 +35,13 @@ public class PasskeyRateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (limited.matches(request) && !limiter.tryAcquireForIp(clientAddress.apply(request))) {
+        boolean refused = false;
+        if (lookup.matches(request)) {
+            refused = !limiter.tryAcquireLookupForIp(clientAddress.apply(request));
+        } else if (options.matches(request)) {
+            refused = !limiter.tryAcquireOptionsForIp(clientAddress.apply(request));
+        }
+        if (refused) {
             response.setHeader("Retry-After", String.valueOf(PasskeyRateLimiter.WINDOW_MILLIS / 1000));
             response.sendError(429);
             return;

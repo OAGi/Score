@@ -40,7 +40,7 @@ An account that already has a passkey is not offered another one after a passwor
 Signing in with a passkey replaces the session ID the sign-in page was using before sign-in; the session cookie after sign-in differs from the one before.
 
 #### Test Assertion #48.1.10
-An Admin can delete an account that has a passkey. The account, its passkeys and its WebAuthn identity are all gone afterwards.
+An Admin can delete an account that has a passkey, and so has received the message about it being added. The account, its passkeys, its WebAuthn identity and its messages are all gone afterwards.
 
 #### Test Assertion #48.1.11
 Adding a passkey sends the user a message, "A passkey was added to your account", that says how many passkeys the user has now ("You have 1 passkey now.").
@@ -60,7 +60,7 @@ Adding a passkey sends the user a message, "A passkey was added to your account"
 7. Sign in with the password, choose "Not now", sign out and sign in with the password again. Verify no offer appears. (Assertion [#7](#test-assertion-4817))
 8. Create a passkey from the offer, sign out and sign in with the password again. Verify no offer appears. (Assertion [#8](#test-assertion-4818))
 9. Sign out so that the sign-in page has started a session, note the session cookie, sign in with the passkey and note the cookie again. Verify they differ. (Assertion [#9](#test-assertion-4819))
-10. Add a passkey, sign out, sign in as an Admin and delete the user's account. Verify the account and its passkey records no longer exist. (Assertion [#10](#test-assertion-48110))
+10. Add a passkey, sign out, sign in as an Admin and delete the user's account. Verify the account and its passkey records no longer exist, and that the deletion is not refused because of the message the user received. (Assertion [#10](#test-assertion-48110))
 11. Sign in with the password and add a passkey. Verify that the user's messages include "A passkey was added to your account" with the number of passkeys. (Assertion [#11](#test-assertion-48111))
 
 ## Test Case 48.2
@@ -81,7 +81,7 @@ The same request with the application's own origin succeeds and returns registra
 An Admin can delete an account whose passkey registration was started but never finished. The account and the WebAuthn identity are both removed.
 
 #### Test Assertion #48.2.4
-Looking up a username (`POST /info/passkey/lookup`) is answered for a first request and for another username, and a username looked up repeatedly within a minute is eventually refused with 429.
+Looking up a username (`POST /info/passkey/lookup`) is answered, and a username looked up repeatedly within a minute is eventually refused with 429 (5 lookups per username and minute by default). The test first waits for a free moment, because one client address may look up only 10 usernames a minute by default and the sign-ins of other tests use that allowance too.
 
 #### Test Assertion #48.2.5
 A non-Admin cannot remove passkeys through `DELETE /passkey-admin/users/{appUserId}` or `DELETE /passkey-admin/stale`; the request is refused with a 4xx answer. An Admin can remove a user's passkeys and gets the number removed.
@@ -94,13 +94,13 @@ A non-Admin cannot remove passkeys through `DELETE /passkey-admin/users/{appUser
 1. Sign in as the end user and start a registration with `Origin: https://evil.example.com` and with `Origin: null`. Verify 403 and that no WebAuthn identity was stored. (Assertion [#1](#test-assertion-4821))
 2. Start a registration with the application's own origin. Verify 200 and a challenge in the answer. (Assertion [#2](#test-assertion-4822))
 3. Start a registration as the end user, sign in as the Admin and delete the end user's account. Verify the account and the identity are gone. (Assertion [#3](#test-assertion-4823))
-4. Look up a random username, look it up again up to fifteen times, then look up another random username. Verify a 429 appears for the repeated one and the other one is answered. (Assertion [#4](#test-assertion-4824))
+4. Look up a random username (retrying every few seconds if the address is over its limit), then look it up again up to eight times. Verify the first lookup is answered and a 429 appears for the repeated one. (Assertion [#4](#test-assertion-4824))
 5. As the end user call both `/passkey-admin` endpoints and verify they are refused; as the Admin call `DELETE /passkey-admin/users/{appUserId}` and verify the answer reports the number removed. (Assertion [#5](#test-assertion-4825))
 
 ## Known coverage gaps
 
 - A disabled or locked account being refused at passkey sign-in is covered by a unit test only. The application does not yet refuse such accounts at password sign-in either, so there is no end-to-end behavior to assert.
-- The made-up answer for unknown usernames is covered by unit tests. An end-to-end check would need many accounts to see the answer track the share of accounts with a passkey.
+- The made-up answer for unknown usernames is covered by unit tests: it is stable for a name, follows the share of accounts with a passkey, and stays the same after a restart when `SCORE_APP_SECRET_KEY` is set. An end-to-end check would need many accounts, and a restart of the instance.
 - The per-address limit is not exercised end to end, because a shared instance would let other tests trip it; it is covered by unit tests.
 - The messages sent when a passkey is removed by the user or by an administrator are covered by unit tests only.
 - Adding a passkey from a signed-in session needs no fresh sign-in, by decision (see the user guide, "Passkey Sign-in"). The origin check stops other sites, and the message sent on every addition makes a rogue passkey visible, but a stolen session can still add one. The origin check stops other sites, but a stolen session could add one.

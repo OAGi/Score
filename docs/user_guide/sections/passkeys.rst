@@ -124,13 +124,26 @@ Set these in ``application.yml`` or, for a Docker deployment, as environment var
    * - ``SCORE_PASSKEY_RP_NAME``
      - ``score.passkey.rp-name``
      - Optional. The name your browser shows when it asks about the passkey. It defaults to the RP ID.
+   * - ``SCORE_PASSKEY_RATE_LIMIT_LOOKUP_PER_IP``
+     - ``score.passkey.rate-limit.lookup-per-ip-per-minute``
+     - Optional. How many usernames one client address may look up a minute on the sign-in page.
+       A person types a few names a minute, so the default is 10.
+       Raise it if many people sign in from one address (for example one office network) and you want each of them to get the automatic passkey prompt after typing the username.
+       Someone over the limit still signs in: the page shows the password field, and the passkey button and the browser's autofill keep working.
    * - ``SCORE_PASSKEY_RATE_LIMIT_PER_IP``
      - ``score.passkey.rate-limit.per-ip-per-minute``
-     - Optional. How many times a minute one client address may ask the sign-in page's passkey endpoints for sign-in options or look up a username.
-       The default is 60.
+     - Optional. How many times a minute one client address may ask for sign-in options, which the page does for the autofill and when the passkey button is clicked.
+       The default is 30.
    * - ``SCORE_PASSKEY_RATE_LIMIT_PER_USERNAME``
      - ``score.passkey.rate-limit.per-username-per-minute``
-     - Optional. How many times a minute one username may be looked up, whichever address asks. The default is 10.
+     - Optional. How many times a minute one username may be looked up, whichever address asks. The default is 5.
+   * - ``SCORE_APP_SECRET_KEY``
+     - ``score.security.secret-encryption.keys.primary``
+     - Optional but recommended. The application secret key: 32 random bytes, written in Base64 (for example from ``openssl rand -base64 32``).
+       The same key protects other stored secrets, so use the same value on every instance, keep it private and do not change it casually.
+       The passkey username lookup uses a key derived from it, never the key itself, to give a made-up answer for names that have no account, so the answers stay the same after a restart and on every instance.
+       Without it the answers change whenever the backend restarts, which lets someone who probes names before and after a restart tell unknown names from real ones, and the backend logs a warning at startup.
+       A value that is not Base64 of 32 bytes stops the application from starting.
    * - ``SCORE_PASSKEY_CLIENT_IP_HEADERS``
      - ``score.passkey.rate-limit.client-ip-headers``
      - Optional. Where to find the client's address when connectCenter is behind a proxy or CDN: the request headers to read, in order of preference, separated by commas.
@@ -189,6 +202,7 @@ Security notes for administrators:
   A list such as ``X-Forwarded-For`` is read from the right, skipping trusted proxies, so addresses a client adds itself are not believed.
   The setting affects only these limits, not the rest of the application.
 * The username lookup does not tell whether a username exists: for a name that has no account it gives a made-up answer, so asking about a name proves nothing.
+  Set ``SCORE_APP_SECRET_KEY`` so that the made-up answers do not change when the backend restarts.
 * Adding a passkey does not ask for the password again.
   This is deliberate: a user without a passkey signs in with the password and is then offered one, and asking for the password a second time would get in the way.
   The consequence is that anyone who gets hold of a signed-in session, for example from a user's compromised computer, can add a passkey to that account, and that passkey keeps working after the session ends and after the password is changed.
@@ -211,4 +225,4 @@ If a user loses a device, an administrator can remove all of that user's passkey
 This is available through the application's API (``DELETE /passkey-admin/users/{appUserId}``, with ``invalidateSessions=true`` to end the sessions); there is no button for it in the user interface yet.
 Only an administrator can use ``/passkey-admin``; anyone else is refused.
 
-Deleting a user's account also deletes that user's passkeys, so an account can be deleted whether or not the user ever added a passkey, or started to.
+Deleting a user's account also deletes that user's passkeys and the messages the user received, so an account can be deleted whether or not the user ever added a passkey, or started to.

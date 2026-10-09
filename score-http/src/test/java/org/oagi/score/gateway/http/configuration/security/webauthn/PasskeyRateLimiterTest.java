@@ -18,18 +18,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PasskeyRateLimiterTest {
 
     private final AtomicLong now = new AtomicLong(1_000_000L);
-    private final PasskeyRateLimiter limiter = new PasskeyRateLimiter(3, 2, now::get);
+    private final PasskeyRateLimiter limiter = new PasskeyRateLimiter(3, 4, 2, now::get);
 
     @Test
     void anAddressIsLimitedWithinTheWindowAndFreedAfterIt() {
         for (int i = 0; i < 3; i++) {
-            assertTrue(limiter.tryAcquireForIp("10.0.0.1"));
+            assertTrue(limiter.tryAcquireLookupForIp("10.0.0.1"));
         }
-        assertFalse(limiter.tryAcquireForIp("10.0.0.1"));
-        assertTrue(limiter.tryAcquireForIp("10.0.0.2"));
+        assertFalse(limiter.tryAcquireLookupForIp("10.0.0.1"));
+        assertTrue(limiter.tryAcquireLookupForIp("10.0.0.2"));
 
         now.addAndGet(PasskeyRateLimiter.WINDOW_MILLIS);
-        assertTrue(limiter.tryAcquireForIp("10.0.0.1"));
+        assertTrue(limiter.tryAcquireLookupForIp("10.0.0.1"));
+    }
+
+    @Test
+    void lookupsAndSignInOptionsHaveTheirOwnAllowanceAndLimit() {
+        // 3 lookups per address, 4 sign-in options per address, and neither spends the other
+        for (int i = 0; i < 3; i++) {
+            assertTrue(limiter.tryAcquireLookupForIp("10.0.0.1"));
+        }
+        assertFalse(limiter.tryAcquireLookupForIp("10.0.0.1"));
+        for (int i = 0; i < 4; i++) {
+            assertTrue(limiter.tryAcquireOptionsForIp("10.0.0.1"), "options " + i);
+        }
+        assertFalse(limiter.tryAcquireOptionsForIp("10.0.0.1"));
     }
 
     @Test
@@ -45,7 +58,7 @@ class PasskeyRateLimiterTest {
         assertTrue(limiter.tryAcquireForUsername("alice"));
         assertTrue(limiter.tryAcquireForUsername("alice"));
         assertFalse(limiter.tryAcquireForUsername("alice"));
-        assertTrue(limiter.tryAcquireForIp("alice"));
+        assertTrue(limiter.tryAcquireLookupForIp("alice"));
     }
 
     private MockHttpServletResponse run(String method, String uri, String ip) throws Exception {
@@ -64,13 +77,18 @@ class PasskeyRateLimiterTest {
     @Test
     void theFilterAnswers429ToTheUnauthenticatedEndpointsOnceAnAddressIsOverTheLimit() throws Exception {
         for (int i = 0; i < 3; i++) {
-            assertEquals(200, run("POST", "/webauthn/authenticate/options", "10.0.0.1").getStatus());
+            assertEquals(200, run("POST", "/info/passkey/lookup", "10.0.0.1").getStatus());
         }
-        // lookup and options share one budget per address
         MockHttpServletResponse limited = run("POST", "/info/passkey/lookup", "10.0.0.1");
         assertEquals(429, limited.getStatus());
         assertNotNull(limited.getHeader("Retry-After"));
         assertEquals(200, run("POST", "/info/passkey/lookup", "10.0.0.2").getStatus());
+
+        // the sign-in options are limited on their own, and more generously
+        for (int i = 0; i < 4; i++) {
+            assertEquals(200, run("POST", "/webauthn/authenticate/options", "10.0.0.1").getStatus(), "options " + i);
+        }
+        assertEquals(429, run("POST", "/webauthn/authenticate/options", "10.0.0.1").getStatus());
     }
 
     @Test
@@ -79,7 +97,7 @@ class PasskeyRateLimiterTest {
             assertEquals(200, run("GET", "/info/passkey", "10.0.0.1").getStatus());
             assertEquals(200, run("POST", "/login/webauthn", "10.0.0.1").getStatus());
         }
-        assertNull(run("POST", "/webauthn/authenticate/options", "10.0.0.1").getHeader("Retry-After"));
+        assertNull(run("POST", "/webauthn/authenticate/options", "10.0.0.9").getHeader("Retry-After"));
     }
 
     @Test
