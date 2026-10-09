@@ -3,7 +3,7 @@ import {SettingsAccountService} from './domain/settings-account.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AuthService} from '../../authentication/auth.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {AbstractControl, FormControl, NgForm, ValidatorFn, Validators} from '@angular/forms';
 import {UserToken} from '../../authentication/domain/auth';
 
@@ -20,9 +20,13 @@ export class SettingsAccountComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
 
   loading: boolean;
+
+  /** Which of the account pages is shown: 'personal-info', 'password' or 'passkeys' (see the routes). */
+  section: 'personal-info' | 'password' | 'passkeys' = this.route.snapshot.data['section'] || 'personal-info';
 
   originalEmail: string;
   emailFormControl: FormControl = new FormControl();
@@ -38,6 +42,16 @@ export class SettingsAccountComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
+  /** The entry of the settings menu that belongs to the page. */
+  get menuItem(): string {
+    return {'personal-info': 'PersonalInfo', 'password': 'Password', 'passkeys': 'Passkeys'}[this.section];
+  }
+
+  /** Passkeys belong to local accounts and exist only while passkey sign-in is configured. */
+  get showPasskeys(): boolean {
+    return this.auth.canUsePasskeys();
+  }
+
   ngOnInit() {
     const token = this.userToken;
     this.accountService.getAccount(token.username).subscribe(resp => {
@@ -48,7 +62,13 @@ export class SettingsAccountComponent implements OnInit {
       }
     });
 
-    this.hideChangePassword = token.authentication !== 'basic';
+    // A local account signed in with a passkey still has a password to change.
+    this.hideChangePassword = token.authentication !== 'basic' && token.authentication !== 'passkey';
+
+    // A page that does not exist for this account (no password, passkeys off) falls back to the first one.
+    if ((this.section === 'password' && this.hideChangePassword) || (this.section === 'passkeys' && !this.showPasskeys)) {
+      this.router.navigateByUrl('/settings/account/personal-info');
+    }
 
     this.oldPasswordFormControl = new FormControl('', [
       Validators.required, Validators.minLength(5), Validators.maxLength(100)
@@ -72,7 +92,7 @@ export class SettingsAccountComponent implements OnInit {
     this.service.updatePersonalInfo({
       email: this.emailFormControl.value
     }, {
-      email_validation_link: window.location.href.replace('/settings/account', '/settings/email_validation')
+      email_validation_link: window.location.href.replace(/\/settings\/account.*$/, '/settings/email_validation')
     }).subscribe(_ => {
       if (this.emailFormControl.valid) {
         this.emailVerified = false;
@@ -94,7 +114,7 @@ export class SettingsAccountComponent implements OnInit {
     this.service.resendEmailValidationRequest({
       email: this.emailFormControl.value
     }, {
-      email_validation_link: window.location.href.replace('/settings/account', '/settings/email_validation')
+      email_validation_link: window.location.href.replace(/\/settings\/account.*$/, '/settings/email_validation')
     }).subscribe(_ => {
       this.snackBar.open('Resent', '', {
         duration: 3000,

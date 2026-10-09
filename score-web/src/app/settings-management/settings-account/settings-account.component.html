@@ -6,9 +6,10 @@
   }
 
   <div class="settings-layout">
-    <score-settings-menu active="Account"></score-settings-menu>
+    <score-settings-menu [active]="menuItem"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
+        @if (section === 'personal-info') {
         <mat-card class="p-0">
           <mat-toolbar class="bg-white">
             <span class="title">Personal Info</span>
@@ -55,7 +56,9 @@
           </div>
         </div>
 
-        @if (!hideChangePassword) {
+        }
+
+        @if (section === 'password' && !hideChangePassword) {
           <form #passwordForm="ngForm">
             <div class="p-0">
               <mat-toolbar class="bg-white">
@@ -113,6 +116,10 @@
               </div>
             </div>
           </form>
+        }
+
+        @if (section === 'passkeys' && showPasskeys) {
+          <score-settings-passkeys></score-settings-passkeys>
         }
       </div>
     </div>

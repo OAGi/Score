@@ -65,3 +65,9 @@
   display: flex; 
   align-items: center
 }
+
+/* The pages of Account, indented under it. */
+.sub-item .sub-label {
+  padding-left: 48px;
+  font-size: 13px;
+}

@@ -2,8 +2,8 @@
   <div class="pe-md-3 pe-0">
     <mat-list>
       <h5 class="ms-2 mb-2">General</h5>
-      <a class="vertical-align" mat-list-item class="nav-item {{ active === 'Password' ? 'active' : '' }}"
-        routerLink="/settings/account">
+      <a class="vertical-align" mat-list-item class="nav-item {{ accountActive ? 'active' : '' }}"
+        routerLink="/settings/account/personal-info">
         <div class="d-flex">
           <mat-icon mat-list-icon class="mat-icon">lock</mat-icon>
           <div mat-line class="mat-line" style="padding-left: 10px; align-content: center;">
@@ -11,6 +11,22 @@
           </div>
         </div>
       </a>
+      <a class="vertical-align sub-item" mat-list-item class="nav-item sub-item {{ active === 'PersonalInfo' ? 'active' : '' }}"
+        routerLink="/settings/account/personal-info">
+        <span class="sub-label">Personal Info</span>
+      </a>
+      @if (hasPassword) {
+        <a class="vertical-align sub-item" mat-list-item class="nav-item sub-item {{ active === 'Password' ? 'active' : '' }}"
+          routerLink="/settings/account/password">
+          <span class="sub-label">Change Password</span>
+        </a>
+      }
+      @if (hasPasskeys) {
+        <a class="vertical-align sub-item" mat-list-item class="nav-item sub-item {{ active === 'Passkeys' ? 'active' : '' }}"
+          routerLink="/settings/account/passkeys">
+          <span class="sub-label">Passkeys</span>
+        </a>
+      }
       <a class="vertical-align" mat-list-item class="nav-item {{ active === 'Preferences' ? 'active' : '' }}"
         routerLink="/settings/preferences">
         <div class="d-flex">

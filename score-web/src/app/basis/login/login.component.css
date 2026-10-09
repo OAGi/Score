@@ -93,3 +93,21 @@ label {
 .oauth2-form-body div:first-child .btn {
   margin-top: 0;
 }
+
+.passkey-step-message {
+  color: #666;
+  margin: 20px 0 0;
+  text-align: center;
+}
+
+/* Continue and Try another way side by side: two columns, one row. */
+.passkey-choice-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 20px;
+}
+
+.auth-form .passkey-choice-grid .btn {
+  margin-top: 0;
+}

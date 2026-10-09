@@ -21,6 +21,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyId
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListValueManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppWebauthnUser;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep;
@@ -134,6 +135,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevel
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRuleExpression;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UserTenant;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.WebauthnCredential;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest;
 
@@ -236,6 +238,12 @@ public class DefaultSchema extends SchemaImpl {
      * authorization purposes.
      */
     public final AppUser APP_USER = AppUser.APP_USER;
+
+    /**
+     * WebAuthn identity (user handle) of an app_user; created on the first
+     * passkey registration.
+     */
+    public final AppWebauthnUser APP_WEBAUTHN_USER = AppWebauthnUser.APP_WEBAUTHN_USER;
 
     /**
      * An ASBIE represents a relationship/association between two ABIEs through
@@ -1048,6 +1056,11 @@ public class DefaultSchema extends SchemaImpl {
     public final UserTenant USER_TENANT = UserTenant.USER_TENANT;
 
     /**
+     * Registered passkeys (WebAuthn credentials) of local accounts.
+     */
+    public final WebauthnCredential WEBAUTHN_CREDENTIAL = WebauthnCredential.WEBAUTHN_CREDENTIAL;
+
+    /**
      * This table stores XML schema built-in types and OAGIS built-in types.
      * OAGIS built-in types are those types defined in the XMLSchemaBuiltinType
      * and the XMLSchemaBuiltinType Patterns schemas.
@@ -1089,6 +1102,7 @@ public class DefaultSchema extends SchemaImpl {
             AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST,
             AppOauth2User.APP_OAUTH2_USER,
             AppUser.APP_USER,
+            AppWebauthnUser.APP_WEBAUTHN_USER,
             Asbie.ASBIE,
             AsbieBizterm.ASBIE_BIZTERM,
             Asbiep.ASBIEP,
@@ -1202,6 +1216,7 @@ public class DefaultSchema extends SchemaImpl {
             UsageRule.USAGE_RULE,
             UsageRuleExpression.USAGE_RULE_EXPRESSION,
             UserTenant.USER_TENANT,
+            WebauthnCredential.WEBAUTHN_CREDENTIAL,
             Xbt.XBT,
             XbtManifest.XBT_MANIFEST
         );

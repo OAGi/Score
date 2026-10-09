@@ -1,4 +1,4 @@
-import { Component, OnInit, HostAttributeToken, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
@@ -9,11 +9,27 @@ import {AuthService} from '../../authentication/auth.service';
   styleUrls: ['./settings-menu.component.css']
 })
 export class SettingsMenuComponent implements OnInit {
-  active = inject(new HostAttributeToken('active'), { optional: true });
+  /** The highlighted entry: Account's pages (PersonalInfo, Password, Passkeys), Preferences or ApplicationSettings. */
+  @Input() active: string | null = null;
   private auth = inject(AuthService);
 
 
   ngOnInit(): void {
+  }
+
+  /** Account is highlighted on all of its pages. */
+  get accountActive(): boolean {
+    return ['PersonalInfo', 'Password', 'Passkeys'].includes(this.active);
+  }
+
+  /** A local account has a password to change; one that signs in through single sign-on does not. */
+  get hasPassword(): boolean {
+    const authentication = this.auth.getUserToken().authentication;
+    return authentication === 'basic' || authentication === 'passkey';
+  }
+
+  get hasPasskeys(): boolean {
+    return this.auth.canUsePasskeys();
   }
 
   get isAdmin(): boolean {

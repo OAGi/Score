@@ -1,0 +1,49 @@
+<div class="d-block passkey-offer-dialog">
+  @if (state !== 'created') {
+    <div class="header d-flex align-items-center" mat-dialog-title>
+      <mat-icon class="passkey-offer-icon" aria-hidden="true">fingerprint</mat-icon>
+      <span>Sign in faster with a passkey</span>
+    </div>
+    <div class="content" mat-dialog-content>
+      <p>Use your fingerprint, face, or screen lock instead of typing your password.</p>
+      @if (state === 'cancelled') {
+        <p class="passkey-offer-message" role="status">
+          No passkey was added. You can try again. If you use a password manager extension such as Bitwarden,
+          make sure it is unlocked and allowed to save passkeys.
+        </p>
+      }
+      @if (state === 'failed') {
+        <p class="passkey-offer-message passkey-offer-error" role="alert">
+          The passkey could not be added. Try again, or add one later in <i>Settings</i>.
+        </p>
+      }
+    </div>
+    <div class="actions" mat-dialog-actions>
+      <button mat-raised-button color="primary" class="passkey-offer-create" (click)="create()"
+        [disabled]="state === 'creating'">
+        {{ (state === 'cancelled' || state === 'failed') ? 'Try again' : 'Create a passkey' }}
+      </button>
+      <button mat-button class="passkey-offer-later" (click)="later()" [disabled]="state === 'creating'">
+        Not now
+      </button>
+      <span class="flex-11-auto"></span>
+      <button mat-button class="passkey-offer-never" (click)="never()" [disabled]="state === 'creating'">
+        Don't ask again
+      </button>
+    </div>
+  } @else {
+    <div class="header d-flex align-items-center" mat-dialog-title>
+      <mat-icon class="passkey-offer-icon passkey-offer-success" aria-hidden="true">check_circle</mat-icon>
+      <span>Passkey added</span>
+    </div>
+    <div class="content" mat-dialog-content>
+      <p role="status">
+        Next time, choose "Sign in with a passkey" on the sign-in page, or pick it from the username field.
+      </p>
+    </div>
+    <div class="actions" mat-dialog-actions>
+      <button mat-raised-button color="primary" class="passkey-offer-done" (click)="done()">Done</button>
+      <button mat-button class="passkey-offer-manage" (click)="manage()">Manage passkeys</button>
+    </div>
+  }
+</div>

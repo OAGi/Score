@@ -91,6 +91,21 @@ springdoc:
     tags-sorter: alpha
 
 score:
+  # Passkey (WebAuthn) sign-in for local accounts. It is on exactly when BOTH rp-id and allowed-origins are set, and
+  # off when they are empty; there is no separate flag. Set them for a Docker deployment through the environment
+  # variables (SCORE_PASSKEY_RP_ID, SCORE_PASSKEY_ALLOWED_ORIGINS, SCORE_PASSKEY_RP_NAME).
+  #   rp-id           the domain passkeys are bound to, e.g. score.example.org (a bare host name: no scheme, port,
+  #                   or path). The browser enforces this binding. Changing it later makes every passkey registered
+  #                   for the old value stop working, so choose it once.
+  #   allowed-origins the addresses users open in the browser, with scheme and port, e.g. https://score.example.org;
+  #                   separate several with commas. Each must be under the rp-id. Plain http is allowed only for
+  #                   localhost.
+  #   rp-name         optional; the name the browser shows when it asks about the passkey. Defaults to the rp-id.
+  # An invalid value stops the application from starting, with the reason in the error.
+  passkey:
+    rp-id: ${SCORE_PASSKEY_RP_ID:}
+    rp-name: ${SCORE_PASSKEY_RP_NAME:}
+    allowed-origins: ${SCORE_PASSKEY_ALLOWED_ORIGINS:}
   integration:
     github:
       enabled: ${SCORE_GITHUB_ENABLED:false}

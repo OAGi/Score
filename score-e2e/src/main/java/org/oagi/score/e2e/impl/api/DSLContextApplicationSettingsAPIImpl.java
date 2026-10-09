@@ -3,7 +3,10 @@ package org.oagi.score.e2e.impl.api;
 import org.jooq.DSLContext;
 import org.oagi.score.e2e.api.ApplicationSettingsAPI;
 
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.APP_WEBAUTHN_USER;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CONFIGURATION;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.WEBAUTHN_CREDENTIAL;
 
 public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettingsAPI {
 
@@ -57,6 +60,20 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
     @Override
     public void setBIEInverseModeEnable(boolean bieInverseModeEnable) {
         upsertBooleanConfiguration(BIE_INVERSE_MODE_ENABLED_CONFIG_NAME, bieInverseModeEnable);
+    }
+
+    @Override
+    public void deletePasskeysOfLoginId(String loginId) {
+        var appWebauthnUserIds = dslContext.select(APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID)
+                .from(APP_WEBAUTHN_USER)
+                .join(APP_USER).on(APP_USER.APP_USER_ID.eq(APP_WEBAUTHN_USER.APP_USER_ID))
+                .where(APP_USER.LOGIN_ID.eq(loginId));
+        dslContext.deleteFrom(WEBAUTHN_CREDENTIAL)
+                .where(WEBAUTHN_CREDENTIAL.APP_WEBAUTHN_USER_ID.in(appWebauthnUserIds))
+                .execute();
+        dslContext.deleteFrom(APP_WEBAUTHN_USER)
+                .where(APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID.in(appWebauthnUserIds))
+                .execute();
     }
 
     private boolean getBooleanConfiguration(String configurationName) {

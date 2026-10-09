@@ -21,6 +21,7 @@ import {
   BusinessTermProperties,
   FunctionsRequiringEmailTransmissionProperties,
   OAuth2AppInfo,
+  PasskeyProperties,
   TenantProperties,
   UserToken
 } from './domain/auth';
@@ -126,6 +127,15 @@ export class AuthService implements OnInit, CanActivate {
     localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
   }
 
+  /**
+   * Whether the signed-in user can manage passkeys: passkey sign-in is on, and the account signs in with a username
+   * and password (single sign-on accounts use their provider's own passkeys).
+   */
+  canUsePasskeys(): boolean {
+    const token = this.getUserToken();
+    return !!token?.passkey?.enabled && (token.authentication === 'basic' || token.authentication === 'passkey');
+  }
+
   getUserToken(): UserToken {
     let value;
     try {
@@ -155,6 +165,11 @@ export class AuthService implements OnInit, CanActivate {
       if (!value.browseStandardMode) {
         value.browseStandardMode = new BrowseStandardModeProperties();
         value.browseStandardMode.enabled = false;
+        this.storeUserInfo(value);
+      }
+      if (!value.passkey) {
+        value.passkey = new PasskeyProperties();
+        value.passkey.enabled = false;
         this.storeUserInfo(value);
       }
     } catch (ignore) {

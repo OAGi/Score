@@ -2,12 +2,12 @@
   @if ((oauth2AppInfos | async); as oAuth2AppInfos) {
     <div class="auth-form">
       @if (!roles.includes('pending') && !roles.includes('reject')) {
-        <form role="form" autocomplete="on" (submit)="login()">
+        <form role="form" autocomplete="on" (submit)="onSubmit()">
           <div class="auth-form-header">
             <h1>Sign in to NIST/OAGi connectCenter</h1>
             <h4 class="pt-1 pe-3 text-align-end">(formerly "Score")</h4>
           </div>
-          <div [hidden]="err === undefined" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <div [hidden]="err === undefined && !passkeyError" class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ errorMessage }}
             <button type="button" class="btn-close" aria-label="Close" (click)="onClose()"></button>
           </div>
@@ -16,29 +16,55 @@
               Username
             </label>
             <input type="text" name="login" id="login_field" class="form-control input-block" tabindex="1"
-              autocapitalize="off" autocorrect="off" autocomplete="username"
-              autofocus="autofocus" [(ngModel)]="credentials.username">
-            <label for="password">
-              Password
-            </label>
-            <input type="password" name="password" id="password" class="form-control form-control input-block" tabindex="2"
-              autocomplete="current-password"
-              [(ngModel)]="credentials.password">
-            <button type="submit" name="commit" tabindex="3" class="btn btn-primary w-100 login-submit-button"
-              data-disable-with="Signing in…">
-              Sign in
-            </button>
+              autocapitalize="off" autocorrect="off" [attr.autocomplete]="showPasskey ? 'username webauthn' : 'username'"
+              autofocus="autofocus" [ngModel]="credentials.username" (ngModelChange)="onUsernameChange($event)">
+            @if (showPasswordFields) {
+              <label for="password">
+                Password
+              </label>
+              <input type="password" name="password" id="password" class="form-control form-control input-block" tabindex="2"
+                autocomplete="current-password"
+                [(ngModel)]="credentials.password">
+              <button type="submit" name="commit" tabindex="3" class="btn btn-primary w-100 login-submit-button"
+                data-disable-with="Signing in…">
+                Sign in
+              </button>
+            } @else if (step === 'passkey') {
+              <p class="passkey-step-message" role="status">Use your passkey to sign in…</p>
+            } @else if (step === 'choose') {
+              <div class="passkey-choice-grid">
+                <button type="button" class="btn btn-primary passkey-retry-button"
+                  tabindex="3" (click)="signInWithPasskeyStep()">
+                  Continue
+                </button>
+                <button type="button" class="btn btn-outline-secondary passkey-another-way-button"
+                  tabindex="4" (click)="useAnotherWay()">
+                  Try another way
+                </button>
+              </div>
+            } @else {
+              <button type="submit" name="commit" tabindex="3" class="btn btn-primary w-100 login-submit-button passkey-continue-button"
+                [disabled]="checking || !credentials.username?.trim()">
+                Continue
+              </button>
+            }
           </div>
           <div>
-            @if (oAuth2AppInfos.length > 0) {
+            @if (showPasskey || oAuth2AppInfos.length > 0) {
               <div class="or-container">
                 <div class="line-separator"></div>
                 <div class="or-label">or</div>
                 <div class="line-separator"></div>
               </div>
-            }
-            @if (oAuth2AppInfos.length > 0) {
               <div class="oauth2-form-body">
+                @if (showPasskey) {
+                  <div>
+                    <button type="button" class="btn btn-outline-secondary w-100 passkey-login-button"
+                      tabindex="3" (click)="loginWithPasskey()">
+                      Sign in with a passkey
+                    </button>
+                  </div>
+                }
                 @for (oauth2AppInfo of oAuth2AppInfos; track oauth2AppInfo) {
                   <div>
                     <a href="{{ 'api/' + oauth2AppInfo.loginUrl }}"

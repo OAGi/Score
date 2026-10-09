@@ -53,4 +53,11 @@ public interface ApplicationSettingsAPI {
     /** Set whether the global BIE Inverse Mode feature is enabled. */
     void setBIEInverseModeEnable(boolean bieInverseModeEnable);
 
+    /**
+     * Remove every passkey (and the WebAuthn identity) of an account, so the account can be deleted.
+     *
+     * @param loginId the account's login ID
+     */
+    void deletePasskeysOfLoginId(String loginId);
+
 }

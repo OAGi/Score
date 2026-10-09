@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyId
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListValueManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppWebauthnUser;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep;
@@ -133,6 +134,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevel
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRuleExpression;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UserTenant;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.WebauthnCredential;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AbieRecord;
@@ -145,6 +147,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AgencyIdListValueRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AppOauth2UserRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AppUserRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AppWebauthnUserRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AsbieBiztermRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AsbieRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AsbiepRecord;
@@ -258,6 +261,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.UsageRuleExpressionRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.UsageRuleRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.UserTenantRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.WebauthnCredentialRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.XbtManifestRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.XbtRecord;
 
@@ -285,6 +289,8 @@ public class Keys {
     public static final UniqueKey<AppOauth2UserRecord> KEY_APP_OAUTH2_USER_PRIMARY = Internal.createUniqueKey(AppOauth2User.APP_OAUTH2_USER, DSL.name("KEY_app_oauth2_user_PRIMARY"), new TableField[] { AppOauth2User.APP_OAUTH2_USER.APP_OAUTH2_USER_ID }, true);
     public static final UniqueKey<AppUserRecord> KEY_APP_USER_APP_USER_UK1 = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("KEY_app_user_app_user_uk1"), new TableField[] { AppUser.APP_USER.LOGIN_ID }, true);
     public static final UniqueKey<AppUserRecord> KEY_APP_USER_PRIMARY = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("KEY_app_user_PRIMARY"), new TableField[] { AppUser.APP_USER.APP_USER_ID }, true);
+    public static final UniqueKey<AppWebauthnUserRecord> KEY_APP_WEBAUTHN_USER_APP_WEBAUTHN_USER_UK1 = Internal.createUniqueKey(AppWebauthnUser.APP_WEBAUTHN_USER, DSL.name("KEY_app_webauthn_user_app_webauthn_user_uk1"), new TableField[] { AppWebauthnUser.APP_WEBAUTHN_USER.USER_HANDLE }, true);
+    public static final UniqueKey<AppWebauthnUserRecord> KEY_APP_WEBAUTHN_USER_PRIMARY = Internal.createUniqueKey(AppWebauthnUser.APP_WEBAUTHN_USER, DSL.name("KEY_app_webauthn_user_PRIMARY"), new TableField[] { AppWebauthnUser.APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID }, true);
     public static final UniqueKey<AsbieRecord> KEY_ASBIE_PRIMARY = Internal.createUniqueKey(Asbie.ASBIE, DSL.name("KEY_asbie_PRIMARY"), new TableField[] { Asbie.ASBIE.ASBIE_ID }, true);
     public static final UniqueKey<AsbieBiztermRecord> KEY_ASBIE_BIZTERM_PRIMARY = Internal.createUniqueKey(AsbieBizterm.ASBIE_BIZTERM, DSL.name("KEY_asbie_bizterm_PRIMARY"), new TableField[] { AsbieBizterm.ASBIE_BIZTERM.ASBIE_BIZTERM_ID }, true);
     public static final UniqueKey<AsbiepRecord> KEY_ASBIEP_PRIMARY = Internal.createUniqueKey(Asbiep.ASBIEP, DSL.name("KEY_asbiep_PRIMARY"), new TableField[] { Asbiep.ASBIEP.ASBIEP_ID }, true);
@@ -426,6 +432,8 @@ public class Keys {
     public static final UniqueKey<UsageRuleExpressionRecord> KEY_USAGE_RULE_EXPRESSION_PRIMARY = Internal.createUniqueKey(UsageRuleExpression.USAGE_RULE_EXPRESSION, DSL.name("KEY_usage_rule_expression_PRIMARY"), new TableField[] { UsageRuleExpression.USAGE_RULE_EXPRESSION.USAGE_RULE_EXPRESSION_ID }, true);
     public static final UniqueKey<UserTenantRecord> KEY_USER_TENANT_PRIMARY = Internal.createUniqueKey(UserTenant.USER_TENANT, DSL.name("KEY_user_tenant_PRIMARY"), new TableField[] { UserTenant.USER_TENANT.USER_TENANT_ID }, true);
     public static final UniqueKey<UserTenantRecord> KEY_USER_TENANT_USER_TENANT_PAIR = Internal.createUniqueKey(UserTenant.USER_TENANT, DSL.name("KEY_user_tenant_user_tenant_pair"), new TableField[] { UserTenant.USER_TENANT.TENANT_ID, UserTenant.USER_TENANT.APP_USER_ID }, true);
+    public static final UniqueKey<WebauthnCredentialRecord> KEY_WEBAUTHN_CREDENTIAL_PRIMARY = Internal.createUniqueKey(WebauthnCredential.WEBAUTHN_CREDENTIAL, DSL.name("KEY_webauthn_credential_PRIMARY"), new TableField[] { WebauthnCredential.WEBAUTHN_CREDENTIAL.WEBAUTHN_CREDENTIAL_ID }, true);
+    public static final UniqueKey<WebauthnCredentialRecord> KEY_WEBAUTHN_CREDENTIAL_WEBAUTHN_CREDENTIAL_UK1 = Internal.createUniqueKey(WebauthnCredential.WEBAUTHN_CREDENTIAL, DSL.name("KEY_webauthn_credential_webauthn_credential_uk1"), new TableField[] { WebauthnCredential.WEBAUTHN_CREDENTIAL.CREDENTIAL_ID }, true);
     public static final UniqueKey<XbtRecord> KEY_XBT_PRIMARY = Internal.createUniqueKey(Xbt.XBT, DSL.name("KEY_xbt_PRIMARY"), new TableField[] { Xbt.XBT.XBT_ID }, true);
     public static final UniqueKey<XbtManifestRecord> KEY_XBT_MANIFEST_PRIMARY = Internal.createUniqueKey(XbtManifest.XBT_MANIFEST, DSL.name("KEY_xbt_manifest_PRIMARY"), new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true);
 
@@ -490,6 +498,7 @@ public class Keys {
     public static final ForeignKey<AgencyIdListValueManifestRecord, AgencyIdListValueManifestRecord> AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK = ForeignKeys0.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK;
     public static final ForeignKey<AppOauth2UserRecord, AppUserRecord> APP_OAUTH2_USER_APP_USER_ID_FK = ForeignKeys0.APP_OAUTH2_USER_APP_USER_ID_FK;
     public static final ForeignKey<AppOauth2UserRecord, Oauth2AppRecord> APP_OAUTH2_USER_OAUTH2_APP_ID_FK = ForeignKeys0.APP_OAUTH2_USER_OAUTH2_APP_ID_FK;
+    public static final ForeignKey<AppWebauthnUserRecord, AppUserRecord> APP_WEBAUTHN_USER_APP_USER_ID_FK = ForeignKeys0.APP_WEBAUTHN_USER_APP_USER_ID_FK;
     public static final ForeignKey<AsbieRecord, AsccManifestRecord> ASBIE_BASED_ASCC_MANIFEST_ID_FK = ForeignKeys0.ASBIE_BASED_ASCC_MANIFEST_ID_FK;
     public static final ForeignKey<AsbieRecord, AppUserRecord> ASBIE_CREATED_BY_FK = ForeignKeys0.ASBIE_CREATED_BY_FK;
     public static final ForeignKey<AsbieRecord, AbieRecord> ASBIE_FROM_ABIE_ID_FK = ForeignKeys0.ASBIE_FROM_ABIE_ID_FK;
@@ -930,9 +939,10 @@ public class Keys {
     public static final ForeignKey<UsageRuleExpressionRecord, UsageRuleRecord> USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK = ForeignKeys0.USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK;
     public static final ForeignKey<UserTenantRecord, AppUserRecord> USER_TENANT_TENANT_ID_APP_USER_ID_FK = ForeignKeys0.USER_TENANT_TENANT_ID_APP_USER_ID_FK;
     public static final ForeignKey<UserTenantRecord, TenantRecord> USER_TENANT_TENANT_ID_FK = ForeignKeys0.USER_TENANT_TENANT_ID_FK;
+    public static final ForeignKey<WebauthnCredentialRecord, AppWebauthnUserRecord> WEBAUTHN_CREDENTIAL_APP_WEBAUTHN_USER_ID_FK = ForeignKeys0.WEBAUTHN_CREDENTIAL_APP_WEBAUTHN_USER_ID_FK;
     public static final ForeignKey<XbtRecord, AppUserRecord> XBT_CREATED_BY_FK = ForeignKeys0.XBT_CREATED_BY_FK;
-    public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = ForeignKeys0.XBT_LAST_UPDATED_BY_FK;
-    public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = ForeignKeys0.XBT_OWNER_USER_ID_FK;
+    public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = ForeignKeys1.XBT_LAST_UPDATED_BY_FK;
+    public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = ForeignKeys1.XBT_OWNER_USER_ID_FK;
     public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = ForeignKeys1.XBT_SUBTYPE_OF_XBT_ID_FK;
     public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = ForeignKeys1.XBT_MANIFEST_LOG_ID_FK;
     public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = ForeignKeys1.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK;
@@ -1002,6 +1012,7 @@ public class Keys {
         public static final ForeignKey<AgencyIdListValueManifestRecord, AgencyIdListValueManifestRecord> AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK = Internal.createForeignKey(AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST, DSL.name("agency_id_list_value_replacement_agency_id_list_manif_fk"), new TableField[] { AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID }, Keys.KEY_AGENCY_ID_LIST_VALUE_MANIFEST_PRIMARY, new TableField[] { AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<AppOauth2UserRecord, AppUserRecord> APP_OAUTH2_USER_APP_USER_ID_FK = Internal.createForeignKey(AppOauth2User.APP_OAUTH2_USER, DSL.name("app_oauth2_user_app_user_id_fk"), new TableField[] { AppOauth2User.APP_OAUTH2_USER.APP_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<AppOauth2UserRecord, Oauth2AppRecord> APP_OAUTH2_USER_OAUTH2_APP_ID_FK = Internal.createForeignKey(AppOauth2User.APP_OAUTH2_USER, DSL.name("app_oauth2_user_oauth2_app_id_fk"), new TableField[] { AppOauth2User.APP_OAUTH2_USER.OAUTH2_APP_ID }, Keys.KEY_OAUTH2_APP_PRIMARY, new TableField[] { Oauth2App.OAUTH2_APP.OAUTH2_APP_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<AppWebauthnUserRecord, AppUserRecord> APP_WEBAUTHN_USER_APP_USER_ID_FK = Internal.createForeignKey(AppWebauthnUser.APP_WEBAUTHN_USER, DSL.name("app_webauthn_user_app_user_id_fk"), new TableField[] { AppWebauthnUser.APP_WEBAUTHN_USER.APP_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<AsbieRecord, AsccManifestRecord> ASBIE_BASED_ASCC_MANIFEST_ID_FK = Internal.createForeignKey(Asbie.ASBIE, DSL.name("asbie_based_ascc_manifest_id_fk"), new TableField[] { Asbie.ASBIE.BASED_ASCC_MANIFEST_ID }, Keys.KEY_ASCC_MANIFEST_PRIMARY, new TableField[] { AsccManifest.ASCC_MANIFEST.ASCC_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<AsbieRecord, AppUserRecord> ASBIE_CREATED_BY_FK = Internal.createForeignKey(Asbie.ASBIE, DSL.name("asbie_created_by_fk"), new TableField[] { Asbie.ASBIE.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<AsbieRecord, AbieRecord> ASBIE_FROM_ABIE_ID_FK = Internal.createForeignKey(Asbie.ASBIE, DSL.name("asbie_from_abie_id_fk"), new TableField[] { Asbie.ASBIE.FROM_ABIE_ID }, Keys.KEY_ABIE_PRIMARY, new TableField[] { Abie.ABIE.ABIE_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
@@ -1442,12 +1453,13 @@ public class Keys {
         public static final ForeignKey<UsageRuleExpressionRecord, UsageRuleRecord> USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK = Internal.createForeignKey(UsageRuleExpression.USAGE_RULE_EXPRESSION, DSL.name("usage_rule_expression_represented_usage_rule_id_fk"), new TableField[] { UsageRuleExpression.USAGE_RULE_EXPRESSION.REPRESENTED_USAGE_RULE_ID }, Keys.KEY_USAGE_RULE_PRIMARY, new TableField[] { UsageRule.USAGE_RULE.USAGE_RULE_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<UserTenantRecord, AppUserRecord> USER_TENANT_TENANT_ID_APP_USER_ID_FK = Internal.createForeignKey(UserTenant.USER_TENANT, DSL.name("user_tenant_tenant_id_app_user_id_fk"), new TableField[] { UserTenant.USER_TENANT.APP_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<UserTenantRecord, TenantRecord> USER_TENANT_TENANT_ID_FK = Internal.createForeignKey(UserTenant.USER_TENANT, DSL.name("user_tenant_tenant_id_fk"), new TableField[] { UserTenant.USER_TENANT.TENANT_ID }, Keys.KEY_TENANT_PRIMARY, new TableField[] { Tenant.TENANT.TENANT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<WebauthnCredentialRecord, AppWebauthnUserRecord> WEBAUTHN_CREDENTIAL_APP_WEBAUTHN_USER_ID_FK = Internal.createForeignKey(WebauthnCredential.WEBAUTHN_CREDENTIAL, DSL.name("webauthn_credential_app_webauthn_user_id_fk"), new TableField[] { WebauthnCredential.WEBAUTHN_CREDENTIAL.APP_WEBAUTHN_USER_ID }, Keys.KEY_APP_WEBAUTHN_USER_PRIMARY, new TableField[] { AppWebauthnUser.APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, AppUserRecord> XBT_CREATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_created_by_fk"), new TableField[] { Xbt.XBT.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
-        public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_last_updated_by_fk"), new TableField[] { Xbt.XBT.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
-        public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_owner_user_id_fk"), new TableField[] { Xbt.XBT.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
     }
 
     private static class ForeignKeys1 {
+        public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_last_updated_by_fk"), new TableField[] { Xbt.XBT.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_owner_user_id_fk"), new TableField[] { Xbt.XBT.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_subtype_of_xbt_id_fk"), new TableField[] { Xbt.XBT.SUBTYPE_OF_XBT_ID }, Keys.KEY_XBT_PRIMARY, new TableField[] { Xbt.XBT.XBT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, LogRecord> XBT_MANIFEST_LOG_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_log_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.LOG_ID }, Keys.KEY_LOG_PRIMARY, new TableField[] { Log.LOG.LOG_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtManifestRecord, XbtManifestRecord> XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK = Internal.createForeignKey(XbtManifest.XBT_MANIFEST, DSL.name("xbt_manifest_next_xbt_manifest_id_fk"), new TableField[] { XbtManifest.XBT_MANIFEST.NEXT_XBT_MANIFEST_ID }, Keys.KEY_XBT_MANIFEST_PRIMARY, new TableField[] { XbtManifest.XBT_MANIFEST.XBT_MANIFEST_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);

@@ -7,6 +7,7 @@ import {CanActivateAdmin, CanActivateUser} from '../authentication/auth.service'
 import {SettingsAccountComponent} from './settings-account/settings-account.component';
 import {SettingsAccountService} from './settings-account/domain/settings-account.service';
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
+import {SettingsPasskeysComponent} from './settings-passkeys/settings-passkeys.component';
 import {SettingsApplicationSettingsComponent} from './settings-application-settings/settings-application-settings.component';
 import {SettingsApplicationSettingsService} from './settings-application-settings/domain/settings-application-settings.service';
 import {MarkdownModule} from 'ngx-markdown';
@@ -17,9 +18,29 @@ import {SettingsPreferencesService} from './settings-preferences/domain/settings
 const routes: Routes = [
   {
     path: 'settings/account',
+    pathMatch: 'full',
+    redirectTo: 'settings/account/personal-info'
+  },
+  {
+    path: 'settings/account/personal-info',
     component: SettingsAccountComponent,
+    data: {section: 'personal-info'},
     canActivate: [CanActivateUser],
-    title: 'Settings'
+    title: 'Personal Info'
+  },
+  {
+    path: 'settings/account/password',
+    component: SettingsAccountComponent,
+    data: {section: 'password'},
+    canActivate: [CanActivateUser],
+    title: 'Change password'
+  },
+  {
+    path: 'settings/account/passkeys',
+    component: SettingsAccountComponent,
+    data: {section: 'passkeys'},
+    canActivate: [CanActivateUser],
+    title: 'Passkeys'
   },
   {
     path: 'settings/email_validation',
@@ -53,6 +74,7 @@ const routes: Routes = [
   declarations: [
     SettingsMenuComponent,
     SettingsAccountComponent,
+    SettingsPasskeysComponent,
     SettingsPreferencesComponent,
     SettingsApplicationSettingsComponent,
     EmailValidationComponent

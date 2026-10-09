@@ -40,6 +40,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManif
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdList.AgencyIdListPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppOauth2User.AppOauth2UserPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppWebauthnUser.AppWebauthnUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie.AsbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep.AsbiepPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Ascc.AsccPath;
@@ -455,6 +456,19 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _appOauth2User = new AppOauth2UserPath(this, null, Keys.APP_OAUTH2_USER_APP_USER_ID_FK.getInverseKey());
 
         return _appOauth2User;
+    }
+
+    private transient AppWebauthnUserPath _appWebauthnUser;
+
+    /**
+     * Get the implicit to-many join path to the <code>app_webauthn_user</code>
+     * table
+     */
+    public AppWebauthnUserPath appWebauthnUser() {
+        if (_appWebauthnUser == null)
+            _appWebauthnUser = new AppWebauthnUserPath(this, null, Keys.APP_WEBAUTHN_USER_APP_USER_ID_FK.getInverseKey());
+
+        return _appWebauthnUser;
     }
 
     private transient AsbiePath _asbieCreatedByFk;

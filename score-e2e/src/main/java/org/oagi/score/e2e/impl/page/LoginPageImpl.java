@@ -8,6 +8,8 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -78,7 +80,30 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
 
     @Override
     public void setPassword(String password) {
+        revealPasswordField();
         sendKeys(getPasswordInput(), password);
+    }
+
+    /**
+     * On an instance with passkey sign-in configured, the login page first asks for the username only. Continue
+     * shows the password field, or, for an account with a passkey, the passkey prompt; when that prompt cannot be
+     * answered the page offers "Try another way", which shows the password field.
+     */
+    private void revealPasswordField() {
+        if (!getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
+            return;
+        }
+        By password = By.cssSelector("input[id=\"password\"]");
+        if (!getDriver().findElements(password).isEmpty()) {
+            return;
+        }
+        click(getDriver(), elementToBeClickable(getDriver(), By.cssSelector(".passkey-continue-button")));
+        By anotherWay = By.cssSelector(".passkey-another-way-button");
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(20)).until(
+                d -> !d.findElements(password).isEmpty() || !d.findElements(anotherWay).isEmpty());
+        if (getDriver().findElements(password).isEmpty()) {
+            click(getDriver(), elementToBeClickable(getDriver(), anotherWay));
+        }
     }
 
     @Override
@@ -108,11 +133,34 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
             }
         }
 
+        dismissPasskeyOfferIfEnabled();
+
         /*
          * To make the 'connectSpec' as a default selected library.
          */
         homePage.setLibrary("connectSpec");
 
         return homePage;
+    }
+
+    /**
+     * On an instance with passkey sign-in configured, a user without a passkey is offered one right after signing in
+     * with a password, in a dialog that would cover the page. Tests that are not about passkeys answer "Not now".
+     * <p>
+     * It is only looked for when {@code org.oagi.score.e2e.passkeys.enabled} is {@code true} in
+     * {@code score-e2e.properties}, so instances without passkeys pay no waiting time.
+     */
+    private void dismissPasskeyOfferIfEnabled() {
+        if (!getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
+            return;
+        }
+
+        By notNow = By.cssSelector(".passkey-offer-later");
+        try {
+            new WebDriverWait(getDriver(), ofSeconds(5L)).until(ExpectedConditions.elementToBeClickable(notNow)).click();
+            new WebDriverWait(getDriver(), ofSeconds(10L)).until(ExpectedConditions.invisibilityOfElementLocated(notNow));
+        } catch (TimeoutException ignore) {
+            // No offer: the account already has a passkey, or it was dismissed before.
+        }
     }
 }

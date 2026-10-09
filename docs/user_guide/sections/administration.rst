@@ -199,8 +199,8 @@ Password Management
 Change password
 ~~~~~~~~~~~~~~~
 
-A user can change the password through the account settings page when the account uses local password-based sign-in.
-The same page also allows the user to update the email address and resend an email verification request when needed.
+A user can change the password on the "Password" page under "Account" in the settings when the account uses local password-based sign-in.
+The "Personal Info" page under "Account" allows the user to update the email address and resend an email verification request when needed.
 
 To change it:
 
@@ -208,7 +208,7 @@ To change it:
 
 2. Choose "Settings" from the drop-down list.
 
-3. On the "Account" settings page, go to the "Change password" section and fill out the fields:
+3. In the settings menu on the left, click "Password" under "Account" and fill out the fields:
 
    1. *Old password*, which is the current password.
 

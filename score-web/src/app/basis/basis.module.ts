@@ -6,6 +6,7 @@ import {DisabledActivate, DisabledComponent} from './disabled/disabled.component
 
 import {HomepageComponent} from './homepage/homepage.component';
 import {LoginComponent} from './login/login.component';
+import {PasskeyOfferDialogComponent} from './passkey-offer/passkey-offer-dialog.component';
 import {JoinComponent} from './join/join.component';
 import {NavbarComponent} from './navbar/navbar.component';
 import {FooterComponent} from './footer/footer.component';
@@ -71,6 +72,7 @@ const routes: Routes = [
   declarations: [
     HomepageComponent,
     LoginComponent,
+    PasskeyOfferDialogComponent,
     JoinComponent,
     NavbarComponent,
     FooterComponent,

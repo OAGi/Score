@@ -2,6 +2,10 @@ package org.oagi.score.gateway.http.common.repository.jooq;
 
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
+import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
+import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyQueryRepository;
+import org.oagi.score.gateway.http.api.passkey_management.repository.jooq.JooqPasskeyCommandRepository;
+import org.oagi.score.gateway.http.api.passkey_management.repository.jooq.JooqPasskeyQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.ScoreUserQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.jooq.JooqAccountCommandRepository;
@@ -105,6 +109,14 @@ public class RepositoryFactory {
 
     public AccountQueryRepository accountQueryRepository(ScoreUser requester) {
         return new JooqAccountQueryRepository(dslContext, requester, this);
+    }
+
+    public PasskeyCommandRepository passkeyCommandRepository(ScoreUser requester) {
+        return new JooqPasskeyCommandRepository(dslContext, requester, this);
+    }
+
+    public PasskeyQueryRepository passkeyQueryRepository(ScoreUser requester) {
+        return new JooqPasskeyQueryRepository(dslContext, requester, this);
     }
 
     public ConfigurationCommandRepository configurationCommandRepository(ScoreUser requester) {

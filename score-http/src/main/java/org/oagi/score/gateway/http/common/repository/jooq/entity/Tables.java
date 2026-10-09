@@ -14,6 +14,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyId
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListValueManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppWebauthnUser;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep;
@@ -127,6 +128,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.TopLevel
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRule;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRuleExpression;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UserTenant;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.WebauthnCredential;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest;
 
@@ -222,6 +224,12 @@ public class Tables {
      * authorization purposes.
      */
     public static final AppUser APP_USER = AppUser.APP_USER;
+
+    /**
+     * WebAuthn identity (user handle) of an app_user; created on the first
+     * passkey registration.
+     */
+    public static final AppWebauthnUser APP_WEBAUTHN_USER = AppWebauthnUser.APP_WEBAUTHN_USER;
 
     /**
      * An ASBIE represents a relationship/association between two ABIEs through
@@ -1032,6 +1040,11 @@ public class Tables {
      * This table captures the tenant roles of the user
      */
     public static final UserTenant USER_TENANT = UserTenant.USER_TENANT;
+
+    /**
+     * Registered passkeys (WebAuthn credentials) of local accounts.
+     */
+    public static final WebauthnCredential WEBAUTHN_CREDENTIAL = WebauthnCredential.WEBAUTHN_CREDENTIAL;
 
     /**
      * This table stores XML schema built-in types and OAGIS built-in types.
