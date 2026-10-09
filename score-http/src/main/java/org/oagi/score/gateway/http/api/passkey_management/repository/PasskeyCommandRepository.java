@@ -32,6 +32,12 @@ public interface PasskeyCommandRepository {
     int deleteCredentialsOutsideRpId(String rpId);
 
     /**
+     * Deletes the WebAuthn identity of an account and all of its credentials, so that the account can be deleted.
+     * It does nothing for an account that never started a passkey registration.
+     */
+    void deletePasskeyDataByUserId(UserId userId);
+
+    /**
      * Deletes the passkey user with the given handle and all of its credentials.
      */
     void deletePasskeyUserByHandle(byte[] userHandle);

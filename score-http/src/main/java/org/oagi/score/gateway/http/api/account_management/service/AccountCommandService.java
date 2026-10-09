@@ -258,6 +258,8 @@ public class AccountCommandService {
             throw new AccessControlException(requester);
         }
 
+        // app_webauthn_user refers to app_user, and registering starts creating it before any passkey exists.
+        repositoryFactory.passkeyCommandRepository(requester).deletePasskeyDataByUserId(userId);
         var command = repositoryFactory.accountCommandRepository(requester, passwordEncoder);
         return command.delete(userId);
     }

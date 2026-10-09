@@ -63,6 +63,10 @@ public class PasskeyProperties {
         return copy;
     }
 
+    public List<String> allowedOrigins() {
+        return List.copyOf(settings.getAllowedOrigins());
+    }
+
     public boolean isEnabled() {
         return settings.isEnabled();
     }

@@ -112,6 +112,14 @@ public class JooqPasskeyCommandRepository extends JooqBaseRepository implements 
     }
 
     @Override
+    public void deletePasskeyDataByUserId(UserId userId) {
+        deleteCredentialsByUserId(userId);
+        dslContext().deleteFrom(APP_WEBAUTHN_USER)
+                .where(APP_WEBAUTHN_USER.APP_USER_ID.eq(valueOf(userId)))
+                .execute();
+    }
+
+    @Override
     public void deletePasskeyUserByHandle(byte[] userHandle) {
         dslContext().deleteFrom(WEBAUTHN_CREDENTIAL)
                 .where(WEBAUTHN_CREDENTIAL.APP_WEBAUTHN_USER_ID.in(

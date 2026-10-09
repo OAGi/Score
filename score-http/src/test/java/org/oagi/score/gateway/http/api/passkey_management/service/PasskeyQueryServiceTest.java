@@ -101,4 +101,42 @@ class PasskeyQueryServiceTest {
         assertFalse(enabled.hasUsablePasskey(null, null));
         assertFalse(lookupService("", repository).hasUsablePasskey(null, "alice"));
     }
+
+    @Test
+    void anUnknownLoginIdGetsTheSameStableAnswerEveryTime() {
+        byte[] key = new byte[32];
+        boolean first = PasskeyQueryService.decoy(key, "ghost", 0.5);
+        for (int i = 0; i < 5; i++) {
+            assertEquals(first, PasskeyQueryService.decoy(key, " Ghost ", 0.5));
+        }
+    }
+
+    @Test
+    void theMadeUpAnswerFollowsTheAdoptionShare() {
+        byte[] key = new byte[32];
+        int names = 4000;
+        for (double share : new double[]{0.0, 0.25, 0.5, 1.0}) {
+            int yes = 0;
+            for (int i = 0; i < names; i++) {
+                if (PasskeyQueryService.decoy(key, "user" + i, share)) {
+                    yes++;
+                }
+            }
+            assertEquals(share, (double) yes / names, 0.03, "share " + share);
+        }
+    }
+
+    @Test
+    void lookupOfAnUnknownLoginIdUsesTheMadeUpAnswer() {
+        PasskeyQueryRepository repository = mock(PasskeyQueryRepository.class);
+        when(repository.findUserIdByLoginId(any())).thenReturn(Optional.empty());
+        when(repository.passkeyAdoption("score.example.org")).thenReturn(0.0);
+        assertFalse(lookupService("score.example.org", repository).hasUsablePasskey(null, "ghost"));
+
+        PasskeyQueryRepository everyone = mock(PasskeyQueryRepository.class);
+        when(everyone.findUserIdByLoginId(any())).thenReturn(Optional.empty());
+        when(everyone.passkeyAdoption("score.example.org")).thenReturn(1.0);
+        assertTrue(lookupService("score.example.org", everyone).hasUsablePasskey(null, "ghost"));
+    }
+
 }

@@ -102,6 +102,21 @@ public class JooqPasskeyQueryRepository extends JooqBaseRepository implements Pa
     }
 
     @Override
+    public double passkeyAdoption(String rpId) {
+        int accounts = dslContext().fetchCount(APP_USER);
+        if (accounts == 0) {
+            return 0.0;
+        }
+        int withPasskey = dslContext().fetchCount(
+                dslContext().selectDistinct(APP_WEBAUTHN_USER.APP_USER_ID)
+                        .from(APP_WEBAUTHN_USER)
+                        .join(WEBAUTHN_CREDENTIAL)
+                        .on(WEBAUTHN_CREDENTIAL.APP_WEBAUTHN_USER_ID.eq(APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID))
+                        .where(WEBAUTHN_CREDENTIAL.RP_ID.equalIgnoreCase(rpId)));
+        return (double) withPasskey / accounts;
+    }
+
+    @Override
     public boolean hasPassword(UserId userId) {
         String password = dslContext().select(APP_USER.PASSWORD)
                 .from(APP_USER)

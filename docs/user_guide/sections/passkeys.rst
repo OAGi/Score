@@ -113,12 +113,32 @@ Set these in ``application.yml`` or, for a Docker deployment, as environment var
    * - ``SCORE_PASSKEY_ALLOWED_ORIGINS``
      - ``score.passkey.allowed-origins``
      - The addresses users open in the browser, with scheme and port, for example ``https://score.example.org``.
-       Separate several with commas.
+       Separate several with commas or spaces (or put each on its own line); a semicolon is not a separator.
+       Every origin must be written out in full: wildcards such as ``https://*.example.org`` are not accepted.
        Every origin must be under the RP ID.
        Plain ``http`` is accepted only for ``localhost``.
    * - ``SCORE_PASSKEY_RP_NAME``
      - ``score.passkey.rp-name``
      - Optional. The name your browser shows when it asks about the passkey. It defaults to the RP ID.
+   * - ``SCORE_PASSKEY_RATE_LIMIT_PER_IP``
+     - ``score.passkey.rate-limit.per-ip-per-minute``
+     - Optional. How many times a minute one client address may ask the sign-in page's passkey endpoints for sign-in options or look up a username.
+       The default is 60.
+   * - ``SCORE_PASSKEY_RATE_LIMIT_PER_USERNAME``
+     - ``score.passkey.rate-limit.per-username-per-minute``
+     - Optional. How many times a minute one username may be looked up, whichever address asks. The default is 10.
+   * - ``SCORE_PASSKEY_CLIENT_IP_HEADERS``
+     - ``score.passkey.rate-limit.client-ip-headers``
+     - Optional. Where to find the client's address when connectCenter is behind a proxy or CDN: the request headers to read, in order of preference, separated by commas.
+       The first header that holds an address is used.
+       The default is ``X-Forwarded-For``.
+       For example ``CF-Connecting-IP,True-Client-IP,X-Forwarded-For`` for an instance behind Cloudflare or Akamai.
+       Leave it empty to always use the address of the connection.
+   * - ``SCORE_PASSKEY_TRUSTED_PROXIES``
+     - ``score.passkey.rate-limit.trusted-proxies``
+     - Optional. The proxies whose headers are believed: addresses or CIDR ranges separated by commas, for example ``10.0.0.0/8,172.16.0.0/12``, or ``*`` for any.
+       The default is the private networks (``10.0.0.0/8``, ``172.16.0.0/12``, ``192.168.0.0/16``, ``127.0.0.0/8`` and similar).
+       A request from any other address is counted at its own address and its headers are ignored.
 
 For example, in ``docker-compose.yml``:
 
@@ -128,6 +148,15 @@ For example, in ``docker-compose.yml``:
      environment:
        - SCORE_PASSKEY_RP_ID=score.example.org
        - SCORE_PASSKEY_ALLOWED_ORIGINS=https://score.example.org
+
+To allow several addresses, list each one:
+
+.. code-block:: yaml
+
+   backend:
+     environment:
+       - SCORE_PASSKEY_RP_ID=example.org
+       - SCORE_PASSKEY_ALLOWED_ORIGINS=https://score.example.org https://test.score.example.org
 
 For local development, ``SCORE_PASSKEY_RP_ID=localhost`` with ``SCORE_PASSKEY_ALLOWED_ORIGINS=http://localhost:4200`` works over plain ``http``.
 
@@ -139,6 +168,25 @@ If you change the RP ID later, every passkey registered for the old one stops wo
 Users can still sign in with their password and add new passkeys, and the old passkeys are kept until removed.
 Each instance keeps its own passkeys, so changing the host name of an instance means users register again.
 To delete the leftovers, an administrator can call ``DELETE /passkey-admin/stale``, which removes every passkey registered for an RP ID other than the configured one.
+
+Security notes for administrators:
+
+* Adding a passkey is accepted only from a page opened at one of the allowed origins.
+  A request that names another origin is refused, so a page elsewhere on the same site cannot add a passkey to a signed-in user's account.
+  If connectCenter is behind a reverse proxy, the proxy must pass the browser's ``Origin`` header on unchanged.
+* The sign-in page's passkey endpoints can be called by anyone, so they are rate limited, per client address and, for the username lookup, per username.
+  Someone over the limit gets a "Too many requests" answer (HTTP 429) and the sign-in page falls back to the password.
+  The limits are counted separately by each backend instance.
+* The limits count requests per client address.
+  Behind a proxy, connectCenter reads the address from the headers named in ``SCORE_PASSKEY_CLIENT_IP_HEADERS``, and only when the request comes from a proxy listed in ``SCORE_PASSKEY_TRUSTED_PROXIES``.
+  If the proxy does not pass the address on, every request looks like it comes from the proxy and all users share one limit; fix the proxy (for nginx, ``proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;``) or raise ``SCORE_PASSKEY_RATE_LIMIT_PER_IP``.
+  Only list headers that your own edge proxy sets or overwrites.
+  A header that clients can send and the proxy passes on unchanged, such as ``CF-Connecting-IP`` on an instance that is not behind Cloudflare, can be forged to get around the limit.
+  A list such as ``X-Forwarded-For`` is read from the right, skipping trusted proxies, so addresses a client adds itself are not believed.
+  The setting affects only these limits, not the rest of the application.
+* The username lookup does not tell whether a username exists: for a name that has no account it gives a made-up answer, so asking about a name proves nothing.
+* Signing in with a passkey starts a new session, as signing in with a password does.
+* Passkey sign-in applies the same account checks as a password sign-in.
 
 To turn passkeys off, unset the variables (or empty them) and restart.
 Passkey sign-in and registration stop; registered passkeys are kept, and setting the same RP ID again brings them back.
@@ -152,3 +200,6 @@ Removing a user's passkeys
 
 If a user loses a device, an administrator can remove all of that user's passkeys and, if needed, end their current sessions.
 This is available through the application's API (``DELETE /passkey-admin/users/{appUserId}``, with ``invalidateSessions=true`` to end the sessions); there is no button for it in the user interface yet.
+Only an administrator can use ``/passkey-admin``; anyone else is refused.
+
+Deleting a user's account also deletes that user's passkeys, so an account can be deleted whether or not the user ever added a passkey, or started to.

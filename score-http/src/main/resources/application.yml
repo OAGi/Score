@@ -102,7 +102,19 @@ score:
   #                   localhost.
   #   rp-name         optional; the name the browser shows when it asks about the passkey. Defaults to the rp-id.
   # An invalid value stops the application from starting, with the reason in the error.
+  #   rate-limit      per backend instance and minute, for the unauthenticated passkey endpoints (the login page's
+  #                   passkey lookup and sign-in options): per client address, and per login ID for the lookup.
+  #   client-ip-headers  where the client address comes from when a proxy is in front: the headers to read, in order of
+  #                   preference, for example CF-Connecting-IP,True-Client-IP,X-Forwarded-For. Empty = use the address of
+  #                   the connection. List only headers that your own edge proxy sets or overwrites.
+  #   trusted-proxies the proxies whose headers are believed: addresses or CIDR ranges, or * for any. The default is the
+  #                   private networks. A request from any other address is taken at its connection address.
   passkey:
+    rate-limit:
+      per-ip-per-minute: ${SCORE_PASSKEY_RATE_LIMIT_PER_IP:60}
+      per-username-per-minute: ${SCORE_PASSKEY_RATE_LIMIT_PER_USERNAME:10}
+      client-ip-headers: ${SCORE_PASSKEY_CLIENT_IP_HEADERS:X-Forwarded-For}
+      trusted-proxies: ${SCORE_PASSKEY_TRUSTED_PROXIES:127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,::1/128,fc00::/7,fe80::/10}
     rp-id: ${SCORE_PASSKEY_RP_ID:}
     rp-name: ${SCORE_PASSKEY_RP_NAME:}
     allowed-origins: ${SCORE_PASSKEY_ALLOWED_ORIGINS:}

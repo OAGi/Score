@@ -94,10 +94,11 @@ public class WebauthnCredential extends TableImpl<WebauthnCredentialRecord> {
 
     /**
      * The column <code>webauthn_credential.signature_count</code>. Last seen
-     * authenticator signature counter, used to detect cloned authenticators.
-     * Synced passkeys commonly keep it at 0.
+     * authenticator signature counter, for information only. Sign-in compares
+     * the counter in attestation_object, not this value, so cloned
+     * authenticators are not detected. Synced passkeys commonly keep it at 0.
      */
-    public final TableField<WebauthnCredentialRecord, ULong> SIGNATURE_COUNT = createField(DSL.name("signature_count"), SQLDataType.BIGINTUNSIGNED.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BIGINTUNSIGNED)), this, "Last seen authenticator signature counter, used to detect cloned authenticators. Synced passkeys commonly keep it at 0.");
+    public final TableField<WebauthnCredentialRecord, ULong> SIGNATURE_COUNT = createField(DSL.name("signature_count"), SQLDataType.BIGINTUNSIGNED.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BIGINTUNSIGNED)), this, "Last seen authenticator signature counter, for information only. Sign-in compares the counter in attestation_object, not this value, so cloned authenticators are not detected. Synced passkeys commonly keep it at 0.");
 
     /**
      * The column <code>webauthn_credential.uv_initialized</code>. Whether user
@@ -132,9 +133,11 @@ public class WebauthnCredential extends TableImpl<WebauthnCredentialRecord> {
 
     /**
      * The column <code>webauthn_credential.attestation_object</code>. The
-     * attestation object returned at registration, kept for auditing.
+     * attestation object returned at registration. Required for sign-in: the
+     * credential public key and the previous counter are read from it when an
+     * assertion is verified.
      */
-    public final TableField<WebauthnCredentialRecord, byte[]> ATTESTATION_OBJECT = createField(DSL.name("attestation_object"), SQLDataType.BLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BLOB)), this, "The attestation object returned at registration, kept for auditing.");
+    public final TableField<WebauthnCredentialRecord, byte[]> ATTESTATION_OBJECT = createField(DSL.name("attestation_object"), SQLDataType.BLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BLOB)), this, "The attestation object returned at registration. Required for sign-in: the credential public key and the previous counter are read from it when an assertion is verified.");
 
     /**
      * The column <code>webauthn_credential.attestation_client_data_json</code>.

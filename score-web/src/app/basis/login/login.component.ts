@@ -37,7 +37,7 @@ export class LoginComponent implements OnDestroy {
   next = '';
   err = undefined;
 
-  /** Passkey sign-in is on only when an administrator saved the relying party settings, and the browser can do it. */
+  /** Passkey sign-in is on only when the deployment sets the relying party (SCORE_PASSKEY_*), and the browser can do it. */
   passkeyEnabled = false;
   passkeyError = '';
 

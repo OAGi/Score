@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.impl.AuthenticatedApiClient;
 import org.oagi.score.e2e.obj.AppUserObject;
 import org.oagi.score.e2e.page.HomePage;
 import org.openqa.selenium.By;
@@ -288,6 +289,61 @@ public class TC_48_1_PasskeySignIn extends BaseTest {
         signInWithPasswordLeavingTheOffer();
 
         assertTrue(noOfferAppears(), "An account that has a passkey should not be offered another");
+    }
+
+    private String sessionCookie() {
+        org.openqa.selenium.Cookie cookie = driver.manage().getCookieNamed("SESSION");
+        return (cookie == null) ? null : cookie.getValue();
+    }
+
+    @Test
+    @DisplayName("TC_48_1_TA_9")
+    public void passkey_sign_in_starts_a_new_session() {
+        requirePasskeysConfigured();
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        addPasskeyInAccountSettings(homePage);
+        logoutAndWaitForLoginPage();
+
+        // The login page has asked the server for sign-in options by now, which gives the anonymous visitor a session.
+        String sessionBeforeSignIn = sessionCookie();
+        assertNotNull(sessionBeforeSignIn, "The login page should have started a session");
+
+        wait(20).until(ExpectedConditions.elementToBeClickable(PASSKEY_BUTTON)).click();
+        wait(30).until(ExpectedConditions.not(ExpectedConditions.urlContains("/login")));
+
+        assertEquals("passkey", signedInAuthenticationMethod());
+        String sessionAfterSignIn = sessionCookie();
+        assertNotNull(sessionAfterSignIn);
+        assertNotEquals(sessionBeforeSignIn, sessionAfterSignIn,
+                "Signing in must replace the session ID, as the password sign-in does");
+    }
+
+    @Test
+    @DisplayName("TC_48_1_TA_10")
+    public void administrator_can_delete_an_account_that_has_a_passkey() {
+        requirePasskeysConfigured();
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        addPasskeyInAccountSettings(homePage);
+        assertTrue(getAPIFactory().getApplicationSettingsAPI().hasPasskeyRecords(appUser.getAppUserId()));
+
+        logoutAndWaitForLoginPage();
+        AppUserObject admin = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(true);
+        try {
+            // The login page would otherwise let the virtual authenticator sign the passkey's owner straight back in.
+            authenticator.setUserVerified(false);
+            loginPage().signIn(admin.getLoginId(), admin.getPassword());
+            AuthenticatedApiClient api = new AuthenticatedApiClient(driver, getConfig().getBaseUrl());
+
+            AuthenticatedApiClient.ApiResponse response = api.delete("/api/accounts/" + appUser.getAppUserId());
+
+            assertTrue(response.statusCode() >= 200 && response.statusCode() < 300,
+                    "Deleting the account should succeed, was " + response.statusCode() + ": " + response.body());
+            assertNull(getAPIFactory().getAppUserAPI().getAppUserByLoginID(appUser.getLoginId()));
+            assertFalse(getAPIFactory().getApplicationSettingsAPI().hasPasskeyRecords(appUser.getAppUserId()),
+                    "The passkeys and the WebAuthn identity should go with the account");
+        } finally {
+            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(admin.getLoginId());
+        }
     }
 
     /** Reads the signed-in account from the menu in the page header. */

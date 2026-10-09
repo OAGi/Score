@@ -60,4 +60,12 @@ public interface ApplicationSettingsAPI {
      */
     void deletePasskeysOfLoginId(String loginId);
 
+    /**
+     * Whether the account has a WebAuthn identity or any passkey stored. Starting a passkey registration creates the
+     * identity before a passkey exists.
+     *
+     * @param appUserId the account's ID
+     */
+    boolean hasPasskeyRecords(java.math.BigInteger appUserId);
+
 }

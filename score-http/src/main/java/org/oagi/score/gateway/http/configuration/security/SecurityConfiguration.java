@@ -12,9 +12,12 @@ import org.oagi.score.gateway.http.api.application_management.service.Applicatio
 import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
+import org.oagi.score.gateway.http.configuration.security.webauthn.ClientAddressResolver;
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyAuthenticationProvider;
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyFeatureFilter;
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyProperties;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyRateLimitFilter;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyRateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -40,6 +43,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyConfiguration;
 import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationFilter;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -88,6 +92,12 @@ public class SecurityConfiguration {
 
     @Autowired
     private PasskeyAuthenticationProvider passkeyAuthenticationProvider;
+
+    @Autowired
+    private PasskeyRateLimiter passkeyRateLimiter;
+
+    @Autowired
+    private ClientAddressResolver clientAddressResolver;
 
     @Value("${resource-server.jwk-set-uri}")
     private String jwkSetUri;
@@ -283,15 +293,14 @@ public class SecurityConfiguration {
                         .withObjectPostProcessor(new ObjectPostProcessor<WebAuthnAuthenticationFilter>() {
                             @Override
                             public <O extends WebAuthnAuthenticationFilter> O postProcess(O filter) {
-                                // Keep ScoreUserDetails as the principal and answer like the password login.
-                                filter.setAuthenticationManager(new ProviderManager(passkeyAuthenticationProvider));
-                                filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-                                filter.setRememberMeServices(rememberMeServices());
+                                PasskeyConfiguration.customizeAuthenticationFilter(filter,
+                                        passkeyAuthenticationProvider, authenticationSuccessHandler, rememberMeServices());
                                 return filter;
                             }
                         }))
-                .addFilterBefore(new PasskeyFeatureFilter(passkeyProperties::isEnabled),
+                .addFilterBefore(new PasskeyFeatureFilter(passkeyProperties::isEnabled, passkeyProperties::allowedOrigins),
                         UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new PasskeyRateLimitFilter(passkeyRateLimiter, clientAddressResolver::resolve), PasskeyFeatureFilter.class)
                 .oauth2Login(oAuth2LoginConfigurer -> {
                     oAuth2LoginConfigurer
                             .loginPage("/login")

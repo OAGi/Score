@@ -26,6 +26,11 @@ public interface PasskeyQueryRepository {
     int countCredentialsByUserId(UserId userId);
 
     /**
+     * The share of accounts (0.0 to 1.0) with at least one passkey registered for {@code rpId}.
+     */
+    double passkeyAdoption(String rpId);
+
+    /**
      * Whether the user can still sign in with a password (a password is stored for the account).
      */
     boolean hasPassword(UserId userId);

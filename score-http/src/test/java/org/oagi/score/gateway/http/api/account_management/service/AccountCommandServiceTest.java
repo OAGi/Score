@@ -3,10 +3,12 @@ package org.oagi.score.gateway.http.api.account_management.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oagi.score.gateway.http.api.account_management.controller.payload.UpdateAccountRequest;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
+import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -18,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,4 +72,30 @@ class AccountCommandServiceTest {
         verify(command).update(eq(userId), eq("user"), eq("User"), eq("Org"), adminCaptor.capture(), eq(null));
         assertThat(adminCaptor.getValue()).isTrue();
     }
+
+    @Test
+    void discardRemovesThePasskeyDataBeforeTheAccount() {
+        AccountCommandService service = new AccountCommandService();
+        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        AccountCommandRepository command = mock(AccountCommandRepository.class);
+        PasskeyCommandRepository passkeyCommand = mock(PasskeyCommandRepository.class);
+        UserId target = new UserId(BigInteger.TEN);
+        ScoreUser admin = new ScoreUser(new UserId(BigInteger.ONE), "admin", "Admin", null, true,
+                List.of(ScoreRole.ADMINISTRATOR));
+
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+        ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
+        when(repositoryFactory.accountCommandRepository(admin, passwordEncoder)).thenReturn(command);
+        when(repositoryFactory.passkeyCommandRepository(admin)).thenReturn(passkeyCommand);
+        when(command.delete(target)).thenReturn(true);
+
+        assertThat(service.discard(admin, target)).isTrue();
+
+        // app_webauthn_user refers to app_user, so deleting the account first would fail on the foreign key
+        InOrder inOrder = inOrder(passkeyCommand, command);
+        inOrder.verify(passkeyCommand).deletePasskeyDataByUserId(target);
+        inOrder.verify(command).delete(target);
+    }
+
 }

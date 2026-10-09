@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.configuration.security.webauthn;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.configuration.security.ScoreUserDetails;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -51,6 +53,21 @@ class PasskeyAuthenticationProviderTest {
         assertInstanceOf(AuthenticatedPrincipal.class, result.getPrincipal());
         assertEquals("alice", result.getName());
         assertEquals(Set.copyOf(alice.getAuthorities()), Set.copyOf(result.getAuthorities()));
+    }
+
+    @Test
+    void aDisabledOrLockedAccountCannotSignIn() {
+        when(operations.authenticate(any())).thenReturn(ImmutablePublicKeyCredentialUserEntity.builder()
+                .name("alice").id(Bytes.random()).displayName("Alice").build());
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_END_USER"));
+
+        when(userDetailsService.loadUserByUsername("alice"))
+                .thenReturn(new ScoreUserDetails("alice", "x", false, true, true, true, authorities));
+        assertThrows(DisabledException.class, () -> provider.authenticate(request));
+
+        when(userDetailsService.loadUserByUsername("alice"))
+                .thenReturn(new ScoreUserDetails("alice", "x", true, true, true, false, authorities));
+        assertThrows(LockedException.class, () -> provider.authenticate(request));
     }
 
     @Test

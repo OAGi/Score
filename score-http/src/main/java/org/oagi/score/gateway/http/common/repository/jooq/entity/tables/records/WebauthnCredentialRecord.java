@@ -108,8 +108,9 @@ public class WebauthnCredentialRecord extends UpdatableRecordImpl<WebauthnCreden
 
     /**
      * Setter for <code>webauthn_credential.signature_count</code>. Last seen
-     * authenticator signature counter, used to detect cloned authenticators.
-     * Synced passkeys commonly keep it at 0.
+     * authenticator signature counter, for information only. Sign-in compares
+     * the counter in attestation_object, not this value, so cloned
+     * authenticators are not detected. Synced passkeys commonly keep it at 0.
      */
     public void setSignatureCount(ULong value) {
         set(5, value);
@@ -117,8 +118,9 @@ public class WebauthnCredentialRecord extends UpdatableRecordImpl<WebauthnCreden
 
     /**
      * Getter for <code>webauthn_credential.signature_count</code>. Last seen
-     * authenticator signature counter, used to detect cloned authenticators.
-     * Synced passkeys commonly keep it at 0.
+     * authenticator signature counter, for information only. Sign-in compares
+     * the counter in attestation_object, not this value, so cloned
+     * authenticators are not detected. Synced passkeys commonly keep it at 0.
      */
     public ULong getSignatureCount() {
         return (ULong) get(5);
@@ -208,7 +210,9 @@ public class WebauthnCredentialRecord extends UpdatableRecordImpl<WebauthnCreden
 
     /**
      * Setter for <code>webauthn_credential.attestation_object</code>. The
-     * attestation object returned at registration, kept for auditing.
+     * attestation object returned at registration. Required for sign-in: the
+     * credential public key and the previous counter are read from it when an
+     * assertion is verified.
      */
     public void setAttestationObject(byte[] value) {
         set(11, value);
@@ -216,7 +220,9 @@ public class WebauthnCredentialRecord extends UpdatableRecordImpl<WebauthnCreden
 
     /**
      * Getter for <code>webauthn_credential.attestation_object</code>. The
-     * attestation object returned at registration, kept for auditing.
+     * attestation object returned at registration. Required for sign-in: the
+     * credential public key and the previous counter are read from it when an
+     * assertion is verified.
      */
     public byte[] getAttestationObject() {
         return (byte[]) get(11);

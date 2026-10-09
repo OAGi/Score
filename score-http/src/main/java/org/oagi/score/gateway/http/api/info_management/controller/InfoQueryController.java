@@ -8,7 +8,10 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.api.passkey_management.service.PasskeyQueryService;
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyProperties;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyRateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +54,9 @@ public class InfoQueryController {
     @Autowired
     private PasskeyQueryService passkeyQueryService;
 
+    @Autowired
+    private PasskeyRateLimiter passkeyRateLimiter;
+
     @GetMapping(value = "/products")
     public List<ProductInfoRecord> getProductInfos() {
         List<ProductInfoRecord> productInfos = new ArrayList();
@@ -76,12 +82,17 @@ public class InfoQueryController {
 
     /**
      * For the login page's username step: whether this account has a passkey it can use here. Sent in the body, not
-     * the URL, so that the login ID stays out of access logs.
+     * the URL, so that the login ID stays out of access logs. Limited per address (PasskeyRateLimitFilter) and per
+     * login ID, and a login ID that does not exist gets a stable made-up answer, so the answer does not tell
+     * whether an account exists.
      */
     @PostMapping(value = "/passkey/lookup")
     public Map<String, Boolean> lookupPasskey(@RequestBody Map<String, String> request) {
-        return Map.of("passkey", passkeyQueryService.hasUsablePasskey(
-                sessionService.getScoreSystemUser(), request.get("username")));
+        String username = request.get("username");
+        if (username != null && !username.isBlank() && !passkeyRateLimiter.tryAcquireForUsername(username)) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
+        }
+        return Map.of("passkey", passkeyQueryService.hasUsablePasskey(sessionService.getScoreSystemUser(), username));
     }
 
     @GetMapping(value = "/oauth2-providers")

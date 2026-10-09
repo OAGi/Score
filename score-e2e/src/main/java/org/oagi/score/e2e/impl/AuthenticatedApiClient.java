@@ -99,6 +99,14 @@ public class AuthenticatedApiClient {
                 .POST(BodyPublishers.ofString(json, StandardCharsets.UTF_8)).build());
     }
 
+    /** POST with one extra request header, for example an {@code Origin} the browser would not send. */
+    public ApiResponse postJson(String path, String json, String headerName, String headerValue) {
+        return send(baseRequest(path)
+                .header("Content-Type", "application/json")
+                .header(headerName, headerValue)
+                .POST(BodyPublishers.ofString(json, StandardCharsets.UTF_8)).build());
+    }
+
     public ApiResponse putJson(String path, String json) {
         return send(baseRequest(path)
                 .header("Content-Type", "application/json")

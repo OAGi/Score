@@ -30,11 +30,18 @@ class PasskeyFeatureFilterTest {
      * @return 200 when the filter let the request through to the rest of the chain, otherwise the status it sent
      */
     private static int run(boolean enabled, String method, String uri) throws Exception {
+        return run(enabled, method, uri, null);
+    }
+
+    private static int run(boolean enabled, String method, String uri, String origin) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
         request.setServletPath(uri);
+        if (origin != null) {
+            request.addHeader("Origin", origin);
+        }
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
-        new PasskeyFeatureFilter(() -> enabled).doFilter(request, response, chain);
+        new PasskeyFeatureFilter(() -> enabled, () -> List.of("https://score.example.org", "http://localhost:4200")).doFilter(request, response, chain);
         return (chain.getRequest() != null) ? HttpServletResponse.SC_OK : response.getStatus();
     }
 
@@ -97,6 +104,39 @@ class PasskeyFeatureFilterTest {
         assertEquals(200, run(true, "GET", "/passkeys"));
         assertEquals(200, run(true, "POST", "/webauthn/register/options"));
         assertEquals(200, run(true, "POST", "/webauthn/register"));
+    }
+
+    @Test
+    void stateChangingAccountRequestsFromAnotherOriginAreRefused() throws Exception {
+        signInLocal();
+        for (String origin : List.of("https://evil.score.example.org", "null")) {
+            assertEquals(403, run(true, "POST", "/webauthn/register/options", origin));
+            assertEquals(403, run(true, "POST", "/webauthn/register", origin));
+            assertEquals(403, run(true, "PATCH", "/passkeys/abc", origin));
+            // Spring's own DELETE /webauthn/register/{id} is switched off altogether
+            assertEquals(403, run(true, "DELETE", "/passkeys/abc", origin));
+        }
+    }
+
+    @Test
+    void stateChangingAccountRequestsFromAnAllowedOriginPass() throws Exception {
+        signInLocal();
+        assertEquals(200, run(true, "POST", "/webauthn/register/options", "https://score.example.org"));
+        assertEquals(200, run(true, "POST", "/webauthn/register", "HTTPS://Score.Example.org/"));
+        assertEquals(200, run(true, "PATCH", "/passkeys/abc", "http://localhost:4200"));
+    }
+
+    @Test
+    void readsAndRequestsWithoutAnOriginAreNotRefusedForTheirOrigin() throws Exception {
+        signInLocal();
+        assertEquals(200, run(true, "GET", "/passkeys", "https://evil.example.com"));
+        assertEquals(200, run(true, "POST", "/webauthn/register/options"));
+    }
+
+    @Test
+    void signInEndpointsDoNotCheckTheOrigin() throws Exception {
+        // the assertion itself is bound to the allowed origins by the WebAuthn verification
+        assertEquals(200, run(true, "POST", "/login/webauthn", "https://evil.example.com"));
     }
 
 }

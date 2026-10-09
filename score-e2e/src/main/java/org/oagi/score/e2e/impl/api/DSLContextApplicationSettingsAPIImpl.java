@@ -76,6 +76,12 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
                 .execute();
     }
 
+    @Override
+    public boolean hasPasskeyRecords(java.math.BigInteger appUserId) {
+        return dslContext.fetchExists(APP_WEBAUTHN_USER,
+                APP_WEBAUTHN_USER.APP_USER_ID.eq(org.jooq.types.ULong.valueOf(appUserId)));
+    }
+
     private boolean getBooleanConfiguration(String configurationName) {
         return Boolean.valueOf(dslContext.select(CONFIGURATION.VALUE)
                 .from(CONFIGURATION)

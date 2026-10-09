@@ -4,7 +4,9 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationRequestToken;
@@ -19,6 +21,7 @@ public class PasskeyAuthenticationProvider implements AuthenticationProvider {
 
     private final WebAuthnRelyingPartyOperations relyingPartyOperations;
     private final UserDetailsService userDetailsService;
+    private final UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
 
     public PasskeyAuthenticationProvider(WebAuthnRelyingPartyOperations relyingPartyOperations,
                                          UserDetailsService userDetailsService) {
@@ -31,14 +34,17 @@ public class PasskeyAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         WebAuthnAuthenticationRequestToken request = (WebAuthnAuthenticationRequestToken) authentication;
+        UserDetails userDetails;
         try {
             PublicKeyCredentialUserEntity userEntity =
                     relyingPartyOperations.authenticate(request.getWebAuthnRequest());
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEntity.getName());
-            return new PasskeyAuthenticationToken(userDetails, userDetails.getAuthorities());
+            userDetails = userDetailsService.loadUserByUsername(userEntity.getName());
         } catch (RuntimeException ex) {
             throw new BadCredentialsException(ex.getMessage(), ex);
         }
+        // The same enabled / locked / expired checks the password login applies.
+        userDetailsChecker.check(userDetails);
+        return new PasskeyAuthenticationToken(userDetails, userDetails.getAuthorities());
     }
 
     @Override
