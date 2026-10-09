@@ -37,6 +37,8 @@ public class MessageQueryService {
                 requester.userId(), Collections.emptyList());
     }
 
+    // Reading a message marks it as read, so this cannot run in the read-only transaction of the class.
+    @Transactional
     public MessageDetailsRecord getMessageDetails(ScoreUser requester, MessageId messageId) {
 
         MessageDetailsRecord messageDetails = query(requester).getMessageDetails(
