@@ -19,28 +19,28 @@ public class TenantRecord extends UpdatableRecordImpl<TenantRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.tenant.tenant_id</code>. Primary key column.
+     * Setter for <code>tenant.tenant_id</code>. Primary key column.
      */
     public void setTenantId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.tenant.tenant_id</code>. Primary key column.
+     * Getter for <code>tenant.tenant_id</code>. Primary key column.
      */
     public ULong getTenantId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.tenant.name</code>. The name of the tenant.
+     * Setter for <code>tenant.name</code>. The name of the tenant.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.tenant.name</code>. The name of the tenant.
+     * Getter for <code>tenant.name</code>. The name of the tenant.
      */
     public String getName() {
         return (String) get(1);

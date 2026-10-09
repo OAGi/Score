@@ -22,7 +22,7 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * Setter for <code>usage_rule.usage_rule_id</code>. Primary key of the
      * usage rule.
      */
     public void setUsageRuleId(ULong value) {
@@ -30,7 +30,7 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> {
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * Getter for <code>usage_rule.usage_rule_id</code>. Primary key of the
      * usage rule.
      */
     public ULong getUsageRuleId() {
@@ -38,23 +38,23 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> {
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
-     * usage rule.
+     * Setter for <code>usage_rule.name</code>. Short mnemonic name of the usage
+     * rule.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.name</code>. Short nmenomic name of the
-     * usage rule.
+     * Getter for <code>usage_rule.name</code>. Short mnemonic name of the usage
+     * rule.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.usage_rule.condition_type</code>. Condition type
+     * Setter for <code>usage_rule.condition_type</code>. Condition type
      * according to the CC specification. It is a value list column. 0 =
      * pre-condition, 1 = post-condition, 2 = invariant.
      */
@@ -63,7 +63,7 @@ public class UsageRuleRecord extends UpdatableRecordImpl<UsageRuleRecord> {
     }
 
     /**
-     * Getter for <code>oagi.usage_rule.condition_type</code>. Condition type
+     * Getter for <code>usage_rule.condition_type</code>. Condition type
      * according to the CC specification. It is a value list column. 0 =
      * pre-condition, 1 = post-condition, 2 = invariant.
      */

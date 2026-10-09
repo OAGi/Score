@@ -22,39 +22,37 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bbiep.bbiep_id</code>. A internal, primary database
-     * key of an BBIEP.
+     * Setter for <code>bbiep.bbiep_id</code>. A internal, primary database key
+     * of a BBIEP.
      */
     public void setBbiepId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.bbiep_id</code>. A internal, primary database
-     * key of an BBIEP.
+     * Getter for <code>bbiep.bbiep_id</code>. A internal, primary database key
+     * of a BBIEP.
      */
     public ULong getBbiepId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>bbiep.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>bbiep.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.based_bccp_manifest_id</code>. A foreign key
+     * Setter for <code>bbiep.based_bccp_manifest_id</code>. A foreign key
      * pointing to the BCCP_MANIFEST record. It is the BCCP, which the BBIEP
      * contextualizes.
      */
@@ -63,7 +61,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbiep.based_bccp_manifest_id</code>. A foreign key
+     * Getter for <code>bbiep.based_bccp_manifest_id</code>. A foreign key
      * pointing to the BCCP_MANIFEST record. It is the BCCP, which the BBIEP
      * contextualizes.
      */
@@ -72,40 +70,42 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbiep.path</code>.
+     * Setter for <code>bbiep.path</code>. The path of this node within the
+     * component graph; used together with HASH_PATH to locate the node.
      */
     public void setPath(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.path</code>.
+     * Getter for <code>bbiep.path</code>. The path of this node within the
+     * component graph; used together with HASH_PATH to locate the node.
      */
     public String getPath() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.hash_path</code>. hash_path generated from
-     * the path of the component graph using hash function, so that it is unique
-     * in the graph.
+     * Setter for <code>bbiep.hash_path</code>. hash_path generated from the
+     * path of the component graph using hash function, so that it is unique in
+     * the graph.
      */
     public void setHashPath(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.hash_path</code>. hash_path generated from
-     * the path of the component graph using hash function, so that it is unique
-     * in the graph.
+     * Getter for <code>bbiep.hash_path</code>. hash_path generated from the
+     * path of the component graph using hash function, so that it is unique in
+     * the graph.
      */
     public String getHashPath() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.definition</code>. Definition to override the
-     * BCCP's Definition. If NULLl, it means that the definition should be
+     * Setter for <code>bbiep.definition</code>. Definition to override the
+     * BCCP's Definition. If NULL, it means that the definition should be
      * inherited from the based CC.
      */
     public void setDefinition(String value) {
@@ -113,8 +113,8 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbiep.definition</code>. Definition to override the
-     * BCCP's Definition. If NULLl, it means that the definition should be
+     * Getter for <code>bbiep.definition</code>. Definition to override the
+     * BCCP's Definition. If NULL, it means that the definition should be
      * inherited from the based CC.
      */
     public String getDefinition() {
@@ -122,7 +122,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbiep.remark</code>. This column allows the user to
+     * Setter for <code>bbiep.remark</code>. This column allows the user to
      * specify very context-specific usage of the BIE. It is different from the
      * Definition column in that the DEFINITION column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
@@ -137,7 +137,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbiep.remark</code>. This column allows the user to
+     * Getter for <code>bbiep.remark</code>. This column allows the user to
      * specify very context-specific usage of the BIE. It is different from the
      * Definition column in that the DEFINITION column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
@@ -152,8 +152,8 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbiep.biz_term</code>. Business term to indicate
-     * what the BIE is called in a particular business context such as in an
+     * Setter for <code>bbiep.biz_term</code>. Business term to indicate what
+     * the BIE is called in a particular business context such as in an
      * industry.
      */
     public void setBizTerm(String value) {
@@ -161,8 +161,8 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbiep.biz_term</code>. Business term to indicate
-     * what the BIE is called in a particular business context such as in an
+     * Getter for <code>bbiep.biz_term</code>. Business term to indicate what
+     * the BIE is called in a particular business context such as in an
      * industry.
      */
     public String getBizTerm() {
@@ -170,93 +170,91 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbiep.display_name</code>. The display name of the
-     * BBIEP
+     * Setter for <code>bbiep.display_name</code>. The display name of the BBIEP
      */
     public void setDisplayName(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.display_name</code>. The display name of the
-     * BBIEP
+     * Getter for <code>bbiep.display_name</code>. The display name of the BBIEP
      */
     public String getDisplayName() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.created_by</code>. A foreign key referring to
-     * the user who creates the BBIEP. The creator of the BBIEP is also its
-     * owner by default. BBIEPs created as children of another ABIE have the
-     * same CREATED_BY',
+     * Setter for <code>bbiep.created_by</code>. A foreign key referring to the
+     * user who creates the BBIEP. The creator of the BBIEP is also its owner by
+     * default. BBIEPs created as children of another ABIE have the same
+     * CREATED_BY.
      */
     public void setCreatedBy(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.created_by</code>. A foreign key referring to
-     * the user who creates the BBIEP. The creator of the BBIEP is also its
-     * owner by default. BBIEPs created as children of another ABIE have the
-     * same CREATED_BY',
+     * Getter for <code>bbiep.created_by</code>. A foreign key referring to the
+     * user who creates the BBIEP. The creator of the BBIEP is also its owner by
+     * default. BBIEPs created as children of another ABIE have the same
+     * CREATED_BY.
      */
     public ULong getCreatedBy() {
         return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the BBIEP record. 
+     * Setter for <code>bbiep.last_updated_by</code>. A foreign key referring to
+     * the last user who has updated the BBIEP record. 
      */
     public void setLastUpdatedBy(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the BBIEP record. 
+     * Getter for <code>bbiep.last_updated_by</code>. A foreign key referring to
+     * the last user who has updated the BBIEP record. 
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(10);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.creation_timestamp</code>. Timestamp when the
+     * Setter for <code>bbiep.creation_timestamp</code>. Timestamp when the
      * BBIEP record was first created. BBIEPs created as children of another
-     * ABIE have the same CREATION_TIMESTAMP,
+     * ABIE have the same CREATION_TIMESTAMP.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.creation_timestamp</code>. Timestamp when the
+     * Getter for <code>bbiep.creation_timestamp</code>. Timestamp when the
      * BBIEP record was first created. BBIEPs created as children of another
-     * ABIE have the same CREATION_TIMESTAMP,
+     * ABIE have the same CREATION_TIMESTAMP.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.last_update_timestamp</code>. The timestamp
-     * when the BBIEP was last updated.
+     * Setter for <code>bbiep.last_update_timestamp</code>. The timestamp when
+     * the BBIEP was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.bbiep.last_update_timestamp</code>. The timestamp
-     * when the BBIEP was last updated.
+     * Getter for <code>bbiep.last_update_timestamp</code>. The timestamp when
+     * the BBIEP was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(12);
     }
 
     /**
-     * Setter for <code>oagi.bbiep.owner_top_level_asbiep_id</code>. This is a
+     * Setter for <code>bbiep.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public void setOwnerTopLevelAsbiepId(ULong value) {
@@ -264,7 +262,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbiep.owner_top_level_asbiep_id</code>. This is a
+     * Getter for <code>bbiep.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public ULong getOwnerTopLevelAsbiepId() {

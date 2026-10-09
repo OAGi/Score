@@ -20,32 +20,32 @@ public class BlobContentRecord extends UpdatableRecordImpl<BlobContentRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.blob_content.blob_content_id</code>. Primary,
-     * internal database key.
+     * Setter for <code>blob_content.blob_content_id</code>. Primary, internal
+     * database key.
      */
     public void setBlobContentId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content.blob_content_id</code>. Primary,
-     * internal database key.
+     * Getter for <code>blob_content.blob_content_id</code>. Primary, internal
+     * database key.
      */
     public ULong getBlobContentId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.blob_content.content</code>. The Blob content of
-     * the schema file.
+     * Setter for <code>blob_content.content</code>. The Blob content of the
+     * schema file.
      */
     public void setContent(byte[] value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.blob_content.content</code>. The Blob content of
-     * the schema file.
+     * Getter for <code>blob_content.content</code>. The Blob content of the
+     * schema file.
      */
     public byte[] getContent() {
         return (byte[]) get(1);

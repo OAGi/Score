@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BbieBizterm.BbieBiztermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bcc.BccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BusinessTerm.BusinessTermPath;
@@ -49,7 +49,7 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.bcc_bizterm</code>
+     * The reference instance of <code>bcc_bizterm</code>
      */
     public static final BccBizterm BCC_BIZTERM = new BccBizterm();
 
@@ -62,46 +62,46 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     }
 
     /**
-     * The column <code>oagi.bcc_bizterm.bcc_bizterm_id</code>. An internal,
-     * primary database key of an bcc_bizterm record.
+     * The column <code>bcc_bizterm.bcc_bizterm_id</code>. An internal, primary
+     * database key of an bcc_bizterm record.
      */
     public final TableField<BccBiztermRecord, ULong> BCC_BIZTERM_ID = createField(DSL.name("bcc_bizterm_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "An internal, primary database key of an bcc_bizterm record.");
 
     /**
-     * The column <code>oagi.bcc_bizterm.business_term_id</code>. An internal ID
-     * of the associated business term
+     * The column <code>bcc_bizterm.business_term_id</code>. An internal ID of
+     * the associated business term
      */
     public final TableField<BccBiztermRecord, ULong> BUSINESS_TERM_ID = createField(DSL.name("business_term_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the associated business term");
 
     /**
-     * The column <code>oagi.bcc_bizterm.bcc_id</code>. An internal ID of the
+     * The column <code>bcc_bizterm.bcc_id</code>. An internal ID of the
      * associated BCC
      */
     public final TableField<BccBiztermRecord, ULong> BCC_ID = createField(DSL.name("bcc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the associated BCC");
 
     /**
-     * The column <code>oagi.bcc_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the bcc_bizterm record. The creator of
-     * the bcc_bizterm is also its owner by default.
+     * The column <code>bcc_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the bcc_bizterm record. The creator of the
+     * bcc_bizterm is also its owner by default.
      */
     public final TableField<BccBiztermRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the bcc_bizterm record. The creator of the bcc_bizterm is also its owner by default.");
 
     /**
-     * The column <code>oagi.bcc_bizterm.last_updated_by</code>. A foreign key
+     * The column <code>bcc_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the bcc_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
     public final TableField<BccBiztermRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the bcc_bizterm record. This may be the user who is in the same group as the creator.");
 
     /**
-     * The column <code>oagi.bcc_bizterm.creation_timestamp</code>. Timestamp
-     * when the bcc_bizterm record was first created.
+     * The column <code>bcc_bizterm.creation_timestamp</code>. Timestamp when
+     * the bcc_bizterm record was first created.
      */
     public final TableField<BccBiztermRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the bcc_bizterm record was first created.");
 
     /**
-     * The column <code>oagi.bcc_bizterm.last_update_timestamp</code>. The
-     * timestamp when the bcc_bizterm was last updated.
+     * The column <code>bcc_bizterm.last_update_timestamp</code>. The timestamp
+     * when the bcc_bizterm was last updated.
      */
     public final TableField<BccBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the bcc_bizterm was last updated.");
 
@@ -114,21 +114,21 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.bcc_bizterm</code> table reference
+     * Create an aliased <code>bcc_bizterm</code> table reference
      */
     public BccBizterm(String alias) {
         this(DSL.name(alias), BCC_BIZTERM);
     }
 
     /**
-     * Create an aliased <code>oagi.bcc_bizterm</code> table reference
+     * Create an aliased <code>bcc_bizterm</code> table reference
      */
     public BccBizterm(Name alias) {
         this(alias, BCC_BIZTERM);
     }
 
     /**
-     * Create a <code>oagi.bcc_bizterm</code> table reference
+     * Create a <code>bcc_bizterm</code> table reference
      */
     public BccBizterm() {
         this(DSL.name("bcc_bizterm"), null);
@@ -169,7 +169,7 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -190,7 +190,7 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     private transient BccPath _bcc;
 
     /**
-     * Get the implicit join path to the <code>oagi.bcc</code> table.
+     * Get the implicit join path to the <code>bcc</code> table.
      */
     public BccPath bcc() {
         if (_bcc == null)
@@ -202,7 +202,7 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     private transient BusinessTermPath _businessTerm;
 
     /**
-     * Get the implicit join path to the <code>oagi.business_term</code> table.
+     * Get the implicit join path to the <code>business_term</code> table.
      */
     public BusinessTermPath businessTerm() {
         if (_businessTerm == null)
@@ -214,8 +214,7 @@ public class BccBizterm extends TableImpl<BccBiztermRecord> {
     private transient BbieBiztermPath _bbieBizterm;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie_bizterm</code>
-     * table
+     * Get the implicit to-many join path to the <code>bbie_bizterm</code> table
      */
     public BbieBiztermPath bbieBizterm() {
         if (_bbieBizterm == null)

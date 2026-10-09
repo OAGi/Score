@@ -23,10 +23,6 @@
         <maven.compiler.release>21</maven.compiler.release>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
-        <db.url>jdbc:mariadb://localhost:3306/oagi</db.url>
-        <db.user>oagi</db.user>
-        <db.password>oagi</db.password>
-
         <selenium.version>4.49.0</selenium.version>
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
@@ -239,7 +235,9 @@
 
                         <database>
                             <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
-                            <inputSchema>oagi</inputSchema>
+                            <inputSchema>${db.name}</inputSchema>
+                            <!-- generate into the default schema, so the generated code carries no database name -->
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
                             <includes>.*</includes>
                             <excludes></excludes>
                         </database>

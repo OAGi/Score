@@ -22,65 +22,65 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.app_user.app_user_id</code>. Primary key column.
+     * Setter for <code>app_user.app_user_id</code>. Primary key column.
      */
     public void setAppUserId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.app_user_id</code>. Primary key column.
+     * Getter for <code>app_user.app_user_id</code>. Primary key column.
      */
     public ULong getAppUserId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.app_user.login_id</code>. User Id of the user.
+     * Setter for <code>app_user.login_id</code>. User Id of the user.
      */
     public void setLoginId(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.login_id</code>. User Id of the user.
+     * Getter for <code>app_user.login_id</code>. User Id of the user.
      */
     public String getLoginId() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.app_user.password</code>. Password to authenticate
-     * the user.
+     * Setter for <code>app_user.password</code>. Password to authenticate the
+     * user.
      */
     public void setPassword(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.password</code>. Password to authenticate
-     * the user.
+     * Getter for <code>app_user.password</code>. Password to authenticate the
+     * user.
      */
     public String getPassword() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.app_user.name</code>. Full name of the user.
+     * Setter for <code>app_user.name</code>. Full name of the user.
      */
     public void setName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.name</code>. Full name of the user.
+     * Getter for <code>app_user.name</code>. Full name of the user.
      */
     public String getName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.app_user.organization</code>. The company the user
+     * Setter for <code>app_user.organization</code>. The company the user
      * represents.
      */
     public void setOrganization(String value) {
@@ -88,7 +88,7 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
     }
 
     /**
-     * Getter for <code>oagi.app_user.organization</code>. The company the user
+     * Getter for <code>app_user.organization</code>. The company the user
      * represents.
      */
     public String getOrganization() {
@@ -96,90 +96,94 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord> {
     }
 
     /**
-     * Setter for <code>oagi.app_user.email</code>. Email address.
+     * Setter for <code>app_user.email</code>. Email address.
      */
     public void setEmail(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.email</code>. Email address.
+     * Getter for <code>app_user.email</code>. Email address.
      */
     public String getEmail() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.app_user.email_verified</code>. The fact whether
-     * the email value is verified or not.
+     * Setter for <code>app_user.email_verified</code>. The fact whether the
+     * email value is verified or not.
      */
     public void setEmailVerified(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.email_verified</code>. The fact whether
-     * the email value is verified or not.
+     * Getter for <code>app_user.email_verified</code>. The fact whether the
+     * email value is verified or not.
      */
     public Byte getEmailVerified() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>oagi.app_user.email_verified_timestamp</code>. The
-     * timestamp when the email address has verified.
+     * Setter for <code>app_user.email_verified_timestamp</code>. The timestamp
+     * when the email address has been verified.
      */
     public void setEmailVerifiedTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.email_verified_timestamp</code>. The
-     * timestamp when the email address has verified.
+     * Getter for <code>app_user.email_verified_timestamp</code>. The timestamp
+     * when the email address has been verified.
      */
     public LocalDateTime getEmailVerifiedTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_developer</code>.
+     * Setter for <code>app_user.is_developer</code>. Indicator whether the user
+     * has a developer role or not.
      */
     public void setIsDeveloper(Byte value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.is_developer</code>.
+     * Getter for <code>app_user.is_developer</code>. Indicator whether the user
+     * has a developer role or not.
      */
     public Byte getIsDeveloper() {
         return (Byte) get(8);
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_admin</code>. Indicator whether the
-     * user has an admin role or not.
+     * Setter for <code>app_user.is_admin</code>. Indicator whether the user has
+     * an admin role or not.
      */
     public void setIsAdmin(Byte value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.is_admin</code>. Indicator whether the
-     * user has an admin role or not.
+     * Getter for <code>app_user.is_admin</code>. Indicator whether the user has
+     * an admin role or not.
      */
     public Byte getIsAdmin() {
         return (Byte) get(9);
     }
 
     /**
-     * Setter for <code>oagi.app_user.is_enabled</code>.
+     * Setter for <code>app_user.is_enabled</code>. Indicator whether the user
+     * account is enabled or not.
      */
     public void setIsEnabled(Byte value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.app_user.is_enabled</code>.
+     * Getter for <code>app_user.is_enabled</code>. Indicator whether the user
+     * account is enabled or not.
      */
     public Byte getIsEnabled() {
         return (Byte) get(10);

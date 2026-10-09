@@ -21,25 +21,23 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.oas_doc_security_scope.oas_doc_security_scope_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_doc_security_scope.oas_doc_security_scope_id</code>.
+     * The primary key of the record.
      */
     public void setOasDocSecurityScopeId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_doc_security_scope.oas_doc_security_scope_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_doc_security_scope.oas_doc_security_scope_id</code>.
+     * The primary key of the record.
      */
     public ULong getOasDocSecurityScopeId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.guid</code>. The GUID of the
+     * Setter for <code>oas_doc_security_scope.guid</code>. The GUID of the
      * record.
      */
     public void setGuid(String value) {
@@ -47,7 +45,7 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.guid</code>. The GUID of the
+     * Getter for <code>oas_doc_security_scope.guid</code>. The GUID of the
      * record.
      */
     public String getGuid() {
@@ -55,90 +53,89 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.oas_doc_security_id</code>.
-     * The owning root-level security entry.
+     * Setter for <code>oas_doc_security_scope.oas_doc_security_id</code>. The
+     * owning root-level security entry.
      */
     public void setOasDocSecurityId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.oas_doc_security_id</code>.
-     * The owning root-level security entry.
+     * Getter for <code>oas_doc_security_scope.oas_doc_security_id</code>. The
+     * owning root-level security entry.
      */
     public ULong getOasDocSecurityId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.scope_name</code>. A scope
-     * name required by this entry (oauth2: from the scheme's flows;
-     * openIdConnect: from the provider).
+     * Setter for <code>oas_doc_security_scope.scope_name</code>. A scope name
+     * required by this entry (oauth2: from the scheme's flows; openIdConnect:
+     * from the provider).
      */
     public void setScopeName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.scope_name</code>. A scope
-     * name required by this entry (oauth2: from the scheme's flows;
-     * openIdConnect: from the provider).
+     * Getter for <code>oas_doc_security_scope.scope_name</code>. A scope name
+     * required by this entry (oauth2: from the scheme's flows; openIdConnect:
+     * from the provider).
      */
     public String getScopeName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.created_by</code>. The user
-     * who creates the record.
+     * Setter for <code>oas_doc_security_scope.created_by</code>. The user who
+     * creates the record.
      */
     public void setCreatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.created_by</code>. The user
-     * who creates the record.
+     * Getter for <code>oas_doc_security_scope.created_by</code>. The user who
+     * creates the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.last_updated_by</code>. The
-     * user who last updates the record.
+     * Setter for <code>oas_doc_security_scope.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.last_updated_by</code>. The
-     * user who last updates the record.
+     * Getter for <code>oas_doc_security_scope.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.oas_doc_security_scope.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * Setter for <code>oas_doc_security_scope.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_doc_security_scope.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * Getter for <code>oas_doc_security_scope.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_doc_security_scope.last_update_timestamp</code>. The
+     * Setter for <code>oas_doc_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -146,8 +143,7 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_doc_security_scope.last_update_timestamp</code>. The
+     * Getter for <code>oas_doc_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

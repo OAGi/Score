@@ -21,135 +21,133 @@ public class OasOauthScopeRecord extends UpdatableRecordImpl<OasOauthScopeRecord
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.oas_oauth_scope_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_oauth_scope.oas_oauth_scope_id</code>. The primary
+     * key of the record.
      */
     public void setOasOauthScopeId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.oas_oauth_scope_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_oauth_scope.oas_oauth_scope_id</code>. The primary
+     * key of the record.
      */
     public ULong getOasOauthScopeId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.guid</code>. The GUID of the
-     * record.
+     * Setter for <code>oas_oauth_scope.guid</code>. The GUID of the record.
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.guid</code>. The GUID of the
-     * record.
+     * Getter for <code>oas_oauth_scope.guid</code>. The GUID of the record.
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.oas_oauth_flow_id</code>. The
-     * owning OAuth flow; one entry of that flow's scopes map.
+     * Setter for <code>oas_oauth_scope.oas_oauth_flow_id</code>. The owning
+     * OAuth flow; one entry of that flow's scopes map.
      */
     public void setOasOauthFlowId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.oas_oauth_flow_id</code>. The
-     * owning OAuth flow; one entry of that flow's scopes map.
+     * Getter for <code>oas_oauth_scope.oas_oauth_flow_id</code>. The owning
+     * OAuth flow; one entry of that flow's scopes map.
      */
     public ULong getOasOauthFlowId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.scope_name</code>. REQUIRED. The
-     * scope name (the scopes map key). Unique within a flow.
+     * Setter for <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
+     * name (the scopes map key). Unique within a flow.
      */
     public void setScopeName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.scope_name</code>. REQUIRED. The
-     * scope name (the scopes map key). Unique within a flow.
+     * Getter for <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
+     * name (the scopes map key). Unique within a flow.
      */
     public String getScopeName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.description</code>. REQUIRED. A
-     * short description of the scope (the scopes map value).
+     * Setter for <code>oas_oauth_scope.description</code>. REQUIRED. A short
+     * description of the scope (the scopes map value).
      */
     public void setDescription(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.description</code>. REQUIRED. A
-     * short description of the scope (the scopes map value).
+     * Getter for <code>oas_oauth_scope.description</code>. REQUIRED. A short
+     * description of the scope (the scopes map value).
      */
     public String getDescription() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.created_by</code>. The user who
-     * creates the record.
+     * Setter for <code>oas_oauth_scope.created_by</code>. The user who creates
+     * the record.
      */
     public void setCreatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.created_by</code>. The user who
-     * creates the record.
+     * Getter for <code>oas_oauth_scope.created_by</code>. The user who creates
+     * the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * Setter for <code>oas_oauth_scope.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * Getter for <code>oas_oauth_scope.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Setter for <code>oas_oauth_scope.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Getter for <code>oas_oauth_scope.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_scope.last_update_timestamp</code>. The
+     * Setter for <code>oas_oauth_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -157,7 +155,7 @@ public class OasOauthScopeRecord extends UpdatableRecordImpl<OasOauthScopeRecord
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_scope.last_update_timestamp</code>. The
+     * Getter for <code>oas_oauth_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

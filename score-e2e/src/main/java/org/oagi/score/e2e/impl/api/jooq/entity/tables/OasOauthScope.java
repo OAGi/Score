@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOauthFlow.OasOauthFlowPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasOauthScopeRecord;
@@ -47,7 +47,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_oauth_scope</code>
+     * The reference instance of <code>oas_oauth_scope</code>
      */
     public static final OasOauthScope OAS_OAUTH_SCOPE = new OasOauthScope();
 
@@ -60,55 +60,54 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     }
 
     /**
-     * The column <code>oagi.oas_oauth_scope.oas_oauth_scope_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_oauth_scope.oas_oauth_scope_id</code>. The primary
+     * key of the record.
      */
     public final TableField<OasOauthScopeRecord, ULong> OAS_OAUTH_SCOPE_ID = createField(DSL.name("oas_oauth_scope_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.guid</code>. The GUID of the
-     * record.
+     * The column <code>oas_oauth_scope.guid</code>. The GUID of the record.
      */
     public final TableField<OasOauthScopeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.oas_oauth_flow_id</code>. The
-     * owning OAuth flow; one entry of that flow's scopes map.
+     * The column <code>oas_oauth_scope.oas_oauth_flow_id</code>. The owning
+     * OAuth flow; one entry of that flow's scopes map.
      */
     public final TableField<OasOauthScopeRecord, ULong> OAS_OAUTH_FLOW_ID = createField(DSL.name("oas_oauth_flow_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning OAuth flow; one entry of that flow's scopes map.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.scope_name</code>. REQUIRED. The
-     * scope name (the scopes map key). Unique within a flow.
+     * The column <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
+     * name (the scopes map key). Unique within a flow.
      */
     public final TableField<OasOauthScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "REQUIRED. The scope name (the scopes map key). Unique within a flow.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.description</code>. REQUIRED. A
-     * short description of the scope (the scopes map value).
+     * The column <code>oas_oauth_scope.description</code>. REQUIRED. A short
+     * description of the scope (the scopes map value).
      */
     public final TableField<OasOauthScopeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "REQUIRED. A short description of the scope (the scopes map value).");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.created_by</code>. The user who
-     * creates the record.
+     * The column <code>oas_oauth_scope.created_by</code>. The user who creates
+     * the record.
      */
     public final TableField<OasOauthScopeRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * The column <code>oas_oauth_scope.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public final TableField<OasOauthScopeRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * The column <code>oas_oauth_scope.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public final TableField<OasOauthScopeRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.oas_oauth_scope.last_update_timestamp</code>. The
+     * The column <code>oas_oauth_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasOauthScopeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -122,21 +121,21 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_oauth_scope</code> table reference
+     * Create an aliased <code>oas_oauth_scope</code> table reference
      */
     public OasOauthScope(String alias) {
         this(DSL.name(alias), OAS_OAUTH_SCOPE);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_oauth_scope</code> table reference
+     * Create an aliased <code>oas_oauth_scope</code> table reference
      */
     public OasOauthScope(Name alias) {
         this(alias, OAS_OAUTH_SCOPE);
     }
 
     /**
-     * Create a <code>oagi.oas_oauth_scope</code> table reference
+     * Create a <code>oas_oauth_scope</code> table reference
      */
     public OasOauthScope() {
         this(DSL.name("oas_oauth_scope"), null);
@@ -177,7 +176,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -203,8 +202,8 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     private transient AppUserPath _oasOauthScopeCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_oauth_scope_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_oauth_scope_created_by_fk</code> key.
      */
     public AppUserPath oasOauthScopeCreatedByFk() {
         if (_oasOauthScopeCreatedByFk == null)
@@ -216,8 +215,8 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     private transient AppUserPath _oasOauthScopeLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_oauth_scope_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_oauth_scope_last_updated_by_fk</code> key.
      */
     public AppUserPath oasOauthScopeLastUpdatedByFk() {
         if (_oasOauthScopeLastUpdatedByFk == null)
@@ -229,7 +228,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     private transient OasOauthFlowPath _oasOauthFlow;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_oauth_flow</code> table.
+     * Get the implicit join path to the <code>oas_oauth_flow</code> table.
      */
     public OasOauthFlowPath oasOauthFlow() {
         if (_oasOauthFlow == null)
