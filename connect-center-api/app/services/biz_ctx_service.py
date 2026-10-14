@@ -211,6 +211,13 @@ class BizCtxService:
         Returns:
             Result of the operation.
         """
+        asbiep_ids = await self._repo.get_top_level_asbiep_ids_using_biz_ctx(biz_ctx_id)
+        if asbiep_ids:
+            joined = ", ".join(str(x) for x in asbiep_ids)
+            raise ValueError(
+                "Cannot delete business context because it is assigned to top-level ASBIEPs: "
+                f"{joined}. Remove those assignments first."
+            )
         deleted = await self._repo.delete(biz_ctx_id)
         logger.info("delete biz_ctx id=%d → %s", int(biz_ctx_id), "deleted" if deleted else "not found")
         return deleted

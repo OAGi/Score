@@ -17,6 +17,7 @@ from app.repositories.contracts.ctx_category import ContextCategoryRepositoryCon
 from app.repositories.models.ctx_category import ContextCategoryRow
 from app.repositories.vendors.mariadb.models.app_user import AppUser
 from app.repositories.vendors.mariadb.models.ctx_category import ContextCategory
+from app.repositories.vendors.mariadb.models.ctx_scheme import CtxScheme
 from app.types.identifiers import (
     AppUserId,
     ContextCategoryId,
@@ -180,6 +181,19 @@ class MariaDbContextCategoryRepository(ContextCategoryRepositoryContract):
         obj.last_updated_by = last_updated_by
         obj.last_update_timestamp = last_update_timestamp
         return True
+
+    async def get_ctx_scheme_ids_using_category(self, context_category_id: ContextCategoryId) -> list[int]:
+        """Handle get ctx scheme ids using category.
+
+        Args:
+            context_category_id: Context category identifier.
+
+        Returns:
+            Identifiers of the context schemes that reference the category.
+        """
+        stmt = select(CtxScheme.ctx_scheme_id).where(CtxScheme.ctx_category_id == context_category_id).order_by(CtxScheme.ctx_scheme_id)
+        res = await self._session.execute(stmt)
+        return [int(row[0]) for row in res.all()]
 
     async def delete(self, context_category_id: ContextCategoryId) -> bool:
         """Handle delete.

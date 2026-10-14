@@ -332,12 +332,6 @@ class CtxSchemeService:
         if existing is None:
             logger.info("delete ctx_scheme id=%d → not found", int(ctx_scheme_id))
             return False
-        if existing.ctx_category is not None:
-            raise ValueError(
-                "Cannot delete context scheme because it is still linked to context category "
-                f"ID {int(existing.ctx_category.ctx_category_id)} ({existing.ctx_category.name}). "
-                "Remove the context category reference first."
-            )
         linked_biz_ctx_ids: set[int] = set()
         for value in existing.values:
             linked = await self._repo.get_biz_ctx_ids_using_ctx_scheme_value(value.ctx_scheme_value_id)

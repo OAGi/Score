@@ -113,6 +113,17 @@ class ContextCategoryRepositoryContract(Protocol):
         """
         pass
 
+    async def get_ctx_scheme_ids_using_category(self, context_category_id: ContextCategoryId) -> list[int]:
+        """Repository contract for listing the context schemes that belong to a category.
+
+        Args:
+            context_category_id: Context category identifier.
+
+        Returns:
+            Identifiers of the context schemes that reference the category.
+        """
+        pass
+
     async def delete(self, context_category_id: ContextCategoryId) -> bool:
         """Repository contract for delete.
 

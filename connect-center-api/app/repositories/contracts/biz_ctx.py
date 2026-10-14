@@ -104,6 +104,17 @@ class BizCtxRepositoryContract(Protocol):
         """
         pass
 
+    async def get_top_level_asbiep_ids_using_biz_ctx(self, biz_ctx_id: BizCtxId) -> list[int]:
+        """Repository contract for listing the top-level ASBIEPs a business context is assigned to.
+
+        Args:
+            biz_ctx_id: Business context identifier.
+
+        Returns:
+            Identifiers of the top-level ASBIEPs that use the business context.
+        """
+        pass
+
     async def delete(self, biz_ctx_id: BizCtxId) -> bool:
         """Repository contract for delete.
 

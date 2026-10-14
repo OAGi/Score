@@ -345,7 +345,13 @@ async def delete_business_context(
     Returns:
         Empty HTTP 204 response when deletion succeeds.
     """
-    deleted = await biz_ctx_service.delete(biz_ctx_id)
+    try:
+        deleted = await biz_ctx_service.delete(biz_ctx_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The business context cannot be deleted.", "cause": str(e)},
+        )
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
