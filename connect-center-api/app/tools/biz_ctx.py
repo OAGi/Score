@@ -962,7 +962,10 @@ async def delete_business_context(
                     raise ToolError(
                         f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again."
                     )
-                return DeleteBizCtxResponse(biz_ctx_id=biz_ctx_id)
+                return DeleteBizCtxResponse(
+                    biz_ctx_id=biz_ctx_id,
+                    message=f"Deleted business context '{biz_ctx_name}' (biz_ctx_id={biz_ctx_id}).",
+                )
             case DeclinedElicitation():
                 return DeleteBizCtxResponse(biz_ctx_id=None, message="Deletion declined by user")
             case CancelledElicitation():
@@ -1073,7 +1076,13 @@ async def delete_business_context_value(
                     raise ToolError(
                         f"The business context value with ID {biz_ctx_value_id} was not found. Please check the ID and try again."
                     )
-                return DeleteBizCtxValueResponse(biz_ctx_value_id=biz_ctx_value_id)
+                return DeleteBizCtxValueResponse(
+                    biz_ctx_value_id=biz_ctx_value_id,
+                    message=(
+                        f"Deleted '{ctx_scheme_value_name}' from business context '{biz_ctx_name}' "
+                        f"(biz_ctx_value_id={biz_ctx_value_id})."
+                    ),
+                )
             case DeclinedElicitation():
                 return DeleteBizCtxValueResponse(biz_ctx_value_id=None, message="Deletion declined by user")
             case CancelledElicitation():

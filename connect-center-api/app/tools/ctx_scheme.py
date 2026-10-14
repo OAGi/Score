@@ -1023,7 +1023,13 @@ async def delete_context_scheme_value(
                     raise ToolError(
                         f"The context scheme value with ID {ctx_scheme_value_id} was not found. Please check the ID and try again."
                     )
-                return DeleteCtxSchemeValueResponse(ctx_scheme_value_id=ctx_scheme_value_id)
+                return DeleteCtxSchemeValueResponse(
+                    ctx_scheme_value_id=ctx_scheme_value_id,
+                    message=(
+                        f"Deleted '{value_row.value}' from context scheme '{scheme_name}' "
+                        f"(ctx_scheme_value_id={ctx_scheme_value_id})."
+                    ),
+                )
             case DeclinedElicitation():
                 return DeleteCtxSchemeValueResponse(ctx_scheme_value_id=None, message="Deletion declined by user")
             case CancelledElicitation():
@@ -1224,7 +1230,10 @@ async def delete_context_scheme(
                     raise ToolError(
                         f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
                     )
-                return DeleteCtxSchemeResponse(ctx_scheme_id=ctx_scheme_id)
+                return DeleteCtxSchemeResponse(
+                    ctx_scheme_id=ctx_scheme_id,
+                    message=f"Deleted context scheme '{scheme_name}' (ctx_scheme_id={ctx_scheme_id}).",
+                )
             case DeclinedElicitation():
                 return DeleteCtxSchemeResponse(ctx_scheme_id=None, message="Deletion declined by user")
             case CancelledElicitation():

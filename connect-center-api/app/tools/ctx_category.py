@@ -748,7 +748,10 @@ async def delete_context_category(
                     raise ToolError(
                         f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
                     )
-                return DeleteCtxCategoryResponse(ctx_category_id=ctx_category_id)
+                return DeleteCtxCategoryResponse(
+                    ctx_category_id=ctx_category_id,
+                    message=f"Deleted context category '{row.name}' (ctx_category_id={ctx_category_id}).",
+                )
             case DeclinedElicitation():
                 return DeleteCtxCategoryResponse(ctx_category_id=None, message="Deletion declined by user")
             case CancelledElicitation():

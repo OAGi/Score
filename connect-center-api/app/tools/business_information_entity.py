@@ -6087,7 +6087,13 @@ async def delete_top_level_asbiep(
                 await business_information_entity_service.execute_delete_top_level_asbiep(
                     top_level_asbiep_id=top_level_asbiep_id,
                 )
-                return DeleteTopLevelAsbiepToolResponse(top_level_asbiep_id=top_level_asbiep_id)
+                return DeleteTopLevelAsbiepToolResponse(
+                    top_level_asbiep_id=top_level_asbiep_id,
+                    message=(
+                        f"Deleted top-level ASBIEP '{_top_level_label(row)}' "
+                        f"(top_level_asbiep_id={top_level_asbiep_id})."
+                    ),
+                )
             case DeclinedElicitation():
                 return DeleteTopLevelAsbiepToolResponse(
                     top_level_asbiep_id=None,
