@@ -110,7 +110,8 @@ from app.services.app_user_service import AppUserService
 from app.services.core_component_service import CoreComponentService
 from app.services.data_type_service import DataTypeService
 from app.services.release_service import ReleaseService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, elicit_form, get_tool_authenticated_user, tool_session
 from app.tools.models.core_component import (
     AddAsccToAccResponse,
     AddBccToAccResponse,
@@ -172,15 +173,17 @@ async def _elicit_on_acc_structure_warnings(
     """Ask for confirmation when an ACC change may create repeated fields later."""
     if not warnings:
         return
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(
             f"{prompt}\n\n"
             "Things to double-check:\n"
             + "\n".join(f"- {warning}" for warning in warnings)
             + "\n\nDo you still want to continue?"
         ),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             return
@@ -1528,10 +1531,12 @@ async def transfer_acc_ownership(
         if target_user.username and target_user.username != target_user.login_id:
             target_user_label = f"{target_user.login_id} ({target_user.username})"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(f"Are you sure you want to transfer ownership of '{row.den}' to {target_user_label}?"),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
         match elicit_result:
             case AcceptedElicitation():
                 payload = await core_component_service.transfer_acc_ownership(
@@ -1924,13 +1929,16 @@ async def change_acc_state(
             if row.namespace is None:
                 raise ToolError(f"'{row.den}' needs a namespace before it can move to the 'QA' state.")
             if not str(row.definition or "").strip():
-                elicit_result = await ctx.elicit(
+                elicit_result = await elicit_form(
+                    ctx,
                     message=(
                         f"'{row.den}' needs a definition before it can move to the 'QA' state.\n\n"
                         "Please enter a short definition for this ACC."
                     ),
                     response_type=MissingAccDefinitionResponse,
                 )
+                if isinstance(elicit_result, InputRequiredResult):
+                    return elicit_result
                 match elicit_result:
                     case AcceptedElicitation(data=data):
                         definition = str(data.definition).strip()
@@ -1948,13 +1956,15 @@ async def change_acc_state(
                         raise ToolError("Changing the ACC state was cancelled.")
 
         if row.release.release_num != "Working" and row.state == "QA" and state == "Production":
-            elicit_result = await ctx.elicit(
+            elicit_result = await elicit_confirmation(
+                ctx,
                 message=(
                     f"Are you sure you want to change '{row.den}' to the 'Production' state?\n\n"
                     "This is the end-user production transition for a non-'Working' release ACC."
                 ),
-                response_type=None,
             )
+            if isinstance(elicit_result, InputRequiredResult):
+                return elicit_result
             match elicit_result:
                 case AcceptedElicitation():
                     pass
@@ -2053,13 +2063,15 @@ async def discard_acc(
             "Only ACCs in the 'Deleted' state can be discarded."
         )
 
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(
             f"Are you sure you want to discard '{row.den}' permanently?\n\n"
             "This removes the ACC and its direct ACC-owned records from the database and cannot be undone."
         ),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             pass
@@ -2213,10 +2225,12 @@ async def transfer_asccp_ownership(
         if target_user.username and target_user.username != target_user.login_id:
             target_user_label = f"{target_user.login_id} ({target_user.username})"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(f"Are you sure you want to transfer ownership of '{row.den}' to {target_user_label}?"),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
         match elicit_result:
             case AcceptedElicitation():
                 payload = await core_component_service.transfer_asccp_ownership(
@@ -2371,10 +2385,12 @@ async def transfer_bccp_ownership(
         if target_user.username and target_user.username != target_user.login_id:
             target_user_label = f"{target_user.login_id} ({target_user.username})"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(f"Are you sure you want to transfer ownership of '{row.den}' to {target_user_label}?"),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
         match elicit_result:
             case AcceptedElicitation():
                 payload = await core_component_service.transfer_bccp_ownership(
@@ -2577,12 +2593,14 @@ async def discard_asccp(
         raise ToolError(
             f"The ASCCP '{row.den}' is currently in the '{row.state}' state. Only ASCCPs in the 'Deleted' state can be discarded."
         )
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(
             f"Are you sure you want to discard '{row.den}' permanently?\n\nThis removes the ASCCP from the database and cannot be undone."
         ),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             pass

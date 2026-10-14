@@ -92,8 +92,10 @@ from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.business_information_entity_service import BusinessInformationEntityService
+from mcp.types import InputRequiredResult
 from app.tools import (
     _to_tool_error,
+    elicit_confirmation,
     get_tool_authenticated_user,
     str_to_bool,
     tool_session,
@@ -5949,13 +5951,15 @@ async def update_top_level_asbiep_state(
             )
 
         if row.state == "QA" and new_state == "Production":
-            elicit_result = await ctx.elicit(
+            elicit_result = await elicit_confirmation(
+                ctx,
                 message=(
                     f"Are you sure you want to move '{_top_level_label(row)}' to the 'Production' state?\n\n"
                     "This action is permanent. Once in Production, the state cannot be changed."
                 ),
-                response_type=None,
             )
+            if isinstance(elicit_result, InputRequiredResult):
+                return elicit_result
             match elicit_result:
                 case AcceptedElicitation():
                     pass
@@ -6068,13 +6072,15 @@ async def delete_top_level_asbiep(
             top_level_asbiep_id=top_level_asbiep_id,
         )
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{_top_level_label(row)}' top-level ASBIEP?\n\n"
                 "It will be permanently removed along with its owned BIE tree."
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         match elicit_result:
             case AcceptedElicitation():
@@ -6190,12 +6196,14 @@ async def transfer_top_level_asbiep_ownership(
         if target_user.username and target_user.username != target_user.login_id:
             target_user_label = f"{target_user.login_id} ({target_user.username})"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to transfer ownership of '{_top_level_label(row)}' to {target_user_label}?"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         match elicit_result:
             case AcceptedElicitation():

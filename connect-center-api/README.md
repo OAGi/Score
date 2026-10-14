@@ -1,7 +1,7 @@
 # connectCenter API
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.136-009688.svg)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.143-009688.svg)](https://fastapi.tiangolo.com/)
 [![MCP](https://img.shields.io/badge/MCP-FastMCP-7c3aed.svg)](https://gofastmcp.com/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE.txt)
 

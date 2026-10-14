@@ -67,7 +67,8 @@ from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.ctx_category_service import ContextCategoryService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, tool_session
 from app.tools.models.ctx_category import (
     CtxCategoryEntryResponse,
     CreateCtxCategoryResponse,
@@ -731,12 +732,14 @@ async def delete_context_category(
                 f"The context category with ID {ctx_category_id} was not found. Please check the ID and try again."
             )
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{row.name}' context category?\n\nIt will be permanently removed.\n"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         match elicit_result:
             case AcceptedElicitation():
