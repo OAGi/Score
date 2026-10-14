@@ -36,7 +36,6 @@
     "@ngx-translate/http-loader": "^18.0.0",
     "@stomp/rx-stomp": "^2.4.0",
     "@stomp/stompjs": "^7.3.0",
-    "@types/uuid": "^8.3.4",
     "angular-split": "^20.0.0",
     "bootstrap": "^5.3.8",
     "core-js": "^3.50.0",
@@ -50,7 +49,7 @@
     "ngx-mat-select-search": "^8.0.6",
     "rxjs": "~7.8.2",
     "tslib": "^2.4.1",
-    "uuid": "^8.3.2",
+    "uuid": "^14.0.3",
     "webfontloader": "^1.6.28",
     "zone.js": "^0.16.3"
   },
