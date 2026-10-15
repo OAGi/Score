@@ -1,21 +1,16 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ ((!!tenantInfo) ? (tenantInfo.name + ' - ') : '') + title }}</span>
-      <span class="flex-11-auto"></span>
-      @if (!addBusinessCtxToTenant) {
-        <button mat-raised-button class="ms-2" color="primary"
-          (click)="setAddBusinessCtxView()">
-          Add Business Context
-        </button>
-      } @else {
-        <button mat-raised-button class="ms-2" color="primary" (click)="setListView()">
-          Done
-        </button>
-      }
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [title]="((!!tenantInfo) ? (tenantInfo.name + ' - ') : '') + title" [showActions]="false">
+  <ng-container ngProjectAs="[detailToolbar]">
+    @if (!addBusinessCtxToTenant) {
+      <button mat-raised-button class="ms-2" color="primary"
+        (click)="setAddBusinessCtxView()">
+        Add Business Context
+      </button>
+    } @else {
+      <button mat-raised-button class="ms-2" color="primary" (click)="setListView()">
+        Done
+      </button>
+    }
+  </ng-container>
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Name" [(model)]="request.filters.name"
       (modelChange)="onChange('filters.name', request.filters.name);"
@@ -158,4 +153,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</score-detail-page>

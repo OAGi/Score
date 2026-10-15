@@ -1,21 +1,16 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ ((!!tenantInfo) ? (tenantInfo.name + ' - ') : '') + title }}</span>
-      <span class="flex-11-auto"></span>
-      @if (!addUserToTenant) {
-        <button mat-raised-button class="ms-2" color="primary"
-          (click)="setAddUserView()">
-          Add User
-        </button>
-      } @else {
-        <button mat-raised-button class="ms-2" color="primary" (click)="setListView()">
-          Done
-        </button>
-      }
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [title]="((!!tenantInfo) ? (tenantInfo.name + ' - ') : '') + title" [showActions]="false">
+  <ng-container ngProjectAs="[detailToolbar]">
+    @if (!addUserToTenant) {
+      <button mat-raised-button class="ms-2" color="primary"
+        (click)="setAddUserView()">
+        Add User
+      </button>
+    } @else {
+      <button mat-raised-button class="ms-2" color="primary" (click)="setListView()">
+        Done
+      </button>
+    }
+  </ng-container>
   <mat-card class="pt-3">
     <score-search-bar placeholder="Search by Login ID" [(model)]="request.filters.loginId"
       (modelChange)="onChange('filters.loginId', request.filters.loginId);"
@@ -164,4 +159,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</score-detail-page>

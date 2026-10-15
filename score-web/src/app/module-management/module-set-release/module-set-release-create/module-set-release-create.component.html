@@ -1,107 +1,91 @@
-<div class="context-section">
-  @if (isUpdating) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
+<score-detail-page [loading]="isUpdating" [actionsWrapper]="false">
+  <ng-container ngProjectAs="[detailTitle]">
+    <score-title-with-library-selector [title]="title"
+      [libraries]="mappedLibraries"
+      (libraryChange)="onLibraryChange($event)"/>
+  </ng-container>
+  <score-detail-card>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName" maxlength="100">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea [(ngModel)]="moduleSetRelease.moduleSetReleaseDescription" cols="30" data-id="moduleSetRelease.description" matInput
+      rows="6"></textarea>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Module Set</mat-label>
+      <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
+            [noEntriesFoundLabel]="'No matching module set found.'"
+          [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+        </mat-option>
+        @for (moduleSet of filteredModuleSetList | async; track moduleSet) {
+          <mat-option [value]="moduleSet.moduleSetId">
+            {{ moduleSet.name }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Release</mat-label>
+      <mat-select [(ngModel)]="moduleSetRelease.releaseId">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+            [noEntriesFoundLabel]="'No matching release found.'"
+          [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+        </mat-option>
+        @for (release of filteredReleaseList | async; track release) {
+          <mat-option [value]="release.releaseId">
+            <div class="d-flex">
+              <span class="release-num">{{release.releaseNum}}</span>
+              @if (!release.workingRelease) {
+                <span
+                  class="f12 ms-auto {{release.state}}">
+                  {{ release.state | separate }}
+                </span>
+              }
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="d-flex flex-column pb-2">
+      <mat-checkbox [(ngModel)]="moduleSetRelease.isDefault">Default</mat-checkbox>
+
+      <mat-checkbox [(ngModel)]="copyFromOther">Copy CC assignment from Module Set Release</mat-checkbox>
     </div>
-  }
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <score-title-with-library-selector [title]="title"
-        [libraries]="mappedLibraries"
-        (libraryChange)="onLibraryChange($event)"/>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
 
-  <div class="p-3">
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input matInput [(ngModel)]="moduleSetRelease.moduleSetReleaseName" maxlength="100">
-        </mat-form-field>
+    <mat-form-field>
+      <mat-label>Module Set Release</mat-label>
+      <mat-select [(ngModel)]="copyTargetModuleSetRelease" [disabled]="!copyFromOther">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="moduleSetReleaseListFilterCtrl"
+            [noEntriesFoundLabel]="'No matching module set release found.'"
+          [placeholderLabel]="'Search...'"></ngx-mat-select-search>
+        </mat-option>
+        @for (moduleSetRelease of filteredModuleSetReleaseList | async; track moduleSetRelease) {
+          <mat-option [value]="moduleSetRelease">
+            <div class="d-flex">
+              <span class="release-num">{{moduleSetRelease.name}}</span>
+              &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Description</mat-label>
-          <textarea [(ngModel)]="moduleSetRelease.moduleSetReleaseDescription" cols="30" data-id="moduleSetRelease.description" matInput
-          rows="6"></textarea>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Module Set</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
-                [noEntriesFoundLabel]="'No matching module set found.'"
-              [placeholderLabel]="'Search...'"></ngx-mat-select-search>
-            </mat-option>
-            @for (moduleSet of filteredModuleSetList | async; track moduleSet) {
-              <mat-option [value]="moduleSet.moduleSetId">
-                {{ moduleSet.name }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Release</mat-label>
-          <mat-select [(ngModel)]="moduleSetRelease.releaseId">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-                [noEntriesFoundLabel]="'No matching release found.'"
-              [placeholderLabel]="'Search...'"></ngx-mat-select-search>
-            </mat-option>
-            @for (release of filteredReleaseList | async; track release) {
-              <mat-option [value]="release.releaseId">
-                <div class="d-flex">
-                  <span class="release-num">{{release.releaseNum}}</span>
-                  @if (!release.workingRelease) {
-                    <span
-                      class="f12 ms-auto {{release.state}}">
-                      {{ release.state | separate }}
-                    </span>
-                  }
-                </div>
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <div class="d-flex flex-column pb-2">
-          <mat-checkbox [(ngModel)]="moduleSetRelease.isDefault">Default</mat-checkbox>
-
-          <mat-checkbox [(ngModel)]="copyFromOther">Copy CC assignment from Module Set Release</mat-checkbox>
-        </div>
-
-        <mat-form-field>
-          <mat-label>Module Set Release</mat-label>
-          <mat-select [(ngModel)]="copyTargetModuleSetRelease" [disabled]="!copyFromOther">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="moduleSetReleaseListFilterCtrl"
-                [noEntriesFoundLabel]="'No matching module set release found.'"
-              [placeholderLabel]="'Search...'"></ngx-mat-select-search>
-            </mat-option>
-            @for (moduleSetRelease of filteredModuleSetReleaseList | async; track moduleSetRelease) {
-              <mat-option [value]="moduleSetRelease">
-                <div class="d-flex">
-                  <span class="release-num">{{moduleSetRelease.name}}</span>
-                  &nbsp;<span class="release-num">{{moduleSetRelease.release.releaseNum}}</span>
-                </div>
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <button (click)="createModuleSetRelease()" [disabled]="!canCreate" color="primary"
-        mat-raised-button>
-        Create
-      </button>
-    </div>
-  </div>
-</div>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button (click)="createModuleSetRelease()" [disabled]="!canCreate" color="primary"
+      mat-raised-button>
+      Create
+    </button>
+  </ng-container>
+</score-detail-page>

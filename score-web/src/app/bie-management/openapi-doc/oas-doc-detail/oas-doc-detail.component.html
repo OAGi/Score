@@ -1,18 +1,16 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <button mat-raised-button class="ms-4" color="warn" (click)="discard()">
-        Discard
-      </button>
-      <span class="flex-11-auto"></span>
-      <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-              [disabled]="!isChanged() || isDisabled(oasDoc)">
-        Update
-      </button>
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [showActions]="false">
+  <ng-container ngProjectAs="[detailTitle]">
+    <span class="title">{{ title }}</span>
+    <button mat-raised-button class="ms-4" color="warn" (click)="discard()">
+      Discard
+    </button>
+  </ng-container>
+  <ng-container ngProjectAs="[detailToolbar]">
+    <button mat-raised-button class="ms-2" color="primary" (click)="update()"
+            [disabled]="!isChanged() || isDisabled(oasDoc)">
+      Update
+    </button>
+  </ng-container>
   <mat-card class="pt-3 pb-0">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
@@ -456,4 +454,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</score-detail-page>

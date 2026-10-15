@@ -1,47 +1,42 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
-        <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-          [disabled]="!isChanged() || isDisabled(biePackage)">
-          Update
-        </button>
-      }
-      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
-        <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
-          [disabled]="loading || isChanged()">
-          Move to QA
-        </button>
-      }
-      @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
-        <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
-          [disabled]="loading">
-          Back to WIP
-        </button>
-      }
-      @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
-        <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
-          [disabled]="loading">
-          Move to Production
-        </button>
-      }
-      @if (biePackage.state === 'Production') {
-        <button mat-raised-button class="ms-2" color="warn" (click)="makeNewRevision()"
-          [disabled]="loading">
-          Revise
-        </button>
-      }
-      @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
-        <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-          >
-          Discard
-        </button>
-      }
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [title]="title" [showActions]="false">
+  <ng-container ngProjectAs="[detailToolbar]">
+    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+      <button mat-raised-button class="ms-2" color="primary" (click)="update()"
+        [disabled]="!isChanged() || isDisabled(biePackage)">
+        Update
+      </button>
+    }
+    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
+        [disabled]="loading || isChanged()">
+        Move to QA
+      </button>
+    }
+    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+      <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
+        [disabled]="loading">
+        Back to WIP
+      </button>
+    }
+    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+      <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
+        [disabled]="loading">
+        Move to Production
+      </button>
+    }
+    @if (biePackage.state === 'Production') {
+      <button mat-raised-button class="ms-2" color="warn" (click)="makeNewRevision()"
+        [disabled]="loading">
+        Revise
+      </button>
+    }
+    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+      <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
+        >
+        Discard
+      </button>
+    }
+  </ng-container>
   <mat-card class="pt-3 pb-0">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
@@ -448,4 +443,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</score-detail-page>

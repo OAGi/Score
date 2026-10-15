@@ -1,14 +1,9 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-      <button mat-raised-button color="primary" (click)="download()">
-        Download
-      </button>
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [title]="title" [showActions]="false">
+  <ng-container ngProjectAs="[detailToolbar]">
+    <button mat-raised-button color="primary" (click)="download()">
+      Download
+    </button>
+  </ng-container>
   <mat-card class="pt-3">
     <mat-card-content class="mat-card-container">
       @if (loading) {
@@ -187,4 +182,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</score-detail-page>

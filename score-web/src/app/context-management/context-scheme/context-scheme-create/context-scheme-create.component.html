@@ -1,135 +1,119 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
+<score-detail-page [title]="title">
+  <score-detail-card>
+    <mat-form-field>
+      <mat-label>Context Category</mat-label>
+      <mat-select placeholder="Context Category" required [(ngModel)]="contextSchemeCreateRequest.contextCategoryId">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
+            [placeholderLabel]="'Search...'"
+          [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+        </mat-option>
+        @for (contextCategory of filteredCtxCategories | async; track contextCategory) {
+          <mat-option [value]="contextCategory.contextCategoryId">
+            {{contextCategory.name}}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-  <div class="p-3">
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field>
-          <mat-label>Context Category</mat-label>
-          <mat-select placeholder="Context Category" required [(ngModel)]="contextSchemeCreateRequest.contextCategoryId">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
-                [placeholderLabel]="'Search...'"
-              [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
-            </mat-option>
-            @for (contextCategory of filteredCtxCategories | async; track contextCategory) {
-              <mat-option [value]="contextCategory.contextCategoryId">
-                {{contextCategory.name}}
-              </mat-option>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeName" maxlength="255"/>
+    </mat-form-field>
+
+    <div class="row" style="padding: 0 0 8px 12px; margin-bottom: 8px;">
+      <button class="load-code-list-button" mat-raised-button (click)="openCodeListDialog()" color="primary">
+        Load from Code List
+      </button>
+    </div>
+
+    <mat-form-field>
+      <mat-label>Scheme ID</mat-label>
+      <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeId" maxlength="45"/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Agency ID</mat-label>
+      <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeAgencyId" maxlength="45"/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Version</mat-label>
+      <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeVersionId" maxlength="45"/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeCreateRequest.description"></textarea>
+    </mat-form-field>
+  </score-detail-card>
+
+  <score-detail-card heading="Context Scheme Values">
+    <div class="table-container">
+      <div class="score-column-container align-items-center justify-content-between">
+        <score-column-selector
+          [columns]="columns"
+          (columnsChange)="onColumnsChange($event)"
+          (onReset)="onColumnsReset()">
+        </score-column-selector>
+
+        <div class="ms-3">
+          <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
+            <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
+              <mat-icon>search</mat-icon>
+            </button>
+            @if (valueSearch && valueSearch.length > 0) {
+              <button mat-icon-button matSuffix (click)="clearFilter()">
+                <mat-icon>cancel</mat-icon>
+              </button>
             }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeName" maxlength="255"/>
-        </mat-form-field>
-
-        <div class="row" style="padding: 0 0 8px 12px; margin-bottom: 8px;">
-          <button class="load-code-list-button" mat-raised-button (click)="openCodeListDialog()" color="primary">
-            Load from Code List
-          </button>
+          </mat-form-field>
         </div>
+      </div>
+      <div class="mat-elevation-z1 table-wrapper mt-3">
+        <table mat-table matSort [dataSource]="dataSource">
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (click)="$event.stopPropagation()"
+                [checked]="selection.hasValue() && isAllSelected()"
+                (change)="masterToggle()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                (change)="$event ? toggle(row) : null"
+                [checked]="isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
 
-        <mat-form-field>
-          <mat-label>Scheme ID</mat-label>
-          <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeId" maxlength="45"/>
-        </mat-form-field>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header
+            score-table-column-resize [defaultWidth]="width('Value')" (onResize)="onResizeWidth($event)"> Value</th>
+            <td mat-cell *matCellDef="let element"> {{ element.value }}</td>
+          </ng-container>
 
-        <mat-form-field>
-          <mat-label>Agency ID</mat-label>
-          <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeAgencyId" maxlength="45"/>
-        </mat-form-field>
+          <ng-container matColumnDef="meaning">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header
+            score-table-column-resize [defaultWidth]="width('Meaning')" (onResize)="onResizeWidth($event)"> Meaning</th>
+            <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
+          </ng-container>
 
-        <mat-form-field>
-          <mat-label>Version</mat-label>
-          <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeVersionId" maxlength="45"/>
-        </mat-form-field>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          (click)="openDialog(row)"></tr>
+        </table>
 
-        <mat-form-field>
-          <mat-label>Description</mat-label>
-          <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeCreateRequest.description"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="p-3">
-    <mat-toolbar class="bg-white">
-      <span class="title">Context Scheme Values</span>
-    </mat-toolbar>
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <div class="table-container">
-          <div class="score-column-container align-items-center justify-content-between">
-            <score-column-selector
-              [columns]="columns"
-              (columnsChange)="onColumnsChange($event)"
-              (onReset)="onColumnsReset()">
-            </score-column-selector>
-
-            <div class="ms-3">
-              <mat-form-field>
-                <mat-label>Search</mat-label>
-                <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
-                <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
-                  <mat-icon>search</mat-icon>
-                </button>
-                @if (valueSearch && valueSearch.length > 0) {
-                  <button mat-icon-button matSuffix (click)="clearFilter()">
-                    <mat-icon>cancel</mat-icon>
-                  </button>
-                }
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="mat-elevation-z1 table-wrapper mt-3">
-            <table mat-table matSort [dataSource]="dataSource">
-              <!-- Checkbox Column -->
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox (click)="$event.stopPropagation()"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    (change)="masterToggle()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()">
-                  </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  <mat-checkbox (click)="$event.stopPropagation()"
-                    (change)="$event ? toggle(row) : null"
-                    [checked]="isSelected(row)">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Value')" (onResize)="onResizeWidth($event)"> Value</th>
-                <td mat-cell *matCellDef="let element"> {{ element.value }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="meaning">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Meaning')" (onResize)="onResizeWidth($event)"> Meaning</th>
-                <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-              (click)="openDialog(row)"></tr>
-            </table>
-
-            <mat-paginator
-              [pageSizeOptions]="[10, 25, 50]"
-            showFirstLastButtons></mat-paginator>
-          </div>
-        </div>
-      </mat-card-content>
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+        showFirstLastButtons></mat-paginator>
+      </div>
+    </div>
+    <ng-container ngProjectAs="[cardActions]">
       <mat-card-actions style="padding: 16px 0 0 0;">
         <button mat-raised-button (click)="openDialog()" color="primary">
           <mat-icon>add</mat-icon>
@@ -143,17 +127,12 @@
           Remove
         </button>
       </mat-card-actions>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="create()"
-          [disabled]="isDisabled()">
-          Create
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    </ng-container>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button mat-raised-button color="primary" (click)="create()"
+      [disabled]="isDisabled()">
+      Create
+    </button>
+  </ng-container>
+</score-detail-page>
