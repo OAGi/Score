@@ -1,0 +1,100 @@
+<mat-sidenav-container class="example-container" [hasBackdrop]="false">
+  <mat-sidenav #sidenav [mode]="'over'" [position]="commentControl ? 'end' : 'start'"
+    [attr.position]="commentControl ? 'end' : null" [class.pd-15]="!!commentControl">
+    @if (commentControl) {
+      <div class="ui header d-flex align-items-center justify-content-between">
+        <h4 class="dividing">Comment</h4>
+        <div class="close">
+          <button mat-icon-button (click)="commentControl.closeCommentSlide()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="ui feed">
+        @for (comment of commentControl.comments; track comment) {
+          <div class="event" [class.new-message]="comment.isNew">
+            <div class="content" [class]="comment.prevCommentId ? 'ps-4' : ''">
+              <div class="summary">
+                <a>{{ comment.created.who.loginId }}</a>
+                <div class="date">{{ comment.timestamp | dateAgo }}</div>
+                @if (comment.created.who.loginId === currentUser && !comment.hidden) {
+                  <mat-icon class="pointer icon"
+                    [inline]="true"
+                  (click)="commentControl.deleteComment(comment)">close</mat-icon>
+                }
+              </div>
+              <div class="extra text">
+                @if (!comment.isEditing) {
+                  <div>
+                    @if (!comment.hidden) {
+                      <span>{{ comment.text }}</span>
+                    }
+                    @if (comment.hidden) {
+                      <span class="text-muted">(This message has been deleted.)</span>
+                    }
+                    @if (comment.created.who.loginId === currentUser && !comment.hidden) {
+                      <mat-icon class="pointer icon mt-1"
+                        [inline]="true"
+                      (click)="commentControl.openEditComment(comment)">edit</mat-icon>
+                    }
+                  </div>
+                }
+                @if (comment.isEditing) {
+                  <div>
+                    <mat-form-field>
+                      <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
+                    </mat-form-field>
+                    <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
+                    <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
+                  </div>
+                }
+              </div>
+              @if (comment.prevCommentId === null && commentControl.replyCommentId !== comment.commentId) {
+                <div class="meta">
+                  <a class="like" (click)="commentControl.openReply(comment)">Reply</a>
+                </div>
+              }
+              @if (commentControl.replyCommentId === comment.commentId) {
+                <div class="reply-box">
+                  <mat-form-field>
+                    <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
+                  </mat-form-field>
+                  <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
+                  <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        @if (commentControl.replyOpened === false) {
+          <div>
+            <mat-form-field>
+              <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
+            </mat-form-field>
+            <button mat-stroked-button (click)="commentControl.addComment()">
+              Comment
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </mat-sidenav>
+
+  <mat-sidenav-content (click)="sidenav.close();">
+    @if (progress) {
+      <div class="main-content-loading-overlay">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+    }
+    <score-base-page [title]="title" [subtitle]="subtitle" [toolbarClass]="toolbarClass" [spacer]="spacer"
+      [loading]="loading" [showToolbar]="showToolbar">
+      <ng-container ngProjectAs="[baseTitle]">
+        <ng-content select="[sidenavTitle]"></ng-content>
+      </ng-container>
+      <ng-container ngProjectAs="[baseActions]">
+        <ng-content select="[sidenavActions]"></ng-content>
+      </ng-container>
+      <ng-content></ng-content>
+    </score-base-page>
+  </mat-sidenav-content>
+</mat-sidenav-container>
