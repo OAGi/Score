@@ -1,717 +1,704 @@
-<mat-sidenav-container class="example-container" [hasBackdrop]="false">
-  <mat-sidenav #sidenav>
-
-  </mat-sidenav>
-
-  <mat-sidenav-content (click)="sidenav.close();">
-    @if (loading) {
-      <div class="main-content-loading-overlay">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </div>
-    }
-    <div class="context-section">
-      <div class="row m-0">
-        <div class="col-12 p-0">
-          <mat-card class="search-box-container mb-1">
-            <mat-card-content>
-              @if (searcher && dataSource) {
-                <div class="container-fluid">
-                  <div class="row">
-                    <div class="col-5 tree-search-box">
-                      <div class="tree-search-controls">
-                        <div class="tree-search-input">
-                          <mat-form-field>
-                            @if (!selectedNode) {
-                              <mat-label>Search</mat-label>
-                            }
-                            @if (selectedNode) {
-                              <mat-label>Search > {{ selectedNode.name }}</mat-label>
-                            }
-                            <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
-                              [disabled]="searcher.isSearching"
-                              (keyup.enter)="search(searcher.inputKeyword)">
-                            @if (searcher.searchKeyword && searcher.searchResult.length > 0) {
-                              <mat-hint matSuffix
-                              align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                            }
-                            @if (searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0) {
-                              <mat-hint matSuffix
-                              align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
-                            }
-                            @if (searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0) {
-                              <mat-hint matSuffix
-                              align="end">0 results</mat-hint>
-                            }
-                          </mat-form-field>
-                        </div>
-                        <div class="tree-search-buttons">
-                          <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
-                            [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
-                            (click)="move(-1)">
-                            <mat-icon>keyboard_arrow_up</mat-icon>
-                          </button>
-                          <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
-                            [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
-                            (click)="move(1)">
-                            <mat-icon>keyboard_arrow_down</mat-icon>
-                          </button>
-                          <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more' : 'Search'"
-                            [hidden]="searcher.fullSearched"
-                            [disabled]="searcher.isSearching"
-                            [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
-                            (click)="search(searcher.inputKeyword, false, true)">
-                            <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-                          </button>
-                          <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
-                            [disabled]="searcher.isSearching"
-                            [hidden]="!searcher.inputKeyword"
-                            (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
-                            <mat-icon>close</mat-icon>
-                          </button>
-                          <div class="search-progress-container">
-                            <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar"
-                            aria-label="Searching"
-                            [hidden]="!searcher.isSearching"></mat-progress-spinner>
-                          </div>
-                        </div>
-                      </div>
+<score-sidenav-page [progress]="loading" [showToolbar]="false">
+  <div class="row m-0">
+    <div class="col-12 p-0">
+      <mat-card class="search-box-container mb-1">
+        <mat-card-content>
+          @if (searcher && dataSource) {
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-5 tree-search-box">
+                  <div class="tree-search-controls">
+                    <div class="tree-search-input">
+                      <mat-form-field>
+                        @if (!selectedNode) {
+                          <mat-label>Search</mat-label>
+                        }
+                        @if (selectedNode) {
+                          <mat-label>Search > {{ selectedNode.name }}</mat-label>
+                        }
+                        <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
+                          [disabled]="searcher.isSearching"
+                          (keyup.enter)="search(searcher.inputKeyword)">
+                        @if (searcher.searchKeyword && searcher.searchResult.length > 0) {
+                          <mat-hint matSuffix
+                          align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+                        }
+                        @if (searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0) {
+                          <mat-hint matSuffix
+                          align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+                        }
+                        @if (searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0) {
+                          <mat-hint matSuffix
+                          align="end">0 results</mat-hint>
+                        }
+                      </mat-form-field>
                     </div>
-                    <div class="col-7 actions-wrap">
-                      <div class="actions ms-auto d-flex align-items-center">
-                        <div>
-                          <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
-                            [matMenuTriggerFor]="settingsContextMenu"
-                            [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-                            <mat-icon>settings</mat-icon>
-                          </button>
-                        </div>
-                        <div class="ms-3">
-                        </div>
+                    <div class="tree-search-buttons">
+                      <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
+                        [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                        (click)="move(-1)">
+                        <mat-icon>keyboard_arrow_up</mat-icon>
+                      </button>
+                      <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
+                        [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+                        (click)="move(1)">
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                      </button>
+                      <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more' : 'Search'"
+                        [hidden]="searcher.fullSearched"
+                        [disabled]="searcher.isSearching"
+                        [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
+                        (click)="search(searcher.inputKeyword, false, true)">
+                        <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+                      </button>
+                      <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
+                        [disabled]="searcher.isSearching"
+                        [hidden]="!searcher.inputKeyword"
+                        (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                      <div class="search-progress-container">
+                        <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar"
+                        aria-label="Searching"
+                        [hidden]="!searcher.isSearching"></mat-progress-spinner>
                       </div>
-                      <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-                        <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
-                          <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-                            <span>Hide cardinality</span>
-                          </mat-checkbox>
-                        </button>
-                        <button mat-menu-item [id]="'bie-settings-hide-order-weights'">
-                          <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideOrderWeights">
-                            <span>Hide order weights</span>
-                          </mat-checkbox>
-                        </button>
-                      </mat-menu>
                     </div>
                   </div>
-                  <div class="row">
-                    @if (selectedNode) {
-                      <div class="tree-breadcrumbs-wrap" id="tree-breadcrumbs-wrap">
-                        @for (bread of selectedNode.parents; track bread; let last = $last) {
-                          <div class="tree-breadcrumb"
-                            >
-                            <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                            @if (last) {
-                              <span
-                              class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
-                            }
-                            @if (!last) {
-                              <span class="tree-breadcrumb-item"
-                              (click)="scrollToNode(bread)">{{ bread.name }}</span>
-                            }
-                          </div>
+                </div>
+                <div class="col-7 actions-wrap">
+                  <div class="actions ms-auto d-flex align-items-center">
+                    <div>
+                      <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
+                        [matMenuTriggerFor]="settingsContextMenu"
+                        [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
+                        <mat-icon>settings</mat-icon>
+                      </button>
+                    </div>
+                    <div class="ms-3">
+                    </div>
+                  </div>
+                  <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+                    <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
+                      <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+                        <span>Hide cardinality</span>
+                      </mat-checkbox>
+                    </button>
+                    <button mat-menu-item [id]="'bie-settings-hide-order-weights'">
+                      <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideOrderWeights">
+                        <span>Hide order weights</span>
+                      </mat-checkbox>
+                    </button>
+                  </mat-menu>
+                </div>
+              </div>
+              <div class="row">
+                @if (selectedNode) {
+                  <div class="tree-breadcrumbs-wrap" id="tree-breadcrumbs-wrap">
+                    @for (bread of selectedNode.parents; track bread; let last = $last) {
+                      <div class="tree-breadcrumb"
+                        >
+                        <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                        @if (last) {
+                          <span
+                          class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('tree-breadcrumbs-wrap') : '' }}</span>
+                        }
+                        @if (!last) {
+                          <span class="tree-breadcrumb-item"
+                          (click)="scrollToNode(bread)">{{ bread.name }}</span>
                         }
                       </div>
                     }
                   </div>
+                }
+              </div>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div class="row m-0" (window:resize)="onResize($event)">
+    <div class="col-12 p-0">
+      <as-split unit="percent" [direction]="'horizontal'" style="overflow-y: scroll;">
+        <as-split-area class="left-panel" size="30">
+          <mat-card class="bie-node-tree-panel">
+            <mat-card-content class="mat-card-container">
+              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
+                minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
+                [style.height.px]="innerHeight" #virtualScroll>
+                <div cdkDropList #cdkDropList
+                  [cdkDropListEnterPredicate]="canDrop"
+                  [cdkDropListData]="dataSource"
+                  (cdkDropListDropped)="drop($event)">
+                <div *cdkVirtualFor="let node of dataSource" class="example-item"
+                  (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false"
+                  cdkDrag [cdkDragData]="node" [cdkDragDisabled]="!canReorder(node)"
+                  (cdkDragStarted)="onDragStarted(node)" (cdkDragMoved)="onDragMoved($event)" (cdkDragEnded)="onDragEnded()">
+                  <div class="dragPlaceholder" [class.dragPlaceholder-invalid]="dropInvalid" *cdkDragPlaceholder></div>
+                  <div class="mat-tree-node d-flex align-items-center pointer"
+                    tabIndex="0"
+                    [attr.data-level]="node.level"
+                    [attr.data-path]="node.path"
+                    [attr.data-hash-path]="node.hashPath"
+                    [class]="{'tree-node-selected': cursorNode === node}"
+                    (click)="onClick(node, $event)"
+                    (keydown)="keyNavigation(node, $event)"
+                    [style.padding-left]="node.level * paddingPixel + 'px'">
+                    @for (guide of choiceGuides(node); track $index) {
+                      <span class="choice-branch-guide"
+                        [class.choice-branch-guide-continue]="guide.continuation"
+                        [class.choice-branch-guide-first]="guide.first && !guide.continuation"
+                        [class.choice-branch-guide-last]="guide.last && !guide.continuation"
+                        [class.choice-branch-guide-only]="guide.only && !guide.continuation"
+                        [style.--choice-guide-extra-offset.px]="guide.offset"
+                        [matTooltip]="guide.tooltip"></span>
+                    }
+
+                    @if (dataSource.isExpandable(node)) {
+                      <button
+                        (click)="toggle(node, $event)"
+                        mat-icon-button>
+                        <mat-icon class="mat-icon-rtl-mirror">
+                          {{ node.expanded ? 'expand_more' : 'chevron_right' }}
+                        </mat-icon>
+                      </button>
+                    } @else {
+                      <button mat-icon-button disabled></button>
+                    }
+
+                    <div class="d-inline-flex align-items-center flex-grow-1">
+                      @let orderWeight = currentWeightOf(node);
+                      <span [class]="[node.type.toLowerCase(),
+                                      this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
+                            [style.padding-right.px]="2"
+                        [class.deprecated]="node.deprecated"
+                        [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+                        [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
+                        [innerHTML]="node.name | highlight : searcher.searchKeyword">
+                      </span>
+
+                      @if (!dataSource.hideCardinality) {
+                        <span [class]="['ps-4']">
+                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+                        </span>
+                      }
+
+                      <!-- Issue #1638: a sibling with a custom order weight shows it as a small badge.
+                           Follow-up: badge display is a per-user preference (dataSource.hideOrderWeights),
+                           defaulting hidden for end-users and shown for developers. Managing weights
+                           (drag handle / Order Weight / Reset) stays developer-only via canReorder. -->
+                      @if (!dataSource.hideOrderWeights && orderWeight !== undefined && orderWeight !== null) {
+                        <span class="order-weight-badge ms-4" matTooltip="Order weight">{{ orderWeight }}</span>
+                      }
+
+                      <div class="ms-auto me-2">
+                        <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
+                          class="copy-link-icon"
+                          matTooltip="Copy Link"
+                          (click)="copyLink(node, $event)">
+                          link
+                        </mat-icon>
+                        @if (canReorder(node)) {
+                          <mat-icon class="dragHandle" cdkDragHandle
+                            [style.visibility]="(node.showCopyLinkIcon && !dragging) ? '' : 'hidden'"
+                            (click)="$event.stopPropagation()">drag_handle</mat-icon>
+                        }
+                        <mat-icon class="context-menu-icon"
+                          [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
+                          [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
+                          (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
+                        </mat-icon>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              }
+                </div>
+              </cdk-virtual-scroll-viewport>
+
+              <!-- Context Menu Area -->
+              <mat-menu class="context-menu" #contextMenuForLeaf="matMenu">
+                <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                  <span class="context-menu-item">Copy Path</span>
+                </button>
+                @if (canReorder(contextMenuItem)) {
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item (click)="setWeight(contextMenuItem)">
+                    <span class="context-menu-item">Order Weight</span>
+                  </button>
+                }
+              </mat-menu>
+
+              <mat-menu class="context-menu" #contextMenu="matMenu">
+                <button mat-menu-item (click)="copyPath(contextMenuItem)">
+                  <span class="context-menu-item">Copy Path</span>
+                </button>
+                @if (isAccDetail(contextMenuItem) || isAsccpDetail(contextMenuItem)) {
+                  <button mat-menu-item (click)="openDiagram(contextMenuItem)"
+                    >
+                    <span class="context-menu-item">Show Diagram</span>
+                  </button>
+                }
+                <button mat-menu-item (click)="findUsages(contextMenuItem)"
+                  [disabled]="!visibleFindUsages(contextMenuItem)">
+                  <span class="context-menu-item">Where Used</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
+                  <span class="context-menu-item">Expand 2</span>
+                </button>
+                <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
+                  <span class="context-menu-item">Expand 3</span>
+                </button>
+                @if (canReorder(contextMenuItem)) {
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item (click)="setWeight(contextMenuItem)">
+                    <span class="context-menu-item">Order Weight</span>
+                  </button>
+                }
+                @if (canResetOrderWeights(contextMenuItem)) {
+                  @if (!canReorder(contextMenuItem)) {
+                    <mat-divider></mat-divider>
+                  }
+                  <button mat-menu-item (click)="resetOrderWeights(contextMenuItem)">
+                    <span class="context-menu-item">Reset Order Weights</span>
+                  </button>
+                }
+              </mat-menu>
             </mat-card-content>
           </mat-card>
-        </div>
-      </div>
-      <div class="row m-0" (window:resize)="onResize($event)">
-        <div class="col-12 p-0">
-          <as-split unit="percent" [direction]="'horizontal'" style="overflow-y: scroll;">
-            <as-split-area class="left-panel" size="30">
-              <mat-card class="bie-node-tree-panel">
-                <mat-card-content class="mat-card-container">
-                  <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
-                    minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                    [style.height.px]="innerHeight" #virtualScroll>
-                    <div cdkDropList #cdkDropList
-                      [cdkDropListEnterPredicate]="canDrop"
-                      [cdkDropListData]="dataSource"
-                      (cdkDropListDropped)="drop($event)">
-                    <div *cdkVirtualFor="let node of dataSource" class="example-item"
-                      (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false"
-                      cdkDrag [cdkDragData]="node" [cdkDragDisabled]="!canReorder(node)"
-                      (cdkDragStarted)="onDragStarted(node)" (cdkDragMoved)="onDragMoved($event)" (cdkDragEnded)="onDragEnded()">
-                      <div class="dragPlaceholder" [class.dragPlaceholder-invalid]="dropInvalid" *cdkDragPlaceholder></div>
-                      <div class="mat-tree-node d-flex align-items-center pointer"
-                        tabIndex="0"
-                        [attr.data-level]="node.level"
-                        [attr.data-path]="node.path"
-                        [attr.data-hash-path]="node.hashPath"
-                        [class]="{'tree-node-selected': cursorNode === node}"
-                        (click)="onClick(node, $event)"
-                        (keydown)="keyNavigation(node, $event)"
-                        [style.padding-left]="node.level * paddingPixel + 'px'">
-                        @for (guide of choiceGuides(node); track $index) {
-                          <span class="choice-branch-guide"
-                            [class.choice-branch-guide-continue]="guide.continuation"
-                            [class.choice-branch-guide-first]="guide.first && !guide.continuation"
-                            [class.choice-branch-guide-last]="guide.last && !guide.continuation"
-                            [class.choice-branch-guide-only]="guide.only && !guide.continuation"
-                            [style.--choice-guide-extra-offset.px]="guide.offset"
-                            [matTooltip]="guide.tooltip"></span>
-                        }
+        </as-split-area>
+        <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
+          <!-- ACC -->
+          @if (isAccDetail() && asAccDetail().isLoaded) {
+            <div class="bie-edit-detail-panel scroll">
+              <mat-tab-group mat-align-tabs="start">
+                <mat-tab label="{{ selectedNode.name }}">
+                  <div class="bie-edit-detail-container">
+                    <div class="row">
+                      <div class="col-3">
+                        <mat-form-field>
+                          <mat-label>Library</mat-label>
+                          <input matInput placeholder="Library" [(ngModel)]="asAccDetail().asccp.libraryName" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3">
+                        <mat-form-field>
+                          <mat-label>Release</mat-label>
+                          <input matInput placeholder="Release" [(ngModel)]="asAccDetail().asccp.releaseNum" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3">
+                        <mat-form-field>
+                          <mat-label>State</mat-label>
+                          <input matInput placeholder="State" [(ngModel)]="asAccDetail().asccp.state" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-3">
+                        <mat-form-field>
+                          <mat-label>Owner</mat-label>
+                          <input matInput placeholder="Owner" [(ngModel)]="asAccDetail().asccp.owner" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row align-items-center">
+                      <div class="col-md-3 col-sm-6">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asAccDetail().asccp.deprecated"
+                            [disabled]="true">
+                            Deprecated
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12">
+                        <mat-form-field>
+                          <mat-label>Component Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Component Definition" [readonly]="true"
+                              value="{{ asAccDetail().asccp.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12">
+                        <mat-form-field>
+                          <mat-label>Type Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Type Definition" [readonly]="true"
+                              value="{{ asAccDetail().acc.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+          }
 
-                        @if (dataSource.isExpandable(node)) {
-                          <button
-                            (click)="toggle(node, $event)"
-                            mat-icon-button>
-                            <mat-icon class="mat-icon-rtl-mirror">
-                              {{ node.expanded ? 'expand_more' : 'chevron_right' }}
-                            </mat-icon>
-                          </button>
-                        } @else {
-                          <button mat-icon-button disabled></button>
-                        }
+          <!-- ASCCP -->
+          @if (isAsccpDetail()) {
+            <div class="bie-edit-detail-panel scroll">
+              <mat-tab-group mat-align-tabs="start">
+                <mat-tab label="{{ selectedNode.name }}">
+                  <div class="bie-edit-detail-container">
+                    <div class="row align-items-center">
+                      <div class="col-3">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asAsccpDetail().ascc.deprecated"
+                            [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                            [disabled]="true">
+                            Deprecated
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asAsccpDetail().asccp.nillable"
+                            matTooltip="This property cannot change since the Core Component is not nillable."
+                            [matTooltipDisabled]="asAsccpDetail().asccp.nillable"
+                            [disabled]="true">
+                            Nillable
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Min</mat-label>
+                          <input matInput placeholder="Cardinality Min" required [value]="asAsccpDetail().ascc.cardinalityMin" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Max</mat-label>
+                          <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsccpDetail().ascc.cardinalityMax | unbounded}})" required
+                            [value]="asAsccpDetail().ascc.cardinalityMax | unbounded"  [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 col-sm-12">
+                        <mat-form-field>
+                          <mat-label>Association Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Association Definition" [readonly]="true"
+                              value="{{ asAsccpDetail().ascc.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 col-sm-12">
+                        <mat-form-field>
+                          <mat-label>Component Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Component Definition" [readonly]="true"
+                              value="{{ asAsccpDetail().asccp.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 col-sm-12">
+                        <mat-form-field>
+                          <mat-label>Type Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Type Definition" [readonly]="true"
+                              value="{{ asAsccpDetail().acc.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+          }
 
-                        <div class="d-inline-flex align-items-center flex-grow-1">
-                          @let orderWeight = currentWeightOf(node);
-                          <span [class]="[node.type.toLowerCase(),
-                                          this.searcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside']"
-                                [style.padding-right.px]="2"
-                            [class.deprecated]="node.deprecated"
-                            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                            [class.search-index]="this.searcher.searchResult.indexOf(node) === this.searcher.searchIndex"
-                            [innerHTML]="node.name | highlight : searcher.searchKeyword">
-                          </span>
-
-                          @if (!dataSource.hideCardinality) {
-                            <span [class]="['ps-4']">
-                              {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                            </span>
-                          }
-
-                          <!-- Issue #1638: a sibling with a custom order weight shows it as a small badge.
-                               Follow-up: badge display is a per-user preference (dataSource.hideOrderWeights),
-                               defaulting hidden for end-users and shown for developers. Managing weights
-                               (drag handle / Order Weight / Reset) stays developer-only via canReorder. -->
-                          @if (!dataSource.hideOrderWeights && orderWeight !== undefined && orderWeight !== null) {
-                            <span class="order-weight-badge ms-4" matTooltip="Order weight">{{ orderWeight }}</span>
-                          }
-
-                          <div class="ms-auto me-2">
-                            <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
-                              class="copy-link-icon"
-                              matTooltip="Copy Link"
-                              (click)="copyLink(node, $event)">
-                              link
-                            </mat-icon>
-                            @if (canReorder(node)) {
-                              <mat-icon class="dragHandle" cdkDragHandle
-                                [style.visibility]="(node.showCopyLinkIcon && !dragging) ? '' : 'hidden'"
-                                (click)="$event.stopPropagation()">drag_handle</mat-icon>
+          <!-- BCCP -->
+          @if (isBccpDetail()) {
+            <div class="bie-edit-detail-panel scroll">
+              <mat-tab-group mat-align-tabs="start">
+                <mat-tab label="{{ selectedNode.name }}">
+                  <div class="bie-edit-detail-container">
+                    <div class="row align-items-center">
+                      <div class="col-3">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asBccpDetail().bcc.deprecated"
+                            [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                            [disabled]="true">
+                            Deprecated
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asBccpDetail().bcc.nillable"
+                            matTooltip="This property cannot change since the Core Component is not nillable."
+                            [matTooltipDisabled]="asBccpDetail().bccp.nillable"
+                            [disabled]="true">
+                            Nillable
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Min</mat-label>
+                          <input matInput placeholder="Cardinality Min" required [value]="asBccpDetail().bcc.cardinalityMin" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Max</mat-label>
+                          <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBccpDetail().bcc.cardinalityMax | unbounded}})" required
+                            [value]="asBccpDetail().bcc.cardinalityMax | unbounded" [disabled]="true">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row form-field-box">
+                      <div class="col-md-6 col-sm-12">
+                        <mat-card>
+                          <mat-card-content>
+                            <mat-form-field>
+                              <mat-label>Value Constraint</mat-label>
+                              <mat-select [value]="asBccpDetail().bcc.fixedOrDefault"
+                                [disabled]="true">
+                                <mat-option value="none">None</mat-option>
+                                <mat-option value="fixed">Fixed Value</mat-option>
+                                <mat-option value="default">Default Value</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                            @if (asBccpDetail().bcc.fixedOrDefault == 'none') {
+                              <mat-form-field>
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                  [disabled]="true">
+                              </mat-form-field>
                             }
-                            <mat-icon class="context-menu-icon"
-                              [matMenuTriggerFor]="dataSource.isExpandable(node) ? contextMenu : contextMenuForLeaf"
-                              [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
-                              (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                            </mat-icon>
+                            @if (asBccpDetail().bcc.fixedOrDefault == 'fixed') {
+                              <mat-form-field>
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                  [(ngModel)]="asBccpDetail().bcc.fixedValue"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                            @if (asBccpDetail().bcc.fixedOrDefault == 'default') {
+                              <mat-form-field>
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                  [(ngModel)]="asBccpDetail().bcc.defaultValue"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+                      <div class="col-md-6 col-sm-12">
+                        <mat-card>
+                          <mat-card-content>
+                            <mat-form-field>
+                              <mat-label>Value Domain Restriction</mat-label>
+                              <mat-select placeholder="Value Domain Restriction" required
+                                [value]="asBccpDetail().dt.valueDomainType"
+                                [disabled]="true">
+                                <mat-option value="Primitive">Primitive</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                            @if (asBccpDetail().dt.valueDomainType === 'Primitive') {
+                              <mat-form-field>
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                  [value]="asBccpDetail().dt.defaultDtAwdPri?.dtAwdPriId">
+                                  @for (dtAwdPri of asBccpDetail().dt.primitiveDtAwdPriList; track dtAwdPri) {
+                                    <mat-option
+                                      [value]="dtAwdPri.dtAwdPriId" [disabled]="true">
+                                      {{ dtAwdPri.xbt?.name }}
+                                    </mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                            }
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                        <mat-form-field>
+                          <mat-label>Association Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Association Definition" [readonly]="true"
+                              value="{{ asBccpDetail().bcc.definition || ' ' }}">
+                            </textarea>
                           </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                        <mat-form-field>
+                          <mat-label>Component Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Component Definition" [readonly]="true"
+                              value="{{ asBccpDetail().bccp.definition || ' ' }}">
+                            </textarea>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+          }
+
+          <!-- BDT_SC -->
+          @if (isDtScDetail()) {
+            <div class="bie-edit-detail-panel scroll">
+              <mat-tab-group mat-align-tabs="start">
+                <mat-tab label="{{ selectedNode.name }}">
+                  <div class="bie-edit-detail-container">
+                    <div class="row align-items-center">
+                      <div class="col-3">
+                        <div class="checkbox">
+                          <mat-checkbox color="primary"
+                            [(ngModel)]="asDtScDetail().dtSc.deprecated"
+                            [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                            [disabled]="true">
+                            Deprecated
+                          </mat-checkbox>
                         </div>
                       </div>
                     </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Min</mat-label>
+                          <input matInput placeholder="Cardinality Min" required
+                            [value]="asDtScDetail().dtSc.cardinalityMin">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-6">
+                        <mat-form-field>
+                          <mat-label>Cardinality Max</mat-label>
+                          <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asDtScDetail().dtSc.cardinalityMax | unbounded}})" required
+                            [value]="asDtScDetail().dtSc.cardinalityMax | unbounded">
+                        </mat-form-field>
+                      </div>
                     </div>
-                  </cdk-virtual-scroll-viewport>
-
-                  <!-- Context Menu Area -->
-                  <mat-menu class="context-menu" #contextMenuForLeaf="matMenu">
-                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
-                      <span class="context-menu-item">Copy Path</span>
-                    </button>
-                    @if (canReorder(contextMenuItem)) {
-                      <mat-divider></mat-divider>
-                      <button mat-menu-item (click)="setWeight(contextMenuItem)">
-                        <span class="context-menu-item">Order Weight</span>
-                      </button>
-                    }
-                  </mat-menu>
-
-                  <mat-menu class="context-menu" #contextMenu="matMenu">
-                    <button mat-menu-item (click)="copyPath(contextMenuItem)">
-                      <span class="context-menu-item">Copy Path</span>
-                    </button>
-                    @if (isAccDetail(contextMenuItem) || isAsccpDetail(contextMenuItem)) {
-                      <button mat-menu-item (click)="openDiagram(contextMenuItem)"
-                        >
-                        <span class="context-menu-item">Show Diagram</span>
-                      </button>
-                    }
-                    <button mat-menu-item (click)="findUsages(contextMenuItem)"
-                      [disabled]="!visibleFindUsages(contextMenuItem)">
-                      <span class="context-menu-item">Where Used</span>
-                    </button>
-                    <mat-divider></mat-divider>
-                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
-                      <span class="context-menu-item">Expand 2</span>
-                    </button>
-                    <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
-                      <span class="context-menu-item">Expand 3</span>
-                    </button>
-                    @if (canReorder(contextMenuItem)) {
-                      <mat-divider></mat-divider>
-                      <button mat-menu-item (click)="setWeight(contextMenuItem)">
-                        <span class="context-menu-item">Order Weight</span>
-                      </button>
-                    }
-                    @if (canResetOrderWeights(contextMenuItem)) {
-                      @if (!canReorder(contextMenuItem)) {
-                        <mat-divider></mat-divider>
-                      }
-                      <button mat-menu-item (click)="resetOrderWeights(contextMenuItem)">
-                        <span class="context-menu-item">Reset Order Weights</span>
-                      </button>
-                    }
-                  </mat-menu>
-                </mat-card-content>
-              </mat-card>
-            </as-split-area>
-            <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
-              <!-- ACC -->
-              @if (isAccDetail() && asAccDetail().isLoaded) {
-                <div class="bie-edit-detail-panel scroll">
-                  <mat-tab-group mat-align-tabs="start">
-                    <mat-tab label="{{ selectedNode.name }}">
-                      <div class="bie-edit-detail-container">
-                        <div class="row">
-                          <div class="col-3">
+                    <div class="row form-field-box">
+                      <div class="col-md-6 col-sm-12">
+                        <mat-card>
+                          <mat-card-content
+                            matTooltip="This value constraint cannot modify by the definition of the Business Information Entity.">
                             <mat-form-field>
-                              <mat-label>Library</mat-label>
-                              <input matInput placeholder="Library" [(ngModel)]="asAccDetail().asccp.libraryName" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-3">
-                            <mat-form-field>
-                              <mat-label>Release</mat-label>
-                              <input matInput placeholder="Release" [(ngModel)]="asAccDetail().asccp.releaseNum" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-3">
-                            <mat-form-field>
-                              <mat-label>State</mat-label>
-                              <input matInput placeholder="State" [(ngModel)]="asAccDetail().asccp.state" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-3">
-                            <mat-form-field>
-                              <mat-label>Owner</mat-label>
-                              <input matInput placeholder="Owner" [(ngModel)]="asAccDetail().asccp.owner" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row align-items-center">
-                          <div class="col-md-3 col-sm-6">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asAccDetail().asccp.deprecated"
+                              <mat-label>Value Constraint</mat-label>
+                              <mat-select [value]="asDtScDetail().dtSc.fixedOrDefault"
                                 [disabled]="true">
-                                Deprecated
-                              </mat-checkbox>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-12">
-                            <mat-form-field>
-                              <mat-label>Component Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Component Definition" [readonly]="true"
-                                  value="{{ asAccDetail().asccp.definition || ' ' }}">
-                                </textarea>
-                              </div>
+                                <mat-option value="none">None</mat-option>
+                                <mat-option value="fixed">Fixed Value</mat-option>
+                                <mat-option value="default">Default Value</mat-option>
+                              </mat-select>
                             </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-12">
-                            <mat-form-field>
-                              <mat-label>Type Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Type Definition" [readonly]="true"
-                                  value="{{ asAccDetail().acc.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
+                            @if (asDtScDetail().dtSc.fixedOrDefault == 'none') {
+                              <mat-form-field>
+                                <mat-label>No value constraints</mat-label>
+                                <input matInput placeholder="No value constraints"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                            @if (asDtScDetail().dtSc.fixedOrDefault == 'fixed') {
+                              <mat-form-field>
+                                <mat-label>Fixed Value</mat-label>
+                                <input matInput placeholder="Fixed Value"
+                                  [(ngModel)]="asDtScDetail().dtSc.fixedValue"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                            @if (asDtScDetail().dtSc.fixedOrDefault == 'default') {
+                              <mat-form-field>
+                                <mat-label>Default Value</mat-label>
+                                <input matInput placeholder="Default Value"
+                                  [(ngModel)]="asDtScDetail().dtSc.defaultValue"
+                                  [disabled]="true">
+                              </mat-form-field>
+                            }
+                          </mat-card-content>
+                        </mat-card>
                       </div>
-                    </mat-tab>
-                  </mat-tab-group>
-                </div>
-              }
-
-              <!-- ASCCP -->
-              @if (isAsccpDetail()) {
-                <div class="bie-edit-detail-panel scroll">
-                  <mat-tab-group mat-align-tabs="start">
-                    <mat-tab label="{{ selectedNode.name }}">
-                      <div class="bie-edit-detail-container">
-                        <div class="row align-items-center">
-                          <div class="col-3">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asAsccpDetail().ascc.deprecated"
-                                [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
+                      <div class="col-md-6 col-sm-12">
+                        <mat-card>
+                          <mat-card-content>
+                            <mat-form-field>
+                              <mat-label>Value Domain Restriction</mat-label>
+                              <mat-select placeholder="Value Domain Restriction" required
+                                [value]="asDtScDetail().dtSc.valueDomainType"
                                 [disabled]="true">
-                                Deprecated
-                              </mat-checkbox>
-                            </div>
-                          </div>
-                          <div class="col-3">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asAsccpDetail().asccp.nillable"
-                                matTooltip="This property cannot change since the Core Component is not nillable."
-                                [matTooltipDisabled]="asAsccpDetail().asccp.nillable"
-                                [disabled]="true">
-                                Nillable
-                              </mat-checkbox>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Min</mat-label>
-                              <input matInput placeholder="Cardinality Min" required [value]="asAsccpDetail().ascc.cardinalityMin" [disabled]="true">
+                                <mat-option value="Primitive">Primitive</mat-option>
+                              </mat-select>
                             </mat-form-field>
-                          </div>
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Max</mat-label>
-                              <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsccpDetail().ascc.cardinalityMax | unbounded}})" required
-                                [value]="asAsccpDetail().ascc.cardinalityMax | unbounded"  [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-md-12 col-sm-12">
-                            <mat-form-field>
-                              <mat-label>Association Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Association Definition" [readonly]="true"
-                                  value="{{ asAsccpDetail().ascc.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-md-12 col-sm-12">
-                            <mat-form-field>
-                              <mat-label>Component Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Component Definition" [readonly]="true"
-                                  value="{{ asAsccpDetail().asccp.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-md-12 col-sm-12">
-                            <mat-form-field>
-                              <mat-label>Type Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Type Definition" [readonly]="true"
-                                  value="{{ asAsccpDetail().acc.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
+                            @if (asDtScDetail().dtSc.valueDomainType === 'Primitive') {
+                              <mat-form-field>
+                                <mat-label>Value Domain</mat-label>
+                                <mat-select placeholder="Value Domain" required
+                                  [value]="asDtScDetail().dtSc.defaultDtScAwdPri?.dtScAwdPriId">
+                                  @for (dtScAwdPri of asDtScDetail().dtSc.primitiveDtScAwdPriList; track dtScAwdPri) {
+                                    <mat-option
+                                      [value]="dtScAwdPri.dtScAwdPriId" [disabled]="true">
+                                      {{ dtScAwdPri.xbt?.name }}
+                                    </mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                            }
+                          </mat-card-content>
+                        </mat-card>
                       </div>
-                    </mat-tab>
-                  </mat-tab-group>
-                </div>
-              }
-
-              <!-- BCCP -->
-              @if (isBccpDetail()) {
-                <div class="bie-edit-detail-panel scroll">
-                  <mat-tab-group mat-align-tabs="start">
-                    <mat-tab label="{{ selectedNode.name }}">
-                      <div class="bie-edit-detail-container">
-                        <div class="row align-items-center">
-                          <div class="col-3">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asBccpDetail().bcc.deprecated"
-                                [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
-                                [disabled]="true">
-                                Deprecated
-                              </mat-checkbox>
-                            </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12">
+                        <mat-form-field>
+                          <mat-label>Component Definition</mat-label>
+                          <div class="textarea-container">
+                            <textarea matInput rows="6"
+                              placeholder="Component Definition" [readonly]="true"
+                              value="{{ asDtScDetail().dtSc.definition || ' ' }}">
+                            </textarea>
                           </div>
-                          <div class="col-3">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asBccpDetail().bcc.nillable"
-                                matTooltip="This property cannot change since the Core Component is not nillable."
-                                [matTooltipDisabled]="asBccpDetail().bccp.nillable"
-                                [disabled]="true">
-                                Nillable
-                              </mat-checkbox>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Min</mat-label>
-                              <input matInput placeholder="Cardinality Min" required [value]="asBccpDetail().bcc.cardinalityMin" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Max</mat-label>
-                              <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBccpDetail().bcc.cardinalityMax | unbounded}})" required
-                                [value]="asBccpDetail().bcc.cardinalityMax | unbounded" [disabled]="true">
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row form-field-box">
-                          <div class="col-md-6 col-sm-12">
-                            <mat-card>
-                              <mat-card-content>
-                                <mat-form-field>
-                                  <mat-label>Value Constraint</mat-label>
-                                  <mat-select [value]="asBccpDetail().bcc.fixedOrDefault"
-                                    [disabled]="true">
-                                    <mat-option value="none">None</mat-option>
-                                    <mat-option value="fixed">Fixed Value</mat-option>
-                                    <mat-option value="default">Default Value</mat-option>
-                                  </mat-select>
-                                </mat-form-field>
-                                @if (asBccpDetail().bcc.fixedOrDefault == 'none') {
-                                  <mat-form-field>
-                                    <mat-label>No value constraints</mat-label>
-                                    <input matInput placeholder="No value constraints"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                                @if (asBccpDetail().bcc.fixedOrDefault == 'fixed') {
-                                  <mat-form-field>
-                                    <mat-label>Fixed Value</mat-label>
-                                    <input matInput placeholder="Fixed Value"
-                                      [(ngModel)]="asBccpDetail().bcc.fixedValue"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                                @if (asBccpDetail().bcc.fixedOrDefault == 'default') {
-                                  <mat-form-field>
-                                    <mat-label>Default Value</mat-label>
-                                    <input matInput placeholder="Default Value"
-                                      [(ngModel)]="asBccpDetail().bcc.defaultValue"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                              </mat-card-content>
-                            </mat-card>
-                          </div>
-                          <div class="col-md-6 col-sm-12">
-                            <mat-card>
-                              <mat-card-content>
-                                <mat-form-field>
-                                  <mat-label>Value Domain Restriction</mat-label>
-                                  <mat-select placeholder="Value Domain Restriction" required
-                                    [value]="asBccpDetail().dt.valueDomainType"
-                                    [disabled]="true">
-                                    <mat-option value="Primitive">Primitive</mat-option>
-                                  </mat-select>
-                                </mat-form-field>
-                                @if (asBccpDetail().dt.valueDomainType === 'Primitive') {
-                                  <mat-form-field>
-                                    <mat-label>Value Domain</mat-label>
-                                    <mat-select placeholder="Value Domain" required
-                                      [value]="asBccpDetail().dt.defaultDtAwdPri?.dtAwdPriId">
-                                      @for (dtAwdPri of asBccpDetail().dt.primitiveDtAwdPriList; track dtAwdPri) {
-                                        <mat-option
-                                          [value]="dtAwdPri.dtAwdPriId" [disabled]="true">
-                                          {{ dtAwdPri.xbt?.name }}
-                                        </mat-option>
-                                      }
-                                    </mat-select>
-                                  </mat-form-field>
-                                }
-                              </mat-card-content>
-                            </mat-card>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-lg-12 col-md-12 col-sm-12">
-                            <mat-form-field>
-                              <mat-label>Association Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Association Definition" [readonly]="true"
-                                  value="{{ asBccpDetail().bcc.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-lg-12 col-md-12 col-sm-12">
-                            <mat-form-field>
-                              <mat-label>Component Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Component Definition" [readonly]="true"
-                                  value="{{ asBccpDetail().bccp.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
+                        </mat-form-field>
                       </div>
-                    </mat-tab>
-                  </mat-tab-group>
-                </div>
-              }
-
-              <!-- BDT_SC -->
-              @if (isDtScDetail()) {
-                <div class="bie-edit-detail-panel scroll">
-                  <mat-tab-group mat-align-tabs="start">
-                    <mat-tab label="{{ selectedNode.name }}">
-                      <div class="bie-edit-detail-container">
-                        <div class="row align-items-center">
-                          <div class="col-3">
-                            <div class="checkbox">
-                              <mat-checkbox color="primary"
-                                [(ngModel)]="asDtScDetail().dtSc.deprecated"
-                                [matTooltip]="selectedNode.ccDeprecated ? 'Core Component is deprecated.' : ''"
-                                [disabled]="true">
-                                Deprecated
-                              </mat-checkbox>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Min</mat-label>
-                              <input matInput placeholder="Cardinality Min" required
-                                [value]="asDtScDetail().dtSc.cardinalityMin">
-                            </mat-form-field>
-                          </div>
-                          <div class="col-6">
-                            <mat-form-field>
-                              <mat-label>Cardinality Max</mat-label>
-                              <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asDtScDetail().dtSc.cardinalityMax | unbounded}})" required
-                                [value]="asDtScDetail().dtSc.cardinalityMax | unbounded">
-                            </mat-form-field>
-                          </div>
-                        </div>
-                        <div class="row form-field-box">
-                          <div class="col-md-6 col-sm-12">
-                            <mat-card>
-                              <mat-card-content
-                                matTooltip="This value constraint cannot modify by the definition of the Business Information Entity.">
-                                <mat-form-field>
-                                  <mat-label>Value Constraint</mat-label>
-                                  <mat-select [value]="asDtScDetail().dtSc.fixedOrDefault"
-                                    [disabled]="true">
-                                    <mat-option value="none">None</mat-option>
-                                    <mat-option value="fixed">Fixed Value</mat-option>
-                                    <mat-option value="default">Default Value</mat-option>
-                                  </mat-select>
-                                </mat-form-field>
-                                @if (asDtScDetail().dtSc.fixedOrDefault == 'none') {
-                                  <mat-form-field>
-                                    <mat-label>No value constraints</mat-label>
-                                    <input matInput placeholder="No value constraints"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                                @if (asDtScDetail().dtSc.fixedOrDefault == 'fixed') {
-                                  <mat-form-field>
-                                    <mat-label>Fixed Value</mat-label>
-                                    <input matInput placeholder="Fixed Value"
-                                      [(ngModel)]="asDtScDetail().dtSc.fixedValue"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                                @if (asDtScDetail().dtSc.fixedOrDefault == 'default') {
-                                  <mat-form-field>
-                                    <mat-label>Default Value</mat-label>
-                                    <input matInput placeholder="Default Value"
-                                      [(ngModel)]="asDtScDetail().dtSc.defaultValue"
-                                      [disabled]="true">
-                                  </mat-form-field>
-                                }
-                              </mat-card-content>
-                            </mat-card>
-                          </div>
-                          <div class="col-md-6 col-sm-12">
-                            <mat-card>
-                              <mat-card-content>
-                                <mat-form-field>
-                                  <mat-label>Value Domain Restriction</mat-label>
-                                  <mat-select placeholder="Value Domain Restriction" required
-                                    [value]="asDtScDetail().dtSc.valueDomainType"
-                                    [disabled]="true">
-                                    <mat-option value="Primitive">Primitive</mat-option>
-                                  </mat-select>
-                                </mat-form-field>
-                                @if (asDtScDetail().dtSc.valueDomainType === 'Primitive') {
-                                  <mat-form-field>
-                                    <mat-label>Value Domain</mat-label>
-                                    <mat-select placeholder="Value Domain" required
-                                      [value]="asDtScDetail().dtSc.defaultDtScAwdPri?.dtScAwdPriId">
-                                      @for (dtScAwdPri of asDtScDetail().dtSc.primitiveDtScAwdPriList; track dtScAwdPri) {
-                                        <mat-option
-                                          [value]="dtScAwdPri.dtScAwdPriId" [disabled]="true">
-                                          {{ dtScAwdPri.xbt?.name }}
-                                        </mat-option>
-                                      }
-                                    </mat-select>
-                                  </mat-form-field>
-                                }
-                              </mat-card-content>
-                            </mat-card>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-12">
-                            <mat-form-field>
-                              <mat-label>Component Definition</mat-label>
-                              <div class="textarea-container">
-                                <textarea matInput rows="6"
-                                  placeholder="Component Definition" [readonly]="true"
-                                  value="{{ asDtScDetail().dtSc.definition || ' ' }}">
-                                </textarea>
-                              </div>
-                            </mat-form-field>
-                          </div>
-                        </div>
-                      </div>
-                    </mat-tab>
-                  </mat-tab-group>
-                </div>
-              }
-            </as-split-area>
-          </as-split>
-        </div>
-      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+          }
+        </as-split-area>
+      </as-split>
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+</score-sidenav-page>
