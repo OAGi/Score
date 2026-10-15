@@ -1,10 +1,4 @@
-<div class="context-section">
-  @if (isLoading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-
+<score-base-page [loading]="isLoading" [showToolbar]="false">
   <div class="row action-group m-0">
     <div class="col-3 title-wrap">
       <span class="title">{{ releaseDetail.releaseNum }} Release Assignment </span>
@@ -238,4 +232,4 @@
       </div>
     </div>
   </div>
-</div>
+</score-base-page>

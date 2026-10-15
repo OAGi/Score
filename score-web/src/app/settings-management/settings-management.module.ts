@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
+import {ScoreCommonModule} from '../common/score-common.module';
 import {CommonModule} from '@angular/common';
 import {CanActivateAdmin, CanActivateUser} from '../authentication/auth.service';
 import {SettingsAccountComponent} from './settings-account/settings-account.component';
@@ -69,7 +70,8 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    MarkdownModule
+    MarkdownModule,
+    ScoreCommonModule
   ],
   declarations: [
     SettingsMenuComponent,

@@ -1,11 +1,5 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white d-flex flex-column align-items-start">
-      <span class="title">{{ "BIE_UPLIFT.TITLE" | translate }}</span>
-      <mat-card-subtitle>Verification</mat-card-subtitle>
-    </mat-toolbar>
-  </div>
-
+<score-base-page [title]="'BIE_UPLIFT.TITLE' | translate" subtitle="Verification"
+  toolbarClass="bg-white d-flex flex-column align-items-start" [spacer]="false">
   <div class="pb-2">
     <mat-card-content class="mat-card-container">
       @if (loading) {
@@ -427,4 +421,4 @@
       </div>
     </mat-card-content>
   </div>
-</div>
+</score-base-page>
