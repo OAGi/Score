@@ -1,5 +1,5 @@
-<score-wizard-page>
-  <ng-container ngProjectAs="[wizardTitle]">
+<score-list-page toolbarClass="bg-white d-flex flex-column align-items-start" [spacer]="false">
+  <ng-container ngProjectAs="[listTitle]">
     <score-title-with-library-selector [title]="('BIE_COPY.TITLE' | translate) + ' with ' + businessContextNames"
       [subtitle]="subtitle"
       [libraries]="libraryChoice.mappedLibraries"
@@ -158,7 +158,7 @@
       </td>
     </ng-container>
   </score-table-view>
-  <ng-container ngProjectAs="[wizardActions]">
+  <ng-container ngProjectAs="[listActionBar]">
     <button mat-raised-button color="warn" (click)="back()">
       Back
     </button>
@@ -168,4 +168,4 @@
       Copy
     </button>
   </ng-container>
-</score-wizard-page>
+</score-list-page>

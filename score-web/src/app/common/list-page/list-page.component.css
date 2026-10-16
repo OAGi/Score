@@ -1,3 +1,7 @@
 :host {
   display: contents;
 }
+
+.action-group:has(.actions:empty) {
+  display: none;
+}

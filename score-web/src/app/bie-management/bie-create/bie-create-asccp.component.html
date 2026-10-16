@@ -1,5 +1,5 @@
-<score-wizard-page>
-  <ng-container ngProjectAs="[wizardTitle]">
+<score-list-page toolbarClass="bg-white d-flex flex-column align-items-start" [spacer]="false">
+  <ng-container ngProjectAs="[listTitle]">
     <score-title-with-library-selector [title]="('BIE_CREATE.TITLE' | translate) + ' with ' + businessContextNames"
       [subtitle]="subtitle"
       [libraries]="libraryChoice.mappedLibraries"
@@ -121,7 +121,7 @@
                   </mat-card>
     </ng-container>
   </score-table-view>
-  <ng-container ngProjectAs="[wizardActions]">
+  <ng-container ngProjectAs="[listActionBar]">
     <button mat-raised-button color="warn" (click)="back()"
       [disabled]="busy()">
       Back
@@ -132,4 +132,4 @@
       Create
     </button>
   </ng-container>
-</score-wizard-page>
+</score-list-page>

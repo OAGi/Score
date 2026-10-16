@@ -15,12 +15,19 @@ import {ListPageComponent} from './list-page.component';
       <div class="table-view">Table view</div>
       <ng-container ngProjectAs="[listExtra]"><span class="extra">Extra</span></ng-container>
       <div listFooter class="footer">Footer</div>
+      @if (actionBar) {
+        <ng-container ngProjectAs="[listActionBar]">
+          <button class="back">Back</button>
+          <button class="next">Next</button>
+        </ng-container>
+      }
     </score-list-page>`
 })
 class HostComponent {
   title: string | null = 'Contexts';
   spacer = true;
   customTitle = false;
+  actionBar = false;
 }
 
 describe('ListPageComponent', () => {
@@ -55,6 +62,19 @@ describe('ListPageComponent', () => {
   it('renders the footer below the card, inside the section', () => {
     detect();
     expect(el('div.context-section > .footer')).toBeTruthy();
+  });
+
+  it('renders the action bar below the card when buttons are projected', () => {
+    host.actionBar = true;
+    detect();
+    const buttons = fixture.nativeElement.querySelectorAll(
+      'div.context-section > div.row.action-group > div.col-12.actions-wrap > div.actions > button');
+    expect(Array.from(buttons).map((b: any) => b.className)).toEqual(['back', 'next']);
+  });
+
+  it('leaves the action bar empty when no buttons are projected', () => {
+    detect();
+    expect(el('div.action-group > .actions-wrap > .actions')?.children.length ?? 0).toBe(0);
   });
 
   it('accepts a projected title in place of the plain one', () => {

@@ -1,4 +1,4 @@
-<score-wizard-page [title]="title" [subtitle]="subtitle">
+<score-list-page [title]="title" [subtitle]="subtitle" toolbarClass="bg-white d-flex flex-column align-items-start" [spacer]="false">
   <score-table-view #tableView [table]="columns" [load]="load" [ready]="ready()" [syncUrl]="false"
     [selection]="selection" [rowKey]="rowKey" [columnSelector]="false" searchClearsSort rowHover>
 
@@ -57,7 +57,7 @@
       </mat-card-content>
     </mat-card>
   </ng-container>
-  <ng-container ngProjectAs="[wizardActions]">
+  <ng-container ngProjectAs="[listActionBar]">
     <button mat-raised-button color="warn" (click)="back()"
       [disabled]="busy()">
       Back
@@ -68,4 +68,4 @@
       Create
     </button>
   </ng-container>
-</score-wizard-page>
+</score-list-page>

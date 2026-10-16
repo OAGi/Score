@@ -1,5 +1,5 @@
-<score-wizard-page toolbarClass="bg-white" [spacer]="true">
-  <ng-container ngProjectAs="[wizardTitle]">
+<score-list-page>
+  <ng-container ngProjectAs="[listTitle]">
     <score-title-with-library-selector [title]="title"
       [libraries]="libraryChoice.mappedLibraries"
       (libraryChange)="onLibraryChange($event)"/>
@@ -132,11 +132,11 @@
       </td>
     </ng-container>
   </score-table-view>
-  <ng-container ngProjectAs="[wizardActions]">
+  <ng-container ngProjectAs="[listActionBar]">
     <button mat-mini-fab color="primary" (click)="next()"
       [hidden]="view().dataSource.data.length == 0"
       [disabled]="this.selection.selected.length == 0">
       <mat-icon matTooltip="Next">forward</mat-icon>
     </button>
   </ng-container>
-</score-wizard-page>
+</score-list-page>

@@ -1,4 +1,4 @@
-<score-wizard-page [title]="'BIE_COPY.TITLE' | translate" [subtitle]="subtitle">
+<score-list-page [title]="'BIE_COPY.TITLE' | translate" [subtitle]="subtitle" toolbarClass="bg-white d-flex flex-column align-items-start" [spacer]="false">
   <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams"
     [selection]="selection" [rowKey]="rowKey" searchClearsSort rowHover>
 
@@ -31,11 +31,11 @@
       </td>
     </ng-container>
   </score-table-view>
-  <ng-container ngProjectAs="[wizardActions]">
+  <ng-container ngProjectAs="[listActionBar]">
     <button mat-raised-button color="primary" (click)="next()"
       [hidden]="view().dataSource.data.length == 0"
       [disabled]="this.selection.selected.length == 0">
       Next
     </button>
   </ng-container>
-</score-wizard-page>
+</score-list-page>

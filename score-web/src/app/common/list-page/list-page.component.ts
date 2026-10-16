@@ -12,7 +12,8 @@ import {BasePageComponent} from '../base-page/base-page.component';
  *  - `[listHeader]`    optional content above the table view, inside the card (e.g. a notice)
  *  - (default)         the `score-table-view`
  *  - `[listExtra]`     anything rendered after the table view (e.g. context menus)
- *  - `[listFooter]`    content below the card, inside the section (e.g. an action group)
+ *  - `[listFooter]`    content below the card, inside the section
+ *  - `[listActionBar]` buttons of the action group below the card (e.g. Back / Next of a wizard step); the group is hidden when empty
  */
 @Component({
   selector: 'score-list-page',

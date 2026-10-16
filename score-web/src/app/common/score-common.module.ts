@@ -24,7 +24,6 @@ import {DetailCardComponent} from './detail-card/detail-card.component';
 import {SidenavPageComponent} from './sidenav-page/sidenav-page.component';
 import {MaterialModule} from '../material.module';
 import {BasePageComponent} from './base-page/base-page.component';
-import {WizardPageComponent} from './wizard-page/wizard-page.component';
 import {ListPageComponent} from './list-page/list-page.component';
 import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.component';
 
@@ -46,7 +45,6 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     ScoreTableColumnResizeDirective,
     MaterialModule,
     BasePageComponent,
-    WizardPageComponent,
     DetailPageComponent,
     DetailCardComponent,
     ListPageComponent,
@@ -62,7 +60,6 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
   exports: [
     SidenavPageComponent,
     BasePageComponent,
-    WizardPageComponent,
     DetailPageComponent,
     DetailCardComponent,
     ListPageComponent,

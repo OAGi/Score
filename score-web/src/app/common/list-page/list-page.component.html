@@ -13,4 +13,12 @@
   </mat-card>
 
   <ng-content select="[listFooter]"></ng-content>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <ng-content select="[listActionBar]"></ng-content>
+      </div>
+    </div>
+  </div>
 </score-base-page>
