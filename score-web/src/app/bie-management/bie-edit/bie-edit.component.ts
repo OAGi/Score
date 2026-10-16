@@ -550,7 +550,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     }
 
     setTimeout(() => {
-      this.treeViewport?.scrollToIndex(index);
+      this.treeViewport?.scrollToIndex(index, {smooth: true});
       this.cdr.detectChanges();
     }, delay);
   }

@@ -887,17 +887,21 @@ th.mat-mdc-header-cell, td.mat-mdc-cell {
   text-overflow: inherit !important;
 }
 
+/* The path is always one line: a long one scrolls sideways (to its end) instead of wrapping over what is below. */
 .tree-breadcrumbs-wrap {
   padding: 6px 15px;
   width: 100%;
-  display: -webkit-box;
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
   min-height: 35px;
   background-color: whitesmoke;
 }
 
 .tree-breadcrumb {
-  display: inline;
+  flex: 0 0 auto;
   line-height: 24px;
   font-size: 12px;
 }

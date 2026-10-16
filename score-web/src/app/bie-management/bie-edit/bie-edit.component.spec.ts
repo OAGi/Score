@@ -21,7 +21,7 @@ describe('BieEditComponent', () => {
 
       expect(treeViewport.scrollToIndex).not.toHaveBeenCalled();
       vi.advanceTimersByTime(100);
-      expect(treeViewport.scrollToIndex).toHaveBeenCalledWith(2);
+      expect(treeViewport.scrollToIndex).toHaveBeenCalledWith(2, {smooth: true});
       expect(context.cdr.detectChanges).toHaveBeenCalledTimes(1);
     } finally {
       vi.useRealTimers();
