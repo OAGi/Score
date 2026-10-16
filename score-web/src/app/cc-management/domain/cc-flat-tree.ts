@@ -2,7 +2,7 @@ import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
-import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
+import {FlatNode, getKey, next} from '../../common/flat-tree';
 import {
   CcAccNodeInfo,
   CcAsccpNodeInfo,
@@ -1000,7 +1000,8 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     };
 
     const plain = (node: T): number => {
-      const {index, created} = builder.record(keyOf(node), [this.plainName(node)]);
+      const {index, created} = builder.record(keyOf(node), [this.plainName(node)], keyOf(node),
+        {name: this.plainName(node), type: node.type});
       if (created) {
         representatives.push(node);
       }
@@ -1022,7 +1023,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
       if (node.name === this.plainName(node) && sameChildren) {
         return {record: plainIndex, clone: false};
       }
-      const {index} = builder.record('@' + (cloneCount++), [node.name], key);
+      const {index} = builder.record('@' + (cloneCount++), [node.name], key, {name: node.name, type: node.type});
       builder.setChildren(index, children ? children.map(child => child.record) : plainChildren);
       clones.set(node, index);
       return {record: index, clone: true};
@@ -1447,6 +1448,7 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
       namesOf: node => [node.name],
+      attributesOf: node => ({name: node.name, type: node.type}),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -1467,10 +1469,6 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
 
   protected visibleIndex(node: T): number {
     return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
-  }
-
-  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
-    return new PathLikeExpressionEvaluator(expr, false);
   }
 
 }

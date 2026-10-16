@@ -6,6 +6,9 @@
         <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
           [disabled]="searcher.isSearching"
           (keyup.enter)="onSearch(searcher.inputKeyword)">
+        @if (searcher.expressionError) {
+          <mat-hint align="start" style="color: var(--mat-sys-error, #b3261e)">{{ searcher.expressionError }}</mat-hint>
+        }
         @if (searcher.isSearching) {
           <mat-hint matSuffix
           align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + '+ ' + searcher.searchedUnit : '' }}</mat-hint>

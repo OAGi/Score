@@ -3,7 +3,7 @@ import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchVisit} from '../../../common/tree-search/tree-node-searcher';
-import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../../common/flat-tree';
+import {FlatNode, getKey} from '../../../common/flat-tree';
 import {BehaviorSubject, forkJoin, Observable, Subject} from 'rxjs';
 import {
   AccDetails,
@@ -2018,7 +2018,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     const builder = new SearchDagBuilder();
     const representatives: T[] = [];
     const record = (node: T): number => {
-      const {index, created} = builder.record(this.searchKey(node), [node.name]);
+      const {index, created} = builder.record(this.searchKey(node), [node.name], this.searchKey(node), {name: node.name, type: node.type});
       if (created) {
         representatives.push(node);
       }
@@ -2076,6 +2076,7 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
       dag: () => graph().dag,
       recordOf: node => graph().recordOf(node),
       namesOf: node => node.isGroup || node.isChoice ? undefined : [node.name],
+      attributesOf: node => ({name: node.name, type: node.type}),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -2097,18 +2098,5 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
     return this.dataSource.data.indexOf(node);
   }
 
-  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
-    return new ModelBrowserNodePathExpressionEvaluator(expr, false);
-  }
-
 }
 
-export class ModelBrowserNodePathExpressionEvaluator<T extends ModelBrowserNode> extends PathLikeExpressionEvaluator<T> {
-  protected next(node: T): T {
-    let next = node.parent as T;
-    while (next && (next.isGroup || next.isChoice)) {
-      next = next.parent as T;
-    }
-    return next;
-  }
-}

@@ -1,7 +1,7 @@
 import {CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
 import {CcGraph} from './core-component-node';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
-import {PathLikeExpressionEvaluator} from '../../common/flat-tree';
+import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 import {PathPattern} from '../../common/tree-search/path-pattern';
 
 function graphWithUserExtensionAssociationWithoutTargetAcc(): CcGraph {
@@ -93,7 +93,7 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
 
   /** The reference: every node of the unfolded tree that the evaluator matches (the tree here has no cycle). */
   function walkedMatches(database: CcFlatNodeDatabase<CcFlatNode>, root: CcFlatNode, expr: string): number {
-    const evaluator = new PathLikeExpressionEvaluator<CcFlatNode>(expr, false);
+    const evaluator = new PatternExpressionEvaluator<CcFlatNode>(expr, {namesOf: n => [n.name]});
     const walk = (node: CcFlatNode): number =>
       (evaluator.eval(node) ? 1 : 0) + database.getChildren(node).reduce((sum, child) => sum + walk(child), 0);
     return walk(root);

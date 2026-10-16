@@ -145,6 +145,9 @@ export class DagPathSearch {
   private reachedCount = 0;
   private readonly reached: Uint8Array;
   private truncated = false;
+  /** The record whose attributes `attributes` reads: set right before a step is made onto it. */
+  private row = 0;
+  private readonly attributes = (attribute: string) => this.dag.attributes?.[attribute]?.[this.row];
 
   constructor(private readonly dag: SearchDag,
               private readonly pattern: PathPattern,
@@ -223,14 +226,14 @@ export class DagPathSearch {
     }
 
     let total = 0;
-    const {childStart, childList, names} = this.dag;
+    const {childStart, childList} = this.dag;
     for (let i = childStart[record]; i < childStart[record + 1]; i++) {
       if (++this.steps > this.budget) {
         this.truncated = true;
         return total;
       }
       const child = childList[i];
-      const childMask = this.pattern.step(mask, ...names[child]);
+      const childMask = this.stepOnto(mask, child);
       if (this.pattern.isMatch(childMask)) {
         total++;
       }
@@ -278,10 +281,10 @@ export class DagPathSearch {
   }
 
   private descend(record: number, mask: number, k: number): number[] | undefined {
-    const {childStart, childList, names} = this.dag;
+    const {childStart, childList} = this.dag;
     for (let i = childStart[record]; i < childStart[record + 1]; i++) {
       const child = childList[i];
-      const childMask = this.pattern.step(mask, ...names[child]);
+      const childMask = this.stepOnto(mask, child);
       if (this.pattern.isMatch(childMask)) {
         if (k === 0) {
           return [i - childStart[record]];
@@ -304,6 +307,11 @@ export class DagPathSearch {
       k -= below;
     }
     return undefined;
+  }
+
+  private stepOnto(mask: number, record: number): number {
+    this.row = record;
+    return this.pattern.stepWith(mask, this.dag.names[record], this.attributes);
   }
 
   private enter(record: number) {

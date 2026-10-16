@@ -2,6 +2,7 @@ import {DagSearchResult, DagSearchScope} from './dag-path-search';
 import {GraphSearchSession, openGraphSearchSession} from './graph-search-session';
 import {PathPattern, PathPatternMode} from './path-pattern';
 import {SearchDag} from './search-dag';
+import {AttrLookup, AttrValue} from './search-expression';
 
 /** The node shape a tree must offer to be searched through its DAG. */
 export interface GraphSearchNode {
@@ -25,6 +26,12 @@ export interface TreeGraphAdapter<N extends GraphSearchNode> {
 
   /** The names a search matches the node by, or undefined for a structural node (a group) that paths skip. */
   namesOf(node: N): string[] | undefined;
+
+  /**
+   * What a predicate may ask about the node (`used`, `displayName`, ...), or undefined when it has no attributes.
+   * Must agree with the values the DAG's records carry (`SearchDag.attributes`).
+   */
+  attributesOf?(node: N): Record<string, AttrValue> | undefined;
 
   /** The node's children as the tree shows them (loading them if needed). */
   childrenOf(node: N): N[];
@@ -96,7 +103,7 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
 
   /** The text a result list highlights: the last step of the expression. */
   get highlightKeyword(): string {
-    return this.pattern.tokens[this.pattern.tokens.length - 1];
+    return this.pattern.highlight;
   }
 
   run(onProgress: (visited: number) => void): Promise<DagSearchResult> {
@@ -150,7 +157,13 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
   }
 
   private maskOf(node: N): number {
-    return this.pattern.stepAll(this.chainOf(node).map(n => this.adapter.namesOf(n)));
+    return this.stepChain(this.pattern, this.chainOf(node));
+  }
+
+  private stepChain(pattern: PathPattern, chain: N[]): number {
+    const lookups: (AttrLookup | undefined)[] = pattern.hasPredicates ?
+      chain.map(n => this.adapter.attributesOf?.(n)).map(values => values && (attribute => values[attribute])) : undefined;
+    return pattern.stepAll(chain.map(n => this.adapter.namesOf(n)), lookups);
   }
 
   private insideScope(node: N): boolean {
@@ -176,7 +189,7 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     return {
       ancestors: records.slice(0, -1),
       record: records[records.length - 1],
-      mask: pattern.stepAll(chain.map(n => this.adapter.namesOf(n)))
+      mask: this.stepChain(pattern, chain)
     };
   }
 

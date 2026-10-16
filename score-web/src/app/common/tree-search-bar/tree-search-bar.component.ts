@@ -31,6 +31,8 @@ export interface TreeSearcher<N = any> {
   isSearching: boolean;
   /** Matches found by the search in progress, not yet in `searchResult`. */
   pendingMatchCount: number;
+  /** Why the keyword is not a valid search expression, when it is not. */
+  expressionError?: string;
   /** Emits when the figures above change without a user action (a running search's progress, its end). */
   progress: Observable<void>;
 

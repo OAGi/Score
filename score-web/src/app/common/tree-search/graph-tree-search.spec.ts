@@ -1,4 +1,4 @@
-import {FlatNode, ExpressionEvaluator, PathLikeExpressionEvaluator} from '../flat-tree';
+import {FlatNode} from '../flat-tree';
 import {TreeGraphAdapter} from './graph-tree-search';
 import {SearchDag, SearchDagBuilder} from './search-dag';
 import {TreeNodeSearcher, TreeSearchDataSource, TreeSearchVisit} from './tree-node-searcher';
@@ -79,10 +79,6 @@ class GraphSearcher extends TreeNodeSearcher<Node, TestDataSource> {
         return this.reorder ? [...children].sort((a, b) => this.reorder(['a']).length - 1 && a.key.localeCompare(b.key) * -1) : children;
       }
     };
-  }
-
-  protected getEvaluator(expr: string): ExpressionEvaluator<Node> {
-    return new PathLikeExpressionEvaluator<Node>(expr, false);
   }
 
   protected visibleIndex(node: Node): number {

@@ -3,13 +3,13 @@ import {
   AsbiepFlatNode,
   BbiepFlatNode,
   BieFlatNodeDatabase,
-  BieFlatNodeDataSource,
-  BiePathLikeExpressionEvaluator
+  BieFlatNodeDataSource
 } from './bie-flat-tree';
 import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
 import {of} from 'rxjs';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
 import {PathPattern} from '../../common/tree-search/path-pattern';
+import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 
 /**
  * #1638 BIE-editor wiring tests. The editor reads the SAME instance-level sibling order as the model
@@ -221,15 +221,31 @@ describe('BieFlatNodeDataSource inherited reused details', () => {
   });
 });
 
-describe('BiePathLikeExpressionEvaluator', () => {
+describe('PatternExpressionEvaluator on BIE nodes', () => {
+  const adapter = {
+    namesOf: (n: any) => n.isGroup ? undefined : [n.name, n.displayName].filter(name => !!name),
+    attributesOf: (n: any) => ({name: n.name, displayName: n.displayName || n.name, used: !!n.used}),
+    strictRootedPaths: true
+  };
+
   it('matches path segments exactly so Party does not resolve to Manufacturing Party', () => {
     const parent = {name: 'BOM Item Data', parent: undefined, isGroup: false} as any;
     const party = {name: 'Party', parent, isGroup: false} as any;
     const manufacturingParty = {name: 'Manufacturing Party', parent, isGroup: false} as any;
-    const evaluator = new BiePathLikeExpressionEvaluator('/BOM Item Data/Party');
+    const evaluator = new PatternExpressionEvaluator('/BOM Item Data/Party', adapter);
 
     expect(evaluator.eval(party)).toBe(true);
     expect(evaluator.eval(manufacturingParty)).toBe(false);
+  });
+
+  it('judges a step by its predicates on the node', () => {
+    const parent = {name: 'Sender', parent: undefined, isGroup: false} as any;
+    const used = {name: 'Code', parent, isGroup: false, used: true} as any;
+    const unused = {name: 'Code', parent, isGroup: false, used: false} as any;
+    const evaluator = new PatternExpressionEvaluator('Sender/Code[used = true]', adapter);
+
+    expect(evaluator.eval(used)).toBe(true);
+    expect(evaluator.eval(unused)).toBe(false);
   });
 });
 
@@ -493,12 +509,13 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     return copy;
   }
 
-  function search(db: FixedDatabase, root: any, expr: string, mode = {}) {
-    const graph = db.searchGraph(root);
+  function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean}) {
+    const graph = db.searchGraph(root, options);
     const pattern = new PathPattern(expr, false, mode);
     const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
+    const attributes = [(a: string) => ({name: root.name, displayName: root.displayName || root.name, used: !!root.used})[a]];
     const found = new DagPathSearch(graph.dag, pattern)
-      .search({ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll(names)});
+      .search({ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll(names, attributes)});
     return {graph, found};
   }
 
@@ -539,6 +556,32 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     // the clone shares the component's identity, so it is not expanded below the component's other places
     expect(graph.dag.identity[graph.recordOf(item2)]).toBe(graph.dag.identity[graph.recordOf(root.children[0] as any)]);
     expect(graph.recordOf(item2)).not.toBe(graph.recordOf(root.children[0] as any));
+  });
+
+  it('tells the places of a component apart by what the BIE says about them', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+
+    expect(search(new FixedDatabase(), root, 'Item').found.total).toBe(2);
+    expect(search(new FixedDatabase(), root, 'Item[used = true]').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item[used = false]').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Box/Item[used]/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item[type = "ASBIEP" and used]').found.total).toBe(1);
+  });
+
+  it('searches the tree the user sees, which is only what the BIE uses, the same way', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+
+    const all = search(new FixedDatabase(), root, 'Item');
+    const hidden = search(new FixedDatabase(), root, 'Item', {}, {hideUnused: true});
+
+    expect(all.found.total).toBe(2);
+    expect(hidden.found.total).toBe(1);
+    // Root, Box (leads to a used node), Item (used)
+    expect(hidden.graph.dag.names.length).toBe(3);
+    expect(search(new FixedDatabase(), root, 'Code', {}, {hideUnused: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, 'Box/Item', {}, {hideUnused: true}).found.total).toBe(1);
   });
 
   it('reads a root path as whole names from the root', () => {

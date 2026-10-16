@@ -13,7 +13,7 @@ import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
 import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchLimits, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
-import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
+import {FlatNode, getKey} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {BehaviorSubject, forkJoin, Observable, Subject} from 'rxjs';
@@ -2478,32 +2478,6 @@ export class Association {
 
 }
 
-export class BiePathLikeExpressionEvaluator<T extends BieFlatNode> extends PathLikeExpressionEvaluator<T> {
-  protected next(node: T): T {
-    let next = node.parent as T;
-    while (next && next.isGroup) {
-      next = next.parent as T;
-    }
-    return next;
-  }
-
-  protected doEval(node: T, token: string): boolean {
-    if (this.isRootPathExpression()) {
-      const names = [node.name, node.displayName].filter(name => !!name);
-      return names.some(name => this.caseSensitive ? name === token : name.toLowerCase() === token.toLowerCase());
-    }
-    const result = super.doEval(node, token);
-    if (result || !node.displayName) {
-      return result;
-    }
-    if (this.caseSensitive) {
-      return node.displayName.indexOf(token) > -1;
-    } else {
-      return node.displayName.toLowerCase().indexOf(token.toLowerCase()) > -1;
-    }
-  }
-}
-
 export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   private _ccGraph: CcGraph;
@@ -2658,15 +2632,21 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
    * children in the order the tree shows them, so that a search runs on the components instead of on the nodes they
    * unfold into.
    *
-   * What a BIE adds to the CC structure is data of single places: a display name (which a search matches too) and the
-   * reuse of another BIE. Those places, and the places above them, get a record of their own (a "clone" showing the
+   * What a BIE adds to the CC structure is data of single places: whether it is used or inherited, a display name
+   * (which a search matches too) and the reuse of another BIE. Those places, and the places above them, get a record of their own (a "clone" showing the
    * same component); everything below stays shared. The places are found by walking the nodes that carry BIE data
    * (used, inherited or reusing), which are few. The result is built anew for every search, as that data can change
    * at any time.
    *
+   * With `hideUnused` the tree is only what the BIE uses (and what leads to it), so every place of it is a clone with
+   * just those children: the DAG is then the tree the user sees, which is small.
+   *
    * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
    */
-  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+  searchGraph(root: T, options?: {hideUnused?: boolean}): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+    const hideUnused = !!options?.hideUnused;
+    const shownChildren = (node: T): T[] => this.children(node)
+      .filter(child => !hideUnused || child.used || child.inherited || this.hasUsedOrInheritedDescendant(child));
     const builder = new SearchDagBuilder();
     const clones = new WeakMap<object, number>();
     const representatives: T[] = [];
@@ -2683,7 +2663,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
     const plain = (node: T): number => {
       const key = keyOf(node);
-      const {index} = builder.record(key, [this.unwrapNode(node).name]);
+      const raw = this.unwrapNode(node);
+      const {index} = builder.record(key, [raw.name], key,
+        {name: raw.name, displayName: raw.name, type: raw.bieType, used: false, inherited: false, reused: false});
       // A node that is a cycle (it has no children loaded) or shows only some of its children says nothing about
       // what its component's children are.
       if (!represented.has(key) && !this.isCycleNode(node) && !this.hasFilteredChildren(node)) {
@@ -2695,23 +2677,26 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
     const carriesBieData = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return !!(raw.used || raw.inherited || raw.reused);
+      return hideUnused || !!(raw.used || raw.inherited || raw.reused);
     };
 
     const isSpecial = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return !!raw.reused || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
+      return hideUnused || carriesBieData(node) || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
     };
 
     const place = (node: T): {record: number, clone: boolean} => {
-      const placed = this.children(node)
+      const placed = shownChildren(node)
         .map(child => carriesBieData(child) ? place(child) : {record: plain(child), clone: false});
       if (!isSpecial(node) && !placed.some(child => child.clone)) {
         return {record: plain(node), clone: false};
       }
       const raw = this.unwrapNode(node);
       const names = [raw.name, raw.displayName].filter((name, i, all) => !!name && all.indexOf(name) === i);
-      const {index} = builder.record('@' + (cloneCount++), names, keyOf(node));
+      const {index} = builder.record('@' + (cloneCount++), names, keyOf(node), {
+        name: raw.name, displayName: raw.displayName || raw.name, type: raw.bieType,
+        used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
+      });
       builder.setChildren(index, placed.map(child => child.record));
       clones.set(raw, index);
       return {record: index, clone: true};
@@ -3979,23 +3964,28 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   }
 
   /**
-   * With unused nodes hidden the tree is only what the BIE uses, which is small and is searched by walking it; with
-   * them shown it is the whole CC structure below, which is searched through its graph.
+   * The BIE tree as the searcher sees it: its DAG (what the tree shows, so with unused nodes hidden only what the BIE
+   * uses), and the attributes a search expression may ask about (`name`, `displayName`, `type`, `used`, `inherited`,
+   * `reused`). Hiding unused nodes changes what the DAG holds, not how it is searched.
    */
-  protected override graphAdapter(): TreeGraphAdapter<T> | undefined {
-    if (this.dataSource.hideUnused) {
-      return undefined;
-    }
+  protected override graphAdapter(): TreeGraphAdapter<T> {
     let graph: ReturnType<BieFlatNodeDatabase<T>['searchGraph']>;
     return {
       dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0]);
+        graph = this.database.searchGraph(this.dataSource.data[0], {hideUnused: this.dataSource.hideUnused});
         return graph?.dag;
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
       namesOf: node => {
         const raw = node.self || node;
         return raw.isGroup ? undefined : [raw.name, raw.displayName].filter(name => !!name);
+      },
+      attributesOf: node => {
+        const raw = node.self || node;
+        return {
+          name: raw.name, displayName: raw.displayName || raw.name, type: raw.bieType,
+          used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
+        };
       },
       childrenOf: node => this.database.children(node),
       identityOf: node => node.self || node,
@@ -4039,10 +4029,6 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
 
   protected visibleIndex(node: T): number {
     return this.dataSource.getNodeIndex(node);
-  }
-
-  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
-    return new BiePathLikeExpressionEvaluator(expr, false);
   }
 
 }

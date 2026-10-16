@@ -1,6 +1,8 @@
 import {AsyncSubject, EMPTY, Observable, of, Subject} from 'rxjs';
 import {ExpressionEvaluator, FlatNode} from '../flat-tree';
 import {GraphTreeSearch, TreeGraphAdapter} from './graph-tree-search';
+import {PatternExpressionEvaluator} from './pattern-expression-evaluator';
+import {parseSearchExpression} from './search-expression';
 
 /** What the searcher needs from the tree data source: the visible (expanded) node list and its expansion state. */
 export interface TreeSearchDataSource<N> {
@@ -96,6 +98,8 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
   isSearching = false;
   /** Matches found by the pass in progress, not yet part of `searchResult`. */
   pendingMatchCount = 0;
+  /** Why the keyword cannot be searched, when it is a malformed expression. */
+  expressionError: string | undefined;
   /**
    * Emits (inside the Angular zone) whenever the counters above change on their own: about once a second while a
    * search runs, and when it ends or is reset. A view showing them listens to this to refresh.
@@ -129,7 +133,17 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
 
   // ---- tree-specific hooks -------------------------------------------------------------------------------------
 
-  protected abstract getEvaluator(expr: string): ExpressionEvaluator<N>;
+  /**
+   * Judges a node against the keyword when the tree is searched by walking it (the graph search could not take it).
+   * By default it is the same expression the graph search reads, over the attributes the graph adapter gives.
+   */
+  protected getEvaluator(expr: string): ExpressionEvaluator<N> {
+    const adapter = this.graphAdapter();
+    if (!adapter) {
+      throw new Error('A tree that cannot describe itself as a graph has to say how its nodes are judged.');
+    }
+    return new PatternExpressionEvaluator(expr, adapter);
+  }
 
   /** The position of the node in the visible list. */
   protected abstract visibleIndex(node: N): number;
@@ -235,6 +249,13 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     }
 
     this._inputKeyword = inputKeyword;
+    const error = parseSearchExpression(inputKeyword).error;
+    if (error) {
+      this.expressionError = error.message + ' (at ' + (error.position + 1) + ')';
+      this.progress.next();
+      return of(-1);
+    }
+    this.expressionError = undefined;
     const done = new AsyncSubject<number>();
     this.isSearching = true;
     const graph = this.prepareGraphSearch(inputKeyword, selectedNode);
@@ -264,6 +285,7 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     this.searchIndex = 0;
     this.isSearching = false;
     this.pendingMatchCount = 0;
+    this.expressionError = undefined;
     this.usingGraph = false;
     this.graphResultCount = 0;
     this.graphCurrentNode = undefined;
