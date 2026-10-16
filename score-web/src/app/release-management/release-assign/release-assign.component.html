@@ -127,8 +127,7 @@
                   </div>
                   <div class="errors">
                     @for (error of item.errors; track error) {
-                      <mat-error role="alert" class="item-error"
-                        >
+                      <mat-error role="alert" class="item-error">
                         <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
                       </mat-error>
                     }
@@ -198,8 +197,7 @@
                   </div>
                   <div class="errors">
                     @for (error of item.errors; track error) {
-                      <mat-error role="alert" class="item-error"
-                        >
+                      <mat-error role="alert" class="item-error">
                         <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
                       </mat-error>
                     }

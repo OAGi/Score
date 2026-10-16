@@ -3,120 +3,120 @@
 
     <ng-container scoreColumnDef="releaseNum">
       <td score-cell *scoreCellDef="let element">
-          {{ element.releaseNum }}
-        </td>
+        {{ element.releaseNum }}
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingState">
       <td score-cell *scoreCellDef="let element">
-          <span class="bie-state {{ element.reusingState }}"
-            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
-            'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
-          @if (element.deprecated) {
-            <span class="bie-state Deprecated"
-              [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          }
-        </td>
+        <span class="bie-state {{ element.reusingState }}"
+          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
+          'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
+        @if (element.deprecated) {
+          <span class="bie-state Deprecated"
+            [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+              [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+              'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+        }
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingDen">
       <td score-cell *scoreCellDef="let element">
-          <div class="den score-line-clamp-2 score-break-word">
-            @if (isAccessibleLeft(element)) {
-              <span>
-                <a href="{{ getRouteLink(element) }}" target="_blank">
-                  {{ element.reusingDen + ((element.reusingDisplayName) ? (' (' + element.reusingDisplayName + ')') : '') }}
-                </a>
-              </span>
-            }
-            @if (!isAccessibleLeft(element)) {
-              <span>
-                {{ element.reusingDen }}
-              </span>
-            }
-          </div>
-          <div class="bie-guid">{{ element.reusingGuid }}</div>
-        </td>
+        <div class="den score-line-clamp-2 score-break-word">
+          @if (isAccessibleLeft(element)) {
+            <span>
+              <a href="{{ getRouteLink(element) }}" target="_blank">
+                {{ element.reusingDen + ((element.reusingDisplayName) ? (' (' + element.reusingDisplayName + ')') : '') }}
+              </a>
+            </span>
+          }
+          @if (!isAccessibleLeft(element)) {
+            <span>
+              {{ element.reusingDen }}
+            </span>
+          }
+        </div>
+        <div class="bie-guid">{{ element.reusingGuid }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingOwner">
       <td score-cell *scoreCellDef="let element">
-          <span>{{ element.reusingOwner }}</span>
-        </td>
+        <span>{{ element.reusingOwner }}</span>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingVersion">
       <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">{{ element.reusingVersion }}</div>
-        </td>
+        <div class="score-line-clamp-2 score-break-word">{{ element.reusingVersion }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingStatus">
       <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">{{ element.reusingStatus }}</div>
-        </td>
+        <div class="score-line-clamp-2 score-break-word">{{ element.reusingStatus }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusingRemark">
       <td score-cell *scoreCellDef="let element">
-          <div>{{ element.reusingRemark }}</div>
-        </td>
+        <div>{{ element.reusingRemark }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusedState">
       <td score-cell *scoreCellDef="let element">
-          <span class="bie-state {{ element.reusedState }}"
-            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
-            'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
-          @if (element.deprecated) {
-            <span class="bie-state Deprecated"
-              [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          }
-        </td>
+        <span class="bie-state {{ element.reusedState }}"
+          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
+          'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
+        @if (element.deprecated) {
+          <span class="bie-state Deprecated"
+            [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+              [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+              'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+        }
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusedDen">
       <td score-cell *scoreCellDef="let element">
-          <div class="den score-line-clamp-2 score-break-word">
-            @if (isAccessibleRight(element)) {
-              <span>
-                <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
-                  {{ element.reusedDen }}
-                </a>
-              </span>
-            }
-            @if (!isAccessibleRight(element)) {
-              <span>
+        <div class="den score-line-clamp-2 score-break-word">
+          @if (isAccessibleRight(element)) {
+            <span>
+              <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
                 {{ element.reusedDen }}
-              </span>
-            }
-          </div>
-          <div class="bie-guid">{{ element.reusedGuid }}</div>
-        </td>
+              </a>
+            </span>
+          }
+          @if (!isAccessibleRight(element)) {
+            <span>
+              {{ element.reusedDen }}
+            </span>
+          }
+        </div>
+        <div class="bie-guid">{{ element.reusedGuid }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusedOwner">
       <td score-cell *scoreCellDef="let element">
-          <span class="score-line-clamp-2 score-break-word">{{ element.reusedOwner }}</span>
-        </td>
+        <span class="score-line-clamp-2 score-break-word">{{ element.reusedOwner }}</span>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusedVersion">
       <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">{{ element.reusedVersion }}</div>
-        </td>
+        <div class="score-line-clamp-2 score-break-word">{{ element.reusedVersion }}</div>
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="reusedStatus">
       <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
-        </td>
+        <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
+      </td>
     </ng-container>
-    </score-table-view>
+  </score-table-view>
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">

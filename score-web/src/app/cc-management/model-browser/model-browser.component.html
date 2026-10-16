@@ -6,29 +6,29 @@
                      (breadcrumbClick)="scrollToNode($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
-          <div class="actions ms-auto d-flex align-items-center">
-            <div>
-              <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
-                [matMenuTriggerFor]="settingsContextMenu"
-                [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-                <mat-icon>settings</mat-icon>
-              </button>
-            </div>
-            <div class="ms-3">
-            </div>
+        <div class="actions ms-auto d-flex align-items-center">
+          <div>
+            <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
+              [matMenuTriggerFor]="settingsContextMenu"
+              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
+              <mat-icon>settings</mat-icon>
+            </button>
           </div>
-          <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-            <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
-              <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-                <span>Hide cardinality</span>
-              </mat-checkbox>
-            </button>
-            <button mat-menu-item [id]="'bie-settings-hide-order-weights'">
-              <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideOrderWeights">
-                <span>Hide order weights</span>
-              </mat-checkbox>
-            </button>
-          </mat-menu>
+          <div class="ms-3">
+          </div>
+        </div>
+        <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+          <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+              <span>Hide cardinality</span>
+            </mat-checkbox>
+          </button>
+          <button mat-menu-item [id]="'bie-settings-hide-order-weights'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideOrderWeights">
+              <span>Hide order weights</span>
+            </mat-checkbox>
+          </button>
+        </mat-menu>
       }
     </ng-container>
     <ng-container treeDetailTree>
@@ -40,7 +40,7 @@
                                          (contextMenuOpen)="contextMenuItem = $event"
                                          (dropped)="drop($event)" (dragStarted)="onDragStarted($event)"
                                          (dragMoved)="onDragMoved($event)" (dragEnded)="onDragEnded()">
-</score-model-browser-tree-viewport>
+      </score-model-browser-tree-viewport>
 
 
       <!-- Context Menu Area -->
@@ -61,8 +61,7 @@
           <span class="context-menu-item">Copy Path</span>
         </button>
         @if (isAccDetail(contextMenuItem) || isAsccpDetail(contextMenuItem)) {
-          <button mat-menu-item (click)="openDiagram(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="openDiagram(contextMenuItem)">
             <span class="context-menu-item">Show Diagram</span>
           </button>
         }

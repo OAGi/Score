@@ -251,14 +251,12 @@
         <mat-divider></mat-divider>
       }
       @if (libraryChoice.library?.name === 'connectSpec' && releaseChoice.release?.workingRelease) {
-        <button mat-menu-item (click)="createBOD()"
-          >
+        <button mat-menu-item (click)="createBOD()">
           <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi BOD Component</span>
         </button>
       }
       @if (libraryChoice.library?.name === 'connectSpec' && releaseChoice.release?.workingRelease) {
-        <button mat-menu-item (click)="createVerb()"
-          >
+        <button mat-menu-item (click)="createVerb()">
           <span class="context-menu-item"><fa-icon [icon]="faFlask" style="padding-right: 10px;"></fa-icon> Create OAGi Verb Component</span>
         </button>
       }

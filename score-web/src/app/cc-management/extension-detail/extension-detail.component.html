@@ -48,31 +48,28 @@
             </button>
           }
           @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-            <button mat-raised-button color="warn" (click)="purgeNode()"
-              >
+            <button mat-raised-button color="warn" (click)="purgeNode()">
               Purge
             </button>
           }
           @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-            <button mat-raised-button color="primary" (click)="restoreNode()"
-              >
+            <button mat-raised-button color="primary" (click)="restoreNode()">
               Restore
             </button>
           }
           @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
-            <button mat-raised-button color="primary" (click)="cancelRevision()"
-              >
+            <button mat-raised-button color="primary" (click)="cancelRevision()">
               Cancel
             </button>
           }
         </div>
-    <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-      <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-        <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-          <span>Hide cardinality</span>
-        </mat-checkbox>
-      </button>
-    </mat-menu>
+        <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+          <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+              <span>Hide cardinality</span>
+            </mat-checkbox>
+          </button>
+        </mat-menu>
       }
     </ng-container>
     <ng-container treeDetailTree>
@@ -99,44 +96,38 @@
           <mat-divider></mat-divider>
         }
         @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
-          <button mat-menu-item (click)="appendAssociation(contextMenuItem, 0)"
-            >
+          <button mat-menu-item (click)="appendAssociation(contextMenuItem, 0)">
             <span class="context-menu-item">Insert Property at First</span>
           </button>
         }
         @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
-          <button mat-menu-item (click)="appendAssociation(contextMenuItem, -1)"
-            >
+          <button mat-menu-item (click)="appendAssociation(contextMenuItem, -1)">
             <span class="context-menu-item">Append Property at Last</span>
           </button>
         }
         @if (isEditable() && isDraggable(contextMenuItem)) {
-          <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem))"
-            >
+          <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem))">
             <span class="context-menu-item">Insert Property Before</span>
           </button>
         }
         @if (isEditable() && isDraggable(contextMenuItem)) {
-          <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem) + 1)"
-            >
+          <button mat-menu-item (click)="appendAssociation(contextMenuItem, pos(contextMenuItem) + 1)">
             <span class="context-menu-item">Insert Property After</span>
           </button>
         }
         @if (!!contextMenuItem && contextMenuItem.level !== 0 && isEditable() &&
-          isDraggable(contextMenuItem) && discardAble(contextMenuItem)) {
+        isDraggable(contextMenuItem) && discardAble(contextMenuItem)) {
           <mat-divider></mat-divider>
         }
         @if (!!contextMenuItem && contextMenuItem.level !== 0 && isEditable() &&
-          isDraggable(contextMenuItem) && discardAble(contextMenuItem)) {
-          <button mat-menu-item (click)="onClickDiscard(contextMenuItem)"
-            >
+        isDraggable(contextMenuItem) && discardAble(contextMenuItem)) {
+          <button mat-menu-item (click)="onClickDiscard(contextMenuItem)">
             <span class="context-menu-item">Remove</span>
           </button>
         }
         <mat-divider></mat-divider>
         @if (!!contextMenuItem && contextMenuItem.level !== 0) {
-          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)">
             <span class="context-menu-item">Open in new tab</span>
           </button>
         }
@@ -504,7 +495,7 @@
                           [formControl]="ccCardinalityMax"
                           [value]="ccCardinalityMax.value | unbounded">
                         @if (ccCardinalityMax.valid && asAsccpDetail().ascc.cardinalityMax === 0 &&
-                          (!asAsccpDetail().ascc.definition || asAsccpDetail().ascc.definition === '')) {
+                        (!asAsccpDetail().ascc.definition || asAsccpDetail().ascc.definition === '')) {
                           <mat-hint
                             style="color: #ff5722;">
                             Definition should define why Cardinality Max is zero (0)
@@ -884,7 +875,7 @@
                           [formControl]="ccCardinalityMax"
                           [value]="ccCardinalityMax.value | unbounded" />
                         @if (ccCardinalityMax.valid && asBccpDetail().bcc.cardinalityMax === 0 &&
-                          (!asBccpDetail().bcc.definition || asBccpDetail().bcc.definition === '')) {
+                        (!asBccpDetail().bcc.definition || asBccpDetail().bcc.definition === '')) {
                           <mat-hint
                             style="color: #ff5722;">
                             Definition should define why Cardinality Max is zero (0)

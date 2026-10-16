@@ -220,8 +220,7 @@
         <span class="context-menu-item">Transfer Ownership</span>
       </button>
       @if (userToken.functionsRequiringEmailTransmission.enabled && !isEditable(contextMenuItem)) {
-        <button mat-menu-item (click)="requestOwnershipTransfer(contextMenuItem)"
-          >
+        <button mat-menu-item (click)="requestOwnershipTransfer(contextMenuItem)">
           <span class="context-menu-item">Request Ownership Transfer</span>
         </button>
       }

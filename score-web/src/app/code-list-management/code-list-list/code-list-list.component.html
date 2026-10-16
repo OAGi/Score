@@ -7,29 +7,25 @@
   <ng-container ngProjectAs="[listActions]">
     @if (showCreateCodeListBtn) {
       <button mat-icon-button class="ms-2" matTooltip="New Code List"
-        (click)="createCodeList()"
-        >
+        (click)="createCodeList()">
         <mat-icon>add</mat-icon>
       </button>
     }
     @if (showDiscardBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Delete"
-        (click)="openDialogCodeListListDelete()"
-        >
+        (click)="openDialogCodeListListDelete()">
         <mat-icon>delete</mat-icon>
       </button>
     }
     @if (showRestoreBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Purge"
-        (click)="openDialogCodeListListPurge()"
-        >
+        (click)="openDialogCodeListListPurge()">
         <mat-icon>delete_forever</mat-icon>
       </button>
     }
     @if (showRestoreBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Restore"
-        (click)="openDialogCodeListListRestore()"
-        >
+        (click)="openDialogCodeListListRestore()">
         <mat-icon>restore_from_trash</mat-icon>
       </button>
     }

@@ -1,105 +1,105 @@
 <score-dialog-page [title]="actionName + ' Business Context Value'">
   <div class="value-cards dialog-form">
-      <mat-card class="p-3 me-2">
-        <mat-card-content>
-          <mat-form-field>
-            <mat-label>Context Category</mat-label>
-            <mat-select [(ngModel)]="businessContextValue.contextCategoryId" (selectionChange)="onCtxCategoryChange()">
-              <mat-option>
-                <ngx-mat-select-search [formControl]="contextCategoryListFilterCtrl"
-                  [placeholderLabel]="'Search...'"
-                [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+    <mat-card class="p-3 me-2">
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>Context Category</mat-label>
+          <mat-select [(ngModel)]="businessContextValue.contextCategoryId" (selectionChange)="onCtxCategoryChange()">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="contextCategoryListFilterCtrl"
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+            </mat-option>
+            @for (contextCategory of filteredContextCategoryList | async; track contextCategory) {
+              <mat-option
+                [value]="contextCategory.contextCategoryId">
+                {{ contextCategory.name }}
               </mat-option>
-              @for (contextCategory of filteredContextCategoryList | async; track contextCategory) {
-                <mat-option
-                  [value]="contextCategory.contextCategoryId">
-                  {{ contextCategory.name }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>Description</mat-label>
-            <textarea rows="6" cols="30" matInput [(ngModel)]="contextCategory.description" [disabled]="true"></textarea>
-          </mat-form-field>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="p-3 me-2">
-        <mat-card-content>
-          <mat-form-field>
-            <mat-label>Context Scheme</mat-label>
-            <mat-select [disabled]="businessContextValue.contextCategoryId === undefined" placeholder="Context Scheme"
-              required
-              [(ngModel)]="businessContextValue.contextSchemeId" (selectionChange)="onCtxSchemeChange()">
-              <mat-option>
-                <ngx-mat-select-search [formControl]="contextSchemeListFilterCtrl"
-                  [placeholderLabel]="'Search...'"
-                [noEntriesFoundLabel]="'No matching context scheme found.'"></ngx-mat-select-search>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="contextCategory.description" [disabled]="true"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="p-3 me-2">
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>Context Scheme</mat-label>
+          <mat-select [disabled]="businessContextValue.contextCategoryId === undefined" placeholder="Context Scheme"
+            required
+            [(ngModel)]="businessContextValue.contextSchemeId" (selectionChange)="onCtxSchemeChange()">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="contextSchemeListFilterCtrl"
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching context scheme found.'"></ngx-mat-select-search>
+            </mat-option>
+            @for (contextScheme of filteredContextSchemeList | async; track contextScheme) {
+              <mat-option
+                [value]="contextScheme.contextSchemeId">
+                {{ contextScheme.schemeName }}
               </mat-option>
-              @for (contextScheme of filteredContextSchemeList | async; track contextScheme) {
-                <mat-option
-                  [value]="contextScheme.contextSchemeId">
-                  {{ contextScheme.schemeName }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+            }
+          </mat-select>
+        </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Scheme ID</mat-label>
-            <input matInput [(ngModel)]="contextScheme.schemeId" maxlength="45"
-              [disabled]="true"/>
-          </mat-form-field>
+        <mat-form-field>
+          <mat-label>Scheme ID</mat-label>
+          <input matInput [(ngModel)]="contextScheme.schemeId" maxlength="45"
+            [disabled]="true"/>
+        </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Agency ID</mat-label>
-            <input matInput [(ngModel)]="contextScheme.schemeAgencyId" maxlength="45"
-              [disabled]="true"/>
-          </mat-form-field>
+        <mat-form-field>
+          <mat-label>Agency ID</mat-label>
+          <input matInput [(ngModel)]="contextScheme.schemeAgencyId" maxlength="45"
+            [disabled]="true"/>
+        </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Version</mat-label>
-            <input matInput [(ngModel)]="contextScheme.schemeVersionId" maxlength="45"
-              [disabled]="true"/>
-          </mat-form-field>
+        <mat-form-field>
+          <mat-label>Version</mat-label>
+          <input matInput [(ngModel)]="contextScheme.schemeVersionId" maxlength="45"
+            [disabled]="true"/>
+        </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Description</mat-label>
-            <textarea rows="6" cols="30" matInput [(ngModel)]="contextScheme.description"
-            [disabled]="true"></textarea>
-          </mat-form-field>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="p-3">
-        <mat-card-content>
-          <mat-form-field>
-            <mat-label>Context Scheme Value</mat-label>
-            <mat-select [disabled]="businessContextValue.contextSchemeId === undefined" placeholder="Context Scheme Value"
-              required
-              [(ngModel)]="businessContextValue.contextSchemeValueId"
-              (selectionChange)="onCtxSchemeValueChange()">
-              <mat-option>
-                <ngx-mat-select-search [formControl]="contextSchemeValueListFilterCtrl"
-                  [placeholderLabel]="'Search...'"
-                [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="contextScheme.description"
+          [disabled]="true"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="p-3">
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>Context Scheme Value</mat-label>
+          <mat-select [disabled]="businessContextValue.contextSchemeId === undefined" placeholder="Context Scheme Value"
+            required
+            [(ngModel)]="businessContextValue.contextSchemeValueId"
+            (selectionChange)="onCtxSchemeValueChange()">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="contextSchemeValueListFilterCtrl"
+                [placeholderLabel]="'Search...'"
+              [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
+            </mat-option>
+            @for (contextSchemeValue of filteredContextSchemeValueList | async; track contextSchemeValue) {
+              <mat-option
+                [value]="contextSchemeValue.contextSchemeValueId"
+                [matTooltip]="contextSchemeValue.meaning">
+                {{ contextSchemeValue.value }}
               </mat-option>
-              @for (contextSchemeValue of filteredContextSchemeValueList | async; track contextSchemeValue) {
-                <mat-option
-                  [value]="contextSchemeValue.contextSchemeValueId"
-                  [matTooltip]="contextSchemeValue.meaning">
-                  {{ contextSchemeValue.value }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+            }
+          </mat-select>
+        </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Meaning</mat-label>
-            <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeValue.meaning"
-            [disabled]="true"></textarea>
-          </mat-form-field>
-        </mat-card-content>
-      </mat-card>
+        <mat-form-field>
+          <mat-label>Meaning</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeValue.meaning"
+          [disabled]="true"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
   </div>
 
   <ng-container ngProjectAs="[dialogActions]">

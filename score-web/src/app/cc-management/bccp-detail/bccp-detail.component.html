@@ -49,20 +49,17 @@
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="warn" (click)="purgeNode()"
-                >
+              <button mat-raised-button color="warn" (click)="purgeNode()">
                 Purge
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="primary" (click)="restoreNode()"
-                >
+              <button mat-raised-button color="primary" (click)="restoreNode()">
                 Restore
               </button>
             }
             @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
-              <button mat-raised-button color="primary" (click)="cancelRevision()"
-                >
+              <button mat-raised-button color="primary" (click)="cancelRevision()">
                 Cancel
               </button>
             }
@@ -112,26 +109,24 @@
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="primary" (click)="restoreNode()"
-                >
+              <button mat-raised-button color="primary" (click)="restoreNode()">
                 Restore
               </button>
             }
             @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
-              <button mat-raised-button color="primary" (click)="cancelRevision()"
-                >
+              <button mat-raised-button color="primary" (click)="cancelRevision()">
                 Cancel
               </button>
             }
           </div>
         }
-    <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-      <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-        <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-          <span>Hide cardinality</span>
-        </mat-checkbox>
-      </button>
-    </mat-menu>
+        <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+          <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+              <span>Hide cardinality</span>
+            </mat-checkbox>
+          </button>
+        </mat-menu>
       }
     </ng-container>
     <ng-container treeDetailTree>
@@ -156,15 +151,13 @@
           <mat-divider></mat-divider>
         }
         @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
-          <button mat-menu-item (click)="changeDt(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="changeDt(contextMenuItem)">
             <span class="context-menu-item">Change DT</span>
           </button>
         }
         <mat-divider></mat-divider>
         @if (!!contextMenuItem && contextMenuItem.level !== 0) {
-          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)">
             <span class="context-menu-item">Open in new tab</span>
           </button>
         }

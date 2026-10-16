@@ -60,12 +60,11 @@
           </mat-chip-row>
         }
         <input
-            #dependencyInput
-            placeholder="Add release dependency"
-            [formControl]="dependencyCtrl"
-            [matAutocomplete]="dependencyAuto"
-            [matChipInputFor]="dependencyChipGrid"
-            >
+          #dependencyInput
+          placeholder="Add release dependency"
+          [formControl]="dependencyCtrl"
+          [matAutocomplete]="dependencyAuto"
+          [matChipInputFor]="dependencyChipGrid">
       </mat-chip-grid>
       <mat-autocomplete #dependencyAuto="matAutocomplete" (optionSelected)="addDependency($event)">
         @for (dependency of filteredDependencyOptions | async; track dependency.releaseId) {

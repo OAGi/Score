@@ -103,55 +103,55 @@
     </ng-container>
 
     <ng-container scoreColumnDef="verb">
-                <td score-cell *scoreCellDef="let element">
-                  <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
-                    [panelWidth]="null"
-                    (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
-                    (click)="$event.stopPropagation()">
-                    <mat-option value="GET">GET</mat-option>
-                    <mat-option value="PUT">PUT</mat-option>
-                    <mat-option value="POST">POST</mat-option>
-                    <mat-option value="DELETE">DELETE</mat-option>
-                    <mat-option value="PATCH">PATCH</mat-option>
-                  </mat-select>
-                  @if (isSelected(element) && !verbSelection[element.topLevelAsbiepId]) {
-                    <mat-error>
-                      Verb is required.
-                    </mat-error>
-                  }
-                </td>
-              </ng-container>
+      <td score-cell *scoreCellDef="let element">
+        <mat-select [(ngModel)]="verbSelection[element.topLevelAsbiepId]" required="true"
+          [panelWidth]="null"
+          (ngModelChange)="onChange('verbSelection', element.topLevelAsbiepId)"
+          (click)="$event.stopPropagation()">
+          <mat-option value="GET">GET</mat-option>
+          <mat-option value="PUT">PUT</mat-option>
+          <mat-option value="POST">POST</mat-option>
+          <mat-option value="DELETE">DELETE</mat-option>
+          <mat-option value="PATCH">PATCH</mat-option>
+        </mat-select>
+        @if (isSelected(element) && !verbSelection[element.topLevelAsbiepId]) {
+          <mat-error>
+            Verb is required.
+          </mat-error>
+        }
+      </td>
+    </ng-container>
 
     <ng-container scoreColumnDef="messageBody">
-                <td score-cell *scoreCellDef="let element">
-                  <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
-                    [panelWidth]="null"
-                    (click)="$event.stopPropagation()">
-                    <!-- Issue #1610: GET never carries a request body; DELETE may, in any version
-                         (dropped from the generated document in 3.0). -->
-                    <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
-                    <mat-option value="Response">Response</mat-option>
-                  </mat-select>
-                  @if (isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]) {
-                    <mat-error>
-                      Message Body is required.
-                    </mat-error>
-                  } @else if (isSelected(element) && isDuplicateBodySlotForAdd(element)) {
-                    <!-- Issue #1492 (Option 2): this (verb, message body) already exists on the document. -->
-                    <mat-error>
-                      This endpoint already has a {{ messageBodySelection[element.topLevelAsbiepId] }} body.
-                    </mat-error>
-                  }
-                </td>
-              </ng-container>
+      <td score-cell *scoreCellDef="let element">
+        <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
+          [panelWidth]="null"
+          (click)="$event.stopPropagation()">
+          <!-- Issue #1610: GET never carries a request body; DELETE may, in any version
+               (dropped from the generated document in 3.0). -->
+          <mat-option value="Request" [disabled]="verbSelection[element.topLevelAsbiepId] === 'GET'">Request</mat-option>
+          <mat-option value="Response">Response</mat-option>
+        </mat-select>
+        @if (isSelected(element) && !messageBodySelection[element.topLevelAsbiepId]) {
+          <mat-error>
+            Message Body is required.
+          </mat-error>
+        } @else if (isSelected(element) && isDuplicateBodySlotForAdd(element)) {
+          <!-- Issue #1492 (Option 2): this (verb, message body) already exists on the document. -->
+          <mat-error>
+            This endpoint already has a {{ messageBodySelection[element.topLevelAsbiepId] }} body.
+          </mat-error>
+        }
+      </td>
+    </ng-container>
 
     <ng-container scoreColumnDef="arrayIndicator">
-                <td score-cell *scoreCellDef="let element">
-                  <mat-checkbox [(ngModel)]="element.arrayIndicator" (click)="$event.stopPropagation()"></mat-checkbox>
-                </td>
-              </ng-container>
+      <td score-cell *scoreCellDef="let element">
+        <mat-checkbox [(ngModel)]="element.arrayIndicator" (click)="$event.stopPropagation()"></mat-checkbox>
+      </td>
+    </ng-container>
 
-      </score-table-view>
+  </score-table-view>
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">

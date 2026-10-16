@@ -90,16 +90,16 @@
 
     <ng-container *scoreDetailDef="let element">
       <mat-card class="mb-2">
-                    @if (element.definition.source) {
-                      <mat-card-header class="element-detail-header">
-                        <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                      </mat-card-header>
-                    }
-                    <mat-card-content>
-                      <p [innerHTML]="element.definition.content | highlight : tableView.applied('definition') : ['bg-warning']"
-                      class="element-detail-content"></p>
-                    </mat-card-content>
-                  </mat-card>
+        @if (element.definition.source) {
+          <mat-card-header class="element-detail-header">
+            <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+          </mat-card-header>
+        }
+        <mat-card-content>
+          <p [innerHTML]="element.definition.content | highlight : tableView.applied('definition') : ['bg-warning']"
+          class="element-detail-content"></p>
+        </mat-card-content>
+      </mat-card>
     </ng-container>
   </score-table-view>
   <ng-container ngProjectAs="[listActionBar]">

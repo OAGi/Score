@@ -1,5 +1,5 @@
 <score-base-page [title]="'BIE_UPLIFT.TITLE' | translate" subtitle="Verification"
- >
+  toolbarClass="bg-white d-flex flex-column align-items-start">
   <div class="pb-2">
     <mat-card-content class="mat-card-container">
       @if (loading) {
@@ -38,20 +38,20 @@
                                    (moveRequest)="move('source', $event)">
               <ng-container treeSearchSettings>
                 <div class="tree-search-settings">
-                <div class="actions ms-auto">
-                  <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="sourceSettingsContextMenu">
-                    <mat-icon>settings</mat-icon>
-                  </button>
+                  <div class="actions ms-auto">
+                    <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="sourceSettingsContextMenu">
+                      <mat-icon>settings</mat-icon>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
-                <button mat-menu-item>
-                  <mat-checkbox class="d-inline-flex pe-2"
-                    [(ngModel)]="sourceDataSource.hideCardinality">
-                    <span>Hide cardinality</span>
-                  </mat-checkbox>
-                </button>
-              </mat-menu>
+                <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
+                  <button mat-menu-item>
+                    <mat-checkbox class="d-inline-flex pe-2"
+                      [(ngModel)]="sourceDataSource.hideCardinality">
+                      <span>Hide cardinality</span>
+                    </mat-checkbox>
+                  </button>
+                </mat-menu>
               </ng-container>
             </score-tree-search-bar>
           }
@@ -81,20 +81,20 @@
                                    (moveRequest)="move('target', $event)">
               <ng-container treeSearchSettings>
                 <div class="tree-search-settings">
-                <div class="actions ms-auto">
-                  <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="targetSettingsContextMenu">
-                    <mat-icon>settings</mat-icon>
-                  </button>
+                  <div class="actions ms-auto">
+                    <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="targetSettingsContextMenu">
+                      <mat-icon>settings</mat-icon>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
-                <button mat-menu-item>
-                  <mat-checkbox class="d-inline-flex pe-2"
-                    [(ngModel)]="targetDataSource.hideCardinality">
-                    <span>Hide cardinality</span>
-                  </mat-checkbox>
-                </button>
-              </mat-menu>
+                <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
+                  <button mat-menu-item>
+                    <mat-checkbox class="d-inline-flex pe-2"
+                      [(ngModel)]="targetDataSource.hideCardinality">
+                      <span>Hide cardinality</span>
+                    </mat-checkbox>
+                  </button>
+                </mat-menu>
               </ng-container>
             </score-tree-search-bar>
           }
@@ -121,26 +121,22 @@
       <!-- Context Menu Area -->
       <mat-menu class="context-menu" #contextMenu="matMenu">
         @if (isSource(contextMenuItem)) {
-          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 2)"
-            >
+          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 2)">
             <span class="context-menu-item">Expand 2</span>
           </button>
         }
         @if (isSource(contextMenuItem)) {
-          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 3)"
-            >
+          <button mat-menu-item (click)="sourceDataSource.expandDescendants(contextMenuItem, 3)">
             <span class="context-menu-item">Expand 3</span>
           </button>
         }
         @if (isTarget(contextMenuItem)) {
-          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 2)"
-            >
+          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 2)">
             <span class="context-menu-item">Expand 2</span>
           </button>
         }
         @if (isTarget(contextMenuItem)) {
-          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 3)"
-            >
+          <button mat-menu-item (click)="targetDataSource.expandDescendants(contextMenuItem, 3)">
             <span class="context-menu-item">Expand 3</span>
           </button>
         }

@@ -215,14 +215,12 @@
           <mat-divider></mat-divider>
         }
         @if (dataSource && dataSource.isExpandable(contextMenuItem)) {
-          <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)"
-            >
+          <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 2)">
             <span class="context-menu-item">Expand 2</span>
           </button>
         }
         @if (dataSource && dataSource.isExpandable(contextMenuItem)) {
-          <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)"
-            >
+          <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
             <span class="context-menu-item">Expand 3</span>
           </button>
         }
@@ -230,14 +228,12 @@
           <mat-divider></mat-divider>
         }
         @if (canEdit && canUseBaseBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="useBaseBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="useBaseBIE(contextMenuItem)">
             <span class="context-menu-item">Use Base BIE</span>
           </button>
         }
         @if (canEdit && canRemoveBaseBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="removeBaseBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="removeBaseBIE(contextMenuItem)">
             <span class="context-menu-item">Remove Base BIE</span>
           </button>
         }
@@ -245,8 +241,7 @@
           <mat-divider></mat-divider>
         }
         @if (canEdit && canReuseBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="reuseBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="reuseBIE(contextMenuItem)">
             <span class="context-menu-item">Reuse BIE</span>
           </button>
         }
@@ -260,32 +255,27 @@
           <mat-divider></mat-divider>
         }
         @if (canEdit && canRemoveReusedBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="findReuses(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="findReuses(contextMenuItem)">
             <span class="context-menu-item">Find Reuses</span>
           </button>
         }
         @if (canEdit && canRemoveReusedBIE(contextMenuItem) && !contextMenuItem.inherited) {
-          <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="removeReusedBIE(contextMenuItem)">
             <span class="context-menu-item">Remove Reused BIE</span>
           </button>
         }
         @if (canEdit && canRemoveReusedBIE(contextMenuItem) && !contextMenuItem.inherited) {
-          <button mat-menu-item (click)="retainReusedBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="retainReusedBIE(contextMenuItem)">
             <span class="context-menu-item">Retain Reused BIE</span>
           </button>
         }
         @if (canEdit && canOverrideBaseReusedBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="overrideBaseReusedBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="overrideBaseReusedBIE(contextMenuItem)">
             <span class="context-menu-item">Override Base Reused BIE</span>
           </button>
         }
         @if (canEdit && canOverrideBaseReusedBIE(contextMenuItem)) {
-          <button mat-menu-item (click)="removeOverrideReusedBIE(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="removeOverrideReusedBIE(contextMenuItem)">
             <span class="context-menu-item">Remove Override Reused BIE</span>
           </button>
         }
@@ -1017,8 +1007,7 @@
                         </mat-error>
                       }
                       @if (!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')) {
-                        <mat-error
-                          >
+                        <mat-error>
                           '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
                         </mat-error>
                       }
@@ -1042,7 +1031,7 @@
                         [formControl]="bieCardinalityMax"
                         [value]="bieCardinalityMax.value | unbounded">
                       @if (bieCardinalityMax.valid && asAsbiepDetail().asbie && asAsbiepDetail().asbie.cardinalityMax === 0 &&
-                        (!asAsbiepDetail().asbie.definition || asAsbiepDetail().asbie.definition === '')) {
+                      (!asAsbiepDetail().asbie.definition || asAsbiepDetail().asbie.definition === '')) {
                         <mat-hint
                           style="color: #ff5722;">
                           Context Definition should define why Cardinality Max is zero (0)
@@ -1622,8 +1611,7 @@
                         </mat-error>
                       }
                       @if (!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')) {
-                        <mat-error
-                          >
+                        <mat-error>
                           '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
                         </mat-error>
                       }
@@ -1647,7 +1635,7 @@
                         [formControl]="bieCardinalityMax"
                         [value]="bieCardinalityMax.value | unbounded">
                       @if (bieCardinalityMax.valid && asBbiepDetail().bbie.cardinalityMax === 0 &&
-                        (!asBbiepDetail().bbie.definition || asBbiepDetail().bbie.definition === '')) {
+                      (!asBbiepDetail().bbie.definition || asBbiepDetail().bbie.definition === '')) {
                         <mat-hint
                           style="color: #ff5722;">
                           Context Definition should define why Cardinality Max is zero (0)
@@ -1825,10 +1813,10 @@
                                     [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                     <span>{{ codeList.name }}</span>
                                     <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                      <span>, Deprecated</span>
+                                        <span>, Deprecated</span>
                                       }@if (codeList.state === 'Deleted') {
-                                      <span>, Deleted</span>
-                                    })</span>
+                                        <span>, Deleted</span>
+                                      })</span>
                                   </div>
                                 </mat-option>
                               }
@@ -1860,10 +1848,10 @@
                                     [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                     <span>{{ agency.name }}</span>
                                     <span class="f12 ms-auto pe-2"> ({{ agency.versionId }}@if (agency.deprecated) {
-                                      <span>, Deprecated</span>
+                                        <span>, Deprecated</span>
                                       }@if (agency.state === 'Deleted') {
-                                      <span>, Deleted</span>
-                                    })</span>
+                                        <span>, Deleted</span>
+                                      })</span>
                                   </div>
                                 </mat-option>
                               }
@@ -1885,8 +1873,7 @@
                             <input matInput placeholder="Minimum Length"
                               [formControl]="facetMinimumLength">
                             @if (!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')) {
-                              <mat-error
-                                >
+                              <mat-error>
                                 '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
                               </mat-error>
                             }
@@ -1908,8 +1895,7 @@
                             <input matInput placeholder="Maximum Length"
                               [formControl]="facetMaximumLength">
                             @if (!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')) {
-                              <mat-error
-                                >
+                              <mat-error>
                                 '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
                               </mat-error>
                             }
@@ -2199,10 +2185,10 @@
                                       [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                       <span>{{ codeList.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (codeList.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </div>
                                   </mat-option>
                                 }
@@ -2227,10 +2213,10 @@
                                       [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                       <span>{{ agency.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ agency.versionId }}@if (agency.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (agency.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </div>
                                   </mat-option>
                                 }
@@ -2376,8 +2362,7 @@
                         </mat-error>
                       }
                       @if (!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')) {
-                        <mat-error
-                          >
+                        <mat-error>
                           '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
                         </mat-error>
                       }
@@ -2401,7 +2386,7 @@
                         [formControl]="bieCardinalityMax"
                         [value]="bieCardinalityMax.value | unbounded">
                       @if (bieCardinalityMax.valid && asBbieScDetail().bbieSc.cardinalityMax === 0 &&
-                        (!asBbieScDetail().bbieSc.definition || asBbieScDetail().bbieSc.definition === '')) {
+                      (!asBbieScDetail().bbieSc.definition || asBbieScDetail().bbieSc.definition === '')) {
                         <mat-hint
                           style="color: #ff5722;">
                           Context Definition should define why Cardinality Max is zero (0)
@@ -2573,10 +2558,10 @@
                                     [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                     <span>{{ codeList.name }}</span>
                                     <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                      <span>, Deprecated</span>
+                                        <span>, Deprecated</span>
                                       }@if (codeList.state === 'Deleted') {
-                                      <span>, Deleted</span>
-                                    })</span>
+                                        <span>, Deleted</span>
+                                      })</span>
                                   </div>
                                 </mat-option>
                               }
@@ -2608,10 +2593,10 @@
                                     [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                     <span>{{ agency.name }}</span>
                                     <span class="f12 ms-auto pe-2"> ({{ agency.versionId }}@if (agency.deprecated) {
-                                      <span>, Deprecated</span>
+                                        <span>, Deprecated</span>
                                       }@if (agency.state === 'Deleted') {
-                                      <span>, Deleted</span>
-                                    })</span>
+                                        <span>, Deleted</span>
+                                      })</span>
                                   </div>
                                 </mat-option>
                               }
@@ -2633,8 +2618,7 @@
                             <input matInput placeholder="Minimum Length"
                               [formControl]="facetMinimumLength">
                             @if (!facetMinimumLength.hasError('min') && facetMinimumLength.hasError('pattern')) {
-                              <mat-error
-                                >
+                              <mat-error>
                                 '{{ facetMinimumLength.value }}' is not allowed for Minimum Length
                               </mat-error>
                             }
@@ -2656,8 +2640,7 @@
                             <input matInput placeholder="Maximum Length"
                               [formControl]="facetMaximumLength">
                             @if (!facetMaximumLength.hasError('min') && facetMaximumLength.hasError('pattern')) {
-                              <mat-error
-                                >
+                              <mat-error>
                                 '{{ facetMaximumLength.value }}' is not allowed for Maximum Length
                               </mat-error>
                             }
@@ -2908,10 +2891,10 @@
                                       [matTooltipDisabled]="isValidState(codeList.state) && codeList.state !== 'Deleted'">
                                       <span>{{ codeList.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (codeList.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </div>
                                   </mat-option>
                                 }
@@ -2936,10 +2919,10 @@
                                       [matTooltipDisabled]="isValidState(agency.state) && agency.state !== 'Deleted'">
                                       <span>{{ agency.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ agency.versionId }}@if (agency.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (agency.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </div>
                                   </mat-option>
                                 }

@@ -1,154 +1,154 @@
 <score-dialog-page title="Select Verb and Noun to {{ action }} BOD">
   <div class="row">
-      <div class="col-6">
-        <div class="dialog-section-title">Select Verb to {{this.action}} BOD</div>
-        <div>
-          <score-table-view #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
-            [selection]="verbSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
+    <div class="col-6">
+      <div class="dialog-section-title">Select Verb to {{this.action}} BOD</div>
+      <div>
+        <score-table-view #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
+          [selection]="verbSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
-      <ng-container scoreColumnDef="state">
-        <td score-cell *scoreCellDef="let element">
-          <span class="cc-state {{ element.state }}"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-          @if (element.deprecated) {
-            <span class="cc-state Deprecated"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-        'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="den">
-        <td score-cell *scoreCellDef="let element">
-          <div class="den den-with-tags score-break-word">
-            <a routerLink="{{ 'core_component/asccp/' + element.manifestId }}"
-              target="_blank" rel="noopener noreferrer"
-              matTooltip="{{ element.den }}">
-              <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-            </a>
-            <div class="tag-list">
-              @for (tag of element.tagList; track tag) {
-                <span class="tag ms-2"
-                  [style.background-color]="tag.backgroundColor"
-                [style.color]="tag.textColor">{{ tag.name }}</span>
+          <ng-container scoreColumnDef="state">
+            <td score-cell *scoreCellDef="let element">
+              <span class="cc-state {{ element.state }}"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+              @if (element.deprecated) {
+                <span class="cc-state Deprecated"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+            'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
               }
-            </div>
-          </div>
-          <div class="description score-line-clamp-2 score-break-word"
-          [innerHTML]="element.module | highlight : verbView.applied('module') : ['bg-warning']"></div>
-        </td>
-      </ng-container>
+            </td>
+          </ng-container>
 
-      <ng-container scoreColumnDef="lastUpdateTimestamp">
-        <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">
-            <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-            <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
-          </div>
-        </td>
-      </ng-container>
+          <ng-container scoreColumnDef="den">
+            <td score-cell *scoreCellDef="let element">
+              <div class="den den-with-tags score-break-word">
+                <a routerLink="{{ 'core_component/asccp/' + element.manifestId }}"
+                  target="_blank" rel="noopener noreferrer"
+                  matTooltip="{{ element.den }}">
+                  <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
+                </a>
+                <div class="tag-list">
+                  @for (tag of element.tagList; track tag) {
+                    <span class="tag ms-2"
+                      [style.background-color]="tag.backgroundColor"
+                    [style.color]="tag.textColor">{{ tag.name }}</span>
+                  }
+                </div>
+              </div>
+              <div class="description score-line-clamp-2 score-break-word"
+              [innerHTML]="element.module | highlight : verbView.applied('module') : ['bg-warning']"></div>
+            </td>
+          </ng-container>
 
-            <ng-container *scoreDetailDef="let element">
-              <mat-card class="mb-2">
-                                          @if (element.definition.source) {
-                                            <mat-card-header class="element-detail-header">
-                                              <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                                            </mat-card-header>
-                                          }
-                                          <mat-card-content>
-                                            <p [innerHTML]="element.definition.content | highlight : verbView.applied('definition') : ['bg-warning']"
-                                            class="element-detail-content"></p>
-                                          </mat-card-content>
-                                        </mat-card>
-            </ng-container>
-          </score-table-view>
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="dialog-section-title">Select Noun to {{this.action}} BOD</div>
-        <div>
-          <score-table-view #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
-            [selection]="nounSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
+          <ng-container scoreColumnDef="lastUpdateTimestamp">
+            <td score-cell *scoreCellDef="let element">
+              <div class="score-line-clamp-2 score-break-word">
+                <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+              </div>
+            </td>
+          </ng-container>
 
-      <ng-container scoreColumnDef="state">
-        <td score-cell *scoreCellDef="let element">
-          <span class="cc-state {{ element.state }}"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-                'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
-          @if (element.deprecated) {
-            <span class="cc-state Deprecated"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-        'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="den">
-        <td score-cell *scoreCellDef="let element">
-          <div class="den den-with-tags score-break-word">
-            <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
-              target="_blank" rel="noopener noreferrer"
-              matTooltip="{{ element.den }}">
-              <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-            </a>
-            <div class="tag-list">
-              @for (tag of element.tagList; track tag) {
-                <span class="tag ms-2"
-                  [style.background-color]="tag.backgroundColor"
-                [style.color]="tag.textColor">{{ tag.name }}</span>
+          <ng-container *scoreDetailDef="let element">
+            <mat-card class="mb-2">
+              @if (element.definition.source) {
+                <mat-card-header class="element-detail-header">
+                  <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+                </mat-card-header>
               }
-            </div>
-          </div>
-          <div class="description score-line-clamp-2 score-break-word"
-          [innerHTML]="element.module | highlight : nounView.applied('module') : ['bg-warning']"></div>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="lastUpdateTimestamp">
-        <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">
-            <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-            <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
-          </div>
-        </td>
-      </ng-container>
-
-            <ng-container *scoreDetailDef="let element">
-              <mat-card class="mb-2">
-                                          @if (element.definition.source) {
-                                            <mat-card-header class="element-detail-header">
-                                              <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-                                            </mat-card-header>
-                                          }
-                                          <mat-card-content>
-                                            <p [innerHTML]="element.definition.content | highlight : nounView.applied('definition') : ['bg-warning']"
-                                            class="element-detail-content"></p>
-                                          </mat-card-content>
-                                        </mat-card>
-            </ng-container>
-          </score-table-view>
-        </div>
+              <mat-card-content>
+                <p [innerHTML]="element.definition.content | highlight : verbView.applied('definition') : ['bg-warning']"
+                class="element-detail-content"></p>
+              </mat-card-content>
+            </mat-card>
+          </ng-container>
+        </score-table-view>
       </div>
+    </div>
+    <div class="col-6">
+      <div class="dialog-section-title">Select Noun to {{this.action}} BOD</div>
+      <div>
+        <score-table-view #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
+          [selection]="nounSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
+
+          <ng-container scoreColumnDef="state">
+            <td score-cell *scoreCellDef="let element">
+              <span class="cc-state {{ element.state }}"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+              @if (element.deprecated) {
+                <span class="cc-state Deprecated"
+                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+            'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container scoreColumnDef="den">
+            <td score-cell *scoreCellDef="let element">
+              <div class="den den-with-tags score-break-word">
+                <a routerLink="{{ 'core_component/acc/' + element.manifestId }}"
+                  target="_blank" rel="noopener noreferrer"
+                  matTooltip="{{ element.den }}">
+                  <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
+                </a>
+                <div class="tag-list">
+                  @for (tag of element.tagList; track tag) {
+                    <span class="tag ms-2"
+                      [style.background-color]="tag.backgroundColor"
+                    [style.color]="tag.textColor">{{ tag.name }}</span>
+                  }
+                </div>
+              </div>
+              <div class="description score-line-clamp-2 score-break-word"
+              [innerHTML]="element.module | highlight : nounView.applied('module') : ['bg-warning']"></div>
+            </td>
+          </ng-container>
+
+          <ng-container scoreColumnDef="lastUpdateTimestamp">
+            <td score-cell *scoreCellDef="let element">
+              <div class="score-line-clamp-2 score-break-word">
+                <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container *scoreDetailDef="let element">
+            <mat-card class="mb-2">
+              @if (element.definition.source) {
+                <mat-card-header class="element-detail-header">
+                  <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+                </mat-card-header>
+              }
+              <mat-card-content>
+                <p [innerHTML]="element.definition.content | highlight : nounView.applied('definition') : ['bg-warning']"
+                class="element-detail-content"></p>
+              </mat-card-content>
+            </mat-card>
+          </ng-container>
+        </score-table-view>
+      </div>
+    </div>
   </div>
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
-    <mat-icon>close</mat-icon>
-    <span class="ps-2">Cancel</span>
-  </button>
-  @if (action === 'create') {
-    <button mat-raised-button color="primary"
-      [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
-      (click)="onClick()">
-      <mat-icon>add</mat-icon>
-      @if (BODName === '') {
-        <span class="ps-2">Create</span>
-      }
-      @if (BODName !== '') {
-        <span class="ps-2">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
-      }
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
-  }
+    @if (action === 'create') {
+      <button mat-raised-button color="primary"
+        [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
+        (click)="onClick()">
+        <mat-icon>add</mat-icon>
+        @if (BODName === '') {
+          <span class="ps-2">Create</span>
+        }
+        @if (BODName !== '') {
+          <span class="ps-2">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
+        }
+      </button>
+    }
   </ng-container>
 </score-dialog-page>

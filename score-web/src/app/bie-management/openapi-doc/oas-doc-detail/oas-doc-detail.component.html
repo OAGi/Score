@@ -208,176 +208,176 @@
       <score-table-view [table]="columns" [load]="load" [ready]="ready()" multiSort [selection]="selection" [rowKey]="rowKey"
         [selectAll]="false" [selectOnRowClick]="false" [rowClass]="rowClass">
 
-      <ng-container scoreColumnDef="branch">
-        <td score-cell *scoreCellDef="let element">
-          <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
-        </td>
-      </ng-container>
+        <ng-container scoreColumnDef="branch">
+          <td score-cell *scoreCellDef="let element">
+            <span [matTooltip]="element.releaseNum">{{ element.releaseNum }}</span>
+          </td>
+        </ng-container>
 
-      <ng-container scoreColumnDef="den">
-        <td score-cell *scoreCellDef="let element">
-          @if (element.topLevelAsbiepId) {
-            <div class="den score-break-word">
-              <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-                 matTooltip="{{ element.den }}">
-                <div class="d-inline-flex align-items-center">
-                  <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                  @if (element.displayName) {
-                    <span class="bie-display-name ms-2">{{ element.displayName }}</span>
-                  }
-                </div>
-                <div>
-                  <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>
-                </div>
-              </a>
-            </div>
-            <div class="bie-guid">{{ element.guid }}</div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="remark">
-        <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="verb">
-        <td score-cell *scoreCellDef="let element">
-          <mat-select [(ngModel)]="element.verb"
-                      [panelWidth]="null"
-                      (ngModelChange)="onChange('verb', element)">
-            <mat-option value="GET">GET</mat-option>
-            <mat-option value="PUT">PUT</mat-option>
-            <mat-option value="POST">POST</mat-option>
-            <mat-option value="DELETE">DELETE</mat-option>
-            <mat-option value="PATCH">PATCH</mat-option>
-          </mat-select>
-          <!-- Issue #1492 (Option 2): the duplicate-body-slot sentence is surfaced only on the
-               Resource Name column (with the specific "Duplicate <body>" note on Message Body), so
-               it is intentionally not repeated here. -->
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="arrayIndicator">
-        <td score-cell *scoreCellDef="let element">
-          <mat-checkbox [(ngModel)]="element.arrayIndicator"
-                        (ngModelChange)="updateOperationIdForArray(element)"
-                        [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="suppressRootIndicator">
-        <td score-cell *scoreCellDef="let element">
-          <mat-checkbox [(ngModel)]="element.suppressRootIndicator"
-                        [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="messageBody">
-        <td score-cell *scoreCellDef="let element">
-          <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId"
-                      (ngModelChange)="recomputeOasValidation()"
-                      [class.oas-body-slot-error]="isDuplicateBodySlot(element)">
-            <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0
-                 it is dropped from the generated document (see the banner above the table). -->
-            <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
-            <mat-option value="Response">Response</mat-option>
-          </mat-select>
-          @if (isDuplicateBodySlot(element)) {
-            <!-- Issue #1492 (Option 2): duplicate body on this (path, verb). -->
-            <div class="oas-body-slot-error-text">Duplicate {{ element.messageBody }} body on this endpoint.</div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="resourceName">
-        <td score-cell *scoreCellDef="let element">
-          <mat-form-field>
-            <input matInput [(ngModel)]="element.resourceName"
-                   (ngModelChange)="recomputeOasValidation()"
-                   [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
-            <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
-                 duplicate body slot is surfaced here too. -->
-            <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
-          </mat-form-field>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="operationId">
-        <td score-cell *scoreCellDef="let element">
-          <mat-form-field>
-            <input matInput [(ngModel)]="element.operationId"
-                   (ngModelChange)="recomputeOasValidation()"
-                   [errorStateMatcher]="operationIdErrorStateMatcher(element)">
-            @if (!element.operationId || !element.operationId.trim()) {
-              <mat-error>Operation ID is required.</mat-error>
-            } @else {
-              <mat-error>Operation ID must be unique within the document.</mat-error>
-            }
-          </mat-form-field>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="tagName">
-        <td score-cell *scoreCellDef="let element">
-          <mat-form-field>
-            <input matInput [(ngModel)]="element.tagName">
-          </mat-form-field>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="security">
-        <td score-cell *scoreCellDef="let element">
-          @if (securitySchemes.length === 0 && !element.securityOverridden) {
-            <span class="oas-security-na" matTooltip="Add a Security Scheme to configure operation security">—</span>
-          } @else {
-            <div class="oas-security-cell"
-                 [matTooltip]="operationSecuritySummary(element)"
-                 (click)="openOperationSecurityDialog(element, $event)">
-              <span class="oas-security-text">{{ operationSecuritySummary(element) }}</span>
-              <mat-icon class="oas-security-edit">edit</mat-icon>
-            </div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="errorResponse">
-        <td score-cell *scoreCellDef="let element">
-          <!-- Issue #1347: inline body-type selector (like Message Body). Selecting ConfirmMessage
-               opens a BIE-selection dialog; the picked BIE's DEN is shown as a re-pickable chip. -->
-          <mat-select [(ngModel)]="element.errorResponseBodyType" [panelWidth]="null"
-                      (ngModelChange)="onErrorResponseBodyTypeChange(element)">
-            @for (opt of errorResponseBodyTypeOptions; track opt.value) {
-              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-            }
-          </mat-select>
-          @if (element.errorResponseBodyType === 'CONFIRM_MESSAGE') {
-            <!-- A "Selected Confirm Message" link opens the picked BIE in a new tab (the DEN would just
-                 restate the selector, so it rides in the link tooltip); the pencil re-opens the
-                 BIE-selection dialog. Color-coded: indigo = picked, red = none picked yet. -->
-            <div class="oas-confirm-message-chip" [class.unset]="!element.confirmMessageTopLevelAsbiepId">
-              @if (element.confirmMessageTopLevelAsbiepId) {
-                <a class="oas-confirm-message-chip-link"
-                   href="/profile_bie/{{ element.confirmMessageTopLevelAsbiepId }}"
-                   target="_blank" rel="noopener"
-                   [matTooltip]="element.confirmMessageDen"
-                   (click)="$event.stopPropagation()">
-                  <span class="oas-confirm-message-chip-text">Selected Confirm Message</span>
-                  <mat-icon class="oas-confirm-message-chip-open">open_in_new</mat-icon>
+        <ng-container scoreColumnDef="den">
+          <td score-cell *scoreCellDef="let element">
+            @if (element.topLevelAsbiepId) {
+              <div class="den score-break-word">
+                <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                   matTooltip="{{ element.den }}">
+                  <div class="d-inline-flex align-items-center">
+                    <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
+                    @if (element.displayName) {
+                      <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+                    }
+                  </div>
+                  <div>
+                    <span>{{ getPath(['/profile_bie', element.topLevelAsbiepId]) }}</span>
+                  </div>
                 </a>
+              </div>
+              <div class="bie-guid">{{ element.guid }}</div>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="remark">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="verb">
+          <td score-cell *scoreCellDef="let element">
+            <mat-select [(ngModel)]="element.verb"
+                        [panelWidth]="null"
+                        (ngModelChange)="onChange('verb', element)">
+              <mat-option value="GET">GET</mat-option>
+              <mat-option value="PUT">PUT</mat-option>
+              <mat-option value="POST">POST</mat-option>
+              <mat-option value="DELETE">DELETE</mat-option>
+              <mat-option value="PATCH">PATCH</mat-option>
+            </mat-select>
+            <!-- Issue #1492 (Option 2): the duplicate-body-slot sentence is surfaced only on the
+                 Resource Name column (with the specific "Duplicate <body>" note on Message Body), so
+                 it is intentionally not repeated here. -->
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="arrayIndicator">
+          <td score-cell *scoreCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.arrayIndicator"
+                          (ngModelChange)="updateOperationIdForArray(element)"
+                          [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="suppressRootIndicator">
+          <td score-cell *scoreCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.suppressRootIndicator"
+                          [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="messageBody">
+          <td score-cell *scoreCellDef="let element">
+            <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId"
+                        (ngModelChange)="recomputeOasValidation()"
+                        [class.oas-body-slot-error]="isDuplicateBodySlot(element)">
+              <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0
+                   it is dropped from the generated document (see the banner above the table). -->
+              <mat-option value="Request" [disabled]="element.verb === 'GET'">Request</mat-option>
+              <mat-option value="Response">Response</mat-option>
+            </mat-select>
+            @if (isDuplicateBodySlot(element)) {
+              <!-- Issue #1492 (Option 2): duplicate body on this (path, verb). -->
+              <div class="oas-body-slot-error-text">Duplicate {{ element.messageBody }} body on this endpoint.</div>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="resourceName">
+          <td score-cell *scoreCellDef="let element">
+            <mat-form-field>
+              <input matInput [(ngModel)]="element.resourceName"
+                     (ngModelChange)="recomputeOasValidation()"
+                     [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
+              <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
+                   duplicate body slot is surfaced here too. -->
+              <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="operationId">
+          <td score-cell *scoreCellDef="let element">
+            <mat-form-field>
+              <input matInput [(ngModel)]="element.operationId"
+                     (ngModelChange)="recomputeOasValidation()"
+                     [errorStateMatcher]="operationIdErrorStateMatcher(element)">
+              @if (!element.operationId || !element.operationId.trim()) {
+                <mat-error>Operation ID is required.</mat-error>
               } @else {
-                <span class="oas-confirm-message-chip-text">Pick a Confirm Message…</span>
+                <mat-error>Operation ID must be unique within the document.</mat-error>
               }
-              <mat-icon class="oas-confirm-message-chip-edit" role="button" tabindex="0"
-                        matTooltip="Pick ConfirmMessage BIE"
-                        (click)="openConfirmMessageBiePicker(element, $event)"
-                        (keydown.enter)="openConfirmMessageBiePicker(element, $event)"
-                        (keydown.space)="openConfirmMessageBiePicker(element, $event)">edit</mat-icon>
-            </div>
-          }
-        </td>
-      </ng-container>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="tagName">
+          <td score-cell *scoreCellDef="let element">
+            <mat-form-field>
+              <input matInput [(ngModel)]="element.tagName">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="security">
+          <td score-cell *scoreCellDef="let element">
+            @if (securitySchemes.length === 0 && !element.securityOverridden) {
+              <span class="oas-security-na" matTooltip="Add a Security Scheme to configure operation security">—</span>
+            } @else {
+              <div class="oas-security-cell"
+                   [matTooltip]="operationSecuritySummary(element)"
+                   (click)="openOperationSecurityDialog(element, $event)">
+                <span class="oas-security-text">{{ operationSecuritySummary(element) }}</span>
+                <mat-icon class="oas-security-edit">edit</mat-icon>
+              </div>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="errorResponse">
+          <td score-cell *scoreCellDef="let element">
+            <!-- Issue #1347: inline body-type selector (like Message Body). Selecting ConfirmMessage
+                 opens a BIE-selection dialog; the picked BIE's DEN is shown as a re-pickable chip. -->
+            <mat-select [(ngModel)]="element.errorResponseBodyType" [panelWidth]="null"
+                        (ngModelChange)="onErrorResponseBodyTypeChange(element)">
+              @for (opt of errorResponseBodyTypeOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (element.errorResponseBodyType === 'CONFIRM_MESSAGE') {
+              <!-- A "Selected Confirm Message" link opens the picked BIE in a new tab (the DEN would just
+                   restate the selector, so it rides in the link tooltip); the pencil re-opens the
+                   BIE-selection dialog. Color-coded: indigo = picked, red = none picked yet. -->
+              <div class="oas-confirm-message-chip" [class.unset]="!element.confirmMessageTopLevelAsbiepId">
+                @if (element.confirmMessageTopLevelAsbiepId) {
+                  <a class="oas-confirm-message-chip-link"
+                     href="/profile_bie/{{ element.confirmMessageTopLevelAsbiepId }}"
+                     target="_blank" rel="noopener"
+                     [matTooltip]="element.confirmMessageDen"
+                     (click)="$event.stopPropagation()">
+                    <span class="oas-confirm-message-chip-text">Selected Confirm Message</span>
+                    <mat-icon class="oas-confirm-message-chip-open">open_in_new</mat-icon>
+                  </a>
+                } @else {
+                  <span class="oas-confirm-message-chip-text">Pick a Confirm Message…</span>
+                }
+                <mat-icon class="oas-confirm-message-chip-edit" role="button" tabindex="0"
+                          matTooltip="Pick ConfirmMessage BIE"
+                          (click)="openConfirmMessageBiePicker(element, $event)"
+                          (keydown.enter)="openConfirmMessageBiePicker(element, $event)"
+                          (keydown.space)="openConfirmMessageBiePicker(element, $event)">edit</mat-icon>
+              </div>
+            }
+          </td>
+        </ng-container>
       </score-table-view>
     </mat-card-content>
   </mat-card>

@@ -1,64 +1,64 @@
 <score-dialog-page title="Assign Business Term">
   <div class="bt-assign-form">
-      <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
-        [syncUrl]="false" searchClearsSort rowHover [busy]="busy()">
+    <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
+      [syncUrl]="false" searchClearsSort rowHover [busy]="busy()">
 
-    <ng-container scoreColumnDef="businessTerm">
-      <td score-cell *scoreCellDef="let element">
-        <a target="_blank" rel="noopener noreferrer"
-           href="/business_term_management/business_term/{{ element.businessTermId }}">
-          <span class="score-line-clamp-2 score-break-word">{{ element.businessTerm }}</span>
-        </a>
-        <div class="description ellipsis">{{ element.guid }}</div>
-      </td>
-    </ng-container>
+      <ng-container scoreColumnDef="businessTerm">
+        <td score-cell *scoreCellDef="let element">
+          <a target="_blank" rel="noopener noreferrer"
+             href="/business_term_management/business_term/{{ element.businessTermId }}">
+            <span class="score-line-clamp-2 score-break-word">{{ element.businessTerm }}</span>
+          </a>
+          <div class="description ellipsis">{{ element.guid }}</div>
+        </td>
+      </ng-container>
 
-    <ng-container scoreColumnDef="externalReferenceUri">
-      <td score-cell *scoreCellDef="let element">
-        <a target="_blank" rel="noopener noreferrer" href="{{ element.externalReferenceUri }}">
-          <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span>
-        </a>
-      </td>
-    </ng-container>
+      <ng-container scoreColumnDef="externalReferenceUri">
+        <td score-cell *scoreCellDef="let element">
+          <a target="_blank" rel="noopener noreferrer" href="{{ element.externalReferenceUri }}">
+            <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span>
+          </a>
+        </td>
+      </ng-container>
 
-    <ng-container scoreColumnDef="externalReferenceId">
-      <td score-cell *scoreCellDef="let element">
-        <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceId }}</span>
-      </td>
-    </ng-container>
+      <ng-container scoreColumnDef="externalReferenceId">
+        <td score-cell *scoreCellDef="let element">
+          <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceId }}</span>
+        </td>
+      </ng-container>
 
-    <ng-container scoreColumnDef="definition">
-      <td score-cell *scoreCellDef="let element">
-        <div class="description score-line-clamp-2 score-break-word"
-             [innerHTML]="element.definition | highlight : tableView.applied('definition') : ['bg-warning']"></div>
-      </td>
-    </ng-container>
+      <ng-container scoreColumnDef="definition">
+        <td score-cell *scoreCellDef="let element">
+          <div class="description score-line-clamp-2 score-break-word"
+               [innerHTML]="element.definition | highlight : tableView.applied('definition') : ['bg-warning']"></div>
+        </td>
+      </ng-container>
 
-    <ng-container scoreColumnDef="lastUpdateTimestamp">
-      <td score-cell *scoreCellDef="let element">
-        <div class="score-line-clamp-2 score-break-word">
-          <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-          <div class="description">
-            <span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated?.who?.loginId }}</b>
+      <ng-container scoreColumnDef="lastUpdateTimestamp">
+        <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">
+            <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+            <div class="description">
+              <span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated?.who?.loginId }}</b>
+            </div>
           </div>
-        </div>
-      </td>
-    </ng-container>
-      </score-table-view>
+        </td>
+      </ng-container>
+    </score-table-view>
 
-      @if (view().dataSource.data.length === 0 && !view().loading()) {
-        <div class="bt-assign-empty">No business terms found.</div>
-      }
+    @if (view().dataSource.data.length === 0 && !view().loading()) {
+      <div class="bt-assign-empty">No business terms found.</div>
+    }
 
-      <div class="bt-assign-meta">
-        <mat-form-field class="bt-assign-typecode">
-          <mat-label>Type Code</mat-label>
-          <input matInput [(ngModel)]="typeCode" maxlength="30"/>
-          <mat-hint>Optional free-text label. The same business term can be assigned to this BIE more than once
-            only when the Type Code differs. Max 30 characters.</mat-hint>
-        </mat-form-field>
-      </div>
+    <div class="bt-assign-meta">
+      <mat-form-field class="bt-assign-typecode">
+        <mat-label>Type Code</mat-label>
+        <input matInput [(ngModel)]="typeCode" maxlength="30"/>
+        <mat-hint>Optional free-text label. The same business term can be assigned to this BIE more than once
+          only when the Type Code differs. Max 30 characters.</mat-hint>
+      </mat-form-field>
     </div>
+  </div>
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" type="button" (click)="cancel()">

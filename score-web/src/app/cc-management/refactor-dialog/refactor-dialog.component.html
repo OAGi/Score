@@ -6,11 +6,11 @@
   }
 
   <section>
-      <score-table-view #baseView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" singleSelect
-        [syncUrl]="false" rowHover>
+    <score-table-view #baseView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" singleSelect
+      [syncUrl]="false" rowHover>
 
-          <ng-container scoreColumnDef="type">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="type">
+        <td score-cell *scoreCellDef="let element">
           <mat-chip-set>
             @switch (element.type) {
               @default {
@@ -19,10 +19,10 @@
             }
           </mat-chip-set>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="state">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="state">
+        <td score-cell *scoreCellDef="let element">
           <span class="cc-state {{ element.state }}"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
               'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
@@ -32,10 +32,10 @@
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
           }
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="den">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="den">
+        <td score-cell *scoreCellDef="let element">
           <div class="den score-break-word">
             <a routerLink="{{ getRouterLink(element) }}" target="_blank"
               matTooltip="{{ element.den }}">
@@ -44,49 +44,49 @@
           </div>
           <div class="description">{{ element.guid }}</div>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="revision">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="revision">
+        <td score-cell *scoreCellDef="let element">
           <span>{{ element.log.revisionNum }}</span>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="owner">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="owner">
+        <td score-cell *scoreCellDef="let element">
           <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="module">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="module">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word"
           [innerHTML]="element.module"></div>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="lastUpdateTimestamp">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="lastUpdateTimestamp">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">
             <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
             <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
           </div>
         </td>
-          </ng-container>
+      </ng-container>
 
-        <ng-container *scoreDetailDef="let element">
-          <mat-card class="mb-2">
-            @if (element.definition.source) {
-              <mat-card-header class="element-detail-header">
-                <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
-              </mat-card-header>
-            }
-            <mat-card-content>
-              <p [innerHTML]="element.definition.content" class="element-detail-content"></p>
-            </mat-card-content>
-          </mat-card>
-        </ng-container>
-      </score-table-view>
+      <ng-container *scoreDetailDef="let element">
+        <mat-card class="mb-2">
+          @if (element.definition.source) {
+            <mat-card-header class="element-detail-header">
+              <mat-card-subtitle class="element-detail-subtitle">{{ element.definition.source }}</mat-card-subtitle>
+            </mat-card-header>
+          }
+          <mat-card-content>
+            <p [innerHTML]="element.definition.content" class="element-detail-content"></p>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+    </score-table-view>
     <div class="analyze-action">
       <button mat-raised-button color="info"
         [disabled]="selection.selected.length === 0"
@@ -100,10 +100,10 @@
 
   <section>
     <div class="dialog-section-title">Analysis result and required action.</div>
-      <score-table-view #issueView [table]="issueColumns" [load]="issueLoad" [syncUrl]="false">
+    <score-table-view #issueView [table]="issueColumns" [load]="issueLoad" [syncUrl]="false">
 
-          <ng-container scoreColumnDef="type">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="type">
+        <td score-cell *scoreCellDef="let element">
           <mat-chip-set>
             @switch (element.type) {
               @default {
@@ -112,10 +112,10 @@
             }
           </mat-chip-set>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="state">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="state">
+        <td score-cell *scoreCellDef="let element">
           <span class="cc-state {{ element.state }}"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
               'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
@@ -125,10 +125,10 @@
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
           }
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="den">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="den">
+        <td score-cell *scoreCellDef="let element">
           <div class="den score-break-word">
             <a routerLink="{{ getRouterLink(element) }}" target="_blank"
               matTooltip="{{ element.den }}">
@@ -137,10 +137,10 @@
           </div>
           <div class="description">{{ element.guid }}</div>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="reason">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reason">
+        <td score-cell *scoreCellDef="let element">
           @if (element.reasons.length > 0) {
             <ul class="m-1">
               @for (reason of element.reasons; track reason) {
@@ -154,29 +154,29 @@
             </ul>
           }
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="revision">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="revision">
+        <td score-cell *scoreCellDef="let element">
           <span>{{ element.revision }}</span>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="owner">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="owner">
+        <td score-cell *scoreCellDef="let element">
           <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
         </td>
-          </ng-container>
+      </ng-container>
 
-          <ng-container scoreColumnDef="lastUpdateTimestamp">
-            <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="lastUpdateTimestamp">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">
             <div>{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
             <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdateUser }}</b></div>
           </div>
         </td>
-          </ng-container>
-      </score-table-view>
+      </ng-container>
+    </score-table-view>
   </section>
 
   <ng-container ngProjectAs="[dialogActions]">
@@ -187,8 +187,8 @@
     <button mat-raised-button color="primary"
         [disabled]="!isValid"
         (click)="doRefactor()">
-        <mat-icon>build</mat-icon>
-        <span class="ps-2">Refactor</span>
-      </button>
+      <mat-icon>build</mat-icon>
+      <span class="ps-2">Refactor</span>
+    </button>
   </ng-container>
 </score-dialog-page>

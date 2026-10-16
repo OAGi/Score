@@ -49,20 +49,17 @@
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="warn" (click)="purgeNode()"
-                >
+              <button mat-raised-button color="warn" (click)="purgeNode()">
                 Purge
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="primary" (click)="restoreNode()"
-                >
+              <button mat-raised-button color="primary" (click)="restoreNode()">
                 Restore
               </button>
             }
             @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
-              <button mat-raised-button color="primary" (click)="cancelRevision()"
-                >
+              <button mat-raised-button color="primary" (click)="cancelRevision()">
                 Cancel
               </button>
             }
@@ -112,31 +109,29 @@
               </button>
             }
             @if (state === 'Deleted' && (access === 'CanMove' || access === 'CanEdit')) {
-              <button mat-raised-button color="primary" (click)="restoreNode()"
-                >
+              <button mat-raised-button color="primary" (click)="restoreNode()">
                 Restore
               </button>
             }
             @if (state === 'WIP' && hasRevision() && access === 'CanEdit') {
-              <button mat-raised-button color="primary" (click)="cancelRevision()"
-                >
+              <button mat-raised-button color="primary" (click)="cancelRevision()">
                 Cancel
               </button>
             }
           </div>
         }
-    <mat-menu class="context-menu" #settingsContextMenu="matMenu">
-      <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-        <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
-          <span>Hide cardinality</span>
-        </mat-checkbox>
-      </button>
-      <button mat-menu-item [id]="'bie-settings-hide-unused'">
-        <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideProhibited">
-          <span>Hide Prohibited SCs</span>
-        </mat-checkbox>
-      </button>
-    </mat-menu>
+        <mat-menu class="context-menu" #settingsContextMenu="matMenu">
+          <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+              <span>Hide cardinality</span>
+            </mat-checkbox>
+          </button>
+          <button mat-menu-item [id]="'bie-settings-hide-unused'">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideProhibited">
+              <span>Hide Prohibited SCs</span>
+            </mat-checkbox>
+          </button>
+        </mat-menu>
       }
     </ng-container>
     <ng-container treeDetailTree>
@@ -161,21 +156,18 @@
           <mat-divider></mat-divider>
         }
         @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
-          <button mat-menu-item (click)="appendSc(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="appendSc(contextMenuItem)">
             <span class="context-menu-item">Add Supplementary Component</span>
           </button>
         }
         @if (!!contextMenuItem && contextMenuItem.level === 1 && isEditable() && canDiscard(contextMenuItem)) {
-          <button mat-menu-item (click)="discardSc(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="discardSc(contextMenuItem)">
             <span class="context-menu-item">Remove</span>
           </button>
         }
         <mat-divider></mat-divider>
         @if (!!contextMenuItem && contextMenuItem.level !== 0) {
-          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)"
-            >
+          <button mat-menu-item (click)="openCoreComponent(contextMenuItem)">
             <span class="context-menu-item">Open in new tab</span>
           </button>
         }
@@ -438,7 +430,7 @@
                                   @for (type of ['Code List', 'Agency ID List']; track type) {
                                     <mat-option [value]="type"
                                       [disabled]="!isEditable() || element.dtAwdPri.inherited">
-                                    {{ type }}</mat-option>
+                                      {{ type }}</mat-option>
                                   }
                                 </mat-select>
                               </mat-form-field>
@@ -470,10 +462,10 @@
                                       [disabled]="!isEditable() || element.dtAwdPri.inherited">
                                       <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (codeList.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </mat-option>
                                   }
                                 </mat-select>
@@ -855,7 +847,7 @@
                                   @for (type of ['Code List', 'Agency ID List']; track type) {
                                     <mat-option [value]="type"
                                       [disabled]="!isEditable() || element.dtScAwdPri.inherited">
-                                    {{ type }}</mat-option>
+                                      {{ type }}</mat-option>
                                   }
                                 </mat-select>
                               </mat-form-field>
@@ -887,10 +879,10 @@
                                       [disabled]="!isEditable() || element.dtScAwdPri.inherited">
                                       <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
                                       <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
-                                        <span>, Deprecated</span>
+                                          <span>, Deprecated</span>
                                         }@if (codeList.state === 'Deleted') {
-                                        <span>, Deleted</span>
-                                      })</span>
+                                          <span>, Deleted</span>
+                                        })</span>
                                     </mat-option>
                                   }
                                 </mat-select>

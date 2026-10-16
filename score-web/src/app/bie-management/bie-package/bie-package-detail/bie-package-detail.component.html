@@ -31,8 +31,7 @@
       </button>
     }
     @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
-      <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-        >
+      <button mat-raised-button class="ms-2" color="warn" (click)="discard()">
         Discard
       </button>
     }
@@ -99,15 +98,13 @@
         <span class="title">BIE List</span>
         <div style="padding: 8px 12px 8px 24px;">
           @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
-            <button mat-raised-button class="me-2" (click)="openAddDialog($event)" color="primary"
-              >
+            <button mat-raised-button class="me-2" (click)="openAddDialog($event)" color="primary">
               <mat-icon>add</mat-icon>
               Add
             </button>
           }
           @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit' && !!biePackage.prev && this.selection.selected.length === 1) {
-            <button mat-raised-button class="me-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent"
-              >
+            <button mat-raised-button class="me-2" (click)="openReplaceDialog($event, this.selection.selected[0])" color="accent">
               <mat-icon>update</mat-icon>
               Replace
             </button>
@@ -129,137 +126,137 @@
         [selection]="(biePackage.state === 'WIP' && biePackage.access === 'CanEdit') ? selection : undefined" [rowKey]="rowKey"
         [selectAll]="false" [selectOnRowClick]="false" [rowClass]="rowClass">
 
-    <ng-container scoreColumnDef="state">
-      <td score-cell *scoreCellDef="let element">
-          <span class="bie-state {{ element.state }}"
-              [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
-              'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
-          @if (element.deprecated) {
-            <span class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
-                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-              'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-          }
-        </td>
-    </ng-container>
+        <ng-container scoreColumnDef="state">
+          <td score-cell *scoreCellDef="let element">
+            <span class="bie-state {{ element.state }}"
+                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+                'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state }}</span>
+            @if (element.deprecated) {
+              <span class="bie-state Deprecated" [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+                  [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+                'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+            }
+          </td>
+        </ng-container>
 
-    <ng-container scoreColumnDef="branch">
-      <td score-cell *scoreCellDef="let element">
-          <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
-        </td>
-    </ng-container>
+        <ng-container scoreColumnDef="branch">
+          <td score-cell *scoreCellDef="let element">
+            <span [matTooltip]="element.release.releaseNum">{{ element.release.releaseNum }}</span>
+          </td>
+        </ng-container>
 
-    <ng-container scoreColumnDef="den">
-      <td score-cell *scoreCellDef="let element">
-          <div class="den score-break-word">
-            <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
-              matTooltip="{{ element.den }}">
-              <div class="d-inline-flex align-items-center">
-                <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
-                @if (element.displayName) {
-                  <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+        <ng-container scoreColumnDef="den">
+          <td score-cell *scoreCellDef="let element">
+            <div class="den score-break-word">
+              <a target="_blank" rel="noopener noreferrer" href="/profile_bie/{{ element.topLevelAsbiepId }}"
+                matTooltip="{{ element.den }}">
+                <div class="d-inline-flex align-items-center">
+                  <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
+                  @if (element.displayName) {
+                    <span class="bie-display-name ms-2">{{ element.displayName }}</span>
+                  }
+                </div>
+              </a>
+            </div>
+            <div class="bie-guid">{{ element.guid }}</div>
+            @if (!!element.source) {
+              <div class="bie-source">
+                <span>Source:</span>
+                <a target="_blank" rel="noopener noreferrer"
+                 href="/profile_bie?{{ linkQuery({
+                  den: element.source.den,
+                  releaseIds: element.source.release.releaseId,
+                  topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
+                  <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
+                    {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.source.release.releaseNum }}
+                  </span>
+                </a>
+              </div>
+            }
+            @if (!!element.based) {
+              <div class="bie-based">
+                <span>Based on:</span>
+                <a target="_blank" rel="noopener noreferrer"
+                 href="/profile_bie?{{ linkQuery({
+                  den: element.based.den,
+                  releaseIds: element.based.release.releaseId,
+                  topLevelAsbiepIds: element.based.topLevelAsbiepId }) }}">
+                  <span class="d-inline">
+                    {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.based.release.releaseNum }}
+                  </span>
+                </a>
+              </div>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="owner">
+          <td score-cell *scoreCellDef="let element">
+            <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="businessContexts">
+          <td score-cell *scoreCellDef="let element">
+            <div class="business-contexts-menu-wrapper">
+              <div class="business-contexts-menu-trigger"
+                [class.is-clickable]="element.businessContextList.length > 1"
+                [matMenuTriggerFor]="businessContextsMenu"
+                (click)="$event.stopPropagation()">
+                <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
+                  [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
+                  {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
+                </span>
+                @if (element.businessContextList.length > 1) {
+                  <mat-icon
+                  class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
                 }
               </div>
-            </a>
-          </div>
-          <div class="bie-guid">{{ element.guid }}</div>
-          @if (!!element.source) {
-            <div class="bie-source">
-              <span>Source:</span>
-              <a target="_blank" rel="noopener noreferrer"
-               href="/profile_bie?{{ linkQuery({
-                den: element.source.den,
-                releaseIds: element.source.release.releaseId,
-                topLevelAsbiepIds: element.source.topLevelAsbiepId }) }}">
-                <span class="d-inline" matTooltip="{{ element.source.sourceAction | pastTense }} at {{ element.source.when | date: 'yyyy-MM-dd HH:mm:ss' }}">
-                  {{ element.source.den + ((element.source.displayName) ? (' (' + element.source.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.source.release.releaseNum }}
-                </span>
-              </a>
+
+              <mat-menu #businessContextsMenu="matMenu">
+                @for (businessContext of element.businessContextList; track businessContext) {
+                  <button mat-menu-item type="button"
+                    (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
+                    <span class="score-break-word">{{ businessContext.name }}</span>
+                  </button>
+                }
+              </mat-menu>
             </div>
-          }
-          @if (!!element.based) {
-            <div class="bie-based">
-              <span>Based on:</span>
-              <a target="_blank" rel="noopener noreferrer"
-               href="/profile_bie?{{ linkQuery({
-                den: element.based.den,
-                releaseIds: element.based.release.releaseId,
-                topLevelAsbiepIds: element.based.topLevelAsbiepId }) }}">
-                <span class="d-inline">
-                  {{ element.based.den + ((element.based.displayName) ? (' (' + element.based.displayName + ')') : '') }}&nbsp;in&nbsp;{{ element.based.release.releaseNum }}
-                </span>
-              </a>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="version">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="status">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="bizTerm">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="remark">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="lastUpdateTimestamp">
+          <td score-cell *scoreCellDef="let element">
+            <div class="score-line-clamp-2 score-break-word">
+              <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+              <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
             </div>
-          }
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="owner">
-      <td score-cell *scoreCellDef="let element">
-          <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="businessContexts">
-      <td score-cell *scoreCellDef="let element">
-          <div class="business-contexts-menu-wrapper">
-            <div class="business-contexts-menu-trigger"
-              [class.is-clickable]="element.businessContextList.length > 1"
-              [matMenuTriggerFor]="businessContextsMenu"
-              (click)="$event.stopPropagation()">
-              <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
-                [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
-                {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
-              </span>
-              @if (element.businessContextList.length > 1) {
-                <mat-icon
-                class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
-              }
-            </div>
-
-            <mat-menu #businessContextsMenu="matMenu">
-              @for (businessContext of element.businessContextList; track businessContext) {
-                <button mat-menu-item type="button"
-                  (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
-                  <span class="score-break-word">{{ businessContext.name }}</span>
-                </button>
-              }
-            </mat-menu>
-          </div>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="version">
-      <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="status">
-      <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="bizTerm">
-      <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="remark">
-      <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
-        </td>
-    </ng-container>
-
-    <ng-container scoreColumnDef="lastUpdateTimestamp">
-      <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word">
-            <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-            <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
-          </div>
-        </td>
-    </ng-container>
+          </td>
+        </ng-container>
       </score-table-view>
     </mat-card-content>
     <mat-card-content class="mat-card-container mt-4">

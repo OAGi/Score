@@ -7,14 +7,14 @@
   <mat-card class="pt-3">
     <score-table-view [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false">
 
-    <ng-container scoreColumnDef="releaseNum">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="releaseNum">
+        <td score-cell *scoreCellDef="let element">
           {{ element.releaseNum }}
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingState">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingState">
+        <td score-cell *scoreCellDef="let element">
           <span class="bie-state {{ element.reusingState }}"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
               'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
@@ -24,10 +24,10 @@
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
           }
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingDen">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingDen">
+        <td score-cell *scoreCellDef="let element">
           <div class="den score-line-clamp-2 score-break-word">
             @if (isAccessibleLeft(element)) {
               <span>
@@ -44,34 +44,34 @@
           </div>
           <div class="bie-guid">{{ element.reusingGuid }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingOwner">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingOwner">
+        <td score-cell *scoreCellDef="let element">
           <span class="score-line-clamp-2 score-break-word">{{ element.reusingOwner }}</span>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingVersion">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingVersion">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusingVersion }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingStatus">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingStatus">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusingStatus }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusingRemark">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusingRemark">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusingRemark }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedState">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedState">
+        <td score-cell *scoreCellDef="let element">
           <span class="bie-state {{ element.reusedState }}"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
               'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
@@ -81,10 +81,10 @@
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
           }
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedDen">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedDen">
+        <td score-cell *scoreCellDef="let element">
           <div class="dev score-line-clamp-2 score-break-word">
             @if (isAccessibleRight(element)) {
               <span>
@@ -101,31 +101,31 @@
           </div>
           <div class="bie-guid">{{ element.reusedGuid }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedOwner">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedOwner">
+        <td score-cell *scoreCellDef="let element">
           <span class="score-line-clamp-2 score-break-word">{{ element.reusedOwner }}</span>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedVersion">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedVersion">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusedVersion }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedStatus">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedStatus">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
         </td>
-    </ng-container>
+      </ng-container>
 
-    <ng-container scoreColumnDef="reusedRemark">
-      <td score-cell *scoreCellDef="let element">
+      <ng-container scoreColumnDef="reusedRemark">
+        <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusedRemark }}</div>
         </td>
-    </ng-container>
+      </ng-container>
     </score-table-view>
   </mat-card>
 </score-detail-page>

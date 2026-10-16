@@ -62,7 +62,7 @@
     <ng-container [scoreColumnDef]="columns.column('more')">
       <td score-cell *scoreCellDef="let element">
         @if (userToken.roles.includes('developer') &&
-          (element.state === 'Initialized' || element.state === 'Draft')) {
+        (element.state === 'Initialized' || element.state === 'Draft')) {
           <button mat-icon-button
             [matMenuTriggerFor]="contextMenu"
             (click)="contextMenuItem = element; $event.stopPropagation();">
@@ -76,26 +76,22 @@
   <ng-container ngProjectAs="[listExtra]">
     <mat-menu class="context-menu" #contextMenu="matMenu">
       @if (!!contextMenuItem && contextMenuItem.state === 'Initialized') {
-        <button mat-menu-item (click)="createDraft(contextMenuItem)"
-          >
+        <button mat-menu-item (click)="createDraft(contextMenuItem)">
           <span class="context-menu-item">Create Draft</span>
         </button>
       }
       @if (!!contextMenuItem && contextMenuItem.state === 'Initialized') {
-        <button mat-menu-item (click)="discard(contextMenuItem)"
-          >
+        <button mat-menu-item (click)="discard(contextMenuItem)">
           <span class="context-menu-item">Discard</span>
         </button>
       }
       @if (!!contextMenuItem && contextMenuItem.state === 'Draft') {
-        <button mat-menu-item (click)="updateState(contextMenuItem, 'Initialized')"
-          >
+        <button mat-menu-item (click)="updateState(contextMenuItem, 'Initialized')">
           <span class="context-menu-item">Move back to Initialized</span>
         </button>
       }
       @if (!!contextMenuItem && contextMenuItem.state === 'Draft') {
-        <button mat-menu-item (click)="updateState(contextMenuItem, 'Published')"
-          >
+        <button mat-menu-item (click)="updateState(contextMenuItem, 'Published')">
           <span class="context-menu-item">Move to Published</span>
         </button>
       }

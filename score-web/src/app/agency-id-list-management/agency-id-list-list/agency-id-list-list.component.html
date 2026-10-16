@@ -7,29 +7,25 @@
   <ng-container ngProjectAs="[listActions]">
     @if (showCreateAgencyIdListBtn) {
       <button mat-icon-button class="ms-2" matTooltip="New Agency ID List"
-        (click)="createAgencyIdList()"
-        >
+        (click)="createAgencyIdList()">
         <mat-icon>add</mat-icon>
       </button>
     }
     @if (showDeleteBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Delete"
-        (click)="openDialogAgencyIdListListDelete()"
-        >
+        (click)="openDialogAgencyIdListListDelete()">
         <mat-icon>delete</mat-icon>
       </button>
     }
     @if (showRestoreBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Purge"
-        (click)="openDialogAgencyIdListListPurge()"
-        >
+        (click)="openDialogAgencyIdListListPurge()">
         <mat-icon>delete_forever</mat-icon>
       </button>
     }
     @if (showRestoreBtn) {
       <button mat-icon-button class="ms-2" matTooltip="Restore"
-        (click)="openDialogAgencyIdListListRestore()"
-        >
+        (click)="openDialogAgencyIdListListRestore()">
         <mat-icon>restore_from_trash</mat-icon>
       </button>
     }

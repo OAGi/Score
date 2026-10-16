@@ -1,75 +1,75 @@
 <score-dialog-page title="Uplift BIE Report">
   @if (loading) {
-      <div class="loading-container">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
-    }
-    @if (!loading) {
-      <mat-card class="search-box">
-        <mat-card-content class="mat-card-container">
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-12">
-                <mat-checkbox class="checklist-leaf-node"
-                  [(ngModel)]="hideSystemMatched"
-                  (ngModelChange)="onToggleHide()">View Issues Only
-                </mat-checkbox>
-              </div>
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
+  @if (!loading) {
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-12">
+              <mat-checkbox class="checklist-leaf-node"
+                [(ngModel)]="hideSystemMatched"
+                (ngModelChange)="onToggleHide()">View Issues Only
+              </mat-checkbox>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
-    }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
 
-    <score-table-view [table]="columns" [load]="load" [ready]="!loading" [syncUrl]="false">
+  <score-table-view [table]="columns" [load]="load" [ready]="!loading" [syncUrl]="false">
 
-      <ng-container scoreColumnDef="ccType">
-        <td score-cell *scoreCellDef="let row">
-          {{ row.ccType }}
-        </td>
-      </ng-container>
+    <ng-container scoreColumnDef="ccType">
+      <td score-cell *scoreCellDef="let row">
+        {{ row.ccType }}
+      </td>
+    </ng-container>
 
-      <ng-container scoreColumnDef="displayPath">
-        <td score-cell *scoreCellDef="let row">
-          <div class="display-path-content">
-            <span>{{ row.sourceDisplayPath }}</span>
-            @if (row.targetDisplayPath) {
-              <span>&darr;</span>
-              <span>{{ row.targetDisplayPath }}</span>
-            }
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="context">
-        <td score-cell *scoreCellDef="let row">
-          <div class="description score-line-clamp-2 score-break-word" [innerHTML]="row.context"></div>
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="match">
-        <td score-cell *scoreCellDef="let row">
-          {{ row.match }}
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="reuse">
-        <td score-cell *scoreCellDef="let row">
-          {{ row.reuse }}
-        </td>
-      </ng-container>
-
-      <ng-container scoreColumnDef="validCode">
-        <td score-cell *scoreCellDef="let row">
-          @if (row.status) {
-            <span>{{ row.status }}</span>
+    <ng-container scoreColumnDef="displayPath">
+      <td score-cell *scoreCellDef="let row">
+        <div class="display-path-content">
+          <span>{{ row.sourceDisplayPath }}</span>
+          @if (row.targetDisplayPath) {
+            <span>&darr;</span>
+            <span>{{ row.targetDisplayPath }}</span>
           }
-          @if (!row.valid && row.message) {
-            <span class="d-block">{{ row.message }}</span>
-          }
-        </td>
-      </ng-container>
-    </score-table-view>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container scoreColumnDef="context">
+      <td score-cell *scoreCellDef="let row">
+        <div class="description score-line-clamp-2 score-break-word" [innerHTML]="row.context"></div>
+      </td>
+    </ng-container>
+
+    <ng-container scoreColumnDef="match">
+      <td score-cell *scoreCellDef="let row">
+        {{ row.match }}
+      </td>
+    </ng-container>
+
+    <ng-container scoreColumnDef="reuse">
+      <td score-cell *scoreCellDef="let row">
+        {{ row.reuse }}
+      </td>
+    </ng-container>
+
+    <ng-container scoreColumnDef="validCode">
+      <td score-cell *scoreCellDef="let row">
+        @if (row.status) {
+          <span>{{ row.status }}</span>
+        }
+        @if (!row.valid && row.message) {
+          <span class="d-block">{{ row.message }}</span>
+        }
+      </td>
+    </ng-container>
+  </score-table-view>
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onClose()">

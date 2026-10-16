@@ -40,7 +40,7 @@
       }
     } @else {
       @if (node.source && node.source.reused &&
-           (node.reusedTopLevelAsbiepId === undefined || node.reusedTopLevelAsbiepId === null)) {
+      (node.reusedTopLevelAsbiepId === undefined || node.reusedTopLevelAsbiepId === null)) {
         <fa-icon [icon]="faCircleExclamation" matTooltip="Select BIE" class="node-status-icon ps-3 pointer warn"
                  (click)="host.matchReused(node)"></fa-icon>
       }
