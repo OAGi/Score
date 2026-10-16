@@ -17,6 +17,9 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class LoginPageImpl extends BasePageImpl implements LoginPage {
 
+    /** Set once the login page showed the passkey flow (username step first), so the post-sign-in offer is expected. */
+    private boolean passkeysDetected;
+
     public LoginPageImpl(BasePage parent) {
         super(parent);
     }
@@ -90,13 +93,15 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
      * answered the page offers "Try another way", which shows the password field.
      */
     private void revealPasswordField() {
-        if (!getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
-            return;
-        }
         By password = By.cssSelector("input[id=\"password\"]");
+        By continueButton = By.cssSelector(".passkey-continue-button");
+        // The Continue button exists only when the instance has passkey sign-in on, whatever the property says.
+        new WebDriverWait(getDriver(), ofSeconds(12L)).until(
+                d -> !d.findElements(password).isEmpty() || !d.findElements(continueButton).isEmpty());
         if (!getDriver().findElements(password).isEmpty()) {
             return;
         }
+        passkeysDetected = true;
         click(getDriver(), elementToBeClickable(getDriver(), By.cssSelector(".passkey-continue-button")));
         By anotherWay = By.cssSelector(".passkey-another-way-button");
         new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(20)).until(
@@ -151,7 +156,7 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
      * {@code score-e2e.properties}, so instances without passkeys pay no waiting time.
      */
     private void dismissPasskeyOfferIfEnabled() {
-        if (!getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
+        if (!passkeysDetected && !getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
             return;
         }
 
