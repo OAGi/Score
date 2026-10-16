@@ -978,6 +978,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .leftJoin(CODE_LIST_MANIFEST.as("based_code_list_manifest")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                    .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .leftJoin(MODULE_CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
@@ -1073,7 +1074,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         break;
 
                     case "agencyId":
-                        field = AGENCY_ID_LIST_VALUE.NAME;
+                        field = AGENCY_ID_LIST_VALUE.VALUE;
                         break;
 
                     case "version":

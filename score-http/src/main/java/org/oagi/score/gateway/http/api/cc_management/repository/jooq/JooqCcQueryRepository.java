@@ -251,7 +251,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                         break;
 
                     case "owner":
-                        field = ownerTable().LOGIN_ID;
+                        field = field("owner_login_id");
                         break;
 
                     case "module":
