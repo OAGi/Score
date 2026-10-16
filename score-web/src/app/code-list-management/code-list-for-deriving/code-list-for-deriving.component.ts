@@ -45,7 +45,7 @@ export class CodeListForDerivingComponent {
   webPageInfo = inject(WebPageInfoService);
 
   faLocationArrow = faLocationArrow;
-  title = 'Code List';
+  title = 'Derive Code List';
 
   readonly libraryChoice = new LibraryChoice(this.auth);
   readonly releaseChoice = new ReleaseChoice(this.auth);

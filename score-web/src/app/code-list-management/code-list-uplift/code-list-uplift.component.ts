@@ -55,7 +55,7 @@ export class CodeListUpliftComponent {
   webPageInfo = inject(WebPageInfoService);
 
   faLocationArrow = faLocationArrow;
-  title = 'Code List';
+  title = 'Uplift Code List';
   /** Where the chosen branch is remembered. */
   private readonly cookieType = 'CC';
 
