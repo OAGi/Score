@@ -27,12 +27,12 @@
     <div class="tree-search-buttons">
       <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
         [disabled]="searcher.isSearching || searcher.resultCount === 0"
-        (click)="moveRequest.emit(-1)">
+        (click)="onMove(-1)">
         <mat-icon>keyboard_arrow_up</mat-icon>
       </button>
       <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
         [disabled]="searcher.isSearching || searcher.resultCount === 0"
-        (click)="moveRequest.emit(1)">
+        (click)="onMove(1)">
         <mat-icon>keyboard_arrow_down</mat-icon>
       </button>
       <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more' : 'Search'"

@@ -424,7 +424,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
 
@@ -521,12 +521,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     });
   }
 
-  scrollToNode(node: BieFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
     const target = $event.target as HTMLElement;
@@ -544,37 +538,12 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
 
 
 
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    setTimeout(() => {
-      this.treeViewport?.scrollToIndex(index, {smooth: true});
-      this.cdr.detectChanges();
-    }, delay);
-  }
-
   onTreeKey({event}: TreeViewportNodeKey<BieFlatNode>) {
     if (event.code === 'Space') {
       this.toggleTreeUsed(this.cursorNode);
       event.preventDefault();
       event.stopPropagation();
     }
-  }
-
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index);
-      this.cdr.detectChanges();
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
   }
 
   openNewEditBieTab(node: BieFlatNode, $event?: MouseEvent) {

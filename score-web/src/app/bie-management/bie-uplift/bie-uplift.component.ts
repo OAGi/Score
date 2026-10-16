@@ -605,34 +605,6 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
     return this.innerY - 400;
   }
 
-  search(type: string, backward?: boolean, force?: boolean) {
-    if (type === 'source') {
-      this.sourceSearcher.search(this.sourceSearcher.inputKeyword, this.sourceSelectedNode, backward, force)
-        .subscribe(index => {
-          this.sourceTree.scrollToIndex(index, {smooth: true});
-        });
-    } else if (type === 'target') {
-      this.targetSearcher.search(this.targetSearcher.inputKeyword, this.targetSelectedNode, backward, force)
-        .subscribe(index => {
-          this.targetTree.scrollToIndex(index, {smooth: true});
-        });
-    }
-  }
-
-  move(type: string, val: number) {
-    if (type === 'source') {
-      this.sourceSearcher.go(val).subscribe(index => {
-        this.onSourceClick(this.sourceDataSource.data[index]);
-        this.sourceTree.scrollToIndex(index, {smooth: true});
-      });
-    } else if (type === 'target') {
-      this.targetSearcher.go(val).subscribe(index => {
-        this.onTargetClick(this.targetDataSource.data[index]);
-        this.targetTree.scrollToIndex(index, {smooth: true});
-      });
-    }
-  }
-
   onSourceClick(node: BieUpliftSourceFlatNode) {
     this.sourceSelectedNode = node;
 

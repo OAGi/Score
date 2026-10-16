@@ -1,8 +1,6 @@
 <score-sidenav-page [commentControl]="commentControl" [currentUser]="currentUser" [progress]="isUpdating" [showToolbar]="false">
   <score-tree-detail #treeDetail [ready]="!!searcher && !!dataSource" [searcher]="searcher" [selectedNode]="selectedNode"
-                           (searchRequest)="search($event.keyword, $event.backward, $event.force)"
-                           (moveRequest)="move($event)"
-                           (breadcrumbClick)="scrollToNode($event)">
+                     [tree]="tree" (nodeSelect)="onClick($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
         @if (isWorkingRelease()) {
@@ -130,7 +128,7 @@
       }
     </ng-container>
     <ng-container treeDetailTree>
-      <score-cc-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [(cursorNode)]="cursorNode"
+      <score-cc-tree-viewport #tree [dataSource]="dataSource" [searcher]="searcher" [(cursorNode)]="cursorNode"
                               [height]="treeDetail.treeHeight" [contextMenu]="contextMenu"
                           [isDraggable]="isDraggableNode" [showDragHandle]="showDragHandleNode" [canDrop]="canDrop"
                           (dropped)="drop($event)"

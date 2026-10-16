@@ -42,6 +42,9 @@ export interface TreeViewportSearcher<N> {
   next(node: N): N;
 
   prev(node: N): N;
+
+  /** The row of the node (expanding the tree down to it when needed). */
+  getNodeIndex(node: N): number;
 }
 
 export interface TreeViewportNodeKey<N> {
@@ -182,6 +185,13 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   }
 
   private moveCursor(node: N) {
+    this.cursorNode = node;
+    this.cursorNodeChange.emit(node);
+  }
+
+  /** Scroll to the node, expanding the tree down to it, and put the cursor on it. */
+  scrollToNode(node: N, delay?: number) {
+    this.scrollToIndex(this.searcher.getNodeIndex(node), {delay, smooth: true});
     this.cursorNode = node;
     this.cursorNodeChange.emit(node);
   }

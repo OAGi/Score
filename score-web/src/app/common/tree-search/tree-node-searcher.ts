@@ -182,6 +182,11 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     return this.currentMatch();
   }
 
+  /** The node shown in a row. */
+  nodeAt(index: number): N {
+    return this.dataSource.data[index];
+  }
+
   getNodeIndex(node: N): number {
     if (!this.dataSource.isExpanded(node)) {
       this.expandTo(node);

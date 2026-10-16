@@ -8,26 +8,6 @@ describe('BieEditComponent', () => {
     expect(BieEditComponent).toBeTruthy();
   });
 
-  it('scrolls to a node after the requested delay and refreshes the viewport', () => {
-    vi.useFakeTimers();
-    try {
-      const treeViewport = {scrollToIndex: vi.fn()};
-      const context = {
-        treeViewport,
-        cdr: {detectChanges: vi.fn()}
-      } as any;
-
-      BieEditComponent.prototype.scrollTree.call(context, 2, 100);
-
-      expect(treeViewport.scrollToIndex).not.toHaveBeenCalled();
-      vi.advanceTimersByTime(100);
-      expect(treeViewport.scrollToIndex).toHaveBeenCalledWith(2, {smooth: true});
-      expect(context.cdr.detectChanges).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
   it('does not allow a max-zero component to be selected, including in Inverse Mode', () => {
     const isUsable = BieEditComponent.prototype.isUsable;
     const node: any = {

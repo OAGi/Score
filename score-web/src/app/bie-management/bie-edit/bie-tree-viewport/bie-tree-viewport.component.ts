@@ -61,4 +61,8 @@ export class BieTreeViewportComponent {
   scrollToIndex(index: number, options?: { delay?: number, smooth?: boolean }) {
     this.tree.scrollToIndex(index, options);
   }
+
+  scrollToNode(node: BieFlatNode, delay?: number) {
+    this.tree.scrollToNode(node, delay);
+  }
 }

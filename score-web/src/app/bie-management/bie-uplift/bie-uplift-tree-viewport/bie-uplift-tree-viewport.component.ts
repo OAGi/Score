@@ -58,4 +58,8 @@ export class BieUpliftTreeViewportComponent<N extends BieFlatNode = BieFlatNode>
   scrollToIndex(index: number, options?: { delay?: number, smooth?: boolean }) {
     this.tree.scrollToIndex(index, options);
   }
+
+  scrollToNode(node: N, delay?: number) {
+    this.tree.scrollToNode(node, delay);
+  }
 }

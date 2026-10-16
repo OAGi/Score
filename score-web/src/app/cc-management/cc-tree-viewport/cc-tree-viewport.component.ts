@@ -35,4 +35,8 @@ export class CcTreeViewportComponent {
   scrollToIndex(index: number, options?: { delay?: number, smooth?: boolean }) {
     this.tree.scrollToIndex(index, options);
   }
+
+  scrollToNode(node: CcFlatNode, delay?: number) {
+    this.tree.scrollToNode(node, delay);
+  }
 }

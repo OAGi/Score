@@ -94,4 +94,20 @@ describe('TreeViewportComponent', () => {
       vi.useRealTimers();
     }
   });
+
+  it('scrolls to a node smoothly and puts the cursor on it', () => {
+    const self: any = {
+      searcher: {getNodeIndex: vi.fn().mockReturnValue(7)},
+      scrollToIndex: vi.fn(),
+      cursorNodeChange: {emit: vi.fn()}
+    };
+    const node = {name: 'n'};
+
+    TreeViewportComponent.prototype.scrollToNode.call(self, node, 500);
+
+    expect(self.searcher.getNodeIndex).toHaveBeenCalledWith(node);
+    expect(self.scrollToIndex).toHaveBeenCalledWith(7, {delay: 500, smooth: true});
+    expect(self.cursorNode).toBe(node);
+    expect(self.cursorNodeChange.emit).toHaveBeenCalledWith(node);
+  });
 });

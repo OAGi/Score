@@ -75,4 +75,8 @@ export class ModelBrowserTreeViewportComponent {
   scrollToIndex(index: number, options?: { delay?: number, smooth?: boolean }) {
     this.tree.scrollToIndex(index, options);
   }
+
+  scrollToNode(node: ModelBrowserNode, delay?: number) {
+    this.tree.scrollToNode(node, delay);
+  }
 }

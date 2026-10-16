@@ -1,9 +1,7 @@
 <score-sidenav-page [progress]="loading" [showToolbar]="false">
   <score-tree-detail #treeDetail [ready]="!!searcher && !!dataSource" [searcher]="searcher" [selectedNode]="selectedNode"
                      [heightOffset]="200" [splitScroll]="true"
-                     (searchRequest)="search($event.keyword, $event.backward, $event.force)"
-                     (moveRequest)="move($event)"
-                     (breadcrumbClick)="scrollToNode($event)">
+                     [tree]="tree" (nodeSelect)="onClick($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
         <div class="actions ms-auto d-flex align-items-center">
@@ -32,7 +30,7 @@
       }
     </ng-container>
     <ng-container treeDetailTree>
-      <score-model-browser-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [host]="this"
+      <score-model-browser-tree-viewport #tree [dataSource]="dataSource" [searcher]="searcher" [host]="this"
                                          [(cursorNode)]="cursorNode" [height]="treeDetail.treeHeight"
                                          [contextMenu]="contextMenu" [leafContextMenu]="contextMenuForLeaf"
                                          [isDraggable]="canReorderNode" [canDrop]="canDrop" [dropInvalid]="dropInvalid"

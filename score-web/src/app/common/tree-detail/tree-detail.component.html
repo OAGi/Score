@@ -5,9 +5,9 @@
         @if (ready && searcher) {
           <div class="container-fluid">
             <div class="row">
-              <score-tree-search-bar class="col-5" [searcher]="searcher" [label]="selectedNode?.displayName || selectedNode?.name"
-                                     (searchRequest)="searchRequest.emit($event)"
-                                     (moveRequest)="moveRequest.emit($event)"></score-tree-search-bar>
+              <score-tree-search-bar class="col-5" [searcher]="searcher" [tree]="tree" [selectedNode]="selectedNode"
+                                     [label]="selectedNode?.displayName || selectedNode?.name"
+                                     (nodeSelect)="nodeSelect.emit($event)"></score-tree-search-bar>
               <div class="col-7 actions-wrap">
                 <ng-content select="[treeDetailActions]"></ng-content>
               </div>

@@ -10,8 +10,16 @@ import {MatInputModule} from '@angular/material/input';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
 
-/** The part of a tree searcher (CcFlatNodeDataSourceSearcher, BieFlatNodeDataSourceSearcher, ...) the search bar reads. */
-export interface TreeSearcher {
+/** What the search bar needs to scroll to a node: the tree viewport (or a derivative of it). */
+export interface TreeScrollTarget<N = any> {
+  scrollToIndex(index: number, options?: {delay?: number, smooth?: boolean}): void;
+
+  /** Scroll to the node and put the cursor on it. */
+  scrollToNode(node: N, delay?: number): void;
+}
+
+/** The part of a tree searcher (CcFlatNodeDataSourceSearcher, BieFlatNodeDataSourceSearcher, ...) the search bar uses. */
+export interface TreeSearcher<N = any> {
   inputKeyword: string;
   searchKeyword: string;
   resultCount: number;
@@ -27,12 +35,15 @@ export interface TreeSearcher {
   progress: Observable<void>;
 
   resetSearch(): void;
-}
 
-export interface TreeSearchRequest {
-  keyword: string;
-  backward: boolean;
-  force: boolean;
+  /** Searches below the node (the whole tree when none), or steps to the next/previous match; emits the match's row. */
+  search(keyword: string, selectedNode: N | undefined, backward?: boolean, force?: boolean): Observable<number>;
+
+  /** Steps from the current match by `val` matches; emits the match's row. */
+  go(val: number): Observable<number>;
+
+  /** The node shown in a row. */
+  nodeAt(index: number): N;
 }
 
 @Component({
@@ -41,9 +52,14 @@ export interface TreeSearchRequest {
   styleUrl: './tree-search-bar.component.css',
   imports: [DecimalPipe, FormsModule, MatButtonModule, MatIconButtonSizesModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule]
 })
-export class TreeSearchBarComponent {
+/**
+ * The search field of a tree with the buttons that step through the matches. It runs the searches itself and brings
+ * the match into view in the tree, so a screen only supplies the searcher and the tree: stepping to a match also
+ * selects it (`nodeSelect`), and a search is scoped to `selectedNode`.
+ */
+export class TreeSearchBarComponent<N = any> {
 
-  @Input() set searcher(searcher: TreeSearcher) {
+  @Input() set searcher(searcher: TreeSearcher<N>) {
     this._searcher = searcher;
     this.progressSubscription?.unsubscribe();
     this.progressSubscription = searcher?.progress
@@ -51,7 +67,7 @@ export class TreeSearchBarComponent {
       .subscribe(() => this.cdr.markForCheck());
   }
 
-  get searcher(): TreeSearcher {
+  get searcher(): TreeSearcher<N> {
     return this._searcher;
   }
 
@@ -60,13 +76,26 @@ export class TreeSearchBarComponent {
 
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
-  private _searcher: TreeSearcher;
+  private _searcher: TreeSearcher<N>;
   private progressSubscription: Subscription | undefined;
 
-  @Output() searchRequest = new EventEmitter<TreeSearchRequest>();
-  @Output() moveRequest = new EventEmitter<number>();
+  /** The tree the matches are scrolled into view in. */
+  @Input() tree: TreeScrollTarget<N> | undefined;
+  /** The node the search is scoped to (the whole tree when none). */
+  @Input() selectedNode: N | undefined | null;
+
+  /** A match was stepped to with the arrow buttons; the screen shows it as the selected node. */
+  @Output() nodeSelect = new EventEmitter<N>();
 
   onSearch(keyword: string, backward = false, force = false) {
-    this.searchRequest.emit({keyword, backward, force});
+    this.searcher.search(keyword, this.selectedNode ?? undefined, backward, force)
+      .subscribe(index => this.tree?.scrollToIndex(index, {delay: 500, smooth: true}));
+  }
+
+  onMove(val: number) {
+    this.searcher.go(val).subscribe(index => {
+      this.nodeSelect.emit(this.searcher.nodeAt(index));
+      this.tree?.scrollToIndex(index, {smooth: true});
+    });
   }
 }

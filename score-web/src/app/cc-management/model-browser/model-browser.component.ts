@@ -184,12 +184,6 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
 
   }
 
-  scrollToNode(node: ModelBrowserNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
   private visibleChoiceChildrenOf(choiceNode: ModelBrowserNode): ModelBrowserNode[] {
     return (((choiceNode.children || []) as ModelBrowserNode[]))
       .filter(child => !child.isGroup && !child.isChoice);
@@ -296,24 +290,7 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
 
 
 
-  scrollTree(index: number, delay?: number) {
-    this.treeViewport.scrollToIndex(index, {delay, smooth: true});
-  }
-
   readonly canReorderNode = (node: ModelBrowserNode) => this.canReorder(node);
-
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
 
   copyPath(node: ModelBrowserNode) {
     if (!node) {

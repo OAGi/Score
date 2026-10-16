@@ -34,8 +34,8 @@
         <div class="col-6 ps-0">
           @if (sourceSearcher && sourceDataSource) {
             <score-tree-search-bar [searcher]="sourceSearcher" [label]="sourceSelectedNode?.displayName || sourceSelectedNode?.name"
-                                   (searchRequest)="search('source', $event.backward, $event.force)"
-                                   (moveRequest)="move('source', $event)">
+                                   [tree]="sourceTree" [selectedNode]="sourceSelectedNode"
+                                   (nodeSelect)="onSourceClick($event)">
               <ng-container treeSearchSettings>
                 <div class="tree-search-settings">
                   <div class="actions ms-auto">
@@ -77,8 +77,8 @@
         <div class="col-6 ps-0 pe-0">
           @if (targetSearcher && targetDataSource) {
             <score-tree-search-bar [searcher]="targetSearcher" [label]="targetSelectedNode?.displayName || targetSelectedNode?.name"
-                                   (searchRequest)="search('target', $event.backward, $event.force)"
-                                   (moveRequest)="move('target', $event)">
+                                   [tree]="targetTree" [selectedNode]="targetSelectedNode"
+                                   (nodeSelect)="onTargetClick($event)">
               <ng-container treeSearchSettings>
                 <div class="tree-search-settings">
                   <div class="actions ms-auto">

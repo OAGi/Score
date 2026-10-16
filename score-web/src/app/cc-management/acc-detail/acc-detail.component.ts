@@ -318,7 +318,7 @@ export class AccDetailComponent implements OnInit {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -1894,18 +1894,6 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-
-
-  scrollTree(index: number, delay?: number) {
-    this.treeViewport.scrollToIndex(index, {delay, smooth: true});
-  }
-
   onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
     if (event.key === 'c' || event.key === 'C') {
       this.contextMenuItem = node;
@@ -1971,19 +1959,6 @@ export class AccDetailComponent implements OnInit {
         }, err => {
           this.isUpdating = false;
         });
-  }
-
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
   }
 
   refactor(node: CcFlatNode): void {
