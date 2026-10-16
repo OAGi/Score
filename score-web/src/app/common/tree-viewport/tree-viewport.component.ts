@@ -3,9 +3,12 @@ import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling'
 import {DataSource} from '@angular/cdk/collections';
 import {NgTemplateOutlet} from '@angular/common';
 import {
+  ChangeDetectorRef,
   Component,
   ContentChild,
+  DestroyRef,
   EventEmitter,
+  inject,
   Input,
   Output,
   QueryList,
@@ -14,6 +17,8 @@ import {
   ViewChildren,
   ViewEncapsulation
 } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Observable, Subscription} from 'rxjs';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule, MatMenuPanel, MatMenuTrigger} from '@angular/material/menu';
@@ -45,6 +50,9 @@ export interface TreeViewportSearcher<N> {
 
   /** The row of the node (expanding the tree down to it when needed). */
   getNodeIndex(node: N): number;
+
+  /** Emits when what the rows show of the search (which nodes are matches) changes on its own: its end, its reset. */
+  progress: Observable<void>;
 }
 
 export interface TreeViewportNodeKey<N> {
@@ -74,7 +82,18 @@ export interface TreeViewportNodeKey<N> {
 export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode> {
 
   @Input({required: true}) dataSource: TreeViewportDataSource<N>;
-  @Input() searcher: TreeViewportSearcher<N>;
+  @Input() set searcher(searcher: TreeViewportSearcher<N>) {
+    this._searcher = searcher;
+    this.searchSubscription?.unsubscribe();
+    // The rows show which nodes are matches; a search that ends or is cleared changes that without any event of the rows.
+    this.searchSubscription = searcher?.progress
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
+  }
+
+  get searcher(): TreeViewportSearcher<N> {
+    return this._searcher;
+  }
   @Input() cursorNode: N | undefined;
   @Input() height: number;
   /** The height of a row; keep it equal to the rows' `min-height` in tree-viewport.component.css. */
@@ -112,6 +131,11 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   @ContentChild('lead', {read: TemplateRef}) lead: TemplateRef<{ $implicit: N }>;
   @ContentChild('content', {read: TemplateRef}) content: TemplateRef<{ $implicit: N }>;
   @ContentChild('prefix', {read: TemplateRef}) prefix: TemplateRef<{ $implicit: N }>;
+
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
+  private _searcher: TreeViewportSearcher<N>;
+  private searchSubscription: Subscription | undefined;
 
   @ViewChild(CdkVirtualScrollViewport, {static: true}) viewport: CdkVirtualScrollViewport;
   @ViewChildren(MatMenuTrigger) private menuTriggers: QueryList<MatMenuTrigger>;

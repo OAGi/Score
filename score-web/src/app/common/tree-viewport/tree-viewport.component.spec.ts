@@ -1,3 +1,4 @@
+import {Subject} from 'rxjs';
 import {TreeViewportComponent} from './tree-viewport.component';
 
 describe('TreeViewportComponent', () => {
@@ -153,5 +154,16 @@ describe('TreeViewportComponent', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('refreshes its rows when the search it shows changes (its end, its reset)', () => {
+    const progress = new Subject<void>();
+    const self: any = {cdr: {markForCheck: vi.fn()}, destroyRef: {onDestroy: () => () => undefined}};
+    const setSearcher = Object.getOwnPropertyDescriptor(TreeViewportComponent.prototype, 'searcher')!.set!;
+
+    setSearcher.call(self, {progress});
+    progress.next();
+
+    expect(self.cdr.markForCheck).toHaveBeenCalledTimes(1);
   });
 });
