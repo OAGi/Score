@@ -218,6 +218,16 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
       host.addEventListener(type, markForCheck, true);
       this.destroyRef.onDestroy(() => host.removeEventListener(type, markForCheck, true));
     }
+    // The rows are drawn in the table, which is OnPush: a checkbox that the selection changes is drawn on the next change only, so a
+    // click on a row would need another click to show. Draw the rows as soon as the selection changes.
+    effect(onCleanup => {
+      const subscription = this.selection()?.changed.subscribe(() => {
+        if (this.started) {
+          this.changeDetector.detectChanges();
+        }
+      });
+      onCleanup(() => subscription?.unsubscribe());
+    });
     // The table is in an `@if`, so its sort is known only after the first render.
     afterNextRender(() => this.start());
     // The screen decides again: search again.
