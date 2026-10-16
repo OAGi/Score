@@ -53,6 +53,10 @@ export class SearchDagBuilder {
     return this.indexByKey.get(key);
   }
 
+  childrenOf(index: number): number[] {
+    return this.children[index];
+  }
+
   setChildren(index: number, children: number[]) {
     this.children[index] = children;
   }

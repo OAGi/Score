@@ -1,4 +1,6 @@
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
 import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {
@@ -970,6 +972,124 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     return node;
   }
 
+  /**
+   * The tree as a `SearchDag` (see `ModelBrowserNodeDatabase.searchGraph`), for searching the components instead of
+   * the millions of nodes they unfold into.
+   *
+   * The components and their children are taken from the CC graph (through fresh nodes, as the tree's own nodes can be
+   * edited). The nodes the tree has already built are then compared with them: a node whose name (its loaded details)
+   * or children differ gets a record of its own, a "clone" showing the same component, so that a search sees the tree
+   * as it is on screen. The result is built anew for every search.
+   *
+   * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
+   */
+  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+    const builder = new SearchDagBuilder();
+    const clones = new WeakMap<object, number>();
+    const hideProhibited = !!this.dataSource && this.dataSource.hideProhibited;
+    const shown = (nodes: T[]): T[] => hideProhibited ? nodes.filter(e => !e.inhibited) : nodes;
+    const representatives: T[] = [];
+    let cloneCount = 0;
+
+    const keyOf = (node: T): string => {
+      const key = this.searchKey(node);
+      if (key === undefined) {
+        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+      }
+      return key;
+    };
+
+    const plain = (node: T): number => {
+      const {index, created} = builder.record(keyOf(node), [this.plainName(node)]);
+      if (created) {
+        representatives.push(node);
+      }
+      return index;
+    };
+
+    const place = (node: T): {record: number, clone: boolean} => {
+      const key = keyOf(node);
+      const plainIndex = builder.indexOf(key);
+      if (plainIndex === undefined) {
+        throw new Error('A node the graph does not know cannot be searched through its graph.');
+      }
+      // A node that was found to have no children (loadChildren marks it not expandable) is as materialized as one with some.
+      const materialized = node.getChildren().length > 0 || (node as unknown as CcFlatNodeImpl)._expandable === false;
+      const children = materialized ? shown(node.children as T[]).map(place) : undefined;
+      const plainChildren = builder.childrenOf(plainIndex);
+      const sameChildren = !children || (children.length === plainChildren.length
+        && children.every((child, i) => child.record === plainChildren[i]));
+      if (node.name === this.plainName(node) && sameChildren) {
+        return {record: plainIndex, clone: false};
+      }
+      const {index} = builder.record('@' + (cloneCount++), [node.name], key);
+      builder.setChildren(index, children ? children.map(child => child.record) : plainChildren);
+      clones.set(node, index);
+      return {record: index, clone: true};
+    };
+
+    try {
+      plain(root);
+      for (let i = 0; i < representatives.length; i++) {
+        const node = representatives[i];
+        builder.setChildren(builder.indexOf(keyOf(node)), shown(this.getChildren(node)).map(child => plain(child)));
+      }
+      place(root);
+    } catch (e) {
+      return undefined;
+    }
+
+    return {
+      dag: builder.build(),
+      recordOf: node => {
+        const clone = clones.get(node);
+        if (clone !== undefined) {
+          return clone;
+        }
+        const key = this.searchKey(node);
+        return key === undefined ? -1 : (builder.indexOf(key) ?? -1);
+      }
+    };
+  }
+
+  /** What makes two nodes the same component: they show the same thing and so have the same children. */
+  private searchKey(node: T): string | undefined {
+    if (node instanceof AccFlatNode) {
+      return 'ACC-' + node.accNode.manifestId;
+    }
+    if (node instanceof AsccpFlatNode) {
+      return 'ASCCP-' + node.asccpNode.manifestId;
+    }
+    if (node instanceof BccpFlatNode) {
+      // an attribute has no supplementary components below it, the same property as an element does
+      return 'BCCP-' + node.bccpNode.manifestId + (node.bccNode?.entityType === 'Attribute' ? '#attribute' : '');
+    }
+    if (node instanceof DtFlatNode) {
+      return 'DT-' + node.dtNode.manifestId;
+    }
+    if (node instanceof DtScFlatNode) {
+      return 'SC-' + node.dtScNode.manifestId;
+    }
+    return undefined;
+  }
+
+  /** The name a node of the component has before its details are loaded (which can replace it). */
+  private plainName(node: T): string {
+    if (node instanceof AccFlatNode) {
+      return node.accNode.objectClassTerm + '. Details';
+    }
+    if (node instanceof AsccpFlatNode) {
+      return node.asccpNode.propertyTerm;
+    }
+    if (node instanceof BccpFlatNode) {
+      return node.bccpNode.propertyTerm;
+    }
+    if (node instanceof DtFlatNode) {
+      return node.dtNode.den;
+    }
+    return node.name;
+  }
+
   detectCycle(node: AsccpFlatNode): boolean {
     const asccpManifestId = node.asccpNode.manifestId;
     let cur = node.parent;
@@ -1226,8 +1346,42 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
   }
 
   toggleNode(node: T, expand: boolean) {
-    if (!node) {
+    if (!this.applyToggle(node, expand)) {
       return;
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+  }
+
+  /**
+   * Expands the node and every collapsed ancestor, announcing the change once. Expanding them one by one announces
+   * each, and every announcement re-renders the rows on screen.
+   */
+  expandTo(node: T) {
+    const chain: T[] = [];
+    for (let n = node; n; n = n.parent as T) {
+      if (!this.isExpanded(n)) {
+        chain.push(n);
+      }
+    }
+    const expanded = chain.reverse().filter(n => {
+      const applied = this.applyToggle(n, true);
+      if (applied) {
+        n.expanded = true;
+      }
+      return applied;
+    });
+    if (expanded.length > 0) {
+      this.dataChange.next(this.data);
+    }
+  }
+
+  /** Changes the rows for the toggle without announcing it; false when there is nothing to change. */
+  private applyToggle(node: T, expand: boolean): boolean {
+    if (!node) {
+      return false;
     }
 
     let children = this._database.children(node);
@@ -1237,7 +1391,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
     const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
-      return;
+      return false;
     }
 
     if (expand) {
@@ -1259,10 +1413,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
         e.removeChangeListener(this);
       });
     }
-
-    // notify the change
-    this.dataChange.next(this.data);
-    node.expanded = expand;
+    return true;
   }
 
   loadDetail(node: T, callbackFn?) {
@@ -1285,6 +1436,19 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
               private database: CcFlatNodeDatabase<T>) {
     super(dataSource);
     dataSource.addListener(this);
+  }
+
+  protected override graphAdapter(): TreeGraphAdapter<T> {
+    let graph: ReturnType<CcFlatNodeDatabase<T>['searchGraph']>;
+    return {
+      dag: () => {
+        graph = this.database.searchGraph(this.dataSource.data[0]);
+        return graph?.dag;
+      },
+      recordOf: node => graph ? graph.recordOf(node) : -1,
+      namesOf: node => [node.name],
+      childrenOf: node => this.database.children(node)
+    };
   }
 
   onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
