@@ -10,10 +10,13 @@ import {
   DtScSummary
 } from '../../cc-management/domain/core-component-node';
 import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
+import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
+import {TreeNodeSearcher, TreeSearchLimits, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
-import {BehaviorSubject, empty, forkJoin, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, Subject} from 'rxjs';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {ScoreUser} from '../../authentication/domain/auth';
 import {Cardinality, Facet, PrimitiveRestriction, ValueConstraint, WhoAndWhen} from '../../basis/basis';
@@ -2642,6 +2645,115 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       .concat(this.sortByViewOrder(viewParentAccManifestId, nodes));
   }
 
+  /**
+   * Whether the node shows only some of its CC children (and so does everything below it), which makes its component's
+   * children list unusable as the general one. The uplift target tree does this below a node that reuses a BIE.
+   */
+  protected hasFilteredChildren(node: T): boolean {
+    return false;
+  }
+
+  /**
+   * The tree as a `SearchDag` (see `ModelBrowserNodeDatabase.searchGraph`): one record per CC component with its
+   * children in the order the tree shows them, so that a search runs on the components instead of on the nodes they
+   * unfold into.
+   *
+   * What a BIE adds to the CC structure is data of single places: a display name (which a search matches too) and the
+   * reuse of another BIE. Those places, and the places above them, get a record of their own (a "clone" showing the
+   * same component); everything below stays shared. The places are found by walking the nodes that carry BIE data
+   * (used, inherited or reusing), which are few. The result is built anew for every search, as that data can change
+   * at any time.
+   *
+   * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
+   */
+  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+    const builder = new SearchDagBuilder();
+    const clones = new WeakMap<object, number>();
+    const representatives: T[] = [];
+    const represented = new Set<string>();
+    let cloneCount = 0;
+
+    const keyOf = (node: T): string => {
+      const key = this.searchKey(node);
+      if (key === undefined) {
+        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+      }
+      return key;
+    };
+
+    const plain = (node: T): number => {
+      const key = keyOf(node);
+      const {index} = builder.record(key, [this.unwrapNode(node).name]);
+      // A node that is a cycle (it has no children loaded) or shows only some of its children says nothing about
+      // what its component's children are.
+      if (!represented.has(key) && !this.isCycleNode(node) && !this.hasFilteredChildren(node)) {
+        represented.add(key);
+        representatives.push(node);
+      }
+      return index;
+    };
+
+    const carriesBieData = (node: T): boolean => {
+      const raw = this.unwrapNode(node);
+      return !!(raw.used || raw.inherited || raw.reused);
+    };
+
+    const isSpecial = (node: T): boolean => {
+      const raw = this.unwrapNode(node);
+      return !!raw.reused || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
+    };
+
+    const place = (node: T): {record: number, clone: boolean} => {
+      const placed = this.children(node)
+        .map(child => carriesBieData(child) ? place(child) : {record: plain(child), clone: false});
+      if (!isSpecial(node) && !placed.some(child => child.clone)) {
+        return {record: plain(node), clone: false};
+      }
+      const raw = this.unwrapNode(node);
+      const names = [raw.name, raw.displayName].filter((name, i, all) => !!name && all.indexOf(name) === i);
+      const {index} = builder.record('@' + (cloneCount++), names, keyOf(node));
+      builder.setChildren(index, placed.map(child => child.record));
+      clones.set(raw, index);
+      return {record: index, clone: true};
+    };
+
+    try {
+      place(root);
+      for (let i = 0; i < representatives.length; i++) {
+        const node = representatives[i];
+        builder.setChildren(builder.indexOf(keyOf(node)), this.children(node).map(child => plain(child)));
+      }
+    } catch (e) {
+      return undefined;
+    }
+
+    return {
+      dag: builder.build(),
+      recordOf: node => {
+        const clone = clones.get(this.unwrapNode(node));
+        if (clone !== undefined) {
+          return clone;
+        }
+        const key = this.searchKey(node);
+        return key === undefined ? -1 : (builder.indexOf(key) ?? -1);
+      }
+    };
+  }
+
+  private searchKey(node: T): string | undefined {
+    const raw = this.unwrapNode(node) as BieFlatNode;
+    if (raw instanceof AbieFlatNode) {
+      return 'ASCCP-' + raw.asccpNode.manifestId;
+    }
+    if (raw instanceof BbiepFlatNode) {
+      return 'BCCP-' + raw.bccpNode.manifestId;
+    }
+    if (raw instanceof BbieScFlatNode) {
+      return 'SC-' + raw.bdtScNode.manifestId;
+    }
+    return undefined;
+  }
+
   private unwrapNode<N extends BieFlatNode>(node: N): N {
     let raw = node;
     let next = raw?.self as N;
@@ -3484,8 +3596,48 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
    * Toggle the node, remove from display list
    */
   toggleNode(node: T, expand: boolean) {
-    if (!node) {
+    if (!this.applyToggle(node, expand)) {
       return;
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+
+    // Issue #1638: announce expansions so the editor can lazily fetch this view parent's order.
+    if (expand) {
+      this.nodeExpanded$.next(node);
+    }
+  }
+
+  /**
+   * Expands the node and every collapsed ancestor, announcing the change once. Expanding them one by one announces
+   * each, and every announcement re-renders the rows on screen, which in a deep tree is what takes the time.
+   */
+  expandTo(node: T) {
+    const chain: T[] = [];
+    for (let n = node; n; n = n.parent as T) {
+      if (!this.isExpanded(n)) {
+        chain.push(n);
+      }
+    }
+    const expanded = chain.reverse().filter(n => {
+      const applied = this.applyToggle(n, true);
+      if (applied) {
+        n.expanded = true;
+      }
+      return applied;
+    });
+    if (expanded.length > 0) {
+      this.dataChange.next(this.data);
+      expanded.forEach(n => this.nodeExpanded$.next(n));
+    }
+  }
+
+  /** Changes the rows for the toggle without announcing it; false when there is nothing to change. */
+  private applyToggle(node: T, expand: boolean): boolean {
+    if (!node) {
+      return false;
     }
 
     let children = this._database.children(node);
@@ -3501,7 +3653,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
-      return;
+      return false;
     }
 
     if (expand) {
@@ -3509,9 +3661,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         e.expanded = false;
         e.addChangeListener(this);
       });
-      const data = this.data;
-      data.splice(index + 1, 0, ...children);
-      this.data = data;
+      this.data.splice(index + 1, 0, ...children);
     } else {
       let count = 0;
       for (
@@ -3520,12 +3670,10 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         i++, count++
       ) {
       }
-      const data = this.data;
-      data.splice(index + 1, count).forEach(e => {
+      this.data.splice(index + 1, count).forEach(e => {
         e.expanded = false;
         e.removeChangeListener(this);
       });
-      this.data = data;
 
       // Release an unchanged BBIEP subtree after collapse. Changed children
       // must remain materialized so edits (including uplift mappings held by
@@ -3536,15 +3684,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
         }
       }
     }
-
-    // notify the change
-    this.dataChange.next(this.data);
-    node.expanded = expand;
-
-    // Issue #1638: announce expansions so the editor can lazily fetch this view parent's order.
-    if (expand) {
-      this.nodeExpanded$.next(node);
-    }
+    return true;
   }
 
   getNodeIndex(node: T): number {
@@ -3828,34 +3968,39 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
 }
 
 export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
+  extends TreeNodeSearcher<T, BieFlatNodeDataSource<T>>
   implements ChangeListener<BieFlatNodeDataSource<T>> {
 
-  searchKeyword = '';
-  _inputKeyword = '';
-  selectedNode: T;
-  searchResult: T[] = [];
-  searchedData: T[];
-  fullSearched = false;
-  searchedItemCount = 0;
-  searchIndex = 0;
-  isSearching = false;
-  searchPrefix = '';
-
-  constructor(private dataSource: BieFlatNodeDataSource<T>,
+  constructor(dataSource: BieFlatNodeDataSource<T>,
               private database: BieFlatNodeDatabase<T>) {
+    super(dataSource);
     dataSource.addListener(this);
     dataSource.searcher = this;
   }
 
-  get inputKeyword(): string {
-    return this._inputKeyword;
-  }
-
-  set inputKeyword(inputKeyword: string) {
-    if (inputKeyword !== this._inputKeyword) {
-      this.resetSearch();
+  /**
+   * With unused nodes hidden the tree is only what the BIE uses, which is small and is searched by walking it; with
+   * them shown it is the whole CC structure below, which is searched through its graph.
+   */
+  protected override graphAdapter(): TreeGraphAdapter<T> | undefined {
+    if (this.dataSource.hideUnused) {
+      return undefined;
     }
-    this._inputKeyword = inputKeyword;
+    let graph: ReturnType<BieFlatNodeDatabase<T>['searchGraph']>;
+    return {
+      dag: () => {
+        graph = this.database.searchGraph(this.dataSource.data[0]);
+        return graph?.dag;
+      },
+      recordOf: node => graph ? graph.recordOf(node) : -1,
+      namesOf: node => {
+        const raw = node.self || node;
+        return raw.isGroup ? undefined : [raw.name, raw.displayName].filter(name => !!name);
+      },
+      childrenOf: node => this.database.children(node),
+      identityOf: node => node.self || node,
+      strictRootedPaths: true
+    };
   }
 
   onChange(entity: BieFlatNodeDataSource<T>, propertyName: string, val: any) {
@@ -3864,168 +4009,35 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
     }
   }
 
-  prev(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index > 0) {
-      return this.dataSource.data[index - 1];
-    }
-    return node;
+  protected override isMatchable(node: T): boolean {
+    return !node.isGroup;
   }
 
-  next(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index < this.dataSource.data.length - 1) {
-      return this.dataSource.data[index + 1];
-    }
-    return node;
+  /** A path keyword (`/a/b`) follows one branch, so it needs far fewer matches and expansions. */
+  protected override limits(keyword: string): TreeSearchLimits {
+    return keyword.charAt(0) === '/' ? {threshold: 1, expandLimit: 1000} : super.limits(keyword);
   }
 
-  go(val: number): Observable<number> {
-    this.searchIndex += val;
-    if (this.searchResult.length <= this.searchIndex) {
-      this.searchIndex = 0;
+  protected override visit(node: T, keyword: string): TreeSearchVisit<T> {
+    const isPathSearch = keyword.charAt(0) === '/';
+    const normalizedPath = keyword.replace(/\s+/g, '').toLowerCase();
+    const canDescendantsMatch = !isPathSearch ||
+      normalizedPath.startsWith('/' + (node.queryPath || '').toLowerCase()) ||
+      node.isGroup;
+    if (!node.expandable || !canDescendantsMatch) {
+      return {children: [], expanded: false};
     }
-    if (this.searchIndex < 0) {
-      this.searchIndex = this.searchResult.length - 1;
+    if (node.children.length === 0) {
+      this.database.loadChildren(node);
     }
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
+    return {children: node.children as T[], expanded: true};
   }
 
-  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
-    if (this.isSearching) {
-      return empty();
-    }
-    if (!inputKeyword || inputKeyword.length === 0) {
-      this.resetSearch();
-      return empty();
-    }
-
-    if (this._inputKeyword !== inputKeyword || force) {
-      this.resetSearch();
-      this._inputKeyword = inputKeyword;
-    }
-    this.isSearching = true;
-    if (!this.fullSearched || force) {
-      const searchResult = [];
-      const evaluator = this.getEvaluator(inputKeyword);
-
-      const isPathSearch = inputKeyword.charAt(0) === '/';
-      const threshold = isPathSearch ? 1 : 100;
-      let expandingLimit = isPathSearch ? 1000 : 10000;
-      const normalizedPath = inputKeyword.replace(/\s+/g, '').toLowerCase();
-
-      let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((inputKeyword.charAt(0) === '/' || !selectedNode) ? [this.dataSource.data[0], ] : [selectedNode, ]) :
-        this.searchedData;
-      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
-        const item = data.shift();
-        this.searchedItemCount++;
-        if (!item.isGroup && evaluator.eval(item)) {
-          searchResult.push(item);
-        }
-        const canDescendantsMatch = !isPathSearch ||
-          normalizedPath.startsWith('/' + (item.queryPath || '').toLowerCase()) ||
-          item.isGroup;
-
-        if (item.expandable && canDescendantsMatch) {
-          expandingLimit--;
-          if (item.children.length === 0) {
-            this.database.loadChildren(item);
-          }
-          if (item.children.length > 0) {
-            data = data.concat(item.children as T[]);
-          }
-        }
-      }
-
-      if (data.length === 0) {
-        this.fullSearched = true;
-      } else {
-        this.searchedData = data;
-      }
-
-      this.searchResult = this.searchResult.concat(searchResult);
-      this.searchKeyword = evaluator.keywordForHighlight();
-      if (searchResult.length > 0) {
-        searchResult.forEach(e => this.dataSource.expand(e));
-        this.searchResult = this.sort(this.searchResult);
-      }
-    } else {
-      if (backward) {
-        this.searchIndex -= 1;
-      } else {
-        this.searchIndex += 1;
-      }
-      if (this.searchResult.length <= this.searchIndex) {
-        this.searchIndex = 0;
-      }
-      if (this.searchIndex < 0) {
-        this.searchIndex = this.searchResult.length - 1;
-      }
-    }
-
-    this.isSearching = false;
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
+  protected override sameNode(a: T, b: T): boolean {
+    return a === b || (!!a.self && !!b.self && a.self === b.self) || (!!a.queryPath && a.queryPath === b.queryPath);
   }
 
-  sort(searchResult: T[]): T[] {
-    return searchResult.sort((a, b) => {
-      const aIdx = this.getNodeIndex(a);
-      const bIdx = this.getNodeIndex(b);
-      return aIdx - bIdx;
-    });
-  }
-
-  isSearchResult(node: T): boolean {
-    if (!this.searchResult || this.searchResult.length === 0 || !node) {
-      return false;
-    }
-    return this.searchResult.some(e => e === node || (e.self && node.self && e.self === node.self) || (e.queryPath && e.queryPath === node.queryPath));
-  }
-
-  isCurrentSearchIndex(node: T): boolean {
-    if (!this.searchResult || this.searchResult.length === 0 || !node) {
-      return false;
-    }
-    const current = this.searchResult[this.searchIndex];
-    if (!current) {
-      return false;
-    }
-    return current === node || (current.self && node.self && current.self === node.self) || (current.queryPath && current.queryPath === node.queryPath);
-  }
-
-  resetSearch() {
-    this.searchKeyword = undefined;
-    this.selectedNode = undefined;
-    this.searchResult = [];
-    this.searchedData = [];
-    this.fullSearched = false;
-    this.searchedItemCount = 0;
-    this.searchIndex = 0;
-    this.isSearching = false;
-    this.searchPrefix = '';
-  }
-
-  getNodeIndex(node: T) {
-    if (!this.dataSource.isExpanded(node)) {
-      this.dataSource.expand(node);
-    }
+  protected visibleIndex(node: T): number {
     return this.dataSource.getNodeIndex(node);
   }
 

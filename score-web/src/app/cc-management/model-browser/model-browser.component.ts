@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {catchError, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -52,7 +52,7 @@ import {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./model-browser.component.css']
 })
-export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowserNode>, ModelBrowserTreeRowHost {
+export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<ModelBrowserNode>, ModelBrowserTreeRowHost {
   private ccNodeService = inject(CcNodeService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
@@ -115,6 +115,10 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, hideOrderWeights);
   }
 
+  ngOnDestroy(): void {
+    this.searcher?.dispose();
+  }
+
   ngOnInit(): void {
     this.loading = true;
     this.route.paramMap.pipe(
@@ -137,6 +141,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       const database = new ModelBrowserNodeDatabase<ModelBrowserNode>(ccGraph, this.type, this.manifestId);
       this.dataSource = new ModelBrowserNodeDataSource<ModelBrowserNode>(database, this.ccNodeService, [this,]);
       this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
+      this.searcher?.dispose();
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);

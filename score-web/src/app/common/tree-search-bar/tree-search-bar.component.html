@@ -6,15 +6,19 @@
         <input matInput type="search" [(ngModel)]="searcher.inputKeyword"
           [disabled]="searcher.isSearching"
           (keyup.enter)="onSearch(searcher.inputKeyword)">
-        @if (searcher.searchKeyword && searcher.searchResult.length > 0) {
+        @if (searcher.isSearching) {
           <mat-hint matSuffix
-          align="end">{{searcher.searchIndex + 1}}/{{searcher.searchResult.length}} in {{ searcher.searchedItemCount }}{{ searcher.fullSearched ? '' : '+' }} nodes</mat-hint>
+          align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + '+ ' + searcher.searchedUnit : '' }}</mat-hint>
         }
-        @if (searcher.searchKeyword && !searcher.fullSearched && searcher.searchResult.length === 0) {
+        @if (!searcher.isSearching && searcher.searchKeyword && searcher.resultCount > 0) {
           <mat-hint matSuffix
-          align="end">0 results in {{ searcher.searchedItemCount }} nodes</mat-hint>
+          align="end">{{searcher.searchIndex + 1}}/{{searcher.resultCount}}{{ searcher.fullSearched ? '' : '+' }}{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + (searcher.fullSearched ? '' : '+') + ' ' + searcher.searchedUnit : '' }}</mat-hint>
         }
-        @if (searcher.searchKeyword && searcher.fullSearched && searcher.searchResult.length === 0) {
+        @if (!searcher.isSearching && searcher.searchKeyword && !searcher.fullSearched && searcher.resultCount === 0) {
+          <mat-hint matSuffix
+          align="end">0 results{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + ' ' + searcher.searchedUnit : '' }}</mat-hint>
+        }
+        @if (!searcher.isSearching && searcher.searchKeyword && searcher.fullSearched && searcher.resultCount === 0) {
           <mat-hint matSuffix
           align="end">0 results</mat-hint>
         }
@@ -22,12 +26,12 @@
     </div>
     <div class="tree-search-buttons">
       <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
-        [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+        [disabled]="searcher.isSearching || searcher.resultCount === 0"
         (click)="moveRequest.emit(-1)">
         <mat-icon>keyboard_arrow_up</mat-icon>
       </button>
       <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
-        [disabled]="searcher.isSearching || !searcher.searchResult || searcher.searchResult.length === 0"
+        [disabled]="searcher.isSearching || searcher.resultCount === 0"
         (click)="moveRequest.emit(1)">
         <mat-icon>keyboard_arrow_down</mat-icon>
       </button>
@@ -44,11 +48,6 @@
         (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
         <mat-icon>close</mat-icon>
       </button>
-      <div class="search-progress-container">
-        <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar"
-        aria-label="Searching"
-        [hidden]="!searcher.isSearching"></mat-progress-spinner>
-      </div>
     </div>
     <ng-content select="[treeSearchSettings]"></ng-content>
   </div>

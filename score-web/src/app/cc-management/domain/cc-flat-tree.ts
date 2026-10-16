@@ -1,4 +1,5 @@
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
 import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
 import {
   CcAccNodeInfo,
@@ -12,7 +13,7 @@ import {
 } from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
-import {BehaviorSubject, empty, Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {sha256} from '../../common/utility';
 import {ShortTag} from '../../tag-management/domain/tag';
 
@@ -1277,33 +1278,13 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
 }
 
 export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
+  extends TreeNodeSearcher<T, CcFlatNodeDataSource<T>>
   implements ChangeListener<CcFlatNodeDataSource<T>> {
 
-  searchKeyword = '';
-  _inputKeyword = '';
-  selectedNode: T;
-  searchResult: T[] = [];
-  searchedData: T[];
-  fullSearched = false;
-  searchedItemCount = 0;
-  searchIndex = 0;
-  isSearching = false;
-  searchPrefix = '';
-
-  constructor(private dataSource: CcFlatNodeDataSource<T>,
+  constructor(dataSource: CcFlatNodeDataSource<T>,
               private database: CcFlatNodeDatabase<T>) {
-    this.dataSource.addListener(this);
-  }
-
-  get inputKeyword(): string {
-    return this._inputKeyword;
-  }
-
-  set inputKeyword(inputKeyword: string) {
-    if (inputKeyword !== this._inputKeyword) {
-      this.resetSearch();
-    }
-    this._inputKeyword = inputKeyword;
+    super(dataSource);
+    dataSource.addListener(this);
   }
 
   onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
@@ -1312,146 +1293,15 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
     }
   }
 
-  prev(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index > 0) {
-      return this.dataSource.data[index - 1];
+  protected override visit(node: T): TreeSearchVisit<T> {
+    const expanded = node.expandable;
+    if (expanded) {
+      this.database.loadChildren(node);
     }
-    return node;
+    return {children: node.children as T[], expanded};
   }
 
-  next(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index < this.dataSource.data.length - 1) {
-      return this.dataSource.data[index + 1];
-    }
-    return node;
-  }
-
-  go(val: number): Observable<number> {
-    this.searchIndex += val;
-    if (this.searchResult.length <= this.searchIndex) {
-      this.searchIndex = 0;
-    }
-    if (this.searchIndex < 0) {
-      this.searchIndex = this.searchResult.length - 1;
-    }
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
-    if (this.isSearching) {
-      return empty();
-    }
-    if (!inputKeyword || inputKeyword.length === 0) {
-      this.resetSearch();
-      return empty();
-    }
-
-    this.isSearching = true;
-    if (!this.fullSearched || force) {
-      const searchResult = [];
-      const evaluator = this.getEvaluator(inputKeyword);
-
-      const threshold = 100;
-      let expandingLimit = 1000;
-      let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0], ] : [selectedNode, ]) :
-        this.searchedData;
-      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
-        const item = data.shift();
-        this.searchedItemCount++;
-        if (evaluator.eval(item)) {
-          searchResult.push(item);
-        }
-        if (item.expandable) {
-          this.database.loadChildren(item);
-          expandingLimit--;
-        }
-
-        if (item.children.length > 0) {
-          data = data.concat(item.children as T[]);
-        }
-      }
-
-      if (data.length === 0) {
-        this.fullSearched = true;
-      } else {
-        this.searchedData = data;
-      }
-
-      this.searchResult = this.searchResult.concat(searchResult);
-      this.searchKeyword = evaluator.keywordForHighlight();
-      if (searchResult.length > 0) {
-        searchResult.forEach(e => this.dataSource.expand(e));
-        this.searchResult = this.sort(this.searchResult);
-      }
-    } else {
-      if (backward) {
-        this.searchIndex -= 1;
-      } else {
-        this.searchIndex += 1;
-      }
-      if (this.searchResult.length <= this.searchIndex) {
-        this.searchIndex = 0;
-      }
-      if (this.searchIndex < 0) {
-        this.searchIndex = this.searchResult.length - 1;
-      }
-    }
-
-    this.isSearching = false;
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  sort(searchResult: T[]): T[] {
-    return searchResult.sort((a, b) => {
-      const aIdx = this.dataSource.data.indexOf(a);
-      const bIdx = this.dataSource.data.indexOf(b);
-      return aIdx - bIdx;
-    });
-  }
-
-  isSearchResult(node: T): boolean {
-    return this.searchResult.indexOf(node) > -1;
-  }
-
-  isCurrentSearchIndex(node: T): boolean {
-    return this.searchResult.indexOf(node) === this.searchIndex;
-  }
-
-  resetSearch() {
-    this.searchKeyword = undefined;
-    this.selectedNode = undefined;
-    this.searchResult = [];
-    this.searchedData = [];
-    this.fullSearched = false;
-    this.searchedItemCount = 0;
-    this.searchIndex = 0;
-    this.isSearching = false;
-    this.searchPrefix = '';
-  }
-
-  getNodeIndex(node: T) {
-    if (!this.dataSource.isExpanded(node)) {
-      this.dataSource.expand(node);
-    }
+  protected visibleIndex(node: T): number {
     return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
   }
 

@@ -81,8 +81,15 @@ describe('TreeViewportComponent', () => {
       vi.advanceTimersByTime(100);
       expect(viewport.scrollToOffset).toHaveBeenCalledWith(66, 'smooth');
 
-      TreeViewportComponent.prototype.scrollToIndex.call(self, -1);
+      // without a delay it still waits for the viewport to render rows that were just revealed
+      TreeViewportComponent.prototype.scrollToIndex.call(self, 4);
       expect(viewport.scrollToOffset).toHaveBeenCalledTimes(1);
+      vi.advanceTimersByTime(0);
+      expect(viewport.scrollToOffset).toHaveBeenLastCalledWith(132, 'auto');
+
+      TreeViewportComponent.prototype.scrollToIndex.call(self, -1);
+      vi.advanceTimersByTime(1000);
+      expect(viewport.scrollToOffset).toHaveBeenCalledTimes(2);
     } finally {
       vi.useRealTimers();
     }

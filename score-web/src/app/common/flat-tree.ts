@@ -1,4 +1,5 @@
 import {CcGraph, CcGraphNode} from '../cc-management/domain/core-component-node';
+import {nameContainsToken, splitCamelCase} from './tree-search/path-pattern';
 
 export interface FlatNode {
   type: string;
@@ -148,20 +149,11 @@ export class PathLikeExpressionEvaluator<T extends FlatNode> implements Expressi
   }
 
   private split(token: string): string {
-    return token.replace(/([a-z])([A-Z])/g, '$1 $2').trim();
+    return splitCamelCase(token);
   }
 
   protected doEval(node: T, token: string): boolean {
-    if (!node || !node.name) {
-      return false;
-    }
-    const tokenNoSpace = token.replace(/\s+/g, '');
-    if (this._caseSensitive) {
-      return node.name.indexOf(token) > -1 || node.name.indexOf(tokenNoSpace) > -1;
-    } else {
-      const nodeNameLower = node.name.toLowerCase();
-      return nodeNameLower.indexOf(token.toLowerCase()) > -1 || nodeNameLower.indexOf(tokenNoSpace.toLowerCase()) > -1;
-    }
+    return !!node && nameContainsToken(node.name, token, this._caseSensitive);
   }
 
   protected next(node: T): T {

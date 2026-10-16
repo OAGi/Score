@@ -1,7 +1,10 @@
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
+import {TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
+import {SearchDag, SearchDagBuilder} from '../../../common/tree-search/search-dag';
+import {TreeNodeSearcher, TreeSearchVisit} from '../../../common/tree-search/tree-node-searcher';
 import {ExpressionEvaluator, FlatNode, getKey, PathLikeExpressionEvaluator} from '../../../common/flat-tree';
-import {BehaviorSubject, empty, forkJoin, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, Subject} from 'rxjs';
 import {
   AccDetails,
   AsccDetails,
@@ -1468,8 +1471,45 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
    * Toggle the node, remove from display list
    */
   toggleNode(node: T, expand: boolean) {
-    if (!node) {
+    if (!this.applyToggle(node, expand)) {
       return;
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+
+    // Issue #1638: announce expansions so the component can lazily fetch this view parent's order.
+    if (expand) {
+      this.nodeExpanded$.next(node);
+    }
+  }
+
+  /** Expands the node and every collapsed ancestor, announcing the change once (see `BieFlatNodeDataSource.expandTo`). */
+  expandTo(node: T) {
+    const chain: T[] = [];
+    for (let n = node; n; n = n.parent as T) {
+      if (!this.isExpanded(n)) {
+        chain.push(n);
+      }
+    }
+    const expanded = chain.reverse().filter(n => {
+      const applied = this.applyToggle(n, true);
+      if (applied) {
+        n.expanded = true;
+      }
+      return applied;
+    });
+    if (expanded.length > 0) {
+      this.dataChange.next(this.data);
+      expanded.forEach(n => this.nodeExpanded$.next(n));
+    }
+  }
+
+  /** Changes the rows for the toggle without announcing it; false when there is nothing to change. */
+  private applyToggle(node: T, expand: boolean): boolean {
+    if (!node) {
+      return false;
     }
 
     let children = this._database.children(node);
@@ -1477,7 +1517,7 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
 
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
-      return;
+      return false;
     }
 
     if (expand) {
@@ -1506,15 +1546,7 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
         }
       }
     }
-
-    // notify the change
-    this.dataChange.next(this.data);
-    node.expanded = expand;
-
-    // Issue #1638: announce expansions so the component can lazily fetch this view parent's order.
-    if (expand) {
-      this.nodeExpanded$.next(node);
-    }
+    return true;
   }
 
   loadDetail(node: T, callbackFn?) {
@@ -1601,6 +1633,9 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   // Issue #1638: instance-level sibling sort weights, keyed "<viewParentAcc>:ASCC|BCC:<child>".
   // Empty by default => children() is a stable no-op (identical to the seq_key order).
   private _viewOrderMap: Map<string, number> = new Map<string, number>();
+  /** Bumped whenever the sibling order changes, which invalidates a search DAG built from the old order. */
+  private _viewOrderVersion = 0;
+  private _searchGraph: {version: number, root: T, dag: SearchDag, builder: SearchDagBuilder} | undefined;
 
   dataSource: ModelBrowserNodeDataSource<T>;
 
@@ -1615,6 +1650,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
 
   setViewOrderMap(viewOrderMap: Map<string, number>) {
     this._viewOrderMap = viewOrderMap || new Map<string, number>();
+    this._viewOrderVersion++;
   }
 
   /**
@@ -1623,6 +1659,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
    * refresh — clearing first means a reset (a removed row) correctly drops back to the seq_key order.
    */
   setViewOrderForParent(viewParentAccManifestId: number, entries: BieViewOrderEntry[]) {
+    this._viewOrderVersion++;
     const prefix = viewParentAccManifestId + ':';
     for (const key of Array.from(this._viewOrderMap.keys())) {
       if (key.startsWith(prefix)) {
@@ -1957,6 +1994,59 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     return node;
   }
 
+  /**
+   * The tree as a `SearchDag`: one record per component (ASCCP, BCCP or supplementary component) with its children in
+   * the order the tree shows them, so that a search can run on the thousands of components rather than on the
+   * millions of nodes they unfold into. Built from the tree's own `children()` (one representative node per
+   * component), so the names and the order are exactly the tree's; rebuilt when the sibling order changes.
+   */
+  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} {
+    if (!this._searchGraph || this._searchGraph.version !== this._viewOrderVersion || this._searchGraph.root !== root) {
+      this._searchGraph = {version: this._viewOrderVersion, root, ...this.buildSearchGraph(root)};
+    }
+    const builder = this._searchGraph.builder;
+    return {
+      dag: this._searchGraph.dag,
+      recordOf: node => {
+        const key = this.searchKey(node);
+        return key === undefined ? -1 : (builder.indexOf(key) ?? -1);
+      }
+    };
+  }
+
+  private buildSearchGraph(root: T): {dag: SearchDag, builder: SearchDagBuilder} {
+    const builder = new SearchDagBuilder();
+    const representatives: T[] = [];
+    const record = (node: T): number => {
+      const {index, created} = builder.record(this.searchKey(node), [node.name]);
+      if (created) {
+        representatives.push(node);
+      }
+      return index;
+    };
+    record(root);
+    for (let i = 0; i < representatives.length; i++) {
+      const node = representatives[i];
+      builder.setChildren(builder.indexOf(this.searchKey(node)), this.children(node).map(child => record(child)));
+    }
+    return {dag: builder.build(), builder};
+  }
+
+  /** What makes two tree nodes the same component: they show the same thing and so have the same name and children. */
+  private searchKey(node: T): string | undefined {
+    const self = node.self;
+    if (self instanceof ModelBrowserAccNode) {
+      return 'ASCCP-' + self.asccpNode.manifestId;
+    }
+    if (self instanceof ModelBrowserBccpNode) {
+      return 'BCCP-' + self.bccpNode.manifestId;
+    }
+    if (self instanceof ModelBrowserBdtScNode) {
+      return 'SC-' + self.bdtScNode.manifestId;
+    }
+    return undefined;
+  }
+
   detectCycle(node: ModelBrowserAsccpNode): boolean {
     const asccpManifestId = node.asccpNode.manifestId;
     let cur = node.parent;
@@ -1971,177 +2061,39 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
 }
 
 export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
+  extends TreeNodeSearcher<T, ModelBrowserNodeDataSource<T>>
   implements ChangeListener<ModelBrowserNodeDataSource<T>> {
 
-  searchKeyword = '';
-  _inputKeyword = '';
-  selectedNode: T;
-  searchResult: T[] = [];
-  searchedData: T[];
-  fullSearched = false;
-  searchedItemCount = 0;
-  searchIndex = 0;
-  isSearching = false;
-  searchPrefix = '';
-
-  constructor(private dataSource: ModelBrowserNodeDataSource<T>,
+  constructor(dataSource: ModelBrowserNodeDataSource<T>,
               private database: ModelBrowserNodeDatabase<T>) {
+    super(dataSource);
     dataSource.addListener(this);
   }
 
-  get inputKeyword(): string {
-    return this._inputKeyword;
-  }
-
-  set inputKeyword(inputKeyword: string) {
-    if (inputKeyword !== this._inputKeyword) {
-      this.resetSearch();
-    }
-    this._inputKeyword = inputKeyword;
+  protected override graphAdapter(): TreeGraphAdapter<T> {
+    const graph = () => this.database.searchGraph(this.dataSource.data[0]);
+    return {
+      dag: () => graph().dag,
+      recordOf: node => graph().recordOf(node),
+      namesOf: node => node.isGroup || node.isChoice ? undefined : [node.name],
+      childrenOf: node => this.database.children(node)
+    };
   }
 
   onChange(entity: ModelBrowserNodeDataSource<T>, propertyName: string, val: any) {
   }
 
-  prev(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index > 0) {
-      return this.dataSource.data[index - 1];
-    }
-    return node;
+  protected override isMatchable(node: T): boolean {
+    return !node.isGroup && !node.isChoice;
   }
 
-  next(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index < this.dataSource.data.length - 1) {
-      return this.dataSource.data[index + 1];
-    }
-    return node;
+  protected override visit(node: T): TreeSearchVisit<T> {
+    // Reading `expandable` loads the children, so it has to come before reading them.
+    const expanded = node.expandable;
+    return {children: node.children as T[], expanded};
   }
 
-  go(val: number): Observable<number> {
-    this.searchIndex += val;
-    if (this.searchResult.length <= this.searchIndex) {
-      this.searchIndex = 0;
-    }
-    if (this.searchIndex < 0) {
-      this.searchIndex = this.searchResult.length - 1;
-    }
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
-    if (this.isSearching) {
-      return empty();
-    }
-    if (!inputKeyword || inputKeyword.length === 0) {
-      this.resetSearch();
-      return empty();
-    }
-
-    this.isSearching = true;
-    if (!this.fullSearched || force) {
-      const searchResult = [];
-      const evaluator = this.getEvaluator(inputKeyword);
-
-      const threshold = 100;
-      let expandingLimit = 1000;
-      let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0],] : [selectedNode,]) :
-        this.searchedData;
-      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
-        const item = data.shift();
-        this.searchedItemCount++;
-        if (!item.isGroup && !item.isChoice && evaluator.eval(item)) {
-          searchResult.push(item);
-        }
-        if (item.expandable) {
-          expandingLimit--;
-        }
-
-        if (item.children.length > 0) {
-          data = data.concat(item.children as T[]);
-        }
-      }
-
-      if (data.length === 0) {
-        this.fullSearched = true;
-      } else {
-        this.searchedData = data;
-      }
-
-      this.searchResult = this.searchResult.concat(searchResult);
-      this.searchKeyword = evaluator.keywordForHighlight();
-      if (searchResult.length > 0) {
-        searchResult.forEach(e => this.dataSource.expand(e));
-        this.searchResult = this.sort(this.searchResult);
-      }
-    } else {
-      if (backward) {
-        this.searchIndex -= 1;
-      } else {
-        this.searchIndex += 1;
-      }
-      if (this.searchResult.length <= this.searchIndex) {
-        this.searchIndex = 0;
-      }
-      if (this.searchIndex < 0) {
-        this.searchIndex = this.searchResult.length - 1;
-      }
-    }
-
-    this.isSearching = false;
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  sort(searchResult: T[]): T[] {
-    return searchResult.sort((a, b) => {
-      const aIdx = this.dataSource.data.indexOf(a);
-      const bIdx = this.dataSource.data.indexOf(b);
-      return aIdx - bIdx;
-    });
-  }
-
-  isSearchResult(node: T): boolean {
-    return this.searchResult.indexOf(node) > -1;
-  }
-
-  isCurrentSearchIndex(node: T): boolean {
-    return this.searchResult.indexOf(node) === this.searchIndex;
-  }
-
-  resetSearch() {
-    this.searchKeyword = undefined;
-    this.selectedNode = undefined;
-    this.searchResult = [];
-    this.searchedData = [];
-    this.fullSearched = false;
-    this.searchedItemCount = 0;
-    this.searchIndex = 0;
-    this.isSearching = false;
-    this.searchPrefix = '';
-  }
-
-  getNodeIndex(node: T) {
-    if (!this.dataSource.isExpanded(node)) {
-      this.dataSource.expand(node);
-    }
+  protected visibleIndex(node: T): number {
     return this.dataSource.data.indexOf(node);
   }
 

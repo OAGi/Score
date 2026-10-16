@@ -8,6 +8,8 @@ import {
 } from './bie-flat-tree';
 import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
 import {of} from 'rxjs';
+import {DagPathSearch} from '../../common/tree-search/dag-path-search';
+import {PathPattern} from '../../common/tree-search/path-pattern';
 
 /**
  * #1638 BIE-editor wiring tests. The editor reads the SAME instance-level sibling order as the model
@@ -469,5 +471,102 @@ describe('Hide unused bounded traversal', () => {
     expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
     used.used = false;
     expect(db.hasUsedOrInheritedDescendant(parent)).toBe(false);
+  });
+});
+
+describe('BieFlatNodeDatabase.searchGraph', () => {
+  /** A database whose nodes are all given up front (nothing is loaded from a CC graph). */
+  class FixedDatabase extends BieFlatNodeDatabase<any> {
+    constructor() {
+      super(null as any, null as any, 0, [], []);
+    }
+
+    loadChildren() {
+    }
+  }
+
+  /** The same component as another node: same ASCCP and ACC, so the same children. */
+  function sameComponentAs(node: AsbiepFlatNode, name: string, asccManifestId: number): AsbiepFlatNode {
+    const copy = asbiepChild(name, asccManifestId);
+    copy.asccpNode = node.asccpNode;
+    copy.accNode = node.accNode;
+    return copy;
+  }
+
+  function search(db: FixedDatabase, root: any, expr: string, mode = {}) {
+    const graph = db.searchGraph(root);
+    const pattern = new PathPattern(expr, false, mode);
+    const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
+    const found = new DagPathSearch(graph.dag, pattern)
+      .search({ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll(names)});
+    return {graph, found};
+  }
+
+  /** Root -> Item (a plain place of component I), Box -> Item' (another place of I, with its own display name). */
+  function tree() {
+    const item = asbiepChild('Item', 10);
+    item.children = [bbiepChild('Code', 20)];
+    const item2 = sameComponentAs(item, 'Item', 12);
+    item2.children = [bbiepChild('Code', 20)];
+    const box = asbiepChild('Box', 11);
+    box.children = [item2];
+    const root = abieParent(1, [item, box]);
+    root.used = true;
+    [item, box, item2].forEach(n => n.parent = n === item2 ? box : root);
+    return {root, item, box, item2};
+  }
+
+  it('shares one record between the places of a component', () => {
+    const {root} = tree();
+    const {graph} = search(new FixedDatabase(), root, 'Item');
+
+    // Root, Item, Code, Box: the second Item place is the same component as the first
+    expect(graph.dag.names.length).toBe(4);
+    expect(search(new FixedDatabase(), root, 'Item').found.total).toBe(2);
+    expect(search(new FixedDatabase(), root, 'Item/Code').found.total).toBe(2);
+  });
+
+  it('gives a place with its own display name a record of its own, and matches by either name', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+    item2.displayName = 'Special';
+
+    const {graph, found} = search(new FixedDatabase(), root, 'Special');
+
+    expect(found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Box/Special/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item/Code').found.total).toBe(2);
+    // the clone shares the component's identity, so it is not expanded below the component's other places
+    expect(graph.dag.identity[graph.recordOf(item2)]).toBe(graph.dag.identity[graph.recordOf(root.children[0] as any)]);
+    expect(graph.recordOf(item2)).not.toBe(graph.recordOf(root.children[0] as any));
+  });
+
+  it('reads a root path as whole names from the root', () => {
+    const {root} = tree();
+
+    expect(search(new FixedDatabase(), root, '/Parent-1/Box/Item/Code', {exact: true, anchored: true}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, '/Box/Item', {exact: true, anchored: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, '/Parent-1/Bo', {exact: true, anchored: true}).found.total).toBe(0);
+  });
+
+  it('keeps a place that shows only some of its children apart from its component', () => {
+    class FilteringDatabase extends FixedDatabase {
+      constructor(private readonly filtered: Set<any>) {
+        super();
+      }
+
+      protected override hasFilteredChildren(node: any): boolean {
+        return this.filtered.has(node.self || node);
+      }
+    }
+    const {root, item2} = tree();
+    item2.used = true;
+    item2.children = [];
+
+    const db = new FilteringDatabase(new Set([item2]));
+    const found = search(db, root, 'Code').found;
+
+    // Item's own Code, and none below the filtered place
+    expect(found.total).toBe(1);
   });
 });

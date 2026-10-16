@@ -186,20 +186,29 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
     this.cursorNodeChange.emit(node);
   }
 
-  /** Scroll so that the row at `index` is the first visible one. */
+  /**
+   * Scroll so that the row at `index` is the first visible one. The scroll always waits for at least the end of the
+   * current task, and then for the viewport to have grown to the row: a caller that has just expanded nodes to reveal
+   * the row has changed the row count, and the viewport only knows the new content height after it has rendered them
+   * (scrolling earlier stops at the old end), which for heavy rows can take a while.
+   */
   scrollToIndex(index: number, options: { delay?: number, smooth?: boolean } = {}) {
     if (index < 0) {
       return;
     }
 
-    const scroll = () => {
-      this.viewport.scrollToOffset(index * this.itemSize, options.smooth ? 'smooth' : 'auto');
+    const scroll = (retries = 60) => {
+      const offset = index * this.itemSize;
+      const element: HTMLElement | undefined = this.viewport.elementRef?.nativeElement;
+      const rowsReach = this.viewport.getDataLength ? this.viewport.getDataLength() * this.itemSize : 0;
+      if (element && retries > 0 && element.scrollHeight - element.clientHeight < offset
+        && rowsReach - element.clientHeight >= offset) {
+        setTimeout(() => scroll(retries - 1), 16);
+        return;
+      }
+      this.viewport.scrollToOffset(offset, options.smooth ? 'smooth' : 'auto');
       this.viewport.checkViewportSize();
     };
-    if (options.delay) {
-      setTimeout(scroll, options.delay);
-    } else {
-      scroll();
-    }
+    setTimeout(scroll, options.delay || 0);
   }
 }

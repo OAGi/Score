@@ -132,6 +132,10 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
       : children;
   }
 
+  protected override hasFilteredChildren(node: T): boolean {
+    return this.isSelectedReuseSubtree(node);
+  }
+
   private isSelectedReuseSubtree(node: T): boolean {
     let current = node as BieFlatNode;
     while (current) {
