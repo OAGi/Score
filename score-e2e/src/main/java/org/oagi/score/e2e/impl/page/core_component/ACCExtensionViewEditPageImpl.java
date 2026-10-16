@@ -462,7 +462,7 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+            return new ACCPanelImpl("//div[contains(@class, \"tree-detail-panel\")][1]");
         });
     }
 

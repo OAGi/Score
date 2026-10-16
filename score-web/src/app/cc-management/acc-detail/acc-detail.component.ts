@@ -118,7 +118,6 @@ export class AccDetailComponent implements OnInit {
 
   faFlask = faFlask;
   title: string;
-  _innerHeight: number = window.innerHeight;
   paddingPixel = 12;
   manifestId: number;
   type = 'ACC';
@@ -464,13 +463,7 @@ export class AccDetailComponent implements OnInit {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (this.rootNode) ? this.rootNode.state : '';
@@ -1957,17 +1950,6 @@ export class AccDetailComponent implements OnInit {
     $event.stopPropagation();
   }
 
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
 
   scrollTree(index: number, delay?: number) {
     if (index < 0) {

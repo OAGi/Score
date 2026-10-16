@@ -21,43 +21,43 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_SELECTOR_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By CARDINALITY_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//textarea[@placeholder=\"Definition\"]");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//textarea[@placeholder=\"Definition\"]");
     private static final By VALUE_DOMAIN_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
 
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");

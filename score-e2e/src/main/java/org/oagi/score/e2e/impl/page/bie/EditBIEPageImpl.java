@@ -1204,7 +1204,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private class ASBIEPanelImpl implements ASBIEPanel {
 
         private static final String ACTIVE_ASBIE_DETAIL_TAB_XPATH =
-                "(//div[contains(@class, \"bie-edit-detail-panel\")]//mat-tab-body[" +
+                "(//div[contains(@class, \"tree-detail-panel\")]//mat-tab-body[" +
                         "(contains(@class, \"mat-mdc-tab-body-active\") or contains(@class, \"mat-tab-body-active\"))" +
                         " and .//textarea[@placeholder = \"Association Definition\"]" +
                         " and .//button[.//*[normalize-space(.) = \"Assign Business Term\"] or normalize-space(.) = \"Assign Business Term\"]])[1]";
@@ -1417,7 +1417,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
         @Override
         public ASBIEPanel getBaseASBIEPanel() {
             By inheritedTabLocator = By.xpath(
-                    "//div[contains(@class, \"bie-edit-detail-panel\")]//mat-tab-header//div[@role=\"tab\"]" +
+                    "//div[contains(@class, \"tree-detail-panel\")]//mat-tab-header//div[@role=\"tab\"]" +
                             "[.//span[contains(normalize-space(.), \"Inherits from\")]]");
             Wait<WebDriver> panelWait = PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L));
             WebElement tab = panelWait.until(driver -> driver.findElements(inheritedTabLocator).stream()
@@ -1432,7 +1432,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
     private class BBIEPanelImpl implements BBIEPanel {
 
         private static final String ACTIVE_BBIE_DETAIL_TAB_XPATH =
-                "(//div[contains(@class, \"bie-edit-detail-panel\")]//mat-tab-body[" +
+                "(//div[contains(@class, \"tree-detail-panel\")]//mat-tab-body[" +
                         "(contains(@class, \"mat-mdc-tab-body-active\") or contains(@class, \"mat-tab-body-active\"))" +
                         " and .//input[@placeholder = \"Example\"]" +
                         " and .//button[.//*[normalize-space(.) = \"Assign Business Term\"] or normalize-space(.) = \"Assign Business Term\"]])[1]";

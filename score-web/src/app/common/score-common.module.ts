@@ -28,6 +28,9 @@ import {ListPageComponent} from './list-page/list-page.component';
 import {DialogPageComponent} from './dialog-page/dialog-page.component';
 import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.component';
 import {BranchSelectorComponent} from './branch-selector/branch-selector.component';
+import {TreeSearchBarComponent} from './tree-search-bar/tree-search-bar.component';
+import {TreeBreadcrumbsComponent} from './tree-breadcrumbs/tree-breadcrumbs.component';
+import {TreeDetailComponent} from './tree-detail/tree-detail.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +56,9 @@ import {BranchSelectorComponent} from './branch-selector/branch-selector.compone
     DialogPageComponent,
     ScoreMatSelectComponent,
     BranchSelectorComponent,
+    TreeSearchBarComponent,
+    TreeBreadcrumbsComponent,
+    TreeDetailComponent,
     MatDialogModule,
     MatCardModule,
     CommonModule,
@@ -70,6 +76,9 @@ import {BranchSelectorComponent} from './branch-selector/branch-selector.compone
     DialogPageComponent,
     ScoreMatSelectComponent,
     BranchSelectorComponent,
+    TreeSearchBarComponent,
+    TreeBreadcrumbsComponent,
+    TreeDetailComponent,
     UnboundedPipe,
     HighlightSearch,
     DateAgoPipe,

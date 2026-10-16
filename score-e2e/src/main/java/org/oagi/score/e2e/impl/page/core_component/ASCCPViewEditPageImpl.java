@@ -440,7 +440,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 click(asccpNode);
                 waitFor(ofMillis(500L));
             }
-            return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+            return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\")][2]");
         });
     }
 
@@ -449,7 +449,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"ACC\"]]");
+            return new ACCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ACC\"]]");
         });
     }
 
@@ -461,12 +461,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
-                    return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"ASCC\"]]");
+                    return new ASCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCC\"]]");
                 }
 
                 @Override
                 public ASCCPPanel getASCCPPanel() {
-                    return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"ASCCP\"]]");
+                    return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCCP\"]]");
                 }
             };
         });
@@ -515,17 +515,17 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {
-                    return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"BCC\"]]");
+                    return new BCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCC\"]]");
                 }
 
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"BCCP\"]]");
+                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCCP\"]]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\") and .//input[@value=\"BDT\"]]");
+                    return new DTPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BDT\"]]");
                 }
             };
         });

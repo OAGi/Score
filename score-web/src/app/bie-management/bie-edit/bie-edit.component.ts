@@ -140,7 +140,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   topLevelAsbiepId: number;
   rootNode: BieEditAbieNode;
 
-  innerY: number = window.innerHeight;
   dataSource: BieFlatNodeDataSource<BieFlatNode>;
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
   // Issue #1638: view-parent ACC manifest ids whose sibling order has already been fetched, so each
@@ -439,13 +438,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.scrollToNode(curNode, 500);
   }
 
-  onResize(event) {
-    this.innerY = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this.innerY - 200;
-  }
 
   initRootNode(rootNode) {
     this.rootNode = new BieEditAbieNode(rootNode);
@@ -602,17 +595,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     $event.stopPropagation();
   }
 
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
 
   scrollTree(index: number, delay?: number) {
     if (index < 0) {

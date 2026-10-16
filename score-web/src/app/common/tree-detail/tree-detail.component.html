@@ -1,0 +1,40 @@
+<div class="row m-0">
+  <div class="col-12 p-0">
+    <mat-card class="search-box-container mb-1">
+      <mat-card-content>
+        @if (ready && searcher) {
+          <div class="container-fluid">
+            <div class="row">
+              <score-tree-search-bar [searcher]="searcher" [label]="selectedNode?.displayName || selectedNode?.name"
+                                     (searchRequest)="searchRequest.emit($event)"
+                                     (moveRequest)="moveRequest.emit($event)"></score-tree-search-bar>
+              <div class="col-7 actions-wrap">
+                <ng-content select="[treeDetailActions]"></ng-content>
+              </div>
+            </div>
+            <div class="row">
+              <score-tree-breadcrumbs [nodes]="selectedNode?.parents"
+                                      (nodeClick)="onBreadcrumbClick($event)"></score-tree-breadcrumbs>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div class="row m-0">
+  <div class="col-12 p-0">
+    <as-split unit="percent" [direction]="'horizontal'" [style.overflow-y]="splitScroll ? 'scroll' : null">
+      <as-split-area class="left-panel" size="30">
+        <mat-card class="tree-panel">
+          <mat-card-content class="mat-card-container">
+            <ng-content select="[treeDetailTree]"></ng-content>
+          </mat-card-content>
+        </mat-card>
+      </as-split-area>
+      <as-split-area class="right-panel" size="70" [style.height.px]="treeHeight + 17">
+        <ng-content select="[treeDetailPane]"></ng-content>
+      </as-split-area>
+    </as-split>
+  </div>
+</div>

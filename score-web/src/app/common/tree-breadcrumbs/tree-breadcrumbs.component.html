@@ -1,0 +1,14 @@
+@if (nodes) {
+  <div #wrap class="tree-breadcrumbs-wrap" id="tree-breadcrumbs-wrap">
+    @for (node of nodes; track node; let last = $last) {
+      <div class="tree-breadcrumb">
+        <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+        @if (last) {
+          <span class="tree-breadcrumb-item-last">{{ node.displayName || node.name }}</span>
+        } @else {
+          <span class="tree-breadcrumb-item" (click)="nodeClick.emit(node)">{{ node.displayName || node.name }}</span>
+        }
+      </div>
+    }
+  </div>
+}
