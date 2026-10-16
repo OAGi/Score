@@ -1,3 +1,4 @@
+import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
@@ -40,7 +41,8 @@ const routes: Routes = [
     SearchBarModule,
     ColumnSelectorModule,
     FontAwesomeModule,
-    TitleWithLibrarySelector
+    TitleWithLibrarySelector,
+    ...SCORE_TABLE
   ],
   declarations: [
     CcListComponent,

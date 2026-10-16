@@ -10,6 +10,7 @@ import {LogChangeSummaryDialogComponent} from './log-change-summary-dialog/log-c
 import {LogCompareDialogComponent} from './log-compare-dialog/log-compare-dialog.component';
 import {LogListComponent} from './log-list/log-list.component';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {SCORE_TABLE} from '../common/score-table';
 
 const routes: Routes = [
   {
@@ -38,6 +39,7 @@ const routes: Routes = [
         CommonModule,
         ScoreCommonModule,
         ColumnSelectorModule,
+        ...SCORE_TABLE
     ],
   declarations: [
     LogListComponent,

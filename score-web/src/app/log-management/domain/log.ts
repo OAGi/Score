@@ -1,34 +1,3 @@
-import {PageRequest} from '../../basis/basis';
-import {ParamMap} from '@angular/router';
-import {HttpParams} from '@angular/common/http';
-import {base64Decode, base64Encode} from '../../common/utility';
-
-export class LogListRequest {
-  reference: string;
-  page: PageRequest = new PageRequest();
-
-  constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
-    const q = (paramMap) ? paramMap.get('q') : undefined;
-    const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-
-    this.page.sortActive = params.get('sortActive') || (defaultPageRequest) ? defaultPageRequest.sortActive : '';
-    this.page.sortDirection = params.get('sortDirection') || (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
-    this.page.pageIndex = Number(params.get('pageIndex') || (defaultPageRequest) ? defaultPageRequest.pageIndex : 0);
-    this.page.pageSize = Number(params.get('pageSize') || (defaultPageRequest) ? defaultPageRequest.pageSize : 10);
-  }
-
-  toQuery(): string {
-    const params = new HttpParams()
-      .set('sortActive', this.page.sortActive)
-      .set('sortDirection', this.page.sortDirection)
-      .set('pageIndex', '' + this.page.pageIndex)
-      .set('pageSize', '' + this.page.pageSize);
-
-    const str = base64Encode(params.toString());
-    return (str) ? 'q=' + str : undefined;
-  }
-}
-
 export class LogSummary {
   logId: number;
   revisionNum: number;

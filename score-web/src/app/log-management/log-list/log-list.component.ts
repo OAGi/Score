@@ -1,21 +1,26 @@
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Log, LogListRequest} from '../domain/log';
+import {ActivatedRoute} from '@angular/router';
+import {Log} from '../domain/log';
 import {LogService} from '../domain/log.service';
 import {LogCompareDialogComponent} from '../log-compare-dialog/log-compare-dialog.component';
-import {PageRequest} from '../../basis/basis';
-import {finalize} from 'rxjs/operators';
-import {Location} from '@angular/common';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {forkJoin} from 'rxjs';
-import {AuthService} from '../../authentication/auth.service';
+import {createTableColumns, defineTable} from '../../common/score-table';
+
+const LOG_TABLE = defineTable({
+  storageKey: 'TableColumns-LogPage',
+  columns: [
+    {id: 'commit', label: 'Commit', width: 200, sortable: true},
+    {id: 'revisionNum', label: 'Revision', width: 100, sortable: true},
+    {id: 'revisionAction', label: 'Action', width: 0, sortable: true},
+    {id: 'loginId', label: 'Actor', width: 140, sortable: true},
+    {id: 'timestamp', label: 'Created At', header: 'Created at', width: 160, sortable: true},
+  ],
+  fixed: [{id: 'check', position: 'start', header: 'Compare'}],
+  sortParam: 'sortActive',
+  defaultSort: {active: 'lastUpdateTimestamp', direction: 'desc'},
+});
 
 @Component({
   standalone: false,
@@ -24,198 +29,16 @@ import {AuthService} from '../../authentication/auth.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./log-list.component.css'],
 })
-export class LogListComponent implements OnInit {
+export class LogListComponent {
   private service = inject(LogService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private auth = inject(AuthService);
   private dialog = inject(MatDialog);
-  private location = inject(Location);
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-
-  logs: Log[];
-  request: LogListRequest;
-  preferencesInfo: PreferencesInfo;
-  loading: boolean;
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfLogPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfLogPage = columns;
-    this.updateTableColumnsForLogPage();
-  }
-
-  updateTableColumnsForLogPage() {
-    this.preferencesService.updateTableColumnsForLogPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfLogPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Created at':
-        this.setWidth('Created At', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForLogPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['check'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Commit':
-          if (column.selected) {
-            displayedColumns.push('commit');
-          }
-          break;
-        case 'Revision':
-          if (column.selected) {
-            displayedColumns.push('revisionNum');
-          }
-          break;
-        case 'Action':
-          if (column.selected) {
-            displayedColumns.push('revisionAction');
-          }
-          break;
-        case 'Actor':
-          if (column.selected) {
-            displayedColumns.push('loginId');
-          }
-          break;
-        case 'Created At':
-          if (column.selected) {
-            displayedColumns.push('timestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  dataSource = new MatTableDataSource<Log>();
+  readonly columns = createTableColumns(LOG_TABLE);
+  /** The two revisions to compare. */
   selection = new SelectionModel<number>(true, []);
 
-  ngOnInit() {
-    this.request = new LogListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.reference = this.route.snapshot.paramMap.get('reference');
-
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.paginator.length = 0;
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-    forkJoin([
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.getRevisions(true);
-    }, error => {
-      this.loading = false;
-    });
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.getRevisions();
-  }
-
-  getRevisions(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getRevisions(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-
-      this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.getRevisions();
-  }
+  readonly load = (params: HttpParams) => this.service.getRevisions(this.route.snapshot.paramMap.get('reference'), params);
 
   isSelected(elem: Log): boolean {
     return this.selection.isSelected(elem.logId);
@@ -234,7 +57,6 @@ export class LogListComponent implements OnInit {
     if (this.selection.selected.length !== 2) {
       return false;
     }
-
     let before;
     let after;
     if (this.selection.selected[0] > this.selection.selected[1]) {

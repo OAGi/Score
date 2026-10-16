@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, ViewChild, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatSidenav} from '@angular/material/sidenav';
@@ -20,12 +20,11 @@ import {
 } from '../../cc-management/state-change-dialog/cancel-revision-dialog';
 import {CodeListDetails, CodeListValue, CodeListValueDetails} from '../domain/code-list';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
 import {CodeListValueDialogComponent} from '../code-list-value-dialog/code-list-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
+import {CODE_LIST_VALUE_TABLE, codeListValueMatches} from '../domain/code-list-value.table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../common/score-table';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
@@ -37,9 +36,6 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {CodeListCommentControl} from './code-list-comment-component';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
 import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
 import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
 import {Title} from '@angular/platform-browser';
@@ -64,7 +60,6 @@ export class CodeListDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private stompService = inject(RxStompService);
   private titleService = inject(Title);
 
@@ -93,118 +88,27 @@ export class CodeListDetailComponent implements OnInit {
   codeList: CodeListDetails;
   agencyIdList: AgencyIdListSummary;
   prevCodeList: CodeListDetails;
-  preferencesInfo: PreferencesInfo;
   hashCode;
-  valueSearch: string;
-  highlightText: string;
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage;
-  }
+  readonly columns = createTableColumns(CODE_LIST_VALUE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<CodeListValueDetails>>(ScoreTableViewComponent);
+  /** The guids of the selected values. */
+  selection = new SelectionModel<string>(true, []);
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfCodeListValuePage = columns;
-    this.updateTableColumnsForCodeListValuePage();
-  }
-
-  updateTableColumnsForCodeListValuePage() {
-    this.preferencesService.updateTableColumnsForCodeListValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCodeListValuePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCodeListValuePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Value':
-          if (column.selected) {
-            displayedColumns.push('value');
-          }
-          break;
-        case 'Meaning':
-          if (column.selected) {
-            displayedColumns.push('meaning');
-          }
-          break;
-        case 'Deprecated':
-          if (column.selected) {
-            displayedColumns.push('deprecated');
-          }
-          break;
-        case 'Definition':
-          if (column.selected) {
-            displayedColumns.push('definition');
-          }
-          break;
-        case 'Definition Source':
-          if (column.selected) {
-            displayedColumns.push('definitionSource');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<CodeListValueDetails>();
-  selection = new SelectionModel<CodeListValueDetails>(true, []);
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  /** The values that the table lists. */
+  values: CodeListValueDetails[] = [];
+  readonly load = inMemoryLoad<CodeListValueDetails>(() => this.values, {
+    definition: row => row.definition?.content,
+    definitionSource: row => row.definition?.source
+  }, (row, params) => codeListValueMatches(row, params.get('search')));
+  readonly allRows = () => this.values;
+  readonly rowKey = (row: CodeListValueDetails) => row.guid;
+  readonly rowSelectable = (row: CodeListValueDetails) => this.isAvailable(row) && !this.isRevisionValue(row as any);
   @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
   get sidenav(): MatSidenav {
     return this.sidenavPage.sidenav;
   }
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
 
   commentControl: CodeListCommentControl;
 
@@ -228,10 +132,9 @@ export class CodeListDetailComponent implements OnInit {
         switchMap((params: ParamMap) => {
           this.manifestId = Number(params.get('manifestId'));
           return forkJoin([
-            this.service.getCodeListDetails(this.manifestId),
-            this.preferencesService.load(this.auth.getUserToken())
+            this.service.getCodeListDetails(this.manifestId)
           ]);
-        })).subscribe(([codeList, preferencesInfo]) => {
+        })).subscribe(([codeList]) => {
       /** Save again as Release info may have changed via Uplifting or other routes. */
       saveBranch(this.auth.getUserToken(), 'CC', codeList.release.releaseId);
 
@@ -245,7 +148,6 @@ export class CodeListDetailComponent implements OnInit {
           codeList.release.releaseId).subscribe(resp => {
         this.agencyIdLists = resp;
         this.allAgencyIdListValues = resp.flatMap(item => item.valueList);
-        this.preferencesInfo = preferencesInfo;
 
         this.filteredAgencyLists.next(this.agencyIdLists.slice());
 
@@ -269,24 +171,6 @@ export class CodeListDetailComponent implements OnInit {
       this.router.navigateByUrl('/code_list');
       return;
     });
-
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.filterPredicate = (data: CodeListValueDetails, filter: string) => {
-      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
-        || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1)
-        || (data.definition && data.definition.content && data.definition.content.toLowerCase().indexOf(filter) > -1)
-        || (data.definition && data.definition.source && data.definition.source.toLowerCase().indexOf(filter) > -1);
-    };
 
     this.subscribeEvent();
   }
@@ -321,18 +205,6 @@ export class CodeListDetailComponent implements OnInit {
   get userRoles(): string[] {
     const userToken = this.auth.getUserToken();
     return userToken.roles;
-  }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-    this.highlightText = filterValue;
-  }
-
-  clearFilter() {
-    this.valueSearch = '';
-    this.applyFilter(this.valueSearch);
   }
 
   init(codeList: CodeListDetails) {
@@ -475,7 +347,7 @@ export class CodeListDetailComponent implements OnInit {
         return;
       }
 
-      const data = this.dataSource.data;
+      const data = this.values;
       if (isAddAction) {
         for (const value of data) {
           if (value.value === result.value) {
@@ -513,40 +385,9 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   _updateDataSource(data: CodeListValueDetails[]) {
-    this.dataSource.data = data;
+    this.values = data;
     this.codeList.valueList = data;
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => this.isAvailable(row)).length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: CodeListValueDetails) {
-    if (this.isAvailable(row)) {
-      this.selection.select(row);
-    }
-  }
-
-  toggle(row: CodeListValueDetails) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: CodeListValueDetails) {
-    return this.selection.isSelected(row);
+    this.view()?.reload();
   }
 
   isAvailable(codeListValue: CodeListValueDetails) {
@@ -563,8 +404,8 @@ export class CodeListDetailComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           const newData = [];
-          this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
+          this.values.forEach(row => {
+            if (!this.selection.isSelected(row.guid)) {
               newData.push(row);
             }
           });

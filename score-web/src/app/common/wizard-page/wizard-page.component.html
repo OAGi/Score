@@ -1,20 +1,11 @@
-<score-list-page [title]="title" [subtitle]="subtitle" [loading]="loading" [toolbarClass]="toolbarClass"
-  [spacer]="spacer" [showColumns]="showColumns" [tableWrapperClass]="tableWrapperClass">
+<score-list-page [title]="title" [subtitle]="subtitle" [toolbarClass]="toolbarClass" [spacer]="spacer">
   <ng-container ngProjectAs="[listTitle]">
     <ng-content select="[wizardTitle]"></ng-content>
-  </ng-container>
-  <ng-container ngProjectAs="[listFilter]">
-    <ng-content select="[listFilter]"></ng-content>
-  </ng-container>
-  <ng-container ngProjectAs="[listColumns]">
-    <ng-content select="[listColumns]"></ng-content>
-  </ng-container>
-  <ng-container ngProjectAs="[listTable]">
-    <ng-content select="[listTable]"></ng-content>
   </ng-container>
   <ng-container ngProjectAs="[listExtra]">
     <ng-content select="[listExtra]"></ng-content>
   </ng-container>
+  <ng-content></ng-content>
   <ng-container ngProjectAs="[listFooter]">
     <div class="row action-group m-0">
       <div class="col-12 actions-wrap">

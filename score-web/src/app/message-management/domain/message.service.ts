@@ -1,14 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {MessageDetails, MessageListEntry, MessageListRequest} from './messageDetails';
+import {MessageDetails, MessageListEntry} from './messageDetails';
 import {map} from 'rxjs/operators';
 import {PageResponse} from '../../basis/basis';
 
 @Injectable()
 export class MessageService {
   private http = inject(HttpClient);
-
 
   getCountOfUnreadMessages(): Observable<number> {
     return this.http.get<number>('/api/messages/count-of-unread');
@@ -26,23 +25,7 @@ export class MessageService {
     return this.http.delete('/api/messages/' + messageId);
   }
 
-  getMessageList(request: MessageListRequest): Observable<PageResponse<MessageListEntry>> {
-    let params = new HttpParams()
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.senderLoginIds.length > 0) {
-      params = params.set('senderLoginIds', request.senderLoginIds.join(','));
-    }
-    if (!!request.createdDate.start || !!request.createdDate.end) {
-      params = params.set('createdOn',
-          '[' + (!!request.createdDate.start ? request.createdDate.start.getTime() : '') + '~' +
-          (!!request.createdDate.end ? request.createdDate.end.getTime() : '') + ']');
-    }
-
+  getMessageList(params: HttpParams): Observable<PageResponse<MessageListEntry>> {
     return this.http.get<PageResponse<MessageListEntry>>('/api/messages', {params}).pipe(
         map((res: PageResponse<MessageListEntry>) => ({
           ...res,

@@ -1,283 +1,79 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
-import {animate, state, style, transition, trigger} from '@angular/animations';
+import {ChangeDetectionStrategy, Component, inject, OnInit, viewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
-import {AccountListService} from '../../account-management/domain/account-list.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {CcListEntry, CcListRequest} from '../cc-list/domain/cc-list';
+import {CcListEntry} from '../cc-list/domain/cc-list';
 import {ExtensionDetailComponent} from '../extension-detail/extension-detail.component';
 import {RefactorDialogService} from './domain/refactor-dialog.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../authentication/auth.service';
-import {forkJoin} from 'rxjs';
+import {CC_WITH_TYPE_TABLE} from '../domain/cc-dialog.table';
+import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../common/score-table';
 import {IssuedCc} from './domain/refactor-dialog';
+
+/** The ACCs to move to: the column settings of the core component list; there is no search and no order of its own. */
+const REFACTOR_ACC_TABLE = defineTable({
+  ...CC_WITH_TYPE_TABLE,
+  defaultSort: undefined,
+  search: undefined,
+});
+
+/** The result of the analysis: the ACCs that the move touches, and what stops it. */
+const REFACTOR_ISSUE_TABLE = defineTable({
+  storageKey: 'TableColumns-CoreComponentAccRefactorPage',
+  columns: [
+    {id: 'type', label: 'Type', width: 80, sortable: true},
+    {id: 'state', label: 'State', width: 104, sortable: true},
+    {id: 'den', label: 'DEN', width: 0, sortable: true},
+    {id: 'reason', label: 'Issue', width: '30%', sortable: true},
+    {id: 'revision', label: 'Revision', width: 80, sortable: true},
+    {id: 'owner', label: 'Owner', width: 140, sortable: true},
+    {id: 'lastUpdateTimestamp', label: 'Updated On', header: 'Updated on', width: 160, sortable: true},
+  ],
+});
 
 @Component({
   standalone: false,
   selector: 'score-based-acc-dialog',
   templateUrl: './refactor-dialog.component.html',
   styleUrls: ['./refactor-dialog.component.css'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
-      state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ]
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class RefactorDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ExtensionDetailComponent>>(MatDialogRef);
   private service = inject(RefactorDialogService);
-  private accountService = inject(AccountListService);
-  private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   webPageInfo = inject(WebPageInfoService);
   data = inject(MAT_DIALOG_DATA);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
 
 
   // ACC Table
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentPage = columns;
-    this.updateTableColumnsForCoreComponentPage();
-  }
-
-  updateTableColumnsForCoreComponentPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentPage(
-      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfCoreComponentPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCoreComponentPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Type':
-          if (column.selected) {
-            displayedColumns.push('type');
-          }
-          break;
-        case 'State':
-          if (column.selected) {
-            displayedColumns.push('state');
-          }
-          break;
-        case 'DEN':
-          if (column.selected) {
-            displayedColumns.push('den');
-          }
-          break;
-        case 'Revision':
-          if (column.selected) {
-            displayedColumns.push('revision');
-          }
-          break;
-        case 'Owner':
-          if (column.selected) {
-            displayedColumns.push('owner');
-          }
-          break;
-        case 'Module':
-          if (column.selected) {
-            displayedColumns.push('module');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
+  readonly columns = createTableColumns(REFACTOR_ACC_TABLE);
+  readonly baseView = viewChild.required<ScoreTableViewComponent<CcListEntry>>('baseView');
+  /** The ACCs that the component can be moved to. */
+  rows: CcListEntry[] = [];
+  readonly load = inMemoryLoad<CcListEntry>(() => this.rows, {
+    revision: row => row.log?.revisionNum,
+    owner: row => row.owner?.loginId,
+    lastUpdateTimestamp: row => row.lastUpdated?.when
+  });
 
   // Issue Table
-  get issueColumns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage;
-  }
+  readonly issueColumns = createTableColumns(REFACTOR_ISSUE_TABLE);
+  readonly issueView = viewChild.required<ScoreTableViewComponent<IssuedCc>>('issueView');
+  issueRows: IssuedCc[] = [];
+  readonly issueLoad = inMemoryLoad<IssuedCc>(() => this.issueRows, {
+    reason: row => (row.reasons || []).join(' ')
+  });
 
-  set issueColumns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentAccRefactorPage = columns;
-    this.updateTableColumnsForCoreComponentAccRefactorPage();
-  }
-
-  updateTableColumnsForCoreComponentAccRefactorPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentAccRefactorPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onIssueColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.issueColumns = defaultTableColumnInfo.columnsOfCoreComponentAccRefactorPage;
-  }
-
-  onIssueColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.issueWidth(column.name)
-    }));
-
-    this.issueColumns = updatedColumnsWithWidth;
-  }
-
-  onResizeIssueWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setIssueWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setIssueWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setIssueWidth(name: string, width: number | string) {
-    const matched = this.issueColumns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCoreComponentAccRefactorPage();
-    }
-  }
-
-  issueWidth(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.issueColumns.find(c => c.name === name)?.width;
-  }
-
-  get displayedIssueColumns(): string[] {
-    let displayedColumns = [];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.issueColumns) {
-      switch (column.name) {
-        case 'Type':
-          if (column.selected) {
-            displayedColumns.push('type');
-          }
-          break;
-        case 'State':
-          if (column.selected) {
-            displayedColumns.push('state');
-          }
-          break;
-        case 'DEN':
-          if (column.selected) {
-            displayedColumns.push('den');
-          }
-          break;
-        case 'Issue':
-          if (column.selected) {
-            displayedColumns.push('reason');
-          }
-          break;
-        case 'Revision':
-          if (column.selected) {
-            displayedColumns.push('revision');
-          }
-          break;
-        case 'Owner':
-          if (column.selected) {
-            displayedColumns.push('owner');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<CcListEntry>();
-  expandedElement: CcListEntry | null;
   selection = new SelectionModel<CcListEntry>(false, []);
+  readonly rowKey = (row: CcListEntry) => row;
 
   loading = false;
   isValid = false;
 
-  issueDataSource = new MatTableDataSource<IssuedCc>();
-
-  request: CcListRequest;
-  preferencesInfo: PreferencesInfo;
-  highlightTextForDefinition: string;
   action: string;
   title: string;
 
@@ -286,14 +82,15 @@ export class RefactorDialogComponent implements OnInit {
 
     this.title = this.data.title;
 
-    forkJoin([
-      this.service.baseAccList(this.data.accManifestId),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([ccList, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+    // Choosing another ACC means the analysis of the previous choice no longer applies.
+    this.selection.changed.subscribe(() => {
+      this.isValid = false;
+    });
 
-      this.dataSource.data = ccList;
+    this.service.baseAccList(this.data.accManifestId).subscribe(ccList => {
+      this.rows = ccList;
       this.loading = false;
+      this.baseView().reload();
     });
   }
 
@@ -311,11 +108,12 @@ export class RefactorDialogComponent implements OnInit {
       .subscribe(resp => {
         let valid = true;
         if (resp.issueList && resp.issueList.length > 0) {
-          this.issueDataSource.data = resp.issueList;
+          this.issueRows = resp.issueList;
           valid = resp.issueList.filter(e => e.reasons.length > 0).length === 0;
         } else {
-          this.issueDataSource.data = [];
+          this.issueRows = [];
         }
+        this.issueView().reload();
         this.isValid = valid;
       });
   }
@@ -349,23 +147,6 @@ export class RefactorDialogComponent implements OnInit {
           this.dialogRef.close(resp);
         });
     }
-  }
-
-  select(row: CcListEntry) {
-    this.selection.select(row);
-    this.isValid = false;
-  }
-
-  toggle(row: CcListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: CcListEntry) {
-    return this.selection.isSelected(row);
   }
 
   getRouterLink(ccList: CcListEntry) {

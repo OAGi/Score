@@ -35,82 +35,55 @@
       </mat-card>
     }
 
-    <div class="table-container">
-      <div class="score-column-container align-items-center justify-content-between">
-        <score-column-selector
-          [columns]="columns"
-          (columnsChange)="onColumnsChange($event)"
-          (onReset)="onColumnsReset()">
-        </score-column-selector>
-      </div>
-      <div class="mat-elevation-z1 table-wrapper mt-3">
-        <table mat-table matSort [dataSource]="dataSource">
-          <ng-container matColumnDef="ccType" size="10">
-            <th mat-header-cell *matHeaderCellDef
-            score-table-column-resize [defaultWidth]="width('Type')" (onResize)="onResizeWidth($event)">Type</th>
-            <td mat-cell *matCellDef="let row">
-              {{ row.ccType }}
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="displayPath">
-            <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Path')" (onResize)="onResizeWidth($event)">
-              Source {{ data.sourceReleaseNum }} Path &rarr;
-              Target {{ data.targetReleaseNum }} Path
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <div class="display-path-content">
-                <span>{{ row.sourceDisplayPath }}</span>
-                @if (row.targetDisplayPath) {
-                  <span>&darr;</span>
-                  <span>{{ row.targetDisplayPath }}</span>
-                }
-              </div>
-            </td>
-          </ng-container>
+    <score-table-view [table]="columns" [load]="load" [ready]="!loading" [syncUrl]="false">
 
-          <ng-container matColumnDef="context">
-            <th mat-header-cell *matHeaderCellDef
-            score-table-column-resize [defaultWidth]="width('Context Definition')" (onResize)="onResizeWidth($event)">Context Definition</th>
-            <td mat-cell *matCellDef="let row">
-              <div class="description score-line-clamp-2 score-break-word" [innerHTML]="row.context"></div>
-            </td>
-          </ng-container>
+      <ng-container scoreColumnDef="ccType">
+        <td score-cell *scoreCellDef="let row">
+          {{ row.ccType }}
+        </td>
+      </ng-container>
 
-          <ng-container matColumnDef="match" size="10">
-            <th mat-header-cell *matHeaderCellDef
-            score-table-column-resize [defaultWidth]="width('Matched')" (onResize)="onResizeWidth($event)">Matched</th>
-            <td mat-cell *matCellDef="let row">
-              {{ row.match }}
-            </td>
-          </ng-container>
+      <ng-container scoreColumnDef="displayPath">
+        <td score-cell *scoreCellDef="let row">
+          <div class="display-path-content">
+            <span>{{ row.sourceDisplayPath }}</span>
+            @if (row.targetDisplayPath) {
+              <span>&darr;</span>
+              <span>{{ row.targetDisplayPath }}</span>
+            }
+          </div>
+        </td>
+      </ng-container>
 
-          <ng-container matColumnDef="reuse" size="10">
-            <th mat-header-cell *matHeaderCellDef
-            score-table-column-resize [defaultWidth]="width('Reused')" (onResize)="onResizeWidth($event)">Reused</th>
-            <td mat-cell *matCellDef="let row">
-              {{ row.reuse }}
-            </td>
-          </ng-container>
+      <ng-container scoreColumnDef="context">
+        <td score-cell *scoreCellDef="let row">
+          <div class="description score-line-clamp-2 score-break-word" [innerHTML]="row.context"></div>
+        </td>
+      </ng-container>
 
-          <ng-container matColumnDef="validCode" size="10">
-            <th mat-header-cell *matHeaderCellDef
-            score-table-column-resize [defaultWidth]="width('Issue')" (onResize)="onResizeWidth($event)">Issue</th>
-            <td mat-cell *matCellDef="let row">
-              @if (row.status) {
-                <span>{{ row.status }}</span>
-              }
-              @if (!row.valid && row.message) {
-                <span class="d-block">{{ row.message }}</span>
-              }
-            </td>
-          </ng-container>
+      <ng-container scoreColumnDef="match">
+        <td score-cell *scoreCellDef="let row">
+          {{ row.match }}
+        </td>
+      </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </div>
-    </div>
+      <ng-container scoreColumnDef="reuse">
+        <td score-cell *scoreCellDef="let row">
+          {{ row.reuse }}
+        </td>
+      </ng-container>
+
+      <ng-container scoreColumnDef="validCode">
+        <td score-cell *scoreCellDef="let row">
+          @if (row.status) {
+            <span>{{ row.status }}</span>
+          }
+          @if (!row.valid && row.message) {
+            <span class="d-block">{{ row.message }}</span>
+          }
+        </td>
+      </ng-container>
+    </score-table-view>
   </div>
   <div class="actions ms-auto" mat-dialog-actions>
     <button mat-raised-button color="warn" (click)="onClose()">

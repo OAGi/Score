@@ -1,28 +1,20 @@
-import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
 import {ContextSchemeService} from '../domain/context-scheme.service';
 import {ContextSchemeCreateRequest, ContextSchemeSummary, ContextSchemeValue} from '../domain/context-scheme';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
 import {ContextSchemeValueDialogComponent} from '../context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
+import {CONTEXT_SCHEME_VALUE_TABLE, contextSchemeValueMatches} from '../domain/context-scheme-value.table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {CodeList, CodeListDetails, CodeListListEntry, CodeListValueDetails} from '../../../code-list-management/domain/code-list';
 import {v4 as uuid} from 'uuid';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {FormControl} from '@angular/forms';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
 import {ContextCategoryService} from '../../context-category/domain/context-category.service';
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
@@ -43,9 +35,7 @@ export class ContextSchemeCreateComponent implements OnInit {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
-  private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
 
 
   title = 'Create Context Scheme';
@@ -61,96 +51,18 @@ export class ContextSchemeCreateComponent implements OnInit {
   disabled: boolean;
 
   contextSchemeCreateRequest: ContextSchemeCreateRequest;
-  preferencesInfo: PreferencesInfo;
-  valueSearch: string;
-  highlightText: string;
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage;
-  }
+  readonly columns = createTableColumns(CONTEXT_SCHEME_VALUE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<ContextSchemeValue>>(ScoreTableViewComponent);
+  /** The guids of the selected values. */
+  selection = new SelectionModel<string>(true, []);
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage = columns;
-    this.updateTableColumnsForContextSchemeValuePage();
-  }
-
-  updateTableColumnsForContextSchemeValuePage() {
-    this.preferencesService.updateTableColumnsForContextSchemeValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfContextSchemeValuePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForContextSchemeValuePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Value':
-          if (column.selected) {
-            displayedColumns.push('value');
-          }
-          break;
-        case 'Meaning':
-          if (column.selected) {
-            displayedColumns.push('meaning');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<ContextSchemeValue>();
-  selection = new SelectionModel<ContextSchemeValue>(true, []);
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  /** The values that the table lists. */
+  values: ContextSchemeValue[] = [];
+  readonly load = inMemoryLoad<ContextSchemeValue>(() => this.values, {},
+    (row, params) => contextSchemeValueMatches(row, params.get('search')));
+  readonly allRows = () => this.values;
+  readonly rowKey = (row: ContextSchemeValue) => row.guid;
 
   ngOnInit() {
     this.disabled = false;
@@ -158,10 +70,8 @@ export class ContextSchemeCreateComponent implements OnInit {
 
     forkJoin([
       this.contextCategoryService.getContextCategorySummaries(),
-      this.service.getContextSchemeSummaries(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([contextCategorySummries, contextSchemeSummaries, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+      this.service.getContextSchemeSummaries()
+    ]).subscribe(([contextCategorySummries, contextSchemeSummaries]) => {
       this.ctxCategories = contextCategorySummries;
       this.filteredCtxCategories.next(this.ctxCategories.slice());
       this.codeLists = [];
@@ -174,12 +84,6 @@ export class ContextSchemeCreateComponent implements OnInit {
         this.filterCtxCategories();
       });
 
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.filterPredicate = (data: ContextSchemeValue, filter: string) => {
-      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
-          || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1);
-    };
   }
 
   filterCtxCategories() {
@@ -202,18 +106,6 @@ export class ContextSchemeCreateComponent implements OnInit {
       (this.contextSchemeCreateRequest.schemeId === undefined || this.contextSchemeCreateRequest.schemeId === '') ||
       (this.contextSchemeCreateRequest.schemeAgencyId === undefined || this.contextSchemeCreateRequest.schemeAgencyId === '') ||
       (this.contextSchemeCreateRequest.schemeVersionId === undefined || this.contextSchemeCreateRequest.schemeVersionId === '');
-  }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-    this.highlightText = filterValue;
-  }
-
-  clearFilter() {
-    this.valueSearch = '';
-    this.applyFilter(this.valueSearch);
   }
 
   openDialog(contextSchemeValue?: ContextSchemeValue) {
@@ -244,13 +136,13 @@ export class ContextSchemeCreateComponent implements OnInit {
           return;
         }
         if (isAddAction) {
-          const data = this.dataSource.data;
+          const data = this.values;
           result.guid = uuid();
           data.push(result);
           this._updateDataSource(data);
         } else {
           const newData = [];
-          this.dataSource.data.forEach(row => {
+          this.values.forEach(row => {
             if (row.guid === result.guid) {
               newData.push(result);
             } else {
@@ -271,42 +163,13 @@ export class ContextSchemeCreateComponent implements OnInit {
    * A newly added value has no guid yet, so it is compared against every existing row.
    */
   isDuplicateContextSchemeValue(result: ContextSchemeValue): boolean {
-    return this.dataSource.data.some(value => value.guid !== result.guid && value.value === result.value);
+    return this.values.some(value => value.guid !== result.guid && value.value === result.value);
   }
 
   _updateDataSource(data: ContextSchemeValue[]) {
-    this.dataSource.data = data;
+    this.values = data;
     this.contextSchemeCreateRequest.contextSchemeValueList = data;
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
-  }
-
-  select(row: ContextSchemeValue) {
-    this.selection.select(row);
-  }
-
-  toggle(row: ContextSchemeValue) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: ContextSchemeValue) {
-    return this.selection.isSelected(row);
+    this.view()?.reload();
   }
 
   removeSchemeValues() {
@@ -319,8 +182,8 @@ export class ContextSchemeCreateComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           const newData = [];
-          this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
+          this.values.forEach(row => {
+            if (!this.selection.isSelected(row.guid)) {
               newData.push(row);
             }
           });

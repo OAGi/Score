@@ -21,15 +21,11 @@ import {hashCode} from '../../../common/utility';
 
 type Row = { verb: string; messageBody: string };
 
-function tableWith(rows: Row[]): any {
-  return {dataSource: {data: rows}};
-}
-
 /** A `this` context exposing the version-detection + banner methods bound to a shared data bag. */
 function detailCtx(openAPIVersion: any, rows: Row[] = []): any {
   const ctx: any = {
     oasDoc: openAPIVersion === null ? null : {openAPIVersion},
-    table: tableWith(rows),
+    rows,
   };
   ctx.isOpenApi31 = OasDocDetailComponent.prototype.isOpenApi31;
   ctx.hasIgnoredDeleteRequestBody = OasDocDetailComponent.prototype.hasIgnoredDeleteRequestBody;
@@ -88,7 +84,7 @@ describe('OasDocDetailComponent.hasIgnoredDeleteRequestBody (#1610 banner)', () 
   });
 
   it('does not throw when the table/dataSource is not yet loaded', () => {
-    const ctx: any = {oasDoc: {openAPIVersion: '3.0.3'}, table: undefined};
+    const ctx: any = {oasDoc: {openAPIVersion: '3.0.3'}, rows: []};
     ctx.isOpenApi31 = OasDocDetailComponent.prototype.isOpenApi31;
     ctx.hasIgnoredDeleteRequestBody = OasDocDetailComponent.prototype.hasIgnoredDeleteRequestBody;
     expect(ctx.hasIgnoredDeleteRequestBody()).toBe(false);
@@ -140,7 +136,7 @@ describe('OasDocDetailComponent error-response selector (#1347)', () => {
   // commit / revert / keep branches can be asserted without Angular's MatDialog.
   function errCtx(rows: ErrRow[], dialogResult?: any): any {
     const ctx: any = {
-      table: {dataSource: {data: rows}},
+      rows,
       committedErrorResponseBodyType: new WeakMap<any, string>(),
       applyErrorResponseBodyType: OasDocDetailComponent.prototype['applyErrorResponseBodyType'],
       onErrorResponseBodyTypeChange: OasDocDetailComponent.prototype.onErrorResponseBodyTypeChange,
@@ -342,8 +338,8 @@ describe('OasDocDetailComponent document-level "apply to all" error response (#1
     };
     const oasDoc = {oasDocId: 7};
     const ctx: any = {
-      table: {dataSource: {data: rows}},
-      paginator: {length: rows.length},
+      rows,
+      totalRows: rows.length,
       bulkErrorResponseBodyType: bodyType,
       errorResponseBodyTypeOptions: OPTIONS,
       oasDoc,
@@ -436,7 +432,7 @@ describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Optio
   function updateCtx(rows: any[], changed: any[]): any {
     const oasDoc = {oasDocId: 1};
     const ctx: any = {
-      table: {dataSource: {data: rows}},
+      rows,
       // The duplicate-body gate now lives in the shared validator (delegated to by recomputeOasValidation).
       oasValidator: new OasOperationValidator(),
       // Match the baseline so docChanged is false; with no changed rows, doUpdate returns after the gate.
@@ -474,13 +470,15 @@ describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Optio
 });
 
 describe('OasDocDetailComponent.generate guards unsaved changes (#1610)', () => {
+  const sortPage = {sortActives: ['tagName'], sortDirections: ['asc']};
+
   function generateCtx(changed: boolean): any {
     const ctx: any = {
       isChanged: () => changed,
       snackBar: {open: vi.fn()},
       openAPIService: {generateOpenAPI: vi.fn().mockReturnValue({subscribe: vi.fn()})},
       oasDoc: {oasDocId: 123},
-      request: {page: {pageIndex: 0}},
+      sortRequest: () => sortPage,
       loading: false,
     };
     ctx.generate = OasDocDetailComponent.prototype.generate;
@@ -502,7 +500,7 @@ describe('OasDocDetailComponent.generate guards unsaved changes (#1610)', () => 
     const ctx = generateCtx(false);
     ctx.generate();
     expect(ctx.snackBar.open).not.toHaveBeenCalled();
-    expect(ctx.openAPIService.generateOpenAPI).toHaveBeenCalledWith(123, ctx.request.page);
+    expect(ctx.openAPIService.generateOpenAPI).toHaveBeenCalledWith(123, sortPage);
     expect(ctx.loading).toBe(true);
   });
 });

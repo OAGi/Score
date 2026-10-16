@@ -5,181 +5,127 @@
     </button>
   </ng-container>
   <mat-card class="pt-3">
-    <mat-card-content class="mat-card-container">
-      @if (loading) {
-        <div class="loading-container">
-          <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
-      }
+    <score-table-view [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false">
 
-      <div class="table-container">
-        <div class="score-column-container align-items-center">
-          <score-column-selector
-            [columns]="columns"
-            (columnsChange)="onColumnsChange($event)"
-            (onReset)="onColumnsReset()">
-          </score-column-selector>
-        </div>
-        <div class="mat-elevation-z1 table-wrapper mt-3">
-          <table mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="releaseNum">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Release')" (onResize)="onResizeWidth($event)"> Release</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.releaseNum }}
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="releaseNum">
+      <td score-cell *scoreCellDef="let element">
+          {{ element.releaseNum }}
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingState">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing State')" (onResize)="onResizeWidth($event)"> State</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="bie-state {{ element.reusingState }}"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
-                    'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
-                @if (element.reusingDeprecated) {
-                  <span class="bie-state Deprecated" [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
-                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-                }
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingState">
+      <td score-cell *scoreCellDef="let element">
+          <span class="bie-state {{ element.reusingState }}"
+              [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
+              'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
+          @if (element.reusingDeprecated) {
+            <span class="bie-state Deprecated" [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
+                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+              'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+          }
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingDen">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing DEN')" (onResize)="onResizeWidth($event)"> DEN</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="den score-line-clamp-2 score-break-word">
-                  @if (isAccessibleLeft(element)) {
-                    <span>
-                      <a href="{{getRouteLink(element)}}" target="_blank">
-                        {{ element.reusingDen }}
-                      </a>
-                    </span>
-                  }
-                  @if (!isAccessibleLeft(element)) {
-                    <span>
-                      {{ element.reusingDen }}
-                    </span>
-                  }
-                </div>
-                <div class="bie-guid">{{ element.reusingGuid }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingDen">
+      <td score-cell *scoreCellDef="let element">
+          <div class="den score-line-clamp-2 score-break-word">
+            @if (isAccessibleLeft(element)) {
+              <span>
+                <a href="{{getRouteLink(element)}}" target="_blank">
+                  {{ element.reusingDen }}
+                </a>
+              </span>
+            }
+            @if (!isAccessibleLeft(element)) {
+              <span>
+                {{ element.reusingDen }}
+              </span>
+            }
+          </div>
+          <div class="bie-guid">{{ element.reusingGuid }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingOwner">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="score-line-clamp-2 score-break-word">{{ element.reusingOwner }}</span>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingOwner">
+      <td score-cell *scoreCellDef="let element">
+          <span class="score-line-clamp-2 score-break-word">{{ element.reusingOwner }}</span>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingVersion">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing Version')" (onResize)="onResizeWidth($event)"> Version</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusingVersion }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingVersion">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusingVersion }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingStatus">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing Status')" (onResize)="onResizeWidth($event)"> Status</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusingStatus }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingStatus">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusingStatus }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusingRemark">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reusing Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusingRemark }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusingRemark">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusingRemark }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="arrow">
-              <th mat-header-cell *matHeaderCellDef > </th>
-              <td mat-cell *matCellDef="let element">
-                <fa-icon [icon]="faRecycle"></fa-icon>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusedState">
+      <td score-cell *scoreCellDef="let element">
+          <span class="bie-state {{ element.reusedState }}"
+              [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
+              'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
+          @if (element.reusedDeprecated) {
+            <span class="bie-state Deprecated" [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
+                [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+              'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+          }
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusedState">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused State')" (onResize)="onResizeWidth($event)"> State</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="bie-state {{ element.reusedState }}"
-                    [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
-                    'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
-                @if (element.reusedDeprecated) {
-                  <span class="bie-state Deprecated" [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
-                      [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
-                    'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
-                }
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusedDen">
+      <td score-cell *scoreCellDef="let element">
+          <div class="dev score-line-clamp-2 score-break-word">
+            @if (isAccessibleRight(element)) {
+              <span>
+                <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
+                  {{ element.reusedDen }}
+                </a>
+              </span>
+            }
+            @if (!isAccessibleRight(element)) {
+              <span>
+                {{ element.reusedDen }}
+              </span>
+            }
+          </div>
+          <div class="bie-guid">{{ element.reusedGuid }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusedDen">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused DEN')" (onResize)="onResizeWidth($event)"> Reused</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="dev score-line-clamp-2 score-break-word">
-                  @if (isAccessibleRight(element)) {
-                    <span>
-                      <a href="/profile_bie/{{element.reusedTopLevelAsbiepId}}" target="_blank">
-                        {{ element.reusedDen }}
-                      </a>
-                    </span>
-                  }
-                  @if (!isAccessibleRight(element)) {
-                    <span>
-                      {{ element.reusedDen }}
-                    </span>
-                  }
-                </div>
-                <div class="bie-guid">{{ element.reusedGuid }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusedOwner">
+      <td score-cell *scoreCellDef="let element">
+          <span class="score-line-clamp-2 score-break-word">{{ element.reusedOwner }}</span>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusedOwner">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused Owner')" (onResize)="onResizeWidth($event)"> Owner</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="score-line-clamp-2 score-break-word">{{ element.reusedOwner }}</span>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusedVersion">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusedVersion }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusedVersion">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused Version')" (onResize)="onResizeWidth($event)"> Version</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusedVersion }}</div>
-              </td>
-            </ng-container>
+    <ng-container scoreColumnDef="reusedStatus">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="reusedStatus">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused Status')" (onResize)="onResizeWidth($event)"> Status</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="reusedRemark">
-              <th mat-header-cell *matHeaderCellDef
-              score-table-column-resize [defaultWidth]="width('Reused Remark')" (onResize)="onResizeWidth($event)"> Remark</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word">{{ element.reusedRemark }}</div>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-        </div>
-      </div>
-    </mat-card-content>
+    <ng-container scoreColumnDef="reusedRemark">
+      <td score-cell *scoreCellDef="let element">
+          <div class="score-line-clamp-2 score-break-word">{{ element.reusedRemark }}</div>
+        </td>
+    </ng-container>
+    </score-table-view>
   </mat-card>
 </score-detail-page>

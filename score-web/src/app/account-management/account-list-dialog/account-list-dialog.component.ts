@@ -1,21 +1,30 @@
 import {SelectionModel} from '@angular/cdk/collections';
-import {Location} from '@angular/common';
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {HttpParams} from '@angular/common/http';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {ActivatedRoute, Router} from '@angular/router';
-import {AuthService} from '../../authentication/auth.service';
-import {PageRequest} from '../../basis/basis';
-import {finalize} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 import {AccountListService} from '../domain/account-list.service';
-import {AccountListEntry, AccountListRequest} from '../domain/accounts';
+import {AccountListEntry} from '../domain/accounts';
+import {ACCOUNT_TABLE} from '../domain/account.table';
 import {PendingAccount} from '../domain/pending-list';
-import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {forkJoin} from 'rxjs';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+
+/**
+ * The accounts of the list, with the column settings of the account list: the dialog shows whether an account is connected to
+ * an OAuth2 user where the list has the status.
+ */
+const ACCOUNT_LIST_DIALOG_TABLE = defineTable({
+  ...ACCOUNT_TABLE,
+  columns: [
+    ...ACCOUNT_TABLE.columns.filter(c => c.id !== 'status'),
+    {id: 'appOauth2UserId', label: 'Status', header: 'OAuth2 User', width: 100, sortable: true},
+  ],
+  filters: [
+    ACCOUNT_TABLE.filters[0],
+    ACCOUNT_TABLE.filters[1],
+    ACCOUNT_TABLE.filters[2],
+  ],
+});
 
 @Component({
   standalone: false,
@@ -24,159 +33,28 @@ import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-r
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./account-list-dialog.component.css']
 })
-export class AccountListDialogComponent implements OnInit {
-  private auth = inject(AuthService);
+export class AccountListDialogComponent {
   private service = inject(AccountListService);
-  private preferencesService = inject(SettingsPreferencesService);
   dialogRef = inject<MatDialogRef<AccountListDialogComponent>>(MatDialogRef);
-  private location = inject(Location);
-  private router = inject(Router);
   pending = inject<PendingAccount>(MAT_DIALOG_DATA);
-  private route = inject(ActivatedRoute);
-
 
   title = 'Link to existing account';
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-  }
-
-  updateTableColumnsForAccountPage() {
-    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForAccountPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Login ID':
-          if (column.selected) {
-            displayedColumns.push('loginId');
-          }
-          break;
-        case 'Role':
-          if (column.selected) {
-            displayedColumns.push('role');
-          }
-          break;
-        case 'Name':
-          if (column.selected) {
-            displayedColumns.push('name');
-          }
-          break;
-        case 'Organization':
-          if (column.selected) {
-            displayedColumns.push('organization');
-          }
-          break;
-      }
-    }
-    displayedColumns.push('appOauth2UserId');
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<AccountListEntry>();
-  loading = false;
-
-  request: AccountListRequest;
-  preferencesInfo: PreferencesInfo;
+  readonly columns = createTableColumns(ACCOUNT_LIST_DIALOG_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);
 
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  readonly view = viewChild.required<ScoreTableViewComponent<AccountListEntry>>(ScoreTableViewComponent);
+  readonly ready = signal(false);
+  /** Only the accounts that are not connected to an SSO user, of the roles that can be linked. */
+  readonly extraParams: Record<string, string> = {excludeSSO: 'true'};
 
-  ngOnInit() {
-    this.request = new AccountListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('name', 'asc', 0, 10));
-    this.request.filters.excludeSSO = true;
-    this.request.filters.roles = ['developer', 'end-user'];
+  readonly load = (params: HttpParams) => this.service.getAccountsListPage(params).pipe(tap(() => this.selection.clear()));
 
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    forkJoin([
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loadAccounts(true);
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadAccounts();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
-  }
-
-  loadAccounts(isInit?: boolean) {
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-    this.service.getAccountsList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.selection.clear();
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-      this.dataSource.data = resp.list;
-    }, error => {
-      this.dataSource.data = [];
+  constructor() {
+    afterNextRender(() => {
+      // Both roles, to begin with.
+      this.view().setFilter('roles', ['developer', 'end-user']);
+      this.ready.set(true);
     });
   }
 
@@ -190,20 +68,5 @@ export class AccountListDialogComponent implements OnInit {
   }
   close() {
     this.dialogRef.close('');
-  }
-
-  select(row: AccountListEntry) {
-    this.selection.select(row);
-  }
-
-  toggle(row: AccountListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-  isSelected(row: AccountListEntry) {
-    return this.selection.isSelected(row);
   }
 }

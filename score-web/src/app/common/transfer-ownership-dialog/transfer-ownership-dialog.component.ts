@@ -1,17 +1,18 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {AccountListService} from '../../account-management/domain/account-list.service';
-import {AccountListEntry, AccountListRequest} from '../../account-management/domain/accounts';
-import {PageRequest} from '../../basis/basis';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {AccountListService} from '../../account-management/domain/account-list.service';
+import {AccountListEntry} from '../../account-management/domain/accounts';
+import {ACCOUNT_TABLE} from '../../account-management/domain/account.table';
 import {AuthService} from '../../authentication/auth.service';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {forkJoin} from 'rxjs';
-import {ScoreTableColumnResizeDirective} from '../score-table-column-resize/score-table-column-resize.directive';
+import {createTableColumns, defineTable} from '../score-table';
+
+/** The account list, to choose who the ownership goes to: the role is given by the one who opens the dialog. */
+const TRANSFER_OWNERSHIP_TABLE = defineTable({
+  ...ACCOUNT_TABLE,
+  filters: [ACCOUNT_TABLE.filters[0], ACCOUNT_TABLE.filters[1]],
+});
 
 @Component({
   standalone: false,
@@ -20,207 +21,32 @@ import {ScoreTableColumnResizeDirective} from '../score-table-column-resize/scor
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./transfer-ownership-dialog.component.css']
 })
-export class TransferOwnershipDialogComponent implements OnInit {
+export class TransferOwnershipDialogComponent {
   dialogRef = inject<MatDialogRef<TransferOwnershipDialogComponent>>(MatDialogRef);
   private auth = inject(AuthService);
   private accountService = inject(AccountListService);
-  private preferencesService = inject(SettingsPreferencesService);
   data = inject(MAT_DIALOG_DATA);
 
-
-  loading = false;
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = columns;
-    this.updateTableColumnsForAccountPage();
-  }
-
-  updateTableColumnsForAccountPage() {
-    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfAccountPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForAccountPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Login ID':
-          if (column.selected) {
-            displayedColumns.push('loginId');
-          }
-          break;
-        case 'Role':
-          if (column.selected) {
-            displayedColumns.push('role');
-          }
-          break;
-        case 'Name':
-          if (column.selected) {
-            displayedColumns.push('name');
-          }
-          break;
-        case 'Organization':
-          if (column.selected) {
-            displayedColumns.push('organization');
-          }
-          break;
-        case 'Status':
-          if (column.selected) {
-            displayedColumns.push('status');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<AccountListEntry>();
+  readonly columns = createTableColumns(TRANSFER_OWNERSHIP_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);
 
-  loginIdList: string[] = [];
-  request: AccountListRequest;
-  preferencesInfo: PreferencesInfo;
+  /** Not the requester; and, of the roles and the business contexts that the dialog is opened for. */
+  readonly extraParams: Record<string, string> = this.extraParamsOf();
 
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  readonly load = (params: HttpParams) => this.accountService.getAccountsListPage(params);
+
+  private extraParamsOf(): Record<string, string> {
+    const params: Record<string, string> = {excludeRequester: 'true'};
+    if (this.auth.getUserToken().tenant.enabled && this.data?.businessCtxIds?.length > 0) {
+      params['businessCtxIds'] = this.data.businessCtxIds.join(',');
+    }
+    if (this.data && this.data.roles) {
+      params['roles'] = this.data.roles.join(',');
+    }
+    return params;
+  }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
-
-  ngOnInit() {
-    this.request = new AccountListRequest();
-
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.paginator.length = 0;
-
-    this.sort.active = 'name';
-    this.sort.direction = 'asc';
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    forkJoin([
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loadAccounts(true);
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadAccounts();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
-  }
-
-  loadAccounts(isInit?: boolean) {
-    this.loading = true;
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    if (this.auth.getUserToken().tenant.enabled) {
-      this.request.filters.businessCtxIds = this.data.businessCtxIds;
-    }
-
-    if (this.data && this.data.roles) {
-      this.request.filters.roles = this.data.roles;
-    }
-    this.accountService.getAccountsList(this.request, true).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-      this.dataSource.data = resp.list;
-      this.loading = false;
-    }, error => {
-      this.loading = false;
-    });
-  }
-
-  select(row: AccountListEntry) {
-    this.selection.select(row);
-  }
-
-  toggle(row: AccountListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: AccountListEntry) {
-    return this.selection.isSelected(row);
-  }
-
 }

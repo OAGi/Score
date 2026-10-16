@@ -1,27 +1,19 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {ReleaseSummary} from '../../../release-management/domain/release';
-import {BieListEntry, BieListRequest} from '../../bie-list/domain/bie-list';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
-import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {PageRequest} from '../../../basis/basis';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter} from '../../../common/utility';
-import {Location} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
-import {finalize} from 'rxjs/operators';
+import {bieLinkQuery, BIE_FILTERS as F, BIE_TABLE} from '../../bie-list/domain/bie.table';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {PreferencesInfo, TableColumnsProperty} from '../../../settings-management/settings-preferences/domain/preferences';
-import {AuthService} from '../../../authentication/auth.service';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {LibrarySummary} from '../../../library-management/domain/library';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+
+const PICKER_TABLE = defineTable({
+  ...BIE_TABLE,
+  filters: [F.states, F.businessContext, F.version, F.remark, F.owner, F.updater, F.updatedDate,
+    // The release is locked to the one that the caller gives: it is part of the query.
+    F.releaseIds],
+});
 
 @Component({
   standalone: false,
@@ -30,230 +22,36 @@ import {LibrarySummary} from '../../../library-management/domain/library';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pagination-response-dialog.component.css']
 })
-export class PaginationResponseDialogComponent implements OnInit {
+export class PaginationResponseDialogComponent {
   dialogRef = inject<MatDialogRef<PaginationResponseDialogComponent>>(MatDialogRef);
   private bieListService = inject(BieListService);
-  private accountService = inject(AccountListService);
-  private auth = inject(AuthService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private location = inject(Location);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
   webPageInfo = inject(WebPageInfoService);
   data = inject(MAT_DIALOG_DATA);
 
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
-  }
-
-  updateTableColumnsForBiePage() {
-    this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBiePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'State':
-            if (column.selected) {
-              displayedColumns.push('state');
-            }
-            break;
-          case 'Branch':
-            if (column.selected) {
-              displayedColumns.push('branch');
-            }
-            break;
-          case 'DEN':
-            if (column.selected) {
-              displayedColumns.push('den');
-            }
-            break;
-          case 'Owner':
-            if (column.selected) {
-              displayedColumns.push('owner');
-            }
-            break;
-          case 'Business Contexts':
-            if (column.selected) {
-              displayedColumns.push('businessContexts');
-            }
-            break;
-          case 'Version':
-            if (column.selected) {
-              displayedColumns.push('version');
-            }
-            break;
-          case 'Status':
-            if (column.selected) {
-              displayedColumns.push('status');
-            }
-            break;
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('bizTerm');
-            }
-            break;
-          case 'Remark':
-            if (column.selected) {
-              displayedColumns.push('remark');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<BieListEntry>();
+  readonly columns = createTableColumns(PICKER_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BieListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(false, []);
-  loading = false;
 
-  loginIdList: string[] = [];
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['WIP', 'QA', 'Production'];
-  request: BieListRequest;
-  preferencesInfo: PreferencesInfo;
-  library: LibrarySummary;
-  release: ReleaseSummary;
+  readonly ready = signal(false);
+  /** Locked to a library, and to the BIEs that the user can view. */
+  readonly extraParams = signal<Record<string, string>>({libraryId: '' + this.data.library?.libraryId, access: 'CanView'});
+  release = this.data.release;
 
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  readonly load = (params: HttpParams) => this.bieListService.getBieListPage(params);
+  readonly rowKey = (row: BieListEntry) => row.topLevelAsbiepId;
 
   constructor() {
-    const data = this.data;
-
-    this.library = data.library;
-    this.release = data.release;
-  }
-
-  ngOnInit() {
-    this.request = new BieListRequest(undefined,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.den = 'Pagination Response. Pagination Response';
-    this.request.access = 'CanView';
-    this.request.library = this.library;
-    this.request.releases = [this.release, ];
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.loadBieList(true);
+    afterNextRender(() => {
+      // The search is of the well-known BIE, and cannot be changed.
+      this.view().setFilter('den', 'Pagination Response. Pagination Response');
+      this.view().setFilter('releaseIds', ['' + this.release.releaseId]);
+      this.ready.set(true);
     });
   }
 
-  onPageChange(event: PageEvent) {
-    this.loadBieList();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
-  }
-
-  loadBieList(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.bieListService.getBieListWithRequest(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-    }, error => {
-      this.dataSource.data = [];
-    });
+  /** The search part of a link to the list that shows the BIE. */
+  linkQuery(extras: { [key: string]: any }): string {
+    return bieLinkQuery(PICKER_TABLE, this.view().query, extras);
   }
 
   onNoClick(): void {
@@ -263,21 +61,4 @@ export class PaginationResponseDialogComponent implements OnInit {
   isDisabled() {
     return this.selection.selected.length === 0;
   }
-
-  select(row: BieListEntry) {
-    this.selection.select(row.topLevelAsbiepId);
-  }
-
-  toggle(row: BieListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAsbiepId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BieListEntry) {
-    return this.selection.isSelected(row.topLevelAsbiepId);
-  }
-
 }

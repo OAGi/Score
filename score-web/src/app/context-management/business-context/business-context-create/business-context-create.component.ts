@@ -1,33 +1,22 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
 import {BusinessContext, BusinessContextValue} from '../domain/business-context';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
 import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
+import {BUSINESS_CONTEXT_VALUE_TABLE} from '../domain/business-context-value.table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {v4 as uuid} from 'uuid';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
-import {forkJoin} from 'rxjs';
 
 @Component({
   standalone: false,
   selector: 'score-business-context-create',
   templateUrl: './business-context-create.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./business-context-create.component.css']
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class BusinessContextCreateComponent implements OnInit {
   private service = inject(BusinessContextService);
@@ -36,124 +25,30 @@ export class BusinessContextCreateComponent implements OnInit {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
-  private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
 
 
   title = 'Create Business Context';
   disabled: boolean;
 
   businessContext: BusinessContext;
-  preferencesInfo: PreferencesInfo;
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage;
-  }
+  readonly columns = createTableColumns(BUSINESS_CONTEXT_VALUE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextValue>>(ScoreTableViewComponent);
+  /** The guids of the selected values. */
+  selection = new SelectionModel<string>(true, []);
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessContextValuePage = columns;
-    this.updateTableColumnsForBusinessContextValuePage();
-  }
-
-  updateTableColumnsForBusinessContextValuePage() {
-    this.preferencesService.updateTableColumnsForBusinessContextValuePage(
-      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBusinessContextValuePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBusinessContextValuePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Context Category':
-          if (column.selected) {
-            displayedColumns.push('contextCategoryName');
-          }
-          break;
-        case 'Context Scheme':
-          if (column.selected) {
-            displayedColumns.push('contextSchemeName');
-          }
-          break;
-        case 'Context Scheme Value':
-          if (column.selected) {
-            displayedColumns.push('contextSchemeValue');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<BusinessContextValue>();
-  selection = new SelectionModel<BusinessContextValue>(true, []);
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  /** The values that the table lists. */
+  values: BusinessContextValue[] = [];
+  readonly load = inMemoryLoad<BusinessContextValue>(() => this.values);
+  readonly allRows = () => this.values;
+  readonly rowKey = (row: BusinessContextValue) => row.guid;
 
   ngOnInit() {
     this.disabled = false;
 
     this.businessContext = new BusinessContext();
 
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-
-    forkJoin([
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-    });
   }
 
   isDisabled(businessContext: BusinessContext) {
@@ -162,8 +57,9 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   _updateDataSource(data: BusinessContextValue[]) {
-    this.dataSource.data = data;
+    this.values = data;
     this.businessContext.businessContextValueList = data;
+    this.view()?.reload();
   }
 
   openDialog(businessContextValue?: BusinessContextValue) {
@@ -181,7 +77,7 @@ export class BusinessContextCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(BusinessContextValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.contextSchemeValueId !== undefined) {
-        for (const value of this.dataSource.data) {
+        for (const value of this.values) {
           if (value.contextSchemeValueId === result.contextSchemeValueId) {
             this.snackBar.open(result.contextSchemeValue + ' already exist', '', {
               duration: 3000,
@@ -191,7 +87,7 @@ export class BusinessContextCreateComponent implements OnInit {
           }
         }
         if (isAddAction) {
-          const data = this.dataSource.data;
+          const data = this.values;
           result.guid = uuid();
           data.push(result);
 
@@ -199,7 +95,7 @@ export class BusinessContextCreateComponent implements OnInit {
         } else {
           const newData = [];
 
-          this.dataSource.data.forEach(row => {
+          this.values.forEach(row => {
             if (row.guid === result.guid) {
               newData.push(result);
             } else {
@@ -217,36 +113,6 @@ export class BusinessContextCreateComponent implements OnInit {
     });
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
-  }
-
-  select(row: BusinessContextValue) {
-    this.selection.select(row);
-  }
-
-  toggle(row: BusinessContextValue) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BusinessContextValue) {
-    return this.selection.isSelected(row);
-  }
-
   removeBizCtxValues() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove Business Context?';
@@ -257,8 +123,8 @@ export class BusinessContextCreateComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           const newData = [];
-          this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
+          this.values.forEach(row => {
+            if (!this.selection.isSelected(row.guid)) {
               newData.push(row);
             }
           });

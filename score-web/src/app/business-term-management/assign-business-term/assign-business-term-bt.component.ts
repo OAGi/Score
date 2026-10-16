@@ -1,28 +1,16 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {SelectionModel} from '@angular/cdk/collections';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {PageRequest} from '../../basis/basis';
-import {AccountListService} from '../../account-management/domain/account-list.service';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter} from '../../common/utility';
-import {Location} from '@angular/common';
-import {finalize, map, switchMap} from 'rxjs/operators';
-import {BieToAssign, BusinessTermListEntry, BusinessTermListRequest, PostAssignBusinessTerm} from '../domain/business-term';
-import {BusinessTermService} from '../domain/business-term.service';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
-import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {SelectionModel} from '@angular/cdk/collections';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../authentication/auth.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {forkJoin} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {BusinessTermService} from '../domain/business-term.service';
+import {BieToAssign, BusinessTermListEntry, PostAssignBusinessTerm} from '../domain/business-term';
+import {BUSINESS_TERM_TABLE} from '../domain/business-term.table';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {base64Decode} from '../../common/utility';
+import {createTableColumns, ScoreTableViewComponent} from '../../common/score-table';
 
 @Component({
   standalone: false,
@@ -31,13 +19,9 @@ import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./assign-business-term-bt.component.css']
 })
-export class AssignBusinessTermBtComponent implements OnInit {
+export class AssignBusinessTermBtComponent {
   private businessTermService = inject(BusinessTermService);
-  private accountService = inject(AccountListService);
-  private auth = inject(AuthService);
-  private location = inject(Location);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
@@ -45,151 +29,40 @@ export class AssignBusinessTermBtComponent implements OnInit {
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
-  }
-
-  updateTableColumnsForBusinessTermPage() {
-    this.preferencesService.updateTableColumnsForBusinessTermPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBusinessTermPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('businessTerm');
-            }
-            break;
-          case 'External Reference URI':
-            if (column.selected) {
-              displayedColumns.push('externalReferenceUri');
-            }
-            break;
-          case 'External Reference ID':
-            if (column.selected) {
-              displayedColumns.push('externalReferenceId');
-            }
-            break;
-          case 'Definition':
-            if (column.selected) {
-              displayedColumns.push('definition');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<BusinessTermListEntry>();
+  readonly columns = createTableColumns(BUSINESS_TERM_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BusinessTermListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(true, []);
-  loading = false;
 
   postAssignBtObj = new PostAssignBusinessTerm();
 
-  loginIdList: string[] = [];
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: BusinessTermListRequest;
-  highlightText: string;
-  preferencesInfo: PreferencesInfo;
+  /** The list waits for the BIEs that the terms are assigned to. */
+  readonly ready = signal(false);
+  /** While the BIEs are being checked. */
+  readonly busy = signal(false);
 
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
+  readonly load = (params: HttpParams) => this.businessTermService.getBusinessTermListPage(params);
+  readonly rowKey = (row: BusinessTermListEntry) => row.businessTermId;
 
-  ngOnInit() {
-    this.request = new BusinessTermListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('name', 'asc', 0, 10));
+  constructor() {
+    afterNextRender(() => this.start());
+  }
 
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
+  private start() {
+    const params: ParamMap = this.route.snapshot.queryParamMap;
+    const bieIds = this.extractArrayParam(params, 'bieIds');
+    const bieTypes = this.extractArrayParam(params, 'bieTypes');
+    if (bieIds.length !== bieTypes.length) {
+      this.router.navigateByUrl('/business_term_management/assign_business_term/create');
+    }
+    const bies: BieToAssign[] = bieIds.map((value, index) => {
+      const bie = new BieToAssign();
+      bie.bieId = Number(value);
+      bie.bieType = bieTypes[index];
+      return bie;
     });
-
-    this.route.queryParamMap.pipe(
-      switchMap((params: ParamMap) => {
-        const bieIds = this.extractArrayParam(params, 'bieIds');
-        const bieTypes = this.extractArrayParam(params, 'bieTypes');
-        if (bieIds.length !== bieTypes.length) {
-          this.router.navigateByUrl('/business_term_management/assign_business_term/create');
-        }
-        const bies: BieToAssign[] = bieIds.map((value, index) => {
-          const bie = new BieToAssign();
-          bie.bieId = Number(value);
-          bie.bieType = bieTypes[index];
-          return bie;
-        });
-        return forkJoin([
-          this.businessTermService.confirmAsbieBbieListByIdAndType(bies),
-          this.accountService.getAccountNames(),
-          this.preferencesService.load(this.auth.getUserToken())
-        ]);
-      })).subscribe(([resp, loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
+    this.busy.set(true);
+    this.businessTermService.confirmAsbieBbieListByIdAndType(bies).subscribe(resp => {
+      this.busy.set(false);
       if (!resp) {
         this.router.navigateByUrl('/business_term_management/assign_business_term/create');
       } else {
@@ -199,10 +72,10 @@ export class AssignBusinessTermBtComponent implements OnInit {
           bie.bieType = e.type;
           return bie;
         });
-
-        this.loadBusinessTermList(true);
+        this.ready.set(true);
       }
     }, err => {
+      this.busy.set(false);
       console.error(err);
     });
   }
@@ -220,82 +93,6 @@ export class AssignBusinessTermBtComponent implements OnInit {
       return [];
     }
     return str.split(',');
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadBusinessTermList();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessTermList();
-  }
-
-  loadBusinessTermList(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.businessTermService.getBusinessTermList(this.request, this.postAssignBtObj.biesToAssign).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-      this.highlightText = this.request.filters.definition;
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: BusinessTermListEntry) {
-    // `used` only protects the Business Term catalog row from discard; it does not prevent reuse in assignments.
-    this.selection.select(row.businessTermId);
-  }
-
-  toggle(row: BusinessTermListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.businessTermId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BusinessTermListEntry) {
-    return this.selection.isSelected(row.businessTermId);
   }
 
   create() {

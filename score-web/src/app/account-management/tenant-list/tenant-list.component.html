@@ -1,37 +1,22 @@
-<score-list-page [title]="title" [loading]="loading">
+<score-list-page title="Tenant Roles">
   <ng-container ngProjectAs="[listActions]">
     <button mat-raised-button class="ms-2" color="primary" routerLink="create">
       New Tenant
     </button>
   </ng-container>
-  <score-search-bar listFilter placeholder="Search by Name" [(model)]="request.name"
-    (modelChange)="onChange('name', request.name);"
-    (searchTriggered)="onSearch();"
-    [advancedSearch]="false">
-  </score-search-bar>
-  <score-column-selector listColumns
-    [columns]="columns"
-    (columnsChange)="onColumnsChange($event)"
-    (onReset)="onColumnsReset()">
-  </score-column-selector>
-  <table listTable mat-table multiTemplateDataRows
-    matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-    [dataSource]="dataSource">
 
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('Tenant Name')" (onResize)="onResizeWidth($event)">Tenant Name</th>
-      <td mat-cell *matCellDef="let element">
+  <score-table-view [table]="columns" [load]="load">
+
+    <ng-container scoreColumnDef="name">
+      <td score-cell *scoreCellDef="let element">
         <a routerLink="{{ element.tenantId }}">
           <span class="score-line-clamp-2 score-break-word">{{ element.name }}</span>
         </a>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="users">
-      <th mat-header-cell *matHeaderCellDef
-      score-table-column-resize [defaultWidth]="width('Users')" (onResize)="onResizeWidth($event)">Users</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="users">
+      <td score-cell *scoreCellDef="let element">
         <button mat-raised-button color="primary" routerLink="users/{{ element.tenantId }}"
           style="margin-right: 10px;">
           Manage Users
@@ -39,22 +24,13 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="businessContexts">
-      <th mat-header-cell *matHeaderCellDef
-      score-table-column-resize [defaultWidth]="width('Business Contexts')" (onResize)="onResizeWidth($event)">Business Contexts</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="businessContexts">
+      <td score-cell *scoreCellDef="let element">
         <button mat-raised-button color="primary" routerLink="bis-ctx/{{ element.tenantId }}"
           style="margin-right: 10px;">
           Manage Business Context
         </button>
       </td>
     </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-  <mat-paginator listTable
-    [pageSizeOptions]="[10, 25, 50]"
-    (page)="onPageChange($event)"
-  showFirstLastButtons></mat-paginator>
+  </score-table-view>
 </score-list-page>

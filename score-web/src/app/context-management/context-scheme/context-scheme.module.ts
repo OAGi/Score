@@ -15,6 +15,7 @@ import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.mo
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {SCORE_TABLE} from '../../common/score-table';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
 
 const routes: Routes = [
@@ -55,6 +56,7 @@ const routes: Routes = [
         FontAwesomeModule,
         SearchBarModule,
         ColumnSelectorModule,
+        ...SCORE_TABLE,
         TitleWithLibrarySelector
     ],
   declarations: [

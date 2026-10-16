@@ -1,470 +1,82 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
-import {animate, state, style, transition, trigger} from '@angular/animations';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {CcListEntry, CcListRequest} from '../../cc-list/domain/cc-list';
+import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
-import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {PageRequest} from '../../../basis/basis';
 import {CcListComponent} from '../cc-list.component';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter} from '../../../common/utility';
-import {WorkingRelease} from '../../../release-management/domain/release';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CC_DIALOG_FILTERS as F} from '../../domain/cc-dialog.table';
+
+const BOD_COLUMNS = [
+  {id: 'state', label: 'State', width: 104, sortable: true},
+  {id: 'den', label: 'DEN', width: 0, sortable: true},
+  {id: 'lastUpdateTimestamp', label: 'Updated On', header: 'Updated on', width: 160, sortable: true},
+] as const;
+
+const BOD_FILTERS = [F.states, F.definition, {...F.module, label: 'Module'}, F.updater, F.updatedDate];
+
+const VERB_TABLE = defineTable({
+  storageKey: 'TableColumns-CoreComponentForVerbBodPage',
+  columns: BOD_COLUMNS,
+  // The verbs are not sorted, to begin with.
+  defaultSort: [],
+  search: {key: 'den', placeholder: 'Search by DEN'},
+  filters: BOD_FILTERS,
+});
+
+const NOUN_TABLE = defineTable({
+  storageKey: 'TableColumns-CoreComponentForNounBodPage',
+  columns: BOD_COLUMNS,
+  defaultSort: {active: 'lastUpdateTimestamp', direction: 'desc'},
+  search: {key: 'den', placeholder: 'Search by DEN'},
+  filters: BOD_FILTERS,
+});
+
+/** What was chosen stays chosen while the list is searched or paged: the rows are the same ones by their manifest id. */
+const newSelection = () => new SelectionModel<CcListEntry>(true, [], true, (a, b) => a.manifestId === b.manifestId);
 
 @Component({
   standalone: false,
   selector: 'score-create-asccp-dialog',
   templateUrl: './create-bod-dialog.component.html',
   styleUrls: ['./create-bod-dialog.component.css'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
-      state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ]
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class CreateBodDialogComponent implements OnInit {
+export class CreateBodDialogComponent {
   dialogRef = inject<MatDialogRef<CcListComponent>>(MatDialogRef);
-  private auth = inject(AuthService);
   private ccListService = inject(CcListService);
-  private accountService = inject(AccountListService);
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   data = inject(MAT_DIALOG_DATA);
 
-
-  workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
-  releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
-
-  // Verb
-  get verbColumns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage;
-  }
-
-  set verbColumns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForVerbBODPage = columns;
-    this.updateTableColumnsForCoreComponentForVerbBODPage();
-  }
-
-  updateTableColumnsForCoreComponentForVerbBODPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentForVerbBODPage(
-      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onVerbColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.verbColumns = defaultTableColumnInfo.columnsOfCoreComponentForVerbBODPage;
-  }
-
-  onVerbColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.verbWidth(column.name)
-    }));
-
-    this.verbColumns = updatedColumnsWithWidth;
-  }
-
-  onResizeVerbWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setVerbWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setVerbWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setVerbWidth(name: string, width: number | string) {
-    const matched = this.verbColumns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCoreComponentForVerbBODPage();
-    }
-  }
-
-  verbWidth(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.verbColumns.find(c => c.name === name)?.width;
-  }
-
-  get displayedVerbColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.verbColumns) {
-      switch (column.name) {
-        case 'State':
-          if (column.selected) {
-            displayedColumns.push('state');
-          }
-          break;
-        case 'DEN':
-          if (column.selected) {
-            displayedColumns.push('den');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  // Noun
-  get nounColumns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage;
-  }
-
-  set nounColumns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfCoreComponentForNounBODPage = columns;
-    this.updateTableColumnsForCoreComponentForNounBODPage();
-  }
-
-  updateTableColumnsForCoreComponentForNounBODPage() {
-    this.preferencesService.updateTableColumnsForCoreComponentForNounBODPage(
-      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onNounColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.nounColumns = defaultTableColumnInfo.columnsOfCoreComponentForNounBODPage;
-  }
-
-  onNounColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.nounWidth(column.name)
-    }));
-
-    this.nounColumns = updatedColumnsWithWidth;
-  }
-
-  onResizeNounWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setNounWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setNounWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setNounWidth(name: string, width: number | string) {
-    const matched = this.nounColumns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCoreComponentForNounBODPage();
-    }
-  }
-
-  nounWidth(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.nounColumns.find(c => c.name === name)?.width;
-  }
-
-  get displayedNounColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.nounColumns) {
-      switch (column.name) {
-        case 'State':
-          if (column.selected) {
-            displayedColumns.push('state');
-          }
-          break;
-        case 'DEN':
-          if (column.selected) {
-            displayedColumns.push('den');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  nounDataSource = new MatTableDataSource<CcListEntry>();
-  verbDataSource = new MatTableDataSource<CcListEntry>();
-  nounExpandedElement: CcListEntry | null;
-  verbExpandedElement: CcListEntry | null;
-  nounSelection = new SelectionModel<CcListEntry>(true, []);
-  verbSelection = new SelectionModel<CcListEntry>(true, []);
-  loading = false;
-
-  loginIdList: string[] = [];
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  verbRequest: CcListRequest;
-  highlightTextForVerbModule: string;
-  highlightTextForVerbDefinition: string;
-  nounRequest: CcListRequest;
-  highlightTextForNounModule: string;
-  highlightTextForNounDefinition: string;
-  preferencesInfo: PreferencesInfo;
+  readonly verbColumns = createTableColumns(VERB_TABLE);
+  readonly nounColumns = createTableColumns(NOUN_TABLE);
+  readonly verbView = viewChild.required<ScoreTableViewComponent<CcListEntry>>('verbView');
+  readonly nounView = viewChild.required<ScoreTableViewComponent<CcListEntry>>('nounView');
+  verbSelection = newSelection();
+  nounSelection = newSelection();
   action: string;
 
-  workingRelease = WorkingRelease;
+  readonly ready = signal(false);
 
-  @ViewChild('verbSort', {static: true}) verbSort: MatSort;
-  @ViewChild('nounSort', {static: true}) nounSort: MatSort;
-  @ViewChild('verbPaginator', {static: true}) verbPaginator: MatPaginator;
-  @ViewChild('nounPaginator', {static: true}) nounPaginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  /** The ASCCPs of the library and the release; the tag says whether they are verbs or nouns. */
+  extraParams: Record<string, string> = {};
 
-  ngOnInit() {
-    this.verbRequest = new CcListRequest();
-    this.nounRequest = new CcListRequest();
-    this.verbRequest.library.libraryId = this.data.libraryId;
-    this.verbRequest.release.releaseId = this.data.releaseId;
-    this.nounRequest.library.libraryId = this.data.libraryId;
-    this.nounRequest.release.releaseId = this.data.releaseId;
+  readonly verbLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Verb'));
+  readonly nounLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Noun'));
+  readonly rowKey = (row: CcListEntry) => row;
+
+  constructor() {
     this.action = this.data.action;
-    this.verbRequest.types = ['ASCCP'];
-    this.verbRequest.tags = ['Verb'];
-    this.nounRequest.types = ['ASCCP'];
-    this.nounRequest.tags = ['Noun'];
-
-    this.verbPaginator.pageIndex = 0;
-    this.verbPaginator.pageSize = 10;
-    this.verbPaginator.length = 0;
-
-    this.nounPaginator.pageIndex = 0;
-    this.nounPaginator.pageSize = 10;
-    this.nounPaginator.length = 0;
-
-    this.verbSort.active = '';
-    this.verbSort.direction = '';
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalVerbSort = this.verbSort.sort;
-    this.verbSort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalVerbSort.apply(this.verbSort, [sortChange]);
+    this.extraParams = {
+      libraryId: '' + this.data.libraryId,
+      releaseId: '' + (this.data.releaseId || 0),
+      types: 'asccp'
     };
-    this.verbSort.sortChange.subscribe(() => {
-      this.onSearch('verb');
-    });
-
-    this.nounSort.active = 'lastUpdateTimestamp';
-    this.nounSort.direction = 'desc';
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalNounSort = this.nounSort.sort;
-    this.nounSort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalNounSort.apply(this.nounSort, [sortChange]);
-    };
-    this.nounSort.sortChange.subscribe(() => {
-      this.onSearch('noun');
-    });
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.loadCcList('verb');
-      this.loadCcList('noun');
-    });
-  }
-
-  onSearch(type: string) {
-    if (type === 'verb') {
-      this.verbPaginator.pageIndex = 0;
-    } else if (type === 'noun') {
-      this.nounPaginator.pageIndex = 0;
-    }
-
-    this.loadCcList(type);
-  }
-
-  loadCcList(type: string) {
-    this.loading = true;
-
-    if (!type || 'verb' === type) {
-      this.verbRequest.page = new PageRequest(
-        this.verbSort.active, this.verbSort.direction,
-        this.verbPaginator.pageIndex, this.verbPaginator.pageSize);
-
-      this.ccListService.getCcList(this.verbRequest).subscribe(resp => {
-        this.verbDataSource.data = resp.list;
-        this.highlightTextForVerbModule = this.verbRequest.filters.module;
-        this.highlightTextForVerbDefinition = this.verbRequest.filters.definition;
-
-        this.verbPaginator.length = resp.length;
-        this.verbPaginator.pageIndex = resp.page;
-
-        // clean up the selection
-        if (this.verbSelection.selected.length > 0) {
-          const selectedMap = new Map(this.verbSelection.selected.map(e => [e.id, e]));
-          this.verbDataSource.data.forEach(e => {
-            if (selectedMap.has(e.id)) {
-              this.verbSelection.deselect(selectedMap.get(e.id));
-              this.verbSelection.select(e);
-            }
-          });
-        }
-        this.loading = false;
-      });
-    }
-
-    if (!type || 'noun' === type) {
-      this.nounRequest.page = new PageRequest(
-        this.nounSort.active, this.nounSort.direction,
-        this.nounPaginator.pageIndex, this.nounPaginator.pageSize);
-
-      this.ccListService.getCcList(this.nounRequest).subscribe(resp => {
-        this.nounDataSource.data = resp.list;
-        this.highlightTextForNounModule = this.nounRequest.filters.module;
-        this.highlightTextForNounDefinition = this.nounRequest.filters.definition;
-
-        this.nounPaginator.length = resp.length;
-        this.nounPaginator.pageIndex = resp.page;
-
-        // clean up the selection
-        if (this.nounSelection.selected.length > 0) {
-          const selectedMap = new Map(this.nounSelection.selected.map(e => [e.id, e]));
-          this.nounDataSource.data.forEach(e => {
-            if (selectedMap.has(e.id)) {
-              this.nounSelection.deselect(selectedMap.get(e.id));
-              this.nounSelection.select(e);
-            }
-          });
-        }
-        this.loading = false;
-      });
-    }
-  }
-
-  onPageChange(event: PageEvent, type: string) {
-    this.loadCcList(type);
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'verbStartDate':
-        this.verbRequest.updatedDate.start = null;
-        break;
-      case 'verbEndDate':
-        this.verbRequest.updatedDate.end = null;
-        break;
-      case 'nounStartDate':
-        this.nounRequest.updatedDate.start = null;
-        break;
-      case 'nounEndDate':
-        this.nounRequest.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onChange(type: string, property?: string, source?) {
-    if (type === 'verb') {
-      if (property === 'filters.den' && !!source) {
-        this.verbRequest.page.sortActive = '';
-        this.verbRequest.page.sortDirection = '';
-        this.verbSort.active = '';
-        this.verbSort.direction = '';
-      }
-
-      if (property === 'fuzzySearch') {
-        if (this.verbRequest.fuzzySearch) {
-          this.verbRequest.page.sortActive = '';
-          this.verbRequest.page.sortDirection = '';
-          this.verbSort.active = '';
-          this.verbSort.direction = '';
-        } else {
-          this.verbRequest.page.sortActive = 'lastUpdateTimestamp';
-          this.verbRequest.page.sortDirection = 'desc';
-          this.verbSort.active = 'lastUpdateTimestamp';
-          this.verbSort.direction = 'desc';
-        }
-      }
-    } else if (type === 'noun') {
-      if (property === 'filters.den' && !!source) {
-        this.nounRequest.page.sortActive = '';
-        this.nounRequest.page.sortDirection = '';
-        this.nounSort.active = '';
-        this.nounSort.direction = '';
-      }
-
-      if (property === 'fuzzySearch') {
-        if (this.nounRequest.fuzzySearch) {
-          this.nounRequest.page.sortActive = '';
-          this.nounRequest.page.sortDirection = '';
-          this.nounSort.active = '';
-          this.nounSort.direction = '';
-        } else {
-          this.nounRequest.page.sortActive = 'lastUpdateTimestamp';
-          this.nounRequest.page.sortDirection = 'desc';
-          this.nounSort.active = 'lastUpdateTimestamp';
-          this.nounSort.direction = 'desc';
-        }
-      }
-    }
+    afterNextRender(() => this.ready.set(true));
   }
 
   onNoClick(): void {
@@ -508,75 +120,6 @@ export class CreateBodDialogComponent implements OnInit {
         verbManifestIdList: this.verbSelection.selected.map(e => e.manifestId),
         nounManifestIdList: this.nounSelection.selected.map(e => e.manifestId)
       });
-    }
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected(type: string) {
-    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
-    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
-
-    const selectedIdList = selection.selected.map(e => e.manifestId).slice().sort();
-    const rowIdList = dataSource.data.map(e => e.manifestId).slice().sort();
-    return selectedIdList.length === rowIdList.length &&
-      selectedIdList.every(val => rowIdList.includes(val));
-  }
-
-  numOfSelected(type: string): number {
-    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
-    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
-
-    const selectedIdList = selection.selected.map(e => e.manifestId).slice().sort();
-    const rowIdList = dataSource.data.map(e => e.manifestId).slice().sort();
-    const numOfSelected = selectedIdList.filter(val => rowIdList.includes(val)).length;
-    return numOfSelected;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle(type: string, event) {
-    const selection = (type === 'verb') ? this.verbSelection : this.nounSelection;
-    const dataSource = (type === 'verb') ? this.verbDataSource : this.nounDataSource;
-    const paginator = (type === 'verb') ? this.verbPaginator : this.nounPaginator;
-
-    (selection.selected.length === paginator.length) ?
-      selection.clear() :
-      ((this.numOfSelected(type) > 0) ?
-        dataSource.data.forEach(row => this.deselect(row, type)) :
-        dataSource.data.forEach(row => this.select(row, type)));
-
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  select(row: CcListEntry, type: string) {
-    if (type === 'verb') {
-      this.verbSelection.select(row);
-    } else {
-      this.nounSelection.select(row);
-    }
-  }
-
-  deselect(row: CcListEntry, type: string) {
-    if (type === 'verb') {
-      this.verbSelection.deselect(row);
-    } else {
-      this.nounSelection.deselect(row);
-    }
-  }
-
-  toggle(row: CcListEntry, type: string) {
-    if (this.isSelected(row, type)) {
-      this.deselect(row, type);
-    } else {
-      this.select(row, type);
-    }
-  }
-
-  isSelected(row: CcListEntry, type: string) {
-    if (type === 'verb') {
-      return this.verbSelection.isSelected(row);
-    } else {
-      return this.nounSelection.isSelected(row);
     }
   }
 

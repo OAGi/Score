@@ -19,7 +19,7 @@ function value(guid: string | undefined, val: string, meaning = ''): ContextSche
  */
 describe('ContextSchemeCreateComponent.isDuplicateContextSchemeValue (#1744 class)', () => {
   function ctxWith(data: ContextSchemeValue[]): any {
-    const ctx: any = {dataSource: {data}};
+    const ctx: any = {values: data};
     ctx.isDuplicateContextSchemeValue = ContextSchemeCreateComponent.prototype.isDuplicateContextSchemeValue;
     return ctx;
   }

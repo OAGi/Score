@@ -40,10 +40,10 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     TruncatePipe,
     PastTensePipe,
     ReplaceAllPipe,
-    ScoreTableColumnResizeDirective,
     SidenavPageComponent
   ],
   imports: [
+    ScoreTableColumnResizeDirective,
     MaterialModule,
     BasePageComponent,
     WizardPageComponent,

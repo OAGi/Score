@@ -9,132 +9,48 @@
   </div>
   <div class="content">
     <mat-card style="box-shadow: none;">
-      <score-search-bar placeholder="Search by Login ID" [(model)]="request.filters.loginId"
-        (modelChange)="onChange('filters.loginId', request.filters.loginId);"
-        (searchTriggered)="onSearch();">
-        <div advancedSearchContent style="padding-left: 3rem;">
-          <mat-card-content class="mat-card-container">
-            <div class="container-fluid" style="padding: 0;">
-              <div class="row">
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Name</mat-label>
-                    <input matInput [(ngModel)]="request.filters.name"
-                      (ngModelChange)="onChange('filters.name', request.filters.name)"
-                      (keyup.enter)="onSearch();"
-                      placeholder="Name">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <input matInput [(ngModel)]="request.filters.organization"
-                      (ngModelChange)="onChange('filters.organization', request.filters.organization)"
-                      (keyup.enter)="onSearch();"
-                      placeholder="Organization">
-                  </mat-form-field>
-                </div>
-                <div class="col-md-2 col-sm-12">
-                  <mat-form-field>
-                    <mat-label>Role</mat-label>
-                    <mat-select [(ngModel)]="request.filters.roles" multiple>
-                      <mat-option [value]="'developer'">
-                        Developer
-                      </mat-option>
-                      <mat-option [value]="'end-user'">
-                        End-User
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-        </div>
-      </score-search-bar>
+      <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
+        [selection]="selection" singleSelect [selectOnRowClick]="false" [syncUrl]="false" [columnSelector]="false" pageFromResponse>
 
-      <mat-card-content class="mat-card-container">
-        @if (loading) {
-          <div class="loading-container">
-            <mat-spinner [diameter]="40"></mat-spinner>
-          </div>
+    <ng-container scoreColumnDef="loginId">
+      <td score-cell *scoreCellDef="let element">
+        <span class="score-line-clamp-2 score-break-word">{{ element.loginId }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container scoreColumnDef="role">
+      <td score-cell *scoreCellDef="let element">
+        @switch (element.developer) {
+          @case (true) {
+            <span>Developer</span>
+          }
+          @case (false) {
+            <span>End User</span>
+          }
         }
+      </td>
+    </ng-container>
 
-        <div class="table-container">
-          <div class="mat-elevation-z1 table-wrapper">
-            <table mat-table
-              matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-              [dataSource]="dataSource">
+    <ng-container scoreColumnDef="name">
+      <td score-cell *scoreCellDef="let element">
+        <span class="score-line-clamp-2 score-break-word">{{ element.name }}</span>
+      </td>
+    </ng-container>
 
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-                <td mat-cell *matCellDef="let element">
-                  <mat-checkbox (click)="$event.stopPropagation()"
-                    (change)="$event ? toggle(element) : null"
-                    [checked]="isSelected(element)">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
+    <ng-container scoreColumnDef="organization">
+      <td score-cell *scoreCellDef="let element">
+        <span class="score-line-clamp-2 score-break-word">{{ element.organization }}</span>
+      </td>
+    </ng-container>
 
-              <ng-container matColumnDef="loginId">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Login ID')" (onResize)="onResizeWidth($event)"> Login ID</th>
-                <td mat-cell *matCellDef="let element">
-                  <span class="score-line-clamp-2 score-break-word">{{ element.loginId }}</span>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="role">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Role')" (onResize)="onResizeWidth($event)"> Role</th>
-                <td mat-cell *matCellDef="let element">
-                  @switch (element.developer) {
-                    @case (true) {
-                      <span>Developer</span>
-                    }
-                    @case (false) {
-                      <span>End User</span>
-                    }
-                  }
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Name')" (onResize)="onResizeWidth($event)"> Name</th>
-                <td mat-cell *matCellDef="let element">
-                  <span class="score-line-clamp-2 score-break-word">{{ element.name }}</span>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="organization">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Organization')" (onResize)="onResizeWidth($event)"> Organization</th>
-                <td mat-cell *matCellDef="let element">
-                  <span class="score-line-clamp-2 score-break-word">{{ element.organization }}</span>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="appOauth2UserId">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                score-table-column-resize [defaultWidth]="width('Status')" (onResize)="onResizeWidth($event)">OAuth2 User</th>
-                <td mat-cell *matCellDef="let element">
-                  @if (element.appOauth2UserId) {
-                    <span>Yes</span>
-                  }
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-
-            <mat-paginator
-              [pageSizeOptions]="[10, 25, 50]"
-              (page)="onPageChange($event)"
-            showFirstLastButtons></mat-paginator>
-          </div>
-        </div>
-      </mat-card-content>
+    <ng-container scoreColumnDef="appOauth2UserId">
+      <td score-cell *scoreCellDef="let element">
+        @if (element.appOauth2UserId) {
+          <span>Yes</span>
+        }
+      </td>
+    </ng-container>
+      </score-table-view>
     </mat-card>
   </div>
 

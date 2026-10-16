@@ -1,301 +1,81 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {AuthService} from '../../../authentication/auth.service';
-import {BieListEntry, BieListRequest} from '../../bie-list/domain/bie-list';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {PageRequest} from '../../../basis/basis';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
-import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter} from '../../../common/utility';
-import {Location} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
-import {finalize} from 'rxjs/operators';
-import {ReleaseSummary} from '../../../release-management/domain/release';
+import {bieLinkQuery, BIE_FILTERS as F, BIE_TABLE} from '../../bie-list/domain/bie.table';
+import {AuthService} from '../../../authentication/auth.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {LibrarySummary} from '../../../library-management/domain/library';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+
+const REUSE_BIE_TABLE = defineTable({
+  ...BIE_TABLE,
+  filters: [F.businessContext, F.version, F.remark, F.owner, F.updater, F.updatedDate],
+});
+
+/** What the BIEs that can be reused are asked with: the ones of the ASCCP that the BIE is of, in the branch of the BIE. */
+export function reuseBieParams(data: any, isDeveloper: boolean): Record<string, string> {
+  const params: Record<string, string> = {
+    libraryId: '' + data.libraryId,
+    releaseIds: '' + data.releaseId,
+    excludeTopLevelAsbiepIds: '' + data.topLevelAsbiepId
+  };
+  if (data.asccpManifestId) {
+    params['asccpManifestId'] = '' + data.asccpManifestId;
+  }
+  const basedTopLevelAsbiepId = data.basedTopLevelAsbiepId;
+  if (Number.isInteger(basedTopLevelAsbiepId) && basedTopLevelAsbiepId > 0) {
+    params['basedTopLevelAsbiepIds'] = '' + basedTopLevelAsbiepId;
+  }
+  // Per Test Assertion #24.1.2: "The end user can reuse developer top-level BIE,"
+  // this check is required only when the current user is a developer.
+  if (isDeveloper) {
+    params['ownedByDeveloper'] = 'true';
+  }
+  return params;
+}
 
 @Component({
   standalone: false,
   selector: 'score-reuse-bie-dialog',
   templateUrl: './reuse-bie-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./reuse-bie-dialog.component.css']
+  styleUrls: ['./reuse-bie-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class ReuseBieDialogComponent implements OnInit {
+export class ReuseBieDialogComponent {
   dialogRef = inject<MatDialogRef<ReuseBieDialogComponent>>(MatDialogRef);
   private bieListService = inject(BieListService);
-  private accountService = inject(AccountListService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private location = inject(Location);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
   webPageInfo = inject(WebPageInfoService);
   data = inject(MAT_DIALOG_DATA);
 
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = columns;
-    this.updateTableColumnsForBiePage();
-  }
-
-  updateTableColumnsForBiePage() {
-    this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBiePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBiePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'State':
-            if (column.selected) {
-              displayedColumns.push('state');
-            }
-            break;
-          case 'Branch':
-            if (column.selected) {
-              displayedColumns.push('branch');
-            }
-            break;
-          case 'DEN':
-            if (column.selected) {
-              displayedColumns.push('den');
-            }
-            break;
-          case 'Owner':
-            if (column.selected) {
-              displayedColumns.push('owner');
-            }
-            break;
-          case 'Business Contexts':
-            if (column.selected) {
-              displayedColumns.push('businessContexts');
-            }
-            break;
-          case 'Version':
-            if (column.selected) {
-              displayedColumns.push('version');
-            }
-            break;
-          case 'Status':
-            if (column.selected) {
-              displayedColumns.push('status');
-            }
-            break;
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('bizTerm');
-            }
-            break;
-          case 'Remark':
-            if (column.selected) {
-              displayedColumns.push('remark');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<BieListEntry>();
+  readonly columns = createTableColumns(REUSE_BIE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BieListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(false, []);
-  loading = false;
 
-  loginIdList: string[] = [];
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: BieListRequest;
-  preferencesInfo: PreferencesInfo;
+  readonly ready = signal(false);
+  readonly extraParams: Record<string, string> = reuseBieParams(this.data, this.isDeveloper);
 
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  readonly load = (params: HttpParams) => this.bieListService.getBieListPage(params);
+  readonly rowKey = (row: BieListEntry) => row.topLevelAsbiepId;
 
-  ngOnInit() {
-    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.asccpManifestId = this.data.asccpManifestId;
-    this.request.filters.den = this.data.den;
-    this.request.library = new LibrarySummary();
-    this.request.library.libraryId = this.data.libraryId;
-    const release = new ReleaseSummary();
-    release.releaseId = this.data.releaseId;
-    this.request.releases = [release, ];
-    const basedTopLevelAsbiepId = this.data.basedTopLevelAsbiepId;
-    this.request.basedTopLevelAsbiepIds = Number.isInteger(basedTopLevelAsbiepId) && basedTopLevelAsbiepId > 0
-      ? [basedTopLevelAsbiepId]
-      : [];
-    this.request.excludeTopLevelAsbiepIds = [this.data.topLevelAsbiepId,];
-    // Per Test Assertion #24.1.2: "The end user can reuse developer top-level BIE,"
-    // this check is required only when the current user is a developer.
-    if (this.isDeveloper) {
-      this.request.ownedByDeveloper = true;
-    }
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
+  constructor() {
+    afterNextRender(() => {
+      // The search is of the BIE that the reuse is for, and cannot be changed.
+      this.view().setFilter('den', this.data.den || '');
+      this.ready.set(true);
     });
+  }
 
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      this.loadBieList(true);
-    });
+  /** The search part of a link to the list that shows the BIE. */
+  linkQuery(extras: { [key: string]: any }): string {
+    return bieLinkQuery(REUSE_BIE_TABLE, this.view().query, extras);
   }
 
   get isDeveloper() {
     const userToken = this.auth.getUserToken();
     return userToken.roles.includes('developer');
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadBieList();
-  }
-
-  onChange(property?: string, source?) {
-    if (property === 'filters.den' && !!source) {
-      this.request.page.sortActive = '';
-      this.request.page.sortDirection = '';
-      this.sort.active = '';
-      this.sort.direction = '';
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
-  }
-
-  loadBieList(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.bieListService.getBieListWithRequest(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-    }, error => {
-      this.dataSource.data = [];
-    });
   }
 
   onNoClick(): void {
@@ -305,21 +85,4 @@ export class ReuseBieDialogComponent implements OnInit {
   isDisabled() {
     return this.selection.selected.length === 0;
   }
-
-  select(row: BieListEntry) {
-    this.selection.select(row.topLevelAsbiepId);
-  }
-
-  toggle(row: BieListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAsbiepId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BieListEntry) {
-    return this.selection.isSelected(row.topLevelAsbiepId);
-  }
-
 }

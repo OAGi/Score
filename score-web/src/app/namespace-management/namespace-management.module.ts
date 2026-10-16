@@ -12,6 +12,7 @@ import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
+import {SCORE_TABLE} from '../common/score-table';
 
 const routes: Routes = [
   {
@@ -49,7 +50,8 @@ const routes: Routes = [
     SearchBarModule,
     ColumnSelectorModule,
     ScoreCommonModule,
-    TitleWithLibrarySelector
+    TitleWithLibrarySelector,
+    ...SCORE_TABLE
   ],
   declarations: [
     NamespaceListComponent,

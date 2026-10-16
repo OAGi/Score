@@ -1,260 +1,106 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {AsbieBbieListEntry, AssignedBtListRequest, AssignedBusinessTermListEntry, BieToAssign} from '../domain/business-term';
-import {BusinessTermService} from '../domain/business-term.service';
-import {MatDialog} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
-import {PageRequest} from '../../basis/basis';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {AccountListService} from '../../account-management/domain/account-list.service';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
-import {Location} from '@angular/common';
+import {HttpParams} from '@angular/common/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
-import {finalize} from 'rxjs/operators';
+import {AsbieBbieListEntry, AssignedBusinessTermListEntry, BieToAssign} from '../domain/business-term';
+import {BusinessTermService} from '../domain/business-term.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {AuthService} from '../../authentication/auth.service';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+
+const BIE_TYPES = [{value: 'BBIE', label: 'BBIE'}, {value: 'ASBIE', label: 'ASBIE'}];
+
+const ASSIGNED_BUSINESS_TERM_TABLE = defineTable({
+  storageKey: 'TableColumns-AssignedBusinessTermPage',
+  columns: [
+    {id: 'bieDen', label: 'BIE DEN', width: 0, sortable: true},
+    {id: 'bieType', label: 'BIE Type', width: 100, sortable: true},
+    {id: 'businessTerm', label: 'Business Term', width: 200, sortable: true},
+    {id: 'primaryIndicator', label: 'Preferred Business Term', width: 200, sortable: true},
+    {id: 'externalReferenceUri', label: 'External Reference URI', width: 200, sortable: true},
+    {id: 'externalReferenceId', label: 'External Reference ID', width: 200, sortable: true},
+    {id: 'typeCode', label: 'Type Code', width: 100, sortable: true},
+    {id: 'lastUpdateTimestamp', label: 'Updated On', header: 'Updated on', width: 160, sortable: true},
+  ],
+  defaultSort: {active: 'lastUpdateTimestamp', direction: 'desc'},
+  search: {key: 'bieDen', placeholder: 'Search by DEN'},
+  filters: [
+    {type: 'select', key: 'bieTypes', httpParam: 'bieTypeList', label: 'Type', options: BIE_TYPES},
+    {type: 'text', key: 'businessTerm', label: 'Business Term'},
+    {type: 'text', key: 'externalReferenceUri', label: 'External Reference URI'},
+    {type: 'text', key: 'typeCode', label: 'Type Code'},
+    {type: 'updater', key: 'updaterUsernameList', httpParam: 'updaterLoginIdList', label: 'Updater'},
+    {
+      type: 'dateRange', key: 'updatedDate', label: 'Updated',
+      httpStart: 'updateStart', httpEnd: 'updateEnd', urlStart: 'updateStart', urlEnd: 'updateEnd'
+    },
+    {type: 'boolean', key: 'primaryIndicator', label: 'Preferred Only'},
+    // What "search by selected BIE" narrows to.
+    {type: 'text', key: 'bieId', label: 'BIE', hidden: true},
+  ],
+});
 
 @Component({
   standalone: false,
   selector: 'score-assigned-business-term',
   templateUrl: './assigned-business-term-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./assigned-business-term-list.component.css']
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class AssignedBusinessTermListComponent implements OnInit {
+export class AssignedBusinessTermListComponent {
   private service = inject(BusinessTermService);
-  private accountService = inject(AccountListService);
-  private auth = inject(AuthService);
-  private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
 
-
-  bieId: number;
-
-  title = 'Business Term Assignment';
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfAssignedBusinessTermPage = columns;
-    this.updateTableColumnsForAssignedBusinessTermPage();
-  }
-
-  updateTableColumnsForAssignedBusinessTermPage() {
-    this.preferencesService.updateTableColumnsForAssignedBusinessTermPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfAssignedBusinessTermPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForAssignedBusinessTermPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'BIE DEN':
-            if (column.selected) {
-              displayedColumns.push('bieDen');
-            }
-            break;
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('businessTerm');
-            }
-            break;
-          case 'Preferred Business Term':
-            if (column.selected) {
-              displayedColumns.push('primaryIndicator');
-            }
-            break;
-          case 'External Reference URI':
-            if (column.selected) {
-              displayedColumns.push('externalReferenceUri');
-            }
-            break;
-          case 'External Reference ID':
-            if (column.selected) {
-              displayedColumns.push('externalReferenceId');
-            }
-            break;
-          case 'Type Code':
-            if (column.selected) {
-              displayedColumns.push('typeCode');
-            }
-            break;
-          case 'BIE Type':
-            if (column.selected) {
-              displayedColumns.push('bieType');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<AssignedBusinessTermListEntry>();
+  readonly columns = createTableColumns(ASSIGNED_BUSINESS_TERM_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<AssignedBusinessTermListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<AssignedBusinessTermListEntry>(true, []);
-  loading = false;
 
-  loginIdList: string[] = [];
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: AssignedBtListRequest;
-  preferencesInfo: PreferencesInfo;
-  typeList: string[] = ['BBIE', 'ASBIE'];
+  /** The list is loaded once the query has been completed with what the URL says about the BIE. */
+  readonly ready = signal(false);
 
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
+  readonly load = (params: HttpParams) => this.service.getAssignedBusinessTermListPage(params);
 
-  ngOnInit() {
-    this.request = new AssignedBtListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.bieTypes = ['BBIE', 'ASBIE'];
-
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo] ) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-      // Load BIE ID
-      const bieId = this.route.snapshot.queryParamMap.get('bieId');
-      const bieType = this.route.snapshot.queryParamMap.get('bieType');
-      if (bieId !== null && bieId !== '' && bieType !== null && bieType !== '') {
-        const bie = new BieToAssign();
-        bie.bieId = Number(bieId);
-        bie.bieType = bieType;
-        this.request.filters.bieId = Number(bieId);
-        this.request.filters.bieTypes = [bieType];
-        this.service.confirmAsbieBbieListByIdAndType([bie])
-            .subscribe((resp: AsbieBbieListEntry[]) => {
-              if (!resp || resp.length !== 1) {
-                this.router.navigateByUrl('/business_term_management/assign_business_term/create');
-              } else {
-                const bieResp = resp[0];
-                this.request.filters.bieId = bieResp.bieId;
-                this.request.filters.bieTypes = [bieResp.type];
-                this.request.filters.bieDen = bieResp.den;
-              }
-            });
-      }
-
-      this.loadAssignedBusinessTermList(true);
-    });
+  constructor() {
+    afterNextRender(() => this.start());
   }
 
-  onPageChange(event: PageEvent) {
-    this.loadAssignedBusinessTermList();
-  }
+  /** Both types are always shown at first, whatever the URL says; a BIE in the URL narrows to it. */
+  private start() {
+    const view = this.view();
+    view.setFilter('bieTypes', ['BBIE', 'ASBIE']);
 
-  onChange(property?: string, source?) {
+    const bieId = this.route.snapshot.queryParamMap.get('bieId');
+    const bieType = this.route.snapshot.queryParamMap.get('bieType');
+    if (bieId !== null && bieId !== '' && bieType !== null && bieType !== '') {
+      const bie = new BieToAssign();
+      bie.bieId = Number(bieId);
+      bie.bieType = bieType;
+      view.setFilter('bieId', bieId);
+      view.setFilter('bieTypes', [bieType]);
+      this.service.confirmAsbieBbieListByIdAndType([bie])
+        .subscribe((resp: AsbieBbieListEntry[]) => {
+          if (!resp || resp.length !== 1) {
+            this.router.navigateByUrl('/business_term_management/assign_business_term/create');
+          } else {
+            const bieResp = resp[0];
+            view.setFilter('bieId', '' + bieResp.bieId);
+            view.setFilter('bieTypes', [bieResp.type]);
+            view.setFilter('bieDen', bieResp.den);
+          }
+        });
+    }
+    this.ready.set(true);
   }
 
   saveSelectedBIEForSearch() {
     const assignedBizTermIds = this.selection.selected;
-    if (assignedBizTermIds.length === 1){
-      const selectedRow = this.dataSource.data.filter(row => assignedBizTermIds.includes(row))[0];
-      this.request.filters.bieId = selectedRow.bieId;
-      this.request.filters.bieDen = selectedRow.den;
-      this.loadAssignedBusinessTermList();
+    if (assignedBizTermIds.length === 1) {
+      const selectedRow = this.view().dataSource.data.filter(row => assignedBizTermIds.includes(row))[0];
+      this.view().setFilter('bieId', '' + selectedRow.bieId);
+      this.view().setFilter('bieDen', selectedRow.den);
+      this.view().reload();
       this.selection.clear();
     } else {
       const dialogConfig = this.confirmDialogService.newConfig();
@@ -267,82 +113,11 @@ export class AssignedBusinessTermListComponent implements OnInit {
     }
   }
 
-  deselect(){
-    this.request.filters.bieId = null;
-    this.request.filters.bieDen = '';
-    this.request.filters.bieTypes = ['ASBIE', 'BBIE'];
-    this.loadAssignedBusinessTermList();
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadAssignedBusinessTermList();
-  }
-
-  loadAssignedBusinessTermList(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getAssignedBusinessTermList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: AssignedBusinessTermListEntry) {
-    this.selection.select(row);
-  }
-
-  toggle(row: AssignedBusinessTermListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: AssignedBusinessTermListEntry) {
-    return this.selection.isSelected(row);
+  deselect() {
+    this.view().setFilter('bieId', '');
+    this.view().setFilter('bieDen', '');
+    this.view().setFilter('bieTypes', ['ASBIE', 'BBIE']);
+    this.view().reload();
   }
 
   discard() {
@@ -364,32 +139,7 @@ export class AssignedBusinessTermListComponent implements OnInit {
               duration: 3000,
             });
             this.selection.clear();
-            this.loadAssignedBusinessTermList();
-          });
-        }
-      });
-  }
-
-  openMakeAsPrimaryDialog(assignedBusinessTerm: AssignedBusinessTermListEntry, $event) {
-    if (assignedBusinessTerm.primaryIndicator) {
-      return;
-    }
-
-    const dialogConfig = this.confirmDialogService.newConfig();
-    dialogConfig.data.header = 'Set ' + assignedBusinessTerm.businessTerm + ' to a preferred term?';
-    dialogConfig.data.content = [
-      'Are you sure you want to set ' + assignedBusinessTerm.businessTerm + ' as a preferred term for BIE ',
-      assignedBusinessTerm.den + '?' ];
-    dialogConfig.data.action = 'Set to preferred';
-    this.confirmDialogService.open(dialogConfig).afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.service.makeAsPrimary(assignedBusinessTerm).subscribe(_ => {
-            this.snackBar.open('Set to Preferred', '', {
-              duration: 3000,
-            });
-            this.selection.clear();
-            this.loadAssignedBusinessTermList();
+            this.view().reload();
           });
         }
       });
@@ -397,7 +147,6 @@ export class AssignedBusinessTermListComponent implements OnInit {
 
   openAssignedBt(type, id) {
     this.router.navigate(['/business_term_management/assign_business_term/details/' + id],
-      {queryParams: { type, id }});
+      {queryParams: {type, id}});
   }
-
 }

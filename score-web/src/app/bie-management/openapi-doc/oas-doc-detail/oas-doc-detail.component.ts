@@ -1,8 +1,8 @@
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {
   BieForOasDoc,
   BieForOasDocDeleteRequest,
-  BieForOasDocListRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
   OasSecurityRequirement,
@@ -16,7 +16,6 @@ import {
   OasOperationValidator,
   recomputeOperationId
 } from '../domain/oas-operation-validation';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {OpenAPIService} from '../domain/openapi.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -25,7 +24,7 @@ import {ErrorStateMatcher} from '@angular/material/core';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from '../../../common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
-import {finalize} from 'rxjs/operators';
+import {finalize, tap} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
@@ -35,7 +34,8 @@ import {
   OasDocConfirmMessageDialogComponent,
   OasDocConfirmMessageDialogResult
 } from '../oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
-import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
+import {OAS_DOC_BIE_TABLE} from '../domain/oas-doc-bie.table';
+import {createTableColumns, ScoreTableViewComponent} from '../../../common/score-table';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
@@ -44,13 +44,6 @@ import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {PageRequest} from '../../../basis/basis';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 import {ReleaseSummary} from '../../../release-management/domain/release';
@@ -72,7 +65,6 @@ export class OasDocDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
   private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
@@ -87,205 +79,44 @@ export class OasDocDetailComponent implements OnInit {
   bizCtxSearch: string;
   disabled: boolean;
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage = columns;
-    this.updateTableColumnsForBieForOasDocPage();
-  }
-
-  updateTableColumnsForBieForOasDocPage() {
-    this.preferencesService.updateTableColumnsForBieForOasDocPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  ensureSecurityColumn() {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
-    // Position the Security column right after Message Body (preserve a saved entry's width/selected).
-    let entry = columns.find(c => c.name === 'Security');
-    if (entry) {
-      columns.splice(columns.indexOf(entry), 1);
-    } else {
-      entry = {name: 'Security', selected: true, width: 120};
-    }
-    const idx = columns.findIndex(c => c.name === 'Message Body');
-    if (idx >= 0) {
-      columns.splice(idx + 1, 0, entry);
-    } else {
-      columns.push(entry);
-    }
-  }
-
-  // Issue #1347: position the Error Response column right after Security (preserve a saved entry).
-  ensureErrorResponseColumn() {
-    const columns = this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage;
-    let entry = columns.find(c => c.name === 'Error Response');
-    if (entry) {
-      columns.splice(columns.indexOf(entry), 1);
-    } else {
-      entry = {name: 'Error Response', selected: true, width: 260};
-    }
-    const idx = columns.findIndex(c => c.name === 'Security');
-    if (idx >= 0) {
-      columns.splice(idx + 1, 0, entry);
-    } else {
-      columns.push(entry);
-    }
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBieForOasDocPage;
-    this.onColumnsChange(this.columns);
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-
-    let columns = [];
-    for (const tableColumn of this.table.columns) {
-      for (const updatedColumn of updatedColumns) {
-        if (tableColumn.name === updatedColumn.name) {
-          tableColumn.isActive = updatedColumn.selected;
-        }
-      }
-      columns.push(tableColumn);
-    }
-
-    this.table.columns = columns;
-    this.table.displayedColumns = this.displayedColumns;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBieForOasDocPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  defaultDisplayedColumns = [
-    {id: 'select', name: '', isActive: true},
-    {id: 'branch', name: 'Branch', isActive: true},
-    {id: 'den', name: 'DEN', isActive: true},
-    {id: 'remark', name: 'Remark', isActive: true},
-    {id: 'verb', name: 'Verb', isActive: true},
-    {id: 'arrayIndicator', name: 'Array Indicator', isActive: true},
-    {id: 'suppressRootIndicator', name: 'Suppress Root Indicator', isActive: true},
-    {id: 'messageBody', name: 'Message Body', isActive: true},
-    {id: 'security', name: 'Security', isActive: true},
-    {id: 'errorResponse', name: 'Error Response', isActive: true},
-    {id: 'resourceName', name: 'Resource Name', isActive: true},
-    {id: 'operationId', name: 'Operation ID', isActive: true},
-    {id: 'tagName', name: 'Tag Name', isActive: true}
-  ];
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'Branch':
-            if (column.selected) {
-              displayedColumns.push('branch');
-            }
-            break;
-          case 'DEN':
-            if (column.selected) {
-              displayedColumns.push('den');
-            }
-            break;
-          case 'Remark':
-            if (column.selected) {
-              displayedColumns.push('remark');
-            }
-            break;
-          case 'Verb':
-            if (column.selected) {
-              displayedColumns.push('verb');
-            }
-            break;
-          case 'Array Indicator':
-            if (column.selected) {
-              displayedColumns.push('arrayIndicator');
-            }
-            break;
-          case 'Suppress Root Indicator':
-            if (column.selected) {
-              displayedColumns.push('suppressRootIndicator');
-            }
-            break;
-          case 'Message Body':
-            if (column.selected) {
-              displayedColumns.push('messageBody');
-            }
-            break;
-          case 'Resource Name':
-            if (column.selected) {
-              displayedColumns.push('resourceName');
-            }
-            break;
-          case 'Operation ID':
-            if (column.selected) {
-              displayedColumns.push('operationId');
-            }
-            break;
-          case 'Tag Name':
-            if (column.selected) {
-              displayedColumns.push('tagName');
-            }
-            break;
-          case 'Security':
-            if (column.selected) {
-              displayedColumns.push('security');
-            }
-            break;
-          case 'Error Response':
-            if (column.selected) {
-              displayedColumns.push('errorResponse');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  table: TableData<BieForOasDoc>;
-  selection = new SelectionModel<BieForOasDoc>(true, []);
+  readonly columns = createTableColumns(OAS_DOC_BIE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BieForOasDoc>>(ScoreTableViewComponent);
+  selection = new SelectionModel<BieForOasDoc>(true, [], true, (a, b) => a.oasOperationId === b.oasOperationId && a.messageBody === b.messageBody);
+  readonly rowKey = (row: BieForOasDoc) => row;
   businessContextSelection = {};
-  request: BieForOasDocListRequest;
-  preferencesInfo: PreferencesInfo;
+  /** The list waits for the document. */
+  readonly ready = signal(false);
+  /** The operations of the page that the table shows (edited in place). */
+  rows: BieForOasDoc[] = [];
+  /** The number of operations of the document. */
+  totalRows = 0;
+  readonly rowClass = (row: BieForOasDoc) => ({'highlight': row.status === 'Duplication'});
+  readonly load = (params: HttpParams) => this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params.set('access', 'CanView')).pipe(
+    tap({
+      next: resp => {
+        this.totalRows = resp.length;
+        resp.list = resp.list.map((elm: BieForOasDoc) => {
+          elm = new BieForOasDoc(elm);
+          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+          elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
+          return elm;
+        });
+        this.rows = resp.list;
+        this.rows.forEach((elm: BieForOasDoc) => {
+          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
+          // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
+          // cancelled CONFIRM_MESSAGE choice to its last committed value.
+          this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
+        });
+        this.recomputeOasValidation();
+      },
+      error: () => {
+        this.rows = [];
+        this.totalRows = 0;
+        this.businessContextSelection = {};
+      }
+    })
+  );
   loading = false;
   isUpdating: boolean;
   option: BieExpressOption;
@@ -326,14 +157,7 @@ export class OasDocDetailComponent implements OnInit {
     return this.oasValidator.bodySlotErrorStateMatcher(row);
   }
 
-  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
   ngOnInit(): void {
-    this.table = new TableData<BieForOasDoc>(this.defaultDisplayedColumns, {});
-    this.table.dataSource = new MatMultiSortTableDataSource<BieForOasDoc>(this.sort, false);
-
     this.topLevelAsbiepIds = [];
     this.option = new BieExpressOption();
     this.option.bieDefinition = true;
@@ -344,50 +168,17 @@ export class OasDocDetailComponent implements OnInit {
 
     const oasDocId = this.route.snapshot.params.id;
 
-    // Init BIE list table for OasDoc
-    this.request = new BieForOasDocListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest(['tagName', 'operationId'], ['asc', 'asc'], 0, 10));
-    this.request.access = 'CanView';
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.table.sortParams = this.request.page.sortActives;
-    this.table.sortDirs = this.request.page.sortDirections;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.table.sortObservable.subscribe(() => {
-      this.onSearch();
-    });
-
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
     forkJoin([
-      this.openAPIService.getOasDoc(oasDocId),
-      this.openAPIService.getBieListForOasDoc(this.request, oasDocId),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([simpleOasDoc, bieForOasDoc, preferencesInfo]) => {
+      this.openAPIService.getOasDoc(oasDocId)
+    ]).subscribe(([simpleOasDoc]) => {
       if (!simpleOasDoc) {
         this.redirectToOasDocList();
         return;
       }
 
-      this.preferencesInfo = preferencesInfo;
-      this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBieForOasDocPage);
-
       this.oasDoc = simpleOasDoc;
       this.init(this.oasDoc);
-      this.loadBieListForOasDoc(true);
+      this.ready.set(true);
     }, err => {
       this.isUpdating = false;
       if (err.status === 404) {
@@ -466,7 +257,7 @@ export class OasDocDetailComponent implements OnInit {
     this.securitySchemes.splice(index, 1);
     if (removedSchemeName) {
       this.oasDoc.securityRequirements = this.pruneSecurityRequirements(this.oasDoc.securityRequirements, removedSchemeName);
-      (this.table?.dataSource?.data || []).forEach(row => {
+      this.rows.forEach(row => {
         const hadRequirements = (row.securityRequirements || []).length > 0;
         row.securityRequirements = this.pruneSecurityRequirements(row.securityRequirements, removedSchemeName);
         // Only a custom override that lost ALL its schemes reverts to inherit. A Public override
@@ -511,7 +302,7 @@ export class OasDocDetailComponent implements OnInit {
               ? this.renameSecurityRequirements(reqs, previousSchemeName, newName)
               : this.pruneSecurityRequirements(reqs, previousSchemeName);
             this.oasDoc.securityRequirements = apply(this.oasDoc.securityRequirements);
-            (this.table?.dataSource?.data || []).forEach(row => {
+            this.rows.forEach(row => {
               const hadRequirements = (row.securityRequirements || []).length > 0;
               row.securityRequirements = apply(row.securityRequirements);
               // Preserve a Public override (empty by intent); only revert a custom override that lost all schemes.
@@ -638,7 +429,7 @@ export class OasDocDetailComponent implements OnInit {
         // apply the result to every sibling row sharing the oasOperationId (each gets its own copy).
         // Truthy check: a not-yet-persisted operation has oasOperationId 0 (falsy); never treat those as
         // siblings of one another, otherwise the edit would cross-contaminate unrelated new rows.
-        const siblings = (this.table.dataSource.data || []).filter(r =>
+        const siblings = this.rows.filter(r =>
           !!r.oasOperationId && r.oasOperationId === row.oasOperationId);
         const targets = siblings.length > 0 ? siblings : [row];
         targets.forEach(r => {
@@ -746,7 +537,7 @@ export class OasDocDetailComponent implements OnInit {
   // persisted operation has oasOperationId 0 (falsy) and must never be treated as a sibling.
   private applyErrorResponseBodyType(row: BieForOasDoc, bodyType: string,
                                      confirmTopLevelAsbiepId: number, confirmDen: string): void {
-    const siblings = (this.table.dataSource.data || []).filter(r =>
+    const siblings = this.rows.filter(r =>
       !!r.oasOperationId && r.oasOperationId === row.oasOperationId);
     const targets = siblings.length > 0 ? siblings : [row];
     const clearConfirm = bodyType !== 'CONFIRM_MESSAGE';
@@ -771,7 +562,7 @@ export class OasDocDetailComponent implements OnInit {
   // releases) + a ConfirmMessage BIE, and the server applies it to that release's operations plus
   // bodyless operations.
   applyErrorResponseBodyTypeToAll(): void {
-    if ((this.table.dataSource.data || []).length === 0 && this.paginator.length === 0) {
+    if (this.rows.length === 0 && this.totalRows === 0) {
       return;
     }
     const bodyType = this.bulkErrorResponseBodyType;
@@ -798,7 +589,7 @@ export class OasDocDetailComponent implements OnInit {
           .afterClosed().subscribe((result: OasDocConfirmMessageDialogResult | undefined) => {
             if (!result || !result.topLevelAsbiepId) {
               // Cancelled — refresh the grid so it reflects any edits persisted above.
-              this.loadBieListForOasDoc(true);
+              this.loadBieListForOasDoc();
               return;
             }
             this.sendBulkErrorResponse({
@@ -884,7 +675,7 @@ export class OasDocDetailComponent implements OnInit {
       .subscribe(() => {
         this.snackBar.open('Applied "' + this.bulkBodyTypeLabel(payload.errorResponseBodyType) + '" to all operations.',
           '', {duration: 3000});
-        this.loadBieListForOasDoc(true);
+        this.loadBieListForOasDoc();
       });
   }
 
@@ -935,53 +726,12 @@ export class OasDocDetailComponent implements OnInit {
     return window.location.origin + path;
   }
 
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.selection.clear();
-    this.loadBieListForOasDoc();
-  }
-
-  loadBieListForOasDoc(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.openAPIService.getBieForOasDocListWithRequest(this.request, this.oasDoc).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list.map((elm: BieForOasDoc) => {
-        elm = new BieForOasDoc(elm);
-        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
-        return elm;
-      });
-      this.table.dataSource.data.forEach((elm: BieForOasDoc) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
-        // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
-        // cancelled CONFIRM_MESSAGE choice to its last committed value.
-        this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
-      });
-      this.recomputeOasValidation();
-
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
-    }, error => {
-      this.table.dataSource.data = [];
-      this.businessContextSelection = {};
-    });
+  loadBieListForOasDoc() {
+    this.view().reload();
   }
 
   getChanged(): BieForOasDoc[] {
-    if (!this.table.dataSource) {
-      return [];
-    }
-    return (this.table.dataSource.data || []).filter(e => e.isChanged);
+    return this.rows.filter(e => e.isChanged);
   }
 
   isChanged(): boolean {
@@ -1005,17 +755,9 @@ export class OasDocDetailComponent implements OnInit {
     this.location.back();
   }
 
-  onPageChange(event: PageEvent) {
-    this.loadBieListForOasDoc();
-  }
-
   onChange(property?: string, source?) {
     if (property === 'branch') {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
-    }
-    if (property === 'filters.den') {
-      this.sort.active = '';
-      this.sort.direction = '';
     }
     if (property === 'verb') {
       // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
@@ -1040,19 +782,8 @@ export class OasDocDetailComponent implements OnInit {
     if (this.isOpenApi31()) {
       return false;
     }
-    return (this.table?.dataSource?.data || []).some(
+    return this.rows.some(
       element => element.verb === 'DELETE' && element.messageBody === 'Request');
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.request.updatedDate.end = null;
-        break;
-    }
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -1215,7 +946,7 @@ export class OasDocDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.table.dataSource.data;
+    dialogConfig.data = this.rows;
     dialogConfig.data.webPageInfo = this.webPageInfo;
     dialogConfig.data.oasDoc = this.oasDoc;
     // Default indicator values
@@ -1264,16 +995,10 @@ export class OasDocDetailComponent implements OnInit {
     });
   }
 
-  _updateDataSource(data: BieForOasDoc[]) {
-    this.table.dataSource.data = data;
-    this.oasDoc.bieList = data;
-    this.recomputeOasValidation();
-  }
-
   // Recomputes the operationId + body-slot duplicate sets from the currently loaded rows. Delegates to
   // the shared OasOperationValidator (the single source of truth, also used by the BIE-root panel).
   recomputeOasValidation(): void {
-    this.oasValidator.recompute(this.table?.dataSource?.data || []);
+    this.oasValidator.recompute(this.rows);
   }
 
   // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Rebuilds from the
@@ -1300,22 +1025,6 @@ export class OasDocDetailComponent implements OnInit {
     this.recomputeOasValidation();
   }
 
-  select(row: BieForOasDoc) {
-    this.selection.select(row);
-  }
-
-  isSelected(row: BieForOasDoc) {
-    return this.selection.isSelected(row);
-  }
-
-  toggle(row: BieForOasDoc) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
   isEditable(): boolean {
     return this.access === 'CanEdit';
   }
@@ -1333,6 +1042,12 @@ export class OasDocDetailComponent implements OnInit {
     return false;
   }
 
+  /** The sort of the table, which the generated document follows. */
+  private sortRequest(): PageRequest {
+    const sorts = this.view().query.sorts;
+    return new PageRequest(sorts.map(e => e.active), sorts.map(e => e.direction));
+  }
+
   generate() {
     // Issue #1610: the document is generated from the persisted record, so any pending edit (e.g. an
     // OpenAPI Version change from 3.0 to 3.1, or a new DELETE Request body) would NOT be reflected.
@@ -1344,7 +1059,7 @@ export class OasDocDetailComponent implements OnInit {
       return;
     }
     this.loading = true;
-    this.openAPIService.generateOpenAPI(this.oasDoc.oasDocId, this.request.page).subscribe(resp => {
+    this.openAPIService.generateOpenAPI(this.oasDoc.oasDocId, this.sortRequest()).subscribe(resp => {
       saveAsBlobResponse(resp);
 
       this.loading = false;
@@ -1372,15 +1087,9 @@ export class OasDocDetailComponent implements OnInit {
             this.snackBar.open('Removed', '', {
               duration: 3000,
             });
+            this.selection.clear();
+            this.view().reload();
           });
-          const newData = [];
-          this.table.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
-              newData.push(row);
-            }
-          });
-          this.selection.clear();
-          this._updateDataSource(newData);
         }
       });
   }
@@ -1411,7 +1120,7 @@ export class OasDocDetailComponent implements OnInit {
       this.isUpdating = false;
       this.loading = false;
     })).subscribe(_ => {
-      this.loadBieListForOasDoc(true);
+      this.loadBieListForOasDoc();
       this.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate(this.oasDoc).subscribe(
         resp => {
           if (resp.errorMessages && resp.errorMessages.length > 0) {

@@ -1,28 +1,23 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {HttpErrorResponse} from '@angular/common/http';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 import {BieListService} from './domain/bie-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BieListEntry, BieListRequest} from './domain/bie-list';
+import {BieListEntry} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {Location} from '@angular/common';
+import {Observable, of, ReplaySubject} from 'rxjs';
+import {PageResponse} from '../../basis/basis';
+import {base64Decode, base64Encode, initFilter} from '../../common/utility';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
@@ -30,17 +25,23 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {BieDeprecateDialogComponent} from '../bie-deprecate-dialog/bie-deprecate-dialog.component';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {MailService} from '../../common/score-mail.service';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
-import {BieCreateService} from '../bie-create/domain/bie-create.service';
 import {MultiActionsSnackBarComponent} from '../../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {LibrarySummary} from '../../library-management/domain/library';
+import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {BieDiagramDialogComponent} from '../bie-diagram-dialog/bie-diagram-dialog.component';
 import {BieStateTransitionFlowService} from '../domain/bie-state-transition-flow.service';
 import {StateDependencySelection} from '../domain/state-dependency-target';
+import {BieCreateService} from '../bie-create/domain/bie-create.service';
+import {createTableColumns, defineTable, queryToUrl, ScoreTableViewComponent} from '../../common/score-table';
+import {BIE_FILTERS as F, BIE_TABLE, BIE_URL_FILTERS} from './domain/bie.table';
+
+const BIE_LIST_TABLE = defineTable({
+  ...BIE_TABLE,
+  fixed: [{id: 'more', position: 'end'}],
+  filters: [F.states, F.businessContext, F.version, F.remark, F.deprecated, F.owner, F.updater, F.updatedDate, F.releaseIds,
+    ...BIE_URL_FILTERS],
+});
 
 @Component({
   standalone: false,
@@ -49,226 +50,134 @@ import {StateDependencySelection} from '../domain/state-dependency-target';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-list.component.css']
 })
-export class BieListComponent implements OnInit {
+export class BieListComponent {
   private service = inject(BieListService);
   private bieCreateService = inject(BieCreateService);
   private bieEditService = inject(BieEditService);
-  private accountService = inject(AccountListService);
   private releaseService = inject(ReleaseService);
   private libraryService = inject(LibraryService);
+  private accountService = inject(AccountListService);
   private mailService = inject(MailService);
   private auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
   private clipboard = inject(Clipboard);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   webPageInfo = inject(WebPageInfoService);
   private stateTransitionFlowService = inject(BieStateTransitionFlowService);
 
-
   title = 'BIE';
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = columns;
-    this.updateTableColumnsForBiePage();
-  }
-
-  updateTableColumnsForBiePage() {
-    this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBiePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBiePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'State':
-            if (column.selected) {
-              displayedColumns.push('state');
-            }
-            break;
-          case 'Branch':
-            if (column.selected) {
-              displayedColumns.push('branch');
-            }
-            break;
-          case 'DEN':
-            if (column.selected) {
-              displayedColumns.push('den');
-            }
-            break;
-          case 'Owner':
-            if (column.selected) {
-              displayedColumns.push('owner');
-            }
-            break;
-          case 'Business Contexts':
-            if (column.selected) {
-              displayedColumns.push('businessContexts');
-            }
-            break;
-          case 'Version':
-            if (column.selected) {
-              displayedColumns.push('version');
-            }
-            break;
-          case 'Status':
-            if (column.selected) {
-              displayedColumns.push('status');
-            }
-            break;
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('bizTerm');
-            }
-            break;
-          case 'Remark':
-            if (column.selected) {
-              displayedColumns.push('remark');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    displayedColumns.push('more');
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<BieListEntry>();
+  readonly libraryChoice = new LibraryChoice(this.auth);
+  readonly columns = createTableColumns(BIE_LIST_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BieListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<BieListEntry>(true, [],
     true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
-  loading = false;
 
-  loginIdList: string[] = [];
+  /** The list is of a library: it waits for it, and loads again when another one is chosen. */
+  readonly ready = signal(false);
+  readonly extraParams = signal<Record<string, string>>({});
+  /** While an action is in progress. */
+  readonly busy = signal(false);
+
+  /** The branches of the library that the BIEs can be of, and those chosen. */
   releases: ReleaseSummary[] = [];
-  libraries: LibrarySummary[] = [];
-  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
-  releaseListFilterCtrl: FormControl = new FormControl();
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['WIP', 'QA', 'Production'];
-  request: BieListRequest;
-  preferencesInfo: PreferencesInfo;
+  selectedReleases: ReleaseSummary[] = [];
+  readonly releaseListFilterCtrl = new FormControl();
+  readonly filteredReleaseList = new ReplaySubject<ReleaseSummary[]>(1);
 
   contextMenuItem: BieListEntry;
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
 
-  ngOnInit() {
-    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
+  /** A library that none of the BIEs belong to has nothing to ask for. */
+  readonly load = (params: HttpParams): Observable<PageResponse<BieListEntry>> => params.has('libraryId') ?
+    this.service.getBieListPage(params) : of({length: 0, page: 0, size: 0, list: []});
+  readonly rowSelectable = (row: BieListEntry) => this.isAdmin || row.owner.loginId === this.username;
 
+  constructor() {
+    afterNextRender(() => this.start());
+  }
+
+  /** Once the table view has the query of the URL: the library that it works for, and the branches that it asks for. */
+  private start() {
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
-      this.initLibraries(libraries);
-
-      this.searchBar.showAdvancedSearch =
-        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-      this.paginator.pageIndex = this.request.page.pageIndex;
-      this.paginator.pageSize = this.request.page.pageSize;
-      this.paginator.length = 0;
-
-      this.sort.active = this.request.page.sortActive;
-      this.sort.direction = this.request.page.sortDirection as SortDirection;
-      // Prevent the sorting event from being triggered if any columns are currently resizing.
-      const originalSort = this.sort.sort;
-      this.sort.sort = (sortChange) => {
-        if (this.tableColumnResizeDirectives &&
-          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-          return;
-        }
-        originalSort.apply(this.sort, [sortChange]);
-      };
-      this.sort.sortChange.subscribe(() => {
-        this.onSearch();
-      });
-
-      forkJoin([
-        this.accountService.getAccountNames(),
-        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']),
-        this.preferencesService.load(this.auth.getUserToken())
-      ]).subscribe(([loginIds, releases, preferencesInfo]) => {
-        this.preferencesInfo = preferencesInfo;
-
-        this.loginIdList.push(...loginIds);
-        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
+      this.libraryChoice.init(libraries);
+      this.applyLibrary();
+      const libraryId = this.libraryChoice.library?.libraryId;
+      if (!libraryId) {
+        this.ready.set(true);
+        return;
+      }
+      this.releaseService.getReleaseSummaryList(libraryId, ['Published']).subscribe(releases => {
         this.initReleases(releases);
-
-        this.loadBieList(true);
+        this.ready.set(true);
       });
     });
+  }
+
+  private applyLibrary() {
+    const libraryId = this.libraryChoice.library?.libraryId;
+    this.extraParams.set(libraryId ? {libraryId: '' + libraryId} : {});
+  }
+
+  /** The branches that the URL asks for are among those of the library. */
+  private initReleases(releases: ReleaseSummary[]) {
+    this.releases = releases.filter(e => !e.workingRelease);
+    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+    const requested = (this.view().filterValue('releaseIds') as string[] | undefined) ?? [];
+    this.selectedReleases = requested.map(id => this.releases.find(r => '' + r.releaseId === id)).filter(e => !!e);
+    this.applyReleases();
+  }
+
+  /** The branches that are chosen go to the query: searching is the user's (or the library's change's) call. */
+  applyReleases() {
+    this.view().setFilter('releaseIds', this.selectedReleases.map(e => '' + e.releaseId));
+  }
+
+  toggleAllForReleaseFilter(selectAllValue: boolean) {
+    this.selectedReleases = selectAllValue ? this.releases : [];
+    this.applyReleases();
+  }
+
+  onLibraryChange(library?: LibrarySummary) {
+    this.libraryChoice.choose(library);
+    this.selectedReleases = [];
+    this.applyReleases();
+    if (!library?.libraryId) {
+      this.releases = [];
+      this.filteredReleaseList.next([]);
+      this.applyLibrary();
+      this.view().onSearch();
+      return;
+    }
+    this.releaseService.getReleaseSummaryList(library.libraryId, ['Published']).subscribe(releases => {
+      this.initReleases(releases);
+      // A change of the library's parameter searches by itself.
+      this.applyLibrary();
+    });
+  }
+
+  /** The search part of a link to the list that shows the BIE (a `q=` of the current query, with what the link says). */
+  linkQuery(extras: { [key: string]: any }): string {
+    const q = queryToUrl(BIE_LIST_TABLE, this.view().query);
+    let params = new HttpParams({fromString: base64Decode(q.substring('q='.length))});
+    Object.keys(extras).forEach(key => {
+      params = params.set(key, extras[key]);
+    });
+    return 'q=' + base64Encode(params.toString());
+  }
+
+  create() {
+    if (!this.libraryChoice.library?.libraryId) {
+      return;
+    }
+    this.router.navigateByUrl('/profile_bie/create');
+  }
+
+  selectionClear() {
+    this.selection = new SelectionModel<BieListEntry>(true, [],
+      true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   }
 
   get username(): string {
@@ -287,168 +196,6 @@ export class BieListComponent implements OnInit {
 
   get isAdmin(): boolean {
     return this.auth.isAdmin();
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadBieList();
-  }
-
-  onChange(property?: string, source?) {
-    if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
-    }
-    if (property === 'filters.den' && !!source) {
-      this.request.page.sortActive = '';
-      this.request.page.sortDirection = '';
-      this.sort.active = '';
-      this.sort.direction = '';
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  toggleAllForReleaseFilter(selectAllValue: boolean) {
-    if (selectAllValue) {
-      this.request.releases = this.releases;
-    } else {
-      this.request.releases = [];
-    }
-  }
-
-  initLibraries(libraries: LibrarySummary[]) {
-    this.libraries = libraries;
-    if (this.libraries.length > 0) {
-      const savedLibraryId = loadLibrary(this.auth.getUserToken());
-      if (savedLibraryId) {
-        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
-      }
-      if (!this.request.library || !this.request.library.libraryId) {
-        this.request.library = this.libraries.find(e => e.isDefault) || this.libraries[0];
-      }
-      if (this.request.library) {
-        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      }
-      this.mappedLibraries = this.libraries.map(e => {
-        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
-      });
-    }
-  }
-
-  initReleases(releases: ReleaseSummary[]) {
-    this.releases = releases.filter(e => !e.workingRelease);
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
-    this.request.releases = this.request.releases.map(e => this.releases.find(r => e.releaseId === r.releaseId));
-  }
-
-  onLibraryChange(library?: LibrarySummary) {
-    this.request.library = library;
-    this.request.releases = [];
-    if (!this.request.library?.libraryId) {
-      saveLibrary(this.auth.getUserToken(), undefined);
-      this.releases = [];
-      this.filteredReleaseList.next([]);
-      this.onSearch();
-      return;
-    }
-    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
-      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      this.initReleases(releases);
-      this.onSearch();
-    });
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadBieList();
-  }
-
-  loadBieList(isInit?: boolean) {
-    if (!this.request.library?.libraryId) {
-      this.loading = false;
-      this.selection.clear();
-      this.dataSource.data = [];
-      this.paginator.length = 0;
-      return;
-    }
-
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getBieListWithRequest(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
-  }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  create() {
-    if (!this.request.library?.libraryId) {
-      return;
-    }
-    this.router.navigateByUrl('/profile_bie/create');
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.filter(row => (this.isAdmin) || row.owner.loginId === this.username).length;
-    return numSelected > 0 && numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: BieListEntry) {
-    if ((this.isAdmin) || row.owner.loginId === this.username) {
-      this.selection.select(row);
-    }
-  }
-
-  toggle(row: BieListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BieListEntry): boolean {
-    if (!row) {
-      return false;
-    }
-    return this.selection.isSelected(row);
-  }
-
-  selectionClear() {
-    this.selection = new SelectionModel<BieListEntry>(true, [],
-      true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   }
 
   isEditable(element: BieListEntry): boolean {
@@ -482,7 +229,7 @@ export class BieListComponent implements OnInit {
   }
 
   openDialogBieDiscard(bieLists: BieListEntry[]) {
-    this.loading = true;
+    this.busy.set(true);
     this.stateTransitionFlowService.requestDependencySelection({
       state: 'Discard',
       rootTopLevelAsbiepIds: bieLists.map(e => e.topLevelAsbiepId),
@@ -493,7 +240,7 @@ export class BieListComponent implements OnInit {
           selection),
       normalizeTargets: (dependencyTargets) => {
         const selectedTopLevelAsbiepIdSet = new Set(bieLists.map(e => e.topLevelAsbiepId));
-        const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
+        const visibleTopLevelAsbiepIdSet = new Set(this.view().dataSource.data.map(e => e.topLevelAsbiepId));
         return dependencyTargets.map(target => ({
           ...target,
           selectable: target.selectable !== false,
@@ -505,30 +252,30 @@ export class BieListComponent implements OnInit {
       }
     }).pipe(
       finalize(() => {
-        this.loading = false;
+        this.busy.set(false);
       })
     ).subscribe((selection?: StateDependencySelection) => {
       if (selection === undefined) {
         return;
       }
-      this.loading = true;
+      this.busy.set(true);
       this.service.delete(
         bieLists.map(e => e.topLevelAsbiepId),
         selection.topLevelAsbiepIds
       ).pipe(finalize(() => {
-        this.loading = false;
+        this.busy.set(false);
       })).subscribe(_ => {
         this.snackBar.open('Discarded', '', {
           duration: 3000,
         });
         this.selectionClear();
-        this.loadBieList();
+        this.view().reload();
       }, error => {
         this.openStateUpdateErrorDialog(error);
       });
     }, error => {
       this.openStateUpdateErrorDialog(error);
-      this.loading = false;
+      this.busy.set(false);
     });
   }
 
@@ -553,16 +300,16 @@ export class BieListComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((result: AccountList) => {
         if (result) {
-          this.loading = true;
+          this.busy.set(true);
           this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).subscribe(_ => {
             this.snackBar.open('Transferred', '', {
               duration: 3000,
             });
             this.selectionClear();
-            this.loadBieList();
-            this.loading = false;
+            this.view().reload();
+            this.busy.set(false);
           }, error => {
-            this.loading = false;
+            this.busy.set(false);
           });
         }
       });
@@ -570,7 +317,7 @@ export class BieListComponent implements OnInit {
   }
 
   requestOwnershipTransfer(bie: BieListEntry) {
-    this.loading = true;
+    this.busy.set(true);
     this.mailService.sendMail('bie-ownership-transfer-request', bie.owner.userId, {
       parameters: {
         bie_link: window.location.href + '/' + bie.topLevelAsbiepId,
@@ -579,12 +326,12 @@ export class BieListComponent implements OnInit {
         targetLoginId: this.auth.getUserToken().username
       }
     }).subscribe(resp => {
-      this.loading = false;
+      this.busy.set(false);
       this.snackBar.open('Request Sent', '', {
         duration: 3000,
       });
     }, error => {
-      this.loading = false;
+      this.busy.set(false);
     });
   }
 
@@ -604,10 +351,10 @@ export class BieListComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.busy.set(true);
     this.bieCreateService.createInheritedBie(bie.topLevelAsbiepId)
       .pipe(finalize(() => {
-        this.loading = false;
+        this.busy.set(false);
       }))
       .subscribe(_ => {
         this.snackBar.openFromComponent(MultiActionsSnackBarComponent, {
@@ -617,13 +364,13 @@ export class BieListComponent implements OnInit {
             message: 'This may take a moment, so please check back shortly.',
             action: 'Search',
             onAction: (data, snackBarRef) => {
-              this.onSearch();
+              this.view().onSearch();
               snackBarRef.dismissWithAction();
             }
           }
         });
       }, error => {
-        this.loading = false;
+        this.busy.set(false);
       });
   }
 
@@ -687,7 +434,7 @@ export class BieListComponent implements OnInit {
         return false;
     }
 
-    this.loading = true;
+    this.busy.set(true);
     this.stateTransitionFlowService.requestDependencySelection({
       state: action,
       rootTopLevelAsbiepIds: this.selection.selected.map(e => e.topLevelAsbiepId),
@@ -698,7 +445,7 @@ export class BieListComponent implements OnInit {
           selection),
       normalizeTargets: (dependencyTargets) => {
         const selectedTopLevelAsbiepIdSet = new Set(this.selection.selected.map(e => e.topLevelAsbiepId));
-        const visibleTopLevelAsbiepIdSet = new Set(this.dataSource.data.map(e => e.topLevelAsbiepId));
+        const visibleTopLevelAsbiepIdSet = new Set(this.view().dataSource.data.map(e => e.topLevelAsbiepId));
         return dependencyTargets.map(target => ({
           ...target,
           selectable: target.selectable !== false,
@@ -713,13 +460,13 @@ export class BieListComponent implements OnInit {
       }
     }).pipe(
       finalize(() => {
-        this.loading = false;
+        this.busy.set(false);
       })
     ).subscribe((selection?: StateDependencySelection) => {
       if (selection === undefined) {
         return;
       }
-      this.loading = true;
+      this.busy.set(true);
       this.service.updateStateOnList(
         actionType,
         toState,
@@ -728,10 +475,10 @@ export class BieListComponent implements OnInit {
         selection.codeListManifestIds
       ).pipe(
         finalize(() => {
-          this.loading = false;
+          this.busy.set(false);
         })
       ).subscribe(_ => {
-        this.loadBieList();
+        this.view().reload();
         this.snackBar.open(notiMsg, '', {
           duration: 3000
         });
@@ -741,7 +488,7 @@ export class BieListComponent implements OnInit {
       });
     }, error => {
       this.openStateUpdateErrorDialog(error);
-      this.loading = false;
+      this.busy.set(false);
     });
   }
 
@@ -780,16 +527,16 @@ export class BieListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.loading = true;
+        this.busy.set(true);
         this.service.transferOwnershipOnList(this.selection.selected, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
-          this.loadBieList();
+          this.view().reload();
           this.selectionClear();
-          this.loading = false;
+          this.busy.set(false);
         }, error => {
-          this.loading = false;
+          this.busy.set(false);
         });
       }
     });
@@ -807,16 +554,16 @@ export class BieListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.loading = true;
+        this.busy.set(true);
         this.bieEditService.deprecate(bie.topLevelAsbiepId, result['reason'], result['remark']).subscribe(_ => {
           this.snackBar.open('Deprecated', '', {
             duration: 3000,
           });
-          this.loadBieList();
+          this.view().reload();
           this.selectionClear();
-          this.loading = false;
+          this.busy.set(false);
         }, error => {
-          this.loading = false;
+          this.busy.set(false);
         });
       }
     });

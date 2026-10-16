@@ -1,237 +1,30 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
-import {AccountListEntry, AccountListRequest} from '../domain/accounts';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {AuthService} from '../../authentication/auth.service';
-import {AccountListService} from '../domain/account-list.service';
-import {Location} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
-import {PageRequest} from '../../basis/basis';
-import {finalize} from 'rxjs/operators';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {HttpParams} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {forkJoin} from 'rxjs';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {AccountListEntry} from '../domain/accounts';
+import {AccountListService} from '../domain/account-list.service';
+import {ACCOUNT_TABLE} from '../domain/account.table';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {createTableColumns} from '../../common/score-table';
 
 @Component({
   standalone: false,
   selector: 'score-transfer-ownership-list',
   templateUrl: './transfer-ownership-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./transfer-ownership-list.component.css']
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class TransferOwnershipListComponent implements OnInit {
-  private auth = inject(AuthService);
+export class TransferOwnershipListComponent {
   private service = inject(AccountListService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private snackBar = inject(MatSnackBar);
-  private location = inject(Location);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
 
-
-  title = 'Transfer Ownership';
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfAccountPage = columns;
-    this.updateTableColumnsForAccountPage();
-  }
-
-  updateTableColumnsForAccountPage() {
-    this.preferencesService.updateTableColumnsForAccountPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfAccountPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForAccountPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Login ID':
-          if (column.selected) {
-            displayedColumns.push('loginId');
-          }
-          break;
-        case 'Role':
-          if (column.selected) {
-            displayedColumns.push('role');
-          }
-          break;
-        case 'Name':
-          if (column.selected) {
-            displayedColumns.push('name');
-          }
-          break;
-        case 'Organization':
-          if (column.selected) {
-            displayedColumns.push('organization');
-          }
-          break;
-        case 'Status':
-          if (column.selected) {
-            displayedColumns.push('status');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
+  readonly columns = createTableColumns(ACCOUNT_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);
-  dataSource = new MatTableDataSource<AccountListEntry>();
-  loading = false;
+  /** While the ownership is being transferred. */
+  readonly busy = signal(false);
 
-  request: AccountListRequest;
-  preferencesInfo: PreferencesInfo;
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
-
-  ngOnInit() {
-    this.request = new AccountListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('name', 'asc', 0, 10));
-
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    forkJoin([
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-
-      this.loadAccounts(true);
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadAccounts();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadAccounts();
-  }
-
-  loadAccounts(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getAccountsList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-      this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  toggle(row: AccountListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: AccountListEntry) {
-    return this.selection.isSelected(row);
-  }
-
-  select(row: AccountListEntry) {
-    this.selection.select(row);
-  }
+  readonly load = (params: HttpParams) => this.service.getAccountsListPage(params);
 
   transferOwnership(row: AccountListEntry): void {
     const dialogConfig = this.confirmDialogService.newConfig();
@@ -245,19 +38,18 @@ export class TransferOwnershipListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.loading = true;
+          this.busy.set(true);
           this.service.transferOwnership(row.userId).subscribe(_ => {
-            this.loading = false;
+            this.busy.set(false);
             this.selection.clear();
 
             this.snackBar.open('Transferred', '', {
               duration: 3000,
             });
           }, error => {
-            this.loading = false;
+            this.busy.set(false);
           });
         }
       });
   }
-
 }

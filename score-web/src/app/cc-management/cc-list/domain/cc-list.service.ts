@@ -143,6 +143,11 @@ export class CcListService {
       params = params.set('isBIEUsable', '' + request.isBIEUsable);
     }
 
+    return this.getCcListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getCcListPage(params: HttpParams): Observable<PageResponse<CcListEntry>> {
     return this.http.get<PageResponse<CcListEntry>>('/api/core-components', {params}).pipe(
         map((res: PageResponse<CcListEntry>) => ({
           ...res,

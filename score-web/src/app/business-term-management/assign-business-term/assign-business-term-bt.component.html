@@ -1,135 +1,9 @@
-<score-wizard-page [title]="title" [subtitle]="subtitle" tableWrapperClass="mat-elevation-z1 table-wrapper" [showColumns]="false" [loading]="loading">
-  <score-search-bar listFilter placeholder="Search by Business Term" [(model)]="request.filters.businessTerm"
-    (modelChange)="onChange('filters.businessTerm', request.filters.businessTerm);"
-    (searchTriggered)="onSearch();">
-    <div advancedSearchContent style="padding-left: 3rem;">
-      <mat-card-content class="mat-card-container">
-        <div class="container-fluid" style="padding: 0;">
-          <div class="row">
-            <div class="col-md-2 col-sm-12">
-              <mat-form-field>
-                <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
-                  <mat-option>
-                    <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
-                      [placeholderLabel]="'Search...'"
-                    [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  </mat-option>
-                  @for (loginId of filteredUpdaterIdList | async; track loginId) {
-                    <mat-option [value]="loginId">
-                      {{loginId}}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            </div>
+<score-wizard-page [title]="title" [subtitle]="subtitle">
+  <score-table-view #tableView [table]="columns" [load]="load" [ready]="ready()" [syncUrl]="false"
+    [selection]="selection" [rowKey]="rowKey" [columnSelector]="false" searchClearsSort rowHover>
 
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated start date</mat-label>
-                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                  [(ngModel)]="request.updatedDate.start" [max]="request.updatedDate.end">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12 d-flex">
-              <mat-form-field>
-                <mat-label>Updated end date</mat-label>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                  [(ngModel)]="request.updatedDate.end" [min]="request.updatedDate.start">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>External Reference URI</mat-label>
-                  <input matInput [(ngModel)]="request.filters.externalReferenceUri"
-                    (ngModelChange)="onChange('filters.externalReferenceUri', request.filters.externalReferenceUri)"
-                    (keyup.enter)="this.onSearch();"
-                    placeholder="External Reference URI">
-                </mat-form-field>
-              </div>
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>External Reference ID</mat-label>
-                  <input matInput [(ngModel)]="request.filters.externalReferenceId"
-                    (ngModelChange)="onChange('filters.externalReferenceId', request.filters.externalReferenceId)"
-                    (keyup.enter)="this.onSearch();"
-                    placeholder="External Reference ID">
-                </mat-form-field>
-              </div>
-              <div class="col-md-2 col-sm-12">
-                <mat-form-field>
-                  <mat-label>Definition</mat-label>
-                  <input matInput [(ngModel)]="request.filters.definition"
-                    (ngModelChange)="onChange('filters.definition', request.filters.definition)"
-                    (keyup.enter)="this.onSearch();"
-                    placeholder="Definition">
-                </mat-form-field>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid" style="padding: 0;">
-            <div class="row">
-              <div class="col-md-2 col-sm-12">
-                <div class="checkbox">
-                  <mat-checkbox color="primary"
-                    data-id="request.searchByCC"
-                    [(ngModel)]="request.filters.searchByCC">
-                    Filter by same CC
-                  </mat-checkbox>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </div>
-  </score-search-bar>
-  <table listTable mat-table multiTemplateDataRows
-    matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction" [matSortStart]="'desc'"
-    [dataSource]="dataSource">
-
-    <ng-container matColumnDef="select">
-      <th mat-header-cell *matHeaderCellDef>
-        <mat-checkbox (change)="$event ? masterToggle() : null"
-          [checked]="selection.hasValue() && isAllSelected()"
-          [indeterminate]="selection.hasValue() && !isAllSelected()">
-        </mat-checkbox>
-      </th>
-      <td mat-cell *matCellDef="let row">
-        <mat-checkbox (click)="$event.stopPropagation()"
-          (change)="$event ? toggle(row) : null"
-          [checked]="isSelected(row)">
-        </mat-checkbox>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="businessTerm">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('Business Term')" (onResize)="onResizeWidth($event)"> Business Term</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="businessTerm">
+      <td score-cell *scoreCellDef="let element">
         <a target="_blank" rel="noopener noreferrer"
           href="/business_term_management/business_term/{{ element.businessTermId }}">
           <span class="score-line-clamp-2 score-break-word">{{ element.businessTerm }}</span>
@@ -140,48 +14,32 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="externalReferenceUri">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('External Reference URI')" (onResize)="onResizeWidth($event)"> External Reference URI</th>
-      <td mat-cell *matCellDef="let element"><span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span></td>
+    <ng-container scoreColumnDef="externalReferenceUri">
+      <td score-cell *scoreCellDef="let element"><span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceUri }}</span></td>
     </ng-container>
 
-    <ng-container matColumnDef="externalReferenceId">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('External Reference ID')" (onResize)="onResizeWidth($event)"> External Reference ID</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="externalReferenceId">
+      <td score-cell *scoreCellDef="let element">
         <span class="score-line-clamp-2 score-break-word">{{ element.externalReferenceId }}</span>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="definition">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('Definition')" (onResize)="onResizeWidth($event)"> Definition</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="definition">
+      <td score-cell *scoreCellDef="let element">
         <div class="description score-line-clamp-2 score-break-word"
-        [innerHTML]="element.definition | highlight : highlightText : ['bg-warning']"></div>
+        [innerHTML]="element.definition | highlight : tableView.applied('definition') : ['bg-warning']"></div>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="lastUpdateTimestamp">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header
-      score-table-column-resize [defaultWidth]="width('Updated On')" (onResize)="onResizeWidth($event)"> Updated on</th>
-      <td mat-cell *matCellDef="let element">
+    <ng-container scoreColumnDef="lastUpdateTimestamp">
+      <td score-cell *scoreCellDef="let element">
         <div class="score-line-clamp-2 score-break-word">
           <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
     </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-    (click)="toggle(row)"></tr>
-  </table>
-  <mat-paginator listTable
-    [pageSizeOptions]="[10, 25, 50]"
-    (page)="onPageChange($event)"
-  showFirstLastButtons></mat-paginator>
+  </score-table-view>
   <ng-container ngProjectAs="[listExtra]">
     <mat-card class="mt-3">
       <mat-card-content class="mat-card-container">
@@ -201,11 +59,11 @@
   </ng-container>
   <ng-container ngProjectAs="[wizardActions]">
     <button mat-raised-button color="warn" (click)="back()"
-      [disabled]="loading">
+      [disabled]="busy()">
       Back
     </button>
     <button mat-raised-button color="primary" (click)="create()"
-      [hidden]="dataSource.data.length == 0"
+      [hidden]="view().dataSource.data.length == 0"
       [disabled]="isCreateDisabled()">
       Create
     </button>

@@ -1,7 +1,7 @@
 import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {ContextCategoryDetails, ContextCategoryListEntry, ContextCategoryListRequest, ContextCategorySummary} from './context-category';
+import {ContextCategoryDetails, ContextCategoryListEntry, ContextCategorySummary} from './context-category';
 import {ContextScheme} from '../../context-scheme/domain/context-scheme';
 import {PageResponse} from '../../../basis/basis';
 import {map} from 'rxjs/operators';
@@ -18,29 +18,7 @@ export class ContextCategoryService implements OnInit {
     return this.http.get<ContextCategorySummary[]>('/api/context-categories/summaries');
   }
 
-  getContextCategoryList(request: ContextCategoryListRequest): Observable<PageResponse<ContextCategoryListEntry>> {
-    let params = new HttpParams()
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
-
+  getContextCategoryList(params: HttpParams): Observable<PageResponse<ContextCategoryListEntry>> {
     return this.http.get<PageResponse<ContextCategoryListEntry>>('/api/context-categories', {params}).pipe(
         map((res: PageResponse<ContextCategoryListEntry>) => ({
           ...res,

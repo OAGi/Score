@@ -1,35 +1,15 @@
-import {Component, inject, OnInit, QueryList, ViewChild, ViewChildren, ChangeDetectionStrategy} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {forkJoin} from 'rxjs';
 import {finalize} from 'rxjs/operators';
-import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {PageRequest} from '../../../basis/basis';
-import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {BusinessTermService} from '../../../business-term-management/domain/business-term.service';
-import {
-  BieToAssign,
-  BusinessTermListEntry,
-  BusinessTermListRequest
-} from '../../../business-term-management/domain/business-term';
-import {AuthService} from '../../../authentication/auth.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {
-  SettingsPreferencesService
-} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {
-  ScoreTableColumnResizeDirective
-} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {initFilter} from '../../../common/utility';
+import {BieToAssign, BusinessTermListEntry} from '../../../business-term-management/domain/business-term';
+import {BUSINESS_TERM_TABLE} from '../../../business-term-management/domain/business-term.table';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 
 export interface BieBusinessTermAssignDialogData {
   // The BIE node the term is assigned to. bieType is 'ASBIE' or 'BBIE'; bieId is the asbieId/bbieId.
@@ -37,6 +17,11 @@ export interface BieBusinessTermAssignDialogData {
   bieType: string;
   den: string;
 }
+
+const BIE_BUSINESS_TERM_ASSIGN_TABLE = defineTable({
+  ...BUSINESS_TERM_TABLE,
+  defaultSort: [{active: 'businessTerm', direction: 'asc'}],
+});
 
 /**
  * Issue #1754: in-place Business Term assignment from the BIE editor. This is the "pick a term" step lifted from
@@ -53,271 +38,36 @@ export interface BieBusinessTermAssignDialogData {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-business-term-assign-dialog.component.css']
 })
-export class BieBusinessTermAssignDialogComponent implements OnInit {
+export class BieBusinessTermAssignDialogComponent {
   private businessTermService = inject(BusinessTermService);
-  private accountService = inject(AccountListService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private auth = inject(AuthService);
-  private preferencesService = inject(SettingsPreferencesService);
   private snackBar = inject(MatSnackBar);
   dialogRef = inject(MatDialogRef<BieBusinessTermAssignDialogComponent>);
   data: BieBusinessTermAssignDialogData = inject(MAT_DIALOG_DATA);
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBusinessTermPage = columns;
-    this.syncDisplayedColumns();
-    this.updateTableColumnsForBusinessTermPage();
-  }
-
-  loading = false;
-  table: TableData<BusinessTermListEntry>;
+  readonly columns = createTableColumns(BIE_BUSINESS_TERM_ASSIGN_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BusinessTermListEntry>>(ScoreTableViewComponent);
   // Multi-select: assign every selected businessTermId to the current BIE.
   selection = new SelectionModel<number>(true, []);
-  request: BusinessTermListRequest;
-  biesToAssign: BieToAssign[] = [];
-  highlightText: string;
-  preferencesInfo: PreferencesInfo = new PreferencesInfo();
-  loginIdList: string[] = [];
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
 
+  /** While the terms are being assigned. */
+  readonly busy = signal(false);
+  biesToAssign: BieToAssign[] = this.biesToAssignOf();
   typeCode = '';
   private readonly primaryIndicator = false;
 
-  readonly defaultDisplayedColumns = [
-    {id: 'select', name: '', isActive: true},
-    {id: 'businessTerm', name: 'Business Term', isActive: true},
-    {id: 'externalReferenceUri', name: 'External Reference URI', isActive: true},
-    {id: 'externalReferenceId', name: 'External Reference ID', isActive: true},
-    {id: 'definition', name: 'Definition', isActive: true},
-    {id: 'lastUpdateTimestamp', name: 'Updated On', isActive: true},
-  ];
+  readonly load = (params: HttpParams) => this.businessTermService.getBusinessTermListPage(params);
+  readonly rowKey = (row: BusinessTermListEntry) => row.businessTermId;
 
-  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-
-  ngOnInit(): void {
-    this.table = new TableData<BusinessTermListEntry>(this.defaultDisplayedColumns, {});
-    this.table.dataSource = new MatMultiSortTableDataSource<BusinessTermListEntry>(this.sort, false);
-
-    this.request = new BusinessTermListRequest(undefined, new PageRequest(['businessTerm'], ['asc'], 0, 10));
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.paginator.length = 0;
-    this.table.sortParams = this.request.page.sortActives;
-    this.table.sortDirs = this.request.page.sortDirections;
-    this.table.sortObservable.subscribe(() => this.onSearch());
-    this.syncDisplayedColumns();
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-
+  private biesToAssignOf(): BieToAssign[] {
     const bie = new BieToAssign();
     bie.bieId = this.data.bieId;
     bie.bieType = this.data.bieType;
-    this.biesToAssign = [bie];
-
-    forkJoin([
-      this.accountService.getAccountNames(),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([loginIds, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
-      this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-      this.syncDisplayedColumns();
-    });
-    this.loadBusinessTermList();
-  }
-
-  onColumnsReset(): void {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBusinessTermPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]): void {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event): void {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string): void {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBusinessTermPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  updateTableColumnsForBusinessTermPage(): void {
-    this.preferencesService.updateTableColumnsForBusinessTermPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  private getDisplayedColumns(): string[] {
-    const displayedColumns = ['select'];
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Business Term':
-          if (column.selected) {
-            displayedColumns.push('businessTerm');
-          }
-          break;
-        case 'External Reference URI':
-          if (column.selected) {
-            displayedColumns.push('externalReferenceUri');
-          }
-          break;
-        case 'External Reference ID':
-          if (column.selected) {
-            displayedColumns.push('externalReferenceId');
-          }
-          break;
-        case 'Definition':
-          if (column.selected) {
-            displayedColumns.push('definition');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  private syncDisplayedColumns(): void {
-    if (this.table) {
-      this.table.displayedColumns = this.getDisplayedColumns();
-    }
-  }
-
-  onChange(property?: string, source?): void {
-  }
-
-  reset(type: string): void {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onPageChange(_event: PageEvent): void {
-    this.loadBusinessTermList();
-  }
-
-  onSearch(): void {
-    this.paginator.pageIndex = 0;
-    this.loadBusinessTermList();
-  }
-
-  loadBusinessTermList(): void {
-    this.loading = true;
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.businessTermService.getBusinessTermList(this.request, this.biesToAssign).pipe(
-      finalize(() => this.loading = false)
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list;
-      this.highlightText = this.request.filters.definition;
-    }, _error => {
-      this.table.dataSource.data = [];
-    });
-  }
-
-  select(row: BusinessTermListEntry): void {
-    // `row.used` is a catalog-level deletion guard, not an assignment guard.
-    this.selection.select(row.businessTermId);
-  }
-
-  toggle(row: BusinessTermListEntry): void {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.businessTermId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: BusinessTermListEntry): boolean {
-    return this.selection.isSelected(row.businessTermId);
-  }
-
-  private visibleRows(): BusinessTermListEntry[] {
-    return this.table?.dataSource?.data || [];
-  }
-
-  isAllSelected(): boolean {
-    const rows = this.visibleRows();
-    return rows.length > 0 && rows.every(row => this.isSelected(row));
-  }
-
-  isPartiallySelected(): boolean {
-    const rows = this.visibleRows();
-    return rows.some(row => this.isSelected(row)) && !this.isAllSelected();
-  }
-
-  masterToggle(): void {
-    if (this.isAllSelected()) {
-      this.visibleRows().forEach(row => this.selection.deselect(row.businessTermId));
-    } else {
-      this.visibleRows().forEach(row => this.select(row));
-    }
+    return [bie];
   }
 
   isCreateDisabled(): boolean {
-    return this.loading || this.selection.selected.length === 0;
+    return this.busy() || this.view().loading() || this.selection.selected.length === 0;
   }
 
   create(): void {
@@ -325,11 +75,11 @@ export class BieBusinessTermAssignDialogComponent implements OnInit {
       return;
     }
     const businessTermIds = [...this.selection.selected];
-    this.loading = true;
+    this.busy.set(true);
     this.checkUniqueness(
       businessTermIds,
       () => this.doCreate(businessTermIds),
-      () => this.loading = false
+      () => this.busy.set(false)
     );
   }
 
@@ -363,7 +113,7 @@ export class BieBusinessTermAssignDialogComponent implements OnInit {
       this.businessTermService.assignBusinessTermToBie(businessTermId, this.biesToAssign,
         this.primaryIndicator, this.typeCode)
     )).pipe(
-      finalize(() => this.loading = false)
+      finalize(() => this.busy.set(false))
     ).subscribe({
       next: () => {
         this.snackBar.open(

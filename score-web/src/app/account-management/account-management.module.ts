@@ -8,6 +8,7 @@ import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanAc
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
+import {SCORE_TABLE} from '../common/score-table';
 import {AccountListComponent} from './account-list/account-list.component';
 import {AccountListService} from './domain/account-list.service';
 import {AccountDetailComponent} from './account-detail/account-detail.component';
@@ -102,7 +103,8 @@ const routes: Routes = [
     CommonModule,
     SearchBarModule,
     ColumnSelectorModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    ...SCORE_TABLE
   ],
   declarations: [
     AccountListComponent,

@@ -1,31 +1,45 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {SelectionModel} from '@angular/cdk/collections';
-import {ActivatedRoute, Router} from '@angular/router';
-import {AccountList} from '../../account-management/domain/accounts';
-import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
-import {NamespaceListEntry, NamespaceListRequest} from '../domain/namespace';
-import {NamespaceService} from '../domain/namespace.service';
-import {PageRequest} from '../../basis/basis';
-import {initFilter, loadLibrary, saveLibrary} from '../../common/utility';
-import {AccountListService} from '../../account-management/domain/account-list.service';
-import {Location} from '@angular/common';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
+import {Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {AccountList} from '../../account-management/domain/accounts';
 import {AuthService} from '../../authentication/auth.service';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {LibrarySummary} from '../../library-management/domain/library';
+import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {NamespaceListEntry} from '../domain/namespace';
+import {NamespaceService} from '../domain/namespace.service';
+
+const NAMESPACE_TABLE = defineTable({
+  storageKey: 'TableColumns-NamespacePage',
+  columns: [
+    {id: 'uri', label: 'URI', width: 0, sortable: true},
+    {id: 'prefix', label: 'Prefix', width: 100, sortable: true},
+    {id: 'owner', label: 'Owner', width: 140, sortable: true},
+    {id: 'std', label: 'Standard', width: 100, sortable: true},
+    {id: 'description', label: 'Description', width: 400, sortable: true},
+    {id: 'lastUpdateTimestamp', label: 'Updated On', header: 'Updated on', width: 160, sortable: true},
+  ],
+  fixed: [{id: 'more', position: 'end', width: 40}],
+  defaultSort: {active: 'lastUpdateTimestamp', direction: 'desc'},
+  search: {key: 'uri', placeholder: 'Search by URI'},
+  filters: [
+    {type: 'updater', key: 'ownerLoginIdList', label: 'Owner'},
+    {type: 'updater', key: 'updaterLoginIdList', label: 'Updater'},
+    {type: 'dateRange', key: 'updatedDate', label: 'Updated', httpParam: 'lastUpdatedOn'},
+    {type: 'text', key: 'description', label: 'Description'},
+    {type: 'text', key: 'prefix', label: 'Prefix'},
+    {
+      type: 'select', key: 'standard', label: 'Standard',
+      options: [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}]
+    },
+  ],
+});
 
 @Component({
   standalone: false,
@@ -37,306 +51,46 @@ import {LibraryService} from '../../library-management/domain/library.service';
 export class NamespaceListComponent implements OnInit {
   private service = inject(NamespaceService);
   private libraryService = inject(LibraryService);
-  private accountService = inject(AccountListService);
   private auth = inject(AuthService);
+  private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
-  private location = inject(Location);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private dialog = inject(MatDialog);
-
 
   title = 'Namespace';
+  readonly libraryChoice = new LibraryChoice(this.auth);
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfNamespacePage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfNamespacePage = columns;
-    this.updateTableColumnsForNamespacePage();
-  }
-
-  updateTableColumnsForNamespacePage() {
-    this.preferencesService.updateTableColumnsForNamespacePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfNamespacePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForNamespacePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'URI':
-          if (column.selected) {
-            displayedColumns.push('uri');
-          }
-          break;
-        case 'Prefix':
-          if (column.selected) {
-            displayedColumns.push('prefix');
-          }
-          break;
-        case 'Owner':
-          if (column.selected) {
-            displayedColumns.push('owner');
-          }
-          break;
-        case 'Standard':
-          if (column.selected) {
-            displayedColumns.push('std');
-          }
-          break;
-        case 'Description':
-          if (column.selected) {
-            displayedColumns.push('description');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<NamespaceListEntry>();
-  selection = new SelectionModel<number>(true, []);
-  loading = false;
-
-  libraries: LibrarySummary[] = [];
-  mappedLibraries: {library: LibrarySummary, selected: boolean}[] = [];
-  loginIdList: string[] = [];
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: NamespaceListRequest;
-  highlightText: string;
-  preferencesInfo: PreferencesInfo;
-
+  readonly columns = createTableColumns(NAMESPACE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<NamespaceListEntry>>(ScoreTableViewComponent);
   contextMenuItem: NamespaceListEntry;
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
+
+  /** The list is of a library: it waits for the libraries, and loads again when another one is chosen. */
+  readonly ready = signal(false);
+  readonly extraParams = signal<Record<string, string>>({});
+  /** While an item is being discarded. */
+  readonly busy = signal(false);
+
+  readonly load = (params: HttpParams) => this.service.getNamespaceListPage(params);
 
   ngOnInit() {
-    this.request = new NamespaceListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
-      this.initLibraries(libraries);
-
-      this.searchBar.showAdvancedSearch =
-        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-      this.paginator.pageIndex = this.request.page.pageIndex;
-      this.paginator.pageSize = this.request.page.pageSize;
-      this.paginator.length = 0;
-
-      this.sort.active = this.request.page.sortActive;
-      this.sort.direction = this.request.page.sortDirection as SortDirection;
-      // Prevent the sorting event from being triggered if any columns are currently resizing.
-      const originalSort = this.sort.sort;
-      this.sort.sort = (sortChange) => {
-        if (this.tableColumnResizeDirectives &&
-          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-          return;
-        }
-        originalSort.apply(this.sort, [sortChange]);
-      };
-      this.sort.sortChange.subscribe(() => {
-        this.onSearch();
-      });
-
-      forkJoin([
-        this.accountService.getAccountNames(),
-        this.preferencesService.load(this.auth.getUserToken())
-      ]).subscribe(([loginIds, preferencesInfo]) => {
-        this.preferencesInfo = preferencesInfo;
-
-        this.loginIdList.push(...loginIds);
-        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-        this.loadNamespaceList(true);
-      });
+      this.libraryChoice.init(libraries);
+      this.updateExtraParams();
+      this.ready.set(!!this.libraryChoice.library?.libraryId);
     });
   }
 
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  onChange(property?: string, source?) {
-  }
-
-  initLibraries(libraries: LibrarySummary[]) {
-    this.libraries = libraries;
-    if (this.libraries.length > 0) {
-      const savedLibraryId = loadLibrary(this.auth.getUserToken());
-      if (savedLibraryId) {
-        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
-      }
-      if (!this.request.library || !this.request.library.libraryId) {
-        this.request.library = this.libraries.find(e => e.isDefault) || this.libraries[0];
-      }
-      if (this.request.library) {
-        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      }
-      this.mappedLibraries = this.libraries.map(e => {
-        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
-      });
-    }
+  private updateExtraParams() {
+    this.extraParams.set({libraryId: '' + this.libraryChoice.library?.libraryId});
   }
 
   onLibraryChange(library?: LibrarySummary) {
-    this.request.library = library;
-    saveLibrary(this.auth.getUserToken(), this.request.library?.libraryId);
-    this.onSearch();
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadNamespaceList();
-  }
-
-  loadNamespaceList(isInit?: boolean) {
-    if (!this.request.library?.libraryId) {
-      this.loading = false;
-      this.selection.clear();
-      this.dataSource.data = [];
-      this.paginator.length = 0;
-      return;
-    }
-
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getNamespaceList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-      this.highlightText = this.request.filters.description;
-
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim();
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.select(row));
-  }
-
-  select(row: NamespaceListEntry) {
-    this.selection.select(row.namespaceId);
-  }
-
-  toggle(row: NamespaceListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.namespaceId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: NamespaceListEntry) {
-    return this.selection.isSelected(row.namespaceId);
+    this.libraryChoice.choose(library);
+    this.updateExtraParams();
   }
 
   create() {
-    if (!this.request.library?.libraryId) {
+    if (!this.libraryChoice.library?.libraryId) {
       return;
     }
     this.router.navigateByUrl('/namespace/create');
@@ -365,15 +119,14 @@ export class NamespaceListComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.loading = true;
+          this.busy.set(true);
           this.service.discard(item.namespaceId).pipe(finalize(() => {
-            this.loading = false;
+            this.busy.set(false);
           })).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
-            this.selection.clear();
-            this.loadNamespaceList();
+            this.view().reload();
           });
         }
       });
@@ -394,10 +147,9 @@ export class NamespaceListComponent implements OnInit {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
-          this.loadNamespaceList();
+          this.view().reload();
         });
       }
     });
   }
-
 }

@@ -1,357 +1,116 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
-import {CodeListListEntry, CodeListListEntryRequest} from '../domain/code-list';
+import {CodeListListEntry} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepicker} from '@angular/material/datepicker';
-import {AccountListService} from '../../account-management/domain/account-list.service';
-import {PageRequest} from '../../basis/basis';
-import {FormControl} from '@angular/forms';
-import {forkJoin, ReplaySubject} from 'rxjs';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../common/utility';
-import {ReleaseService} from '../../release-management/domain/release.service';
+import {CODE_LIST_TABLE} from '../domain/code-list.table';
 import {AuthService} from '../../authentication/auth.service';
-import {ReleaseSummary, WorkingRelease} from '../../release-management/domain/release';
-import {finalize} from 'rxjs/operators';
 import {WebPageInfoService} from '../../basis/basis.service';
-import {PreferencesInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {ReleaseSummary} from '../../release-management/domain/release';
+import {ReleaseChoice} from '../../release-management/domain/release-choice';
+import {ReleaseService} from '../../release-management/domain/release.service';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
 import {LibrarySummary} from '../../library-management/domain/library';
+import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
+
+const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
+const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
+const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
+
+const CODE_LIST_FOR_DERIVING_TABLE = defineTable({
+  ...CODE_LIST_TABLE,
+  filters: [
+    {type: 'select', key: 'states', label: 'State'},
+    {type: 'select', key: 'deprecated', label: 'Deprecated', options: TRUE_FALSE, onlyWhenOne: true},
+    ...CODE_LIST_TABLE.filters,
+  ],
+});
 
 @Component({
   standalone: false,
   selector: 'score-code-list-for-deriving',
   templateUrl: './code-list-for-deriving.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./code-list-for-deriving.component.css']
+  styleUrls: ['./code-list-for-deriving.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class CodeListForDerivingComponent implements OnInit {
+export class CodeListForDerivingComponent {
   private service = inject(CodeListService);
   private releaseService = inject(ReleaseService);
   private libraryService = inject(LibraryService);
-  private accountService = inject(AccountListService);
-  private preferencesService = inject(SettingsPreferencesService);
   private auth = inject(AuthService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
   webPageInfo = inject(WebPageInfoService);
 
-
   faLocationArrow = faLocationArrow;
-  title = 'Derive Code List';
-  workingRelease = WorkingRelease;
-  workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
-  releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
+  title = 'Code List';
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfCodeListPage;
-  }
-
-  updateTableColumnsForCodeListPage() {
-    this.preferencesService.updateTableColumnsForCodeListPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForCodeListPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'State':
-          if (column.selected) {
-            displayedColumns.push('state');
-          }
-          break;
-        case 'Name':
-          if (column.selected) {
-            displayedColumns.push('codeListName');
-          }
-          break;
-        case 'Based Code List':
-          if (column.selected) {
-            displayedColumns.push('basedCodeListName');
-          }
-          break;
-        case 'Agency ID':
-          if (column.selected) {
-            displayedColumns.push('agencyId');
-          }
-          break;
-        case 'Version':
-          if (column.selected) {
-            displayedColumns.push('versionId');
-          }
-          break;
-        case 'Extensible':
-          if (column.selected) {
-            displayedColumns.push('extensible');
-          }
-          break;
-        case 'Revision':
-          if (column.selected) {
-            displayedColumns.push('revision');
-          }
-          break;
-        case 'Owner':
-          if (column.selected) {
-            displayedColumns.push('owner');
-          }
-          break;
-        case 'Module':
-          if (column.selected) {
-            displayedColumns.push('module');
-          }
-          break;
-        case 'Updated On':
-          if (column.selected) {
-            displayedColumns.push('lastUpdateTimestamp');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<CodeListListEntry>();
+  readonly libraryChoice = new LibraryChoice(this.auth);
+  readonly releaseChoice = new ReleaseChoice(this.auth);
+  readonly columns = createTableColumns(CODE_LIST_FOR_DERIVING_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<CodeListListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(false, []);
-  loading = false;
 
-  releases: ReleaseSummary[];
-  libraries: LibrarySummary[] = [];
-  mappedLibraries: { library: LibrarySummary, selected: boolean }[] = [];
-  loginIdList: string[] = [];
-  releaseListFilterCtrl: FormControl = new FormControl();
-  loginIdListFilterCtrl: FormControl = new FormControl();
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
-  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  request: CodeListListEntryRequest;
-  highlightTextForModule: string;
-  highlightTextForDefinition: string;
-  preferencesInfo: PreferencesInfo;
+  /** The list is of a library and a branch: it waits for them, and loads again when another one is chosen. */
+  readonly ready = signal(false);
+  readonly extraParams = signal<Record<string, string>>({});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: []});
 
-  @ViewChild('dateStart', {static: true}) dateStart: MatDatepicker<any>;
-  @ViewChild('dateEnd', {static: true}) dateEnd: MatDatepicker<any>;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
+  readonly load = (params: HttpParams) => this.service.getCodeListListPage(params);
+  readonly rowKey = (row: CodeListListEntry) => row.codeListManifestId;
 
-  ngOnInit() {
-    this.request = new CodeListListEntryRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.states.push('Published');
+  constructor() {
+    afterNextRender(() => this.start());
+  }
 
+  private start() {
+    // The published code lists, to begin with.
+    this.view().setFilter('states', ['Published']);
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
-      this.initLibraries(libraries);
-
-      this.searchBar.showAdvancedSearch =
-        (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-      this.paginator.pageIndex = this.request.page.pageIndex;
-      this.paginator.pageSize = this.request.page.pageSize;
-      this.paginator.length = 0;
-
-      this.sort.active = this.request.page.sortActive;
-      this.sort.direction = this.request.page.sortDirection as SortDirection;
-      // Prevent the sorting event from being triggered if any columns are currently resizing.
-      const originalSort = this.sort.sort;
-      this.sort.sort = (sortChange) => {
-        if (this.tableColumnResizeDirectives &&
-          this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-          return;
-        }
-        originalSort.apply(this.sort, [sortChange]);
-      };
-      this.sort.sortChange.subscribe(() => {
-        this.onSearch();
-      });
-
-      this.releases = [];
-
-      forkJoin([
-        this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published', ]),
-        this.accountService.getAccountNames(),
-        this.preferencesService.load(this.auth.getUserToken())
-      ]).subscribe(([releases, loginIds, preferencesInfo]) => {
-        this.preferencesInfo = preferencesInfo;
-
-        this.initReleases(releases);
-
-        this.loginIdList.push(...loginIds);
-        initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-        initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-
-        this.loadCodeList(true);
+      this.libraryChoice.init(libraries);
+      this.releaseService.getReleaseSummaryList(this.libraryChoice.library?.libraryId, ['Published']).subscribe(releases => {
+        this.releaseChoice.init(releases, 0);
+        this.applyChoices();
+        this.ready.set(true);
       });
     });
   }
 
-  onPageChange(event: PageEvent) {
-    this.loadCodeList();
+  /** The library and the branch that the list is of. Returns whether the parameters for the endpoint changed. */
+  private applyChoices(): boolean {
+    const states = this.releaseChoice.release?.workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
+    this.filterOptions.update(options => ({...options, states: states.map(e => ({value: e, label: e}))}));
+    const params = {
+      libraryId: '' + this.libraryChoice.library?.libraryId,
+      releaseId: '' + (this.releaseChoice.release?.releaseId || 0)
+    };
+    if (JSON.stringify(params) === JSON.stringify(this.extraParams())) {
+      return false;
+    }
+    this.extraParams.set(params);
+    return true;
   }
 
-  onChange(property?: string, source?) {
-    if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
-    }
-  }
-
-  reset(type: string) {
-    switch (type) {
-      case 'startDate':
-        this.dateStart.select(undefined);
-        this.request.updatedDate.start = null;
-        break;
-      case 'endDate':
-        this.dateEnd.select(undefined);
-        this.request.updatedDate.end = null;
-        break;
-    }
-  }
-
-  initLibraries(libraries: LibrarySummary[]) {
-    this.libraries = libraries;
-    if (this.libraries.length > 0) {
-      const savedLibraryId = loadLibrary(this.auth.getUserToken());
-      if (savedLibraryId) {
-        this.request.library = this.libraries.filter(e => e.libraryId === savedLibraryId)[0];
-      }
-      if (!this.request.library || !this.request.library.libraryId) {
-        this.request.library = this.libraries.find(e => e.isDefault) || this.libraries[0];
-      }
-      if (this.request.library) {
-        saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      }
-      this.mappedLibraries = this.libraries.map(e => {
-        return {library: e, selected: (this.request.library.libraryId === e.libraryId)};
-      });
-    }
-  }
-
-  initReleases(releases: ReleaseSummary[]) {
-    this.releases = [...releases];
-    if (this.releases.length > 0) {
-      if (this.request.release.releaseId === 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
-        if (savedReleaseId) {
-          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
-          if (!this.request.release) {
-            this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
-          }
-        }
-      } else {
-        this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
-      }
-    }
-    if (!this.request.release || this.request.release.releaseId === 0) {
-      this.request.release = this.releases[0];
-    }
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
+  onBranchChange(release: ReleaseSummary) {
+    this.releaseChoice.choose(release);
+    this.applyChoices();
   }
 
   onLibraryChange(library: LibrarySummary) {
-    this.request.library = library;
-    this.releaseService.getReleaseSummaryList(this.request.library.libraryId, ['Published']).subscribe(releases => {
-      saveLibrary(this.auth.getUserToken(), this.request.library.libraryId);
-      this.initReleases(releases);
-      this.onSearch();
+    this.libraryChoice.choose(library);
+    this.releaseService.getReleaseSummaryList(library.libraryId, ['Published']).subscribe(releases => {
+      this.releaseChoice.init(releases);
+      this.applyChoices();
     });
-  }
-
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadCodeList();
-  }
-
-  loadCodeList(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.service.getCodeListList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.dataSource.data = resp.list;
-      this.highlightTextForModule = this.request.filters.module;
-      this.highlightTextForDefinition = this.request.filters.definition;
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim();
-  }
-
-  select(row: CodeListListEntry) {
-    this.selection.select(row.codeListManifestId);
-  }
-
-  toggle(row: CodeListListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row.codeListManifestId);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: CodeListListEntry) {
-    return this.selection.isSelected(row.codeListManifestId);
   }
 
   next() {
     this.router.navigate(['/code_list/create/' + this.selection.selected[0]], {
       queryParams: {
-        releaseId: this.request.release.releaseId
+        releaseId: this.releaseChoice.release.releaseId
       },
     });
   }
-
 }

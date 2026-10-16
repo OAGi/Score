@@ -6,14 +6,11 @@ import {WizardPageComponent} from './wizard-page.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [WizardPageComponent],
   template: `
-    <score-wizard-page [title]="title" [subtitle]="subtitle" [showColumns]="showColumns"
-      [toolbarClass]="toolbarClass" [spacer]="spacer">
+    <score-wizard-page [title]="title" [subtitle]="subtitle" [toolbarClass]="toolbarClass" [spacer]="spacer">
       @if (custom) {
         <ng-container ngProjectAs="[wizardTitle]"><span class="custom-title">Custom</span></ng-container>
       }
-      <div listFilter class="filter">Filter</div>
-      <div listColumns class="columns">Columns</div>
-      <table listTable class="table"></table>
+      <div class="table-view">Table view</div>
       <ng-container ngProjectAs="[listExtra]"><span class="extra">Extra</span></ng-container>
       <ng-container ngProjectAs="[wizardActions]">
         <button class="back">Back</button>
@@ -24,7 +21,6 @@ import {WizardPageComponent} from './wizard-page.component';
 class HostComponent {
   title: string | null = 'Create BIE';
   subtitle = 'Select Business Context';
-  showColumns = true;
   toolbarClass = 'bg-white d-flex flex-column align-items-start';
   spacer = false;
   custom = false;
@@ -54,12 +50,10 @@ describe('WizardPageComponent', () => {
     expect(toolbar.querySelector('.flex-11-auto')).toBeNull();
   });
 
-  it('forwards the list slots to the list shell', () => {
+  it('forwards the table view and the extra content to the list shell', () => {
     detect();
     const card = el('div.context-section > mat-card')!;
-    expect(card.querySelector(':scope > .filter')).toBeTruthy();
-    expect(card.querySelector('.score-column-container .columns')).toBeTruthy();
-    expect(card.querySelector('.table-wrapper > table.table')).toBeTruthy();
+    expect(card.querySelector(':scope > .table-view')).toBeTruthy();
     expect(card.lastElementChild!.classList.contains('extra')).toBe(true);
   });
 
@@ -74,10 +68,8 @@ describe('WizardPageComponent', () => {
     host.title = null;
     host.subtitle = '';
     host.custom = true;
-    host.showColumns = false;
     detect();
     expect(el('mat-toolbar span.title')).toBeNull();
     expect(el('mat-toolbar span.custom-title')).toBeTruthy();
-    expect(el('.score-column-container')).toBeNull();
   });
 });

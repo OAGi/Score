@@ -1,17 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, viewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
 import {MatchInfo} from '../domain/bie-uplift';
 import {BieUpliftService} from '../domain/bie-uplift.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
-import {forkJoin} from 'rxjs';
+import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 
 @Component({
   standalone: false,
@@ -23,118 +15,35 @@ import {forkJoin} from 'rxjs';
 export class ReportDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ReportDialogComponent>>(MatDialogRef);
   service = inject(BieUpliftService);
-  private auth = inject(AuthService);
-  private preferencesService = inject(SettingsPreferencesService);
   data = inject(MAT_DIALOG_DATA);
 
 
-  dataSource = new MatTableDataSource<MatchInfo>();
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage;
-  }
+  readonly columns = createTableColumns(defineTable({
+    storageKey: 'TableColumns-BieUpliftReportPage',
+    columns: [
+      {id: 'ccType', label: 'Type', width: 80, sortable: true},
+      {
+        id: 'displayPath', label: 'Path', width: 0, sortable: true,
+        header: `Source ${this.data.sourceReleaseNum} Path \u2192 Target ${this.data.targetReleaseNum} Path`
+      },
+      {id: 'context', label: 'Context Definition', width: '40%', sortable: true},
+      {id: 'match', label: 'Matched', width: '5%', sortable: true},
+      {id: 'reuse', label: 'Reused', width: '5%', sortable: true},
+      {id: 'validCode', label: 'Issue', width: '10%', sortable: true},
+    ],
+  }));
+  readonly view = viewChild.required<ScoreTableViewComponent<MatchInfo>>(ScoreTableViewComponent);
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage = columns;
-    this.updateTableColumnsForBieUpliftReportPage();
-  }
-
-  updateTableColumnsForBieUpliftReportPage() {
-    this.preferencesService.updateTableColumnsForBieUpliftReportPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBieUpliftReportPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBieUpliftReportPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Type':
-          if (column.selected) {
-            displayedColumns.push('ccType');
-          }
-          break;
-        case 'Path':
-          if (column.selected) {
-            displayedColumns.push('displayPath');
-          }
-          break;
-        case 'Context Definition':
-          if (column.selected) {
-            displayedColumns.push('context');
-          }
-          break;
-        case 'Matched':
-          if (column.selected) {
-            displayedColumns.push('match');
-          }
-          break;
-        case 'Reused':
-          if (column.selected) {
-            displayedColumns.push('reuse');
-          }
-          break;
-        case 'Issue':
-          if (column.selected) {
-            displayedColumns.push('validCode');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
+  /** The rows of the report that are shown (all, or the ones with issues). */
+  rows: MatchInfo[] = [];
+  readonly load = inMemoryLoad<MatchInfo>(() => this.rows, {
+    displayPath: row => row.sourceDisplayPath,
+    validCode: row => [row.status, row.message].filter(value => !!value).join(' ')
+  });
   hideSystemMatched = true;
   matches: MatchInfo[];
   matchMap: Map<string, MatchInfo>;
-  preferencesInfo: PreferencesInfo;
   loading = false;
 
   ngOnInit() {
@@ -144,13 +53,9 @@ export class ReportDialogComponent implements OnInit {
     this.matches = this.data.matches;
     this.matches.forEach(m => this.matchMap.set(this.validationKey(m), m));
 
-    forkJoin([
-      this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).pipe(finalize(() => {
+    this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches).pipe(finalize(() => {
       this.loading = false;
-    })).subscribe(([resp, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+    })).subscribe(resp => {
 
       resp.validations.forEach(v => {
         const match = this.matchMap.get(this.validationKey(v));
@@ -161,13 +66,13 @@ export class ReportDialogComponent implements OnInit {
         match.message = v.message ? v.message : '';
         match.status = v.status ? v.status : '';
       });
-      this.dataSource.data = this.matches.filter(r => this.show(r));
+      this.setRows(this.matches.filter(r => this.show(r)));
     }, () => {
       this.matches.forEach(match => {
         match.valid = false;
         match.message = 'Unable to validate this mapping.';
       });
-      this.dataSource.data = this.matches;
+      this.setRows(this.matches);
     });
   }
 
@@ -188,7 +93,12 @@ export class ReportDialogComponent implements OnInit {
   }
 
   onToggleHide() {
-    this.dataSource.data = this.matches.filter(r => this.show(r));
+    this.setRows(this.matches.filter(r => this.show(r)));
+  }
+
+  private setRows(rows: MatchInfo[]) {
+    this.rows = rows;
+    this.view()?.reload();
   }
 
   onClose(): void {
@@ -205,7 +115,7 @@ export class ReportDialogComponent implements OnInit {
       'Source Context Definition',
       `Target ${this.data.targetReleaseNum} Path`,
       'Type', 'Matched', 'Reused', 'Issue'
-    ]), ...this.dataSource.data.map(e => {
+    ]), ...this.rows.map(e => {
       const status = [e.status, e.message].filter(value => !!value).join(' ');
       return this.toCsvRow([
         e.sourceDisplayPath, e.context, e.targetDisplayPath,

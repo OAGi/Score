@@ -1,3 +1,4 @@
+import {SCORE_TABLE} from '../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatBadgeModule} from '@angular/material/badge';
@@ -165,7 +166,8 @@ const routes: Routes = [
         FontAwesomeModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        ...SCORE_TABLE
     ],
   declarations: [
     BieCreateBizCtxComponent,

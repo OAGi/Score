@@ -15,6 +15,7 @@ import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.mo
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {SCORE_TABLE} from '../../common/score-table';
 
 const routes: Routes = [
   {
@@ -52,7 +53,8 @@ const routes: Routes = [
     CommonModule,
     SearchBarModule,
     ColumnSelectorModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    ...SCORE_TABLE
   ],
   declarations: [
     BusinessContextListComponent,

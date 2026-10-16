@@ -13,6 +13,7 @@ import {ModuleSetListComponent} from './module-set-list/module-set-list.componen
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
+import {SCORE_TABLE} from '../../common/score-table';
 
 const routes: Routes = [
   {
@@ -50,7 +51,8 @@ const routes: Routes = [
     ScoreCommonModule,
     SearchBarModule,
     ColumnSelectorModule,
-    TitleWithLibrarySelector
+    TitleWithLibrarySelector,
+    ...SCORE_TABLE
   ],
   declarations: [
     ModuleSetListComponent,

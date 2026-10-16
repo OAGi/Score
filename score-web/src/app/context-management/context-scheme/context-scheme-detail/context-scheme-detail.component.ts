@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CodelistListDialogComponent} from '../codelist-list-dialog/codelist-list-dialog.component';
@@ -7,26 +7,17 @@ import {ContextSchemeSummary, ContextSchemeUpdateRequest, ContextSchemeValue} fr
 import {BusinessContextService} from '../../business-context/domain/business-context.service';
 import {MatCheckboxChange} from '@angular/material/checkbox';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
 import {ContextSchemeValueDialogComponent} from '../context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
+import {CONTEXT_SCHEME_VALUE_TABLE, contextSchemeValueMatches} from '../domain/context-scheme-value.table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {hashCode} from '../../../common/utility';
 import {CodeList, CodeListDetails, CodeListListEntry, CodeListValueDetails} from '../../../code-list-management/domain/code-list';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
 import {ContextCategoryService} from '../../context-category/domain/context-category.service';
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
@@ -51,9 +42,7 @@ export class ContextSchemeDetailComponent implements OnInit {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
-  private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private titleService = inject(Title);
 
 
@@ -71,100 +60,22 @@ export class ContextSchemeDetailComponent implements OnInit {
 
   contextSchemes: ContextSchemeSummary[];
   contextSchemeUpdateRequest: ContextSchemeUpdateRequest;
-  preferencesInfo: PreferencesInfo;
   hashCode;
-  valueSearch: string;
-  highlightText: string;
   businessContext;
   disabled: boolean;
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage;
-  }
+  readonly columns = createTableColumns(CONTEXT_SCHEME_VALUE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<ContextSchemeValue>>(ScoreTableViewComponent);
+  /** The guids of the selected values. */
+  selection = new SelectionModel<string>(true, []);
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfContextSchemeValuePage = columns;
-    this.updateTableColumnsForContextSchemeValuePage();
-  }
-
-  updateTableColumnsForContextSchemeValuePage() {
-    this.preferencesService.updateTableColumnsForContextSchemeValuePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfContextSchemeValuePage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForContextSchemeValuePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Value':
-          if (column.selected) {
-            displayedColumns.push('value');
-          }
-          break;
-        case 'Meaning':
-          if (column.selected) {
-            displayedColumns.push('meaning');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<ContextSchemeValue>();
-  selection = new SelectionModel<ContextSchemeValue>(true, []);
-
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  /** The values that the table lists. */
+  values: ContextSchemeValue[] = [];
+  readonly load = inMemoryLoad<ContextSchemeValue>(() => this.values, {},
+    (row, params) => contextSchemeValueMatches(row, params.get('search')));
+  readonly allRows = () => this.values;
+  readonly rowKey = (row: ContextSchemeValue) => row.guid;
+  readonly rowSelectable = (row: ContextSchemeValue) => !row.used;
 
   ngOnInit() {
     this.contextSchemeUpdateRequest = new ContextSchemeUpdateRequest();
@@ -176,17 +87,15 @@ export class ContextSchemeDetailComponent implements OnInit {
       this.contextCategoryService.getContextCategorySummaries(),
       this.service.getContextSchemeSummaries(),
       this.service.getContextSchemeDetails(contextSchemeId),
-      this.service.getContextSchemeValues(contextSchemeId),
-      this.preferencesService.load(this.auth.getUserToken())
+      this.service.getContextSchemeValues(contextSchemeId)
     ]).subscribe(([contextCategorySummries, contextSchemeSummaries,
-                    contextScheme, contextSchemeValues, preferencesInfo]) => {
+                    contextScheme, contextSchemeValues]) => {
 
       if (!contextScheme) {
         this.redirectToContextSchemeList();
         return;
       }
 
-      this.preferencesInfo = preferencesInfo;
       this.ctxCategories = contextCategorySummries;
       this.filteredCtxCategories.next(this.ctxCategories.slice());
       this.codeLists = [];
@@ -207,7 +116,8 @@ export class ContextSchemeDetailComponent implements OnInit {
       setAppTitleIfPresent(this.titleService, this.contextSchemeUpdateRequest.schemeName, 'Context Scheme');
 
       this.hashCode = hashCode(this.contextSchemeUpdateRequest);
-      this.dataSource.data = this.contextSchemeUpdateRequest.contextSchemeValueList;
+      this.values = this.contextSchemeUpdateRequest.contextSchemeValueList;
+      this.view().reload();
       this.filteredCodeLists.next(this.codeLists.slice());
 
       this.isUpdating = false;
@@ -234,21 +144,6 @@ export class ContextSchemeDetailComponent implements OnInit {
         this.filterCtxCategories();
       });
 
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.filterPredicate = (data: ContextSchemeValue, filter: string) => {
-      return (data.value && data.value.toLowerCase().indexOf(filter) > -1)
-          || (data.meaning && data.meaning.toLowerCase().indexOf(filter) > -1);
-    };
   }
 
   private redirectToContextSchemeList() {
@@ -285,18 +180,6 @@ export class ContextSchemeDetailComponent implements OnInit {
       (contextScheme.schemeVersionId === undefined || contextScheme.schemeVersionId === '');
   }
 
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-    this.highlightText = filterValue;
-  }
-
-  clearFilter() {
-    this.valueSearch = '';
-    this.applyFilter(this.valueSearch);
-  }
-
   openDialog(contextSchemeValue?: ContextSchemeValue) {
     const dialogConfig = new MatDialogConfig();
     this.disabled = true;
@@ -309,7 +192,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(ContextSchemeValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for (const value of this.dataSource.data) {
+        for (const value of this.values) {
           if (value.guid !== result.guid && value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 3000,
@@ -319,13 +202,13 @@ export class ContextSchemeDetailComponent implements OnInit {
           }
         }
         if (isAddAction) {
-          const data = this.dataSource.data;
+          const data = this.values;
           result.guid = uuid();
           data.push(result);
           this._updateDataSource(data);
         } else {
           const newData = [];
-          this.dataSource.data.forEach(row => {
+          this.values.forEach(row => {
             if (row.guid === result.guid) {
               newData.push(result);
             } else {
@@ -349,8 +232,8 @@ export class ContextSchemeDetailComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           const newData = [];
-          this.dataSource.data.forEach(row => {
-            if (!this.selection.isSelected(row)) {
+          this.values.forEach(row => {
+            if (!this.selection.isSelected(row.guid)) {
               newData.push(row);
             }
           });
@@ -363,40 +246,9 @@ export class ContextSchemeDetailComponent implements OnInit {
 
 
   _updateDataSource(data: ContextSchemeValue[]) {
-    this.dataSource.data = data;
+    this.values = data;
     this.contextSchemeUpdateRequest.contextSchemeValueList = data;
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => {
-        this.selection.select(row);
-      });
-  }
-
-  select(row: ContextSchemeValue) {
-    this.selection.select(row);
-  }
-
-  toggle(row: ContextSchemeValue) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
-  }
-
-  isSelected(row: ContextSchemeValue) {
-    return this.selection.isSelected(row);
+    this.view()?.reload();
   }
 
   back() {
@@ -482,8 +334,10 @@ export class ContextSchemeDetailComponent implements OnInit {
       contextSchemeValue = new ContextSchemeValue();
       contextSchemeValue.meaning = codelistvalue.meaning;
       contextSchemeValue.value = codelistvalue.value;
+      // The table keys its rows (and so the selection) by guid.
+      contextSchemeValue.guid = uuid();
       contextSchemeValueList.push(contextSchemeValue);
-      this.selection.select(contextSchemeValue);
+      this.selection.select(contextSchemeValue.guid);
     }
     return contextSchemeValueList;
   }

@@ -7,7 +7,7 @@ import {CommonModule} from '@angular/common';
 import {RefactorDialogService} from './domain/refactor-dialog.service';
 import {RefactorDialogComponent} from './refactor-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
-import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {SCORE_TABLE} from '../../common/score-table';
 
 @NgModule({
     imports: [
@@ -18,7 +18,7 @@ import {ColumnSelectorModule} from '../../common/column-selector/column-selector
         CommonModule,
         RouterModule,
         ScoreCommonModule,
-        ColumnSelectorModule
+        ...SCORE_TABLE
     ],
   declarations: [
     RefactorDialogComponent,

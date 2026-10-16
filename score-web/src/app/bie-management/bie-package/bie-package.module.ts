@@ -1,3 +1,4 @@
+import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
@@ -61,7 +62,8 @@ const routes: Routes = [
         MatMultiSortModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        ...SCORE_TABLE
     ],
   exports: [
     BiePackageListComponent,

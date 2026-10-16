@@ -1,315 +1,112 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {forkJoin, of} from 'rxjs';
-import {AuthService} from '../../authentication/auth.service';
-import {Location} from '@angular/common';
-import {AccountList, AccountListEntry, AccountListRequest} from '../domain/accounts';
-import {AccountListService} from '../domain/account-list.service';
-import {TenantListService} from '../domain/tenant-list.service';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {PageRequest} from '../../basis/basis';
-import {TenantList} from '../domain/tenants';
-import {finalize, switchMap} from 'rxjs/operators';
-import {PreferencesInfo, TableColumnsInfo, TableColumnsProperty} from '../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {ScoreTableColumnResizeDirective} from '../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SearchBarComponent} from '../../common/search-bar/search-bar.component';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Title} from '@angular/platform-browser';
+import {finalize} from 'rxjs/operators';
+import {AccountListEntry} from '../domain/accounts';
+import {AccountListService} from '../domain/account-list.service';
+import {ACCOUNT_TABLE} from '../domain/account.table';
+import {TenantListService} from '../domain/tenant-list.service';
+import {TenantList} from '../domain/tenants';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+
+const TENANT_USER_TABLE = defineTable({
+  ...ACCOUNT_TABLE,
+  storageKey: 'TableColumns-TenantManagementForAccountPage',
+  // The roles of an account are not a condition of the users of a tenant.
+  filters: ACCOUNT_TABLE.filters.filter(f => f.key !== 'roles'),
+  columns: [...ACCOUNT_TABLE.columns, {id: 'manage', label: 'Manage', width: 120}],
+});
 
 @Component({
   standalone: false,
   selector: 'score-tenant-user-detail',
   templateUrl: './tenant-user-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./tenant-user-detail.component.css']
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-
 export class TenantUserDetailComponent implements OnInit {
-  private auth = inject(AuthService);
   private service = inject(TenantListService);
   private accountService = inject(AccountListService);
-  private preferencesService = inject(SettingsPreferencesService);
   private snackBar = inject(MatSnackBar);
-  private location = inject(Location);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private titleService = inject(Title);
 
-
   title = 'Users Management';
-  loading = false;
   tenantInfo: TenantList;
-  tenantId: any;
-
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfTenantManagementForAccountPage = columns;
-    this.updateTableColumnsForTenantManagementForAccountPage();
-  }
-
-  updateTableColumnsForTenantManagementForAccountPage() {
-    this.preferencesService.updateTableColumnsForTenantManagementForAccountPage(
-      this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfTenantManagementForAccountPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForTenantManagementForAccountPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Login ID':
-          if (column.selected) {
-            displayedColumns.push('loginId');
-          }
-          break;
-        case 'Role':
-          if (column.selected) {
-            displayedColumns.push('role');
-          }
-          break;
-        case 'Name':
-          if (column.selected) {
-            displayedColumns.push('name');
-          }
-          break;
-        case 'Organization':
-          if (column.selected) {
-            displayedColumns.push('organization');
-          }
-          break;
-        case 'Status':
-          if (column.selected) {
-            displayedColumns.push('status');
-          }
-          break;
-        case 'Manage':
-          if (column.selected) {
-            displayedColumns.push('manage');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
-  dataSource = new MatTableDataSource<AccountListEntry>();
-
+  tenantId: number;
   addUserToTenant = false;
 
-  request: AccountListRequest;
-  preferencesInfo: PreferencesInfo;
+  readonly columns = createTableColumns(TENANT_USER_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<AccountListEntry>>(ScoreTableViewComponent);
 
-  contextMenuItem: AccountList;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
-  @ViewChild(SearchBarComponent, {static: true}) searchBar: SearchBarComponent;
+  /** The list waits for the tenant. */
+  readonly ready = signal(false);
+  readonly busy = signal(false);
+  /** The users of the tenant, or the ones that can be added to it. */
+  readonly extraParams = signal<Record<string, string>>({});
+
+  readonly load = (params: HttpParams) => this.accountService.getAccountsListPage(params);
 
   ngOnInit(): void {
-    this.request = new AccountListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('name', 'asc', 0, 10));
-
-    this.searchBar.showAdvancedSearch =
-      (this.route.snapshot.queryParamMap && this.route.snapshot.queryParamMap.get('adv_ser') === 'true');
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.sort.active = this.request.page.sortActive;
-    this.sort.direction = this.request.page.sortDirection as SortDirection;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
+    this.tenantId = Number(this.route.snapshot.paramMap.get('id'));
+    this.applyParams();
+    this.service.getTenantInfo(this.tenantId).subscribe({
+      next: resp => {
+        if (!resp) {
+          this.redirectToTenantList();
+          return;
+        }
+        this.tenantInfo = resp;
+        setAppTitleIfPresent(this.titleService, this.tenantInfo.name, 'Tenant Users');
+        this.ready.set(true);
+      },
+      error: error => {
+        if (error.status === 404) {
+          this.redirectToTenantList();
+        }
       }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.sort.sortChange.subscribe(() => {
-      this.onSearch();
-    });
-
-    this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => of(Number(params.get('id'))))
-    ).subscribe(t => {
-      this.loading = true;
-      this.tenantId = t;
-      this.request.filters.tenantId = t;
-
-      forkJoin([
-        this.preferencesService.load(this.auth.getUserToken())
-      ]).subscribe(([preferencesInfo]) => {
-        this.preferencesInfo = preferencesInfo;
-
-        this.getTenantInfo();
-      });
     });
   }
 
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.getTenantInfo();
-  }
-
-  getTenantInfo() {
-    this.loading = true;
-
-    this.service.getTenantInfo(this.tenantId).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      if (!resp) {
-        this.redirectToTenantList();
-        return;
-      }
-
-      this.tenantInfo = resp;
-      setAppTitleIfPresent(this.titleService, this.tenantInfo.name, 'Tenant Users');
-      this.loadAccounts(true);
-    }, error => {
-      this.dataSource.data = [];
-      if (error.status === 404) {
-        this.redirectToTenantList();
-      }
-    });
+  private applyParams() {
+    const params: Record<string, string> = {tenantId: '' + this.tenantId};
+    if (this.addUserToTenant) {
+      params['notConnectedToTenant'] = 'true';
+    }
+    this.extraParams.set(params);
   }
 
   private redirectToTenantList() {
-    this.loading = false;
     this.snackBar.open('The requested tenant is unavailable.', '', {
       duration: 3000,
     });
     this.router.navigateByUrl('/tenant');
   }
 
-  loadAccounts(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.accountService.getAccountsList(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.paginator.pageIndex = resp.page;
-      this.dataSource.data = resp.list;
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0],
-          this.request.toQuery() + '&adv_ser=' + (this.searchBar.showAdvancedSearch));
-      }
-    }, error => {
-      this.dataSource.data = [];
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadAccounts();
-  }
-
-  onChange(property?: string, source?) {
-  }
-
   removeUser(userId: number) {
-    this.loading = true;
-
+    this.busy.set(true);
     this.service.deleteTenantUser(this.tenantId, userId).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.loadAccounts();
-    }, error => {
-      this.dataSource.data = [];
-    });
+      finalize(() => this.busy.set(false))
+    ).subscribe(() => this.view().reload());
   }
 
   setAddUserView() {
-    this.addUserToTenant = !this.addUserToTenant;
-    this.request.filters.notConnectedToTenant = true;
-    this.loadAccounts();
+    this.addUserToTenant = true;
+    this.applyParams();
   }
 
   setListView() {
-    this.addUserToTenant = !this.addUserToTenant;
-    this.request.filters.notConnectedToTenant = false;
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.loadAccounts();
+    this.addUserToTenant = false;
+    this.applyParams();
   }
 
   addUser(userId: number) {
-    this.loading = true;
-
+    this.busy.set(true);
     this.service.addTenantUser(this.tenantId, userId).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.loadAccounts();
-    }, error => {
-      this.dataSource.data = [];
-    });
+      finalize(() => this.busy.set(false))
+    ).subscribe(() => this.view().reload());
   }
 }

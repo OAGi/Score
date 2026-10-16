@@ -4,7 +4,6 @@ import {Observable} from 'rxjs';
 import {
   AgencyIdListCreateResponse,
   AgencyIdListDetails,
-  AgencyIdListForListRequest,
   AgencyIdListListEntry,
   AgencyIdListSummary,
   AgencyIdListValueSummary
@@ -18,59 +17,7 @@ import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 export class AgencyIdListService {
   private http = inject(HttpClient);
 
-
-  getAgencyIdListList(request: AgencyIdListForListRequest): Observable<PageResponse<AgencyIdListListEntry>> {
-    let params = new HttpParams()
-        .set('libraryId', '' + request.library.libraryId)
-        .set('releaseId', '' + (request.release?.releaseId || 0))
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.ownerLoginIdList.length > 0) {
-      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-    if (request.filters.definition) {
-      params = params.set('definition', request.filters.definition);
-    }
-    if (request.filters.module) {
-      params = params.set('module', request.filters.module);
-    }
-    if (request.access) {
-      params = params.set('access', request.access);
-    }
-    if (request.states.length > 0) {
-      params = params.set('states', request.states.join(','));
-    }
-    if (request.deprecated && request.deprecated.length === 1) {
-      params = params.set('deprecated', '' + request.deprecated[0]);
-    }
-    if (request.newComponent && request.newComponent.length === 1) {
-      params = params.set('newComponent', '' + request.newComponent[0]);
-    }
-    if (request.extensible !== undefined) {
-      params = params.set('extensible', (request.extensible) ? 'true' : 'false');
-    }
-    if (request.ownedByDeveloper !== undefined) {
-      params = params.set('ownedByDeveloper', (request.ownedByDeveloper) ? 'true' : 'false');
-    }
-    if (request.namespaces && request.namespaces.length > 0) {
-      params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
-    }
-
+  getAgencyIdListListPage(params: HttpParams): Observable<PageResponse<AgencyIdListListEntry>> {
     return this.http.get<PageResponse<AgencyIdListListEntry>>('/api/agency-id-lists', {params}).pipe(
         map((res: PageResponse<AgencyIdListListEntry>) => ({
           ...res,

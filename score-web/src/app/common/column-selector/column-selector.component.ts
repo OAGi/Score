@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, Output, ViewEncapsulation, ChangeDetectionStrategy} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {TableColumnsState} from '../score-table/table-columns-state';
 
 @Component({
   standalone: false,
@@ -14,11 +15,21 @@ export class ColumnSelectorComponent {
   @Input() classes: string[];
   @Input() draggable: boolean = true;
   @Input() multiple: boolean = true;
+  /** Column state of a defined table (`defineTable`). Takes the place of `columns`/`columnsChange`/`onReset`. */
+  @Input() state?: TableColumnsState;
   @Input() columns: { name: string; selected: boolean }[] = [];
   @Output() columnsChange = new EventEmitter<{ name: string; selected: boolean }[]>();
   @Output() onReset = new EventEmitter<void>();
 
   overlayVisible = false;
+
+  get items(): { name: string; selected: boolean }[] {
+    return this.state ? this.state.list() : this.columns;
+  }
+
+  get resettable(): boolean {
+    return !!this.state || this.onReset.observed;
+  }
 
   handleOverlayClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
@@ -28,7 +39,7 @@ export class ColumnSelectorComponent {
     if (!columnElement) return;
 
     const columnIndex = Array.from(columnElement.parentElement!.children).indexOf(columnElement);
-    const column = this.columns[columnIndex];
+    const column = this.items[columnIndex];
 
     if (this.multiple) {
       // Toggle selection for checkboxes
@@ -48,20 +59,20 @@ export class ColumnSelectorComponent {
   }
 
   toggleColumnSelection(selectedColumn: { name: string; selected: boolean }) {
-    this.columnsChange.emit(this.columns);
+    this.emitChange();
   }
 
   selectSingleColumn(selectedColumn: { name: string; selected: boolean }): void {
-    this.columns.forEach(col => (col.selected = false)); // Deselect all
+    this.items.forEach(col => (col.selected = false)); // Deselect all
     selectedColumn.selected = true; // Select the current column
     this.closeOverlay();
-    this.columnsChange.emit(this.columns);
+    this.emitChange();
   }
 
   drop(event: CdkDragDrop<{ name: string; selected: boolean }[]>) {
     if (this.draggable) {
-      moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
-      this.columnsChange.emit(this.columns);
+      moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+      this.emitChange();
     }
   }
 
@@ -74,6 +85,18 @@ export class ColumnSelectorComponent {
   }
 
   onResetButtonClick() {
-    this.onReset.emit();
+    if (this.state) {
+      this.state.reset();
+    } else {
+      this.onReset.emit();
+    }
+  }
+
+  private emitChange() {
+    if (this.state) {
+      this.state.update(this.items);
+    } else {
+      this.columnsChange.emit(this.columns);
+    }
   }
 }

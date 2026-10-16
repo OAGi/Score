@@ -7,6 +7,7 @@ import {CommonModule} from '@angular/common';
 import {SearchBarModule} from '../search-bar/search-bar.module';
 import {ScoreCommonModule} from '../score-common.module';
 import {ColumnSelectorModule} from '../column-selector/column-selector.module';
+import {SCORE_TABLE} from '../score-table';
 
 @NgModule({
     imports: [
@@ -17,7 +18,8 @@ import {ColumnSelectorModule} from '../column-selector/column-selector.module';
         CommonModule,
         SearchBarModule,
         ScoreCommonModule,
-        ColumnSelectorModule
+        ColumnSelectorModule,
+        ...SCORE_TABLE
     ],
   declarations: [
     TransferOwnershipDialogComponent

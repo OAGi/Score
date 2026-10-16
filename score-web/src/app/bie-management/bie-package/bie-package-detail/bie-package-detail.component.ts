@@ -1,32 +1,31 @@
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, signal, viewChild} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode, saveAsBlobResponse} from '../../../common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
-import {catchError, finalize, map} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../../authentication/auth.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {PageRequest} from '../../../basis/basis';
-import {BieListInBiePackageRequest, BiePackageDetails} from '../domain/bie-package';
+import {BiePackageDetails} from '../domain/bie-package';
 import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {BiePackageService} from '../domain/bie-package.service';
 import {BiePackageBieDialogComponent} from '../bie-package-add-bie-dialog/bie-package-bie-dialog.component';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {ScoreTableColumnResizeDirective} from '../../../common/score-table-column-resize/score-table-column-resize.directive';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
+import {BIE_TABLE, bieLinkQuery} from '../../bie-list/domain/bie.table';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 import {forkJoin, of} from 'rxjs';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
+
+/** The BIEs of a package: the column settings are those of every list of BIEs; there is no search. */
+const BIE_PACKAGE_BIE_TABLE = defineTable({
+  ...BIE_TABLE,
+  search: undefined,
+});
 
 @Component({
   standalone: false,
@@ -43,7 +42,6 @@ export class BiePackageDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
-  private preferencesService = inject(SettingsPreferencesService);
   private dialog = inject(MatDialog);
   private titleService = inject(Title);
   webPageInfo = inject(WebPageInfoService);
@@ -62,168 +60,38 @@ export class BiePackageDetailComponent implements OnInit {
     return this.manifestVersion === '0.3' ? '0.3 (draft)' : '0.2';
   }
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBiePage;
-  }
-
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
-
-    this.preferencesInfo.tableColumnsInfo.columnsOfBiePage = columns;
-    this.updateTableColumnsForBiePage();
-  }
-
-  updateTableColumnsForBiePage() {
-    this.preferencesService.updateTableColumnsForBiePage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBiePage;
-    this.onColumnsChange(this.columns);
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-
-    let columns = [];
-    for (const tableColumn of this.table.columns) {
-      for (const updatedColumn of updatedColumns) {
-        if (tableColumn.name === updatedColumn.name) {
-          tableColumn.isActive = updatedColumn.selected;
-        }
-      }
-      columns.push(tableColumn);
-    }
-
-    this.table.columns = columns;
-    this.table.displayedColumns = this.displayedColumns;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      case 'Updated on':
-        this.setWidth('Updated On', $event.width);
-        break;
-
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBiePage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  defaultDisplayedColumns = [
-    {id: 'select', name: '', isActive: true},
-    {id: 'state', name: 'State', isActive: true},
-    {id: 'branch', name: 'Branch', isActive: true},
-    {id: 'den', name: 'DEN', isActive: true},
-    {id: 'owner', name: 'Owner', isActive: true},
-    {id: 'businessContexts', name: 'Business Contexts', isActive: true},
-    {id: 'version', name: 'Version', isActive: true},
-    {id: 'status', name: 'Status', isActive: true},
-    {id: 'bizTerm', name: 'Business Term', isActive: true},
-    {id: 'remark', name: 'Remark', isActive: true},
-    {id: 'lastUpdateTimestamp', name: 'Updated on', isActive: true}
-  ];
-
-  get displayedColumns(): string[] {
-    let displayedColumns = ['select'];
-    if (this.preferencesInfo) {
-      for (const column of this.columns) {
-        switch (column.name) {
-          case 'State':
-            if (column.selected) {
-              displayedColumns.push('state');
-            }
-            break;
-          case 'Branch':
-            if (column.selected) {
-              displayedColumns.push('branch');
-            }
-            break;
-          case 'DEN':
-            if (column.selected) {
-              displayedColumns.push('den');
-            }
-            break;
-          case 'Owner':
-            if (column.selected) {
-              displayedColumns.push('owner');
-            }
-            break;
-          case 'Business Contexts':
-            if (column.selected) {
-              displayedColumns.push('businessContexts');
-            }
-            break;
-          case 'Version':
-            if (column.selected) {
-              displayedColumns.push('version');
-            }
-            break;
-          case 'Status':
-            if (column.selected) {
-              displayedColumns.push('status');
-            }
-            break;
-          case 'Business Term':
-            if (column.selected) {
-              displayedColumns.push('bizTerm');
-            }
-            break;
-          case 'Remark':
-            if (column.selected) {
-              displayedColumns.push('remark');
-            }
-            break;
-          case 'Updated On':
-            if (column.selected) {
-              displayedColumns.push('lastUpdateTimestamp');
-            }
-            break;
-        }
-      }
-    }
-    return displayedColumns;
-  }
-
-  table: TableData<BieListEntry>;
-  selection = new SelectionModel<BieListEntry>(true, []);
+  readonly columns = createTableColumns(BIE_PACKAGE_BIE_TABLE);
+  readonly view = viewChild.required<ScoreTableViewComponent<BieListEntry>>(ScoreTableViewComponent);
+  selection = new SelectionModel<BieListEntry>(true, [], true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
+  readonly rowKey = (row: BieListEntry) => row;
   businessContextSelection = {};
-  request: BieListInBiePackageRequest;
-  preferencesInfo: PreferencesInfo;
-  loading = false;
+  readonly rowClass = (row: BieListEntry) => ({'highlight': row.status === 'Duplication'});
+  biePackageId: number;
+  /** The list waits for the package. */
+  readonly ready = signal(false);
+  /** The BIEs of the page that the table shows. */
+  rows: BieListEntry[] = [];
+  /** The search part of a link to the list that shows the BIE (a `q=` of the current query, with what the link says). */
+  linkQuery(extras: { [key: string]: any }): string {
+    return bieLinkQuery(BIE_PACKAGE_BIE_TABLE, this.view().query, extras);
+  }
 
-  @ViewChild(MatMultiSort, {static: true}) sort: MatMultiSort;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChildren(ScoreTableColumnResizeDirective) tableColumnResizeDirectives: QueryList<ScoreTableColumnResizeDirective>;
+  readonly load = (params: HttpParams) => this.biePackageService.getBieListInBiePackagePage(this.biePackageId, params).pipe(
+    tap({
+      next: resp => {
+        this.rows = resp.list;
+        this.businessContextSelection = {};
+        resp.list.forEach(elm => {
+          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
+        });
+      },
+      error: () => {
+        this.rows = [];
+        this.businessContextSelection = {};
+      }
+    })
+  );
+  loading = false;
 
   ngOnInit(): void {
     this.option = new BieExpressOption();
@@ -236,52 +104,16 @@ export class BiePackageDetailComponent implements OnInit {
     this.option.includeBusinessContextInFilename = true;
     this.option.includeVersionInFilename = true;
 
-    this.table = new TableData<BieListEntry>(this.defaultDisplayedColumns, {});
-    this.table.dataSource = new MatMultiSortTableDataSource<BieListEntry>(this.sort, false);
+    this.biePackageId = Number(this.route.snapshot.params.id);
 
-    // Init BIE list table for BIE package
-    this.request = new BieListInBiePackageRequest(this.route.snapshot.queryParamMap,
-      new PageRequest(['lastUpdateTimestamp'], ['desc'], 0, 10));
-
-    this.paginator.pageIndex = this.request.page.pageIndex;
-    this.paginator.pageSize = this.request.page.pageSize;
-    this.paginator.length = 0;
-
-    this.table.sortParams = this.request.page.sortActives;
-    this.table.sortDirs = this.request.page.sortDirections;
-    // Prevent the sorting event from being triggered if any columns are currently resizing.
-    const originalSort = this.sort.sort;
-    this.sort.sort = (sortChange) => {
-      if (this.tableColumnResizeDirectives &&
-        this.tableColumnResizeDirectives.filter(e => e.resizing).length > 0) {
-        return;
-      }
-      originalSort.apply(this.sort, [sortChange]);
-    };
-    this.table.sortObservable.subscribe(() => {
-      this.onSearch();
-    });
-
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.request.biePackageId = this.route.snapshot.params.id;
-
-    forkJoin([
-      this.biePackageService.get(this.request.biePackageId),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([biePackage, preferencesInfo]) => {
+    this.biePackageService.get(this.biePackageId).subscribe(biePackage => {
       if (!biePackage) {
         this.redirectToBiePackageList();
         return;
       }
 
-      this.preferencesInfo = preferencesInfo;
-      this.onColumnsChange(this.preferencesInfo.tableColumnsInfo.columnsOfBiePage);
-
       this.init(biePackage);
-      this.loadBieListInBiePackage(true);
+      this.ready.set(true);
     }, err => {
       this.loading = false;
       if (err.status === 404) {
@@ -323,42 +155,6 @@ export class BiePackageDetailComponent implements OnInit {
     return window.location.origin + path;
   }
 
-  onSearch() {
-    this.paginator.pageIndex = 0;
-    this.loadBieListInBiePackage();
-  }
-
-  loadBieListInBiePackage(isInit?: boolean) {
-    this.loading = true;
-
-    this.request.page = new PageRequest(
-      this.table.sortParams, this.table.sortDirs,
-      this.paginator.pageIndex, this.paginator.pageSize);
-
-    this.biePackageService.getBieListInBiePackage(this.request).pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    ).subscribe(resp => {
-      this.paginator.length = resp.length;
-      this.table.dataSource.data = resp.list;
-      this.table.dataSource.data.forEach((elm: BieListEntry) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
-      });
-
-      if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
-      }
-    }, error => {
-      this.table.dataSource.data = [];
-      this.businessContextSelection = {};
-    });
-  }
-
-  onPageChange(event: PageEvent) {
-    this.loadBieListInBiePackage();
-  }
-
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
     const charCode = $event.key?.toLowerCase();
@@ -379,7 +175,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.table.dataSource.data;
+    dialogConfig.data = this.rows;
     dialogConfig.data.action = 'Add';
     dialogConfig.data.biePackage = this.biePackage;
     dialogConfig.data.webPageInfo = this.webPageInfo;
@@ -403,7 +199,7 @@ export class BiePackageDetailComponent implements OnInit {
         });
 
         this.selection.clear();
-        this.loadBieListInBiePackage();
+        this.view().reload();
 
         this.loading = false;
       }, err => {
@@ -422,7 +218,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.table.dataSource.data;
+    dialogConfig.data = this.rows;
     dialogConfig.data.action = 'Replace';
     dialogConfig.data.den = selected.den;
     dialogConfig.data.excludeTopLevelAsbiepIds = [selected.topLevelAsbiepId];
@@ -449,7 +245,7 @@ export class BiePackageDetailComponent implements OnInit {
         });
 
         this.selection.clear();
-        this.loadBieListInBiePackage();
+        this.view().reload();
 
         this.loading = false;
       }, err => {
@@ -460,22 +256,6 @@ export class BiePackageDetailComponent implements OnInit {
       this.loading = false;
       throw err;
     });
-  }
-
-  select(row: BieListEntry) {
-    this.selection.select(row);
-  }
-
-  isSelected(row: BieListEntry) {
-    return this.selection.isSelected(row);
-  }
-
-  toggle(row: BieListEntry) {
-    if (this.isSelected(row)) {
-      this.selection.deselect(row);
-    } else {
-      this.select(row);
-    }
   }
 
   removeBieInBiePackage() {
@@ -489,7 +269,7 @@ export class BiePackageDetailComponent implements OnInit {
         });
 
         this.selection.clear();
-        this.loadBieListInBiePackage();
+        this.view().reload();
       });
     };
 
@@ -559,7 +339,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     const targetBieLists = (selectedBieLists && selectedBieLists.length > 0)
       ? selectedBieLists
-      : this.table.dataSource.data;
+      : this.rows;
     for (const bieList of targetBieLists) {
       const selectedBusinessContext = this.businessContextSelection[bieList.topLevelAsbiepId];
       if (!!selectedBusinessContext) {
@@ -633,7 +413,7 @@ export class BiePackageDetailComponent implements OnInit {
             duration: 3000,
           });
 
-          this.biePackageService.get(this.request.biePackageId).subscribe(biePackage => {
+          this.biePackageService.get(this.biePackageId).subscribe(biePackage => {
             this.init(biePackage);
           });
 
