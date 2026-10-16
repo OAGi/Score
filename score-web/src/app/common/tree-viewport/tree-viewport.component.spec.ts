@@ -74,7 +74,7 @@ describe('TreeViewportComponent', () => {
     vi.useFakeTimers();
     try {
       const viewport = {scrollToOffset: vi.fn(), checkViewportSize: vi.fn()};
-      const self = {viewport, itemSize: 33} as any;
+      const self = {viewport, itemSize: 33, renderedRow: () => undefined} as any;
 
       TreeViewportComponent.prototype.scrollToIndex.call(self, 2, {delay: 100, smooth: true});
       expect(viewport.scrollToOffset).not.toHaveBeenCalled();
@@ -109,5 +109,49 @@ describe('TreeViewportComponent', () => {
     expect(self.scrollToIndex).toHaveBeenCalledWith(7, {delay: 500, smooth: true});
     expect(self.cursorNode).toBe(node);
     expect(self.cursorNodeChange.emit).toHaveBeenCalledWith(node);
+  });
+
+  it('scrolls to where the row really is when rows are not as tall as itemSize', () => {
+    vi.useFakeTimers();
+    try {
+      const element = {getBoundingClientRect: () => ({top: 100}), scrollTop: 1000};
+      const viewport = {
+        scrollToOffset: vi.fn(), checkViewportSize: vi.fn(), elementRef: {nativeElement: element},
+        getDataLength: () => 400
+      };
+      const row = {getBoundingClientRect: () => ({top: 500})};
+      const self = {viewport, itemSize: 33, renderedRow: () => row} as any;
+
+      TreeViewportComponent.prototype.scrollToIndex.call(self, 300, {smooth: true});
+      vi.advanceTimersByTime(0);
+
+      // 500 - 100 below the viewport's top edge, on top of what is scrolled already (not 300 * 33)
+      expect(viewport.scrollToOffset).toHaveBeenCalledWith(1400, 'smooth');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('waits until the row is rendered before it scrolls to it', () => {
+    vi.useFakeTimers();
+    try {
+      const rendered: {row?: any} = {};
+      const viewport = {
+        scrollToOffset: vi.fn(), checkViewportSize: vi.fn(),
+        elementRef: {nativeElement: {getBoundingClientRect: () => ({top: 0}), scrollTop: 0}},
+        getDataLength: () => 400
+      };
+      const self = {viewport, itemSize: 33, renderedRow: () => rendered.row} as any;
+
+      TreeViewportComponent.prototype.scrollToIndex.call(self, 5);
+      vi.advanceTimersByTime(100);
+      expect(viewport.scrollToOffset).not.toHaveBeenCalled();
+
+      rendered.row = {getBoundingClientRect: () => ({top: 180})};
+      vi.advanceTimersByTime(50);
+      expect(viewport.scrollToOffset).toHaveBeenCalledWith(180, 'auto');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

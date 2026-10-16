@@ -197,10 +197,15 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   }
 
   /**
-   * Scroll so that the row at `index` is the first visible one. The scroll always waits for at least the end of the
-   * current task, and then for the viewport to have grown to the row: a caller that has just expanded nodes to reveal
-   * the row has changed the row count, and the viewport only knows the new content height after it has rendered them
-   * (scrolling earlier stops at the old end), which for heavy rows can take a while.
+   * Scroll so that the row at `index` is the first visible one (or as near as the end of the tree allows).
+   *
+   * The scroll always waits for at least the end of the current task, and then for the viewport to have the row: a
+   * caller that has just expanded nodes to reveal the row has changed the row count, and the viewport only knows the
+   * new content height, and has the row, after it has rendered them, which for heavy rows can take a while.
+   *
+   * The position comes from the row itself, not from `index * itemSize`: rows are not necessarily as tall as
+   * `itemSize` (those of the BIE tree are taller), and every row of error adds up along the way (at the 300th row the
+   * target would be far below the screen).
    */
   scrollToIndex(index: number, options: { delay?: number, smooth?: boolean } = {}) {
     if (index < 0) {
@@ -208,17 +213,30 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
     }
 
     const scroll = (retries = 60) => {
-      const offset = index * this.itemSize;
       const element: HTMLElement | undefined = this.viewport.elementRef?.nativeElement;
-      const rowsReach = this.viewport.getDataLength ? this.viewport.getDataLength() * this.itemSize : 0;
-      if (element && retries > 0 && element.scrollHeight - element.clientHeight < offset
-        && rowsReach - element.clientHeight >= offset) {
+      const row = this.renderedRow(index);
+      const inData = !this.viewport.getDataLength || this.viewport.getDataLength() > index;
+      if (element && !row && inData && retries > 0 && this.viewport.getDataLength) {
+        // the row is not rendered yet (or the content is not as tall as the row's position yet)
         setTimeout(() => scroll(retries - 1), 16);
         return;
       }
+      const offset = row && element
+        ? row.getBoundingClientRect().top - element.getBoundingClientRect().top + element.scrollTop
+        : index * this.itemSize;
       this.viewport.scrollToOffset(offset, options.smooth ? 'smooth' : 'auto');
       this.viewport.checkViewportSize();
     };
     setTimeout(scroll, options.delay || 0);
+  }
+
+  /** The element of the row, when it is rendered. */
+  private renderedRow(index: number): HTMLElement | undefined {
+    const element: HTMLElement | undefined = this.viewport.elementRef?.nativeElement;
+    const range = this.viewport.getRenderedRange?.();
+    if (!element || !range || index < range.start || index >= range.end) {
+      return undefined;
+    }
+    return element.querySelectorAll<HTMLElement>('.example-item')[index - range.start];
   }
 }
