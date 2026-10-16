@@ -1,13 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>{{ data.header }}</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content" mat-dialog-content>
+<score-dialog-page title="{{ data.header }}">
+  <div class="content dialog-form">
     @for (text of data.content; track text) {
       <p>
         {{ text }}
@@ -183,12 +175,15 @@
     </div>
     }
   </div>
-  <div class="actions ms-auto" mat-dialog-actions>
-    <button mat-button class="btn btn-outline-primary" color="primary" (click)="onConfirm()">
-      {{ data.actionLabel }}
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
-    <button mat-button class="btn" color="warn" (click)="onNoClick()">
-      Cancel
+    <button mat-raised-button color="primary" (click)="onConfirm()">
+      <mat-icon>check</mat-icon>
+      <span class="ps-2">{{ data.actionLabel }}</span>
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

@@ -44,12 +44,14 @@
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="close()">
-      Cancel
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
     <button mat-raised-button color="primary"
       [disabled]="selection.selected.length === 0"
       (click)="link()">
-      Link
+      <mat-icon>link</mat-icon>
+      <span class="ps-2">Link</span>
     </button>
   </ng-container>
 </score-dialog-page>

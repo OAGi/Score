@@ -1,19 +1,6 @@
-<div class="header d-flex align-items-center" mat-dialog-title>
-  <span class="import-title">Upload Business Terms</span>
-  <!-- Top-right cancel (mirrors the app-wide dialog close button, see confirm-dialog): available on
-       every step up to (but not including) the Result step, so the user can back out any time before
-       the import has run. The Result step already offers Close. -->
-  @if (phase !== 'result') {
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button type="button"
-              aria-label="Cancel and close" matTooltip="Cancel" (click)="close()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  }
-</div>
-
-<mat-dialog-content class="import-content">
+<score-dialog-page [closable]="phase !== 'result'">
+  <span dialogTitle class="import-title">Upload Business Terms</span>
+  <div class="import-content dialog-form">
   <mat-stepper class="import-stepper"
                linear
                (selectionChange)="onStepSelectionChange($event.selectedIndex)">
@@ -341,32 +328,53 @@
     </mat-step>
 
   </mat-stepper>
-</mat-dialog-content>
+  </div>
 
-<mat-dialog-actions align="end" class="import-actions">
-  @switch (phase) {
-    @case ('upload') {
-      <button mat-button type="button" (click)="close()">Cancel</button>
-      <button mat-flat-button color="primary" type="button"
-              [disabled]="!canProceedFromUpload" (click)="goToMap()">Next</button>
+  <ng-container ngProjectAs="[dialogActions]">
+    @switch (phase) {
+      @case ('upload') {
+        <button mat-raised-button color="warn" type="button" (click)="close()">
+          <mat-icon>close</mat-icon>
+          <span class="ps-2">Cancel</span>
+        </button>
+        <button mat-raised-button color="primary" type="button"
+                [disabled]="!canProceedFromUpload" (click)="goToMap()">
+          <mat-icon>arrow_forward</mat-icon>
+          <span class="ps-2">Next</span>
+        </button>
+      }
+      @case ('map') {
+        <button mat-raised-button type="button" (click)="backToUpload()">
+          <mat-icon>arrow_back</mat-icon>
+          <span class="ps-2">Back</span>
+        </button>
+        <button mat-raised-button color="primary" type="button"
+                [disabled]="!canProceedFromMapping" (click)="goToPreview()">
+          <mat-icon>arrow_forward</mat-icon>
+          <span class="ps-2">Next</span>
+        </button>
+      }
+      @case ('preview') {
+        <button mat-raised-button type="button" (click)="backToMap()">
+          <mat-icon>arrow_back</mat-icon>
+          <span class="ps-2">Back</span>
+        </button>
+        <button mat-raised-button color="primary" type="button"
+                [disabled]="selectedCount === 0 || importing" (click)="importSelected()">
+          @if (importing) {
+            <mat-spinner [diameter]="18" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>check</mat-icon>
+          }
+          <span class="ps-2">Import {{ selectedCount }} selected</span>
+        </button>
+      }
+      @case ('result') {
+        <button mat-raised-button color="primary" type="button" (click)="close()">
+          <mat-icon>close</mat-icon>
+          <span class="ps-2">Close</span>
+        </button>
+      }
     }
-    @case ('map') {
-      <button mat-button type="button" (click)="backToUpload()">Back</button>
-      <button mat-flat-button color="primary" type="button"
-              [disabled]="!canProceedFromMapping" (click)="goToPreview()">Next</button>
-    }
-    @case ('preview') {
-      <button mat-button type="button" (click)="backToMap()">Back</button>
-      <button mat-flat-button color="primary" type="button"
-              [disabled]="selectedCount === 0 || importing" (click)="importSelected()">
-        @if (importing) {
-          <mat-spinner [diameter]="18" class="btn-spinner"></mat-spinner>
-        }
-        Import {{ selectedCount }} selected
-      </button>
-    }
-    @case ('result') {
-      <button mat-flat-button color="primary" type="button" (click)="close()">Close</button>
-    }
-  }
-</mat-dialog-actions>
+  </ng-container>
+</score-dialog-page>

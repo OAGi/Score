@@ -3,31 +3,6 @@
   width: 100%;
 }
 
-/* Title row + close button mirror the app-wide dialog convention (see confirm-dialog). */
-.header {
-  width: 100%;
-  padding-top: 8px;
-  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: .1px;
-  line-height: 24px;
-}
-
-.import-title {
-  margin-bottom: 0;
-}
-
-.close {
-  position: relative;
-  margin-left: auto;
-  left: 12px;
-}
-
-.close button {
-  outline: none;
-}
-
 /* Let each step size to its own content (Material supplies padding + scroll); no fixed
    min-height/width so short steps and short tables no longer leave large empty gaps.
    overflow-x is clipped so nothing (e.g. a wide table) can push out and de-center the dialog. */
@@ -609,11 +584,6 @@ tr.mat-mdc-row:hover {
   display: inline-block;
   margin-right: 6px;
   vertical-align: middle;
-}
-
-.import-actions {
-  flex: 0 0 auto;
-  padding: 8px 40px 18px;
 }
 
 ::ng-deep .multiline-tooltip {

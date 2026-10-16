@@ -1,21 +1,13 @@
-<div class="d-block">
+<score-dialog-page>
+  <score-title-with-library-selector dialogTitle [title]="title"
+    [libraries]="mappedLibraries"
+    (libraryChange)="onLibraryChange($event)"/>
   @if (loading) {
     <div class="loading-container">
       <mat-spinner [diameter]="40"></mat-spinner>
     </div>
   }
-  <div>
-    <div class="header d-flex align-items-center" mat-dialog-title>
-      <score-title-with-library-selector [title]="title"
-        [libraries]="mappedLibraries"
-        (libraryChange)="onLibraryChange($event)"/>
-      <div class="close pe-2">
-        <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-    </div>
-    <div class="content" mat-dialog-content>
+  <div class="content dialog-form">
       <mat-card class="mb-3">
         <mat-card-content class="mat-card-container">
           <div class="container-fluid" style="padding: 0;">
@@ -344,14 +336,15 @@
         </mat-expansion-panel>
       </mat-accordion>
     </div>
-  </div>
-  <div class="actions ms-auto" mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
       <span class="ps-2">Close</span>
     </button>
     <button mat-raised-button color="primary" (click)="onUplift()" [disabled]="!targetRelease">
-      <span>Uplift</span>
+      <mat-icon>upgrade</mat-icon>
+      <span class="ps-2">Uplift</span>
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

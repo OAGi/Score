@@ -55,9 +55,9 @@ public class OasSecuritySchemeDialogImpl implements OasSecuritySchemeDialog {
             By.xpath(BASE_XPATH + "//span[normalize-space(.) = \"OAuth Flows\"]/following-sibling::button[1]");
     private static final By FLOW_CARD_LOCATOR = By.xpath(FLOW_CARD_XPATH);
     private static final By PRIMARY_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Add\" or normalize-space(.) = \"Save\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Add\" or normalize-space(.) = \"Save\"]]");
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Cancel\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Cancel\"]]");
 
     private final BasePageImpl parent;
 

@@ -1,23 +1,20 @@
-<div class="close pe-2">
-  <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
-<div class="header">
-  <span>Search Options</span>
-</div>
-<div class="content">
-  <mat-checkbox [(ngModel)]="options.excludeDataTypeSupplementaryComponents">
-    Exclude Data Type Supplementary Components
-  </mat-checkbox>
-</div>
-<div class="actions ms-auto">
-  <button mat-button class="btn btn-outline-primary" color="primary"
-          (click)="onClick()"
-          [mat-dialog-close]="true">
-    Apply
-  </button>
-  <button mat-button class="btn" color="warn" (click)="onNoClick()">
-    Cancel
-  </button>
-</div>
+<score-dialog-page title="Search Options">
+  <div class="dialog-form">
+    <mat-checkbox [(ngModel)]="options.excludeDataTypeSupplementaryComponents">
+      Exclude Data Type Supplementary Components
+    </mat-checkbox>
+  </div>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
+    </button>
+    <button mat-raised-button color="primary"
+            (click)="onClick()"
+            [mat-dialog-close]="true">
+      <mat-icon>check</mat-icon>
+      <span class="ps-2">Apply</span>
+    </button>
+  </ng-container>
+</score-dialog-page>

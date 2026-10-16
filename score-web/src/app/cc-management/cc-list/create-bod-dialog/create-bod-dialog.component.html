@@ -134,17 +134,19 @@
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
-    Cancel
+    <mat-icon>close</mat-icon>
+    <span class="ps-2">Cancel</span>
   </button>
   @if (action === 'create') {
     <button mat-raised-button color="primary"
       [disabled]="nounSelection.selected.length === 0 || verbSelection.selected.length === 0"
       (click)="onClick()">
+      <mat-icon>add</mat-icon>
       @if (BODName === '') {
-        <span>Create</span>
+        <span class="ps-2">Create</span>
       }
       @if (BODName !== '') {
-        <span>Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
+        <span class="ps-2">Create '{{BODName}}'{{ (totalNumberOfBODs > 1) ? ' and ' + (totalNumberOfBODs - 1) + ' more' : ''}}</span>
       }
     </button>
   }

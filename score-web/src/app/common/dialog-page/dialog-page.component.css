@@ -69,3 +69,8 @@
 .dialog-actions:empty {
   display: none;
 }
+
+/* Body of a plain form dialog (no table view): gives it the same side inset as the title and the actions. */
+.dialog-body ::ng-deep .dialog-form {
+  padding: 0 var(--score-dialog-padding);
+}

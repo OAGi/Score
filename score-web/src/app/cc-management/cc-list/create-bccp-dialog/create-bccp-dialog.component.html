@@ -87,20 +87,23 @@
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
-      Cancel
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
     @if (action === 'create') {
       <button mat-raised-button color="primary"
         [disabled]="selection.selected.length === 0"
         (click)="onClick()">
-        Create
+        <mat-icon>add</mat-icon>
+        <span class="ps-2">Create</span>
       </button>
     }
     @if (action === 'update') {
       <button mat-raised-button color="accent"
         [disabled]="selection.selected.length === 0"
         (click)="onClick()">
-        Update
+        <mat-icon>save</mat-icon>
+        <span class="ps-2">Update</span>
       </button>
     }
   </ng-container>

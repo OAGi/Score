@@ -139,12 +139,14 @@
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
-      Cancel
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
     <button mat-raised-button color="primary"
       [disabled]="selection.selected.length !== 1"
       (click)="onSubmit()">
-      Select
+      <mat-icon>check</mat-icon>
+      <span class="ps-2">Select</span>
     </button>
   </ng-container>
 </score-dialog-page>

@@ -40,9 +40,9 @@ public class OasSecurityRequirementDialogImpl implements OasSecurityRequirementD
     private static final By ADD_ALTERNATIVE_BUTTON_LOCATOR =
             By.xpath(BASE_XPATH + "//button[contains(., \"Add Alternative\")]");
     private static final By APPLY_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Apply\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Apply\"]]");
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Cancel\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Cancel\"]]");
 
     private final BasePageImpl parent;
 

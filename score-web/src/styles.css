@@ -854,10 +854,11 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
 
 .center-dialog {
   position: fixed !important;
-  top: 8%;
+  top: 0;
   left: 3%;
   right: 3%;
-  bottom: 8%;
+  bottom: 0;
+  margin-block: auto;
   max-width: 100% !important;
 }
 

@@ -181,12 +181,14 @@
 
   <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
-      Cancel
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
     </button>
     <button mat-raised-button color="primary"
         [disabled]="!isValid"
         (click)="doRefactor()">
-        Refactor
+        <mat-icon>build</mat-icon>
+        <span class="ps-2">Refactor</span>
       </button>
   </ng-container>
 </score-dialog-page>
