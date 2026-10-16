@@ -7,54 +7,10 @@
   background-color: #ececec;
 }
 
-.mat-tree-node .abie, .mat-tree-node .asbiep, .mat-tree-node .asbiep-extension {
-  color: #4078c0 !important;
-  font-weight: bold !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bbiep {
-  color: #006400 !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bbiep-attribute {
-  color: #666 !important;
-  font-style: italic !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bbie_sc {
-  color: #bd2c00 !important;
-  text-shadow: inherit !important;
-}
-
 .sticky {
   position: sticky;
   position: -webkit-sticky;
   top: 10px;
-}
-
-.mat-tree-node .node-row-content {
-  min-width: 0;
-  width: 100%;
-}
-
-.mat-tree-node .node-label {
-  min-width: 0;
-  flex: 0 1 auto;
-}
-
-.mat-tree-node .node-cardinality,
-.mat-tree-node .node-status-icon,
-.mat-tree-node .node-action-icons {
-  flex: 0 0 auto;
-}
-
-.mat-tree-node .node-action-icons {
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
 }
 
 .comment.mat-icon {
@@ -116,12 +72,6 @@
   position: absolute;
   top: 0;
   right: 0;
-}
-
-.mat-tree-node .node-edit-container {
-  width: 100%;
-  height: 100%;
-  padding-right: 64px;
 }
 
 /* Issue #1519: BIE-root "OpenAPI Document Information" panel — one card per OAS binding */

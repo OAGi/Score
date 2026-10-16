@@ -12,6 +12,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
@@ -45,6 +46,7 @@ const routes: Routes = [
         CommonModule,
         TranslatePipe,
         ScoreCommonModule,
+        CcTreeViewportComponent,
         SearchOptionsDialogModule,
         FindUsagesDialogModule,
         DragDropModule,

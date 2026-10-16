@@ -1,0 +1,53 @@
+<score-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [height]="height" [contextMenu]="contextMenu"
+                     [cursorNode]="cursorNode" (cursorNodeChange)="cursorNodeChange.emit($event)"
+                     [isActionsHidden]="isActionsHidden"
+                     (nodeClick)="nodeClick.emit($event)" (nodeKey)="nodeKey.emit($event)"
+                     (copyLink)="copyLink.emit($event)" (contextMenuOpen)="contextMenuOpen.emit($event)">
+  <ng-template #prefix let-node>
+    @if (node.level > 0) {
+      <mat-checkbox class="bie-checkbox"
+                    #usedCheckbox="matCheckbox"
+                    [checked]="host.used(node)"
+                    [disabled]="!host.isUsable(node)"
+                    [color]="(node.used === undefined) ? 'warn' : undefined"
+                    (click)="host.toggleTreeUsed(node, $event, usedCheckbox)"
+                    [matTooltip]="host.getNodeTooltip(node)"
+                    [matTooltipDisabled]="host.getNodeTooltip(node) === ''">
+      </mat-checkbox>
+    }
+  </ng-template>
+
+  <ng-template #content let-node>
+    @if (host.renamingNode !== node) {
+      <span class="node-label"
+            [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
+            [class.deprecated]="node.deprecated"
+            [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+            [class.search-index]="searcher.isCurrentSearchIndex(node)"
+            [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
+            (dblclick)="host.startChangingDisplayName(node)">
+      </span>
+      @if (!dataSource.hideCardinality) {
+        <span class="node-cardinality ps-2">
+          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+        </span>
+      }
+      @if (node.reused) {
+        <fa-icon [icon]="faRecycle" matTooltip="Reused" class="node-status-icon ps-3 pointer"
+                 (click)="host.openNewEditBieTab(node, $event)"></fa-icon>
+      }
+      @if (node.inherited) {
+        <fa-icon [icon]="faSitemap" matTooltip="Inherited" class="node-status-icon ps-3 pointer"></fa-icon>
+      }
+    } @else {
+      <div class="node-edit-container d-flex flex-column">
+        <input matInput #editInput
+               [(ngModel)]="node.displayName"
+               [maxLength]="100"
+               (blur)="host.stopChangingDisplayName()"
+               (keydown.enter)="host.stopChangingDisplayName()"
+               class="edit-input"/>
+      </div>
+    }
+  </ng-template>
+</score-tree-viewport>

@@ -12,14 +12,6 @@
   top: 10px;
 }
 
-.mat-tree-node > .ms-auto.align-self-center.me-2,
-.mat-tree-node > .ms-auto.align-self-center.me-2.d-inline-flex {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
-}
-
 .comment.mat-icon {
   width: 16px;
   height: 16px;
@@ -54,11 +46,6 @@ button:focus, button:active:focus, button.active:focus {
 .exclude-scs {
   vertical-align: middle;
   margin-right: 5px;
-}
-
-.mat-tree-node div.tag-list,
-.mat-tree-node span.tag {
-  height: 20px;
 }
 
 .textarea-container {

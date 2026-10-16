@@ -71,11 +71,6 @@ button:focus, button:active:focus, button.active:focus {
   margin-right: 5px;
 }
 
-.mat-tree-node div.tag-list,
-.mat-tree-node span.tag {
-  height: 20px;
-}
-
 .textarea-container {
   position: relative;
 }

@@ -1,6 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +19,8 @@ import {
   CcFlatNodeDataSource,
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {findPreviousAssociation} from '../domain/association-revision';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
@@ -118,7 +119,6 @@ export class AccDetailComponent implements OnInit {
 
   faFlask = faFlask;
   title: string;
-  paddingPixel = 12;
   manifestId: number;
   type = 'ACC';
   isUpdating: boolean;
@@ -158,23 +158,13 @@ export class AccDetailComponent implements OnInit {
   hasBasedAcc: boolean;
   initialExpandDepth = 10;
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
   @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
   get sidenav(): MatSidenav {
     return this.sidenavPage.sidenav;
   }
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
-
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
@@ -516,14 +506,6 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   private getPreviousAssociation(node?: CcFlatNode): AsccSummary | BccSummary | null {
     node = node || this.selectedNode;
@@ -1918,52 +1900,23 @@ export class AccDetailComponent implements OnInit {
     this.cursorNode = node;
   }
 
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
 
 
   scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
+    this.treeViewport.scrollToIndex(index, {delay, smooth: true});
+  }
 
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
+
+  readonly isDraggableNode = (node: CcFlatNode) => this.isDraggable(node);
+  readonly showDragHandleNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');

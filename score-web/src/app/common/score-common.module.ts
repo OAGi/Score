@@ -31,6 +31,7 @@ import {BranchSelectorComponent} from './branch-selector/branch-selector.compone
 import {TreeSearchBarComponent} from './tree-search-bar/tree-search-bar.component';
 import {TreeBreadcrumbsComponent} from './tree-breadcrumbs/tree-breadcrumbs.component';
 import {TreeDetailComponent} from './tree-detail/tree-detail.component';
+import {TreeViewportComponent} from './tree-viewport/tree-viewport.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import {TreeDetailComponent} from './tree-detail/tree-detail.component';
     TreeSearchBarComponent,
     TreeBreadcrumbsComponent,
     TreeDetailComponent,
+    TreeViewportComponent,
     MatDialogModule,
     MatCardModule,
     CommonModule,
@@ -79,6 +81,7 @@ import {TreeDetailComponent} from './tree-detail/tree-detail.component';
     TreeSearchBarComponent,
     TreeBreadcrumbsComponent,
     TreeDetailComponent,
+    TreeViewportComponent,
     UnboundedPipe,
     HighlightSearch,
     DateAgoPipe,

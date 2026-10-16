@@ -35,7 +35,8 @@ import {
   BieFlatNodeDataSourceSearcher,
   ChangeListener
 } from '../domain/bie-flat-tree';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {BieTreeRowHost, BieTreeViewportComponent} from './bie-tree-viewport/bie-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from '@angular/forms';
 import {
@@ -59,7 +60,6 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/a
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
 import {MatChipGrid} from '@angular/material/chips';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -104,7 +104,7 @@ import {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-edit.component.css']
 })
-export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
+export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, BieTreeRowHost {
   private service = inject(BieEditService);
   private ccNodeService = inject(CcNodeService);
   private bieViewOrderService = inject(BieViewOrderService);
@@ -135,7 +135,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   faRecycle = faRecycle;
   faSitemap = faSitemap;
   loading = false;
-  paddingPixel = 12;
 
   topLevelAsbiepId: number;
   rootNode: BieEditAbieNode;
@@ -253,18 +252,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(BieTreeViewportComponent, {static: true}) treeViewport: BieTreeViewportComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
-
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: BieFlatNode;
   @ViewChild('businessContextInput') businessContextInput: ElementRef<HTMLInputElement>;
   @ViewChild('matAutocomplete') matAutocomplete: MatAutocomplete;
@@ -470,14 +459,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
   }
 
-  toggle(node: BieFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   onClick(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
@@ -561,39 +542,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
   }
 
-  keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
-    // Skip if the target is an input, textarea, or contenteditable element
-    const target = $event.target as HTMLElement;
-    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-    if (isInputField) {
-      return;
-    }
-
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.code === 'Space') {
-      this.toggleTreeUsed(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
 
 
   scrollTree(index: number, delay?: number) {
@@ -602,12 +550,17 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
 
     setTimeout(() => {
-      if (this.virtualScroll) {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize);
-        this.virtualScroll.checkViewportSize();
-      }
+      this.treeViewport?.scrollToIndex(index);
       this.cdr.detectChanges();
     }, delay);
+  }
+
+  onTreeKey({event}: TreeViewportNodeKey<BieFlatNode>) {
+    if (event.code === 'Space') {
+      this.toggleTreeUsed(this.cursorNode);
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 
   search(inputKeyword, backward?: boolean, force?: boolean) {

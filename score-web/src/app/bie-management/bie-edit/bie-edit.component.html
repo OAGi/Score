@@ -194,99 +194,11 @@
       }
     </ng-container>
     <ng-container treeDetailTree>
-      <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}"
-        minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-        [style.height.px]="treeDetail.treeHeight" #virtualScroll>
-        <div *cdkVirtualFor="let node of dataSource" class="example-item"
-          (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false">
-          <div class="mat-tree-node d-flex align-items-center pointer"
-            tabIndex="0"
-            [attr.data-level]="node.level"
-            [attr.data-path]="node.path"
-            [attr.data-query-path]="node.queryPath"
-            [class]="{'tree-node-selected': cursorNode === node}"
-            (click)="onClick(node, $event)"
-            (keydown)="keyNavigation(node, $event)"
-            [style.padding-left]="node.level * paddingPixel + 'px'">
-            @if (dataSource.isExpandable(node)) {
-              <button
-                (click)="toggle(node, $event)"
-                mat-icon-button>
-                <mat-icon class="mat-icon-rtl-mirror">
-                  {{ node.expanded ? 'expand_more' : 'chevron_right' }}
-                </mat-icon>
-              </button>
-            } @else {
-              <button mat-icon-button disabled></button>
-            }
-
-            @if (node.level > 0) {
-              <mat-checkbox class="bie-checkbox"
-                #usedCheckbox="matCheckbox"
-                [checked]="used(node)"
-                [disabled]="!isUsable(node)"
-                [color]="(node.used === undefined) ? 'warn' : undefined"
-                (click)="toggleTreeUsed(node, $event, usedCheckbox)"
-                [matTooltip]="getNodeTooltip(node)"
-                [matTooltipDisabled]="getNodeTooltip(node) === ''">
-              </mat-checkbox>
-            }
-
-            @if (renamingNode !== node) {
-              <div class="node-row-content d-flex align-items-center flex-grow-1">
-              <span class="node-label" [class]="[node.type.toLowerCase(),
-                              this.searcher.isSearchResult(node) ? 'inside' : 'outside']"
-                    [style.padding-right.px]="2"
-                  [class.deprecated]="node.deprecated"
-                  [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                  [class.search-index]="this.searcher.isCurrentSearchIndex(node)"
-                  [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
-                  (dblclick)="startChangingDisplayName(node)">
-                </span>
-                @if (!dataSource.hideCardinality) {
-                  <span class="node-cardinality" [class]="['ps-4']">
-                    {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                  </span>
-                }
-                @if (node.reused) {
-                  <fa-icon [icon]="faRecycle"
-                    matTooltip="Reused"
-                    [class]="['node-status-icon', 'ps-3', 'pointer']"
-                  (click)="openNewEditBieTab(node, $event)"></fa-icon>
-                }
-                @if (node.inherited) {
-                  <fa-icon [icon]="faSitemap"
-                    matTooltip="Inherited"
-                  [class]="['node-status-icon', 'ps-3', 'pointer']"></fa-icon>
-                }
-                <div class="node-action-icons ms-auto me-2">
-                  <mat-icon style="{{ node.showCopyLinkIcon ? '' : 'visibility: hidden' }}"
-                    class="copy-link-icon"
-                    matTooltip="Copy Link"
-                    (click)="copyLink(node, $event)">
-                    link
-                  </mat-icon>
-                  <mat-icon class="context-menu-icon"
-                    [matMenuTriggerFor]="contextMenu"
-                    [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
-                    (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                  </mat-icon>
-                </div>
-              </div>
-            } @else {
-              <div class="node-edit-container d-flex flex-column">
-                <input matInput #editInput
-                  [(ngModel)]="node.displayName"
-                  [maxLength]="100"
-                  (blur)="stopChangingDisplayName()"
-                  (keydown.enter)="stopChangingDisplayName()"
-                  class="edit-input"/>
-              </div>
-            }
-
-          </div>
-        </div>
-      </cdk-virtual-scroll-viewport>
+      <score-bie-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [host]="this" [(cursorNode)]="cursorNode"
+                               [height]="treeDetail.treeHeight" [contextMenu]="contextMenu"
+                               (nodeClick)="onClick($event)" (nodeKey)="onTreeKey($event)"
+                               (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event">
+      </score-bie-tree-viewport>
 
       <!-- Context Menu Area -->
       <mat-menu class="context-menu" #contextMenu="matMenu">

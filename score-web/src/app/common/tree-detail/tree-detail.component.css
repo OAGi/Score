@@ -91,7 +91,7 @@ score-tree-detail .mat-tree-node span {
   text-overflow: ellipsis;
 }
 
-score-tree-detail .mat-tree-node > span.pe-2.align-self-center {
+score-tree-detail .mat-tree-node > .node-label {
   min-width: 0;
   flex: 0 1 auto;
 }
@@ -102,12 +102,16 @@ score-tree-detail .mat-tree-node > .tag-list {
   overflow: hidden;
 }
 
-score-tree-detail .mat-tree-node > .ms-auto.align-self-center.me-2,
-score-tree-detail .mat-tree-node > .ms-auto.align-self-center.me-2.d-inline-flex {
+score-tree-detail .mat-tree-node > .tree-row-actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   padding-left: 8px;
+}
+
+score-tree-detail .mat-tree-node > .node-cardinality,
+score-tree-detail .mat-tree-node > .node-status-icon {
+  flex: 0 0 auto;
 }
 
 score-tree-detail .tag-list {
@@ -169,4 +173,36 @@ score-tree-detail .tree-detail-container {
 
 score-tree-detail .tree-detail-container div.checkbox {
   padding-bottom: 1.25em;
+}
+
+/* BIE tree rows: node types and the in-place display name editor. */
+
+score-tree-detail .mat-tree-node .abie,
+score-tree-detail .mat-tree-node .asbiep,
+score-tree-detail .mat-tree-node .asbiep-extension {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-detail .mat-tree-node .bbiep {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-detail .mat-tree-node .bbiep-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-detail .mat-tree-node .bbie_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-detail .mat-tree-node .node-edit-container {
+  width: 100%;
+  height: 100%;
+  padding-right: 64px;
 }

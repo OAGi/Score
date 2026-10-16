@@ -1,0 +1,31 @@
+<score-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [height]="height" [contextMenu]="contextMenu"
+                     [cursorNode]="cursorNode" (cursorNodeChange)="cursorNodeChange.emit($event)"
+                     [isDraggable]="isDraggable" [showDragHandle]="showDragHandle" [canDrop]="canDrop"
+                     (nodeClick)="nodeClick.emit($event)" (nodeKey)="nodeKey.emit($event)"
+                     (copyLink)="copyLink.emit($event)" (contextMenuOpen)="contextMenuOpen.emit($event)"
+                     (dropped)="dropped.emit($event)">
+  <ng-template #content let-node>
+    <span class="node-label"
+          [class]="[node.typeClass.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
+          [class.search-index]="searcher.isCurrentSearchIndex(node)"
+          [class.deprecated]="node.deprecated"
+          [class.text-danger]="node.state === 'Deleted'"
+          [class.text-line-through]="node.state === 'Deleted'"
+          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
+          [innerHTML]="node.name | highlight : searcher.searchKeyword">
+    </span>
+
+    @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {
+      <span class="node-cardinality ps-2">
+        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
+      </span>
+    }
+
+    <div class="tag-list ps-2">
+      @for (tag of node.tagList; track tag) {
+        <span class="tag ms-2" [style.background-color]="tag.backgroundColor"
+              [style.color]="tag.textColor">{{ tag.name }}</span>
+      }
+    </div>
+  </ng-template>
+</score-tree-viewport>

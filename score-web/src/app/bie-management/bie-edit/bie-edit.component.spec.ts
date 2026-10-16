@@ -11,22 +11,17 @@ describe('BieEditComponent', () => {
   it('scrolls to a node after the requested delay and refreshes the viewport', () => {
     vi.useFakeTimers();
     try {
-      const virtualScroll = {
-        scrollToOffset: vi.fn(),
-        checkViewportSize: vi.fn()
-      };
+      const treeViewport = {scrollToIndex: vi.fn()};
       const context = {
-        virtualScroll,
-        virtualScrollItemSize: 33,
+        treeViewport,
         cdr: {detectChanges: vi.fn()}
       } as any;
 
       BieEditComponent.prototype.scrollTree.call(context, 2, 100);
 
-      expect(virtualScroll.scrollToOffset).not.toHaveBeenCalled();
+      expect(treeViewport.scrollToIndex).not.toHaveBeenCalled();
       vi.advanceTimersByTime(100);
-      expect(virtualScroll.scrollToOffset).toHaveBeenCalledWith(66);
-      expect(virtualScroll.checkViewportSize).toHaveBeenCalledTimes(1);
+      expect(treeViewport.scrollToIndex).toHaveBeenCalledWith(2);
       expect(context.cdr.detectChanges).toHaveBeenCalledTimes(1);
     } finally {
       vi.useRealTimers();
