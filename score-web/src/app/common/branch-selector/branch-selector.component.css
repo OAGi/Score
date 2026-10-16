@@ -1,0 +1,27 @@
+score-branch-selector {
+  display: contents;
+}
+
+score-branch-selector .branch-selector {
+  padding: 0 0.5rem 0 1rem;
+}
+
+score-branch-selector .additional-selection {
+  opacity: 0.75;
+}
+
+/* The search box of the panel lines up with the options below it: the select-all check box on theirs, the text on theirs. */
+.score-branch-selector-panel .mat-select-search-inner.mat-select-search-inner-toggle-all .mat-select-search-input.mat-select-search-input.mat-select-search-input {
+  padding-left: 17px;
+}
+
+/* The clear button is hidden while empty, so no room is kept for it (it clipped the placeholder). */
+.score-branch-selector-panel .mat-select-search-inner .mat-select-search-input.mat-select-search-input.mat-select-search-input:placeholder-shown {
+  padding-right: 5px;
+}
+
+.score-branch-selector-panel .mat-select-search-inner .mat-select-search-toggle-all-checkbox {
+  position: relative;
+  left: 2px;
+  top: 4px;
+}

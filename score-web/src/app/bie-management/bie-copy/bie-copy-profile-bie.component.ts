@@ -1,17 +1,15 @@
 import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
-import {FormControl} from '@angular/forms';
 import {SelectionModel} from '@angular/cdk/collections';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ReplaySubject} from 'rxjs';
 import {BieCopyService} from './domain/bie-copy.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContextSummary} from '../../context-management/business-context/domain/business-context';
 import {BieListEntry} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BIE_FILTERS as F, BIE_TABLE, BIE_URL_FILTERS} from '../bie-list/domain/bie.table';
-import {base64Decode, base64Encode, initFilter, saveBooleanProperty} from '../../common/utility';
+import {base64Decode, base64Encode, saveBooleanProperty} from '../../common/utility';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
@@ -106,13 +104,10 @@ export class BieCopyProfileBieComponent {
   /** The branches of the library that the BIEs can be of, and those chosen. */
   releases: ReleaseSummary[] = [];
   selectedReleases: ReleaseSummary[] = [];
-  readonly releaseListFilterCtrl = new FormControl();
-  readonly filteredReleaseList = new ReplaySubject<ReleaseSummary[]>(1);
 
   /** The branches that the URL asks for are among those of the library. */
   private initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease && e.state === 'Published');
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     const requested = (this.view().filterValue('releaseIds') as string[] | undefined) ?? [];
     this.selectedReleases = requested.map(id => this.releases.find(r => '' + r.releaseId === id)).filter(e => !!e);
     this.applyReleases();
@@ -121,11 +116,6 @@ export class BieCopyProfileBieComponent {
   /** The branches that are chosen go to the query: searching is the user's (or the library's change's) call. */
   applyReleases() {
     this.view().setFilter('releaseIds', this.selectedReleases.map(e => '' + e.releaseId));
-  }
-
-  toggleAllForReleaseFilter(selectAllValue: boolean) {
-    this.selectedReleases = selectAllValue ? this.releases : [];
-    this.applyReleases();
   }
 
   get businessContextNames(): string {

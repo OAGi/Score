@@ -10,28 +10,9 @@
     [filterOptions]="filterOptions()" [selection]="selection" singleSelect searchClearsSort pageFromResponse rowHover
     advancedSearchOffset="14.5rem">
 
-    <div searchPrefix class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
-      <mat-form-field appearance="outline">
-        <mat-label>Branch</mat-label>
-        <mat-select [ngModel]="releaseChoice.release"
-          (ngModelChange)="onBranchChange($event)">
-          <mat-select-trigger class="d-flex">
-            <span>{{ releaseChoice.release?.releaseNum }}</span>
-          </mat-select-trigger>
-          <mat-option>
-            <ngx-mat-select-search [formControl]="releaseChoice.filterCtrl"
-              [placeholderLabel]="'Search...'"
-            [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
-          </mat-option>
-          @for (release of releaseChoice.filtered | async; track release) {
-            <mat-option [value]="release">
-              <div class="d-flex">
-                <span class="release-num">{{ release.releaseNum }}</span>
-              </div>
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+    <div searchPrefix class="d-flex">
+      <score-branch-selector [releases]="releaseChoice.releases" [selected]="releaseChoice.release"
+        (selectedChange)="onBranchChange($event)"/>
       <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
     </div>
 

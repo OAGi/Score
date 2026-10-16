@@ -27,6 +27,7 @@ import {BasePageComponent} from './base-page/base-page.component';
 import {ListPageComponent} from './list-page/list-page.component';
 import {DialogPageComponent} from './dialog-page/dialog-page.component';
 import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.component';
+import {BranchSelectorComponent} from './branch-selector/branch-selector.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     ListPageComponent,
     DialogPageComponent,
     ScoreMatSelectComponent,
+    BranchSelectorComponent,
     MatDialogModule,
     MatCardModule,
     CommonModule,
@@ -67,6 +69,7 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     ListPageComponent,
     DialogPageComponent,
     ScoreMatSelectComponent,
+    BranchSelectorComponent,
     UnboundedPipe,
     HighlightSearch,
     DateAgoPipe,

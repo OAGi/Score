@@ -1,14 +1,11 @@
 import {afterNextRender, ChangeDetectionStrategy, Component, inject, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
-import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
-import {initFilter} from '../../../common/utility';
 import {BiePackage, BiePackageListEntry} from '../domain/bie-package';
 import {BiePackageService} from '../domain/bie-package.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
@@ -90,8 +87,6 @@ export class BiePackageListComponent {
   /** The branches of the library that the packages can be of, and those chosen. */
   releases: ReleaseSummary[] = [];
   selectedReleases: ReleaseSummary[] = [];
-  readonly releaseListFilterCtrl = new FormControl();
-  readonly filteredReleaseList = new ReplaySubject<ReleaseSummary[]>(1);
 
   readonly load = (params: HttpParams) => this.biePackageService.getBiePackageListPage(params);
   readonly rowKey = (row: BiePackageListEntry) => row.biePackageId;
@@ -119,7 +114,6 @@ export class BiePackageListComponent {
   /** The branches that the URL asks for are among those of the library. */
   private initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     const requested = (this.view().filterValue('releaseIds') as string[] | undefined) ?? [];
     this.selectedReleases = requested.map(id => this.releases.find(r => '' + r.releaseId === id)).filter(e => !!e);
     this.applyReleases();
@@ -128,11 +122,6 @@ export class BiePackageListComponent {
   /** The branches that are chosen go to the query: searching is the user's (or the library's change's) call. */
   applyReleases() {
     this.view().setFilter('releaseIds', this.selectedReleases.map(e => '' + e.releaseId));
-  }
-
-  toggleAllForReleaseFilter(selectAllValue: boolean) {
-    this.selectedReleases = selectAllValue ? this.releases : [];
-    this.applyReleases();
   }
 
   onLibraryChange(library: LibrarySummary) {

@@ -3,11 +3,8 @@
         [selection]="selection" [rowKey]="rowKey" singleSelect searchDisabled [syncUrl]="false" advancedSearchOffset="11.5rem"
         rowHover>
 
-    <div searchPrefix class="branch-selector d-flex" style="width: 8rem; padding: 0 0.5rem 0 1rem;">
-      <mat-form-field appearance="outline">
-        <mat-label>Branch</mat-label>
-        <input matInput [disabled]="true" [value]="release.releaseNum"/>
-      </mat-form-field>
+    <div searchPrefix class="d-flex">
+      <score-branch-selector width="8rem" readonly [selected]="release"/>
       <mat-divider [vertical]="true" style="padding-left: 1.5rem;"/>
     </div>
 

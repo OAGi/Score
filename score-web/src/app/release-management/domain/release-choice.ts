@@ -1,18 +1,14 @@
-import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
 import {AuthService} from '../../authentication/auth.service';
-import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {loadBranch, saveBranch} from '../../common/utility';
 import {ReleaseSummary} from './release';
 
 /**
  * The branch (release) that a list of a library shows: the one in the URL, or the one the user last chose (remembered per user),
- * or else the first. `filterCtrl`/`filtered` are for the search box of the branch selector.
+ * or else the first. The `score-branch-selector` shows it.
  */
 export class ReleaseChoice {
   releases: ReleaseSummary[] = [];
   release: ReleaseSummary = new ReleaseSummary();
-  readonly filterCtrl = new FormControl();
-  readonly filtered = new ReplaySubject<ReleaseSummary[]>(1);
 
   /** `cookieType` is what the remembered choice is kept under. */
   constructor(private readonly auth: AuthService, private readonly cookieType = 'CC') {
@@ -44,7 +40,6 @@ export class ReleaseChoice {
     if (!this.release || this.release?.releaseId === 0) {
       this.release = this.releases[0];
     }
-    initFilter(this.filterCtrl, this.filtered, this.releases, (e) => e.releaseNum);
   }
 
   /** The user chose another one. */

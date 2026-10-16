@@ -9,36 +9,8 @@
   <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [selection]="selection" singleSelect searchClearsSort advancedSearchOpen rowHover advancedSearchOffset="14.5rem">
 
-    <div searchPrefix class="branch-selector d-flex" style="width: 11rem; padding: 0 0.5rem 0 1rem;">
-      <mat-form-field appearance="outline">
-        <mat-label>Branch</mat-label>
-        <mat-select [ngModel]="selectedReleases" (ngModelChange)="selectedReleases = $event; applyReleases()"
-          [multiple]="true" placeholder="Branch">
-          <mat-select-trigger class="d-flex">
-            <span>{{ (selectedReleases.length > 0) ? selectedReleases[0].releaseNum : '' }}</span>
-            @if (selectedReleases.length > 1) {
-              <span class="ms-2 additional-selection">
-                (+{{ selectedReleases.length - 1 }} {{ selectedReleases.length === 2 ? 'other' : 'others' }})
-              </span>
-            }
-          </mat-select-trigger>
-          <mat-option>
-            <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
-              [placeholderLabel]="'Search...'" [showToggleAllCheckbox]="true"
-              (toggleAll)="toggleAllForReleaseFilter($event)"
-              [toggleAllCheckboxTooltipMessage]="'Select All / Unselect All'"
-            [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
-          </mat-option>
-          @for (release of filteredReleaseList | async; track release) {
-            <mat-option [value]="release">
-              <div class="d-flex">
-                <span class="ps-2 release-num">{{ release.releaseNum }}</span>
-              </div>
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
+    <score-branch-selector searchPrefix multiple [releases]="releases" [selected]="selectedReleases"
+      (selectedChange)="selectedReleases = $event; applyReleases()"/>
 
     <ng-container scoreColumnDef="state">
       <td score-cell *scoreCellDef="let element">

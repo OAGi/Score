@@ -14,10 +14,9 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
-import {FormControl} from '@angular/forms';
-import {Observable, of, ReplaySubject} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {PageResponse} from '../../basis/basis';
-import {base64Decode, base64Encode, initFilter} from '../../common/utility';
+import {base64Decode, base64Encode} from '../../common/utility';
 import {finalize} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {UserToken} from '../../authentication/domain/auth';
@@ -85,8 +84,6 @@ export class BieListComponent {
   /** The branches of the library that the BIEs can be of, and those chosen. */
   releases: ReleaseSummary[] = [];
   selectedReleases: ReleaseSummary[] = [];
-  readonly releaseListFilterCtrl = new FormControl();
-  readonly filteredReleaseList = new ReplaySubject<ReleaseSummary[]>(1);
 
   contextMenuItem: BieListEntry;
 
@@ -124,7 +121,6 @@ export class BieListComponent {
   /** The branches that the URL asks for are among those of the library. */
   private initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
     const requested = (this.view().filterValue('releaseIds') as string[] | undefined) ?? [];
     this.selectedReleases = requested.map(id => this.releases.find(r => '' + r.releaseId === id)).filter(e => !!e);
     this.applyReleases();
@@ -135,18 +131,12 @@ export class BieListComponent {
     this.view().setFilter('releaseIds', this.selectedReleases.map(e => '' + e.releaseId));
   }
 
-  toggleAllForReleaseFilter(selectAllValue: boolean) {
-    this.selectedReleases = selectAllValue ? this.releases : [];
-    this.applyReleases();
-  }
-
   onLibraryChange(library?: LibrarySummary) {
     this.libraryChoice.choose(library);
     this.selectedReleases = [];
     this.applyReleases();
     if (!library?.libraryId) {
       this.releases = [];
-      this.filteredReleaseList.next([]);
       this.applyLibrary();
       this.view().onSearch();
       return;

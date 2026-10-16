@@ -1,15 +1,13 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
-import {FormControl} from '@angular/forms';
 import {HttpParams} from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
 import {faLocationArrow} from '@fortawesome/free-solid-svg-icons';
-import {ReplaySubject} from 'rxjs';
 import {AuthService} from '../../../authentication/auth.service';
 import {CodeListListEntry} from '../../../code-list-management/domain/code-list';
 import {CODE_LIST_TABLE} from '../../../code-list-management/domain/code-list.table';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
-import {initFilter, loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
+import {loadBranch, loadLibrary, saveBranch, saveLibrary} from '../../../common/utility';
 import {createTableColumns} from '../../../common/score-table';
 import {ReleaseSummary, WorkingRelease} from '../../../release-management/domain/release';
 import {ReleaseService} from '../../../release-management/domain/release.service';
@@ -47,8 +45,6 @@ export class CodelistListDialogComponent implements OnInit {
   library: LibrarySummary = new LibrarySummary();
   release: ReleaseSummary = new ReleaseSummary();
   releases: ReleaseSummary[] = [];
-  releaseListFilterCtrl: FormControl = new FormControl();
-  filteredReleaseList: ReplaySubject<ReleaseSummary[]> = new ReplaySubject<ReleaseSummary[]>(1);
 
   /** The table lists what the library and the branch hold, so it waits for them. */
   readonly ready = signal(false);
@@ -119,7 +115,6 @@ export class CodelistListDialogComponent implements OnInit {
     if (!this.release || this.release.releaseId === 0) {
       this.release = this.releases[0];
     }
-    initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releases, (e) => e.releaseNum);
   }
 
   onLibraryChange(library: LibrarySummary) {
