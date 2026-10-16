@@ -70,6 +70,12 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
     }
 
     @Override
+    public WebElement getPasswordInputOrContinueButton() {
+        By locator = By.cssSelector("input[id=\"password\"], .passkey-continue-button");
+        return visibilityOfElementLocated(getDriver(), locator);
+    }
+
+    @Override
     public WebElement getSignInButton() {
         By locator = By.xpath("//button[@type=\"submit\" and contains(normalize-space(.), \"Sign in\")]"
                 + " | //input[@value=\"Sign in\"]");
