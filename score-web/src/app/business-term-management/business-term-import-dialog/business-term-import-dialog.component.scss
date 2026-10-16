@@ -54,7 +54,8 @@
 
 .import-card-container {
   width: 100%;
-  padding: 2px 16px;
+  /* The dialog shell already insets the body; no side padding here keeps the steps aligned with the title and the action bar. */
+  padding: 2px 0;
   box-sizing: border-box;
 }
 
