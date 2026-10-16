@@ -5,7 +5,7 @@
         @if (ready && searcher) {
           <div class="container-fluid">
             <div class="row">
-              <score-tree-search-bar [searcher]="searcher" [label]="selectedNode?.displayName || selectedNode?.name"
+              <score-tree-search-bar class="col-5" [searcher]="searcher" [label]="selectedNode?.displayName || selectedNode?.name"
                                      (searchRequest)="searchRequest.emit($event)"
                                      (moveRequest)="moveRequest.emit($event)"></score-tree-search-bar>
               <div class="col-7 actions-wrap">

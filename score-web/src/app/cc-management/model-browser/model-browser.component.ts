@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {catchError, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -25,9 +25,7 @@ import {
   ModelBrowserNodeDataSource,
   ModelBrowserNodeDataSourceSearcher
 } from './domain/model-browser-node';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {CdkDragDrop, CdkDragMove} from '@angular/cdk/drag-drop';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
@@ -41,6 +39,10 @@ import {
   reorderRejectReason
 } from './domain/bie-view-order';
 import {SetWeightDialogComponent, SetWeightDialogData} from './set-weight-dialog/set-weight-dialog.component';
+import {
+  ModelBrowserTreeRowHost,
+  ModelBrowserTreeViewportComponent
+} from './model-browser-tree-viewport/model-browser-tree-viewport.component';
 
 
 @Component({
@@ -50,7 +52,7 @@ import {SetWeightDialogComponent, SetWeightDialogData} from './set-weight-dialog
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./model-browser.component.css']
 })
-export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowserNode> {
+export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowserNode>, ModelBrowserTreeRowHost {
   private ccNodeService = inject(CcNodeService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
@@ -73,24 +75,13 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
   type: string;
   manifestId: number;
 
-  innerY: number = window.innerHeight;
   dataSource: ModelBrowserNodeDataSource<ModelBrowserNode>;
   searcher: ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>;
   cursorNode: ModelBrowserNode;
   selectedNode: ModelBrowserNode;
 
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(ModelBrowserTreeViewportComponent, {static: true}) treeViewport: ModelBrowserTreeViewportComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
-
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: ModelBrowserNode;
 
   // Issue #1638 — drag state: hover-only handle, and a red drop-slot (placeholder) on an invalid drop.
@@ -172,22 +163,8 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     });
   }
 
-  onResize(event) {
-    this.innerY = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this.innerY - 200;
-  }
 
-  toggle(node: ModelBrowserNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   onClick(node: ModelBrowserNode, $event?: MouseEvent) {
     if (!!$event) {
@@ -312,56 +289,13 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
   }
 
-  keyNavigation(node: ModelBrowserNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
 
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
 
   scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-    }
+    this.treeViewport.scrollToIndex(index, {delay, smooth: true});
   }
+
+  readonly canReorderNode = (node: ModelBrowserNode) => this.canReorder(node);
 
   search(inputKeyword, backward?: boolean, force?: boolean) {
     this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
@@ -730,8 +664,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     let next = false;
     if (this.validTargetHashPaths.size > 0) {
       const pointerY = event.pointerPosition.y;
-      const viewport: HTMLElement = this.virtualScroll && this.virtualScroll.elementRef
-        ? this.virtualScroll.elementRef.nativeElement : null;
+      const viewport = this.treeViewport.viewportElement;
       const rows = viewport ? Array.from(viewport.querySelectorAll('.mat-tree-node[data-hash-path]')) : [];
       let aboveHash: string | null = null, aboveBottom = -Infinity;
       let belowHash: string | null = null, belowTop = Infinity;

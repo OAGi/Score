@@ -10,6 +10,7 @@ import {AngularSplitModule} from 'angular-split';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ModelBrowserComponent} from './model-browser.component';
+import {ModelBrowserTreeViewportComponent} from './model-browser-tree-viewport/model-browser-tree-viewport.component';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
@@ -48,6 +49,7 @@ const routes: Routes = [
     TranslatePipe,
     CommonModule,
     ScoreCommonModule,
+    ModelBrowserTreeViewportComponent,
     MatBadgeModule,
     MatDialogModule,
     NgxMatSelectSearchModule,

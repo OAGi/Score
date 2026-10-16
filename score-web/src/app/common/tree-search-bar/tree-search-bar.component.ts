@@ -32,8 +32,7 @@ export interface TreeSearchRequest {
   templateUrl: './tree-search-bar.component.html',
   styleUrl: './tree-search-bar.component.css',
   imports: [FormsModule, MatButtonModule, MatIconButtonSizesModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatProgressSpinnerModule, MatTooltipModule],
-  host: {class: 'col-5'}
+    MatProgressSpinnerModule, MatTooltipModule]
 })
 export class TreeSearchBarComponent {
 

@@ -10,6 +10,7 @@ describe('TreeViewportComponent', () => {
 
   beforeEach(() => {
     ctx = {
+      keyboardNavigation: true,
       cursorNode: {id: 'cursor'},
       cursorNodeChange: {emit: vi.fn()},
       nodeClick: {emit: vi.fn()},
@@ -47,6 +48,20 @@ describe('TreeViewportComponent', () => {
     TreeViewportComponent.prototype.onKeydown.call(ctx, node, space);
     expect(ctx.nodeKey.emit).toHaveBeenCalledWith({node, event: space});
     expect(space.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('does nothing on key presses when keyboard navigation is off', () => {
+    ctx.keyboardNavigation = false;
+    TreeViewportComponent.prototype.onKeydown.call(ctx, {} as any, key('ArrowDown'));
+    expect(ctx.searcher.next).not.toHaveBeenCalled();
+    expect(ctx.nodeKey.emit).not.toHaveBeenCalled();
+  });
+
+  it('uses the per-node context menu when one is given', () => {
+    const own: any = {};
+    const shared: any = {};
+    expect(TreeViewportComponent.prototype.menuOf.call({contextMenu: shared}, {} as any)).toBe(shared);
+    expect(TreeViewportComponent.prototype.menuOf.call({contextMenu: shared, contextMenuFor: () => own}, {} as any)).toBe(own);
   });
 
   it('ignores keys typed into an input', () => {

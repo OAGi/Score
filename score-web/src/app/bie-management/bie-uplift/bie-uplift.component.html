@@ -33,61 +33,11 @@
       <div class="row ms-0 me-0" (window:resize)="onResize($event)">
         <div class="col-6 ps-0">
           @if (sourceSearcher && sourceDataSource) {
-            <div class="tree-search-box tree-search-controls">
-              <div class="tree-search-input">
-                <mat-form-field>
-                  @if (!sourceSelectedNode) {
-                    <mat-label>Search</mat-label>
-                  }
-                  @if (sourceSelectedNode) {
-                    <mat-label>Search > {{ (sourceSelectedNode.displayName ? sourceSelectedNode.displayName : sourceSelectedNode.name) }}</mat-label>
-                  }
-                  <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
-                    [disabled]="sourceSearcher.isSearching"
-                    (keyup.enter)="search('source')">
-                  @if (sourceSearcher.searchKeyword && sourceSearcher.searchResult.length > 0) {
-                    <mat-hint matSuffix
-                    align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}} in {{ sourceSearcher.searchedItemCount }}{{ sourceSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                  }
-                  @if (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0) {
-                    <mat-hint matSuffix
-                    align="end">0 results in {{ sourceSearcher.searchedItemCount }} nodes</mat-hint>
-                  }
-                  @if (sourceSearcher.searchKeyword && sourceSearcher.fullSearched && sourceSearcher.searchResult.length === 0) {
-                    <mat-hint matSuffix
-                    align="end">0 results</mat-hint>
-                  }
-                </mat-form-field>
-              </div>
-              <div class="tree-search-buttons">
-                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
-                  [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
-                  (click)="move('source', -1)">
-                  <mat-icon>keyboard_arrow_up</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
-                  [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
-                  (click)="move('source', 1)">
-                  <mat-icon>keyboard_arrow_down</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more' : 'Search'"
-                  [hidden]="sourceSearcher.fullSearched"
-                  [disabled]="sourceSearcher.isSearching"
-                  [matTooltip]="(sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'Search more...' : 'Search'"
-                  (click)="search('source', false, true)">
-                  <mat-icon>{{ (sourceSearcher.searchKeyword && !sourceSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
-                  [hidden]="!sourceSearcher.inputKeyword"
-                  (click)="sourceSearcher.resetSearch()">
-                  <mat-icon>close</mat-icon>
-                </button>
-                <div class="search-progress-container">
-                  <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar" aria-label="Searching"
-                  [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
-                </div>
-              </div>
-              <div class="tree-search-settings">
+            <score-tree-search-bar [searcher]="sourceSearcher" [label]="sourceSelectedNode?.displayName || sourceSelectedNode?.name"
+                                   (searchRequest)="search('source', $event.backward, $event.force)"
+                                   (moveRequest)="move('source', $event)">
+              <ng-container treeSearchSettings>
+                <div class="tree-search-settings">
                 <div class="actions ms-auto">
                   <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="sourceSettingsContextMenu">
                     <mat-icon>settings</mat-icon>
@@ -102,95 +52,19 @@
                   </mat-checkbox>
                 </button>
               </mat-menu>
-            </div>
+              </ng-container>
+            </score-tree-search-bar>
           }
           <div class="row" style="padding: 0 15px;">
-            @if (sourceSelectedNode) {
-              <div class="tree-breadcrumbs-wrap" id="bc-source">
-                @for (bread of sourceSelectedNode.parents; track bread; let last = $last) {
-                  <div class="tree-breadcrumb"
-                    >
-                    <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                    @if (last) {
-                      <span
-                      class="tree-breadcrumb-item-last">{{ bread.displayName ? bread.displayName : bread.name }} {{ last ? scrollBreadcrumb('bc-source') : '' }}</span>
-                    }
-                    @if (!last) {
-                      <span class="tree-breadcrumb-item"
-                      (click)="onSourceBreadCrumbClick(bread)">{{ bread.displayName ? bread.displayName : bread.name }}</span>
-                    }
-                  </div>
-                }
-              </div>
-            }
+            <score-tree-breadcrumbs wrapId="bc-source" [nodes]="sourceSelectedNode?.parents"
+                                  (nodeClick)="onSourceBreadCrumbClick($event)"></score-tree-breadcrumbs>
           </div>
           <!-- Source BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                [style.height.px]="innerHeight" #sourceVirtualScroll>
-                <div *cdkVirtualFor="let node of sourceDataSource" class="example-item">
-                  <div class="mat-tree-node d-flex align-items-center pointer"
-                    tabIndex="0"
-                    [attr.data-path]="node.path"
-                    [attr.data-query-path]="node.queryPath"
-                    [class]="{'tree-node-selected': sourceSelectedNode === node}"
-                    (click)="onSourceClick(node)"
-                    [style.padding-left]="node.level * paddingPixel + 'px'">
-                    @if (sourceDataSource.isExpandable(node)) {
-                      <button
-                        (click)="sourceDataSource.toggle(node)"
-                        mat-icon-button>
-                        <mat-icon class="mat-icon-rtl-mirror">
-                          {{ sourceDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                        </mat-icon>
-                      </button>
-                    } @else {
-                      <button mat-icon-button disabled></button>
-                    }
-
-                    @if (isSourceNodeCheckable(node)) {
-                      <mat-checkbox
-                        [checked]="node.target !== undefined"
-                      [disabled]="true"></mat-checkbox>
-                    }
-
-                    <div class="d-inline-flex align-items-center flex-grow-1">
-                      <span [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
-                                      this.sourceSearcher.isSearchResult(node) ? 'inside' : 'outside']"
-                            [style.padding-right.px]="2"
-                        [class.deprecated]="node.deprecated"
-                        [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                        [class.search-index]="this.sourceSearcher.isCurrentSearchIndex(node)"
-                        [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : sourceSearcher.searchKeyword">
-                      </span>
-
-                      @if (!sourceDataSource.hideCardinality) {
-                        <span [class]="['ps-4']">
-                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                        </span>
-                      }
-
-                      @if (node.reused) {
-                        <fa-icon [icon]="faRecycle"
-                          matTooltip="Reused"
-                          [class]="['ps-3', 'pointer']" class="pointer"
-                        ></fa-icon>
-                      }
-
-                      <div class="ms-auto me-2">
-                        @if (sourceDataSource.isExpandable(node)) {
-                          <mat-icon
-                            class="context-menu-icon"
-                            [matMenuTriggerFor]="contextMenu"
-                            (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                          </mat-icon>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </cdk-virtual-scroll-viewport>
+              <score-bie-uplift-tree-viewport #sourceTree side="source" [dataSource]="sourceDataSource" [searcher]="sourceSearcher" [host]="this"
+                [selectedNode]="sourceSelectedNode" [height]="innerHeight" [contextMenu]="contextMenu"
+                (nodeClick)="onSourceClick($event)" (contextMenuOpen)="contextMenuItem = $event"></score-bie-uplift-tree-viewport>
             </mat-card-content>
           </mat-card>
           <div class="row">
@@ -202,61 +76,11 @@
         </div>
         <div class="col-6 ps-0 pe-0">
           @if (targetSearcher && targetDataSource) {
-            <div class="tree-search-box tree-search-controls">
-              <div class="tree-search-input">
-                <mat-form-field>
-                  @if (!targetSelectedNode) {
-                    <mat-label>Search</mat-label>
-                  }
-                  @if (targetSelectedNode) {
-                    <mat-label>Search > {{targetSelectedNode.name}}</mat-label>
-                  }
-                  <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
-                    [disabled]="targetSearcher.isSearching"
-                    (keyup.enter)="search('target')">
-                  @if (targetSearcher.searchKeyword && targetSearcher.searchResult.length > 0) {
-                    <mat-hint matSuffix
-                    align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}} in {{ targetSearcher.searchedItemCount }}{{ targetSearcher.fullSearched ? '' : '+' }} nodes</mat-hint>
-                  }
-                  @if (targetSearcher.searchKeyword && !targetSearcher.fullSearched && targetSearcher.searchResult.length === 0) {
-                    <mat-hint matSuffix
-                    align="end">0 results in {{ targetSearcher.searchedItemCount }} nodes</mat-hint>
-                  }
-                  @if (targetSearcher.searchKeyword && targetSearcher.fullSearched && targetSearcher.searchResult.length === 0) {
-                    <mat-hint matSuffix
-                    align="end">0 results</mat-hint>
-                  }
-                </mat-form-field>
-              </div>
-              <div class="tree-search-buttons">
-                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
-                  [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
-                  (click)="move('target', -1)">
-                  <mat-icon>keyboard_arrow_up</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
-                  [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
-                  (click)="move('target', 1)">
-                  <mat-icon>keyboard_arrow_down</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more' : 'Search'"
-                  [hidden]="targetSearcher.fullSearched"
-                  [disabled]="targetSearcher.isSearching"
-                  [matTooltip]="(targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'Search more...' : 'Search'"
-                  (click)="search('target', false, true)">
-                  <mat-icon>{{ (targetSearcher.searchKeyword && !targetSearcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
-                </button>
-                <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
-                  [hidden]="!targetSearcher.inputKeyword"
-                  (click)="targetSearcher.resetSearch()">
-                  <mat-icon>close</mat-icon>
-                </button>
-                <div class="search-progress-container">
-                  <mat-progress-spinner mode="indeterminate" [diameter]="20" class="search-progress-bar" aria-label="Searching"
-                  [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
-                </div>
-              </div>
-              <div class="tree-search-settings">
+            <score-tree-search-bar [searcher]="targetSearcher" [label]="targetSelectedNode?.displayName || targetSelectedNode?.name"
+                                   (searchRequest)="search('target', $event.backward, $event.force)"
+                                   (moveRequest)="move('target', $event)">
+              <ng-container treeSearchSettings>
+                <div class="tree-search-settings">
                 <div class="actions ms-auto">
                   <button mat-icon-button mat-medium-icon-button type="button" aria-label="Search settings" [matMenuTriggerFor]="targetSettingsContextMenu">
                     <mat-icon>settings</mat-icon>
@@ -271,106 +95,19 @@
                   </mat-checkbox>
                 </button>
               </mat-menu>
-            </div>
+              </ng-container>
+            </score-tree-search-bar>
           }
           <div class="row" style="padding: 0 15px;">
-            @if (targetSelectedNode) {
-              <div class="tree-breadcrumbs-wrap" id="bc-target">
-                @for (bread of targetSelectedNode.parents; track bread; let last = $last) {
-                  <div class="tree-breadcrumb"
-                    >
-                    <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
-                    @if (last) {
-                      <span
-                      class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('bc-target') : '' }}</span>
-                    }
-                    @if (!last) {
-                      <span class="tree-breadcrumb-item"
-                      (click)="onTargetBreadCrumbClick(bread)">{{ bread.name }}</span>
-                    }
-                  </div>
-                }
-              </div>
-            }
+            <score-tree-breadcrumbs wrapId="bc-target" [nodes]="targetSelectedNode?.parents"
+                                  (nodeClick)="onTargetBreadCrumbClick($event)"></score-tree-breadcrumbs>
           </div>
           <!-- Target BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx }}" maxBufferPx="{{ maxBufferPx }}"
-                [style.height.px]="innerHeight" #targetVirtualScroll>
-                <div *cdkVirtualFor="let node of targetDataSource" class="example-item">
-                  <div class="mat-tree-node d-flex align-items-center pointer"
-                    tabIndex="0"
-                    [attr.data-path]="node.path"
-                    [attr.data-query-path]="node.queryPath"
-                    [class]="{'tree-node-selected': targetSelectedNode === node}"
-                    (click)="onTargetClick(node)"
-                    [style.padding-left]="node.level * paddingPixel + 'px'">
-                    @if (targetDataSource.isExpandable(node)) {
-                      <button
-                        (click)="targetDataSource.toggle(node)"
-                        mat-icon-button>
-                        <mat-icon class="mat-icon-rtl-mirror">
-                          {{ targetDataSource.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-                        </mat-icon>
-                      </button>
-                    } @else {
-                      <button mat-icon-button disabled></button>
-                    }
-
-                    @if (isTargetNodeCheckable(node)) {
-                      <mat-checkbox
-                        [checked]="node.source !== undefined"
-                        (change)="checkMatch($event, node)"
-                        [disabled]="!canMatch(node)"
-                        [attr.aria-label]="canMatch(node) ? 'Map ' + node.name : getMatchDisabledReason(node)"></mat-checkbox>
-                    }
-
-                    <div class="d-inline-flex align-items-center flex-grow-1">
-                      <span [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
-                                      this.targetSearcher.isSearchResult(node) ? 'inside' : 'outside']"
-                            [style.padding-right.px]="2"
-                        [class.deprecated]="node.deprecated"
-                        [matTooltip]="node.deprecated ? 'Deprecated' : ''"
-                        [class.search-index]="this.targetSearcher.isCurrentSearchIndex(node)"
-                        [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
-                      </span>
-
-                      @if (!targetDataSource.hideCardinality) {
-                        <span [class]="['ps-4']">
-                          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-                        </span>
-                      }
-
-                      @if (node.source && node.source.reused &&
-                            (node.reusedTopLevelAsbiepId === undefined || node.reusedTopLevelAsbiepId === null)) {
-                        <fa-icon [icon]="faCircleExclamation"
-                          matTooltip="Select BIE"
-                          (click)="matchReused(node)"
-                          [class]="['ps-3', 'pointer', 'warn']" class="pointer"
-                        ></fa-icon>
-                      }
-                      @if (node.reusedTopLevelAsbiepId !== undefined && node.reusedTopLevelAsbiepId !== null) {
-                        <fa-icon [icon]="faRecycle"
-                          matTooltip="Reused"
-                          (click)="matchReused(node)"
-                          [class]="['ps-3', 'pointer']" class="pointer"
-                        ></fa-icon>
-                      }
-
-                      <div class="ms-auto me-2">
-                        @if (targetDataSource.isExpandable(node)) {
-                          <mat-icon
-                            class="context-menu-icon"
-                            [matMenuTriggerFor]="contextMenu"
-                            (click)="contextMenuItem = node; $event.stopPropagation();">more_vert
-                          </mat-icon>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </cdk-virtual-scroll-viewport>
+              <score-bie-uplift-tree-viewport #targetTree side="target" [dataSource]="targetDataSource" [searcher]="targetSearcher" [host]="this"
+                [selectedNode]="targetSelectedNode" [height]="innerHeight" [contextMenu]="contextMenu"
+                (nodeClick)="onTargetClick($event)" (contextMenuOpen)="contextMenuItem = $event"></score-bie-uplift-tree-viewport>
             </mat-card-content>
           </mat-card>
           <div class="row">

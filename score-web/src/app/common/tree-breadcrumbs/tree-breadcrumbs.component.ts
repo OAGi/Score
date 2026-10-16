@@ -14,6 +14,8 @@ export interface TreeBreadcrumbNode {
 export class TreeBreadcrumbsComponent<N extends TreeBreadcrumbNode = TreeBreadcrumbNode> implements AfterViewChecked {
 
   @Input() nodes: N[] | null | undefined;
+  /** Element id of the path, for a screen that shows more than one. */
+  @Input() wrapId = 'tree-breadcrumbs-wrap';
   @Output() nodeClick = new EventEmitter<N>();
 
   @ViewChild('wrap') wrap: ElementRef<HTMLElement> | undefined;

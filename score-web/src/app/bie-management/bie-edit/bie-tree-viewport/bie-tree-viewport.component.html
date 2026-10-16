@@ -19,7 +19,7 @@
 
   <ng-template #content let-node>
     @if (host.renamingNode !== node) {
-      <span class="node-label"
+      <span class="node-label node-tight"
             [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
             [class.deprecated]="node.deprecated"
             [matTooltip]="node.deprecated ? 'Deprecated' : ''"
@@ -28,7 +28,7 @@
             (dblclick)="host.startChangingDisplayName(node)">
       </span>
       @if (!dataSource.hideCardinality) {
-        <span class="node-cardinality ps-2">
+        <span class="node-cardinality node-tight ps-4">
           {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
         </span>
       }

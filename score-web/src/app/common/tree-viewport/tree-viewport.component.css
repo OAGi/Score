@@ -1,0 +1,203 @@
+/* Tree rows and drag-and-drop of the node tree (the row content is projected into the rows, so this sheet is not view-encapsulated). */
+
+score-tree-viewport .mat-tree-node {
+  font-size: 13px;
+  min-height: 33px;
+  font-family: Roboto;
+}
+
+score-tree-viewport .mat-tree-node .material-icons {
+  font-size: 20px;
+}
+
+score-tree-viewport .mat-tree-node .mat-icon-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  outline: none;
+}
+
+score-tree-viewport .mat-tree-node div {
+  height: 20px;
+}
+
+score-tree-viewport .mat-tree-node > .node-label,
+score-tree-viewport .mat-tree-node > .node-cardinality {
+  cursor: pointer;
+  padding-right: 2px !important;
+  margin-right: 10px;
+}
+
+/* BIE-style rows (BIE edit, model browser, uplift) have no gap after the label and cardinality. */
+score-tree-viewport .mat-tree-node > .node-label.node-tight {
+  margin-right: 0;
+}
+
+score-tree-viewport .mat-tree-node > .node-cardinality.node-tight {
+  padding-right: 0 !important;
+  margin-right: 0;
+}
+
+score-tree-viewport .mat-tree-node .deprecated {
+  text-decoration: line-through;
+  background-color: #ececec;
+}
+
+score-tree-viewport .mat-tree-node .acc,
+score-tree-viewport .mat-tree-node .acc-group {
+  color: #bd2c00 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .asccp,
+score-tree-viewport .mat-tree-node .asccp-extension {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .bccp {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .bccp-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .dt_sc,
+score-tree-viewport .mat-tree-node .bdt_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+score-tree-viewport .mat-tree-node > .node-label {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+score-tree-viewport .mat-tree-node > .tag-list {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+score-tree-viewport .mat-tree-node > .tree-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
+score-tree-viewport .mat-tree-node > .node-cardinality,
+score-tree-viewport .mat-tree-node > .node-status-icon {
+  flex: 0 0 auto;
+}
+
+score-tree-viewport .tag-list {
+  display: inline-block;
+}
+
+score-tree-viewport .tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block !important;
+}
+
+score-tree-viewport .mat-tree-node div.tag-list,
+score-tree-viewport .mat-tree-node span.tag {
+  height: 20px;
+}
+
+score-tree-viewport .dragHandle {
+  margin-left: auto;
+  cursor: grab;
+}
+
+score-tree-viewport .cdk-drag:not(.cdk-drag-disabled):active .dragHandle {
+  cursor: grabbing;
+}
+
+score-tree-viewport .cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+score-tree-viewport .cdk-drop-list-dragging .mat-tree-node:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+score-tree-viewport .dragPlaceholder {
+  background: #ccc;
+  border: dashed 2px #999;
+  min-height: 33px;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+score-tree-viewport .mat-tree-node .dt {
+  color: #796f00 !important;
+  text-shadow: inherit !important;
+}
+
+/* BIE tree rows: node types and the in-place display name editor. */
+
+score-tree-viewport .mat-tree-node .abie,
+score-tree-viewport .mat-tree-node .asbiep,
+score-tree-viewport .mat-tree-node .asbiep-extension {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .bbiep {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .bbiep-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .bbie_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+score-tree-viewport .mat-tree-node .node-edit-container {
+  width: 100%;
+  height: 100%;
+  padding-right: 64px;
+}
+
+/* Drag-and-drop reorder (issue #1638): the drop slot turns red where a drop would be invalid, and the preview is a
+   clone appended to the body, so it is matched by its row class instead of by the score-tree-viewport ancestor. */
+score-tree-viewport .dragHandle {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+score-tree-viewport .dragPlaceholder.dragPlaceholder-invalid {
+  background: rgba(211, 47, 47, 0.18);
+  border-color: rgba(211, 47, 47, 0.75);
+}
+
+.example-item.cdk-drag-preview {
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  opacity: 0.95;
+  /* let elementFromPoint() during drag hit the row beneath the cursor, not the preview clone */
+  pointer-events: none;
+}
+

@@ -1,4 +1,3 @@
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
 import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
@@ -15,6 +14,7 @@ import {BieListService} from '../bie-list/domain/bie-list.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AuthService} from '../../authentication/auth.service';
 import {BieUpliftService} from './domain/bie-uplift.service';
+import {BieUpliftTreeRowHost, BieUpliftTreeViewportComponent} from './bie-uplift-tree-viewport/bie-uplift-tree-viewport.component';
 import {BieUpliftMap, BieUpliftSourceFlatNode, BieUpliftTargetFlatNode, MatchInfo, UpliftNode} from './domain/bie-uplift';
 import {CcNodeService} from '../../cc-management/domain/core-component-node.service';
 import {
@@ -175,7 +175,7 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-uplift.component.css']
 })
-export class BieUpliftComponent implements OnInit {
+export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
   private bizCtxService = inject(BusinessContextService);
   private bieListService = inject(BieListService);
   private accountService = inject(AccountListService);
@@ -199,17 +199,8 @@ export class BieUpliftComponent implements OnInit {
   loading = false;
 
   @ViewChild(MatStepper, {static: true}) stepper: MatStepper;
-  @ViewChild('sourceVirtualScroll', {static: true}) public sourceVirtualScroll: CdkVirtualScrollViewport;
-  @ViewChild('targetVirtualScroll', {static: true}) public targetVirtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
-
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
+  @ViewChild('sourceTree', {static: true}) sourceTree: BieUpliftTreeViewportComponent<BieUpliftSourceFlatNode>;
+  @ViewChild('targetTree', {static: true}) targetTree: BieUpliftTreeViewportComponent<BieUpliftTargetFlatNode>;
 
   contextMenuItem: BieFlatNode;
 
@@ -228,7 +219,6 @@ export class BieUpliftComponent implements OnInit {
   private sourceWrapperByRawNode = new Map<BieFlatNode, BieUpliftSourceFlatNode>();
   private targetWrapperByRawNode = new Map<BieFlatNode, BieUpliftTargetFlatNode>();
 
-  paddingPixel = 12;
   innerY: number = window.innerHeight;
 
   topLevelAsbiepId: number;
@@ -615,12 +605,12 @@ export class BieUpliftComponent implements OnInit {
     if (type === 'source') {
       this.sourceSearcher.search(this.sourceSearcher.inputKeyword, this.sourceSelectedNode, backward, force)
         .subscribe(index => {
-          this.sourceVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+          this.sourceTree.scrollToIndex(index, {smooth: true});
         });
     } else if (type === 'target') {
       this.targetSearcher.search(this.targetSearcher.inputKeyword, this.targetSelectedNode, backward, force)
         .subscribe(index => {
-          this.targetVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+          this.targetTree.scrollToIndex(index, {smooth: true});
         });
     }
   }
@@ -629,12 +619,12 @@ export class BieUpliftComponent implements OnInit {
     if (type === 'source') {
       this.sourceSearcher.go(val).subscribe(index => {
         this.onSourceClick(this.sourceDataSource.data[index]);
-        this.sourceVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+        this.sourceTree.scrollToIndex(index, {smooth: true});
       });
     } else if (type === 'target') {
       this.targetSearcher.go(val).subscribe(index => {
         this.onTargetClick(this.targetDataSource.data[index]);
-        this.targetVirtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+        this.targetTree.scrollToIndex(index, {smooth: true});
       });
     }
   }
@@ -656,17 +646,6 @@ export class BieUpliftComponent implements OnInit {
     }
   }
 
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
 
   scrollToSourceNode(node: BieUpliftSourceFlatNode) {
     let index = -1;
@@ -679,7 +658,7 @@ export class BieUpliftComponent implements OnInit {
       this.sourceDataSource.toggleNode(currentNode.parent as BieUpliftSourceFlatNode, true);
       currentNode = currentNode.parent as BieUpliftSourceFlatNode;
     }
-    this.scrollTree(this.sourceVirtualScroll, index, 500);
+    this.sourceTree.scrollToIndex(index, {delay: 500, smooth: true});
   }
 
   scrollToTargetNode(node: BieUpliftTargetFlatNode) {
@@ -693,7 +672,7 @@ export class BieUpliftComponent implements OnInit {
       this.targetDataSource.toggleNode(currentNode.parent as BieUpliftTargetFlatNode, true);
       currentNode = currentNode.parent as BieUpliftTargetFlatNode;
     }
-    this.scrollTree(this.targetVirtualScroll, index, 500);
+    this.targetTree.scrollToIndex(index, {delay: 500, smooth: true});
   }
 
   onSourceBreadCrumbClick(node: BieFlatNode) {
@@ -708,19 +687,6 @@ export class BieUpliftComponent implements OnInit {
     this.scrollToTargetNode(targetNode);
   }
 
-  scrollTree(virtualScroll: CdkVirtualScrollViewport, index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-    }
-  }
 
   isSource(node: BieFlatNode): node is BieUpliftSourceFlatNode {
     if (!node) {
@@ -1603,8 +1569,6 @@ export class BieUpliftComponent implements OnInit {
     }
 
     this.expandSourceNode(this.currentUnmatchedSource);
-    this.sourceVirtualScroll.scrollToIndex(
-      this.sourceDataSource.data.indexOf(this.currentUnmatchedSource) * this.virtualScrollItemSize, 'smooth'
-    );
+    this.sourceTree.scrollToIndex(this.sourceDataSource.data.indexOf(this.currentUnmatchedSource), {smooth: true});
   }
 }

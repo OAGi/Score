@@ -2118,6 +2118,14 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
     });
   }
 
+  isSearchResult(node: T): boolean {
+    return this.searchResult.indexOf(node) > -1;
+  }
+
+  isCurrentSearchIndex(node: T): boolean {
+    return this.searchResult.indexOf(node) === this.searchIndex;
+  }
+
   resetSearch() {
     this.searchKeyword = undefined;
     this.selectedNode = undefined;

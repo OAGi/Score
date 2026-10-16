@@ -7,12 +7,15 @@
     <div *cdkVirtualFor="let node of dataSource" class="example-item"
          (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false"
          cdkDrag [cdkDragData]="node"
-         [cdkDragDisabled]="!isDraggable(node)">
-      <div class="dragPlaceholder" *cdkDragPlaceholder></div>
+         [cdkDragDisabled]="!isDraggable(node)"
+         (cdkDragStarted)="dragStarted.emit(node)" (cdkDragMoved)="dragMoved.emit($event)"
+         (cdkDragEnded)="dragEnded.emit()">
+      <div class="dragPlaceholder" [class.dragPlaceholder-invalid]="dropInvalid" *cdkDragPlaceholder></div>
       <div class="mat-tree-node d-flex align-items-center pointer"
            tabIndex="0"
            [attr.data-level]="node.level"
            [attr.data-path]="node.path"
+           [attr.data-hash-path]="node.hashPath"
            [attr.data-query-path]="node.queryPath"
            [class.tree-node-selected]="cursorNode === node"
            (click)="onClick(node, $event)"
@@ -20,6 +23,8 @@
            [matTooltip]="'Circular reference detected.'"
            [matTooltipDisabled]="!node.isCycle"
            [style.padding-left]="node.level * paddingPixel + 'px'">
+        <ng-container *ngTemplateOutlet="lead; context: {$implicit: node}"></ng-container>
+
         @if (dataSource.isExpandable(node)) {
           <button mat-icon-button (click)="toggle(node, $event)">
             <mat-icon class="mat-icon-rtl-mirror">
@@ -35,19 +40,25 @@
 
         @if (!isActionsHidden(node)) {
           <div class="tree-row-actions ms-auto me-2">
-            <mat-icon class="copy-link-icon" matTooltip="Copy Link"
-                      [style.visibility]="node.showCopyLinkIcon ? '' : 'hidden'"
-                      (click)="onCopyLink(node, $event)">link
-            </mat-icon>
-            @if (showDragHandle(node)) {
-              <mat-icon class="dragHandle" cdkDragHandle>drag_handle</mat-icon>
+            @if (showCopyLink) {
+              <mat-icon class="copy-link-icon" matTooltip="Copy Link"
+                        [style.visibility]="node.showCopyLinkIcon ? '' : 'hidden'"
+                        (click)="onCopyLink(node, $event)">link
+              </mat-icon>
             }
-            <mat-icon class="context-menu-icon"
-                      [style.visibility]="!node.isCycle ? '' : 'hidden'"
-                      [matMenuTriggerFor]="contextMenu"
-                      [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
-                      (click)="onContextMenuOpen(node, $event)">more_vert
-            </mat-icon>
+            @if (showDragHandle(node)) {
+              <mat-icon class="dragHandle" cdkDragHandle
+                        [style.visibility]="isDragHandleHidden(node) ? 'hidden' : ''"
+                        (click)="dragHandleStopsClick && $event.stopPropagation()">drag_handle</mat-icon>
+            }
+            @if (menuOf(node); as menu) {
+              <mat-icon class="context-menu-icon"
+                        [style.visibility]="!node.isCycle ? '' : 'hidden'"
+                        [matMenuTriggerFor]="menu"
+                        [matMenuTriggerData]="{'menuId': 'contextMenu', 'hashPath': node.hashPath}"
+                        (click)="onContextMenuOpen(node, $event)">more_vert
+              </mat-icon>
+            }
           </div>
         }
       </div>

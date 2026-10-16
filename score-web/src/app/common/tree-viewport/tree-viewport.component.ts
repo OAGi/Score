@@ -1,4 +1,4 @@
-import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, CdkDragMove, DragDropModule} from '@angular/cdk/drag-drop';
 import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
 import {DataSource} from '@angular/cdk/collections';
 import {NgTemplateOutlet} from '@angular/common';
@@ -11,7 +11,8 @@ import {
   QueryList,
   TemplateRef,
   ViewChild,
-  ViewChildren
+  ViewChildren,
+  ViewEncapsulation
 } from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -52,8 +53,8 @@ export interface TreeViewportNodeKey<N> {
  * The node tree of a tree-detail screen: a virtual-scrolled list of rows, each with an expand toggle, a content
  * area, the copy-link / context-menu actions and, when enabled, drag-and-drop reordering.
  *
- * The row content comes from the template named `content` (context: the node); a template named `prefix` renders
- * between the toggle and the content (e.g. a checkbox). Use a derivative (`score-cc-tree-viewport`,
+ * The row content comes from the template named `content` (context: the node); a template named `lead` renders
+ * before the expand toggle (e.g. guide lines) and `prefix` between the toggle and the content (e.g. a checkbox). Use a derivative (`score-cc-tree-viewport`,
  * `score-bie-tree-viewport`) rather than this component directly.
  *
  * Keyboard (row focused): arrows move the cursor / expand / collapse, Enter selects, `o` opens the context menu;
@@ -62,6 +63,8 @@ export interface TreeViewportNodeKey<N> {
 @Component({
   selector: 'score-tree-viewport',
   templateUrl: './tree-viewport.component.html',
+  styleUrl: './tree-viewport.component.css',
+  encapsulation: ViewEncapsulation.None,
   imports: [ScrollingModule, DragDropModule, NgTemplateOutlet, MatButtonModule, MatIconModule, MatMenuModule,
     MatTooltipModule]
 })
@@ -74,10 +77,20 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   @Input() itemSize = 33;
   @Input() paddingPixel = 12;
   @Input() contextMenu: MatMenuPanel;
+  /** The context menu of a node, when it differs per node; a node without one has no context-menu action. */
+  @Input() contextMenuFor: (node: N) => MatMenuPanel | null;
+  @Input() showCopyLink = true;
+  /** Arrow keys, Enter and `o` act on the cursor node; turn off for a tree that only reacts to clicks. */
+  @Input() keyboardNavigation = true;
   /** Rows for which drag-and-drop is enabled; without it nothing is draggable. */
   @Input() isDraggable: (node: N) => boolean = () => false;
   @Input() showDragHandle: (node: N) => boolean = () => false;
   @Input() canDrop: () => boolean = () => true;
+  /** The drop slot is highlighted as invalid while dragging. */
+  @Input() dropInvalid = false;
+  @Input() isDragHandleHidden: (node: N) => boolean = () => false;
+  /** A click on the drag handle does not select the row. */
+  @Input() dragHandleStopsClick = false;
   /** Rows whose copy-link / context-menu actions are hidden (e.g. while the row is being renamed). */
   @Input() isActionsHidden: (node: N) => boolean = () => false;
 
@@ -88,7 +101,11 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   /** The context menu of a node is about to open. */
   @Output() contextMenuOpen = new EventEmitter<N>();
   @Output() dropped = new EventEmitter<CdkDragDrop<any>>();
+  @Output() dragStarted = new EventEmitter<N>();
+  @Output() dragMoved = new EventEmitter<CdkDragMove>();
+  @Output() dragEnded = new EventEmitter<void>();
 
+  @ContentChild('lead', {read: TemplateRef}) lead: TemplateRef<{ $implicit: N }>;
   @ContentChild('content', {read: TemplateRef}) content: TemplateRef<{ $implicit: N }>;
   @ContentChild('prefix', {read: TemplateRef}) prefix: TemplateRef<{ $implicit: N }>;
 
@@ -126,7 +143,15 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
     this.contextMenuOpen.emit(node);
   }
 
+  menuOf(node: N): MatMenuPanel | null {
+    return this.contextMenuFor ? this.contextMenuFor(node) : this.contextMenu;
+  }
+
   onKeydown(node: N, event: KeyboardEvent) {
+    if (!this.keyboardNavigation) {
+      return;
+    }
+
     const target = event.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
       return;

@@ -29,6 +29,7 @@ import {ScoreCommonModule} from '../common/score-common.module';
 import {BieReportComponent} from './bie-report/bie-report.component';
 import {BieReportService} from './bie-report/domain/bie-report.service';
 import {BieUpliftComponent} from './bie-uplift/bie-uplift.component';
+import {BieUpliftTreeViewportComponent} from './bie-uplift/bie-uplift-tree-viewport/bie-uplift-tree-viewport.component';
 import {BieUpliftService} from './bie-uplift/domain/bie-uplift.service';
 import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.component';
 import {ReportDialogComponent} from './bie-uplift/report-dialog/report-dialog.component';
@@ -166,6 +167,7 @@ const routes: Routes = [
         AngularSplitModule,
         FontAwesomeModule,
         BieTreeViewportComponent,
+        BieUpliftTreeViewportComponent,
         SearchBarModule,
         ColumnSelectorModule,
         TitleWithLibrarySelector,
