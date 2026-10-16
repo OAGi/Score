@@ -1,15 +1,8 @@
-<div class="d-block">
-  <div class="content">
-    <div class="row">
+<score-dialog-page title="{{ action }} BOD">
+  <div class="row">
       <div class="col-6">
-        <div class="header d-flex align-items-center pb-0" mat-dialog-title>
-          <div class="row action-group m-0">
-            <div class="title-wrap">
-              <span class="title">Select Verb to {{this.action}} BOD</span>
-            </div>
-          </div>
-        </div>
-        <mat-card style="box-shadow: none;">
+        <div class="dialog-section-title">Select Verb to {{this.action}} BOD</div>
+        <div>
           <score-table-view #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
             [selection]="verbSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
@@ -70,17 +63,11 @@
                                         </mat-card>
             </ng-container>
           </score-table-view>
-        </mat-card>
+        </div>
       </div>
       <div class="col-6">
-        <div class="header d-flex align-items-center pb-0" mat-dialog-title>
-          <div class="row action-group m-0">
-            <div class="title-wrap">
-              <span class="title">Select Noun to {{this.action}} BOD</span>
-            </div>
-          </div>
-        </div>
-        <mat-card style="box-shadow: none;">
+        <div class="dialog-section-title">Select Noun to {{this.action}} BOD</div>
+        <div>
           <score-table-view #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
             [selection]="nounSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
@@ -141,14 +128,12 @@
                                         </mat-card>
             </ng-container>
           </score-table-view>
-        </mat-card>
+        </div>
       </div>
-    </div>
   </div>
-</div>
 
-<div class="actions ms-auto" mat-dialog-actions>
-  <button mat-raised-button color="warn" (click)="onNoClick()">
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" (click)="onNoClick()">
     Cancel
   </button>
   @if (action === 'create') {
@@ -163,4 +148,5 @@
       }
     </button>
   }
-</div>
+  </ng-container>
+</score-dialog-page>

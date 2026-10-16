@@ -1,14 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>BIEs reused '{{ data.den }}'</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content" mat-dialog-content>
-    <score-table-view [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false" [hiddenColumns]="hiddenColumns">
+<score-dialog-page title="BIEs reused '{{ data.den }}'">
+  <score-table-view [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false" [hiddenColumns]="hiddenColumns">
 
     <ng-container scoreColumnDef="releaseNum">
       <td score-cell *scoreCellDef="let element">
@@ -126,11 +117,11 @@
         </td>
     </ng-container>
     </score-table-view>
-  </div>
-  <div class="actions ms-auto" mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
       Close
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

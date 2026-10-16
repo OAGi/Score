@@ -1,17 +1,8 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <score-title-with-library-selector [title]="title"
+<score-dialog-page>
+  <score-title-with-library-selector dialogTitle [title]="title"
       [libraries]="mappedLibraries"
       (libraryChange)="onLibraryChange($event)"/>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content">
-    <mat-card style="box-shadow: none;">
-      <score-table-view [table]="columns" [load]="load" [selection]="selection" singleSelect
+  <score-table-view [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" advancedSearchOffset="11.5rem">
 
         <div searchPrefix class="branch-selector d-flex" style="width: 8rem; padding: 0 0.5rem 0 1rem;">
@@ -145,10 +136,8 @@
           </td>
         </ng-container>
       </score-table-view>
-    </mat-card>
-  </div>
 
-  <div class="actions ms-auto" mat-dialog-actions>
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       Cancel
     </button>
@@ -157,5 +146,5 @@
       (click)="onSubmit()">
       Select
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

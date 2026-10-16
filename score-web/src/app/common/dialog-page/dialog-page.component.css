@@ -1,0 +1,71 @@
+:host {
+  display: block;
+  --score-dialog-padding: 16px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: var(--score-dialog-padding) var(--score-dialog-padding) 8px;
+  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .1px;
+  line-height: 24px;
+}
+
+.dialog-header::before {
+  display: none;
+}
+
+.dialog-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  font-weight: 400;
+}
+
+.dialog-close {
+  flex: none;
+  outline: none;
+}
+
+.dialog-body {
+  box-sizing: border-box;
+  max-height: none;
+  /* The table view brings its own side padding, which lines it up with the title and the actions. */
+  padding: var(--score-dialog-padding) 0;
+  overflow: visible;
+}
+
+/* The search bar is a sibling of the table card, which has its own side padding; give the bar the same inset. */
+.dialog-body ::ng-deep score-search-bar {
+  display: block;
+  padding: 0 var(--score-dialog-padding);
+}
+
+.dialog-body ::ng-deep .dialog-section-title {
+  margin-bottom: 8px;
+  padding: 0 var(--score-dialog-padding);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 0 var(--score-dialog-padding) var(--score-dialog-padding);
+}
+
+.dialog-actions:empty {
+  display: none;
+}

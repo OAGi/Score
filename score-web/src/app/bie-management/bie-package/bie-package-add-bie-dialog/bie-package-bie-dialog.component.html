@@ -1,19 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <div class="d-flex align-items-center">
-      <div class="d-flex flex-column">
-        <span class="title">{{ action }} BIE</span>
-      </div>
-    </div>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content">
-    <mat-card style="box-shadow: none;">
-      <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
+<score-dialog-page title="{{ action }} BIE">
+  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
         [filterOptions]="filterOptions()" [selection]="selection" [rowKey]="rowKey" multiSort [syncUrl]="false"
         searchClearsSort rowHover>
 
@@ -126,17 +112,16 @@
       </td>
     </ng-container>
       </score-table-view>
-    </mat-card>
-  </div>
-  <div class="actions ms-auto" mat-dialog-actions>
-    <button mat-raised-button class="me-2" (click)="add()" color="primary"
-      [disabled]="selection.isEmpty()">
-      <mat-icon>{{ action === 'add' ? 'add' : 'update' }}</mat-icon>
-      <span class="ps-2">{{ action }}</span>
-    </button>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
       <span class="ps-2">Close</span>
     </button>
-  </div>
-</div>
+    <button mat-raised-button (click)="add()" color="primary"
+      [disabled]="selection.isEmpty()">
+      <mat-icon>{{ action === 'add' ? 'add' : 'update' }}</mat-icon>
+      <span class="ps-2">{{ action }}</span>
+    </button>
+  </ng-container>
+</score-dialog-page>

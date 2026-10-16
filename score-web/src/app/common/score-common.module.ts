@@ -25,6 +25,7 @@ import {SidenavPageComponent} from './sidenav-page/sidenav-page.component';
 import {MaterialModule} from '../material.module';
 import {BasePageComponent} from './base-page/base-page.component';
 import {ListPageComponent} from './list-page/list-page.component';
+import {DialogPageComponent} from './dialog-page/dialog-page.component';
 import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.component';
 
 @NgModule({
@@ -48,6 +49,7 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     DetailPageComponent,
     DetailCardComponent,
     ListPageComponent,
+    DialogPageComponent,
     ScoreMatSelectComponent,
     MatDialogModule,
     MatCardModule,
@@ -63,6 +65,7 @@ import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.compo
     DetailPageComponent,
     DetailCardComponent,
     ListPageComponent,
+    DialogPageComponent,
     ScoreMatSelectComponent,
     UnboundedPipe,
     HighlightSearch,

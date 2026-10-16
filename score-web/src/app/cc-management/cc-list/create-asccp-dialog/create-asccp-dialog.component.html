@@ -1,15 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Select ACC to {{this.action}} ASCCP</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content">
-    <mat-card style="box-shadow: none;">
-      <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
+<score-dialog-page title="Select ACC to {{this.action}} ASCCP">
+  <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
         searchClearsSort pageFromResponse rowHover >
 
@@ -82,9 +72,8 @@
         </ng-container>
 
       </score-table-view>
-    </mat-card>
-  </div>
-  <div class="actions ms-auto" mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       Cancel
     </button>
@@ -102,5 +91,5 @@
         Update
       </button>
     }
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

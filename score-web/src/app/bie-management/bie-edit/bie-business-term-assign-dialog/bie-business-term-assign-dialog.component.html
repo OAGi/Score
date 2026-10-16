@@ -1,16 +1,5 @@
-<div class="header d-flex align-items-center" mat-dialog-title>
-  <span class="assign-title">Assign Business Term</span>
-  <div class="close pe-2">
-    <button mat-icon-button mat-small-icon-button type="button"
-            aria-label="Cancel and close" matTooltip="Cancel" (click)="cancel()">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-</div>
-
-<mat-dialog-content class="assign-content">
-  <mat-card-content class="mat-card-container assign-card-container">
-    <div class="bt-assign-form">
+<score-dialog-page title="Assign Business Term">
+  <div class="bt-assign-form">
       <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
         [syncUrl]="false" searchClearsSort rowHover [busy]="busy()">
 
@@ -70,11 +59,15 @@
         </mat-form-field>
       </div>
     </div>
-  </mat-card-content>
-</mat-dialog-content>
-<mat-dialog-actions class="assign-actions" align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" [disabled]="isCreateDisabled()" (click)="create()">
-    Assign@if (selection.selected.length > 1) { ({{ selection.selected.length }}) }
-  </button>
-</mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" type="button" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
+    </button>
+    <button mat-raised-button color="primary" type="button" [disabled]="isCreateDisabled()" (click)="create()">
+      <mat-icon>check</mat-icon>
+      <span class="ps-2">Assign@if (selection.selected.length > 1) { ({{ selection.selected.length }}) }</span>
+    </button>
+  </ng-container>
+</score-dialog-page>

@@ -1,19 +1,5 @@
-<div class="d-block">
+<score-dialog-page title="Uplift BIE Report">
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Uplift BIE Report</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button aria-label="Close uplift BIE report" (click)="onClose()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content" mat-dialog-content>
-    @if (loading) {
       <div class="loading-container">
         <mat-spinner [diameter]="40"></mat-spinner>
       </div>
@@ -84,8 +70,8 @@
         </td>
       </ng-container>
     </score-table-view>
-  </div>
-  <div class="actions ms-auto" mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onClose()">
       <mat-icon>close</mat-icon>
       <span class="ps-2">Cancel</span>
@@ -96,5 +82,5 @@
     <button mat-raised-button color="primary" (click)="onUplift()">
       Uplift
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

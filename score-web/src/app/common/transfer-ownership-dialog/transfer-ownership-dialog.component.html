@@ -1,15 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Transfer ownership</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content">
-    <mat-card style="box-shadow: none;">
-      <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams"
+<score-dialog-page title="Transfer ownership">
+  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams"
         [selection]="selection" singleSelect [syncUrl]="false" pageFromResponse>
 
     <ng-container scoreColumnDef="loginId">
@@ -49,10 +39,8 @@
       </td>
     </ng-container>
       </score-table-view>
-    </mat-card>
-  </div>
 
-  <div class="actions ms-auto" mat-dialog-actions>
+  <ng-container ngProjectAs="[dialogActions]">
     <button mat-raised-button color="warn" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
       Cancel
@@ -63,5 +51,5 @@
       <mat-icon>send</mat-icon>
       Transfer
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

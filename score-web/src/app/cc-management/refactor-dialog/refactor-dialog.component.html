@@ -1,14 +1,11 @@
-<div class="d-block">
+<score-dialog-page title="Refactor to Base" subtitle='Select a base ACC to move "{{title}}"'>
   @if (loading) {
     <div class="loading-container">
       <mat-spinner [diameter]="40"></mat-spinner>
     </div>
   }
-  <div>
-    <div class="content" mat-dialog-content>
-      <div class="header d-flex align-items-center">
-        <span>Select a base ACC to move "{{title}}"</span>
-      </div>
+
+  <section>
       <score-table-view #baseView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" singleSelect
         [syncUrl]="false" rowHover>
 
@@ -90,21 +87,19 @@
           </mat-card>
         </ng-container>
       </score-table-view>
-    </div>
-    <div class="actions ms-auto" mat-dialog-actions>
+    <div class="analyze-action">
       <button mat-raised-button color="info"
         [disabled]="selection.selected.length === 0"
         (click)="checkValidation()">
         Analyze
       </button>
     </div>
-  </div>
-  <mat-divider class="m-3"/>
-  <div>
-    <div class="content" mat-dialog-content>
-      <div class="header d-flex align-items-center">
-        <span>Analysis result and required action.</span>
-      </div>
+  </section>
+
+  <mat-divider class="my-3"/>
+
+  <section>
+    <div class="dialog-section-title">Analysis result and required action.</div>
       <score-table-view #issueView [table]="issueColumns" [load]="issueLoad" [syncUrl]="false">
 
           <ng-container scoreColumnDef="type">
@@ -182,17 +177,16 @@
         </td>
           </ng-container>
       </score-table-view>
-    </div>
-    <div class="actions ms-auto" mat-dialog-actions>
-      <button mat-raised-button color="warn" (click)="onNoClick()">
-        Cancel
-      </button>
-      <button mat-raised-button color="primary"
-        class="float-end"
+  </section>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" (click)="onNoClick()">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary"
         [disabled]="!isValid"
         (click)="doRefactor()">
         Refactor
       </button>
-    </div>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>
