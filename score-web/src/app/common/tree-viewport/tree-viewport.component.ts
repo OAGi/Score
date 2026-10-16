@@ -77,7 +77,8 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   @Input() searcher: TreeViewportSearcher<N>;
   @Input() cursorNode: N | undefined;
   @Input() height: number;
-  @Input() itemSize = 33;
+  /** The height of a row; keep it equal to the rows' `min-height` in tree-viewport.component.css. */
+  @Input() itemSize = 36;
   @Input() paddingPixel = 12;
   @Input() contextMenu: MatMenuPanel;
   /** The context menu of a node, when it differs per node; a node without one has no context-menu action. */
@@ -203,9 +204,9 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
    * caller that has just expanded nodes to reveal the row has changed the row count, and the viewport only knows the
    * new content height, and has the row, after it has rendered them, which for heavy rows can take a while.
    *
-   * The position comes from the row itself, not from `index * itemSize`: rows are not necessarily as tall as
-   * `itemSize` (those of the BIE tree are taller), and every row of error adds up along the way (at the 300th row the
-   * target would be far below the screen).
+   * The position comes from the row itself, not from `index * itemSize`: a row taller than `itemSize` (a row with
+   * content that does not fit) would add its error up along the way, and at the 300th row the target would be far
+   * below the screen.
    */
   scrollToIndex(index: number, options: { delay?: number, smooth?: boolean } = {}) {
     if (index < 0) {
