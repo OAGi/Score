@@ -6,7 +6,7 @@ import {ListPageComponent} from './list-page.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ListPageComponent],
   template: `
-    <score-list-page [title]="title" [spacer]="spacer">
+    <score-list-page [title]="title" [subtitle]="subtitle" [spacer]="spacer">
       @if (customTitle) {
         <ng-container ngProjectAs="[listTitle]"><span class="custom-title">Library</span></ng-container>
       }
@@ -26,6 +26,7 @@ import {ListPageComponent} from './list-page.component';
 class HostComponent {
   title: string | null = 'Contexts';
   spacer = true;
+  subtitle = '';
   customTitle = false;
   actionBar = false;
 }
@@ -75,6 +76,15 @@ describe('ListPageComponent', () => {
   it('leaves the action bar empty when no buttons are projected', () => {
     detect();
     expect(el('div.action-group > .actions-wrap > .actions')?.children.length ?? 0).toBe(0);
+  });
+
+  it('stacks a sub-title under the title and keeps a plain row without one', () => {
+    detect();
+    expect(el('mat-toolbar')!.classList.contains('flex-column')).toBe(false);
+    host.subtitle = 'Step 1';
+    detect();
+    expect(el('mat-toolbar')!.classList.contains('flex-column')).toBe(true);
+    expect(el('mat-toolbar mat-card-subtitle')?.textContent).toBe('Step 1');
   });
 
   it('accepts a projected title in place of the plain one', () => {

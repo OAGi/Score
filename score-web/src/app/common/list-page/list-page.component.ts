@@ -26,8 +26,12 @@ export class ListPageComponent {
   /** Plain title; leave it `null` when the title is given through `[listTitle]`. */
   @Input() title: string | null = null;
   @Input() subtitle = '';
-  /** Class(es) of the title toolbar. */
+  /** Class(es) of the title toolbar; a sub-title is stacked under the title on top of them. */
   @Input() toolbarClass = 'bg-white';
   /** Pushes `[listActions]` to the right of the title. */
   @Input() spacer = true;
+
+  get effectiveToolbarClass(): string {
+    return this.subtitle ? `${this.toolbarClass} d-flex flex-column align-items-start` : this.toolbarClass;
+  }
 }
