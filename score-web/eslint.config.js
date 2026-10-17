@@ -55,6 +55,17 @@ module.exports = [
       // separately-verified exercise -- see the follow-ups on issue #1749.
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
       '@angular-eslint/prefer-standalone': 'off',
+      // This is a convention, not a default: Angular 22 makes OnPush the default, and a component without `changeDetection`
+      // silently stops repainting when its host mutates the model in place (the shared tree components did, once).
+      // A subclass does not inherit the strategy of its base class either, so every @Component has to say it.
+      'no-restricted-syntax': ['error', {
+        selector: "Decorator > CallExpression[callee.name='Component'] > ObjectExpression:not(:has(> Property[key.name='changeDetection']))",
+        message: 'This @Component has no changeDetection. Angular 22 makes OnPush the default, so the view stops repainting when the '
+          + 'parent changes the model in place (a tree node, a table row, a form value): the screen shows stale data and e2e tests fail on it. '
+          + 'A component does not inherit this from its base class or from the component it wraps, so each one has to say it. '
+          + 'Add `changeDetection: ChangeDetectionStrategy.Eager` (what the rest of the app uses), '
+          + 'or OnPush if the component only reads signals/immutable inputs and calls markForCheck() where needed.',
+      }],
       '@angular-eslint/use-lifecycle-interface': 'off',
     },
   },
