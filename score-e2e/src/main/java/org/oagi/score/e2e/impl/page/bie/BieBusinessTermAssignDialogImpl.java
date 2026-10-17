@@ -26,28 +26,28 @@ public class BieBusinessTermAssignDialogImpl implements BieBusinessTermAssignDia
     private static final String BASE_XPATH = "//mat-dialog-container";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//span[contains(@class, \"assign-title\")]");
+            By.xpath(BASE_XPATH + "//div[contains(@class, \"dialog-title\")]/span");
 
     // The search bar's main input. score-search-bar renders a single input in its main-search area.
     private static final By SEARCH_INPUT_LOCATOR =
-            By.xpath(BASE_XPATH + "//score-search-bar[contains(@class, \"bt-assign-search-bar\")]"
+            By.xpath(BASE_XPATH + "//score-search-bar"
                     + "//div[contains(@class, \"main-search\")]//input");
 
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//score-search-bar[contains(@class, \"bt-assign-search-bar\")]"
+            By.xpath(BASE_XPATH + "//score-search-bar"
                     + "//div[contains(@class, \"main-search\")]//button[1]");
 
     private static final By MASTER_CHECKBOX_LOCATOR =
-            By.xpath(BASE_XPATH + "//th[contains(@class, \"bt-col-select\")]//mat-checkbox");
+            By.xpath(BASE_XPATH + "//th[contains(@class, \"mat-column-select\")]//mat-checkbox");
 
     private static final By TYPE_CODE_INPUT_LOCATOR =
             By.xpath(BASE_XPATH + "//mat-form-field[contains(@class, \"bt-assign-typecode\")]//input");
 
     private static final By ASSIGN_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//mat-dialog-actions//button[@color=\"primary\"]");
+            By.xpath(BASE_XPATH + "//div[contains(@class, \"dialog-actions\")]//button[@color=\"primary\"]");
 
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//mat-dialog-actions//button[normalize-space(.)=\"Cancel\"]");
+            By.xpath(BASE_XPATH + "//div[contains(@class, \"dialog-actions\")]//button[contains(normalize-space(.), \"Cancel\")]");
 
     private static final By DIALOG_CONTAINER_LOCATOR = By.cssSelector("mat-dialog-container");
 
@@ -94,13 +94,13 @@ public class BieBusinessTermAssignDialogImpl implements BieBusinessTermAssignDia
         // sibling select-cell checkbox in the same row.
         return elementToBeClickable(getDriver(), By.xpath(BASE_XPATH
                 + "//tr[@mat-row][.//a[normalize-space(.)=\"" + businessTerm + "\"]]"
-                + "//td[contains(@class, \"bt-col-select\")]//mat-checkbox"));
+                + "//td[contains(@class, \"mat-column-select\")]//mat-checkbox"));
     }
 
     @Override
     public WebElement getRowCheckboxAtIndex(int index) {
         return elementToBeClickable(getDriver(), By.xpath("(" + BASE_XPATH
-                + "//tr[@mat-row]//td[contains(@class, \"bt-col-select\")]//mat-checkbox)[" + index + "]"));
+                + "//tr[@mat-row]//td[contains(@class, \"mat-column-select\")]//mat-checkbox)[" + index + "]"));
     }
 
     @Override

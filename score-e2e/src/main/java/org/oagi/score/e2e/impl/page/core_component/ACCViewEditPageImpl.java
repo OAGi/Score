@@ -798,7 +798,17 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
      * Association nodes render two detail panels (association and property). If the second one is
      * missing the click did not select the node yet, so throw to let {@code retry} click it again.
      */
-    private void awaitAssociationPanels() {
+    private void awaitAssociationPanels(WebElement node) {
+        // The panels of the previously selected association stay until the clicked node becomes the cursor.
+        for (int i = 0; i < 10; i++) {
+            if (node.getAttribute("class").contains("tree-node-selected")) {
+                break;
+            }
+            waitFor(ofMillis(300L));
+        }
+        if (!node.getAttribute("class").contains("tree-node-selected")) {
+            throw new NoSuchElementException("The clicked node was not selected");
+        }
         By propertyPanel = By.xpath("//div[contains(@class, \"tree-detail-panel\")][2]");
         for (int i = 0; i < 10; i++) {
             if (!getDriver().findElements(propertyPanel).isEmpty()) {
@@ -814,7 +824,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(asccNode);
             waitFor(ofMillis(500L));
-            awaitAssociationPanels();
+            awaitAssociationPanels(asccNode);
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
@@ -834,7 +844,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(bccNode);
             waitFor(ofMillis(500L));
-            awaitAssociationPanels();
+            awaitAssociationPanels(bccNode);
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {

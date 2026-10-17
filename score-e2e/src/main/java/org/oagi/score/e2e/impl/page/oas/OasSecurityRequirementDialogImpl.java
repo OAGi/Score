@@ -31,7 +31,8 @@ public class OasSecurityRequirementDialogImpl implements OasSecurityRequirementD
             + "//div[contains(concat(\" \", normalize-space(@class), \" \"), \" requirement-card \")]";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]");
+            By.xpath("(" + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]//span | "
+                    + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]");
     private static final By MODE_RADIO_GROUP_LOCATOR =
             By.xpath(BASE_XPATH + "//mat-radio-group[contains(@class, \"security-mode-group\")]");
     private static final By REQ_CARD_LOCATOR = By.xpath(REQ_CARD_XPATH);

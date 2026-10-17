@@ -26,7 +26,8 @@ public class AddOperationForOpenAPIDocumentDialogImpl implements AddOperationFor
     private static final String BASE_XPATH = "//mat-dialog-container";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]");
+            By.xpath("(" + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]//span | "
+                    + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]");
     private static final By SUBTITLE_LOCATOR =
             By.xpath(BASE_XPATH + "//p[contains(@class, \"score-text-muted\")]");
     private static final By VERB_SELECT_LOCATOR =

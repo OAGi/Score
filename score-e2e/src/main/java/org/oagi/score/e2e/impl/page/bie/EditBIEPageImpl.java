@@ -2186,12 +2186,15 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public void unbind(WebElement card) {
+            int cardCount = getBindingCardCount();
             click(getDriver(), card.findElement(By.xpath(".//button[contains(@class, \"oas-binding-discard\")]")));
             WebElement confirmRemoveButton = elementToBeClickable(getDriver(), By.xpath(
                     "//mat-dialog-container//span[contains(text(), \"Remove\")]//ancestor::button[1]"));
             click(getDriver(), confirmRemoveButton);
             invisibilityOfLoadingContainerElement(getDriver());
             assert "Removed from OpenAPI Document.".equals(getSnackBarMessage(getDriver()));
+            // The panel reloads the bindings after the toast; wait until the removed card is gone.
+            PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)).until(driver -> getBindingCardCount() < cardCount);
         }
 
         @Override

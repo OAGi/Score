@@ -68,9 +68,13 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
 
     @Override
     public ReleaseObject getTheLatestRelease(LibraryObject library) {
+        // Only a published release can be browsed or profiled, so an unfinished (Initialized/Draft)
+        // release left behind by another test must not be taken as the latest one.
         ULong maxReleaseId = dslContext.select(DSL.max(RELEASE.RELEASE_ID))
                 .from(RELEASE)
-                .where(RELEASE.LIBRARY_ID.eq(ULong.valueOf(library.getLibraryId())))
+                .where(and(
+                        RELEASE.LIBRARY_ID.eq(ULong.valueOf(library.getLibraryId())),
+                        RELEASE.STATE.eq("Published")))
                 .fetchOneInto(ULong.class);
         ReleaseRecord release = dslContext.selectFrom(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(maxReleaseId))

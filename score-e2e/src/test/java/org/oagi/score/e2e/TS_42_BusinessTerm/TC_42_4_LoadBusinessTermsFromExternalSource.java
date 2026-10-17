@@ -669,7 +669,10 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
         // Close the first dialog before opening a fresh one: the selected valid CSV is retained
         // when navigating back, and an unsupported replacement in that dialog uses a snackbar.
-        uploadBusinessTermsPage.cancelViaCloseButton();
+        // (The finally block above has normally closed it already.)
+        if (!uploadBusinessTermsPage.isClosed()) {
+            uploadBusinessTermsPage.cancelViaCloseButton();
+        }
         UploadBusinessTermsPage freshDialog =
                 homePage.getBIEMenu().openViewEditBusinessTermSubMenu().hitUploadBusinessTermsButton();
         assertFalse(freshDialog.isFileTileVisible(), "A new upload dialog should start without a selected file.");

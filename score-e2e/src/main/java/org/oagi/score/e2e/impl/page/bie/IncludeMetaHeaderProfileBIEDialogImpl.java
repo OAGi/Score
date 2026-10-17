@@ -56,7 +56,7 @@ public class IncludeMetaHeaderProfileBIEDialogImpl implements IncludeMetaHeaderP
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override

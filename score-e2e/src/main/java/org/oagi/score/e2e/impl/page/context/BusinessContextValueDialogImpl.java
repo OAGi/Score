@@ -72,7 +72,7 @@ public class BusinessContextValueDialogImpl implements BusinessContextValueDialo
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//score-business-context-value-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//score-business-context-value-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //score-business-context-value-dialog//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override

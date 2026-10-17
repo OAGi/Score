@@ -478,7 +478,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
 
     }
 

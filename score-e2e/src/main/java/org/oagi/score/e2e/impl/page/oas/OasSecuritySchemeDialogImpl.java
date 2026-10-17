@@ -32,7 +32,8 @@ public class OasSecuritySchemeDialogImpl implements OasSecuritySchemeDialog {
     private static final String FLOW_CARD_XPATH = BASE_XPATH + "//div[contains(@class, \"oas-flow-card\")]";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]");
+            By.xpath("(" + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]//span | "
+                    + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]");
     private static final By TYPE_SELECT_LOCATOR =
             By.xpath(BASE_XPATH + "//mat-label[normalize-space(.) = \"Type\"]/ancestor::mat-form-field[1]//mat-select");
     private static final By SCHEME_NAME_FIELD_LOCATOR =

@@ -178,6 +178,11 @@ public abstract class PageHelper {
 
     public static WebElement clear(WebElement element) {
         if (element != null) {
+            // A tree search box is disabled while it searches.
+            new FluentWait<>(element)
+                    .withTimeout(Duration.ofSeconds(60L))
+                    .pollingEvery(Duration.ofMillis(100L))
+                    .until(WebElement::isEnabled);
             element.clear();
             // ng-reflect-model attribute in some elements couldn't reflect this clear text.
             element.sendKeys(" ");
@@ -433,7 +438,7 @@ public abstract class PageHelper {
     }
 
     public static String getDialogTitle(WebDriver driver) {
-        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]/span";
+        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]//span";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
     }

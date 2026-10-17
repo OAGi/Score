@@ -381,7 +381,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         click(tdDomainName);
 
         visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]//span[@class=\"text-line-through\"]"));
+                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]//span[contains(@class, \"text-line-through\")]"));
     }
 
     @Override

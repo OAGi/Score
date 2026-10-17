@@ -29,7 +29,7 @@ public class OasDocConfirmMessageDialogImpl implements OasDocConfirmMessageDialo
     private static final String BASE_XPATH = "//mat-dialog-container";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//div[contains(@class, \"header\")]/span");
+            By.xpath(BASE_XPATH + "//div[contains(@class, \"header\")]//span");
     private static final By SELECT_BUTTON_LOCATOR =
             By.cssSelector("mat-dialog-container #btn-confirm-message-dialog-select");
     private static final By CANCEL_BUTTON_LOCATOR =
