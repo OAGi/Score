@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, Output, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output, ViewEncapsulation} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {AngularSplitModule} from 'angular-split';
 import {TreeScrollTarget, TreeSearcher, TreeSearchBarComponent} from '../tree-search-bar/tree-search-bar.component';
@@ -23,6 +23,7 @@ export interface TreeDetailNode extends TreeBreadcrumbNode {
 @Component({
   selector: 'score-tree-detail',
   templateUrl: './tree-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tree-detail.component.css',
   encapsulation: ViewEncapsulation.None,
   imports: [MatCardModule, AngularSplitModule, TreeSearchBarComponent, TreeBreadcrumbsComponent]

@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, AfterViewChecked, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 
 export interface TreeBreadcrumbNode {
   name: string;
@@ -9,6 +9,7 @@ export interface TreeBreadcrumbNode {
 @Component({
   selector: 'score-tree-breadcrumbs',
   templateUrl: './tree-breadcrumbs.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {style: 'display: contents'}
 })
 export class TreeBreadcrumbsComponent<N extends TreeBreadcrumbNode = TreeBreadcrumbNode> implements AfterViewChecked {

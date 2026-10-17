@@ -1,5 +1,5 @@
 import {DecimalPipe} from '@angular/common';
-import {ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, Input, Output} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Observable, Subscription} from 'rxjs';
 import {FormsModule} from '@angular/forms';
@@ -51,6 +51,7 @@ export interface TreeSearcher<N = any> {
 @Component({
   selector: 'score-tree-search-bar',
   templateUrl: './tree-search-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tree-search-bar.component.css',
   imports: [DecimalPipe, FormsModule, MatButtonModule, MatIconButtonSizesModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule]
 })

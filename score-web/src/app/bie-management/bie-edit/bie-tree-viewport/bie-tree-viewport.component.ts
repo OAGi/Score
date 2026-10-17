@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
 import {MatInputModule} from '@angular/material/input';
@@ -33,6 +33,7 @@ export interface BieTreeRowHost {
 @Component({
   selector: 'score-bie-tree-viewport',
   templateUrl: './bie-tree-viewport.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ScoreCommonModule, FormsModule, MatCheckboxModule, MatInputModule, MatTooltipModule, FaIconComponent,
     TreeViewportComponent]
 })

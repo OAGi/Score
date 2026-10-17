@@ -1,5 +1,5 @@
 import {CdkDragDrop, CdkDragMove} from '@angular/cdk/drag-drop';
-import {Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation} from '@angular/core';
 import {MatMenuPanel} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ScoreCommonModule} from '../../../common/score-common.module';
@@ -33,6 +33,7 @@ export interface ModelBrowserTreeRowHost {
 @Component({
   selector: 'score-model-browser-tree-viewport',
   templateUrl: './model-browser-tree-viewport.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './model-browser-tree-viewport.component.css',
   encapsulation: ViewEncapsulation.None,
   imports: [ScoreCommonModule, MatTooltipModule, TreeViewportComponent]

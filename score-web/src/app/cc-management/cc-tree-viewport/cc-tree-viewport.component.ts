@@ -1,5 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {MatMenuPanel} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ScoreCommonModule} from '../../common/score-common.module';
@@ -10,6 +10,7 @@ import {CcFlatNode, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '..
 @Component({
   selector: 'score-cc-tree-viewport',
   templateUrl: './cc-tree-viewport.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ScoreCommonModule, MatTooltipModule, TreeViewportComponent]
 })
 export class CcTreeViewportComponent {

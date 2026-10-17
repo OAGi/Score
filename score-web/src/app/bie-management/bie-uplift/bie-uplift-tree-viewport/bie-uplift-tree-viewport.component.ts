@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatMenuPanel} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -31,6 +31,7 @@ export interface BieUpliftTreeRowHost {
 @Component({
   selector: 'score-bie-uplift-tree-viewport',
   templateUrl: './bie-uplift-tree-viewport.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bie-uplift-tree-viewport.component.css',
   imports: [ScoreCommonModule, MatCheckboxModule, MatTooltipModule, FaIconComponent, TreeViewportComponent]
 })

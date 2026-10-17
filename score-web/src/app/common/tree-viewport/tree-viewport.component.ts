@@ -3,6 +3,7 @@ import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling'
 import {DataSource} from '@angular/cdk/collections';
 import {NgTemplateOutlet} from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
@@ -74,6 +75,7 @@ export interface TreeViewportNodeKey<N> {
 @Component({
   selector: 'score-tree-viewport',
   templateUrl: './tree-viewport.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tree-viewport.component.css',
   encapsulation: ViewEncapsulation.None,
   imports: [ScrollingModule, DragDropModule, NgTemplateOutlet, MatButtonModule, MatIconModule, MatMenuModule,
