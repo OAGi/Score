@@ -25,7 +25,7 @@ const BIE_EXPRESS_TABLE = defineTable({
   ...BIE_TABLE,
   filters: [F.states, F.businessContext, F.version, F.remark, F.deprecated, F.owner, F.updater, F.updatedDate,
     // The branch is chosen beside the search box; it is part of the query.
-    {type: 'text', key: 'releaseId', label: 'Branch', hidden: true}],
+    {type: 'text', key: 'releaseIds', label: 'Branch', hidden: true}],
 });
 
 @Component({
@@ -95,7 +95,7 @@ export class BieExpressComponent implements OnInit {
 
   /** Once the table view has the query of the URL: the library and the branch that it asks for. */
   private start() {
-    const requestedReleaseId = Number(this.view().filterValue('releaseId') || 0);
+    const requestedReleaseId = Number(this.view().filterValue('releaseIds') || 0);
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.libraryChoice.init(libraries);
       this.applyLibrary();
@@ -117,7 +117,7 @@ export class BieExpressComponent implements OnInit {
   }
 
   private applyRelease() {
-    this.view().setFilter('releaseId', '' + (this.releaseChoice.release?.releaseId || 0));
+    this.view().setFilter('releaseIds', '' + (this.releaseChoice.release?.releaseId || 0));
   }
 
   onBranchChange(release: ReleaseSummary) {

@@ -109,15 +109,17 @@
     }
 
     <div toolbar class="d-flex align-items-center">
-      <section class="browser-mode-toggle-section me-2">
-        <div class="d-flex align-items-center">
-          <mat-icon class="me-2">{{ browserMode ? 'preview' : 'code_blocks' }}</mat-icon>
-          <mat-label>{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
-        </div>
-        <mat-slide-toggle labelPosition="before"
-          [checked]="browserMode" (change)="onBrowserModeChange($event)">
-        </mat-slide-toggle>
-      </section>
+      @if (preferencesInfo) {
+        <section class="browser-mode-toggle-section me-2">
+          <div class="d-flex align-items-center">
+            <mat-icon class="me-2">{{ browserMode ? 'preview' : 'code_blocks' }}</mat-icon>
+            <mat-label>{{ browserMode ? 'Browser View' : 'Dev View' }}</mat-label>
+          </div>
+          <mat-slide-toggle labelPosition="before"
+            [checked]="browserMode" (change)="onBrowserModeChange($event)">
+          </mat-slide-toggle>
+        </section>
+      }
       @if (!browserMode) {
         <score-column-selector class="pe-2"
           [title]="'Types'"
