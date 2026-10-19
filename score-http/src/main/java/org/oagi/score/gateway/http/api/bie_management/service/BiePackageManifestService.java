@@ -326,6 +326,8 @@ public class BiePackageManifestService {
         List<ReleaseDetailsRecord> releaseDetailsRecords =
                 releaseQueryRepository.getReleaseSummaryList(libraryId).stream()
                         .map(e -> releaseQueryRepository.getReleaseDetails(e.releaseId()))
+                        // A release whose details cannot be read (e.g. its updater was removed) is not a candidate.
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
         Map<ReleaseId, ReleaseDetailsRecord> releaseInDatabaseMap = releaseDetailsRecords.stream()
                 .collect(Collectors.toMap(ReleaseDetailsRecord::releaseId, Function.identity()));
