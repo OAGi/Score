@@ -813,7 +813,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST_VALUE.LAST_UPDATE_TIMESTAMP,
 
                             AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(AGENCY_ID_LIST_VALUE_MANIFEST)
                     .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -840,7 +841,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_DEPRECATED),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT),
-                        isUsed(agencyIdListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
 
                         fetchOwnerSummary(record),
                         new WhoAndWhen(
@@ -880,15 +881,38 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         .fetchOneInto(Integer.class) > 0;
     }
 
-    private boolean isUsed(AgencyIdListValueManifestId agencyIdListValueManifestId) {
-        return dslContext().selectCount()
-                .from(AGENCY_ID_LIST_MANIFEST)
-                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId)))
-                .fetchOneInto(Integer.class) > 0 ||
-                dslContext().selectCount()
-                        .from(CODE_LIST_MANIFEST)
-                        .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId)))
-                        .fetchOneInto(Integer.class) > 0;
+    private static final String VALUE_USED_FIELD_NAME = "used";
+
+    private Field<Boolean> valueUsedField() {
+        var valueManifestId =
+                AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID;
+
+        var based = AGENCY_ID_LIST_VALUE_MANIFEST.as("based");
+        var replacement = AGENCY_ID_LIST_VALUE_MANIFEST.as("replacement");
+
+        return field(
+                exists(selectOne()
+                        .from(AGENCY_ID_LIST_MANIFEST)
+                        .where(and(
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId),
+                                // A reference from the value's own parent list is not a usage
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.ne(
+                                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                        )))
+                        .or(exists(selectOne()
+                                .from(CODE_LIST_MANIFEST)
+                                .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+                        .or(exists(selectOne()
+                                .from(based)
+                                .where(based.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+                        .or(exists(selectOne()
+                                .from(replacement)
+                                .where(replacement.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+        ).as(VALUE_USED_FIELD_NAME);
     }
 
     private List<AgencyIdListValueDetailsRecord> getPrevAgencyIdListValueDetailsList(
@@ -920,7 +944,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST_VALUE.as("prev").LAST_UPDATE_TIMESTAMP,
 
                             AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(AGENCY_ID_LIST_VALUE_MANIFEST)
                     .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -953,7 +978,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_DEPRECATED),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_DEVELOPER_DEFAULT),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_USER_DEFAULT),
-                        isUsed(agencyIdListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
 
                         fetchOwnerSummary(record),
                         new WhoAndWhen(
