@@ -82,7 +82,10 @@
               <mat-form-field>
                 <mat-label>{{ 'BCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
                 <input matInput placeholder="{{ 'BCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="60"
-                  [(ngModel)]="detail.propertyTerm" [disabled]="true">
+                  [(ngModel)]="detail.propertyTerm"
+                  (focusout)="detail.propertyTerm = trim(detail.propertyTerm)"
+                  [required]="true"
+                  [disabled]="!editable.propertyTerm">
               </mat-form-field>
             </div>
           </div>
@@ -91,7 +94,7 @@
               <div class="checkbox">
                 <mat-checkbox color="primary"
                   [(ngModel)]="detail.nillable"
-                  [disabled]="true">
+                  [disabled]="!editable.nillable">
                   <span>Nillable</span>
                 </mat-checkbox>
               </div>
@@ -100,7 +103,7 @@
               <div class="checkbox">
                 <mat-checkbox color="primary"
                   [(ngModel)]="detail.deprecated"
-                  [disabled]="true">
+                  [disabled]="!editable.deprecated">
                   <span>Deprecated</span>
                   @if (detail.replacement) {
                     <span>, replaced by </span>
@@ -121,9 +124,9 @@
             <div class="col-md-3 col-sm-3">
               <mat-form-field>
                 <mat-select [(ngModel)]="detail.fixedOrDefault"
-                  [disabled]="true">
+                  [disabled]="!editable.valueConstraint">
                   <mat-option value="none">None</mat-option>
-                  <mat-option value="fixed">Fixed Value</mat-option>
+                  <mat-option value="fixed" [disabled]="fixedOptionDisabled">Fixed Value</mat-option>
                   <mat-option value="default">Default Value</mat-option>
                 </mat-select>
                 <mat-label>Value Constraint</mat-label>
@@ -142,7 +145,7 @@
                   <mat-label>Fixed Value</mat-label>
                   <input matInput placeholder="Fixed Value"
                     [(ngModel)]="detail.fixedValue"
-                    [disabled]="true">
+                    [disabled]="!editable.valueConstraint">
                 </mat-form-field>
               }
               @if (detail.fixedOrDefault == 'default') {
@@ -150,7 +153,44 @@
                   <mat-label>Default Value</mat-label>
                   <input matInput placeholder="Default Value"
                     [(ngModel)]="detail.defaultValue"
+                    [disabled]="!editable.defaultValue">
+                </mat-form-field>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              @if (editable.namespace) {
+                <mat-form-field>
+                  <mat-label>Namespace</mat-label>
+                  <mat-select placeholder="Namespace"
+                    [(ngModel)]="detail.namespaceId"
+                    [required]="true">
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="namespaceFilter"
+                        [placeholderLabel]="'Search...'"
+                      [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+                    </mat-option>
+                    @for (namespace of filteredNamespaces | async; track namespace) {
+                      <mat-option [value]="namespace.namespaceId">
+                        {{ namespace.uri }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              }
+              @if (!editable.namespace) {
+                <mat-form-field>
+                  <mat-label>Namespace</mat-label>
+                  <mat-select placeholder="Namespace"
+                    [(ngModel)]="detail.namespaceId"
+                    [required]="true"
                     [disabled]="true">
+                    @for (namespace of getSelectableNamespaces(detail.namespaceId); track namespace) {
+                      <mat-option
+                      [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
+                    }
+                  </mat-select>
                 </mat-form-field>
               }
             </div>
@@ -158,25 +198,11 @@
           <div class="row">
             <div class="col-12">
               <mat-form-field>
-                <mat-label>Namespace</mat-label>
-                <mat-select placeholder="Namespace"
-                  [(ngModel)]="detail.namespaceId"
-                  [disabled]="true">
-                  <mat-option [value]="0">-</mat-option>
-                  @for (namespace of getSelectableNamespaces(detail.namespaceId); track namespace) {
-                    <mat-option
-                    [value]="namespace.namespaceId">{{namespace.uri}}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <mat-form-field>
                 <mat-label>Definition Source</mat-label>
                 <input matInput placeholder="Definition Source" maxlength="100"
-                  [(ngModel)]="detail.definitionSource" [disabled]="true">
+                  [(ngModel)]="detail.definitionSource"
+                  (focusout)="detail.definitionSource = trim(detail.definitionSource)"
+                  [disabled]="!editable.definition">
               </mat-form-field>
             </div>
           </div>
@@ -188,7 +214,8 @@
                   <textarea matInput rows="6" cols="30"
                     placeholder="Definition"
                     [(ngModel)]="detail.definition"
-                  [readonly]="true"></textarea>
+                    (focusout)="detail.definition = trim(detail.definition)"
+                  [readonly]="!editable.definition"></textarea>
                   @if (state === 'WIP' && access === 'CanEdit' && canCopyDefinition) {
                     <button mat-icon-button mat-small-icon-button
                       (click)="copyToDefinition(detail.definition)"

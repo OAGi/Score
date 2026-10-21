@@ -1,3 +1,4 @@
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
 import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
 import {DtPanelComponent} from '../detail-panels/dt-panel.component';
 import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
@@ -48,6 +49,7 @@ const routes: Routes = [
     GithubIssueBoxComponent,
     DtPanelComponent,
     BccPanelComponent,
+    BccpPanelComponent,
     DtScPanelComponent
   ],
   declarations: [
