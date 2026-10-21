@@ -1332,7 +1332,8 @@ export class AccDetailComponent implements OnInit {
       });
   }
 
-  isValidAttributeGroup(componentType: string): boolean {
+  /** An arrow function: the ACC panel calls it without the screen as `this`. */
+  isValidAttributeGroup = (componentType: string): boolean => {
     if (componentType !== AttributeGroup.value) {
       // If the type is not attribute group, it's okay to pass validation.
       return true;
@@ -1349,9 +1350,10 @@ export class AccDetailComponent implements OnInit {
       .filter(e => (e as BccpFlatNode).bccNode.entityType === 'Attribute')
       .length;
     return lenOfChildren === lenOfBccpEntityChildren;
-  }
+  };
 
-  componentTypeAble(componentType: string) {
+  /** An arrow function: the ACC panel calls it without the screen as `this`. */
+  componentTypeAble = (componentType: string): boolean => {
     if (this.userRoles.includes('developer')) {
       if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
         return false;
@@ -1362,7 +1364,7 @@ export class AccDetailComponent implements OnInit {
       }
     }
     return true;
-  }
+  };
 
   abstractAble(detail: CcAccNodeInfo) {
     if (this.prevAccDetails) {

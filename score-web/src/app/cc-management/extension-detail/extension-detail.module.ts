@@ -1,4 +1,5 @@
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {AccPanelComponent} from '../detail-panels/acc-panel.component';
 import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
 import {AsccpPanelComponent} from '../detail-panels/asccp-panel.component';
 import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
@@ -50,6 +51,7 @@ const routes: Routes = [
     AngularSplitModule,
     GithubIssueBoxComponent,
     DtPanelComponent,
+    AccPanelComponent,
     AsccPanelComponent,
     AsccpPanelComponent,
     BccPanelComponent,

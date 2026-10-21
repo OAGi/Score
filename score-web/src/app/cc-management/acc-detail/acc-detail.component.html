@@ -264,281 +264,70 @@
     <ng-container treeDetailPane>
       <!-- ACC -->
       @if (isAccDetail()) {
-        <div class="tree-detail-panel">
-          <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-            <mat-tab label="{{ asAccDetail().den }}">
-              <div class="tree-detail-container">
-                <div class="row">
-                  <div class="col-2">
-                    <mat-form-field>
-                      <mat-label>Library</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().library.name" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-2">
-                    <mat-form-field>
-                      <mat-label>Release</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().release.releaseNum" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="{{ asAccDetail().lastChanged ? 'col-1' : 'col-2' }}"
-                    (click)="openInNewTab('/core_component/acc/' + asAccDetail().since.accManifestId)"
-                    style="cursor: pointer;">
-                    <mat-form-field>
-                      <mat-label>Since</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().since.release.releaseNum" [disabled]="true"
-                        style="pointer-events: none;">
-                    </mat-form-field>
-                  </div>
-                  @if (asAccDetail().lastChanged) {
-                    <div class="col-1"
-                      (click)="openInNewTab('/core_component/acc/' + asAccDetail().lastChanged.accManifestId)"
-                      style="cursor: pointer;">
-                      <mat-form-field>
-                        <mat-label>Last Changed</mat-label>
-                        <input matInput [(ngModel)]="asAccDetail().lastChanged.release.releaseNum" [disabled]="true"
-                          style="pointer-events: none;">
-                      </mat-form-field>
-                    </div>
-                  }
-                  <div class="col-2">
-                    <mat-form-field>
-                      <mat-label>Revision</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().log.revisionNum" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-2">
-                    <mat-form-field>
-                      <mat-label>State</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().state" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-2">
-                    <mat-form-field>
-                      <mat-label>Owner</mat-label>
-                      <input matInput [(ngModel)]="asAccDetail().owner.loginId" [matTooltip]="asAccDetail().owner.username" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-2">
-                    <mat-form-field matTooltip="Aggregate Core Component">
-                      <mat-label>Core Component</mat-label>
-                      <input matInput value="ACC" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-4">
-                    <mat-form-field>
-                      <mat-label>GUID</mat-label>
-                      <input matInput maxlength="41"
-                        [(ngModel)]="asAccDetail().guid" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-6">
-                    <mat-form-field>
-                      <mat-label>{{'ACC_DETAIL.DEN' | translate}}</mat-label>
-                      <input matInput maxlength="200"
-                        [(ngModel)]="asAccDetail().den" [disabled]="true">
-                    </mat-form-field>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12">
-                    <mat-form-field>
-                      <mat-label>{{ 'ACC_DETAIL.OBJECT' | translate }}</mat-label>
-                      <div class="object-class-term-container">
-                        <input matInput placeholder="{{ 'ACC_DETAIL.OBJECT' | translate }}" maxlength="100"
-                          [required]="true"
-                          [(ngModel)]="asAccDetail().objectClassTerm"
-                          (focusout)="asAccDetail().objectClassTerm = trim(asAccDetail().objectClassTerm)"
-                          [disabled]="selectedNode.level !== 0 || !isEditable()">
-                        @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                        && !!this.selectedModel && originalName === undefined) {
-                          <button mat-icon-button mat-small-icon-button
-                            (mousedown)="generateName(asAccDetail(), selectedModel)"
-                            matTooltip="Generate">
-                            @if (!isNameGenerating) {
-                              <mat-icon>memory</mat-icon>
-                            }
-                            @if (isNameGenerating) {
-                              <mat-spinner diameter="24"></mat-spinner>
-                            }
-                          </button>
-                        }
-                        @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                        && !!this.selectedModel && originalName !== undefined) {
-                          <button mat-icon-button mat-small-icon-button
-                            (click)="revertName(asAccDetail())"
-                            matTooltip="Undo">
-                            @if (!isNameGenerating) {
-                              <mat-icon>undo</mat-icon>
-                            }
-                          </button>
-                        }
-                      </div>
-                    </mat-form-field>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4">
-                    <mat-form-field>
-                      <mat-label>Component Type</mat-label>
-                      <mat-select placeholder="Component Type"
-                        [(ngModel)]="asAccDetail().oagisComponentType"
-                        [disabled]="selectedNode.level !== 0 || !isEditable() || hasRevision() || isExtension()">
-                        @for (componentType of componentTypes; track componentType) {
-                          <mat-option
-                            [value]="componentType.value"
-                            [disabled]="!isValidAttributeGroup(componentType.value)"
-                          [hidden]="!componentTypeAble(componentType.value)">{{ componentType.name }}</mat-option>
-                        }
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-4">
-                    <div class="checkbox">
-                      <mat-checkbox color="primary"
-                        [(ngModel)]="asAccDetail().abstracted"
-                        [disabled]="selectedNode.level !== 0 || !isEditable() || !abstractAble(asAccDetail())">
-                        <span>Abstract</span>
-                      </mat-checkbox>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="checkbox">
-                      <mat-checkbox color="primary"
-                        [(ngModel)]="asAccDetail().deprecated"
-                        [disabled]="selectedNode.level !== 0 || !isEditable() || !hasRevision() || this.prevAccDetails.deprecated">
-                        <span>Deprecated</span>
-                        @if (asAccDetail().replacement) {
-                          <span>, replaced by </span>
-                        }
-                      </mat-checkbox>
-                      @if (asAccDetail().replacement) {
-                        <div class="ms-1 d-inline-block" style="vertical-align: super">
-                          <span>
-                            <a target="_blank" rel="noopener noreferrer"
-                            href="/core_component/acc/{{ asAccDetail().replacement.accManifestId }}">{{ asAccDetail().replacement.den }}</a>
-                          </span>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12">
-                    @if (selectedNode.level === 0 && isEditable() && !hasRevision()) {
-                      <mat-form-field>
-                        <mat-label>Namespace</mat-label>
-                        <mat-select placeholder="Namespace"
-                          [(ngModel)]="asAccDetail().namespaceId"
-                          [required]="true">
-                          <mat-option>
-                            <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                              [placeholderLabel]="'Search...'"
-                            [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-                          </mat-option>
-                          @for (namespace of filteredNamespaceList | async; track namespace) {
-                            <mat-option [value]="namespace.namespaceId">
-                              {{ namespace.uri }}
-                            </mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
-                    }
-                    @if (selectedNode.level !== 0 || !isEditable() || hasRevision()) {
-                      <mat-form-field>
-                        <mat-label>Namespace</mat-label>
-                        <mat-select placeholder="Namespace"
-                          [(ngModel)]="asAccDetail().namespaceId"
-                          [required]="true" [disabled]="true">
-                          @for (namespace of getSelectableNamespaces(asAccDetail().namespaceId); track namespace) {
-                            <mat-option
-                            [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
-                    }
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12">
-                    <mat-form-field>
-                      <mat-label>Definition Source</mat-label>
-                      <input matInput placeholder="Definition Source" maxlength="100"
-                        [(ngModel)]="asAccDetail().definitionSource"
-                        (focusout)="asAccDetail().definitionSource = trim(asAccDetail().definitionSource)"
-                        [disabled]="selectedNode.level !== 0 || !isEditable()">
-                    </mat-form-field>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12">
-                    <mat-form-field>
-                      <mat-label>Definition</mat-label>
-                      <div class="textarea-container">
-                        <textarea matInput rows="6" cols="30"
-                          placeholder="Definition"
-                          [(ngModel)]="asAccDetail().definition"
-                          (focusout)="asAccDetail().definition = trim(asAccDetail().definition)"
-                        [readonly]="selectedNode.level !== 0 || !isEditable()"></textarea>
-                        @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0) {
-                          <button mat-icon-button mat-small-icon-button
-                            (click)="copyToDefinition(asAccDetail().definition)"
-                            matTooltip="Copy to Definition">
-                            <mat-icon>content_paste</mat-icon>
-                          </button>
-                        }
-                        @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                        && !!this.selectedModel && originalText === undefined) {
-                          <button mat-icon-button mat-small-icon-button
-                            #triggerForGenerateDefinition="matMenuTrigger"
-                            [matMenuTriggerFor]="modelMenuForGenerateDefinition"
-                            (mousedown)="handleMouseDownForGenerateDefinition($event, triggerForGenerateDefinition)"
-                            matTooltip="Generate"
-                            (contextmenu)="$event.preventDefault(); $event.stopPropagation();">
-                            @if (!isDefinitionGenerating) {
-                              <mat-icon>memory</mat-icon>
-                            }
-                            @if (isDefinitionGenerating) {
-                              <mat-spinner diameter="24"></mat-spinner>
-                            }
-                          </button>
-                        }
-                        @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                        && !!this.selectedModel && originalText !== undefined) {
-                          <button mat-icon-button mat-small-icon-button
-                            (click)="revertDefinition(asAccDetail())"
-                            matTooltip="Undo">
-                            @if (!isDefinitionGenerating) {
-                              <mat-icon>undo</mat-icon>
-                            }
-                          </button>
-                        }
-                      </div>
-                    </mat-form-field>
-                  </div>
-                </div>
-                @if (githubService.enabled$() | async) {
-                  <div class="row">
-                    <div class="col-12">
-                      <score-github-issue-box
-                        [manifestId]="asAccDetail().manifestId"
-                        ccType="acc"
-                        [state]="asAccDetail().state"
-                        [ownerLoginId]="asAccDetail()?.owner?.loginId"
-                        [currentUser]="currentUser"
-                        [editable]="type === 'ACC' && asAccDetail().manifestId === manifestId">
-                      </score-github-issue-box>
-                    </div>
-                  </div>
+        <score-cc-acc-panel [detail]="asAccDetail()" [state]="state" [access]="access" [currentUser]="currentUser"
+          [editable]="{objectClassTerm: selectedNode.level === 0 && isEditable(), componentType: selectedNode.level === 0 && isEditable() && !hasRevision() && !isExtension(),
+            abstract: selectedNode.level === 0 && isEditable() && abstractAble(asAccDetail()), deprecated: selectedNode.level === 0 && isEditable() && hasRevision() && !prevAccDetails.deprecated,
+            namespace: selectedNode.level === 0 && isEditable() && !hasRevision(), definition: selectedNode.level === 0 && isEditable()}"
+          [namespaces]="namespaces" [isDeveloper]="userRoles.includes('developer')"
+          [canCopyDefinition]="selectedNode.level !== 0"
+          [namespaceFilter]="namespaceListFilterCtrl" [filteredNamespaces]="filteredNamespaceList"
+          [isValidAttributeGroup]="isValidAttributeGroup" [componentTypeAble]="componentTypeAble"
+          [githubEditable]="type === 'ACC' && asAccDetail().manifestId === manifestId"
+          (definitionCopy)="copyToDefinition($event)">
+          <ng-container ngProjectAs="[accNameActions]">
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalName === undefined) {
+              <button mat-icon-button mat-small-icon-button
+                (mousedown)="generateName(asAccDetail(), selectedModel)"
+                matTooltip="Generate">
+                @if (!isNameGenerating) {
+                  <mat-icon>memory</mat-icon>
                 }
-              </div>
-            </mat-tab>
-          </mat-tab-group>
-        </div>
+                @if (isNameGenerating) {
+                  <mat-spinner diameter="24"></mat-spinner>
+                }
+              </button>
+            }
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalName !== undefined) {
+              <button mat-icon-button mat-small-icon-button
+                (click)="revertName(asAccDetail())"
+                matTooltip="Undo">
+                @if (!isNameGenerating) {
+                  <mat-icon>undo</mat-icon>
+                }
+              </button>
+            }
+          </ng-container>
+          <ng-container ngProjectAs="[accDefinitionActions]">
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalText === undefined) {
+              <button mat-icon-button mat-small-icon-button
+                #triggerForGenerateDefinition="matMenuTrigger"
+                [matMenuTriggerFor]="modelMenuForGenerateDefinition"
+                (mousedown)="handleMouseDownForGenerateDefinition($event, triggerForGenerateDefinition)"
+                matTooltip="Generate"
+                (contextmenu)="$event.preventDefault(); $event.stopPropagation();">
+                @if (!isDefinitionGenerating) {
+                  <mat-icon>memory</mat-icon>
+                }
+                @if (isDefinitionGenerating) {
+                  <mat-spinner diameter="24"></mat-spinner>
+                }
+              </button>
+            }
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalText !== undefined) {
+              <button mat-icon-button mat-small-icon-button
+                (click)="revertDefinition(asAccDetail())"
+                matTooltip="Undo">
+                @if (!isDefinitionGenerating) {
+                  <mat-icon>undo</mat-icon>
+                }
+              </button>
+            }
+          </ng-container>
+        </score-cc-acc-panel>
       }
 
       <!-- Dropdown Menu -->
