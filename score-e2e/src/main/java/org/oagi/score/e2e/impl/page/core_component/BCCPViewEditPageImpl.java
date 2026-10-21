@@ -388,12 +388,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new BCCPPanelContainer() {
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\")][2]");
+                    return new BCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("//div[contains(@class, \"tree-detail-panel\")][3]");
+                    return new DTPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[3]");
                 }
             };
         });
@@ -428,7 +428,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"tree-detail-panel\")][1]");
+            return new ACCPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[1]");
         });
     }
 
@@ -440,12 +440,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
-                    return new ASCCPanelImpl("//div[contains(@class, \"tree-detail-panel\")][1]");
+                    return new ASCCPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[1]");
                 }
 
                 @Override
                 public ASCCPPanel getASCCPPanel() {
-                    return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\")][2]");
+                    return new ASCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
                 }
             };
         });

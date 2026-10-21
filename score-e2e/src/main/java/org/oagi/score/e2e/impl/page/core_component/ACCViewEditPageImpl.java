@@ -809,7 +809,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         if (!node.getAttribute("class").contains("tree-node-selected")) {
             throw new NoSuchElementException("The clicked node was not selected");
         }
-        By propertyPanel = By.xpath("//div[contains(@class, \"tree-detail-panel\")][2]");
+        By propertyPanel = By.xpath("(//div[contains(@class, \"tree-detail-panel\")])[2]");
         for (int i = 0; i < 10; i++) {
             if (!getDriver().findElements(propertyPanel).isEmpty()) {
                 return;

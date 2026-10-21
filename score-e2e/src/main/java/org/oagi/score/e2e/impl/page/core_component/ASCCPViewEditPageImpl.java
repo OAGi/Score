@@ -440,7 +440,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 click(asccpNode);
                 waitFor(ofMillis(500L));
             }
-            return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\")][2]");
+            return new ASCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
         });
     }
 
