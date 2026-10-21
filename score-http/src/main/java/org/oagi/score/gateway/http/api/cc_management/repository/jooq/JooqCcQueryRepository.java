@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.types.ULong;
+import org.apache.commons.lang3.tuple.Pair;
+import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
@@ -105,11 +107,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             return new ResultAndCount(Collections.emptyList(), 0);
         }
 
-        var where = queryBuilder.select();
+        var sortFields = queryBuilder.sortFields(pageRequest);
+        var where = queryBuilder.select(false, pageRequest.isPagination() ? sortFields : null,
+                pageRequest.pageOffset() + pageRequest.pageSize());
         if (where == null) {
             return new ResultAndCount(Collections.emptyList(), 0);
         }
-        int count = dslContext().fetchCount(where);
+        int count = dslContext().fetchCount(queryBuilder.select(true));
         List<CcListEntryRecord> result = queryBuilder.fetch(where, pageRequest);
         return new ResultAndCount(result, count);
     }
@@ -151,6 +155,10 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 .fetch(new CcListQueryBuilder(filterCriteria).mapper());
     }
 
+    private boolean isNotEmpty(Collection<?> c) {
+        return c != null && !c.isEmpty();
+    }
+
     private class CcListQueryBuilder {
 
         private Set<ReleaseSummaryRecord> includedReleaseSummarySet;
@@ -167,51 +175,63 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
         }
 
         SelectOrderByStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
 
-            SelectOrderByStep select = null;
+        /**
+         * @param forCount when true, each branch has only the joins its conditions need and just the identity columns.
+         */
+        SelectOrderByStep<? extends org.jooq.Record> select(boolean forCount) {
+            return select(forCount, null, 0);
+        }
+
+        /**
+         * @param branchOrderBy the order of the final list, or null: when there are two or more branches, each branch
+         *                      is ordered and cut to its first {@code branchLimit} rows before they are united. A row
+         *                      in the first {@code branchLimit} rows of the united rows has fewer rows before it in its
+         *                      own branch than {@code branchLimit}, so no row of the page is cut; the caller still
+         *                      orders the united rows and takes its page. This needs a total order, because the
+         *                      branches and the united rows must agree on which of the equal rows come first.
+         */
+        SelectOrderByStep<? extends org.jooq.Record> select(
+                boolean forCount, List<SortField<?>> branchOrderBy, int branchLimit) {
+
+            List<SelectConditionStep<? extends org.jooq.Record>> branches = new ArrayList<>();
             if (filterCriteria.types().isAcc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new AccListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
             if (filterCriteria.types().isAscc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new AsccListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
             if (filterCriteria.types().isBcc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new BccListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
             if (filterCriteria.types().isAsccp()) {
                 var queryBuilder = new AsccpListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
             if (filterCriteria.types().isBccp() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new BccpListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
             if (filterCriteria.types().isDt() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new DtListQueryBuilder(filterCriteria);
-                var where = queryBuilder.select().where(
-                        queryBuilder.conditions(includedReleaseSummarySet)
-                );
-                select = (select != null) ? select.union(where) : where;
+                branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            return select;
+            if (branches.isEmpty()) {
+                return null;
+            }
+
+            boolean limitBranches = branchOrderBy != null && !branchOrderBy.isEmpty() && branches.size() > 1;
+            SelectUnionStep select = null;
+            for (var branch : branches) {
+                Select<?> member = limitBranches ? branch.orderBy(branchOrderBy).limit(branchLimit) : branch;
+                select = (select != null) ? (SelectUnionStep) select.union(member) : (SelectUnionStep) member;
+            }
+            return (SelectOrderByStep<? extends org.jooq.Record>) select;
         }
 
         public List<SortField<?>> sortFields(PageRequest pageRequest) {
@@ -278,6 +298,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 sortFields.add(field("score").desc());
             }
 
+            if (!sortFields.isEmpty()) {
+                // A total order, so that every page of the list and the rows kept from each branch are the same
+                // whatever the page is: rows with equal values in the columns above are ordered by their identity.
+                sortFields.add(field("type").asc());
+                sortFields.add(field("manifest_id").asc());
+            }
+
             return sortFields;
         }
 
@@ -298,10 +325,34 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     finalStep = conditionStep.orderBy(sortFields);
                 }
             }
-            return finalStep.fetch(mapper());
+            // Tags are resolved for the whole page in one query instead of one query per row.
+            List<CcListEntryRecord> entries = finalStep.fetch(mapper(manifestId -> Collections.emptyList()));
+            if (entries.isEmpty()) {
+                return entries;
+            }
+
+            Map<Pair<CcType, ManifestId>, List<TagSummaryRecord>> tagMap =
+                    tagQueryRepository.getTagSummariesByPairsOfTypeAndManifestId(entries.stream()
+                            .map(e -> Pair.of(e.type(), (ManifestId) e.manifestId()))
+                            .collect(Collectors.toList()));
+            return entries.stream().map(e -> withTagList(e,
+                            tagMap.getOrDefault(Pair.of(e.type(), (ManifestId) e.manifestId()), Collections.emptyList())))
+                    .collect(Collectors.toList());
+        }
+
+        private CcListEntryRecord withTagList(CcListEntryRecord e, Collection<TagSummaryRecord> tagList) {
+            return new CcListEntryRecord(e.type(), e.library(), e.release(), e.manifestId(), e.guid(),
+                    e.basedManifestId(), e.den(), e.name(), e.definition(), e.module(), e.oagisComponentType(),
+                    e.namespaceId(), e.state(), e.deprecated(), e.newComponent(), e.dtType(), e.sixDigitId(),
+                    e.defaultValueDomain(), tagList, e.log(), e.owner(), e.created(), e.lastUpdated());
         }
 
         private RecordMapper<org.jooq.Record, CcListEntryRecord> mapper() {
+            return mapper(JooqCcQueryRepository.this::getTagSummaryList);
+        }
+
+        private RecordMapper<org.jooq.Record, CcListEntryRecord> mapper(
+                java.util.function.Function<Id, ? extends Collection<TagSummaryRecord>> tagResolver) {
             return record -> {
                 CcType type = CcType.valueOf(record.getValue("type", String.class));
                 Id manifestId = toManifestId(type, record.getValue("manifest_id", BigInteger.class));
@@ -334,7 +385,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                         record.getValue("six_digit_id", String.class),
                         record.getValue("default_value_domain", String.class),
 
-                        getTagSummaryList(manifestId),
+                        tagResolver.apply(manifestId),
 
                         (record.get(LOG.LOG_ID) != null) ? new LogSummaryRecord(
                                 new LogId(record.get(LOG.LOG_ID).toBigInteger()),
@@ -418,7 +469,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("ACC").as("type"),
@@ -461,23 +520,57 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 );
             }
 
-            return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(ACC)
-                    .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
-                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(ACC_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(ACC.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(ACC.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(ACC.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(ACC_MANIFEST_TAG).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST_TAG.ACC_MANIFEST_ID))
-                    .leftJoin(TAG).on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
-                    .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("ACC").as("type"), ACC_MANIFEST.ACC_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().select(selectFields)
+                    .from(ACC);
+            step = step
+                    .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID));
+            step = step
+                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(ACC_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(ACC.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(ACC.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(ACC.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(ACC_MANIFEST_TAG).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ACC_MANIFEST_TAG.ACC_MANIFEST_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(TAG).on(ACC_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
@@ -616,7 +709,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("ASCC").as("type"),
@@ -655,27 +756,57 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 fields.add(val(0).as("score"));
             }
 
-            return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(ASCC)
-                    .join(ASCC_MANIFEST).on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID))
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("ASCC").as("type"), ASCC_MANIFEST.ASCC_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().select(selectFields)
+                    .from(ASCC);
+            step = step
+                    .join(ASCC_MANIFEST).on(ASCC.ASCC_ID.eq(ASCC_MANIFEST.ASCC_ID));
+            step = step
                     .join(ACC_MANIFEST)
                     .on(and(
                             ASCC_MANIFEST.RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID),
                             ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)
-                    ))
-                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(ASCC_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(ASCC.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(ASCC.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(ASCC.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+                    ));
+            step = step
+                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID));
+            step = step
+                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(ASCC_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(ASCC.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(ASCC.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(ASCC.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
@@ -747,7 +878,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("BCC").as("type"),
@@ -786,27 +925,57 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 fields.add(val(0).as("score"));
             }
 
-            return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(BCC)
-                    .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("BCC").as("type"), BCC_MANIFEST.BCC_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().select(selectFields)
+                    .from(BCC);
+            step = step
+                    .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID));
+            step = step
                     .join(ACC_MANIFEST)
                     .on(and(
                             BCC_MANIFEST.RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID),
                             BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)
-                    ))
-                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(BCC_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(BCC.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(BCC.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(BCC.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+                    ));
+            step = step
+                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID));
+            step = step
+                    .join(LOG).on(ACC_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(BCC_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(BCC.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(BCC.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(BCC.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_ACC_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
@@ -876,7 +1045,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("ASCCP").as("type"),
@@ -919,29 +1096,65 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 );
             }
 
-            return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(ASCCP)
-                    .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID))
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("ASCCP").as("type"), ASCCP_MANIFEST.ASCCP_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().select(selectFields)
+                    .from(ASCCP);
+            step = step
+                    .join(ASCCP_MANIFEST).on(ASCCP.ASCCP_ID.eq(ASCCP_MANIFEST.ASCCP_ID));
+            step = step
                     .join(ACC_MANIFEST)
                     .on(and(
                             ASCCP_MANIFEST.RELEASE_ID.eq(ACC_MANIFEST.RELEASE_ID),
                             ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)
-                    ))
-                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                    .join(LOG).on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(ASCCP_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(ASCCP.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(ASCCP.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(ASCCP.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(ASCCP_MANIFEST_TAG).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID))
-                    .leftJoin(TAG).on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
-                    .leftJoin(MODULE_ASCCP_MANIFEST).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+                    ));
+            step = step
+                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID));
+            step = step
+                    .join(LOG).on(ASCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(ASCCP_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(ASCCP.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(ASCCP.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(ASCCP.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(ASCCP_MANIFEST_TAG).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST_TAG.ASCCP_MANIFEST_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(TAG).on(ASCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_ASCCP_MANIFEST).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_ASCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_ASCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
@@ -1028,7 +1241,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("BCCP").as("type"),
@@ -1071,23 +1292,57 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 );
             }
 
-            return dslContext().select(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(BCCP)
-                    .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID))
-                    .join(LOG).on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(BCCP_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(BCCP.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(BCCP.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(BCCP.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(BCCP_MANIFEST_TAG).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID))
-                    .leftJoin(TAG).on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
-                    .leftJoin(MODULE_BCCP_MANIFEST).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("BCCP").as("type"), BCCP_MANIFEST.BCCP_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().select(selectFields)
+                    .from(BCCP);
+            step = step
+                    .join(BCCP_MANIFEST).on(BCCP.BCCP_ID.eq(BCCP_MANIFEST.BCCP_ID));
+            step = step
+                    .join(LOG).on(BCCP_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(BCCP_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(BCCP.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(BCCP.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(BCCP.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(BCCP_MANIFEST_TAG).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(BCCP_MANIFEST_TAG.BCCP_MANIFEST_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(TAG).on(BCCP_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_BCCP_MANIFEST).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_BCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_BCCP_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
@@ -1159,7 +1414,15 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             this.filterCriteria = filterCriteria;
         }
 
-        SelectOnConditionStep<? extends org.jooq.Record> select() {
+        SelectJoinStep<? extends org.jooq.Record> select() {
+            return select(false);
+        }
+
+        /**
+         * @param forCount when true, only the identity columns are selected and only the joins that the
+         *                 filter conditions need are made, so that the rows can be counted cheaply.
+         */
+        SelectJoinStep<? extends org.jooq.Record> select(boolean forCount) {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
                     inline("DT").as("type"),
@@ -1202,35 +1465,69 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 );
             }
 
-            return dslContext().selectDistinct(concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields()))
-                    .from(DT)
-                    .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                    .join(LOG).on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .join(releaseTable()).on(releaseTablePk().eq(DT_MANIFEST.RELEASE_ID))
-                    .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID))
-                    .join(ownerTable()).on(DT.OWNER_USER_ID.eq(ownerTablePk()))
-                    .join(creatorTable()).on(DT.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(DT.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(DT_MANIFEST_TAG).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST_TAG.DT_MANIFEST_ID))
-                    .leftJoin(TAG).on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID))
-                    .leftJoin(MODULE_DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID))
-                    .leftJoin(MODULE_SET_RELEASE).on(and(
+            Field<?>[] selectFields = forCount
+                    ? new Field<?>[]{inline("DT").as("type"), DT_MANIFEST.DT_MANIFEST_ID.as("manifest_id")}
+                    : concat(fields.stream(), libraryFields(), releaseFields(), ownerFields(), creatorFields(), updaterFields());
+            SelectJoinStep<? extends org.jooq.Record> step = dslContext().selectDistinct(selectFields)
+                    .from(DT);
+            step = step
+                    .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID));
+            step = step
+                    .join(LOG).on(DT_MANIFEST.LOG_ID.eq(LOG.LOG_ID));
+            step = step
+                    .join(releaseTable()).on(releaseTablePk().eq(DT_MANIFEST.RELEASE_ID));
+            if (!forCount) {
+                step = step
+                        .join(libraryTable()).on(libraryTablePk().eq(releaseTable().LIBRARY_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.ownerLoginIdList())) {
+                step = step
+                        .join(ownerTable()).on(DT.OWNER_USER_ID.eq(ownerTablePk()));
+            }
+            if (!forCount) {
+                step = step
+                        .join(creatorTable()).on(DT.CREATED_BY.eq(creatorTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.updaterLoginIdList())) {
+                step = step
+                        .join(updaterTable()).on(DT.LAST_UPDATED_BY.eq(updaterTablePk()));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(DT_MANIFEST_TAG).on(DT_MANIFEST.DT_MANIFEST_ID.eq(DT_MANIFEST_TAG.DT_MANIFEST_ID));
+            }
+            if (!forCount || isNotEmpty(filterCriteria.tags())) {
+                step = step
+                        .leftJoin(TAG).on(DT_MANIFEST_TAG.TAG_ID.eq(TAG.TAG_ID));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE_DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(MODULE).on(MODULE_DT_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID))
-                    .leftJoin(DT_AWD_PRI).on(and(
+                    ));
+            }
+            if (!forCount || hasLength(filterCriteria.module())) {
+                step = step
+                        .leftJoin(MODULE).on(MODULE_DT_MANIFEST.MODULE_ID.eq(MODULE.MODULE_ID));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(DT_AWD_PRI).on(and(
                             DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
                             DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID),
                             DT_AWD_PRI.IS_DEFAULT.eq((byte) 1)
-                    ))
-                    .leftJoin(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID))
-                    .leftJoin(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
-                    .leftJoin(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                    .leftJoin(CODE_LIST_MANIFEST).on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
-                    .leftJoin(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                    .leftJoin(AGENCY_ID_LIST_MANIFEST).on(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
-                    .leftJoin(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID));
+                    ));
+            }
+            if (!forCount) {
+                step = step
+                        .leftJoin(CDT_PRI).on(DT_AWD_PRI.CDT_PRI_ID.eq(CDT_PRI.CDT_PRI_ID));
+            }
+            return step;
         }
 
         List<Condition> conditions(Collection<ReleaseSummaryRecord> includedReleases) {
