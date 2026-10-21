@@ -1,5 +1,6 @@
 import {AccPanelComponent} from '../detail-panels/acc-panel.component';
 import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
+import {AsccpPanelComponent} from '../detail-panels/asccp-panel.component';
 import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
 import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
 import {DtPanelComponent} from '../detail-panels/dt-panel.component';
@@ -61,6 +62,7 @@ const routes: Routes = [
     DtPanelComponent,
     AccPanelComponent,
     AsccPanelComponent,
+    AsccpPanelComponent,
     BccPanelComponent,
     BccpPanelComponent,
     DtScPanelComponent

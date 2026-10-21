@@ -28,12 +28,12 @@ export interface AccPanelEditable {
  * The detail of an ACC node (core component screens).
  *
  * The screen decides what is editable (`editable`) and brings the generate / undo buttons, which depend on its AI
- * state: put them into `[accNameActions]` and `[accDefinitionActions]`.
+ * state: put them into `[nameActions]` and `[definitionActions]`.
  */
 @Component({
   selector: 'score-cc-acc-panel',
   templateUrl: './acc-panel.component.html',
-  styleUrl: './acc-panel.component.css',
+  styleUrl: './cc-panel.css',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [AsyncPipe, FormsModule, ReactiveFormsModule, MaterialModule, MatTooltipModule, TranslatePipe, GithubIssueBoxComponent]
 })

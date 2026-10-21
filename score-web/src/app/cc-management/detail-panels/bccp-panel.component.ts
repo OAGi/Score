@@ -14,7 +14,7 @@ import {selectableNamespaces} from './selectable-namespaces';
 @Component({
   selector: 'score-cc-bccp-panel',
   templateUrl: './bccp-panel.component.html',
-  styleUrl: './bccp-panel.component.css',
+  styleUrl: './cc-panel.css',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [AsyncPipe, FormsModule, MaterialModule, MatTooltipModule, TranslatePipe, GithubIssueBoxComponent]
 })

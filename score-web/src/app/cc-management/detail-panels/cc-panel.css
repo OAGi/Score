@@ -13,13 +13,8 @@
   padding-right: 26px;
 }
 
-/* The generate / undo buttons are the screen's, projected into these containers. */
-.textarea-container ::ng-deep button {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
+/* The copy button is the panel's own; the screen's generate / undo buttons are projected into the same container. */
+.textarea-container ::ng-deep button,
 .object-class-term-container ::ng-deep button {
   position: absolute;
   top: 0;

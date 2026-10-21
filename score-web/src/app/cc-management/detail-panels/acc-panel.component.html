@@ -86,7 +86,7 @@
                   [(ngModel)]="detail.objectClassTerm"
                   (focusout)="detail.objectClassTerm = trim(detail.objectClassTerm)"
                   [disabled]="!editable.objectClassTerm">
-                <ng-content select="[accNameActions]"></ng-content>
+                <ng-content select="[nameActions]"></ng-content>
               </div>
             </mat-form-field>
           </div>
@@ -203,7 +203,7 @@
                     <mat-icon>content_paste</mat-icon>
                   </button>
                 }
-                <ng-content select="[accDefinitionActions]"></ng-content>
+                <ng-content select="[definitionActions]"></ng-content>
               </div>
             </mat-form-field>
           </div>

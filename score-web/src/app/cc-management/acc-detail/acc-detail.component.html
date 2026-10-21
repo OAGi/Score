@@ -274,7 +274,7 @@
           [isValidAttributeGroup]="isValidAttributeGroup" [componentTypeAble]="componentTypeAble"
           [githubEditable]="type === 'ACC' && asAccDetail().manifestId === manifestId"
           (definitionCopy)="copyToDefinition($event)">
-          <ng-container ngProjectAs="[accNameActions]">
+          <ng-container ngProjectAs="[nameActions]">
             @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
             && !!selectedModel && originalName === undefined) {
               <button mat-icon-button mat-small-icon-button
@@ -299,7 +299,7 @@
               </button>
             }
           </ng-container>
-          <ng-container ngProjectAs="[accDefinitionActions]">
+          <ng-container ngProjectAs="[definitionActions]">
             @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
             && !!selectedModel && originalText === undefined) {
               <button mat-icon-button mat-small-icon-button

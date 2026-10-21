@@ -208,251 +208,46 @@
           (definitionCopy)="copyToDefinition($event)"></score-cc-ascc-panel>
       }
       @if (isAsccpDetail()) {
-        <div class="tree-detail-panel">
-          <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-            @if (asAsccpDetail().asccp) {
-              <mat-tab label="{{ asAsccpDetail().asccp.den }}">
-                <div class="tree-detail-container">
-                  <div class="row">
-                    <div class="col-2">
-                      <mat-form-field>
-                        <mat-label>Library</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.library.name" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-2">
-                      <mat-form-field>
-                        <mat-label>Release</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.release.releaseNum" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="{{ asAsccpDetail().asccp.lastChanged ? 'col-1' : 'col-2' }}"
-                      (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.since.asccpManifestId)"
-                      style="cursor: pointer;">
-                      <mat-form-field>
-                        <mat-label>Since</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.since.release.releaseNum" [disabled]="true"
-                          style="pointer-events: none;">
-                      </mat-form-field>
-                    </div>
-                    @if (asAsccpDetail().asccp.lastChanged) {
-                      <div class="col-1"
-                        (click)="openInNewTab('/core_component/asccp/' + asAsccpDetail().asccp.lastChanged.asccpManifestId)"
-                        style="cursor: pointer;">
-                        <mat-form-field>
-                          <mat-label>Last Changed</mat-label>
-                          <input matInput [(ngModel)]="asAsccpDetail().asccp.lastChanged.release.releaseNum" [disabled]="true"
-                            style="pointer-events: none;">
-                        </mat-form-field>
-                      </div>
-                    }
-                    <div class="col-2">
-                      <mat-form-field>
-                        <mat-label>Revision</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.log.revisionNum" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-2">
-                      <mat-form-field>
-                        <mat-label>State</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.state" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-2">
-                      <mat-form-field>
-                        <mat-label>Owner</mat-label>
-                        <input matInput [(ngModel)]="asAsccpDetail().asccp.owner.loginId" [matTooltip]="asAsccpDetail().asccp.owner.username" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-2">
-                      <mat-form-field matTooltip="Association Core Component Property">
-                        <mat-label>Core Component</mat-label>
-                        <input matInput value="ASCCP" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-4">
-                      <mat-form-field>
-                        <mat-label>GUID</mat-label>
-                        <input matInput maxlength="41"
-                          [(ngModel)]="asAsccpDetail().asccp.guid" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                    <div class="col-6">
-                      <mat-form-field>
-                        <mat-label>{{ 'ASCCP_DETAIL.DEN' | translate }}</mat-label>
-                        <input matInput maxlength="200"
-                          [(ngModel)]="asAsccpDetail().asccp.den" [disabled]="true">
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      <mat-form-field>
-                        <mat-label>{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}</mat-label>
-                        <input matInput placeholder="{{ 'ASCCP_DETAIL.PROPERTY_TERM' | translate }}" maxlength="100"
-                          [(ngModel)]="asAsccpDetail().asccp.propertyTerm"
-                          (focusout)="asAsccpDetail().asccp.propertyTerm = trim(asAsccpDetail().asccp.propertyTerm)"
-                          [required]="true"
-                          [disabled]="!isEditable() || hasRevision()">
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-4">
-                      <div class="checkbox">
-                        <mat-checkbox color="primary"
-                          [(ngModel)]="asAsccpDetail().asccp.reusable"
-                          [disabled]="!isEditable() || hasRevision() && this.prevAsccpDetails.reusable">
-                          <span>Reusable</span>
-                        </mat-checkbox>
-                      </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="checkbox">
-                        <mat-checkbox color="primary"
-                          [(ngModel)]="asAsccpDetail().asccp.nillable"
-                          [disabled]="!isEditable() || hasRevision() && this.prevAsccpDetails.nillable">
-                          <span>Nillable</span>
-                        </mat-checkbox>
-                      </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="checkbox">
-                        <mat-checkbox color="primary"
-                          [(ngModel)]="asAsccpDetail().asccp.deprecated"
-                          [disabled]="!isEditable() || !hasRevision() || this.prevAsccpDetails.deprecated">
-                          <span>Deprecated</span>
-                          @if (asAsccpDetail().asccp.replacement) {
-                            <span>, replaced by </span>
-                          }
-                        </mat-checkbox>
-                        @if (asAsccpDetail().asccp.replacement) {
-                          <div class="ms-1 d-inline-block" style="vertical-align: super">
-                            <span>
-                              <a target="_blank" rel="noopener noreferrer"
-                              href="/core_component/asccp/{{ asAsccpDetail().asccp.replacement.asccpManifestId }}">{{ asAsccpDetail().asccp.replacement.den }}</a>
-                            </span>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      @if (selectedNode.level === 0 && isEditable() && !hasRevision()) {
-                        <mat-form-field>
-                          <mat-label>Namespace</mat-label>
-                          <mat-select placeholder="Namespace"
-                            [(ngModel)]="asAsccpDetail().asccp.namespaceId"
-                            [required]="true">
-                            <mat-option>
-                              <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                                [placeholderLabel]="'Search...'"
-                              [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-                            </mat-option>
-                            @for (namespace of filteredNamespaceList | async; track namespace) {
-                              <mat-option [value]="namespace.namespaceId">
-                                {{ namespace.uri }}
-                              </mat-option>
-                            }
-                          </mat-select>
-                        </mat-form-field>
-                      }
-                      @if (selectedNode.level !== 0 || !isEditable() || hasRevision()) {
-                        <mat-form-field>
-                          <mat-label>Namespace</mat-label>
-                          <mat-select placeholder="Namespace"
-                            [(ngModel)]="asAsccpDetail().asccp.namespaceId"
-                            [required]="true"
-                            [disabled]="true">
-                            @for (namespace of getSelectableNamespaces(asAsccpDetail().asccp.namespaceId); track namespace) {
-                              <mat-option
-                              [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
-                            }
-                          </mat-select>
-                        </mat-form-field>
-                      }
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      <mat-form-field>
-                        <mat-label>Definition Source</mat-label>
-                        <input matInput placeholder="Definition Source" maxlength="100"
-                          [(ngModel)]="asAsccpDetail().asccp.definitionSource"
-                          (focusout)="asAsccpDetail().asccp.definitionSource = trim(asAsccpDetail().asccp.definitionSource)"
-                          [disabled]="!isEditable()">
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      <mat-form-field>
-                        <mat-label>Definition</mat-label>
-                        <div class="textarea-container">
-                          <textarea matInput rows="6" cols="30"
-                            placeholder="Definition"
-                            [(ngModel)]="asAsccpDetail().asccp.definition"
-                            (focusout)="asAsccpDetail().asccp.definition = trim(asAsccpDetail().asccp.definition)"
-                          [readonly]="!isEditable()"></textarea>
-                          @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level !== 0) {
-                            <button mat-icon-button mat-small-icon-button
-                              (click)="copyToDefinition(asAsccpDetail().asccp.definition)"
-                              matTooltip="Copy to Definition">
-                              <mat-icon>content_paste</mat-icon>
-                            </button>
-                          }
-                          @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                          && !!this.selectedModel && originalText === undefined) {
-                            <button mat-icon-button mat-small-icon-button
-                              #trigger="matMenuTrigger"
-                              [matMenuTriggerFor]="modelMenu"
-                              (mousedown)="handleMouseDownForGenerate($event, trigger)"
-                              matTooltip="Generate"
-                              (contextmenu)="$event.preventDefault()">
-                              @if (!isGenerating) {
-                                <mat-icon>memory</mat-icon>
-                              }
-                              @if (isGenerating) {
-                                <mat-spinner diameter="24"></mat-spinner>
-                              }
-                            </button>
-                          }
-                          @if (this.state === 'WIP' && this.access === 'CanEdit' && selectedNode.level === 0
-                          && !!this.selectedModel && originalText !== undefined) {
-                            <button mat-icon-button mat-small-icon-button
-                              (click)="revert(asAsccpDetail())"
-                              matTooltip="Undo">
-                              @if (!isGenerating) {
-                                <mat-icon>undo</mat-icon>
-                              }
-                            </button>
-                          }
-                        </div>
-                      </mat-form-field>
-                    </div>
-                  </div>
-                  @if (githubService.enabled$() | async) {
-                    <div class="row">
-                      <div class="col-12">
-                        <score-github-issue-box
-                          [manifestId]="asAsccpDetail().asccp.manifestId"
-                          ccType="asccp"
-                          [state]="asAsccpDetail().asccp.state"
-                          [ownerLoginId]="asAsccpDetail()?.asccp?.owner?.loginId"
-                          [currentUser]="currentUser"
-                          [editable]="type === 'ASCCP' && asAsccpDetail().asccp.manifestId === manifestId">
-                        </score-github-issue-box>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </mat-tab>
+        <score-cc-asccp-panel [detail]="asAsccpDetail().asccp" [state]="state" [access]="access" [currentUser]="currentUser"
+          [editable]="{propertyTerm: isEditable() && !hasRevision(),
+            reusable: isEditable() && !(hasRevision() && prevAsccpDetails.reusable),
+            nillable: isEditable() && !(hasRevision() && prevAsccpDetails.nillable),
+            deprecated: isEditable() && hasRevision() && !prevAsccpDetails.deprecated,
+            namespace: selectedNode.level === 0 && isEditable() && !hasRevision(), definition: isEditable()}"
+          [canCopyDefinition]="selectedNode.level !== 0"
+          [namespaces]="namespaces" [isDeveloper]="userRoles.includes('developer')"
+          [namespaceFilter]="namespaceListFilterCtrl" [filteredNamespaces]="filteredNamespaceList"
+          [githubEditable]="type === 'ASCCP' && asAsccpDetail().asccp.manifestId === manifestId"
+          (definitionCopy)="copyToDefinition($event)">
+          <ng-container ngProjectAs="[definitionActions]">
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalText === undefined) {
+              <button mat-icon-button mat-small-icon-button
+                #trigger="matMenuTrigger"
+                [matMenuTriggerFor]="modelMenu"
+                (mousedown)="handleMouseDownForGenerate($event, trigger)"
+                matTooltip="Generate"
+                (contextmenu)="$event.preventDefault()">
+                @if (!isGenerating) {
+                  <mat-icon>memory</mat-icon>
+                }
+                @if (isGenerating) {
+                  <mat-spinner diameter="24"></mat-spinner>
+                }
+              </button>
             }
-          </mat-tab-group>
-        </div>
+            @if (state === 'WIP' && access === 'CanEdit' && selectedNode.level === 0
+            && !!selectedModel && originalText !== undefined) {
+              <button mat-icon-button mat-small-icon-button
+                (click)="revert(asAsccpDetail())"
+                matTooltip="Undo">
+                @if (!isGenerating) {
+                  <mat-icon>undo</mat-icon>
+                }
+              </button>
+            }
+          </ng-container>
+        </score-cc-asccp-panel>
       }
 
       <!-- Dropdown Menu -->

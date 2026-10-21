@@ -14,7 +14,7 @@ import {AsccNodeInfo} from '../domain/core-component-node';
 @Component({
   selector: 'score-cc-ascc-panel',
   templateUrl: './ascc-panel.component.html',
-  styleUrl: './ascc-panel.component.css',
+  styleUrl: './cc-panel.css',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, ReactiveFormsModule, MaterialModule, MatTooltipModule, TranslatePipe, ScoreCommonModule]
 })

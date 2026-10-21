@@ -10,7 +10,7 @@ import {CcDtScNodeInfo} from '../domain/core-component-node';
 @Component({
   selector: 'score-cc-dt-sc-panel',
   templateUrl: './dt-sc-panel.component.html',
-  styleUrl: './dt-sc-panel.component.css',
+  styleUrl: './cc-panel.css',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, MaterialModule, MatTooltipModule, TranslatePipe, ScoreCommonModule]
 })

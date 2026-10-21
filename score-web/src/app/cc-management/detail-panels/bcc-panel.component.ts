@@ -14,7 +14,7 @@ import {BccNodeInfo, EntityType, EntityTypes} from '../domain/core-component-nod
 @Component({
   selector: 'score-cc-bcc-panel',
   templateUrl: './bcc-panel.component.html',
-  styleUrl: './bcc-panel.component.css',
+  styleUrl: './cc-panel.css',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, ReactiveFormsModule, MaterialModule, MatTooltipModule, TranslatePipe, ScoreCommonModule]
 })
