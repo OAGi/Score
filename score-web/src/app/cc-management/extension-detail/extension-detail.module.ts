@@ -1,4 +1,10 @@
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
+import {AsccpPanelComponent} from '../detail-panels/asccp-panel.component';
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
@@ -42,7 +48,13 @@ const routes: Routes = [
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    DtPanelComponent,
+    AsccPanelComponent,
+    AsccpPanelComponent,
+    BccPanelComponent,
+    BccpPanelComponent,
+    DtScPanelComponent
   ],
   declarations: [
     ExtensionDetailComponent

@@ -729,7 +729,7 @@ export const OagisComponentTypeMap = {
   12: AttributeGroup
 };
 
-class AsccNodeInfo {
+export class AsccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   prevAsccManifestId: number;
@@ -852,7 +852,7 @@ class AsccNodeInfo {
   }
 }
 
-class AsccpNodeInfo {
+export class AsccpNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   asccpId: number;
@@ -1046,7 +1046,7 @@ export const EntityTypes: EntityType[] = [
   Attribute, Element
 ];
 
-class BccNodeInfo {
+export class BccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   prevBccManifestId: number;
@@ -1242,7 +1242,7 @@ class BccNodeInfo {
   }
 }
 
-class BccpNodeInfo {
+export class BccpNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;
@@ -1434,7 +1434,7 @@ class BccpNodeInfo {
   }
 }
 
-class DtNodeInfo {
+export class DtNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;

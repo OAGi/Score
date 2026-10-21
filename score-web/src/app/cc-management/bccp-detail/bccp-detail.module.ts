@@ -1,3 +1,6 @@
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {BccpDetailComponent} from './bccp-detail.component';
@@ -42,7 +45,10 @@ const routes: Routes = [
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    DtPanelComponent,
+    BccPanelComponent,
+    DtScPanelComponent
   ],
   declarations: [
     BccpDetailComponent

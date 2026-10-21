@@ -1,5 +1,11 @@
 import {SCORE_TABLE} from '../../common/score-table';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
+import {AsccpPanelComponent} from '../detail-panels/asccp-panel.component';
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AccDetailComponent} from './acc-detail.component';
@@ -55,6 +61,12 @@ const routes: Routes = [
         SearchBarModule,
         ColumnSelectorModule,
         GithubIssueBoxComponent,
+        DtPanelComponent,
+        AsccPanelComponent,
+        AsccpPanelComponent,
+        BccPanelComponent,
+        BccpPanelComponent,
+        DtScPanelComponent,
         ...SCORE_TABLE
     ],
   declarations: [

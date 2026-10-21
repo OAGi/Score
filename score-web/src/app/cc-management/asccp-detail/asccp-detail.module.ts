@@ -1,3 +1,8 @@
+import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AsccpDetailComponent} from './asccp-detail.component';
@@ -51,7 +56,12 @@ const routes: Routes = [
     DragDropModule,
     AngularSplitModule,
     CcPlantumlDiagramModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    DtPanelComponent,
+    AsccPanelComponent,
+    BccPanelComponent,
+    BccpPanelComponent,
+    DtScPanelComponent
   ],
   declarations: [
     AsccpDetailComponent
