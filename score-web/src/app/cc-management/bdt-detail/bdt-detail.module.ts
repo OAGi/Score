@@ -12,6 +12,9 @@ import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.comp
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {BdtPanelComponent} from '../detail-panels/bdt-panel.component';
+import {BdtScPanelComponent} from '../detail-panels/bdt-sc-panel.component';
+import {ValueDomainComponent} from '../detail-panels/value-domain.component';
 import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
@@ -42,7 +45,10 @@ const routes: Routes = [
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    BdtPanelComponent,
+    BdtScPanelComponent,
+    ValueDomainComponent
   ],
   declarations: [
     BdtDetailComponent

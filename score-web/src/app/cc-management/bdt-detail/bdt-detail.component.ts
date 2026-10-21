@@ -136,7 +136,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   initialExpandDepth = 10;
 
   primitiveTypeList = ['Primitive', 'Code List', 'Agency ID List'];
-  primitiveList = ['Binary', 'Boolean', 'Decimal', 'Double', 'Float', 'Integer', 'NormalizedString', 'String', 'TimeDuration', 'TimePoint', 'Token'];
 
   selectedValueDomain: any;
 
@@ -144,7 +143,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   agencyIdLists: AgencyIdListSummary[];
   xbtList: XbtSummary[];
 
-  restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
 
   contextMenuItem: CcFlatNode;
@@ -1168,14 +1166,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       });
   }
 
-  isEmpty(str: string): boolean {
-    return str === undefined || str === null || str.trim() === '';
-  }
-
-  randSixDigitId(): string {
-    return (Math.random() + 1).toString(36).substring(2, 8).toUpperCase();
-  }
-
 
   hasTokenPrimitive(detail: CcDtNodeInfo | CcDtScNodeInfo) {
     if (detail instanceof CcDtNodeInfo) {
@@ -1294,7 +1284,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.onChangeValueDomain(detail);
   }
 
-  filteredCodeLists(element: any): CodeListSummary[] {
+  /** An arrow function: the value domain calls it without the screen as `this`. */
+  filteredCodeLists = (element: any): CodeListSummary[] => {
     let selfCodeListManifestId;
     if (!!element.dtAwdPri) {
       selfCodeListManifestId = element.dtAwdPri.codeList.codeListManifestId;
@@ -1315,9 +1306,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         .filter(e => !!e).map(e => e.codeListManifestId);
 
     return this.codeLists.filter(e => !selectedCodeLists.includes(e.codeListManifestId) || e.codeListManifestId === selfCodeListManifestId);
-  }
+  };
 
-  filteredAgencyIdLists(element: any): AgencyIdListSummary[] {
+  /** An arrow function: the value domain calls it without the screen as `this`. */
+  filteredAgencyIdLists = (element: any): AgencyIdListSummary[] => {
     let selfAgencyIdListManifestId;
     if (!!element.dtAwdPri && !!element.dtAwdPri.agencyIdList) {
       selfAgencyIdListManifestId = element.dtAwdPri.agencyIdList.agencyIdListManifestId;
@@ -1338,15 +1330,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         .filter(e => !!e).map(e => e.agencyIdListManifestId);
 
     return this.agencyIdLists.filter(e => !selectedAgencyIdLists.includes(e.agencyIdListManifestId) || e.agencyIdListManifestId === selfAgencyIdListManifestId);
-  }
-
-  compareCodeList(a: CodeListSummary, b: CodeListSummary): boolean {
-    return !!a && !!b && a.codeListManifestId === b.codeListManifestId;
-  }
-
-  compareAgencyIdList(a: AgencyIdListSummary, b: AgencyIdListSummary): boolean {
-    return !!a && !!b && a.agencyIdListManifestId === b.agencyIdListManifestId;
-  }
+  };
 
   onChangeValueDomain(detail: CcNodeInfo) {
     if (detail instanceof CcDtNodeInfo) {
