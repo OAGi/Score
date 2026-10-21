@@ -30,7 +30,7 @@ const BIE_COPY_TABLE = defineTable({
 
 @Component({
   standalone: false,
-  selector: 'score-bie-create-asccp',
+  selector: 'score-bie-copy-asccp',
   templateUrl: './bie-copy-profile-bie.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-copy-profile-bie.component.css']

@@ -26,7 +26,7 @@ const BIZ_CTX_WITH_TENANT_TABLE = defineTable({
 
 @Component({
   standalone: false,
-  selector: 'score-bie-create',
+  selector: 'score-bie-copy',
   templateUrl: './bie-copy-biz-ctx.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-copy-biz-ctx.component.css']
