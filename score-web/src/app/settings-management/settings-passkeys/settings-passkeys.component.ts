@@ -131,7 +131,7 @@ export class SettingsPasskeysComponent implements OnInit {
   remove(passkey: PasskeySummary) {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove passkey?';
-    dialogConfig.data.content = ['Are you sure you want to remove \'' + passkey.label + '\'?',
+    dialogConfig.data.content = ['Are you sure you want to remove \'' + this.title(passkey) + '\'?',
       'It can no longer be used to sign in. The passkey stays on your device until you delete it there.'];
     dialogConfig.data.action = 'Remove';
 
