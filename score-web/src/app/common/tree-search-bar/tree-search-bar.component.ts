@@ -61,8 +61,8 @@ export interface TreeSearcher<N = any> {
 })
 /**
  * The search field of a tree with the buttons that step through the matches. It runs the searches itself and brings
- * the match into view in the tree, so a screen only supplies the searcher and the tree: stepping to a match also
- * selects it (`nodeSelect`), and a search is scoped to `selectedNode`.
+ * the match into view in the tree, so a screen only supplies the searcher and the tree: reaching a match also
+ * selects it (`nodeSelect`), and a search is scoped to the node the user last picked, not to a selected match.
  */
 export class TreeSearchBarComponent<N = any> {
 
@@ -78,9 +78,6 @@ export class TreeSearchBarComponent<N = any> {
     return this._searcher;
   }
 
-  /** Name of the selected node, shown in the field label (`Search > name`). */
-  @Input() label: string | undefined;
-
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
   private _searcher: TreeSearcher<N>;
@@ -88,10 +85,28 @@ export class TreeSearchBarComponent<N = any> {
 
   /** The tree the matches are scrolled into view in. */
   @Input() tree: TreeScrollTarget<N> | undefined;
-  /** The node the search is scoped to (the whole tree when none). */
-  @Input() selectedNode: N | undefined | null;
+  /**
+   * The node the screen has selected. The search is not scoped to it directly: a node the search itself selected (a
+   * match stepped to) must not narrow the next search, so only a node the user picked becomes the scope.
+   */
+  @Input() set selectedNode(node: N | undefined | null) {
+    if (node !== this.selectedByMatch) {
+      this.scope = node ?? undefined;
+    }
+  }
 
-  /** A match was stepped to with the arrow buttons; the screen shows it as the selected node. */
+  /** The node the search is scoped to: the last one the user picked (the whole tree when none). */
+  scope: N | undefined;
+  /** The node the search selected last. */
+  private selectedByMatch: N | undefined;
+
+  /** Name of the node the search is scoped to, shown in the field label (`Search > name`). */
+  get scopeLabel(): string | undefined {
+    const node = this.scope as any;
+    return node?.displayName || node?.name;
+  }
+
+  /** A match was reached; the screen shows it as the selected node. */
   @Output() nodeSelect = new EventEmitter<N>();
 
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement> | undefined;
@@ -162,14 +177,25 @@ export class TreeSearchBarComponent<N = any> {
   onSearch(keyword: string, backward = false, force = false) {
     // the field is disabled while the search runs, which takes the focus away without a blur
     this.hideSuggestions();
-    this.searcher.search(keyword, this.selectedNode ?? undefined, backward, force)
-      .subscribe(index => this.tree?.scrollToIndex(index, {delay: 500, smooth: true}));
+    this.searcher.search(keyword, this.scope, backward, force)
+      .subscribe(index => {
+        // select the match the search lands on, as moving between results does, so the breadcrumbs follow it
+        if (index >= 0) {
+          this.selectMatch(index);
+        }
+        this.tree?.scrollToIndex(index, {delay: 500, smooth: true});
+      });
   }
 
   onMove(val: number) {
     this.searcher.go(val).subscribe(index => {
-      this.nodeSelect.emit(this.searcher.nodeAt(index));
+      this.selectMatch(index);
       this.tree?.scrollToIndex(index, {smooth: true});
     });
+  }
+
+  private selectMatch(index: number) {
+    this.selectedByMatch = this.searcher.nodeAt(index);
+    this.nodeSelect.emit(this.selectedByMatch);
   }
 }

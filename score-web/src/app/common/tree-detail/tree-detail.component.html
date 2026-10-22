@@ -5,7 +5,6 @@
         @if (ready && searcher) {
           <div class="tree-detail-header-row">
             <score-tree-search-bar class="tree-detail-search" [searcher]="searcher" [tree]="tree" [selectedNode]="selectedNode"
-                                   [label]="selectedNode?.displayName || selectedNode?.name"
                                    (nodeSelect)="nodeSelect.emit($event)"></score-tree-search-bar>
             <div class="actions-wrap tree-detail-actions">
               <ng-content select="[treeDetailActions]"></ng-content>

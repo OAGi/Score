@@ -33,7 +33,7 @@
       <div class="row ms-0 me-0" (window:resize)="onResize($event)">
         <div class="col-6 ps-0">
           @if (sourceSearcher && sourceDataSource) {
-            <score-tree-search-bar [searcher]="sourceSearcher" [label]="sourceSelectedNode?.displayName || sourceSelectedNode?.name"
+            <score-tree-search-bar [searcher]="sourceSearcher"
                                    [tree]="sourceTree" [selectedNode]="sourceSelectedNode"
                                    (nodeSelect)="onSourceClick($event)">
               <ng-container treeSearchSettings>
@@ -76,7 +76,7 @@
         </div>
         <div class="col-6 ps-0 pe-0">
           @if (targetSearcher && targetDataSource) {
-            <score-tree-search-bar [searcher]="targetSearcher" [label]="targetSelectedNode?.displayName || targetSelectedNode?.name"
+            <score-tree-search-bar [searcher]="targetSearcher"
                                    [tree]="targetTree" [selectedNode]="targetSelectedNode"
                                    (nodeSelect)="onTargetClick($event)">
               <ng-container treeSearchSettings>

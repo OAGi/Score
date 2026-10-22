@@ -19,6 +19,7 @@ score-tree-detail .tree-detail-header-row {
 
 score-tree-detail .tree-detail-search {
   flex: 1 1 280px;
+  max-width: max(420px, 42%);
   min-width: 0;
 }
 

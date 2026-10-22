@@ -2,7 +2,7 @@
   <div class="tree-search-controls">
     <div class="tree-search-input">
       <mat-form-field>
-        <mat-label>{{ label ? 'Search > ' + label : 'Search' }}</mat-label>
+        <mat-label>{{ scopeLabel ? 'Search > ' + scopeLabel : 'Search' }}</mat-label>
         <input matInput #searchInput type="search" [(ngModel)]="searcher.inputKeyword"
           autocomplete="off" spellcheck="false"
           [matAutocomplete]="suggest" [matAutocompleteDisabled]="suggestions.length === 0"
