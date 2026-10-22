@@ -5,6 +5,9 @@ set -eu
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
+# shellcheck source=../../docker/buildx.sh
+. "$project_dir/../docker/buildx.sh"
+
 project_version=
 if [ -f "$project_dir/VERSION" ]; then
   project_version=$(tr -d '[:space:]' < "$project_dir/VERSION")
@@ -63,7 +66,6 @@ if [ -z "$mariadb_client_version" ]; then
   exit 1
 fi
 
-docker_platform=${DOCKER_DEFAULT_PLATFORM:-linux/amd64}
 war_name="score-http-$project_version.war"
 war_path="$project_dir/target/$war_name"
 jdbc_jar_path="$HOME/.m2/repository/org/mariadb/jdbc/mariadb-java-client/$mariadb_client_version/mariadb-java-client-$mariadb_client_version.jar"
@@ -104,17 +106,11 @@ echo "Preparing files..."
 cp "$war_path" "$script_dir/score-http.war"
 cp "$jdbc_jar_path" "$script_dir/mariadb-java-client-$mariadb_client_version.jar"
 
-echo "Building docker image $image_name..."
 (
   cd "$script_dir"
-  docker build --no-cache --platform "$docker_platform" --build-arg "MARIADB_CLIENT_VERSION=$mariadb_client_version" -f Dockerfile -t "$image_name" .
+  buildx_build "$image_name" Dockerfile . --no-cache --build-arg "MARIADB_CLIENT_VERSION=$mariadb_client_version"
 )
 
-if command -v trivy >/dev/null 2>&1; then
-  echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
-  trivy image --format table --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
-else
-  echo "Info: trivy is not installed. Install Trivy to scan vulnerabilities for $image_name."
-fi
+buildx_scan "$image_name" --format table --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed
 
 echo "Done."

@@ -1,4 +1,6 @@
-FROM node:20-bookworm-slim AS docs-builder
+# The docs build output (.next standalone JS, static assets) is architecture independent, so it
+# runs on the build host's own platform: under QEMU (amd64 on Apple Silicon) `next build` segfaults.
+FROM --platform=$BUILDPLATFORM node:20-bookworm-slim AS docs-builder
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -9,6 +11,10 @@ RUN npm ci
 
 COPY docs ./
 RUN npm run build
+
+
+# Only the node binary is taken from here, and it must match the target platform.
+FROM node:20-bookworm-slim AS node-runtime
 
 
 FROM python:3.11-slim
@@ -51,7 +57,7 @@ RUN apt-get update \
     && apt-get install --yes --no-install-recommends build-essential pkg-config default-libmysqlclient-dev supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=docs-builder /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
 
 COPY pyproject.toml README.md server.sh docs-server.sh ./
 COPY docker/supervisord.conf /etc/supervisor/conf.d/connect-center.conf

@@ -159,7 +159,9 @@ mv "$tmp" "$SEED"
 log "new seed in place: $SEED ($(du -h "$SEED" | cut -f1))"
 
 log "[4/4] building $IMAGE_REPO:$TO_VERSION with the refreshed seed"
-sh "$REPO_ROOT/score-repo/docker/build.sh" "$TO_VERSION"
+# The fleet is linux/amd64 and --push uploads this local image, so pin the platform (a bare build
+# would use the host's, e.g. arm64 on Apple Silicon).
+IMAGE_PLATFORMS="${IMAGE_PLATFORMS:-linux/amd64}" sh "$REPO_ROOT/score-repo/docker/build.sh" "$TO_VERSION"
 
 if [ "$DO_PUSH" = 1 ]; then
   log "pushing $IMAGE_REPO:$TO_VERSION"

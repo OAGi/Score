@@ -41,8 +41,8 @@ deploy/deploy.sh test 3.5.2 -y     # explicit version, no confirmation prompt
 | script | what it does |
 |---|---|
 | `open-sg.sh [ip]` | re-point the two SSH SG rules to your current public IP (aws CLI) |
-| `build-images.sh [ver]` | build all three images (wraps each module's `docker/build.sh`) |
-| `push-images.sh [ver]` | `docker push` the three tags to Docker Hub |
+| `build-images.sh [ver]` | build all three images (wraps each module's `docker/build.sh`); local build = `linux/amd64`. `PUSH_IMAGE=1` builds **amd64 + arm64** and pushes the multi-arch manifest to Docker Hub directly |
+| `push-images.sh [ver]` | `docker push` the three tags to Docker Hub (tags already published by a `PUSH_IMAGE=1` build are skipped) |
 | `remote-deploy.sh <inst> [ver]` | prune disk + **pull images (validates the tag before editing anything)** + backup compose + bump tags + `up -d` + wait for clean backend startup |
 | `verify.sh <inst> [ver]` | **hard-asserts** public 200, frontend/backend image==ver, backend 401, Flyway head==ver & success=1 (exit≠0 on any failure); STOMP wss 101 as a warning |
 | `rollback.sh <inst> [ver\|--list]` | restore newest `~/docker-compose.yml.bak-*` (or re-point to a version); `--list` shows each backup's tags |

@@ -15,7 +15,13 @@ if ! docker system info 2>/dev/null | grep -qi 'Username:'; then
 fi
 
 for tag in "$IMAGE_WEB:$VERSION" "$IMAGE_HTTP:$VERSION" "$IMAGE_REPO:$VERSION"; do
-  docker image inspect "$tag" >/dev/null 2>&1 || die "image $tag not found locally -- run deploy/build-images.sh $VERSION first."
+  if ! docker image inspect "$tag" >/dev/null 2>&1; then
+    # A PUSH_IMAGE=1 build publishes the multi-arch manifest itself and leaves nothing locally.
+    docker buildx imagetools inspect "$tag" >/dev/null 2>&1 \
+      || die "image $tag not found locally or in the registry -- run deploy/build-images.sh $VERSION first."
+    log "$tag already published (multi-arch build) -- skipping push"
+    continue
+  fi
   log "docker push $tag"
   docker push "$tag"
 done
