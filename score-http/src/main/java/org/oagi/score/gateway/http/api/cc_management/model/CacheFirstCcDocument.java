@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -223,6 +224,11 @@ public class CacheFirstCcDocument implements CcDocument {
     @Override
     public List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId) {
         return lookup(d -> d.getAccListByBasedAccManifestId(basedAccManifestId));
+    }
+
+    @Override
+    public Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        return lookup(d -> d.getAccListByBasedAccManifestIds(basedAccManifestIds));
     }
 
     @Override

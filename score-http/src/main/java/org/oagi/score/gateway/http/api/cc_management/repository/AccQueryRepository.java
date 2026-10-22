@@ -31,8 +31,8 @@ public interface AccQueryRepository {
 
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList);
 
-    /** The ACCs that have the given ACC as their base, in the order of their manifest ids. */
-    List<AccSummaryRecord> getAccSummaryListByBasedAccManifestId(AccManifestId basedAccManifestId);
+    /** The ACCs that have any of the given ACCs as their base, in the order of their manifest ids. */
+    List<AccSummaryRecord> getAccSummaryListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds);
 
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList, String objectClassTerm);
 

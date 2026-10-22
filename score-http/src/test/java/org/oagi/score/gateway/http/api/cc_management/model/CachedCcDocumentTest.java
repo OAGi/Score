@@ -187,8 +187,27 @@ class CachedCcDocumentTest {
         CachedCcDocument document = document();
         assertEquals(List.of(), document.getAccListByBasedAccManifestId(accId(31)));
         assertEquals(List.of(), document.getAsccpListByRoleOfAccManifestId(accId(31)));
-        verify(accQuery, never()).getAccSummaryListByBasedAccManifestId(any());
+        verify(accQuery, never()).getAccSummaryListByBasedAccManifestIds(any());
         verify(asccpQuery, never()).getAsccpSummaryList(any(AccManifestId.class));
+    }
+
+    @Test
+    void theUsagesOfManyComponentsAreReadInOneQuery() {
+        AccSummaryRecord first = acc(20, RELEASE, 10L);
+        AccSummaryRecord second = acc(21, RELEASE, 10L);
+        AccSummaryRecord third = acc(22, RELEASE, 11L);
+        AccSummaryRecord ofAnotherRelease = acc(23, OTHER_RELEASE, 11L);
+        when(accQuery.getAccSummaryListByBasedAccManifestIds(any()))
+                .thenReturn(List.of(first, second, third, ofAnotherRelease));
+        when(tagQuery.getTagSummariesByPairsOfTypeAndManifestId(any())).thenReturn(Map.of());
+
+        Map<AccManifestId, List<AccSummaryRecord>> usages =
+                document().getAccListByBasedAccManifestIds(List.of(accId(10), accId(11), accId(12)));
+
+        assertEquals(List.of(first, second), usages.get(accId(10)));
+        assertEquals(List.of(third), usages.get(accId(11)));
+        assertEquals(List.of(), usages.get(accId(12)));
+        verify(accQuery, times(1)).getAccSummaryListByBasedAccManifestIds(any());
     }
 
     @Test

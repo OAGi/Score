@@ -278,13 +278,13 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
     }
 
     @Override
-    public List<AccSummaryRecord> getAccSummaryListByBasedAccManifestId(AccManifestId basedAccManifestId) {
-        if (basedAccManifestId == null) {
+    public List<AccSummaryRecord> getAccSummaryListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        if (basedAccManifestIds == null || basedAccManifestIds.isEmpty()) {
             return Collections.emptyList();
         }
         var queryBuilder = new GetAccSummaryQueryBuilder();
         return queryBuilder.select()
-                .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(valueOf(basedAccManifestId)))
+                .where(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.in(valueOf(basedAccManifestIds)))
                 .orderBy(ACC_MANIFEST.ACC_MANIFEST_ID)
                 .fetch(queryBuilder.mapper());
     }

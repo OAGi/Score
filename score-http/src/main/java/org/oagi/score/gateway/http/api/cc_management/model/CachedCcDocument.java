@@ -1004,7 +1004,32 @@ public class CachedCcDocument implements CcDocument {
         if (basedAccManifestId == null || knownAcc(basedAccManifestId) == null) {
             return Collections.emptyList();
         }
-        return repositoryFactory.accQueryRepository(requester).getAccSummaryListByBasedAccManifestId(basedAccManifestId);
+        return repositoryFactory.accQueryRepository(requester).getAccSummaryListByBasedAccManifestIds(List.of(basedAccManifestId));
+    }
+
+    @Override
+    public Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        Map<AccManifestId, List<AccSummaryRecord>> result = new LinkedHashMap<>();
+        List<AccManifestId> ids = basedAccManifestIds.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        ids.forEach(id -> result.put(id, new ArrayList<>()));
+        for (List<AccManifestId> batch : partition(ids)) {
+            // The ACCs based on a component of another release are of that release, so the scope leaves them out.
+            List<AccSummaryRecord> accs = inScope(repositoryFactory.accQueryRepository(requester)
+                    .getAccSummaryListByBasedAccManifestIds(batch), AccSummaryRecord::release);
+            for (AccSummaryRecord acc : accs) {
+                result.get(acc.basedAccManifestId()).add(acc);
+            }
+            if (!cache.isBypassed()) {
+                // The caller asks for the tags of each of them next. They are what getAcc answers, so they are
+                // remembered, and their tags are read in bulk, instead of one lookup of the cache for each.
+                Map<String, Object> known = new HashMap<>();
+                accs.forEach(e -> known.put("acc:" + e.accManifestId().value(), e));
+                rememberAll(known);
+                resolveTags(accs.stream().map(e -> Pair.<CcType, ManifestId>of(CcType.ACC, e.accManifestId()))
+                        .collect(Collectors.toList()));
+            }
+        }
+        return result;
     }
 
     @Override

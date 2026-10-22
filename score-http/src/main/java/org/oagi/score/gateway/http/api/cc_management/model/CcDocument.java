@@ -30,7 +30,9 @@ import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface CcDocument {
 
@@ -65,6 +67,18 @@ public interface CcDocument {
     List<XbtSummaryRecord> getXbtListByName(String name);
 
     List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId);
+
+    /**
+     * The ACCs that have each of the given ACCs as their base, by base. A document that can answer many at once
+     * (one read for all of them) overrides this; the default asks one by one.
+     */
+    default Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        Map<AccManifestId, List<AccSummaryRecord>> result = new LinkedHashMap<>();
+        for (AccManifestId basedAccManifestId : basedAccManifestIds) {
+            result.put(basedAccManifestId, getAccListByBasedAccManifestId(basedAccManifestId));
+        }
+        return result;
+    }
 
     List<AsccpSummaryRecord> getAsccpListByRoleOfAccManifestId(AccManifestId roleOfAccManifestId);
 

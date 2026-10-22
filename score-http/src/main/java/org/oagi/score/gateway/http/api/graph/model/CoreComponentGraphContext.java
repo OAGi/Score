@@ -20,7 +20,6 @@ import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySupport
 import org.oagi.score.gateway.http.api.cc_management.service.SeqKeyHandler;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 @Data
@@ -39,25 +38,25 @@ public class CoreComponentGraphContext implements GraphContext {
         graph.addNode(node);
 
         if (node.getType() == Node.NodeType.ACC) {
-            Queue<Node> queue = new LinkedBlockingQueue();
-            queue.offer(node);
+            // One level of the ACCs derived from the node at a time, asked in one read.
+            List<Node> level = List.of(node);
+            while (!level.isEmpty()) {
+                Map<AccManifestId, List<AccSummaryRecord>> usagesByBase = ccDocument.getAccListByBasedAccManifestIds(
+                        level.stream().map(e -> (AccManifestId) e.getManifestId()).collect(Collectors.toList()));
 
-            while (!queue.isEmpty()) {
-                Node currentNode = queue.poll();
-                switch (currentNode.getType()) {
-                    case ACC:
-                        List<Node> accUsages = ccDocument.getAccListByBasedAccManifestId((AccManifestId) currentNode.getManifestId())
-                                .stream().map(e -> toNode(e)).collect(Collectors.toList());
+                List<Node> nextLevel = new ArrayList<>();
+                for (Node currentNode : level) {
+                    List<Node> accUsages = usagesByBase.getOrDefault(currentNode.getManifestId(), Collections.emptyList())
+                            .stream().map(e -> toNode(e)).collect(Collectors.toList());
 
-                        accUsages.forEach(_node -> {
-                            graph.addNode(_node);
-                        });
+                    accUsages.forEach(_node -> {
+                        graph.addNode(_node);
+                    });
 
-                        graph.addEdges(currentNode, accUsages);
-                        queue.addAll(accUsages);
-
-                        break;
+                    graph.addEdges(currentNode, accUsages);
+                    nextLevel.addAll(accUsages);
                 }
+                level = nextLevel;
             }
 
             List<Node> asccpUsages = ccDocument.getAsccpListByRoleOfAccManifestId((AccManifestId) node.getManifestId())
