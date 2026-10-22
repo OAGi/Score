@@ -13,6 +13,11 @@ final class CcCacheKeys {
 
     /** Adds the keys of everything that shows the record {@code kind}/{@code id}. */
     static void add(Set<String> keys, CcChangeKind kind, long id, Long parentId) {
+        add(keys, kind, id, parentId, null);
+    }
+
+    /** Adds the keys of everything that shows the record {@code kind}/{@code id}; {@code releaseId} is the release of an XBT. */
+    static void add(Set<String> keys, CcChangeKind kind, long id, Long parentId, Long releaseId) {
         switch (kind) {
             case ACC -> {
                 keys.add("acc:" + id);
@@ -42,13 +47,26 @@ final class CcCacheKeys {
                 keys.add("dt:" + id);
                 keys.add("tags:dt:" + id);
                 keys.add("dt_sc-of-dt:" + id);
+                keys.add("dt-awd-pri:" + id);
+                if (releaseId != null) {
+                    keys.add("dts:" + releaseId);
+                }
             }
             case DT_SC -> {
                 keys.add("dt_sc:" + id);
+                keys.add("dt_sc-awd-pri:" + id);
                 if (parentId != null) {
                     keys.add("dt_sc-of-dt:" + parentId);
                 }
             }
+            case XBT -> {
+                if (releaseId != null) {
+                    keys.add("xbts:" + releaseId);
+                }
+            }
+            case NAMESPACE -> keys.add("namespace:" + id);
+            case CODE_LIST -> keys.add("code-list:" + id);
+            case AGENCY_ID_LIST -> keys.add("agency-id-list:" + id);
             default -> throw new IllegalArgumentException(kind + " is not a record");
         }
     }
@@ -68,7 +86,7 @@ final class CcCacheKeys {
 
     static boolean isRecord(CcChangeKind kind) {
         return switch (kind) {
-            case ACC, ASCC, BCC, ASCCP, BCCP, DT, DT_SC -> true;
+            case ACC, ASCC, BCC, ASCCP, BCCP, DT, DT_SC, XBT, CODE_LIST, AGENCY_ID_LIST, NAMESPACE -> true;
             default -> false;
         };
     }

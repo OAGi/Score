@@ -651,6 +651,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     }
 
     @Override
+    public List<DtAwdPriSummaryRecord> getDtAwdPriSummaryListByDtIds(Collection<DtId> dtIds) {
+        if (dtIds == null || dtIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtAwdPriSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_AWD_PRI.DT_ID.in(valueOf(dtIds)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(ReleaseId releaseId) {
         if (releaseId == null) {
             return Collections.emptyList();
@@ -1228,6 +1239,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         var queryBuilder = new GetDtScAwdPriSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(DT_SC_AWD_PRI.RELEASE_ID.in(valueOf(releaseIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryListByDtScIds(Collection<DtScId> dtScIds) {
+        if (dtScIds == null || dtScIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtScAwdPriSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_SC_AWD_PRI.DT_SC_ID.in(valueOf(dtScIds)))
                 .fetch(queryBuilder.mapper());
     }
 

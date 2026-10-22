@@ -38,9 +38,9 @@ import java.util.concurrent.TimeoutException;
  * bypassed: an entry that nobody forgets must not be served. The rows are deleted after two hours.
  */
 @Component
-public class CcChangeFeed implements CcCacheWriteObserver {
+public class CcCacheWatchdog implements CcCacheWriteObserver {
 
-    private static final Logger logger = LoggerFactory.getLogger(CcChangeFeed.class);
+    private static final Logger logger = LoggerFactory.getLogger(CcCacheWatchdog.class);
 
     private static final int BATCH = 5000;
     private static final long POLL_MILLIS = 500;
@@ -94,7 +94,7 @@ public class CcChangeFeed implements CcCacheWriteObserver {
     private ScheduledExecutorService executor;
 
     @Autowired
-    public CcChangeFeed(RepositoryFactory repositoryFactory, CcCache cache, CcCacheStatus status) {
+    public CcCacheWatchdog(RepositoryFactory repositoryFactory, CcCache cache, CcCacheStatus status) {
         this.repository = repositoryFactory.ccChangeLogRepository();
         this.cache = cache;
         this.status = status;
@@ -104,7 +104,7 @@ public class CcChangeFeed implements CcCacheWriteObserver {
     @PostConstruct
     void start() {
         executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "cc-change-feed");
+            Thread thread = new Thread(runnable, "cc-change-watchdog");
             thread.setDaemon(true);
             return thread;
         });
@@ -134,7 +134,7 @@ public class CcChangeFeed implements CcCacheWriteObserver {
     }
 
     /**
-     * Has the log read by the thread of the feed, which has a connection of its own, so that the caller (who may be inside a
+     * Has the log read by the thread of the watchdog, which has a connection of its own, so that the caller (who may be inside a
      * transaction and holds a connection already) needs no second one.
      *
      * @param maxWaitMillis how long to wait for it. A reader who does not wait long enough may go on with a cache that has not
@@ -277,10 +277,15 @@ public class CcChangeFeed implements CcCacheWriteObserver {
         Set<Long> libraries = new HashSet<>();
         Set<Long> users = new HashSet<>();
         Set<Long> tags = new HashSet<>();
+        Map<CcChangeKind, Set<Long>> shownBy = new EnumMap<>(CcChangeKind.class);
         boolean dependenciesChanged = false;
         for (CcChange change : changes) {
             if (CcCacheKeys.isRecord(change.kind())) {
-                CcCacheKeys.add(keys, change.kind(), change.id(), change.parentId());
+                CcCacheKeys.add(keys, change.kind(), change.id(), change.parentId(), change.releaseId());
+                if (change.kind() == CcChangeKind.XBT || change.kind() == CcChangeKind.CODE_LIST
+                        || change.kind() == CcChangeKind.AGENCY_ID_LIST) {
+                    shownBy.computeIfAbsent(change.kind(), k -> new HashSet<>()).add(change.id());
+                }
                 continue;
             }
             switch (change.kind()) {
@@ -297,6 +302,8 @@ public class CcChangeFeed implements CcCacheWriteObserver {
         libraries.forEach(id -> addAll(keys, repository.recordsOfLibrary(id)));
         users.forEach(id -> addAll(keys, repository.recordsOfUser(id)));
         tags.forEach(id -> addAll(keys, repository.recordsTaggedWith(id)));
+        // the allowed primitives of a data type show the names of an XBT, a code list and an agency identification list
+        shownBy.forEach((kind, ids) -> addAll(keys, repository.recordsShowing(kind, ids)));
         if (dependenciesChanged) {
             repository.allReleaseIds().forEach(id -> keys.add(CcCacheKeys.scope(id)));
         }
@@ -304,7 +311,7 @@ public class CcChangeFeed implements CcCacheWriteObserver {
     }
 
     private static void addAll(Set<String> keys, List<RecordRef> refs) {
-        refs.forEach(ref -> CcCacheKeys.add(keys, ref.kind(), ref.id(), ref.parentId()));
+        refs.forEach(ref -> CcCacheKeys.add(keys, ref.kind(), ref.id(), ref.parentId(), ref.releaseId()));
     }
 
     // ---- housekeeping --------------------------------------------------------------------------------------------

@@ -4,6 +4,8 @@ package org.oagi.score.gateway.http.api.cc_management.cache;
 public enum CcChangeKind {
     /** The record with this manifest id, and what is listed under it. */
     ACC, ASCC, BCC, ASCCP, BCCP, DT, DT_SC,
+    /** The manifest of an XBT, a code list or an agency identification list; and a namespace. */
+    XBT, CODE_LIST, AGENCY_ID_LIST, NAMESPACE,
     /** A release: all records of it show it. */
     RELEASE,
     /** The dependencies of a release: the releases a document answers for. */

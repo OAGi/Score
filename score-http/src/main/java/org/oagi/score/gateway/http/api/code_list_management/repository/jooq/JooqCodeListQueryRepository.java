@@ -56,6 +56,43 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
     }
 
     @Override
+    public List<CodeListSummaryRecord> getCodeListSummaryListByManifestIds(Collection<CodeListManifestId> codeListManifestIds) {
+        if (codeListManifestIds == null || codeListManifestIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetCodeListSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.in(valueOf(codeListManifestIds)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public Map<CodeListManifestId, ReleaseId> getCodeListReleaseIds(Collection<CodeListManifestId> codeListManifestIds) {
+        if (codeListManifestIds == null || codeListManifestIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<CodeListManifestId, ReleaseId> releaseIds = new HashMap<>();
+        dslContext().select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.RELEASE_ID)
+                .from(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.in(valueOf(codeListManifestIds)))
+                .forEach(r -> releaseIds.put(new CodeListManifestId(r.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()),
+                        new ReleaseId(r.get(CODE_LIST_MANIFEST.RELEASE_ID).toBigInteger())));
+        return releaseIds;
+    }
+
+    @Override
+    public ReleaseId getCodeListReleaseId(CodeListManifestId codeListManifestId) {
+        if (codeListManifestId == null) {
+            return null;
+        }
+        ULong releaseId = dslContext().select(CODE_LIST_MANIFEST.RELEASE_ID)
+                .from(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
+                .fetchOne(CODE_LIST_MANIFEST.RELEASE_ID);
+        return (releaseId != null) ? new ReleaseId(releaseId.toBigInteger()) : null;
+    }
+
+    @Override
     public CodeListSummaryRecord getCodeListSummary(CodeListManifestId codeListManifestId) {
         if (codeListManifestId == null) {
             return null;

@@ -15,12 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class DelegatingCcDocumentTest {
+class CacheFirstCcDocumentTest {
 
     private final CcDocument cached = mock(CcDocument.class);
     private final CcDocument loaded = mock(CcDocument.class);
     private final AtomicInteger loads = new AtomicInteger();
-    private final DelegatingCcDocument document = new DelegatingCcDocument(cached, () -> {
+    private final CacheFirstCcDocument document = new CacheFirstCcDocument(cached, () -> {
         loads.incrementAndGet();
         return loaded;
     });
@@ -66,12 +66,13 @@ class DelegatingCcDocumentTest {
 
     @Test
     void aScanOfTheReleaseIsAnsweredByTheLoadedDocumentAndSoIsEverythingAfterIt() {
-        XbtSummaryRecord xbt = mock(XbtSummaryRecord.class);
+        var blob = mock(org.oagi.score.gateway.http.api.cc_management.model.blob_content.BlobContentSummaryRecord.class);
+        var blobId = new org.oagi.score.gateway.http.api.cc_management.model.blob_content.BlobContentManifestId(BigInteger.TEN);
         AsccpSummaryRecord asccp = mock(AsccpSummaryRecord.class);
-        when(loaded.getXbt(new XbtManifestId(BigInteger.TEN))).thenReturn(xbt);
+        when(loaded.getBlobContent(blobId)).thenReturn(blob);
         when(loaded.getAsccp(new AsccpManifestId(BigInteger.ONE))).thenReturn(asccp);
 
-        assertSame(xbt, document.getXbt(new XbtManifestId(BigInteger.TEN)));
+        assertSame(blob, document.getBlobContent(blobId));
         assertSame(asccp, document.getAsccp(new AsccpManifestId(BigInteger.ONE)));
 
         assertEquals(1, loads.get());
@@ -97,11 +98,11 @@ class DelegatingCcDocumentTest {
 
     @Test
     void aHintThatFailsIsIgnoredAndDoesNotMakeTheDocumentFallBack() {
-        doThrow(new IllegalStateException("boom")).when(cached).prefetchGraph(CcType.ACC, accId(1));
+        doThrow(new IllegalStateException("boom")).when(cached).prefetchDependencies(CcType.ACC, accId(1));
         AccSummaryRecord acc = mock(AccSummaryRecord.class);
         when(cached.getAcc(accId(1))).thenReturn(acc);
 
-        assertDoesNotThrow(() -> document.prefetchGraph(CcType.ACC, accId(1)));
+        assertDoesNotThrow(() -> document.prefetchDependencies(CcType.ACC, accId(1)));
         assertSame(acc, document.getAcc(accId(1)));
         assertEquals(0, loads.get());
     }
@@ -115,5 +116,4 @@ class DelegatingCcDocumentTest {
         document.prefetchChildren(CcType.ACC, List.of(accId(2)));
         verify(cached, never()).prefetchChildren(CcType.ACC, List.of(accId(2)));
     }
-
 }

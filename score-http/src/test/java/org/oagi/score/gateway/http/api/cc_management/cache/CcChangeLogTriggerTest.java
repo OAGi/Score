@@ -281,4 +281,109 @@ class CcChangeLogTriggerTest {
         assertEquals(0L, value(read().fetchOne("select count(*) from cc_change_log where cc_change_log_id > ?", before), 0),
                 "and after the rollback it is gone");
     }
+
+    // ---- XBT, code lists, agency identification lists, namespaces, allowed primitives ---------------------------------
+
+    @Test
+    void anXbtACodeListAndAnAgencyIdListWriteTheSameRowsAsTheComponents() throws SQLException {
+        for (String[] t : new String[][]{{"xbt", "XBT"}, {"code_list", "CODE_LIST"}, {"agency_id_list", "AGENCY_ID_LIST"}}) {
+            String table = t[0], kind = t[1], manifest = table + "_manifest", manifestId = manifest + "_id";
+            Record sample = read().fetchOne("select " + manifestId + ", release_id from " + manifest + " order by 1 limit 1");
+            long id = value(sample, 0);
+            String expected = row(kind, id, null, value(sample, 1));
+
+            assertEquals(sorted(expected), logged(dsl -> dsl.execute("update " + manifest + " set " + manifestId + " = " + manifestId
+                    + " where " + manifestId + " = ?", id)), manifest + " update");
+            assertEquals(sorted(expected), logged(dsl -> dsl.execute("delete from " + manifest + " where " + manifestId + " = ?", id)), manifest + " delete");
+            List<String> inserted = logged(dsl -> copy(dsl, manifest, manifestId, id));
+            assertEquals(1, inserted.size(), manifest + " insert: " + inserted);
+            assertTrue(inserted.get(0).startsWith(kind + " ") && inserted.get(0).endsWith(" - " + value(sample, 1)), manifest + " insert: " + inserted);
+
+            // the component table: one row for every manifest that shows the row
+            Record shared = read().fetchOne("select " + table + "_id, count(*) from " + manifest + " group by 1 order by 2 desc, 1 limit 1");
+            long baseId = value(shared, 0);
+            List<String> expectedAll = read().fetch("select " + manifestId + ", release_id from " + manifest + " where " + table + "_id = ?", baseId)
+                    .map(r -> row(kind, value(r, 0), null, value(r, 1))).stream().sorted().collect(Collectors.toList());
+            assertEquals(expectedAll, logged(dsl -> dsl.execute("update `" + table + "` set " + table + "_id = " + table + "_id where " + table + "_id = ?", baseId)),
+                    table + " update");
+            assertEquals(expectedAll, logged(dsl -> dsl.execute("delete from `" + table + "` where " + table + "_id = ?", baseId)), table + " delete");
+        }
+    }
+
+    @Test
+    void aNamespaceWritesOneRowWhenItChangesOrIsDeleted() throws SQLException {
+        long namespace = value(read().fetchOne("select min(namespace_id) from namespace"), 0);
+        String expected = row("NAMESPACE", namespace, null, null);
+        assertEquals(sorted(expected), logged(dsl -> dsl.execute("update namespace set namespace_id = namespace_id where namespace_id = ?", namespace)), "update");
+        assertEquals(sorted(expected), logged(dsl -> dsl.execute("delete from namespace where namespace_id = ?", namespace)), "delete");
+    }
+
+    @Test
+    void theAllowedPrimitivesWriteOneRowForEveryManifestOfTheDataTypeInTheirRelease() throws SQLException {
+        for (String[] t : new String[][]{{"dt_awd_pri", "dt_awd_pri_id", "dt", "DT"}, {"dt_sc_awd_pri", "dt_sc_awd_pri_id", "dt_sc", "DT_SC"}}) {
+            String table = t[0], pk = t[1], owner = t[2], kind = t[3];
+            Record sample = read().fetchOne("select " + pk + ", " + owner + "_id, release_id from " + table + " order by 1 limit 1");
+            long id = value(sample, 0), ownerId = value(sample, 1), release = value(sample, 2);
+            String parent = owner.equals("dt_sc") ? "owner_dt_manifest_id" : "null";
+            List<String> expected = read().fetch("select " + owner + "_manifest_id, " + parent + " from " + owner + "_manifest where "
+                            + owner + "_id = ? and release_id = ?", ownerId, release)
+                    .map(r -> row(kind, value(r, 0), value(r, 1), release)).stream().sorted().collect(Collectors.toList());
+            assertFalse(expected.isEmpty());
+
+            assertEquals(expected, logged(dsl -> dsl.execute("update " + table + " set " + pk + " = " + pk + " where " + pk + " = ?", id)), table + " update");
+            assertEquals(expected, logged(dsl -> dsl.execute("delete from " + table + " where " + pk + " = ?", id)), table + " delete");
+            assertEquals(expected, logged(dsl -> copy(dsl, table, pk, id)), table + " insert");
+        }
+    }
+
+    // ---- the values of code lists and agency identification lists -----------------------------------------------------
+
+    @Test
+    void theValuesOfACodeListWriteOneRowForEveryListThatShowsThem() throws SQLException {
+        Record sample = read().fetchOne("select code_list_value_manifest_id, code_list_manifest_id, release_id from code_list_value_manifest order by 1 limit 1");
+        long id = value(sample, 0);
+        String expected = row("CODE_LIST", value(sample, 1), null, value(sample, 2));
+        assertEquals(sorted(expected), logged(dsl -> dsl.execute("update code_list_value_manifest set code_list_value_manifest_id = code_list_value_manifest_id"
+                + " where code_list_value_manifest_id = ?", id)), "code_list_value_manifest update");
+        assertEquals(sorted(expected), logged(dsl -> dsl.execute("delete from code_list_value_manifest where code_list_value_manifest_id = ?", id)),
+                "code_list_value_manifest delete");
+        assertEquals(sorted(expected), logged(dsl -> copy(dsl, "code_list_value_manifest", "code_list_value_manifest_id", id)), "code_list_value_manifest insert");
+
+        Record shared = read().fetchOne("select code_list_value_id, count(*) from code_list_value_manifest group by 1 order by 2 desc, 1 limit 1");
+        long valueId = value(shared, 0);
+        List<String> expectedAll = read().fetch("select m.code_list_manifest_id, m.release_id from code_list_value_manifest vm"
+                        + " join code_list_manifest m on m.code_list_manifest_id = vm.code_list_manifest_id where vm.code_list_value_id = ?", valueId)
+                .map(r -> row("CODE_LIST", value(r, 0), null, value(r, 1))).stream().sorted().collect(Collectors.toList());
+        assertFalse(expectedAll.isEmpty());
+        assertEquals(expectedAll, logged(dsl -> dsl.execute("update code_list_value set code_list_value_id = code_list_value_id where code_list_value_id = ?", valueId)),
+                "code_list_value update");
+        assertEquals(expectedAll, logged(dsl -> dsl.execute("delete from code_list_value where code_list_value_id = ?", valueId)), "code_list_value delete");
+    }
+
+    @Test
+    void theValuesOfAnAgencyIdListWriteOneRowForEveryListThatShowsThemOrStandsForThem() throws SQLException {
+        Record sample = read().fetchOne("select agency_id_list_value_manifest_id, agency_id_list_manifest_id from agency_id_list_value_manifest order by 1 limit 1");
+        long id = value(sample, 0), list = value(sample, 1);
+        List<String> expected = read().fetch("select agency_id_list_manifest_id, release_id from agency_id_list_manifest where agency_id_list_manifest_id = ?"
+                        + " or agency_id_list_value_manifest_id = ?", list, id)
+                .map(r -> row("AGENCY_ID_LIST", value(r, 0), null, value(r, 1))).stream().sorted().collect(Collectors.toList());
+        assertFalse(expected.isEmpty());
+        assertEquals(expected, logged(dsl -> dsl.execute("update agency_id_list_value_manifest set agency_id_list_value_manifest_id = agency_id_list_value_manifest_id"
+                + " where agency_id_list_value_manifest_id = ?", id)), "agency_id_list_value_manifest update");
+        assertEquals(expected, logged(dsl -> dsl.execute("delete from agency_id_list_value_manifest where agency_id_list_value_manifest_id = ?", id)),
+                "agency_id_list_value_manifest delete");
+        List<String> inserted = logged(dsl -> copy(dsl, "agency_id_list_value_manifest", "agency_id_list_value_manifest_id", id));
+        assertTrue(inserted.stream().allMatch(e -> e.startsWith("AGENCY_ID_LIST ")) && !inserted.isEmpty(), "insert: " + inserted);
+
+        long valueId = value(read().fetchOne("select agency_id_list_value_id from agency_id_list_value_manifest where agency_id_list_value_manifest_id = ?", id), 0);
+        List<String> expectedAll = read().fetch("select m.agency_id_list_manifest_id, m.release_id from agency_id_list_manifest m where m.agency_id_list_manifest_id in"
+                        + " (select vm.agency_id_list_manifest_id from agency_id_list_value_manifest vm where vm.agency_id_list_value_id = ?)"
+                        + " or m.agency_id_list_value_manifest_id in (select vm.agency_id_list_value_manifest_id from agency_id_list_value_manifest vm"
+                        + " where vm.agency_id_list_value_id = ?)", valueId, valueId)
+                .map(r -> row("AGENCY_ID_LIST", value(r, 0), null, value(r, 1))).stream().sorted().collect(Collectors.toList());
+        assertFalse(expectedAll.isEmpty());
+        assertEquals(expectedAll, logged(dsl -> dsl.execute("update agency_id_list_value set agency_id_list_value_id = agency_id_list_value_id"
+                + " where agency_id_list_value_id = ?", valueId)), "agency_id_list_value update");
+        assertEquals(expectedAll, logged(dsl -> dsl.execute("delete from agency_id_list_value where agency_id_list_value_id = ?", valueId)), "agency_id_list_value delete");
+    }
 }

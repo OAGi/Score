@@ -30,6 +30,7 @@ import org.oagi.score.gateway.http.api.business_term_management.repository.Busin
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermCommandRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
+import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheProperties;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentFactory;
 import org.oagi.score.gateway.http.api.cc_management.repository.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.jooq.*;
@@ -104,7 +105,10 @@ public class RepositoryFactory {
     @Autowired(required = false)
     private CcCache ccCache;
 
-    /** The same connection and settings, without the log of every statement: the change feed asks twice a second. */
+    @Autowired(required = false)
+    private CcCacheProperties ccCacheProperties;
+
+    /** The same connection and settings, without the log of every statement: the change watchdog asks twice a second. */
     private final DSLContext quietDslContext;
 
     public RepositoryFactory(@Autowired DSLContext dslContext) {
@@ -127,6 +131,11 @@ public class RepositoryFactory {
     /** The cache shared by every request, or one that holds nothing where there is no cache (e.g. a bare factory). */
     public CcCache ccCache() {
         return (ccCache != null) ? ccCache : CcCache.DISABLED;
+    }
+
+    /** What a cached document is told, or the defaults where nothing is configured (e.g. a bare factory). */
+    public CcCacheProperties ccCacheProperties() {
+        return (ccCacheProperties != null) ? ccCacheProperties : new CcCacheProperties();
     }
 
     public ScoreUserQueryRepository scoreUserQueryRepository() {

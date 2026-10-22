@@ -108,7 +108,7 @@ public class CoreComponentGraphContext implements GraphContext {
     @Override
     public void prefetchGraph(Node root) {
         switch (root.getType()) {
-            case ACC, ASCCP, BCCP, DT -> ccDocument.prefetchGraph(CcType.valueOf(root.getType().name()), root.getManifestId());
+            case ACC, ASCCP, BCCP, DT -> ccDocument.prefetchDependencies(CcType.valueOf(root.getType().name()), root.getManifestId());
             default -> {
             }
         }

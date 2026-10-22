@@ -13,7 +13,10 @@ import java.util.List;
 public interface CcChangeLogRepository {
 
     /** A record the lookups below name: its kind, manifest id and the ACC or DT manifest it belongs to. */
-    record RecordRef(CcChangeKind kind, long id, Long parentId) {
+    record RecordRef(CcChangeKind kind, long id, Long parentId, Long releaseId) {
+        public RecordRef(CcChangeKind kind, long id, Long parentId) {
+            this(kind, id, parentId, null);
+        }
     }
 
     /** The greatest sequence number that is visible, or 0 when there is none. */
@@ -36,6 +39,12 @@ public interface CcChangeLogRepository {
      * @return whether it was done
      */
     boolean restartNumbering();
+
+    /**
+     * The data types and their supplementary components whose allowed primitives are the XBT, the code lists or the agency
+     * identification lists with these manifest ids (the primitives show their names).
+     */
+    List<RecordRef> recordsShowing(CcChangeKind kind, java.util.Collection<Long> manifestIds);
 
     List<RecordRef> recordsOfRelease(long releaseId);
 

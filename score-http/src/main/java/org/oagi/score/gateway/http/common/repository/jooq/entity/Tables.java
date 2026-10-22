@@ -464,7 +464,7 @@ public class Tables {
 
     /**
      * Temporary log of the changes to the data core component records are made
-     * of, read by the CC cache (CcChangeFeed) to forget what changed; can be
+     * of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be
      * dropped with its triggers if CDC is introduced. Rows are deleted by the
      * application after 2 hours (retention policy, checked every 10 minutes)
      * and the numbering restarts from 1 once the table has stayed empty for 10

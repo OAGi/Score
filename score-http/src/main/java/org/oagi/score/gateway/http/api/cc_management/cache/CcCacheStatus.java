@@ -3,21 +3,21 @@ package org.oagi.score.gateway.http.api.cc_management.cache;
 import org.springframework.stereotype.Component;
 
 /**
- * Whether the cache may be trusted: only while {@link CcChangeFeed} keeps up with the change log, because an entry is
- * forgotten only when the feed reads that its record changed. Without the feed (the table is not there yet, the database
+ * Whether the cache may be trusted: only while {@link CcCacheWatchdog} keeps up with the change log, because an entry is
+ * forgotten only when the watchdog reads that its record changed. Without the watchdog (the table is not there yet, the database
  * does not answer) the cache is bypassed and the database answers.
  */
 @Component
 public class CcCacheStatus {
 
-    /** A feed that has not read for this long is not keeping up. */
+    /** A watchdog that has not read for this long is not keeping up. */
     private static final long MAX_SILENCE_NANOS = 15_000_000_000L;
-    /** A reader that starts a document wants the feed to have read within this time. */
+    /** A reader that starts a document wants the watchdog to have read within this time. */
     private static final long FRESH_NANOS = 250_000_000L;
     /** How long such a reader waits for a read that is under way. */
     private static final long FRESHEN_WAIT_MILLIS = 50;
 
-    /** For a cache that has no feed to depend on (tests). */
+    /** For a cache that has no watchdog to depend on (tests). */
     public static CcCacheStatus alwaysReady() {
         CcCacheStatus status = new CcCacheStatus();
         status.alwaysReady = true;
@@ -27,10 +27,10 @@ public class CcCacheStatus {
     private volatile boolean alwaysReady;
     private volatile long lastReadNanos;
     private volatile boolean started;
-    private volatile CcChangeFeed feed;
+    private volatile CcCacheWatchdog watchdog;
 
-    void bind(CcChangeFeed feed) {
-        this.feed = feed;
+    void bind(CcCacheWatchdog watchdog) {
+        this.watchdog = watchdog;
     }
 
     void succeeded() {
@@ -47,13 +47,13 @@ public class CcCacheStatus {
     }
 
     /**
-     * Has the feed read the changes that were committed before now, unless it has just done so. It is the cheap way to
+     * Has the watchdog read the changes that were committed before now, unless it has just done so. It is the cheap way to
      * see a change another instance made: one indexed query, at most four times a second.
      */
     void freshen() {
-        CcChangeFeed feed = this.feed;
-        if (feed != null && System.nanoTime() - lastReadNanos > FRESH_NANOS) {
-            feed.catchUp(FRESHEN_WAIT_MILLIS);
+        CcCacheWatchdog watchdog = this.watchdog;
+        if (watchdog != null && System.nanoTime() - lastReadNanos > FRESH_NANOS) {
+            watchdog.catchUp(FRESHEN_WAIT_MILLIS);
         }
     }
 }

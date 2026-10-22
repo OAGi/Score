@@ -96,6 +96,18 @@ springdoc:
     tags-sorter: alpha
 
 score:
+  # The CC cache (see spring.cache above). The defaults are the smallest values measured to be enough
+  # (CcCacheTuningBenchmark); there is rarely a reason to change them.
+  #   batch-size                    the most ids sent to the database in one IN list. Smaller lists are no heavier for the
+  #                                 database but take more statements: 100 made a large graph read with the cache empty
+  #                                 about 40% slower than 500, and over 500 nothing was gained.
+  #   max-prefetched-dependencies   how many times one request reads the dependencies of a component ahead, when it asks for
+  #                                 components that have nothing to do with each other. 0 reads nothing ahead, which costs
+  #                                 seconds for a schema export of a few ASCCPs; over 4 nothing was gained.
+  cc-cache:
+    batch-size: 500
+    max-prefetched-dependencies: 4
+
   # Passkey (WebAuthn) sign-in for local accounts. It is on exactly when BOTH rp-id and allowed-origins are set, and
   # off when they are empty; there is no separate flag. Set them for a Docker deployment through the environment
   # variables (SCORE_PASSKEY_RP_ID, SCORE_PASSKEY_ALLOWED_ORIGINS, SCORE_PASSKEY_RP_NAME).

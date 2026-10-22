@@ -204,7 +204,7 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
 -- cc_change_log: what changed in the data core component records are made of
 -- ------------------------------------------------------------------
 --
--- The cache of core component records (see CcChangeFeed in score-http) must forget a record when the data it was made of
+-- The cache of core component records (see CcCacheWatchdog in score-http) must forget a record when the data it was made of
 -- changes. The triggers below (named `<table>_cc_change_<event>_trg`) write one row here, in the transaction of the change,
 -- for every row that changes in a table those records are made of, whoever makes the change (the application, a script, a
 -- person with a SQL client). Every instance reads the rows and deletes the old ones; nothing else uses them.
@@ -225,6 +225,14 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
 --   5. tag, release, library: UPDATE, DELETE. One row of kind TAG, RELEASE, LIBRARY (everything that shows it is forgotten).
 --   6. release_dep: INSERT, UPDATE, DELETE. One row of kind RELEASE_DEP (the releases a document answers for).
 --   7. app_user: UPDATE, only when LOGIN_ID or IS_DEVELOPER changes. One row of kind USER (the records show the owner).
+--   8. xbt_manifest, code_list_manifest, agency_id_list_manifest: INSERT, UPDATE, DELETE; xbt, code_list, agency_id_list: UPDATE,
+--      DELETE (one row for every manifest that shows the row). Kind XBT, CODE_LIST, AGENCY_ID_LIST with the manifest id and its release.
+--   9. namespace: UPDATE, DELETE. One row of kind NAMESPACE.
+--      Also code_list_value_manifest, code_list_value (the values of a code list) and agency_id_list_value_manifest,
+--      agency_id_list_value (the values of an agency identification list, and the value the list itself stands for): one row of kind
+--      CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the changed value.
+--  10. dt_awd_pri, dt_sc_awd_pri (the allowed primitives of a DT, of a DT_SC): INSERT, UPDATE, DELETE. One row of kind DT, DT_SC for
+--      every manifest of the DT (DT_SC) in the release of the row.
 --
 -- Creating a trigger needs the TRIGGER privilege, and, when the binary log is on, also SUPER or
 -- log_bin_trust_function_creators=1.
@@ -234,7 +242,7 @@ DROP TABLE IF EXISTS `cc_change_log`;
 CREATE TABLE `cc_change_log`
 (
     `cc_change_log_id`    bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key. Given when a row is written, but rows become visible in the order of their transactions'' commits, not of this number. Deleting rows does not lower it; the application starts the numbering again from 1 when the table has stayed empty for 10 minutes.',
-    `kind`                varchar(16)         NOT NULL COMMENT 'What changed: ACC, ASCC, BCC, ASCCP, BCCP, DT or DT_SC (a manifest of that kind; written by the triggers on the manifest tables, on the component tables, on seq_key (always ACC) and on the manifest tag tables (ACC, ASCCP, BCCP, DT)); RELEASE (trigger on release), RELEASE_DEP (release_dep), LIBRARY (library), USER (app_user, when login_id or is_developer changes) or TAG (tag).',
+    `kind`                varchar(16)         NOT NULL COMMENT 'What changed: ACC, ASCC, BCC, ASCCP, BCCP, DT or DT_SC (a manifest of that kind; written by the triggers on the manifest tables, on the component tables, on seq_key (always ACC) and on the manifest tag tables (ACC, ASCCP, BCCP, DT)); RELEASE (trigger on release), RELEASE_DEP (release_dep), LIBRARY (library), USER (app_user, when login_id or is_developer changes), TAG (tag), XBT, CODE_LIST or AGENCY_ID_LIST (a manifest; triggers on the manifest and the component table) or NAMESPACE (namespace). DT and DT_SC are also written by the triggers on dt_awd_pri and dt_sc_awd_pri.',
     `target_id`            bigint(20) unsigned NOT NULL COMMENT 'The manifest id of the changed record (kind ACC to DT_SC), or the id of the release (RELEASE; for RELEASE_DEP the release that depends on others), the library (LIBRARY), the user (USER) or the tag (TAG) that changed.',
     `parent_manifest_id`  bigint(20) unsigned          DEFAULT NULL COMMENT 'The ACC_MANIFEST_ID that owns the changed ASCC or BCC, or the DT_MANIFEST_ID that owns the changed DT_SC; NULL for the other kinds.',
     `release_id`          bigint(20) unsigned          DEFAULT NULL COMMENT 'The release of the changed record, when it is known. No foreign key: a release may be deleted while its rows are still here.',
@@ -244,7 +252,7 @@ CREATE TABLE `cc_change_log`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci
-  ROW_FORMAT = DYNAMIC COMMENT ='Temporary log of the changes to the data core component records are made of, read by the CC cache (CcChangeFeed) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_cc_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER.';
+  ROW_FORMAT = DYNAMIC COMMENT ='Temporary log of the changes to the data core component records are made of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_cc_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9) namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b) code_list_value_manifest, code_list_value, agency_id_list_value_manifest and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of the data type in the release of the changed row.';
 
 DROP TRIGGER IF EXISTS `acc_manifest_cc_change_insert_trg`;
 CREATE TRIGGER `acc_manifest_cc_change_insert_trg` AFTER INSERT ON `acc_manifest` FOR EACH ROW
@@ -485,6 +493,179 @@ CREATE TRIGGER `app_user_cc_change_update_trg` AFTER UPDATE ON `app_user` FOR EA
     INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
     SELECT 'USER', NEW.`app_user_id`, NULL, NULL FROM DUAL
     WHERE NOT (OLD.`login_id` <=> NEW.`login_id` AND OLD.`is_developer` <=> NEW.`is_developer`);
+
+
+DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_insert_trg`;
+CREATE TRIGGER `xbt_manifest_cc_change_insert_trg` AFTER INSERT ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_update_trg`;
+CREATE TRIGGER `xbt_manifest_cc_change_update_trg` AFTER UPDATE ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_delete_trg`;
+CREATE TRIGGER `xbt_manifest_cc_change_delete_trg` AFTER DELETE ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', OLD.`xbt_manifest_id`, NULL, OLD.`release_id`);
+
+DROP TRIGGER IF EXISTS `xbt_cc_change_update_trg`;
+CREATE TRIGGER `xbt_cc_change_update_trg` AFTER UPDATE ON `xbt` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'XBT', `xbt_manifest_id`, NULL, `release_id` FROM `xbt_manifest` WHERE `xbt_id` = NEW.`xbt_id`;
+
+DROP TRIGGER IF EXISTS `xbt_cc_change_delete_trg`;
+CREATE TRIGGER `xbt_cc_change_delete_trg` AFTER DELETE ON `xbt` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'XBT', `xbt_manifest_id`, NULL, `release_id` FROM `xbt_manifest` WHERE `xbt_id` = OLD.`xbt_id`;
+
+DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_insert_trg`;
+CREATE TRIGGER `code_list_manifest_cc_change_insert_trg` AFTER INSERT ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_update_trg`;
+CREATE TRIGGER `code_list_manifest_cc_change_update_trg` AFTER UPDATE ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_delete_trg`;
+CREATE TRIGGER `code_list_manifest_cc_change_delete_trg` AFTER DELETE ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
+
+DROP TRIGGER IF EXISTS `code_list_cc_change_update_trg`;
+CREATE TRIGGER `code_list_cc_change_update_trg` AFTER UPDATE ON `code_list` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'CODE_LIST', `code_list_manifest_id`, NULL, `release_id` FROM `code_list_manifest` WHERE `code_list_id` = NEW.`code_list_id`;
+
+DROP TRIGGER IF EXISTS `code_list_cc_change_delete_trg`;
+CREATE TRIGGER `code_list_cc_change_delete_trg` AFTER DELETE ON `code_list` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'CODE_LIST', `code_list_manifest_id`, NULL, `release_id` FROM `code_list_manifest` WHERE `code_list_id` = OLD.`code_list_id`;
+
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_insert_trg`;
+CREATE TRIGGER `agency_id_list_manifest_cc_change_insert_trg` AFTER INSERT ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_update_trg`;
+CREATE TRIGGER `agency_id_list_manifest_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_manifest_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', OLD.`agency_id_list_manifest_id`, NULL, OLD.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_cc_change_update_trg`;
+CREATE TRIGGER `agency_id_list_cc_change_update_trg` AFTER UPDATE ON `agency_id_list` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest` WHERE `agency_id_list_id` = NEW.`agency_id_list_id`;
+
+DROP TRIGGER IF EXISTS `agency_id_list_cc_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_cc_change_delete_trg` AFTER DELETE ON `agency_id_list` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest` WHERE `agency_id_list_id` = OLD.`agency_id_list_id`;
+
+DROP TRIGGER IF EXISTS `namespace_cc_change_update_trg`;
+CREATE TRIGGER `namespace_cc_change_update_trg` AFTER UPDATE ON `namespace` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('NAMESPACE', NEW.`namespace_id`, NULL, NULL);
+
+DROP TRIGGER IF EXISTS `namespace_cc_change_delete_trg`;
+CREATE TRIGGER `namespace_cc_change_delete_trg` AFTER DELETE ON `namespace` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('NAMESPACE', OLD.`namespace_id`, NULL, NULL);
+
+DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_insert_trg`;
+CREATE TRIGGER `dt_awd_pri_cc_change_insert_trg` AFTER INSERT ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
+
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_insert_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_cc_change_insert_trg` AFTER INSERT ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
+
+DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_update_trg`;
+CREATE TRIGGER `dt_awd_pri_cc_change_update_trg` AFTER UPDATE ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
+
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_update_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_cc_change_update_trg` AFTER UPDATE ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
+
+DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_delete_trg`;
+CREATE TRIGGER `dt_awd_pri_cc_change_delete_trg` AFTER DELETE ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    WHERE `dt_id` = OLD.`dt_id` AND `release_id` = OLD.`release_id`;
+
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_delete_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_cc_change_delete_trg` AFTER DELETE ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    WHERE `dt_sc_id` = OLD.`dt_sc_id` AND `release_id` = OLD.`release_id`;
+
+
+DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_insert_trg`;
+CREATE TRIGGER `code_list_value_manifest_cc_change_insert_trg` AFTER INSERT ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_insert_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_cc_change_insert_trg` AFTER INSERT ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
+    WHERE `agency_id_list_manifest_id` = NEW.`agency_id_list_manifest_id`
+       OR `agency_id_list_value_manifest_id` = NEW.`agency_id_list_value_manifest_id`;
+
+DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_update_trg`;
+CREATE TRIGGER `code_list_value_manifest_cc_change_update_trg` AFTER UPDATE ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_update_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
+    WHERE `agency_id_list_manifest_id` = NEW.`agency_id_list_manifest_id`
+       OR `agency_id_list_value_manifest_id` = NEW.`agency_id_list_value_manifest_id`;
+
+DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_delete_trg`;
+CREATE TRIGGER `code_list_value_manifest_cc_change_delete_trg` AFTER DELETE ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
+
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
+    WHERE `agency_id_list_manifest_id` = OLD.`agency_id_list_manifest_id`
+       OR `agency_id_list_value_manifest_id` = OLD.`agency_id_list_value_manifest_id`;
+
+DROP TRIGGER IF EXISTS `code_list_value_cc_change_update_trg`;
+CREATE TRIGGER `code_list_value_cc_change_update_trg` AFTER UPDATE ON `code_list_value` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'CODE_LIST', m.`code_list_manifest_id`, NULL, m.`release_id` FROM `code_list_value_manifest` vm
+    JOIN `code_list_manifest` m ON m.`code_list_manifest_id` = vm.`code_list_manifest_id`
+    WHERE vm.`code_list_value_id` = NEW.`code_list_value_id`;
+
+DROP TRIGGER IF EXISTS `agency_id_list_value_cc_change_update_trg`;
+CREATE TRIGGER `agency_id_list_value_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_value` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', m.`agency_id_list_manifest_id`, NULL, m.`release_id` FROM `agency_id_list_manifest` m
+    WHERE m.`agency_id_list_manifest_id` IN (SELECT vm.`agency_id_list_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = NEW.`agency_id_list_value_id`)
+       OR m.`agency_id_list_value_manifest_id` IN (SELECT vm.`agency_id_list_value_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = NEW.`agency_id_list_value_id`);
+
+DROP TRIGGER IF EXISTS `code_list_value_cc_change_delete_trg`;
+CREATE TRIGGER `code_list_value_cc_change_delete_trg` AFTER DELETE ON `code_list_value` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'CODE_LIST', m.`code_list_manifest_id`, NULL, m.`release_id` FROM `code_list_value_manifest` vm
+    JOIN `code_list_manifest` m ON m.`code_list_manifest_id` = vm.`code_list_manifest_id`
+    WHERE vm.`code_list_value_id` = OLD.`code_list_value_id`;
+
+DROP TRIGGER IF EXISTS `agency_id_list_value_cc_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_value_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_value` FOR EACH ROW
+    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+    SELECT 'AGENCY_ID_LIST', m.`agency_id_list_manifest_id`, NULL, m.`release_id` FROM `agency_id_list_manifest` m
+    WHERE m.`agency_id_list_manifest_id` IN (SELECT vm.`agency_id_list_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = OLD.`agency_id_list_value_id`)
+       OR m.`agency_id_list_value_manifest_id` IN (SELECT vm.`agency_id_list_value_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = OLD.`agency_id_list_value_id`);
 
 
 -- When only a part of this script is run, the variable saved at the top of the script is not set (NULL).

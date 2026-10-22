@@ -4,6 +4,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
@@ -37,6 +38,9 @@ public interface DtQueryRepository {
 
     List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(DtManifestId dtManifestId);
 
+    /** The allowed primitives of these data types in every release that has them; the caller picks the release. */
+    List<DtAwdPriSummaryRecord> getDtAwdPriSummaryListByDtIds(Collection<DtId> dtIds);
+
     DtAwdPriSummaryRecord getDefaultDtAwdPriSummary(DtManifestId dtManifestId);
 
     List<DtAwdPriDetailsRecord> getDefaultPrimitiveValues(String representationTerm);
@@ -62,6 +66,9 @@ public interface DtQueryRepository {
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(ReleaseId releaseId);
 
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(DtScManifestId dtScManifestId);
+
+    /** The allowed primitives of these supplementary components in every release that has them; the caller picks the release. */
+    List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryListByDtScIds(Collection<DtScId> dtScIds);
 
     DtScAwdPriSummaryRecord getDefaultDtScAwdPriSummary(DtScManifestId dtScManifestId);
 

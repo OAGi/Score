@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * When the rows of {@code cc_change_log} are deleted: those older than the retention, at most a number at a time, and never
- * the younger ones that the feed may still need.
+ * the younger ones that the watchdog may still need.
  * <pre>
  *   mvn test -Dtest=CcChangeLogRetentionTest -DargLine=-Dscore.freshness=true
  * </pre>
@@ -104,15 +104,15 @@ class CcChangeLogRetentionTest {
 
     @Test
     void theFeedDeletesWhatIsOlderThanItsRetentionAndNothingElse() {
-        long retentionMinutes = CcChangeFeed.RETENTION.toMinutes();
+        long retentionMinutes = CcCacheWatchdog.RETENTION.toMinutes();
         row((int) retentionMinutes + 5, 1);
         row((int) retentionMinutes + 1, 2);
         row((int) retentionMinutes - 5, 3);
         row(0, 4);
         CcCacheStatus status = new CcCacheStatus();
-        CcChangeFeed feed = new CcChangeFeed(repositoryFactory, new SpringCcCache(new ConcurrentMapCacheManager(), status), status);
+        CcCacheWatchdog watchdog = new CcCacheWatchdog(repositoryFactory, new SpringCcCache(new ConcurrentMapCacheManager(), status), status);
 
-        feed.purge();
+        watchdog.purge();
 
         assertEquals(2, count());
         assertEquals(2, dsl.fetchOne("select count(*) from cc_change_log where target_id in (3, 4)").get(0, Long.class));
@@ -124,9 +124,9 @@ class CcChangeLogRetentionTest {
                 + " select 'ACC', seq, now(6) - interval 5 hour from seq_1_to_12000");
         row(0, 1);
         CcCacheStatus status = new CcCacheStatus();
-        CcChangeFeed feed = new CcChangeFeed(repositoryFactory, new SpringCcCache(new ConcurrentMapCacheManager(), status), status);
+        CcCacheWatchdog watchdog = new CcCacheWatchdog(repositoryFactory, new SpringCcCache(new ConcurrentMapCacheManager(), status), status);
 
-        feed.purge();
+        watchdog.purge();
 
         assertEquals(1, count(), "all the old rows went, in chunks of 5,000, and the young one stayed");
     }

@@ -50,6 +50,43 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
     }
 
     @Override
+    public List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListByManifestIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds) {
+        if (agencyIdListManifestIds == null || agencyIdListManifestIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetAgencyIdListSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(valueOf(agencyIdListManifestIds)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public Map<AgencyIdListManifestId, ReleaseId> getAgencyIdListReleaseIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds) {
+        if (agencyIdListManifestIds == null || agencyIdListManifestIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<AgencyIdListManifestId, ReleaseId> releaseIds = new HashMap<>();
+        dslContext().select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(valueOf(agencyIdListManifestIds)))
+                .forEach(r -> releaseIds.put(new AgencyIdListManifestId(r.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()),
+                        new ReleaseId(r.get(AGENCY_ID_LIST_MANIFEST.RELEASE_ID).toBigInteger())));
+        return releaseIds;
+    }
+
+    @Override
+    public ReleaseId getAgencyIdListReleaseId(AgencyIdListManifestId agencyIdListManifestId) {
+        if (agencyIdListManifestId == null) {
+            return null;
+        }
+        ULong releaseId = dslContext().select(AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(valueOf(agencyIdListManifestId)))
+                .fetchOne(AGENCY_ID_LIST_MANIFEST.RELEASE_ID);
+        return (releaseId != null) ? new ReleaseId(releaseId.toBigInteger()) : null;
+    }
+
+    @Override
     public AgencyIdListSummaryRecord getAgencyIdListSummary(
             AgencyIdListManifestId agencyIdListManifestId) {
 

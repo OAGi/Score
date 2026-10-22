@@ -66,9 +66,19 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
                     DT_MANIFEST_TAG, DT_MANIFEST_TAG.DT_MANIFEST_ID, DT_MANIFEST_TAG.TAG_ID),
             new Spec(CcChangeKind.DT_SC, DT_SC_MANIFEST, DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.RELEASE_ID, DT_SC_MANIFEST.DT_SC_ID,
                     DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID, DT_SC.DT_SC_ID, DT_SC.OWNER_USER_ID, DT_SC.CREATED_BY, DT_SC.LAST_UPDATED_BY,
-                    null, null, null));
+                    null, null, null),
+            new Spec(CcChangeKind.XBT, XBT_MANIFEST, XBT_MANIFEST.XBT_MANIFEST_ID, XBT_MANIFEST.RELEASE_ID, XBT_MANIFEST.XBT_ID,
+                    NO_PARENT, XBT.XBT_ID, XBT.OWNER_USER_ID, XBT.CREATED_BY, XBT.LAST_UPDATED_BY,
+                    null, null, null),
+            new Spec(CcChangeKind.CODE_LIST, CODE_LIST_MANIFEST, CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.RELEASE_ID,
+                    CODE_LIST_MANIFEST.CODE_LIST_ID, NO_PARENT, CODE_LIST.CODE_LIST_ID, CODE_LIST.OWNER_USER_ID, CODE_LIST.CREATED_BY,
+                    CODE_LIST.LAST_UPDATED_BY, null, null, null),
+            new Spec(CcChangeKind.AGENCY_ID_LIST, AGENCY_ID_LIST_MANIFEST, AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
+                    AGENCY_ID_LIST_MANIFEST.RELEASE_ID, AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID, NO_PARENT,
+                    AGENCY_ID_LIST.AGENCY_ID_LIST_ID, AGENCY_ID_LIST.OWNER_USER_ID, AGENCY_ID_LIST.CREATED_BY,
+                    AGENCY_ID_LIST.LAST_UPDATED_BY, null, null, null));
 
-    /** The same connection and settings as everywhere, without the log of every statement: the feed asks twice a second. */
+    /** The same connection and settings as everywhere, without the log of every statement: the watchdog asks twice a second. */
     private final DSLContext dslContext;
 
     public JooqCcChangeLogRepository(DSLContext dslContext) {
@@ -83,7 +93,8 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
 
     @Override
     public List<CcChange> readAfter(long seq, int limit) {
-        return dslContext.select(CC_CHANGE_LOG.CC_CHANGE_LOG_ID, CC_CHANGE_LOG.KIND, CC_CHANGE_LOG.TARGET_ID, CC_CHANGE_LOG.PARENT_MANIFEST_ID)
+        return dslContext.select(CC_CHANGE_LOG.CC_CHANGE_LOG_ID, CC_CHANGE_LOG.KIND, CC_CHANGE_LOG.TARGET_ID, CC_CHANGE_LOG.PARENT_MANIFEST_ID,
+                        CC_CHANGE_LOG.RELEASE_ID)
                 .from(CC_CHANGE_LOG)
                 .where(CC_CHANGE_LOG.CC_CHANGE_LOG_ID.gt(ULong.valueOf(seq)))
                 .orderBy(CC_CHANGE_LOG.CC_CHANGE_LOG_ID)
@@ -93,7 +104,8 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
 
     @Override
     public List<CcChange> readRange(long from, long to) {
-        return dslContext.select(CC_CHANGE_LOG.CC_CHANGE_LOG_ID, CC_CHANGE_LOG.KIND, CC_CHANGE_LOG.TARGET_ID, CC_CHANGE_LOG.PARENT_MANIFEST_ID)
+        return dslContext.select(CC_CHANGE_LOG.CC_CHANGE_LOG_ID, CC_CHANGE_LOG.KIND, CC_CHANGE_LOG.TARGET_ID, CC_CHANGE_LOG.PARENT_MANIFEST_ID,
+                        CC_CHANGE_LOG.RELEASE_ID)
                 .from(CC_CHANGE_LOG)
                 .where(CC_CHANGE_LOG.CC_CHANGE_LOG_ID.between(ULong.valueOf(from), ULong.valueOf(to)))
                 .orderBy(CC_CHANGE_LOG.CC_CHANGE_LOG_ID)
@@ -114,7 +126,8 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
                 r.get(0, Long.class),
                 CcChangeKind.valueOf(r.get(1, String.class)),
                 r.get(2, Long.class),
-                r.get(3, Long.class));
+                r.get(3, Long.class),
+                r.get(4, Long.class));
     }
 
     @Override
@@ -135,7 +148,7 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
     public List<RecordRef> recordsOfRelease(long releaseId) {
         List<RecordRef> refs = new ArrayList<>();
         for (Spec s : SPECS) {
-            collect(refs, s, dslContext.select(s.manifestId(), s.parent())
+            collect(refs, s, dslContext.select(s.manifestId(), s.parent(), s.manifestReleaseId())
                     .from(s.manifest())
                     .where(s.manifestReleaseId().eq(ULong.valueOf(releaseId))));
         }
@@ -146,7 +159,7 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
     public List<RecordRef> recordsOfLibrary(long libraryId) {
         List<RecordRef> refs = new ArrayList<>();
         for (Spec s : SPECS) {
-            collect(refs, s, dslContext.select(s.manifestId(), s.parent())
+            collect(refs, s, dslContext.select(s.manifestId(), s.parent(), s.manifestReleaseId())
                     .from(s.manifest())
                     .join(RELEASE).on(RELEASE.RELEASE_ID.eq(s.manifestReleaseId()))
                     .where(RELEASE.LIBRARY_ID.eq(ULong.valueOf(libraryId))));
@@ -159,7 +172,7 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
         ULong user = ULong.valueOf(userId);
         List<RecordRef> refs = new ArrayList<>();
         for (Spec s : SPECS) {
-            collect(refs, s, dslContext.select(s.manifestId(), s.parent())
+            collect(refs, s, dslContext.select(s.manifestId(), s.parent(), s.manifestReleaseId())
                     .from(s.manifest())
                     .join(s.componentId().getTable()).on(s.componentId().eq(s.manifestComponentId()))
                     .where(s.ownerUserId().eq(user).or(s.createdBy().eq(user)).or(s.lastUpdatedBy().eq(user))));
@@ -183,11 +196,51 @@ public class JooqCcChangeLogRepository implements CcChangeLogRepository {
     }
 
     @Override
+    public List<RecordRef> recordsShowing(CcChangeKind kind, java.util.Collection<Long> manifestIds) {
+        List<RecordRef> refs = new ArrayList<>();
+        TableField<?, ULong> inDt;
+        TableField<?, ULong> inDtSc;
+        switch (kind) {
+            case XBT -> {
+                inDt = DT_AWD_PRI.XBT_MANIFEST_ID;
+                inDtSc = DT_SC_AWD_PRI.XBT_MANIFEST_ID;
+            }
+            case CODE_LIST -> {
+                inDt = DT_AWD_PRI.CODE_LIST_MANIFEST_ID;
+                inDtSc = DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID;
+            }
+            case AGENCY_ID_LIST -> {
+                inDt = DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID;
+                inDtSc = DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID;
+            }
+            default -> {
+                return refs;
+            }
+        }
+        List<Long> all = new ArrayList<>(manifestIds);
+        for (int from = 0; from < all.size(); from += 1000) {
+            List<ULong> chunk = all.subList(from, Math.min(from + 1000, all.size())).stream().map(ULong::valueOf).toList();
+            dslContext.select(DT_MANIFEST.DT_MANIFEST_ID)
+                    .from(DT_AWD_PRI)
+                    .join(DT_MANIFEST).on(DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID).and(DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID)))
+                    .where(inDt.in(chunk))
+                    .fetch().forEach(r -> refs.add(new RecordRef(CcChangeKind.DT, r.get(0, Long.class), null)));
+            dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID)
+                    .from(DT_SC_AWD_PRI)
+                    .join(DT_SC_MANIFEST).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)
+                            .and(DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID)))
+                    .where(inDtSc.in(chunk))
+                    .fetch().forEach(r -> refs.add(new RecordRef(CcChangeKind.DT_SC, r.get(0, Long.class), r.get(1, Long.class))));
+        }
+        return refs;
+    }
+
+    @Override
     public List<Long> allReleaseIds() {
         return dslContext.select(RELEASE.RELEASE_ID).from(RELEASE).fetch(r -> r.get(0, Long.class));
     }
 
     private void collect(List<RecordRef> refs, Spec spec, Select<? extends Record> query) {
-        query.fetch().forEach(r -> refs.add(new RecordRef(spec.kind(), r.get(0, Long.class), r.get(1, Long.class))));
+        query.fetch().forEach(r -> refs.add(new RecordRef(spec.kind(), r.get(0, Long.class), r.get(1, Long.class), r.get(2, Long.class))));
     }
 }

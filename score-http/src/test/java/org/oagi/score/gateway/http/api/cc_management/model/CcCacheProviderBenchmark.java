@@ -109,7 +109,7 @@ class CcCacheProviderBenchmark {
         long t0 = System.nanoTime();
         CcDocument document = new CachedCcDocument(REQUESTER, repositoryFactory, release);
         long t1 = System.nanoTime();
-        document.prefetchGraph(CcType.ACC, new AccManifestId(BigInteger.valueOf(root)));
+        document.prefetchDependencies(CcType.ACC, new AccManifestId(BigInteger.valueOf(root)));
         long t2 = System.nanoTime();
         CoreComponentGraphContext context = new CoreComponentGraphContext(document);
         Node rootNode = context.toNode(document.getAcc(new AccManifestId(BigInteger.valueOf(root))));

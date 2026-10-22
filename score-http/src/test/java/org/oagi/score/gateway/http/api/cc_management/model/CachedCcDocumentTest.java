@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.cc_management.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
+import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheProperties;
 import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
@@ -53,16 +54,25 @@ class CachedCcDocumentTest {
     private final TagQueryRepository tagQuery = mock(TagQueryRepository.class);
     private final ReleaseQueryRepository releaseQuery = mock(ReleaseQueryRepository.class);
     private SpringCcCache cache;
+    private final org.oagi.score.gateway.http.api.xbt_management.repository.XbtQueryRepository xbtQuery = mock(org.oagi.score.gateway.http.api.xbt_management.repository.XbtQueryRepository.class);
+    private final org.oagi.score.gateway.http.api.namespace_management.repository.NamespaceQueryRepository namespaceQuery = mock(org.oagi.score.gateway.http.api.namespace_management.repository.NamespaceQueryRepository.class);
+    private final org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository codeListQuery = mock(org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository.class);
+    private final org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository agencyQuery = mock(org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository.class);
 
     @BeforeEach
     void setUp() {
         cache = new SpringCcCache(new ConcurrentMapCacheManager(), org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady());
         when(repositoryFactory.ccCache()).thenReturn(cache);
+        when(repositoryFactory.ccCacheProperties()).thenReturn(new CcCacheProperties());
         when(repositoryFactory.accQueryRepository(requester)).thenReturn(accQuery);
         when(repositoryFactory.asccpQueryRepository(requester)).thenReturn(asccpQuery);
         when(repositoryFactory.bccpQueryRepository(requester)).thenReturn(bccpQuery);
         when(repositoryFactory.ccQueryRepository(requester)).thenReturn(ccQuery);
         when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
+        when(repositoryFactory.xbtQueryRepository(requester)).thenReturn(xbtQuery);
+        when(repositoryFactory.namespaceQueryRepository(requester)).thenReturn(namespaceQuery);
+        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
+        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyQuery);
         when(repositoryFactory.seqKeyQueryRepository(requester)).thenReturn(seqKeyQuery);
         when(seqKeyQuery.getSeqKeySummaryListByFromAccManifestIds(any())).thenReturn(List.of());
         when(repositoryFactory.tagQueryRepository(requester)).thenReturn(tagQuery);
@@ -134,38 +144,55 @@ class CachedCcDocumentTest {
     }
 
     @Test
-    void aDocumentThatKeepsFindingNothingReadsTheGraphOfTheFirstComponentItLookedUp() {
+    void theFirstLookupOfAComponentReadsItsDependenciesAndTheLaterOnesFindEverythingInThem() {
         AccSummaryRecord first = acc(100, RELEASE, null);
         when(accQuery.getAccSummary(any())).thenAnswer(invocation -> {
             AccManifestId id = invocation.getArgument(0);
             return id.equals(accId(100)) ? first : acc(id.value().longValue(), RELEASE, null);
         });
-        when(ccQuery.getGraphManifestIds(CcType.ACC, accId(100))).thenReturn(new GraphManifestIds(
+        when(ccQuery.getDependencyManifestIds(CcType.ACC, accId(100))).thenReturn(new DependencyManifestIds(
                 Set.of(accId(100), accId(200)), Set.of(), Set.of(), Set.of()));
         AccSummaryRecord reached = acc(200, RELEASE, null);
-        when(accQuery.getAccSummaryListByManifestIds(any())).thenReturn(List.of(reached));
+        when(accQuery.getAccSummaryListByManifestIds(any())).thenReturn(List.of(first, reached));
         when(accQuery.getAsccSummaryListByFromAccManifestIds(any())).thenReturn(List.of());
         when(accQuery.getBccSummaryListByFromAccManifestIds(any())).thenReturn(List.of());
         when(asccpQuery.getAsccpSummaryListByManifestIds(any())).thenReturn(List.of());
         when(tagQuery.getTagSummariesByPairsOfTypeAndManifestId(any())).thenReturn(Map.of());
 
         CachedCcDocument document = document();
-        for (int i = 0; i < 15; i++) {
-            document.getAcc(accId(100 + i));
-        }
-        verify(ccQuery, never()).getGraphManifestIds(any(), any());
+        assertSame(first, document.getAcc(accId(100)));
 
-        document.getAcc(accId(115));
-
-        verify(ccQuery, times(1)).getGraphManifestIds(CcType.ACC, accId(100));
-        verify(accQuery, times(1)).getAccSummaryListByManifestIds(any());
+        verify(ccQuery, times(1)).getDependencyManifestIds(CcType.ACC, accId(100));
         assertSame(reached, document.getAcc(accId(200)));
-        verify(accQuery, never()).getAccSummary(accId(200));
+        assertSame(first, document.getAcc(accId(100)));
+        verify(accQuery, never()).getAccSummary(any());
+        verify(ccQuery, times(1)).getDependencyManifestIds(any(), any());
+    }
+
+    @Test
+    void aComponentOutsideTheDependenciesAlreadyReadGetsItsOwnButOnlyAFewTimes() {
+        when(accQuery.getAccSummary(any())).thenAnswer(invocation -> {
+            AccManifestId id = invocation.getArgument(0);
+            return acc(id.value().longValue(), RELEASE, null);
+        });
+        when(ccQuery.getDependencyManifestIds(any(), any())).thenReturn(new DependencyManifestIds(Set.of(), Set.of(), Set.of(), Set.of()));
+        when(accQuery.getAccSummaryListByManifestIds(any())).thenReturn(List.of());
+        when(accQuery.getAsccSummaryListByFromAccManifestIds(any())).thenReturn(List.of());
+        when(accQuery.getBccSummaryListByFromAccManifestIds(any())).thenReturn(List.of());
+        when(tagQuery.getTagSummariesByPairsOfTypeAndManifestId(any())).thenReturn(Map.of());
+
+        CachedCcDocument document = document();
+        for (int i = 0; i < 40; i++) {
+            document.getAcc(accId(1000 + i));
+        }
+
+        verify(ccQuery, times(new CcCacheProperties().getMaxPrefetchedDependencies())).getDependencyManifestIds(any(), any());
     }
 
     @Test
     void aTransactionThatHasWrittenReadsTheDatabaseAndCachesNothing() {
         when(repositoryFactory.ccCache()).thenReturn(CcCache.DISABLED);
+        when(repositoryFactory.ccCacheProperties()).thenReturn(new CcCacheProperties());
         CachedCcDocument uncached = new CachedCcDocument(requester, repositoryFactory, RELEASE);
         AccSummaryRecord acc5 = acc(5, RELEASE, null);
         when(accQuery.getAccSummary(accId(5))).thenReturn(acc5);
@@ -194,7 +221,7 @@ class CachedCcDocumentTest {
     }
 
     @Test
-    void prefetchingAGraphLoadsWhatItReachesOnceAndLeavesNoLookupToTheDatabase() {
+    void prefetchingTheDependenciesLoadsWhatTheyReachOnceAndLeavesNoLookupToTheDatabase() {
         ReleaseSummaryRecord release = release(RELEASE);
         AccSummaryRecord root = acc(40, RELEASE, null);
         AsccSummaryRecord ascc = mock(AsccSummaryRecord.class);
@@ -206,7 +233,7 @@ class CachedCcDocumentTest {
         when(asccp.roleOfAccManifestId()).thenReturn(accId(40));
         when(asccp.release()).thenReturn(release);
 
-        when(ccQuery.getGraphManifestIds(CcType.ACC, accId(40))).thenReturn(new GraphManifestIds(
+        when(ccQuery.getDependencyManifestIds(CcType.ACC, accId(40))).thenReturn(new DependencyManifestIds(
                 Set.of(accId(40)), Set.of(new AsccpManifestId(BigInteger.valueOf(41))), Set.of(), Set.of()));
         when(accQuery.getAccSummaryListByManifestIds(any())).thenReturn(List.of(root));
         when(accQuery.getAsccSummaryListByFromAccManifestIds(any())).thenReturn(List.of(ascc));
@@ -215,10 +242,10 @@ class CachedCcDocumentTest {
         when(tagQuery.getTagSummariesByPairsOfTypeAndManifestId(any())).thenReturn(Map.of());
 
         CachedCcDocument document = document();
-        document.prefetchGraph(CcType.ACC, accId(40));
-        document().prefetchGraph(CcType.ACC, accId(40));
+        document.prefetchDependencies(CcType.ACC, accId(40));
+        document().prefetchDependencies(CcType.ACC, accId(40));
 
-        verify(ccQuery, times(1)).getGraphManifestIds(CcType.ACC, accId(40));
+        verify(ccQuery, times(1)).getDependencyManifestIds(CcType.ACC, accId(40));
         assertSame(root, document.getAcc(accId(40)));
         assertEquals(List.of(ascc), document.getAsccListByFromAccManifestId(accId(40)));
         assertSame(asccp, document.getAsccp(new AsccpManifestId(BigInteger.valueOf(41))));

@@ -109,10 +109,10 @@ public interface CcDocument {
     }
 
     /**
-     * A hint that the graph rooted at this component is about to be walked, so that a document that loads on demand
-     * can fetch everything the graph reaches at once. Like {@link #prefetchChildren} it changes no answer.
+     * A hint that the dependencies of this component are about to be walked, so that a document that loads on demand
+     * can fetch everything it depends on at once. Like {@link #prefetchChildren} it changes no answer.
      */
-    default void prefetchGraph(CcType type, ManifestId root) {
+    default void prefetchDependencies(CcType type, ManifestId root) {
     }
 
 }

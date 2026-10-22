@@ -10,7 +10,7 @@ import java.util.Map;
  * <p>
  * It is never the source of truth. A reader takes the {@link #epoch()} once, asks for what it needs with
  * {@link #get} / {@link #getAll}, reads the rest from the database and offers it with {@link #put} / {@link #putAll}
- * under the epoch it took. {@link CcChangeFeed} forgets the entries of the records that changed, with {@link #invalidate}.
+ * under the epoch it took. {@link CcCacheWatchdog} forgets the entries of the records that changed, with {@link #invalidate}.
  * <p>
  * <b>Why the epoch.</b> A reader may read a row, the row may then change and be forgotten, and the reader may only then
  * store what it read. {@link #invalidate} therefore starts a new epoch before it forgets, and a store under an older epoch
@@ -62,7 +62,7 @@ public interface CcCache {
 
     /**
      * The current epoch: it changes every time entries are forgotten. Take it before reading the database.
-     * It is also where this cache sees a change another instance made (the feed reads the log if it has not just done so).
+     * It is also where this cache sees a change another instance made (the watchdog reads the log if it has not just done so).
      */
     long epoch();
 
@@ -86,7 +86,7 @@ public interface CcCache {
 
     /**
      * Whether the cache must not be used by the current thread: its transaction has written to that data without
-     * committing yet (neither the cache nor the database it was filled from reflects such a write), the feed that forgets
+     * committing yet (neither the cache nor the database it was filled from reflects such a write), the watchdog that forgets
      * what changed is not keeping up, or the provider is not reachable. The caller reads the database and caches nothing.
      */
     boolean isBypassed();

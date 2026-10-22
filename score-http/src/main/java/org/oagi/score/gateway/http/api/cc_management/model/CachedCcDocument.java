@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
+import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheProperties;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
@@ -54,22 +55,12 @@ import java.util.stream.Collectors;
  * <p>
  * It answers like {@link CcDocumentImpl}: a component outside the releases the document was made for (and the
  * releases they depend on) is not found. What it caches is the lookups by manifest id and the lists under a parent
- * (the associations of an ACC and their order, the supplementary components of a DT, the tags); the other lookups, the ones that scan
- * the release or look for the users of a component, are answered by a {@link CcDocumentImpl} that is built the first
- * time one of them is called.
+ * (the associations of an ACC and their order, the supplementary components of a DT, the tags) and the records that point at
+ * a component, which it asks the database for. It does not answer the two lookups that need the whole release
+ * ({@link #getAsccpList()} and {@link #getBlobContent}); {@link CacheFirstCcDocument}, which is what the factory hands out,
+ * answers them from the loaded releases.
  */
 public class CachedCcDocument implements CcDocument {
-
-    /** The most ids sent to the database in one {@code IN} list. */
-    private static final int BATCH_SIZE = 500;
-
-    /**
-     * How many components this document has had to read one by one before it reads the graph of the first of them at
-     * once: a document that walks a tree finds nothing cached the first time, and a query per component would take
-     * seconds where the graph takes a few hundred milliseconds, while one that looks up a few components has no use
-     * for a graph.
-     */
-    private static final int MISSES_BEFORE_READING_THE_GRAPH = 16;
 
     private final ScoreUser requester;
     private final RepositoryFactory repositoryFactory;
@@ -80,17 +71,21 @@ public class CachedCcDocument implements CcDocument {
     private final long epoch;
 
     /**
-     * What this document has already got from the cache or the database. A graph reads the same entries thousands of
+     * What this document has already got from the cache or the database. Reading the dependencies reads the same entries thousands of
      * times, and when the cache is not in the JVM each of those reads would be a round trip. It lives as long as the
      * document, which is as long as one operation.
      */
     private final ConcurrentMap<String, Object> memo = new ConcurrentHashMap<>();
 
     private volatile Set<ReleaseId> scope;
-    private final LoadOnce<CcDocument> eagerDocument;
 
-    private final AtomicInteger misses = new AtomicInteger();
-    private final AtomicReference<Pair<CcType, ManifestId>> firstMiss = new AtomicReference<>();
+    /** The keys of the components in the dependencies this document has prefetched: asking for one of them needs no prefetch of its own. */
+    private final Set<String> prefetchedKeys = ConcurrentHashMap.newKeySet();
+    private final AtomicInteger prefetchedDependencies = new AtomicInteger();
+    /** The most ids sent to the database in one {@code IN} list; see {@link CcCacheProperties#getBatchSize()}. */
+    private final int batchSize;
+    /** The most times the dependencies of a component are read ahead; see {@link CcCacheProperties#getMaxPrefetchedDependencies()}. */
+    private final int maxPrefetchedDependencies;
 
     public CachedCcDocument(ScoreUser requester, RepositoryFactory repositoryFactory, ReleaseId releaseId) {
         this(requester, repositoryFactory, Arrays.asList(releaseId));
@@ -102,30 +97,19 @@ public class CachedCcDocument implements CcDocument {
         this.cache = repositoryFactory.ccCache();
         this.epoch = cache.epoch();
         this.releaseIdList = new ArrayList<>(releaseIdList);
-        this.eagerDocument = new LoadOnce<>(() -> new CcDocumentImpl(requester, repositoryFactory, this.releaseIdList));
+        this.batchSize = repositoryFactory.ccCacheProperties().getBatchSize();
+        this.maxPrefetchedDependencies = repositoryFactory.ccCacheProperties().getMaxPrefetchedDependencies();
     }
 
     // ---- the cache -----------------------------------------------------------------------------------------------
 
-    private <T> T cached(String key, Supplier<T> loader) {
-        return cached(key, loader, null);
-    }
-
-    /** @param onMiss what to do when the cache has nothing under the key, before the value is read */
     @SuppressWarnings("unchecked")
-    private <T> T cached(String key, Supplier<T> loader, Runnable onMiss) {
+    private <T> T cached(String key, Supplier<T> loader) {
         boolean bypassed = cache.isBypassed();
         if (!bypassed) {
             Object hit = recall(key);
             if (hit != null) {
                 return (T) hit;
-            }
-            if (onMiss != null) {
-                onMiss.run();
-                hit = recall(key);
-                if (hit != null) {
-                    return (T) hit;
-                }
             }
         }
         T value = loader.get();
@@ -178,15 +162,23 @@ public class CachedCcDocument implements CcDocument {
         }
     }
 
-    private void noteMiss(CcType type, ManifestId manifestId) {
-        firstMiss.compareAndSet(null, Pair.of(type, manifestId));
-        if (misses.incrementAndGet() == MISSES_BEFORE_READING_THE_GRAPH) {
-            Pair<CcType, ManifestId> first = firstMiss.get();
-            try {
-                prefetchGraph(first.getLeft(), first.getRight());
-            } catch (RuntimeException e) {
-                // Only a speed-up: what could not be read now is read, or fails, where it is looked up.
-            }
+    /**
+     * Prefetches the dependencies of a component the first time the document asks for it, unless that component is among dependencies that were read
+     * already. The consumers of this document (a schema export, a BIE, the graph screen) all go on to ask for most of
+     * what the component reaches, and asking the cache for each of those one by one costs a round trip each when the cache is in
+     * Redis, and a query each when the cache is empty; the dependencies are read in a few bulk reads, or loaded in a few queries.
+     */
+    private void prefetchFor(CcType type, ManifestId manifestId, String key) {
+        if (memo.containsKey(key) || prefetchedKeys.contains(key) || cache.isBypassed()) {
+            return;
+        }
+        if (prefetchedDependencies.incrementAndGet() > maxPrefetchedDependencies) {
+            return;
+        }
+        try {
+            prefetch(type, manifestId, true);
+        } catch (RuntimeException e) {
+            // Only a speed-up: what could not be read now is read, or fails, where it is looked up.
         }
     }
 
@@ -217,10 +209,6 @@ public class CachedCcDocument implements CcDocument {
         return records.stream().filter(e -> scope().contains(releaseOf.apply(e).releaseId())).collect(Collectors.toList());
     }
 
-    private CcDocument eager() {
-        return eagerDocument.get();
-    }
-
     // ---- lookups by manifest id ----------------------------------------------------------------------------------
 
     @Override
@@ -228,9 +216,9 @@ public class CachedCcDocument implements CcDocument {
         if (accManifestId == null) {
             return null;
         }
+        prefetchFor(CcType.ACC, accManifestId, "acc:" + accManifestId.value());
         return inScope(cached("acc:" + accManifestId.value(),
-                () -> repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId),
-                () -> noteMiss(CcType.ACC, accManifestId)),
+                () -> repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId)),
                 AccSummaryRecord::release);
     }
 
@@ -259,9 +247,9 @@ public class CachedCcDocument implements CcDocument {
         if (asccpManifestId == null) {
             return null;
         }
+        prefetchFor(CcType.ASCCP, asccpManifestId, "asccp:" + asccpManifestId.value());
         return inScope(cached("asccp:" + asccpManifestId.value(),
-                () -> repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId),
-                () -> noteMiss(CcType.ASCCP, asccpManifestId)),
+                () -> repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId)),
                 AsccpSummaryRecord::release);
     }
 
@@ -270,9 +258,9 @@ public class CachedCcDocument implements CcDocument {
         if (bccpManifestId == null) {
             return null;
         }
+        prefetchFor(CcType.BCCP, bccpManifestId, "bccp:" + bccpManifestId.value());
         return inScope(cached("bccp:" + bccpManifestId.value(),
-                () -> repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId),
-                () -> noteMiss(CcType.BCCP, bccpManifestId)),
+                () -> repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId)),
                 BccpSummaryRecord::release);
     }
 
@@ -281,9 +269,9 @@ public class CachedCcDocument implements CcDocument {
         if (dtManifestId == null) {
             return null;
         }
+        prefetchFor(CcType.DT, dtManifestId, "dt:" + dtManifestId.value());
         return inScope(cached("dt:" + dtManifestId.value(),
-                () -> repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId),
-                () -> noteMiss(CcType.DT, dtManifestId)),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId)),
                 DtSummaryRecord::release);
     }
 
@@ -343,7 +331,7 @@ public class CachedCcDocument implements CcDocument {
         List<SeqKeySummaryRecord> seqKeys = cached("seq-key-from-acc:" + accManifestId.value(),
                 () -> List.copyOf(repositoryFactory.seqKeyQueryRepository(requester).getSeqKeySummaryList(accManifestId)));
 
-        // The ASCCs and BCCs of the ACC are in the cache as lists (and are read together with the graph).
+        // The ASCCs and BCCs of the ACC are in the cache as lists (and are read together with the dependencies).
         Map<AsccManifestId, AsccSummaryRecord> asccs = new HashMap<>();
         getAsccListByFromAccManifestId(accManifestId).forEach(e -> asccs.put(e.asccManifestId(), e));
         Map<BccManifestId, BccSummaryRecord> bccs = new HashMap<>();
@@ -419,78 +407,290 @@ public class CachedCcDocument implements CcDocument {
         return ids.stream().filter(type::isInstance).map(type::cast).distinct().collect(Collectors.toList());
     }
 
+    /** The components that a component depends on, not what their data types need besides (the screen showing the graph needs only the components). */
     @Override
-    public void prefetchGraph(CcType type, ManifestId root) {
+    public void prefetchDependencies(CcType type, ManifestId root) {
+        prefetch(type, root, false);
+    }
+
+    /** @param withDtRelated also what the data types need: their supplementary components, allowed primitives, namespaces, code lists... */
+    private void prefetch(CcType type, ManifestId root, boolean withDtRelated) {
         if (cache.isBypassed() || root == null) {
             return;
         }
-        String marker = "graph:" + type.name().toLowerCase(Locale.ROOT) + ":" + root.value();
-        if (!readGraph(marker)) {
+        String marker = (withDtRelated ? "dependencies-dt:" : "dependencies:") + type.name().toLowerCase(Locale.ROOT) + ":" + root.value();
+        if (!readDependencies(marker)) {
             cache.singleFlight(marker, () -> {
-                if (!readGraph(marker)) {
-                    loadGraph(type, root, marker);
+                if (!readDependencies(marker)) {
+                    loadDependencies(type, root, marker, withDtRelated);
                 }
             });
-            readGraph(marker);
+            readDependencies(marker);
         }
     }
 
-    /** Reads the whole graph that the marker stands for, in a few bulk reads. @return whether there was one */
-    private boolean readGraph(String marker) {
+    /** Reads all the dependencies that the marker stands for, in a few bulk reads. @return whether there was one */
+    private boolean readDependencies(String marker) {
         Object found = recall(marker);
-        if (!(found instanceof GraphClosure closure)) {
+        if (!(found instanceof DependencyManifestIds dependencies)) {
             return false;
         }
         List<String> keys = new ArrayList<>();
-        for (long id : closure.accs()) {
-            keys.add("acc:" + id);
-            keys.add("ascc-from-acc:" + id);
-            keys.add("bcc-from-acc:" + id);
-            keys.add("seq-key-from-acc:" + id);
-            keys.add("tags:acc:" + id);
+        for (AccManifestId id : dependencies.accs()) {
+            keys.add("acc:" + id.value());
+            keys.add("ascc-from-acc:" + id.value());
+            keys.add("bcc-from-acc:" + id.value());
+            keys.add("seq-key-from-acc:" + id.value());
+            keys.add("tags:acc:" + id.value());
+            prefetchedKeys.add("acc:" + id.value());
         }
-        for (long id : closure.asccps()) {
-            keys.add("asccp:" + id);
-            keys.add("tags:asccp:" + id);
+        for (AsccpManifestId id : dependencies.asccps()) {
+            keys.add("asccp:" + id.value());
+            keys.add("tags:asccp:" + id.value());
+            prefetchedKeys.add("asccp:" + id.value());
         }
-        for (long id : closure.bccps()) {
-            keys.add("bccp:" + id);
-            keys.add("tags:bccp:" + id);
+        for (BccpManifestId id : dependencies.bccps()) {
+            keys.add("bccp:" + id.value());
+            keys.add("tags:bccp:" + id.value());
+            prefetchedKeys.add("bccp:" + id.value());
         }
-        for (long id : closure.dts()) {
-            keys.add("dt:" + id);
-            keys.add("dt_sc-of-dt:" + id);
-            keys.add("tags:dt:" + id);
+        for (DtManifestId id : dependencies.dts()) {
+            keys.add("dt:" + id.value());
+            keys.add("dt_sc-of-dt:" + id.value());
+            keys.add("tags:dt:" + id.value());
+            if (dependencies.hasDtRelated()) {
+                keys.add("dt-awd-pri:" + id.value());
+            }
+            prefetchedKeys.add("dt:" + id.value());
         }
-        for (long id : closure.previousAccs()) {
-            keys.add("ascc-from-acc:" + id);
-            keys.add("bcc-from-acc:" + id);
+        for (AccManifestId id : dependencies.prevAccs()) {
+            keys.add("ascc-from-acc:" + id.value());
+            keys.add("bcc-from-acc:" + id.value());
         }
-        for (long id : closure.previousDts()) {
-            keys.add("dt_sc-of-dt:" + id);
+        for (DtManifestId id : dependencies.prevDts()) {
+            keys.add("dt:" + id.value());
+            keys.add("dt_sc-of-dt:" + id.value());
+            keys.add("dt-awd-pri:" + id.value());
+            prefetchedKeys.add("dt:" + id.value());
+        }
+        for (DtManifestId id : dependencies.basedDts()) {
+            keys.add("dt:" + id.value());
+            keys.add("dt_sc-of-dt:" + id.value());
+            keys.add("dt-awd-pri:" + id.value());
+            prefetchedKeys.add("dt:" + id.value());
+        }
+        for (DtScManifestId id : dependencies.dtScs()) {
+            keys.add("dt_sc:" + id.value());
+            keys.add("dt_sc-awd-pri:" + id.value());
+        }
+        for (NamespaceId id : dependencies.namespaces()) {
+            keys.add("namespace:" + id.value());
+        }
+        for (CodeListManifestId id : dependencies.codeLists()) {
+            keys.add("code-list:" + id.value());
+            keys.add("code-list-release:" + id.value());
+        }
+        for (AgencyIdListManifestId id : dependencies.agencyIdLists()) {
+            keys.add("agency-id-list:" + id.value());
+            keys.add("agency-id-list-release:" + id.value());
+        }
+        if (dependencies.hasDtRelated()) {
+            for (ReleaseId releaseId : scope()) {
+                keys.add("xbts:" + releaseId.value());
+                keys.add("dts:" + releaseId.value());
+            }
         }
         recallAll(keys);
         return true;
     }
 
-    private void loadGraph(CcType type, ManifestId root, String marker) {
-        GraphManifestIds reached = repositoryFactory.ccQueryRepository(requester).getGraphManifestIds(type, root);
-        Set<AccManifestId> previousAccs = prefetchAccChildren(List.copyOf(reached.accs()));
+    private void loadDependencies(CcType type, ManifestId root, String marker, boolean withDtRelated) {
+        DependencyManifestIds reached = repositoryFactory.ccQueryRepository(requester).getDependencyManifestIds(type, root);
+        Set<AccManifestId> prevAccs = prefetchAccChildren(List.copyOf(reached.accs()));
         prefetchAsccpChildren(List.copyOf(reached.asccps()));
         prefetchBccpChildren(List.copyOf(reached.bccps()));
-        Set<DtManifestId> previousDts = prefetchDtChildren(List.copyOf(reached.dts()));
+        Set<DtManifestId> prevDts = prefetchDtChildren(List.copyOf(reached.dts()));
         resolveTags(List.of(Pair.of(type, root)));
-        try {
-            remember(marker, new GraphClosure(
-                    ids(reached.accs()), ids(reached.asccps()), ids(reached.bccps()), ids(reached.dts()),
-                    ids(previousAccs), ids(previousDts)));
-        } catch (ArithmeticException e) {
-            // An id that does not fit a long: the graph is cached all the same, only not as a whole.
+        DependencyManifestIds dtRelated = withDtRelated ? prefetchDtRelated(reached.dts(), prevDts) : reached;
+        if (withDtRelated) {
+            // what the document will ask for besides the components: the XBTs and the data types of its releases
+            xbtIndex();
+            dtIndex();
         }
+        remember(marker, new DependencyManifestIds(
+                Set.copyOf(reached.accs()), Set.copyOf(reached.asccps()), Set.copyOf(reached.bccps()), Set.copyOf(reached.dts()),
+                Set.copyOf(prevAccs), Set.copyOf(prevDts),
+                Set.copyOf(dtRelated.dtScs()), Set.copyOf(dtRelated.basedDts()), Set.copyOf(dtRelated.namespaces()),
+                Set.copyOf(dtRelated.codeLists()), Set.copyOf(dtRelated.agencyIdLists())));
     }
 
-    private static long[] ids(Collection<? extends ManifestId> manifestIds) {
-        return manifestIds.stream().mapToLong(e -> e.value().longValueExact()).toArray();
+    /**
+     * Reads, in bulk, what the data types among the dependencies lead to: the supplementary components, the data types they are based on, the
+     * allowed primitives of both (and so the code lists and agency identification lists those refer to, with their releases) and
+     * the namespaces. These tables are small, and a schema export asks for all of it, one record at a time.
+     */
+    private DependencyManifestIds prefetchDtRelated(Collection<DtManifestId> reachedDts, Set<DtManifestId> prevDts) {
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+
+        // the data types: the ones reached, the ones they stand in for, and the ones they are based on (and so on)
+        Set<DtManifestId> all = new LinkedHashSet<>(reachedDts);
+        all.addAll(prevDts);
+        Map<DtManifestId, DtSummaryRecord> dts = new LinkedHashMap<>(resolve("dt:", all,
+                dtQuery::getDtSummaryListByManifestIds, DtSummaryRecord::dtManifestId));
+        Set<DtManifestId> basedDts = new LinkedHashSet<>();
+        Map<DtManifestId, DtSummaryRecord> pending = dts;
+        for (int depth = 0; depth < 8; depth++) {
+            Set<DtManifestId> next = pending.values().stream().map(DtSummaryRecord::basedDtManifestId)
+                    .filter(Objects::nonNull).filter(e -> !dts.containsKey(e)).collect(Collectors.toCollection(LinkedHashSet::new));
+            if (next.isEmpty()) {
+                break;
+            }
+            Map<DtManifestId, DtSummaryRecord> found = resolve("dt:", next,
+                    dtQuery::getDtSummaryListByManifestIds, DtSummaryRecord::dtManifestId);
+            resolveLists("dt_sc-of-dt:", next,
+                    dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+            basedDts.addAll(found.keySet());
+            dts.putAll(found);
+            pending = found;
+        }
+
+        // the supplementary components, each also under its own key
+        Map<DtManifestId, List<DtScSummaryRecord>> dtScLists = resolveLists("dt_sc-of-dt:", dts.keySet(),
+                dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+        Map<DtScManifestId, DtScSummaryRecord> dtScs = new LinkedHashMap<>();
+        dtScLists.values().forEach(list -> list.forEach(e -> dtScs.put(e.dtScManifestId(), e)));
+        Map<String, Object> dtScEntries = new HashMap<>();
+        dtScs.forEach((id, record) -> {
+            if (!memo.containsKey("dt_sc:" + id.value())) {
+                dtScEntries.put("dt_sc:" + id.value(), record);
+            }
+        });
+        rememberAll(dtScEntries);
+
+        // the allowed primitives
+        List<DtAwdPriSummaryRecord> awdPris = new ArrayList<>();
+        awdPriOf(dts, awdPris);
+        List<DtScAwdPriSummaryRecord> dtScAwdPris = new ArrayList<>();
+        dtScAwdPriOf(dtScs, dtScAwdPris);
+
+        // the code lists and agency identification lists they refer to, and the release of each
+        Set<CodeListManifestId> codeLists = new LinkedHashSet<>();
+        Set<AgencyIdListManifestId> agencyIdLists = new LinkedHashSet<>();
+        awdPris.forEach(e -> {
+            if (e.codeListManifestId() != null) {
+                codeLists.add(e.codeListManifestId());
+            }
+            if (e.agencyIdListManifestId() != null) {
+                agencyIdLists.add(e.agencyIdListManifestId());
+            }
+        });
+        dtScAwdPris.forEach(e -> {
+            if (e.codeListManifestId() != null) {
+                codeLists.add(e.codeListManifestId());
+            }
+            if (e.agencyIdListManifestId() != null) {
+                agencyIdLists.add(e.agencyIdListManifestId());
+            }
+        });
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+        resolve("code-list:", codeLists, codeListQuery::getCodeListSummaryListByManifestIds, CodeListSummaryRecord::codeListManifestId);
+        resolveReleases("code-list-release:", codeLists, codeListQuery::getCodeListReleaseIds);
+        var agencyQuery = repositoryFactory.agencyIdListQueryRepository(requester);
+        resolve("agency-id-list:", agencyIdLists, agencyQuery::getAgencyIdListSummaryListByManifestIds, AgencyIdListSummaryRecord::agencyIdListManifestId);
+        resolveReleases("agency-id-list-release:", agencyIdLists, agencyQuery::getAgencyIdListReleaseIds);
+
+        // the namespaces: a few, all of them
+        List<NamespaceSummaryRecord> namespaces = repositoryFactory.namespaceQueryRepository(requester).getNamespaceSummaryList();
+        Map<String, Object> namespaceEntries = new HashMap<>();
+        namespaces.forEach(e -> namespaceEntries.put("namespace:" + e.namespaceId().value(), e));
+        rememberAll(namespaceEntries);
+
+        return new DependencyManifestIds(Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
+                Set.copyOf(dtScs.keySet()),
+                Set.copyOf(basedDts),
+                namespaces.stream().map(NamespaceSummaryRecord::namespaceId).collect(Collectors.toUnmodifiableSet()),
+                Set.copyOf(codeLists),
+                Set.copyOf(agencyIdLists));
+    }
+
+    /** The allowed primitives of each data type, read like {@link #resolveLists}; they are added to {@code collected}. */
+    @SuppressWarnings("unchecked")
+    private void awdPriOf(Map<DtManifestId, DtSummaryRecord> dts, List<DtAwdPriSummaryRecord> collected) {
+        Map<String, Object> hits = recallAll(dts.keySet().stream().map(e -> "dt-awd-pri:" + e.value()).collect(Collectors.toList()));
+        List<DtSummaryRecord> missing = new ArrayList<>();
+        dts.forEach((id, dt) -> {
+            Object hit = hits.get("dt-awd-pri:" + id.value());
+            if (hit != null) {
+                collected.addAll((List<DtAwdPriSummaryRecord>) hit);
+            } else {
+                missing.add(dt);
+            }
+        });
+        if (missing.isEmpty()) {
+            return;
+        }
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        Map<Pair<ReleaseId, org.oagi.score.gateway.http.api.cc_management.model.dt.DtId>, List<DtAwdPriSummaryRecord>> byDt = new HashMap<>();
+        for (List<org.oagi.score.gateway.http.api.cc_management.model.dt.DtId> batch :
+                partition(missing.stream().map(DtSummaryRecord::dtId).distinct().collect(Collectors.toList()))) {
+            for (DtAwdPriSummaryRecord record : dtQuery.getDtAwdPriSummaryListByDtIds(batch)) {
+                byDt.computeIfAbsent(Pair.of(record.releaseId(), record.dtId()), k -> new ArrayList<>()).add(record);
+            }
+        }
+        Map<String, Object> remembered = new HashMap<>();
+        for (DtSummaryRecord dt : missing) {
+            // the loaded releases list them by id
+            List<DtAwdPriSummaryRecord> list = byDt.getOrDefault(Pair.of(dt.release().releaseId(), dt.dtId()), Collections.emptyList()).stream()
+                    .sorted(Comparator.comparing(e -> e.dtAwdPriId().value())).collect(Collectors.toUnmodifiableList());
+            remembered.put("dt-awd-pri:" + dt.dtManifestId().value(), list);
+            collected.addAll(list);
+        }
+        rememberAll(remembered);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void dtScAwdPriOf(Map<DtScManifestId, DtScSummaryRecord> dtScs, List<DtScAwdPriSummaryRecord> collected) {
+        Map<String, Object> hits = recallAll(dtScs.keySet().stream().map(e -> "dt_sc-awd-pri:" + e.value()).collect(Collectors.toList()));
+        List<DtScSummaryRecord> missing = new ArrayList<>();
+        dtScs.forEach((id, dtSc) -> {
+            Object hit = hits.get("dt_sc-awd-pri:" + id.value());
+            if (hit != null) {
+                collected.addAll((List<DtScAwdPriSummaryRecord>) hit);
+            } else {
+                missing.add(dtSc);
+            }
+        });
+        if (missing.isEmpty()) {
+            return;
+        }
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        Map<Pair<ReleaseId, org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId>, List<DtScAwdPriSummaryRecord>> byDtSc = new HashMap<>();
+        for (List<org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId> batch :
+                partition(missing.stream().map(DtScSummaryRecord::dtScId).distinct().collect(Collectors.toList()))) {
+            for (DtScAwdPriSummaryRecord record : dtQuery.getDtScAwdPriSummaryListByDtScIds(batch)) {
+                byDtSc.computeIfAbsent(Pair.of(record.releaseId(), record.dtScId()), k -> new ArrayList<>()).add(record);
+            }
+        }
+        Map<String, Object> remembered = new HashMap<>();
+        for (DtScSummaryRecord dtSc : missing) {
+            List<DtScAwdPriSummaryRecord> list = byDtSc.getOrDefault(Pair.of(dtSc.release().releaseId(), dtSc.dtScId()), Collections.emptyList()).stream()
+                    .sorted(Comparator.comparing(e -> e.dtScAwdPriId().value())).collect(Collectors.toUnmodifiableList());
+            remembered.put("dt_sc-awd-pri:" + dtSc.dtScManifestId().value(), list);
+            collected.addAll(list);
+        }
+        rememberAll(remembered);
+    }
+
+    /** The release of each manifest: the cached ones read together, the missing ones read in batches (and cached). */
+    private <I extends ManifestId> void resolveReleases(String prefix, Collection<I> ids,
+                                                       Function<List<I>, Map<I, ReleaseId>> loader) {
+        Map<String, Object> hits = recallAll(ids.stream().map(e -> prefix + e.value()).collect(Collectors.toList()));
+        List<I> missing = ids.stream().filter(e -> !hits.containsKey(prefix + e.value())).collect(Collectors.toList());
+        for (List<I> batch : partition(missing)) {
+            Map<String, Object> remembered = new HashMap<>();
+            loader.apply(batch).forEach((id, releaseId) -> remembered.put(prefix + id.value(), releaseId));
+            rememberAll(remembered);
+        }
     }
 
     /** @return the components the ACCs without associations stand in for */
@@ -673,44 +873,105 @@ public class CachedCcDocument implements CcDocument {
         return "tags:" + pair.getLeft().name().toLowerCase(Locale.ROOT) + ":" + pair.getRight().value();
     }
 
-    private static <T> List<List<T>> partition(List<T> list) {
+    private <T> List<List<T>> partition(List<T> list) {
         List<List<T>> batches = new ArrayList<>();
-        for (int i = 0; i < list.size(); i += BATCH_SIZE) {
-            batches.add(list.subList(i, Math.min(i + BATCH_SIZE, list.size())));
+        for (int i = 0; i < list.size(); i += batchSize) {
+            batches.add(list.subList(i, Math.min(i + batchSize, list.size())));
         }
         return batches;
     }
 
     // ---- everything else: answered by the document that loads the releases ---------------------------------------
 
+    // ---- the XBTs of the releases in scope: a list per release, which is what they are cached as -----------------------
+
+    private volatile Map<XbtManifestId, XbtSummaryRecord> xbtIndex;
+    private volatile Map<String, List<XbtSummaryRecord>> xbtIndexByName;
+
+    private void indexXbts() {
+        Map<XbtManifestId, XbtSummaryRecord> byId = new HashMap<>();
+        Map<String, List<XbtSummaryRecord>> byName = new HashMap<>();
+        var xbtQuery = repositoryFactory.xbtQueryRepository(requester);
+        for (ReleaseId releaseId : scope().stream().sorted(Comparator.comparing(e -> e.value())).collect(Collectors.toList())) {
+            List<XbtSummaryRecord> xbts = cached("xbts:" + releaseId.value(), () -> List.copyOf(xbtQuery.getXbtSummaryList(releaseId)));
+            for (XbtSummaryRecord xbt : xbts) {
+                byId.put(xbt.xbtManifestId(), xbt);
+                byName.computeIfAbsent(xbt.name(), k -> new ArrayList<>()).add(xbt);
+            }
+        }
+        xbtIndexByName = byName;
+        xbtIndex = byId;
+    }
+
+    private Map<XbtManifestId, XbtSummaryRecord> xbtIndex() {
+        if (xbtIndex == null) {
+            indexXbts();
+        }
+        return xbtIndex;
+    }
+
+    private volatile Map<DtManifestId, DtSummaryRecord> dtIndex;
+
+    /** The data types of the releases in scope: a list per release, which is what they are cached as. */
+    private Map<DtManifestId, DtSummaryRecord> dtIndex() {
+        Map<DtManifestId, DtSummaryRecord> index = dtIndex;
+        if (index == null) {
+            index = new HashMap<>();
+            var dtQuery = repositoryFactory.dtQueryRepository(requester);
+            for (ReleaseId releaseId : scope().stream().sorted(Comparator.comparing(e -> e.value())).collect(Collectors.toList())) {
+                for (DtSummaryRecord dt : cached("dts:" + releaseId.value(), () -> List.copyOf(dtQuery.getDtSummaryList(releaseId)))) {
+                    index.put(dt.dtManifestId(), dt);
+                }
+            }
+            dtIndex = index;
+        }
+        return index;
+    }
+
+    private Map<String, List<XbtSummaryRecord>> xbtIndexByName() {
+        xbtIndex();
+        return xbtIndexByName;
+    }
+
     @Override
     public Collection<AsccpSummaryRecord> getAsccpList() {
-        return eager().getAsccpList();
+        throw new UnsupportedOperationException("The list of every ASCCP of the releases is answered from the loaded releases, by CacheFirstCcDocument.");
     }
 
     @Override
     public List<DtSummaryRecord> getDtList() {
-        return eager().getDtList();
+        return new ArrayList<>(dtIndex().values());
     }
 
     @Override
     public List<DtAwdPriSummaryRecord> getDtAwdPriList(DtManifestId dtManifestId) {
-        return eager().getDtAwdPriList(dtManifestId);
+        if (dtManifestId == null || getDt(dtManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return cached("dt-awd-pri:" + dtManifestId.value(),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtAwdPriSummaryList(dtManifestId).stream()
+                        // the query has no order of its own; the loaded releases list them by id
+                        .sorted(Comparator.comparing(e -> e.dtAwdPriId().value())).collect(Collectors.toUnmodifiableList()));
     }
 
     @Override
     public List<DtScAwdPriSummaryRecord> getDtScAwdPriList(DtScManifestId dtScManifestId) {
-        return eager().getDtScAwdPriList(dtScManifestId);
+        if (dtScManifestId == null || getDtSc(dtScManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return cached("dt_sc-awd-pri:" + dtScManifestId.value(),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtScAwdPriSummaryList(dtScManifestId).stream()
+                        .sorted(Comparator.comparing(e -> e.dtScAwdPriId().value())).collect(Collectors.toUnmodifiableList()));
     }
 
     @Override
     public XbtSummaryRecord getXbt(XbtManifestId xbtManifestId) {
-        return eager().getXbt(xbtManifestId);
+        return xbtIndex().get(xbtManifestId);
     }
 
     @Override
     public List<XbtSummaryRecord> getXbtListByName(String name) {
-        return eager().getXbtListByName(name);
+        return xbtIndexByName().getOrDefault(name, Collections.emptyList());
     }
 
     @Override
@@ -745,22 +1006,43 @@ public class CachedCcDocument implements CcDocument {
 
     @Override
     public NamespaceSummaryRecord getNamespace(NamespaceId namespaceId) {
-        return eager().getNamespace(namespaceId);
+        if (namespaceId == null) {
+            return null;
+        }
+        return cached("namespace:" + namespaceId.value(),
+                () -> repositoryFactory.namespaceQueryRepository(requester).getNamespaceSummary(namespaceId));
     }
 
     @Override
     public CodeListSummaryRecord getCodeList(CodeListManifestId codeListManifestId) {
-        return eager().getCodeList(codeListManifestId);
+        if (codeListManifestId == null) {
+            return null;
+        }
+        var query = repositoryFactory.codeListQueryRepository(requester);
+        // the record carries no release; the release of a manifest never changes
+        ReleaseId releaseId = cached("code-list-release:" + codeListManifestId.value(), () -> query.getCodeListReleaseId(codeListManifestId));
+        if (releaseId == null || !scope().contains(releaseId)) {
+            return null;
+        }
+        return cached("code-list:" + codeListManifestId.value(), () -> query.getCodeListSummary(codeListManifestId));
     }
 
     @Override
     public AgencyIdListSummaryRecord getAgencyIdList(AgencyIdListManifestId agencyIdListManifestId) {
-        return eager().getAgencyIdList(agencyIdListManifestId);
+        if (agencyIdListManifestId == null) {
+            return null;
+        }
+        var query = repositoryFactory.agencyIdListQueryRepository(requester);
+        ReleaseId releaseId = cached("agency-id-list-release:" + agencyIdListManifestId.value(), () -> query.getAgencyIdListReleaseId(agencyIdListManifestId));
+        if (releaseId == null || !scope().contains(releaseId)) {
+            return null;
+        }
+        return cached("agency-id-list:" + agencyIdListManifestId.value(), () -> query.getAgencyIdListSummary(agencyIdListManifestId));
     }
 
     @Override
     public BlobContentSummaryRecord getBlobContent(BlobContentManifestId blobContentManifestId) {
-        return eager().getBlobContent(blobContentManifestId);
+        throw new UnsupportedOperationException("A blob is answered from the loaded releases, by CacheFirstCcDocument.");
     }
 
 }

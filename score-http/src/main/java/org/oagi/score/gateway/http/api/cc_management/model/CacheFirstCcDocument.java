@@ -37,23 +37,24 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A {@link CcDocument} that delegates to a {@link CachedCcDocument} and, when that one cannot answer or is not the
- * right one for the question, to a document that has the releases loaded ({@link CcDocumentImpl}).
+ * A {@link CcDocument} that answers from the cache first: it asks a {@link CachedCcDocument} and, when that one cannot
+ * answer or is not the right one for the question, a document that has the releases loaded ({@link CcDocumentImpl}).
  * <p>
  * It switches to the loaded document in two cases, and stays with it from then on, so what one document answers
  * always comes from one place afterwards:
  * <ul>
  *   <li>a lookup of the cached document fails (the database, the cache provider, anything unexpected): the same
  *   lookup is answered by the loaded document, which throws what it throws if it cannot answer either;</li>
- *   <li>a lookup that scans the release or looks for the users of a component is called: those are what the loaded
- *   document is made for, and it answers everything after them from memory instead of one query at a time.</li>
+ *   <li>a lookup that scans the release or looks for the users of a component is called, or one of the few lookups the
+ *   cache does not hold (blobs): those are what the loaded document is made for, and
+ *   it answers everything after them from memory instead of one query at a time.</li>
  * </ul>
  * The prefetch hints only speed the cached document up, so a hint that fails is ignored.
  * It may be shared by the threads of one request.
  */
-public class DelegatingCcDocument implements CcDocument {
+public class CacheFirstCcDocument implements CcDocument {
 
-    private static final Logger logger = LoggerFactory.getLogger(DelegatingCcDocument.class);
+    private static final Logger logger = LoggerFactory.getLogger(CacheFirstCcDocument.class);
 
     private final CcDocument cached;
     private final LoadOnce<CcDocument> loaded;
@@ -64,10 +65,15 @@ public class DelegatingCcDocument implements CcDocument {
      * @param cached the document that answers until it cannot
      * @param loader loads the releases, the way they are always loaded, the first time the loaded document is needed
      */
-    public DelegatingCcDocument(CcDocument cached, Supplier<CcDocument> loader) {
+    public CacheFirstCcDocument(CcDocument cached, Supplier<CcDocument> loader) {
         this.cached = cached;
         this.loaded = new LoadOnce<>(loader);
         this.current = cached;
+    }
+
+    /** Whether this document has gone over to the loaded releases (and stays there); for measuring and for metrics. */
+    public boolean isLoaded() {
+        return current != cached;
     }
 
     private CcDocument switchToLoaded() {
@@ -191,27 +197,27 @@ public class DelegatingCcDocument implements CcDocument {
 
     @Override
     public List<DtSummaryRecord> getDtList() {
-        return scan(CcDocument::getDtList);
+        return lookup(CcDocument::getDtList);
     }
 
     @Override
     public List<DtAwdPriSummaryRecord> getDtAwdPriList(DtManifestId dtManifestId) {
-        return scan(d -> d.getDtAwdPriList(dtManifestId));
+        return lookup(d -> d.getDtAwdPriList(dtManifestId));
     }
 
     @Override
     public List<DtScAwdPriSummaryRecord> getDtScAwdPriList(DtScManifestId dtScManifestId) {
-        return scan(d -> d.getDtScAwdPriList(dtScManifestId));
+        return lookup(d -> d.getDtScAwdPriList(dtScManifestId));
     }
 
     @Override
     public XbtSummaryRecord getXbt(XbtManifestId xbtManifestId) {
-        return scan(d -> d.getXbt(xbtManifestId));
+        return lookup(d -> d.getXbt(xbtManifestId));
     }
 
     @Override
     public List<XbtSummaryRecord> getXbtListByName(String name) {
-        return scan(d -> d.getXbtListByName(name));
+        return lookup(d -> d.getXbtListByName(name));
     }
 
     @Override
@@ -246,17 +252,17 @@ public class DelegatingCcDocument implements CcDocument {
 
     @Override
     public NamespaceSummaryRecord getNamespace(NamespaceId namespaceId) {
-        return scan(d -> d.getNamespace(namespaceId));
+        return lookup(d -> d.getNamespace(namespaceId));
     }
 
     @Override
     public CodeListSummaryRecord getCodeList(CodeListManifestId codeListManifestId) {
-        return scan(d -> d.getCodeList(codeListManifestId));
+        return lookup(d -> d.getCodeList(codeListManifestId));
     }
 
     @Override
     public AgencyIdListSummaryRecord getAgencyIdList(AgencyIdListManifestId agencyIdListManifestId) {
-        return scan(d -> d.getAgencyIdList(agencyIdListManifestId));
+        return lookup(d -> d.getAgencyIdList(agencyIdListManifestId));
     }
 
     @Override
@@ -278,10 +284,10 @@ public class DelegatingCcDocument implements CcDocument {
     }
 
     @Override
-    public void prefetchGraph(CcType type, ManifestId root) {
+    public void prefetchDependencies(CcType type, ManifestId root) {
         if (current == cached) {
             try {
-                cached.prefetchGraph(type, root);
+                cached.prefetchDependencies(type, root);
             } catch (RuntimeException e) {
                 logger.debug("A prefetch of the cached CC document failed and is ignored.", e);
             }

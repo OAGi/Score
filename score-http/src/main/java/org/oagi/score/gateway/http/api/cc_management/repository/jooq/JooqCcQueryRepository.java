@@ -12,7 +12,7 @@ import org.oagi.score.gateway.http.api.cc_management.controller.payload.CcChange
 import org.oagi.score.gateway.http.api.cc_management.model.CcListEntryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
-import org.oagi.score.gateway.http.api.cc_management.model.GraphManifestIds;
+import org.oagi.score.gateway.http.api.cc_management.model.DependencyManifestIds;
 import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
@@ -1736,7 +1736,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     + ") select kind, id from reach";
 
     @Override
-    public GraphManifestIds getGraphManifestIds(CcType type, ManifestId root) {
+    public DependencyManifestIds getDependencyManifestIds(CcType type, ManifestId root) {
         int kind = switch (type) {
             case ACC -> GRAPH_ACC;
             case ASCCP -> GRAPH_ASCCP;
@@ -1759,7 +1759,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 default -> throw new IllegalStateException();
             }
         });
-        return new GraphManifestIds(accs, asccps, bccps, dts);
+        return new DependencyManifestIds(accs, asccps, bccps, dts);
     }
 
     @Override

@@ -10,8 +10,8 @@ import java.util.Collection;
 
 /**
  * Where the code that needs a {@link CcDocument} gets one: the document of the releases it asks for, answering from
- * the shared cache and delegating to the loaded releases ({@link CcDocumentImpl}) where the cache cannot answer
- * ({@link DelegatingCcDocument}).
+ * the shared cache and falling back to the loaded releases ({@link CcDocumentImpl}) where the cache cannot answer
+ * ({@link CacheFirstCcDocument}).
  * <p>
  * Without a cache (a {@link RepositoryFactory} made outside Spring) there is nothing to answer from, so the releases
  * are loaded at once, as they always were.
@@ -32,7 +32,7 @@ public class CcDocumentFactory {
         if (repositoryFactory.ccCache() == CcCache.DISABLED) {
             return new CcDocumentImpl(requester, repositoryFactory, releaseIds);
         }
-        return new DelegatingCcDocument(new CachedCcDocument(requester, repositoryFactory, releaseIds),
+        return new CacheFirstCcDocument(new CachedCcDocument(requester, repositoryFactory, releaseIds),
                 () -> new CcDocumentImpl(requester, repositoryFactory, releaseIds));
     }
 

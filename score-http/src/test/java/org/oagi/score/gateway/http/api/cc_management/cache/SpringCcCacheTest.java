@@ -111,7 +111,7 @@ class SpringCcCacheTest {
         java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
         java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(4);
         try {
-            java.util.concurrent.Future<?> leader = pool.submit(() -> cache.singleFlight("graph:acc:1", () -> {
+            java.util.concurrent.Future<?> leader = pool.submit(() -> cache.singleFlight("dependencies:acc:1", () -> {
                 runs.incrementAndGet();
                 started.countDown();
                 try {
@@ -125,7 +125,7 @@ class SpringCcCacheTest {
             java.util.List<java.util.concurrent.Future<Object>> waiters = new java.util.ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 waiters.add(pool.submit(() -> {
-                    cache.singleFlight("graph:acc:1", runs::incrementAndGet);
+                    cache.singleFlight("dependencies:acc:1", runs::incrementAndGet);
                     return cache.get("acc:1");
                 }));
             }
@@ -138,7 +138,7 @@ class SpringCcCacheTest {
             }
             assertEquals(1, runs.get());
 
-            cache.singleFlight("graph:acc:1", runs::incrementAndGet);
+            cache.singleFlight("dependencies:acc:1", runs::incrementAndGet);
             assertEquals(2, runs.get(), "a later request runs it again");
         } finally {
             pool.shutdownNow();

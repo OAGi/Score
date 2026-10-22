@@ -10,7 +10,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CcChangeFeedTest {
+class CcCacheWatchdogTest {
 
     /** A change log that is a list the test adds to, with the rows that are not yet visible kept apart. */
     private static final class FakeLog implements CcChangeLogRepository {
@@ -41,6 +41,13 @@ class CcChangeFeedTest {
         @Override
         public int purgeOlderThan(java.time.Duration age, int limit) {
             return 0;
+        }
+
+        final Map<CcChangeKind, List<RecordRef>> showing = new HashMap<>();
+
+        @Override
+        public List<RecordRef> recordsShowing(CcChangeKind kind, Collection<Long> manifestIds) {
+            return showing.getOrDefault(kind, List.of());
         }
 
         @Override
@@ -90,7 +97,7 @@ class CcChangeFeedTest {
     }
     private final CcCacheStatus status = new CcCacheStatus();
     private final SpringCcCache cache = new SpringCcCache(new ConcurrentMapCacheManager(), status);
-    private final CcChangeFeed feed = new CcChangeFeed(factory(log), cache, status);
+    private final CcCacheWatchdog watchdog = new CcCacheWatchdog(factory(log), cache, status);
 
     private void fill(String... keys) {
         Map<String, Object> values = new HashMap<>();
@@ -107,10 +114,10 @@ class CcChangeFeedTest {
     @Test
     void aChangedRecordIsForgottenWithWhatIsListedUnderItAndNothingElse() {
         fill("acc:1", "acc:2", "ascc:7", "ascc-from-acc:1", "seq-key-from-acc:1", "ascc-from-acc:2", "tags:acc:1");
-        feed.poll();
+        watchdog.poll();
 
         log.visible.add(change(1, CcChangeKind.ASCC, 7, 1L));
-        feed.poll();
+        watchdog.poll();
 
         assertNull(cache.get("ascc:7"));
         assertNull(cache.get("ascc-from-acc:1"), "the list of the ACC it belongs to");
@@ -124,10 +131,10 @@ class CcChangeFeedTest {
     @Test
     void anAccChangeForgetsItsOwnListsAndTagsToo() {
         fill("acc:1", "tags:acc:1", "ascc-from-acc:1", "bcc-from-acc:1", "seq-key-from-acc:1", "acc:2");
-        feed.poll();
+        watchdog.poll();
 
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
-        feed.poll();
+        watchdog.poll();
 
         for (String key : List.of("acc:1", "tags:acc:1", "ascc-from-acc:1", "bcc-from-acc:1", "seq-key-from-acc:1")) {
             assertNull(cache.get(key), key);
@@ -139,19 +146,19 @@ class CcChangeFeedTest {
     void aRowThatBecomesVisibleLateIsStillForgotten() {
         fill("acc:1", "acc:2", "acc:3");
         log.visible.add(change(10, CcChangeKind.ACC, 3, null));
-        feed.poll();   // starts after row 10
+        watchdog.poll();   // starts after row 10
 
         // 12 commits before 11, as the transaction that wrote 11 is longer
         log.visible.add(change(12, CcChangeKind.ACC, 2, null));
-        feed.poll();
+        watchdog.poll();
         assertNull(cache.get("acc:2"));
         assertEquals("acc:1", cache.get("acc:1"));
 
         log.visible.add(change(11, CcChangeKind.ACC, 1, null));
-        feed.catchUp();
+        watchdog.catchUp();
         long deadline = System.nanoTime() + 5_000_000_000L;
         while (cache.get("acc:1") != null && System.nanoTime() < deadline) {
-            feed.poll();    // the gap is looked at again after a delay
+            watchdog.poll();    // the gap is looked at again after a delay
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -167,8 +174,8 @@ class CcChangeFeedTest {
         status.bind(null);   // so that filling the cache does not read the log
         fill("acc:1");
 
-        feed.poll();   // the first read starts after row 5 but looks back
-        feed.poll();
+        watchdog.poll();   // the first read starts after row 5 but looks back
+        watchdog.poll();
 
         assertNull(cache.get("acc:1"));
     }
@@ -178,10 +185,10 @@ class CcChangeFeedTest {
         log.releases.put(9L, List.of(new RecordRef(CcChangeKind.ACC, 1, null), new RecordRef(CcChangeKind.ASCC, 2, 1L),
                 new RecordRef(CcChangeKind.DT_SC, 3, 4L)));
         fill("acc:1", "ascc:2", "dt_sc:3", "dt_sc-of-dt:4", "acc:77");
-        feed.poll();
+        watchdog.poll();
 
         log.visible.add(change(1, CcChangeKind.RELEASE, 9, null));
-        feed.poll();
+        watchdog.poll();
 
         for (String key : List.of("acc:1", "ascc:2", "dt_sc:3", "dt_sc-of-dt:4")) {
             assertNull(cache.get(key), key);
@@ -193,10 +200,10 @@ class CcChangeFeedTest {
     void aChangeOfTheDependenciesOfReleasesForgetsTheirScopes() {
         log.releaseIds.addAll(List.of(1L, 2L));
         fill("scope:1", "scope:2", "acc:1");
-        feed.poll();
+        watchdog.poll();
 
         log.visible.add(change(1, CcChangeKind.RELEASE_DEP, 2, null));
-        feed.poll();
+        watchdog.poll();
 
         assertNull(cache.get("scope:1"));
         assertNull(cache.get("scope:2"));
@@ -206,18 +213,18 @@ class CcChangeFeedTest {
     @Test
     void theCacheIsUsedOnlyWhileTheLogCanBeRead() {
         log.failing = true;
-        feed.poll();
+        watchdog.poll();
         assertTrue(cache.isBypassed(), "without the change log nothing would be forgotten");
 
         log.failing = false;
-        feed.poll();
+        watchdog.poll();
         assertFalse(cache.isBypassed());
     }
 
     @Test
     void aForgettingThatFailsIsTriedAgainWithTheSameRows() {
         fill("acc:1");
-        feed.poll();
+        watchdog.poll();
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
         CcCache flaky = new CcCache() {
             int calls;
@@ -266,7 +273,7 @@ class CcChangeFeedTest {
             }
         };
         CcCacheStatus status2 = new CcCacheStatus();
-        CcChangeFeed feed2 = new CcChangeFeed(factory(log), flaky, status2);
+        CcCacheWatchdog feed2 = new CcCacheWatchdog(factory(log), flaky, status2);
         feed2.poll();                       // starts after row 1 and looks back at it: the first forgetting fails
         assertEquals("acc:1", cache.get("acc:1"));
         feed2.poll();                       // and is tried again
@@ -328,7 +335,7 @@ class CcChangeFeedTest {
     void aRowIsForgottenOnceNoMatterHowOftenTheLogIsRead() {
         Counting counting = new Counting(cache);
         CcCacheStatus status2 = new CcCacheStatus();
-        CcChangeFeed counted = new CcChangeFeed(factory(log), counting, status2);
+        CcCacheWatchdog counted = new CcCacheWatchdog(factory(log), counting, status2);
         status2.bind(null);
         counted.poll();                                           // starts: nothing in the log
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
@@ -364,20 +371,20 @@ class CcChangeFeedTest {
 
     @Test
     void theRowsAreKeptLongerThanTheFeedLooksForARowThatComesLate() {
-        assertTrue(CcChangeFeed.RETENTION.toNanos() > CcChangeFeed.GAP_LIFETIME_NANOS,
-                "a row that is deleted before the feed stops looking for it could be missed");
+        assertTrue(CcCacheWatchdog.RETENTION.toNanos() > CcCacheWatchdog.GAP_LIFETIME_NANOS,
+                "a row that is deleted before the watchdog stops looking for it could be missed");
     }
 
     @Test
     void numbersThatGoBackAreReadFromTheNewEnd() {
         fill("acc:1", "acc:2");
         log.visible.add(change(5000, CcChangeKind.ACC, 9, null));
-        feed.poll();                       // the cursor is at 5000
+        watchdog.poll();                       // the cursor is at 5000
 
         log.visible.clear();               // the table was emptied and its numbers start again
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
         log.visible.add(change(2, CcChangeKind.ACC, 2, null));
-        feed.poll();
+        watchdog.poll();
 
         assertNull(cache.get("acc:1"), "a change with a number below the old cursor is not missed");
         assertNull(cache.get("acc:2"));
@@ -385,20 +392,20 @@ class CcChangeFeedTest {
 
         log.visible.add(change(3, CcChangeKind.ACC, 3, null));
         fill("acc:3");
-        feed.poll();
+        watchdog.poll();
         assertNull(cache.get("acc:3"), "and the next one is read as usual");
     }
 
     @Test
     void anEmptiedTableIsReadFromItsNewEnd() {
         log.visible.add(change(100, CcChangeKind.ACC, 9, null));
-        feed.poll();
+        watchdog.poll();
         log.visible.clear();
-        feed.poll();
+        watchdog.poll();
         fill("acc:1");
 
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
-        feed.poll();
+        watchdog.poll();
 
         assertNull(cache.get("acc:1"));
     }
@@ -407,41 +414,94 @@ class CcChangeFeedTest {
     void anEmptyLogPutsTheCursorBackSoThatNumbersFromOneAreRead() {
         fill("acc:1");
         log.visible.add(change(5000, CcChangeKind.ACC, 9, null));
-        feed.poll();                       // the cursor is at 5000
+        watchdog.poll();                       // the cursor is at 5000
         log.visible.clear();               // the old rows were deleted
-        feed.poll();                       // the feed sees the empty log
+        watchdog.poll();                       // the watchdog sees the empty log
 
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));    // and the numbers start again
         log.visible.add(change(2, CcChangeKind.ACC, 2, null));
-        feed.poll();
+        watchdog.poll();
 
         assertNull(cache.get("acc:1"));
-        assertEquals(0, log.restarts, "the feed does not restart the numbers itself, only the housekeeping does");
+        assertEquals(0, log.restarts, "the watchdog does not restart the numbers itself, only the housekeeping does");
     }
 
     @Test
     void theNumbersAreRestartedOnlyAfterTheLogHasStayedEmptyForAWhile() {
-        feed.restartAfterEmptyNanos = 5_000_000_000L;
-        feed.poll();                       // empty: seen now
-        feed.purge();
+        watchdog.restartAfterEmptyNanos = 5_000_000_000L;
+        watchdog.poll();                       // empty: seen now
+        watchdog.purge();
         assertEquals(0, log.restarts, "not yet");
 
-        feed.restartAfterEmptyNanos = 0;
-        feed.purge();
+        watchdog.restartAfterEmptyNanos = 0;
+        watchdog.purge();
         assertEquals(1, log.restarts, "empty for long enough");
 
         log.visible.add(change(1, CcChangeKind.ACC, 1, null));
-        feed.poll();                       // a row: the log is not empty any more
-        feed.purge();
+        watchdog.poll();                       // a row: the log is not empty any more
+        watchdog.purge();
         assertEquals(1, log.restarts, "never while there are rows (the numbers would go back under the cursors)");
     }
 
     @Test
     void aLogThatWasNeverSeenEmptyIsNeverRestarted() {
         log.visible.add(change(7, CcChangeKind.ACC, 1, null));
-        feed.restartAfterEmptyNanos = 0;
-        feed.poll();
-        feed.purge();
+        watchdog.restartAfterEmptyNanos = 0;
+        watchdog.poll();
+        watchdog.purge();
         assertEquals(0, log.restarts);
+    }
+
+    @Test
+    void anXbtForgetsItsReleaseListAndThePrimitivesThatShowItsName() {
+        log.showing.put(CcChangeKind.XBT, List.of(new RecordRef(CcChangeKind.DT, 5, null), new RecordRef(CcChangeKind.DT_SC, 6, 5L)));
+        fill("xbts:9", "xbts:10", "dt-awd-pri:5", "dt_sc-awd-pri:6", "dt-awd-pri:7", "dt:5");
+        watchdog.poll();
+
+        log.visible.add(new CcChange(1, CcChangeKind.XBT, 77, null, 9L));
+        watchdog.poll();
+
+        assertNull(cache.get("xbts:9"));
+        assertNull(cache.get("dt-awd-pri:5"));
+        assertNull(cache.get("dt_sc-awd-pri:6"));
+        assertNull(cache.get("dt:5"), "the data type itself goes with it");
+        assertEquals("xbts:10", cache.get("xbts:10"), "the XBTs of another release");
+        assertEquals("dt-awd-pri:7", cache.get("dt-awd-pri:7"), "a data type that does not use the XBT");
+    }
+
+    @Test
+    void aNamespaceAndTheAllowedPrimitivesOfADataTypeAreForgotten() {
+        fill("namespace:3", "namespace:4", "dt-awd-pri:8", "dt_sc-awd-pri:9", "dt_sc-of-dt:8");
+        watchdog.poll();
+
+        log.visible.add(change(1, CcChangeKind.NAMESPACE, 3, null));
+        log.visible.add(change(2, CcChangeKind.DT, 8, null));
+        log.visible.add(change(3, CcChangeKind.DT_SC, 9, 8L));
+        watchdog.poll();
+
+        assertNull(cache.get("namespace:3"));
+        assertEquals("namespace:4", cache.get("namespace:4"));
+        assertNull(cache.get("dt-awd-pri:8"));
+        assertNull(cache.get("dt_sc-awd-pri:9"));
+    }
+
+    @Test
+    void aCodeListAndAnAgencyIdListAreForgottenAndSoAreThePrimitivesThatShowTheirNames() {
+        log.showing.put(CcChangeKind.CODE_LIST, List.of(new RecordRef(CcChangeKind.DT, 5, null)));
+        log.showing.put(CcChangeKind.AGENCY_ID_LIST, List.of(new RecordRef(CcChangeKind.DT_SC, 6, 5L)));
+        fill("code-list:1", "code-list:2", "agency-id-list:3", "agency-id-list:4", "dt-awd-pri:5", "dt_sc-awd-pri:6", "dt-awd-pri:7");
+        watchdog.poll();
+
+        log.visible.add(change(1, CcChangeKind.CODE_LIST, 1, null));
+        log.visible.add(change(2, CcChangeKind.AGENCY_ID_LIST, 3, null));
+        watchdog.poll();
+
+        assertNull(cache.get("code-list:1"));
+        assertNull(cache.get("agency-id-list:3"));
+        assertNull(cache.get("dt-awd-pri:5"));
+        assertNull(cache.get("dt_sc-awd-pri:6"));
+        assertEquals("code-list:2", cache.get("code-list:2"));
+        assertEquals("agency-id-list:4", cache.get("agency-id-list:4"));
+        assertEquals("dt-awd-pri:7", cache.get("dt-awd-pri:7"));
     }
 }

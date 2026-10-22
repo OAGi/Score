@@ -23,7 +23,7 @@ class CcDocumentFactoryTest {
         CcDocument document = new CcDocumentFactory(repositoryFactory)
                 .create(mock(ScoreUser.class), new ReleaseId(BigInteger.ONE));
 
-        assertInstanceOf(DelegatingCcDocument.class, document);
+        assertInstanceOf(CacheFirstCcDocument.class, document);
     }
 
 }

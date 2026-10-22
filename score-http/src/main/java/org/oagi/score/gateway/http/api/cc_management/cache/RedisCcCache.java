@@ -25,7 +25,7 @@ import java.util.*;
  * which the commands that take several keys need. The version of the application is part of the key, so a deployment starts
  * from an empty cache.
  * <p>
- * <b>Forgetting.</b> {@link CcChangeFeed} names the keys of the records that changed. An epoch counter in Redis changes
+ * <b>Forgetting.</b> {@link CcCacheWatchdog} names the keys of the records that changed. An epoch counter in Redis changes
  * first and the keys are removed after, and a store is a script that stores only if the epoch is still the one the reader
  * took: so what a reader read before a change can never be put back after the entry was forgotten, on any instance.
  * The entries of everything that did not change stay.
@@ -35,7 +35,7 @@ import java.util.*;
  * <p>
  * <b>Failure.</b> Redis that does not answer is a miss, never an error; for a few seconds afterwards the cache is
  * bypassed altogether, so that a dead Redis does not add its time-out to every lookup. Forgetting is the exception: it
- * fails, so that the feed tries again.
+ * fails, so that the watchdog tries again.
  * <p>
  * The cache shares its Redis with whatever else uses it (the sessions): it never scans or flushes it, it only counts
  * epochs and gives every entry an expiry. When Redis is flushed the epoch starts again from the clock, not from zero.

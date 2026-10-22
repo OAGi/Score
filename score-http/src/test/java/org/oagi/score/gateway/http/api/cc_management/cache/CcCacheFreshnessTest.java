@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Changes the data of the development database for real, the way the application does, and checks that a cached document
- * answers what an eager one does afterwards: that the triggers write the change log, the feed reads it, and the cache forgets
+ * answers what an eager one does afterwards: that the triggers write the change log, the watchdog reads it, and the cache forgets
  * what changed and no more. Everything it changes it changes back.
  * <pre>
  *   mvn test -Dtest=CcCacheFreshnessTest -Dscore.freshness=true
@@ -56,12 +56,12 @@ class CcCacheFreshnessTest {
     private ConcurrentMapCacheManager springCaches;
     private org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory redis;
     private String redisPrefix;
-    private CcChangeFeed feed;
+    private CcCacheWatchdog watchdog;
     private RepositoryFactory repositoryFactory;
 
     private ReleaseId release;
     private AccManifestId accManifest;
-    private long accId, asccId, bccId, asccpId, bccpId, dtId, ownerId, libraryId, releaseId;
+    private long accId, asccId, bccId, asccpId, bccpId, dtId, ownerId, libraryId, releaseId, namespaceId, dtManifestId, dtAwdPriId, xbtId, codeListManifestId, agencyIdListManifestId;
 
     @BeforeAll
     static void connect() {
@@ -93,8 +93,8 @@ class CcCacheFreshnessTest {
             springCaches = new ConcurrentMapCacheManager();
             cache = new SpringCcCache(springCaches, status);
         }
-        feed = new CcChangeFeed(new RepositoryFactory(dsl), cache, status);
-        feed.poll();
+        watchdog = new CcCacheWatchdog(new RepositoryFactory(dsl), cache, status);
+        watchdog.poll();
         assertTrue(status.isReady(), "the change log must be readable: is the migration applied?");
 
         repositoryFactory = new RepositoryFactory(dsl);
@@ -126,6 +126,23 @@ class CcCacheFreshnessTest {
                 join dt_manifest d on d.dt_manifest_id = p.bdt_manifest_id
                 where b.from_acc_manifest_id = ? order by 1 limit 1""", acc).get(0, Long.class);
         ownerId = dsl.fetchOne("select owner_user_id from acc where acc_id = ?", accId).get(0, Long.class);
+        namespaceId = dsl.fetchOne("select namespace_id from acc where acc_id = ?", accId).get(0, Long.class);
+        dtManifestId = dsl.fetchOne("""
+                select d.dt_manifest_id from bcc_manifest b join bccp_manifest p on p.bccp_manifest_id = b.to_bccp_manifest_id
+                join dt_manifest d on d.dt_manifest_id = p.bdt_manifest_id
+                where b.from_acc_manifest_id = ? order by 1 limit 1""", acc).get(0, Long.class);
+        Record awd = dsl.fetchOne("""
+                select p.dt_awd_pri_id, x.xbt_id from dt_awd_pri p join dt_manifest d on d.dt_id = p.dt_id and d.release_id = p.release_id
+                join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id
+                where d.dt_manifest_id = ? order by 1 limit 1""", dtManifestId);
+        codeListManifestId = dsl.fetchOne("""
+                select min(m.code_list_manifest_id) from code_list_manifest m where m.release_id = ?
+                and exists (select 1 from code_list_value_manifest v where v.code_list_manifest_id = m.code_list_manifest_id)""", releaseId).get(0, Long.class);
+        agencyIdListManifestId = dsl.fetchOne("""
+                select min(m.agency_id_list_manifest_id) from agency_id_list_manifest m where m.release_id = ?
+                and exists (select 1 from agency_id_list_value_manifest v where v.agency_id_list_manifest_id = m.agency_id_list_manifest_id)""", releaseId).get(0, Long.class);
+        dtAwdPriId = awd.get(0, Long.class);
+        xbtId = awd.get(1, Long.class);
     }
 
     @org.junit.jupiter.api.AfterEach
@@ -170,7 +187,7 @@ class CcCacheFreshnessTest {
     }
 
     /** The keys under which a record and what is listed under it are cached. */
-    private static Set<String> keysOf(String table, long id, Long parent) {
+    private Set<String> keysOf(String table, long id, Long parent) {
         Set<String> keys = new TreeSet<>();
         switch (table) {
             case "acc" -> keys.addAll(Set.of("acc:" + id, "tags:acc:" + id, "ascc-from-acc:" + id, "bcc-from-acc:" + id, "seq-key-from-acc:" + id));
@@ -184,9 +201,17 @@ class CcCacheFreshnessTest {
             }
             case "asccp" -> keys.addAll(Set.of("asccp:" + id, "tags:asccp:" + id));
             case "bccp" -> keys.addAll(Set.of("bccp:" + id, "tags:bccp:" + id));
-            case "dt" -> keys.addAll(Set.of("dt:" + id, "tags:dt:" + id, "dt_sc-of-dt:" + id));
+            case "dt" -> {
+                keys.addAll(Set.of("dt:" + id, "tags:dt:" + id, "dt_sc-of-dt:" + id, "dt-awd-pri:" + id));
+                // the data types of the release are cached as a list
+                Record release = dsl.fetchOne("select release_id from dt_manifest where dt_manifest_id = ?", id);
+                if (release != null) {
+                    keys.add("dts:" + release.get(0, Long.class));
+                }
+            }
             case "dt_sc" -> {
                 keys.add("dt_sc:" + id);
+                keys.add("dt_sc-awd-pri:" + id);
                 if (parent != null) {
                     keys.add("dt_sc-of-dt:" + parent);
                 }
@@ -208,6 +233,17 @@ class CcCacheFreshnessTest {
                 keys.addAll(keysOf(table, r.get(0, Long.class), r.get(1, Long.class)));
             }
         }
+        // the XBTs are cached as a list per release
+        for (Record r : dsl.fetch("select distinct m.release_id from xbt_manifest m " + fragment.apply("xbt"), bindings)) {
+            keys.add("xbts:" + r.get(0, Long.class));
+        }
+        // the code lists and the agency identification lists are cached one by one
+        for (Record r : dsl.fetch("select m.code_list_manifest_id from code_list_manifest m " + fragment.apply("code_list"), bindings)) {
+            keys.add("code-list:" + r.get(0, Long.class));
+        }
+        for (Record r : dsl.fetch("select m.agency_id_list_manifest_id from agency_id_list_manifest m " + fragment.apply("agency_id_list"), bindings)) {
+            keys.add("agency-id-list:" + r.get(0, Long.class));
+        }
         return keys;
     }
 
@@ -217,6 +253,9 @@ class CcCacheFreshnessTest {
         Map<String, Object> out = new LinkedHashMap<>();
         AccSummaryRecord acc = document.getAcc(accManifest);
         out.put("acc", acc);
+        out.put("namespace", document.getNamespace(acc.namespaceId()));
+        out.put("code list", document.getCodeList(new org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId(BigInteger.valueOf(codeListManifestId))));
+        out.put("agency id list", document.getAgencyIdList(new org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId(BigInteger.valueOf(agencyIdListManifestId))));
         out.put("tags", document.getTagListByAccManifestId(accManifest));
         List<AsccSummaryRecord> asccs = document.getAsccListByFromAccManifestId(accManifest);
         List<BccSummaryRecord> bccs = document.getBccListByFromAccManifestId(accManifest);
@@ -236,6 +275,16 @@ class CcCacheFreshnessTest {
                 out.put("dt " + bccp.dtManifestId().value(), dt);
                 out.put("dt tags " + bccp.dtManifestId().value(), document.getTagListByDtManifestId(bccp.dtManifestId()));
                 out.put("dt_sc " + bccp.dtManifestId().value(), document.getDtScList(bccp.dtManifestId()));
+                var awdPri = document.getDtAwdPriList(bccp.dtManifestId());
+                out.put("dt awd pri " + bccp.dtManifestId().value(), awdPri);
+                for (var a : awdPri) {
+                    if (a.xbtManifestId() != null) {
+                        out.put("xbt " + a.xbtManifestId().value(), document.getXbt(a.xbtManifestId()));
+                    }
+                }
+                for (var sc : document.getDtScList(bccp.dtManifestId())) {
+                    out.put("dt_sc awd pri " + sc.dtScManifestId().value(), document.getDtScAwdPriList(sc.dtScManifestId()));
+                }
             }
         }
         return JSON.writeValueAsString(out);
@@ -252,7 +301,7 @@ class CcCacheFreshnessTest {
     // ---- a change, and back ----------------------------------------------------------------------------------------
 
     /**
-     * Fills the cache, makes the change, lets the feed read, and checks the cached document against an eager one; then the same
+     * Fills the cache, makes the change, lets the watchdog read, and checks the cached document against an eager one; then the same
      * for the change undone.
      *
      * @param visible whether the answers must differ from before (the change is in a field the records carry)
@@ -268,12 +317,12 @@ class CcCacheFreshnessTest {
 
         dsl.execute(change, bindings);
         try {
-            feed.catchUp();
+            watchdog.catchUp();
             Set<String> cachedAfter = cachedKeys();
             Set<String> forgotten = new TreeSet<>(cachedBefore);
             forgotten.removeAll(cachedAfter);
             assertEquals(expectedForgotten, forgotten, what + ": the keys that were forgotten");
-            assertTrue(cachedBefore.containsAll(cachedAfter), what + ": nothing was added by the feed");
+            assertTrue(cachedBefore.containsAll(cachedAfter), what + ": nothing was added by the watchdog");
 
             String eager = eagerAnswers();
             assertEquals(eager, cachedAnswers(), what + ": after the change");
@@ -283,7 +332,7 @@ class CcCacheFreshnessTest {
         } finally {
             dsl.execute(undo, bindings);
         }
-        feed.catchUp();
+        watchdog.catchUp();
         assertEquals(before, cachedAnswers(), what + ": after the change was undone");
         assertEquals(eagerAnswers(), cachedAnswers(), what + ": after the change was undone, as eager");
     }
@@ -316,6 +365,101 @@ class CcCacheFreshnessTest {
     }
 
     @Test
+    void aChangeOfANamespaceOfAnXbtOrOfTheAllowedPrimitivesIsSeenAtOnce() throws Exception {
+        check("namespace", true, Set.of("namespace:" + namespaceId), "update namespace set uri = concat(uri, 'x') where namespace_id = ?",
+                "update namespace set uri = left(uri, char_length(uri) - 1) where namespace_id = ?", namespaceId);
+
+        Set<String> dtKeys = new TreeSet<>(manifestKeys("dt", "dt_id", dsl.fetchOne("select dt_id from dt_manifest where dt_manifest_id = ?", dtManifestId).get(0, Long.class)));
+        dtKeys.removeIf(k -> !k.startsWith("dt-awd-pri:") && !k.startsWith("dts:") && !k.startsWith("dt:") && !k.startsWith("tags:dt:") && !k.startsWith("dt_sc-of-dt:"));
+        check("dt_awd_pri", true, dtKeys, "update dt_awd_pri set is_default = 1 - is_default where dt_awd_pri_id = ?",
+                "update dt_awd_pri set is_default = 1 - is_default where dt_awd_pri_id = ?", dtAwdPriId);
+
+        // an XBT: the list of its release and the data types (and their supplementary components) whose primitives show its name
+        Set<String> xbtKeys = new TreeSet<>();
+        for (Record r : dsl.fetch("select release_id from xbt_manifest where xbt_id = ?", xbtId)) {
+            xbtKeys.add("xbts:" + r.get(0, Long.class));
+        }
+        for (Record r : dsl.fetch("""
+                select distinct d.dt_manifest_id from dt_awd_pri p join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id
+                join dt_manifest d on d.dt_id = p.dt_id and d.release_id = p.release_id where x.xbt_id = ?""", xbtId)) {
+            xbtKeys.addAll(keysOf("dt", r.get(0, Long.class), null));
+            xbtKeys.add("dt-awd-pri:" + r.get(0, Long.class));
+        }
+        xbtKeys.removeIf(k -> k.startsWith("dts:"));
+        for (Record r : dsl.fetch("""
+                select distinct m.dt_sc_manifest_id, m.owner_dt_manifest_id from dt_sc_awd_pri p join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id
+                join dt_sc_manifest m on m.dt_sc_id = p.dt_sc_id and m.release_id = p.release_id where x.xbt_id = ?""", xbtId)) {
+            xbtKeys.addAll(keysOf("dt_sc", r.get(0, Long.class), r.get(1, Long.class)));
+            xbtKeys.add("dt_sc-awd-pri:" + r.get(0, Long.class));
+        }
+        check("xbt", true, xbtKeys, "update xbt set name = concat(name, 'x') where xbt_id = ?",
+                "update xbt set name = left(name, char_length(name) - 1) where xbt_id = ?", xbtId);
+    }
+
+    /** The data types (and supplementary components) whose allowed primitives refer to these manifests, and their primitives' keys. */
+    private Set<String> primitivesShowing(String column, Collection<Long> manifestIds) {
+        Set<String> keys = new TreeSet<>();
+        String in = manifestIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+        for (Record r : dsl.fetch("select distinct d.dt_manifest_id from dt_awd_pri p join dt_manifest d on d.dt_id = p.dt_id and d.release_id = p.release_id"
+                + " where p." + column + " in (" + in + ")")) {
+            keys.addAll(keysOf("dt", r.get(0, Long.class), null));
+        }
+        keys.removeIf(k -> k.startsWith("dts:"));   // what a change of a name reaches through the primitives is not the list of the release
+        for (Record r : dsl.fetch("select distinct m.dt_sc_manifest_id, m.owner_dt_manifest_id from dt_sc_awd_pri p join dt_sc_manifest m on m.dt_sc_id = p.dt_sc_id"
+                + " and m.release_id = p.release_id where p." + column + " in (" + in + ")")) {
+            keys.addAll(keysOf("dt_sc", r.get(0, Long.class), r.get(1, Long.class)));
+        }
+        return keys;
+    }
+
+    @Test
+    void aChangeOfACodeListOrAnAgencyIdListAndOfTheirValuesIsSeenAtOnce() throws Exception {
+        // the code list: its name
+        long codeListId = dsl.fetchOne("select code_list_id from code_list_manifest where code_list_manifest_id = ?", codeListManifestId).get(0, Long.class);
+        List<Long> listManifests = dsl.fetch("select code_list_manifest_id from code_list_manifest where code_list_id = ?", codeListId).getValues(0, Long.class);
+        Set<String> keys = new TreeSet<>(primitivesShowing("code_list_manifest_id", listManifests));
+        for (Long m : listManifests) {
+            keys.add("code-list:" + m);
+        }
+        check("code list", true, keys, "update code_list set name = concat(name, 'x') where code_list_id = ?",
+                "update code_list set name = left(name, char_length(name) - 1) where code_list_id = ?", codeListId);
+
+        // one of its values
+        long valueId = dsl.fetchOne("select code_list_value_id from code_list_value_manifest where code_list_manifest_id = ? order by 1 limit 1", codeListManifestId).get(0, Long.class);
+        listManifests = dsl.fetch("select m.code_list_manifest_id from code_list_value_manifest vm join code_list_manifest m on m.code_list_manifest_id = vm.code_list_manifest_id"
+                + " where vm.code_list_value_id = ?", valueId).getValues(0, Long.class);
+        keys = new TreeSet<>(primitivesShowing("code_list_manifest_id", listManifests));
+        for (Long m : listManifests) {
+            keys.add("code-list:" + m);
+        }
+        check("code list value", true, keys, "update code_list_value set value = concat(value, 'x') where code_list_value_id = ?",
+                "update code_list_value set value = left(value, char_length(value) - 1) where code_list_value_id = ?", valueId);
+
+        // the agency identification list: its name
+        long agencyId = dsl.fetchOne("select agency_id_list_id from agency_id_list_manifest where agency_id_list_manifest_id = ?", agencyIdListManifestId).get(0, Long.class);
+        List<Long> agencyManifests = dsl.fetch("select agency_id_list_manifest_id from agency_id_list_manifest where agency_id_list_id = ?", agencyId).getValues(0, Long.class);
+        keys = new TreeSet<>(primitivesShowing("agency_id_list_manifest_id", agencyManifests));
+        for (Long m : agencyManifests) {
+            keys.add("agency-id-list:" + m);
+        }
+        check("agency id list", true, keys, "update agency_id_list set name = concat(name, 'x') where agency_id_list_id = ?",
+                "update agency_id_list set name = left(name, char_length(name) - 1) where agency_id_list_id = ?", agencyId);
+
+        // one of its values
+        long agencyValueId = dsl.fetchOne("select agency_id_list_value_id from agency_id_list_value_manifest where agency_id_list_manifest_id = ? order by 1 limit 1", agencyIdListManifestId).get(0, Long.class);
+        agencyManifests = dsl.fetch("select m.agency_id_list_manifest_id from agency_id_list_manifest m where m.agency_id_list_manifest_id in"
+                + " (select vm.agency_id_list_manifest_id from agency_id_list_value_manifest vm where vm.agency_id_list_value_id = ?)"
+                + " or m.agency_id_list_value_manifest_id in (select vm.agency_id_list_value_manifest_id from agency_id_list_value_manifest vm where vm.agency_id_list_value_id = ?)",
+                agencyValueId, agencyValueId).getValues(0, Long.class);
+        keys = new TreeSet<>(primitivesShowing("agency_id_list_manifest_id", agencyManifests));
+        for (Long m : agencyManifests) {
+            keys.add("agency-id-list:" + m);
+        }
+        check("agency id list value", true, keys, "update agency_id_list_value set name = concat(name, 'x') where agency_id_list_value_id = ?",
+                "update agency_id_list_value set name = left(name, char_length(name) - 1) where agency_id_list_value_id = ?", agencyValueId);
+    }
+
+    @Test
     void aChangeOfWhatTheRecordsAreJoinedWithIsSeenAtOnce() throws Exception {
         check("owner", true, keysWhere(t -> "join `" + t + "` b on b." + t + "_id = m." + t + "_id where b.owner_user_id = " + ownerId
                 + " or b.created_by = " + ownerId + " or b.last_updated_by = " + ownerId), "update app_user set is_developer = 1 - is_developer where app_user_id = ?",
@@ -344,7 +488,7 @@ class CcCacheFreshnessTest {
         assertNotNull(cache.get("acc:" + accManifest.value()), "the ACC is cached");
 
         dsl.execute("update acc_manifest set den = den where acc_manifest_id = ?", other);
-        feed.catchUp();
+        watchdog.catchUp();
 
         assertNotNull(cache.get("acc:" + accManifest.value()), "a change of another record does not empty the cache");
         assertEquals(before, cachedAnswers());
@@ -362,7 +506,7 @@ class CcCacheFreshnessTest {
             }
             // a later transaction commits first
             dsl.execute("update acc_manifest set den = den where acc_manifest_id = ?", other);
-            feed.catchUp();
+            watchdog.catchUp();
             assertNotNull(cache.get("acc:" + acc), "the change of the open transaction is not visible yet");
 
             slow.commit();
@@ -371,13 +515,13 @@ class CcCacheFreshnessTest {
                 while (cache.get("acc:" + acc) != null || !cachedAnswers().equals(eagerAnswers())) {
                     assertTrue(System.nanoTime() < deadline, "the change that became visible late was missed");
                     Thread.sleep(200);
-                    feed.catchUp();
+                    watchdog.catchUp();
                 }
             } finally {
                 dsl.execute("update acc_manifest set den = left(den, char_length(den) - 1) where acc_manifest_id = ?", acc);
             }
         }
-        feed.catchUp();
+        watchdog.catchUp();
         assertEquals(before, cachedAnswers());
     }
 }

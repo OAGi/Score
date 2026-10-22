@@ -3,7 +3,7 @@ package org.oagi.score.gateway.http.api.cc_management.repository;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.CcChangesResponse;
 import org.oagi.score.gateway.http.api.cc_management.model.CcListEntryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
-import org.oagi.score.gateway.http.api.cc_management.model.GraphManifestIds;
+import org.oagi.score.gateway.http.api.cc_management.model.DependencyManifestIds;
 import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.repository.criteria.CcListFilterCriteria;
@@ -31,10 +31,10 @@ public interface CcQueryRepository {
     Collection<CcChangesResponse.CcChange> getCcChanges(ReleaseId releaseId);
 
     /**
-     * The components a graph rooted at the given ACC, ASCCP, BCCP or DT reaches, found in one query.
-     * It follows the manifests as they are, so it may reach more than a graph does (which stops at the releases it
+     * The components that the given ACC, ASCCP, BCCP or DT depends on, found in one query.
+     * It follows the manifests as they are, so it may find more than the graph does (which stops at the releases it
      * is made for and, for a developer, at the user extension groups); never less.
      */
-    GraphManifestIds getGraphManifestIds(CcType type, ManifestId root);
+    DependencyManifestIds getDependencyManifestIds(CcType type, ManifestId root);
 
 }
