@@ -13,7 +13,7 @@ SET @OLD_SQL_NOTES = @@SQL_NOTES;
 SET SQL_NOTES = 0;
 
 -- ------------------------------------------------------------------
--- Passkey (WebAuthn) sign-in
+-- Passkey (WebAuthn) sign-in (#1815)
 -- ------------------------------------------------------------------
 --
 -- Passkeys let a local account sign in with a fingerprint, face or screen lock instead of a password.
@@ -73,17 +73,28 @@ CREATE TABLE `webauthn_credential`
   ROW_FORMAT = DYNAMIC COMMENT ='Registered passkeys (WebAuthn credentials) of local accounts.';
 
 -- ------------------------------------------------------------------
--- Query optimization: default primitive lookup indexes
+-- Query optimization: default primitive lookup indexes (#1821)
 -- ------------------------------------------------------------------
+--
+-- The default value domain lookup of a data type (and of a supplementary component) filters by the data type, the release and
+-- `is_default`. The new indexes serve it with one row read instead of every award primitive of the data type in all releases.
+--
+-- Their first column is the column of the foreign key, so they also enforce that foreign key, and the single-column indexes
+-- (`dt_awd_pri_dt_id_fk`, `dt_sc_awd_pri_dt_sc_id_fk`) that were created for it are redundant and dropped. The foreign key
+-- constraints stay. The new index is added first, because a foreign key always needs an index on its column.
 
 ALTER TABLE `dt_awd_pri`
-    ADD INDEX `dt_awd_pri_dt_id_release_id_is_default_idx` (`dt_id`, `release_id`, `is_default`);
+    ADD INDEX IF NOT EXISTS `dt_awd_pri_dt_id_release_id_is_default_idx` (`dt_id`, `release_id`, `is_default`);
+ALTER TABLE `dt_awd_pri`
+    DROP INDEX IF EXISTS `dt_awd_pri_dt_id_fk`;
 
 ALTER TABLE `dt_sc_awd_pri`
-    ADD INDEX `dt_sc_awd_pri_dt_sc_id_release_id_is_default_idx` (`dt_sc_id`, `release_id`, `is_default`);
+    ADD INDEX IF NOT EXISTS `dt_sc_awd_pri_dt_sc_id_release_id_is_default_idx` (`dt_sc_id`, `release_id`, `is_default`);
+ALTER TABLE `dt_sc_awd_pri`
+    DROP INDEX IF EXISTS `dt_sc_awd_pri_dt_sc_id_fk`;
 
 -- ------------------------------------------------------------------
--- Query optimization: faster `levenshtein` function
+-- Query optimization: faster `levenshtein` function (#1820)
 -- ------------------------------------------------------------------
 
 -- `levenshtein` scores the fuzzy search of the CC list (the `score` column is computed for every matching row), and
@@ -201,7 +212,7 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
     collation_connection = @OLD_COLLATION_CONNECTION_LEVENSHTEIN;
 
 -- ------------------------------------------------------------------
--- cc_change_log: what changed in the data core component records are made of
+-- cc_change_log: what changed in the data core component records are made of (#1818)
 -- ------------------------------------------------------------------
 --
 -- The cache of core component records (see CcCacheWatchdog in score-http) must forget a record when the data it was made of
