@@ -182,6 +182,9 @@ public class CachedCcDocument implements CcDocument {
         }
     }
 
+    /** The ACCs of the scope that are the base of another ACC; read when first asked. */
+    private volatile Set<AccManifestId> basedAccManifestIds;
+
     /** The releases this document answers for: the given ones and everything they depend on. */
     private Set<ReleaseId> scope() {
         Set<ReleaseId> scope = this.scope;
@@ -1005,6 +1008,21 @@ public class CachedCcDocument implements CcDocument {
             return Collections.emptyList();
         }
         return repositoryFactory.accQueryRepository(requester).getAccSummaryListByBasedAccManifestIds(List.of(basedAccManifestId));
+    }
+
+    @Override
+    public boolean hasAccByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        if (basedAccManifestId == null) {
+            return false;
+        }
+        // The ACCs of the releases the document answers for that are the base of another one, read once: the answer for a
+        // component of another release is false, as its derived ACCs are of that release.
+        Set<AccManifestId> based = this.basedAccManifestIds;
+        if (based == null) {
+            based = repositoryFactory.accQueryRepository(requester).getBasedAccManifestIds(scope());
+            this.basedAccManifestIds = based;
+        }
+        return based.contains(basedAccManifestId);
     }
 
     @Override

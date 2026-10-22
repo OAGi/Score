@@ -227,6 +227,11 @@ public class CacheFirstCcDocument implements CcDocument {
     }
 
     @Override
+    public boolean hasAccByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        return lookup(d -> d.hasAccByBasedAccManifestId(basedAccManifestId));
+    }
+
+    @Override
     public Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
         return lookup(d -> d.getAccListByBasedAccManifestIds(basedAccManifestIds));
     }

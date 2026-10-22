@@ -211,6 +211,19 @@ class CachedCcDocumentTest {
     }
 
     @Test
+    void whetherAnAccIsTheBaseOfAnotherIsReadOnceForAllOfThem() {
+        when(accQuery.getBasedAccManifestIds(any())).thenReturn(Set.of(accId(10), accId(11)));
+
+        CachedCcDocument document = document();
+        assertEquals(true, document.hasAccByBasedAccManifestId(accId(10)));
+        assertEquals(true, document.hasAccByBasedAccManifestId(accId(11)));
+        assertEquals(false, document.hasAccByBasedAccManifestId(accId(12)));
+        assertEquals(false, document.hasAccByBasedAccManifestId(null));
+        verify(accQuery, times(1)).getBasedAccManifestIds(any());
+        verify(accQuery, never()).getAccSummaryListByBasedAccManifestIds(any());
+    }
+
+    @Test
     void aComponentOutsideTheDependenciesAlreadyReadGetsItsOwnButOnlyAFewTimes() {
         when(accQuery.getAccSummary(any())).thenAnswer(invocation -> {
             AccManifestId id = invocation.getArgument(0);

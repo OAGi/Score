@@ -278,6 +278,20 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
     }
 
     @Override
+    public Set<AccManifestId> getBasedAccManifestIds(Collection<ReleaseId> releaseIdList) {
+        if (releaseIdList == null || releaseIdList.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return dslContext().selectDistinct(ACC_MANIFEST.BASED_ACC_MANIFEST_ID)
+                .from(ACC_MANIFEST)
+                .where(and(
+                        ACC_MANIFEST.RELEASE_ID.in(valueOf(releaseIdList)),
+                        ACC_MANIFEST.BASED_ACC_MANIFEST_ID.isNotNull()))
+                .fetch(r -> new AccManifestId(r.get(ACC_MANIFEST.BASED_ACC_MANIFEST_ID).toBigInteger()))
+                .stream().collect(Collectors.toSet());
+    }
+
+    @Override
     public List<AccSummaryRecord> getAccSummaryListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
         if (basedAccManifestIds == null || basedAccManifestIds.isEmpty()) {
             return Collections.emptyList();

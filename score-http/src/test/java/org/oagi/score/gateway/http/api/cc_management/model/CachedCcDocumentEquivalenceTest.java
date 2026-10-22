@@ -263,6 +263,9 @@ class CachedCcDocumentEquivalenceTest {
         check("getAccListByBasedAccManifestIds", in.accs().size() + " components", eager, cached,
                 d -> d.getAccListByBasedAccManifestIds(in.accs()));
         for (AccManifestId id : in.accs()) {
+            check("hasAccByBasedAccManifestId", id, eager, cached, d -> d.hasAccByBasedAccManifestId(id));
+        }
+        for (AccManifestId id : in.accs()) {
             check("getAsccpListByRoleOfAccManifestId", id, eager, cached, d -> d.getAsccpListByRoleOfAccManifestId(id));
             check("getAsccListByFromAccManifestId", id, eager, cached, d -> d.getAsccListByFromAccManifestId(id));
             check("getBccListByFromAccManifestId", id, eager, cached, d -> d.getBccListByFromAccManifestId(id));

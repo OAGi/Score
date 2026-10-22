@@ -68,6 +68,11 @@ public interface CcDocument {
 
     List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId);
 
+    /** Whether any ACC has the given ACC as its base; a document that knows it without the ACCs overrides this. */
+    default boolean hasAccByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        return !getAccListByBasedAccManifestId(basedAccManifestId).isEmpty();
+    }
+
     /**
      * The ACCs that have each of the given ACCs as their base, by base. A document that can answer many at once
      * (one read for all of them) overrides this; the default asks one by one.

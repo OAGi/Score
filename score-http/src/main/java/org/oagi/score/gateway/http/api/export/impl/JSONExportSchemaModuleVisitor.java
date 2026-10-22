@@ -296,7 +296,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
             addAssociation(builder, association);
         }
 
-        boolean extendable = !ccDocument.getAccListByBasedAccManifestId(acc.accManifestId()).isEmpty();
+        boolean extendable = ccDocument.hasAccByBasedAccManifestId(acc.accManifestId());
         LinkedHashMap<String, Object> schema = new LinkedHashMap<>();
         List<Object> allOf = new ArrayList<>();
         if (acc.getBasedACC() != null) {

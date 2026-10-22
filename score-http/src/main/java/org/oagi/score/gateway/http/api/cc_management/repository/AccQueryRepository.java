@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface AccQueryRepository {
 
@@ -30,6 +31,9 @@ public interface AccQueryRepository {
     List<AccSummaryRecord> getAccSummaryListByManifestIds(Collection<AccManifestId> accManifestIdList);
 
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList);
+
+    /** The ACCs of the given releases that are the base of another ACC. */
+    Set<AccManifestId> getBasedAccManifestIds(Collection<ReleaseId> releaseIdList);
 
     /** The ACCs that have any of the given ACCs as their base, in the order of their manifest ids. */
     List<AccSummaryRecord> getAccSummaryListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds);
