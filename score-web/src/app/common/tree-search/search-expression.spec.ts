@@ -13,8 +13,8 @@ describe('parseSearchExpression', () => {
   it('reads an expression without a predicate as plain names, as it always was', () => {
     const parsed = parseSearchExpression('/Sender/Release ID');
     expect(parsed.rooted).toBe(true);
-    expect(parsed.steps.map(s => s.text)).toEqual(['Sender', 'Release ID']);
-    expect(parseSearchExpression('ReleaseID').steps[0].text).toBe('Release ID');
+    expect(parsed.steps.map(s => s.tests[0].token)).toEqual(['Sender', 'Release ID']);
+    expect(parseSearchExpression('ReleaseID').steps[0].tests[0].token).toBe('Release ID');
   });
 
   it('does not cut a step at a / inside a predicate', () => {
@@ -70,5 +70,15 @@ describe('search predicates', () => {
     expect(matches('Sender/Code[used]', sender, {name: 'Code', used: true})).toBe(true);
     expect(matches('Sender[used]/Code', sender, {name: 'Code', used: true})).toBe(false);
     expect(matches('Sender[used = false]/Code', sender, {name: 'Code', used: true})).toBe(true);
+  });
+
+  it('read a bare word after a comparison as text, and attributes with underscores', () => {
+    const node = {name: 'Extension', type: 'ACC', component_type: 'Extension', entity_type: 'Attribute'};
+    expect(matches('*[type=ACC and component_type=Extension]', node)).toBe(true);
+    expect(matches('*[type=ACC and component_type=Base]', node)).toBe(false);
+    expect(matches('*[entity_type = \'Attribute\']', node)).toBe(true);
+    expect(matches('*[entity_type = attribute]', node)).toBe(true);
+    expect(matches('*[entity_type != Element]', node)).toBe(true);
+    expect(matches('*[used = false]', {name: 'A', used: false})).toBe(true);
   });
 });

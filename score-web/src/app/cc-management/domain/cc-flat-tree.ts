@@ -1,3 +1,6 @@
+import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {AttrValue} from '../../common/tree-search/search-expression';
+import {COMPONENT_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
@@ -1000,8 +1003,8 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     };
 
     const plain = (node: T): number => {
-      const {index, created} = builder.record(keyOf(node), [this.plainName(node)], keyOf(node),
-        {name: this.plainName(node), type: node.type});
+      const {index, created} = builder.record(keyOf(node), [this.plainName(node)], this.identityKey(node),
+        ccSearchAttributes(node, this.plainName(node)));
       if (created) {
         representatives.push(node);
       }
@@ -1023,7 +1026,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
       if (node.name === this.plainName(node) && sameChildren) {
         return {record: plainIndex, clone: false};
       }
-      const {index} = builder.record('@' + (cloneCount++), [node.name], key, {name: node.name, type: node.type});
+      const {index} = builder.record('@' + (cloneCount++), [node.name], this.identityKey(node), ccSearchAttributes(node, node.name));
       builder.setChildren(index, children ? children.map(child => child.record) : plainChildren);
       clones.set(node, index);
       return {record: index, clone: true};
@@ -1055,6 +1058,12 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
 
   /** What makes two nodes the same component: they show the same thing and so have the same children. */
   private searchKey(node: T): string | undefined {
+    const identity = this.identityKey(node);
+    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node));
+  }
+
+  /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
+  private identityKey(node: T): string | undefined {
     if (node instanceof AccFlatNode) {
       return 'ACC-' + node.accNode.manifestId;
     }
@@ -1433,6 +1442,8 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
   extends TreeNodeSearcher<T, CcFlatNodeDataSource<T>>
   implements ChangeListener<CcFlatNodeDataSource<T>> {
 
+  override readonly searchAttributes = COMPONENT_SEARCH_ATTRIBUTES;
+
   constructor(dataSource: CcFlatNodeDataSource<T>,
               private database: CcFlatNodeDatabase<T>) {
     super(dataSource);
@@ -1448,7 +1459,7 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
       namesOf: node => [node.name],
-      attributesOf: node => ({name: node.name, type: node.type}),
+      attributesOf: node => ccSearchAttributes(node, node.name),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -1471,4 +1482,19 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
     return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
   }
 
+}
+
+/** What a search predicate can ask about a node of the component tree. */
+function ccSearchAttributes(node: CcFlatNode, text: string): Record<string, AttrValue> {
+  const component = node instanceof AccFlatNode ? node.accNode : node instanceof AsccpFlatNode ? node.asccpNode
+    : node instanceof BccpFlatNode ? node.bccpNode : node instanceof DtFlatNode ? node.dtNode
+      : node instanceof DtScFlatNode ? node.dtScNode : undefined;
+  return componentSearchAttributes(node.type, text, component, node instanceof BccpFlatNode ? node.bccNode : undefined, ccCardinality(node));
+}
+
+/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */
+function ccCardinality(node: CcFlatNode): NodeCardinality | undefined {
+  const edge = node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode
+    : node instanceof DtScFlatNode ? node.dtScNode : undefined;
+  return edge ? {min: edge.cardinalityMin, max: edge.cardinalityMax} : undefined;
 }

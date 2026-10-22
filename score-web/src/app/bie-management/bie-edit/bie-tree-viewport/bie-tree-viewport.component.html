@@ -24,7 +24,7 @@
             [class.deprecated]="node.deprecated"
             [matTooltip]="node.deprecated ? 'Deprecated' : ''"
             [class.search-index]="searcher.isCurrentSearchIndex(node)"
-            [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.searchKeyword"
+            [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.keywordFor(node, (node.displayName ? node.displayName : node.name))"
             (dblclick)="host.startChangingDisplayName(node)">
       </span>
       @if (!dataSource.hideCardinality) {

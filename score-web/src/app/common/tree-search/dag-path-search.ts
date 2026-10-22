@@ -1,4 +1,6 @@
+import {DagContextHost, DagNodeContext} from './dag-node-context';
 import {PathPattern} from './path-pattern';
+import {NodeContext} from './search-eval';
 import {SearchDag} from './search-dag';
 
 /** Where a search starts: the node the user selected (or the root) and what is already known about its ancestors. */
@@ -26,7 +28,7 @@ export interface DagSearchResult {
 export const DEFAULT_DAG_SEARCH_BUDGET = 20_000_000;
 
 /** What the "no component below itself" rule works on: components (identities), not the records standing in for them. */
-interface Components {
+export interface Components {
   /** Per record, the identity of its component. */
   identityOf: Int32Array;
   identityCount: number;
@@ -42,7 +44,7 @@ const componentCache = new WeakMap<SearchDag, Components>();
  * can contain itself). Only identities inside a cycle make the number of matches below them depend on their
  * ancestors, so only they need more than their record and match state as a memo key.
  */
-function componentsOf(dag: SearchDag): Components {
+export function componentsOf(dag: SearchDag): Components {
   const cached = componentCache.get(dag);
   if (cached) {
     return cached;
@@ -127,12 +129,12 @@ function componentsOf(dag: SearchDag): Components {
  * tree (it can match) but has no children, which is how a recursive structure stays finite. (Records that stand for
  * one place of a component, see `SearchDag.identity`, count as that component.)
  */
-export class DagPathSearch {
+export class DagPathSearch implements DagContextHost {
 
-  private readonly identityOf: Int32Array;
+  private readonly identityMap: Int32Array;
   private readonly sccOf: Int32Array;
   private readonly cyclic: Uint8Array;
-  private readonly onPath: Uint8Array;
+  private readonly onPathIdentities: Uint8Array;
   private readonly path: number[] = [];
   private readonly acyclicMemo = new Map<number, number>();
   private readonly cyclicMemo = new Map<string, number>();
@@ -148,18 +150,59 @@ export class DagPathSearch {
   /** The record whose attributes `attributes` reads: set right before a step is made onto it. */
   private row = 0;
   private readonly attributes = (attribute: string) => this.dag.attributes?.[attribute]?.[this.row];
+  /** What the tests of the pattern found below a component, for the components that are in no cycle. */
+  private readonly remembered = new Map<string, boolean>();
 
-  constructor(private readonly dag: SearchDag,
+  constructor(readonly dag: SearchDag,
               private readonly pattern: PathPattern,
               private readonly budget = DEFAULT_DAG_SEARCH_BUDGET,
               private readonly onProgress?: (visited: number) => void) {
     const {identityOf, identityCount, sccOf, cyclic} = componentsOf(dag);
-    this.identityOf = identityOf;
+    this.identityMap = identityOf;
     this.sccOf = sccOf;
     this.cyclic = cyclic;
-    this.onPath = new Uint8Array(identityCount);
+    this.onPathIdentities = new Uint8Array(identityCount);
     this.reached = new Uint8Array(dag.names.length);
-    this.maskSpace = 2 ** (pattern.tokens.length + 1);
+    this.maskSpace = 2 ** pattern.stateBits;
+  }
+
+  // ---- what the nodes' contexts ask of the search ---------------------------------------------------------------
+
+  identityOf(record: number): number {
+    return this.identityMap[record];
+  }
+
+  isCyclic(identity: number): boolean {
+    return this.cyclic[identity] === 1;
+  }
+
+  onPath(identity: number): boolean {
+    return this.onPathIdentities[identity] > 0;
+  }
+
+  spend(): boolean {
+    if (++this.steps > this.budget) {
+      this.truncated = true;
+      return false;
+    }
+    return true;
+  }
+
+  recall(test: number, record: number): boolean | undefined {
+    return this.remembered.get(test + ':' + record);
+  }
+
+  remember(test: number, record: number, found: boolean) {
+    this.remembered.set(test + ':' + record, found);
+  }
+
+  flag(mask: number, k: number): boolean {
+    return this.pattern.ancestorFlag(mask, k);
+  }
+
+  /** A node to look down from: its children are the nodes that are stepped onto from the state `mask`. */
+  private contextOf(record: number, mask: number): DagNodeContext {
+    return new DagNodeContext(this, record, undefined, -1, false, mask);
   }
 
   search(scope: DagSearchScope): DagSearchResult {
@@ -227,17 +270,18 @@ export class DagPathSearch {
 
     let total = 0;
     const {childStart, childList} = this.dag;
+    const kids = this.pattern.needsContext ? this.contextOf(record, mask).children() : undefined;
     for (let i = childStart[record]; i < childStart[record + 1]; i++) {
       if (++this.steps > this.budget) {
         this.truncated = true;
         return total;
       }
       const child = childList[i];
-      const childMask = this.stepOnto(mask, child);
+      const childMask = this.stepOnto(mask, child, kids?.[i - childStart[record]]);
       if (this.pattern.isMatch(childMask)) {
         total++;
       }
-      if (!this.onPath[this.identityOf[child]]) {
+      if (!this.onPathIdentities[this.identityMap[child]]) {
         this.enter(child);
         total += this.count(child, childMask);
         this.leave(child);
@@ -268,7 +312,7 @@ export class DagPathSearch {
       }
       const child = childList[i];
       total++;
-      if (!this.onPath[this.identityOf[child]]) {
+      if (!this.onPathIdentities[this.identityMap[child]]) {
         this.enter(child);
         total += this.size(child);
         this.leave(child);
@@ -282,16 +326,17 @@ export class DagPathSearch {
 
   private descend(record: number, mask: number, k: number): number[] | undefined {
     const {childStart, childList} = this.dag;
+    const kids = this.pattern.needsContext ? this.contextOf(record, mask).children() : undefined;
     for (let i = childStart[record]; i < childStart[record + 1]; i++) {
       const child = childList[i];
-      const childMask = this.stepOnto(mask, child);
+      const childMask = this.stepOnto(mask, child, kids?.[i - childStart[record]]);
       if (this.pattern.isMatch(childMask)) {
         if (k === 0) {
           return [i - childStart[record]];
         }
         k--;
       }
-      if (this.onPath[this.identityOf[child]]) {
+      if (this.onPathIdentities[this.identityMap[child]]) {
         continue;
       }
       this.enter(child);
@@ -309,19 +354,22 @@ export class DagPathSearch {
     return undefined;
   }
 
-  private stepOnto(mask: number, record: number): number {
+  private stepOnto(mask: number, record: number, context?: NodeContext): number {
+    if (context) {
+      return this.pattern.stepContext(mask, context);
+    }
     this.row = record;
     return this.pattern.stepWith(mask, this.dag.names[record], this.attributes);
   }
 
   private enter(record: number) {
     this.path.push(record);
-    this.onPath[this.identityOf[record]]++;
+    this.onPathIdentities[this.identityMap[record]]++;
   }
 
   private leave(record: number) {
     this.path.pop();
-    this.onPath[this.identityOf[record]]--;
+    this.onPathIdentities[this.identityMap[record]]--;
   }
 
   /**
@@ -329,12 +377,12 @@ export class DagPathSearch {
    * its own cycle's records are among the ancestors (they cannot be expanded again).
    */
   private memoKey(record: number, mask: number): number | string {
-    const identity = this.identityOf[record];
+    const identity = this.identityMap[record];
     if (!this.cyclic[identity]) {
       return record * this.maskSpace + mask;
     }
     const scc = this.sccOf[identity];
-    const ancestors = this.path.map(r => this.identityOf[r])
+    const ancestors = this.path.map(r => this.identityMap[r])
       .filter(id => id !== identity && this.sccOf[id] === scc).sort((a, b) => a - b);
     return record + ':' + mask + ':' + ancestors.join(',');
   }

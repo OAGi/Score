@@ -838,6 +838,7 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
   background-color: orange !important;
 }
 
+
 .mat-tree .Deleted {
   text-decoration: line-through;
   text-decoration-color: black;
@@ -1348,6 +1349,34 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
 
 .mat-mdc-option {
   word-break: break-all;
+}
+
+/* the search box's suggestions are a dense list: half the height of a regular option */
+.tree-search-suggestions .mat-mdc-option {
+  min-height: 24px;
+  font-size: 12px;
+  word-break: normal;
+}
+
+.tree-search-suggestions .mat-mdc-option .mdc-list-item__primary-text {
+  display: flex;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.tree-search-suggestion-label {
+  font-family: monospace;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.tree-search-suggestion-detail {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  opacity: 0.7;
 }
 
 .mat-drawer-content {

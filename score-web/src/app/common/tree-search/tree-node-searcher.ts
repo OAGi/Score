@@ -1,3 +1,4 @@
+import {SearchAttribute} from './search-suggest';
 import {AsyncSubject, EMPTY, Observable, of, Subject} from 'rxjs';
 import {ExpressionEvaluator, FlatNode} from '../flat-tree';
 import {GraphTreeSearch, TreeGraphAdapter} from './graph-tree-search';
@@ -87,6 +88,8 @@ function zoneRunner(): (task: () => void) => void {
 export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchDataSource<N>> {
 
   searchKeyword = '';
+  /** Whether a result is marked as a whole, because the expression names nothing to mark in the names. */
+  marksWholeNode = false;
   _inputKeyword = '';
   /** The matches found by the node walk (a graph search does not list them: see `resultCount`). */
   searchResult: N[] = [];
@@ -100,6 +103,8 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
   pendingMatchCount = 0;
   /** Why the keyword cannot be searched, when it is a malformed expression. */
   expressionError: string | undefined;
+  /** The node attributes a search predicate may ask about (what the search box suggests); none for a name-only search. */
+  readonly searchAttributes: SearchAttribute[] = [];
   /**
    * Emits (inside the Angular zone) whenever the counters above change on their own: about once a second while a
    * search runs, and when it ends or is reset. A view showing them listens to this to refresh.
@@ -216,6 +221,11 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     }
   }
 
+  /** What to mark in a node's text: the keyword, or all of the text when the expression names nothing and the node is a result. */
+  keywordFor(node: N, text: string): string {
+    return this.marksWholeNode && this.isSearchResult(node) ? text : this.searchKeyword;
+  }
+
   isSearchResult(node: N): boolean {
     if (this.usingGraph) {
       return !!node && this.graph.isMatch(node);
@@ -249,7 +259,8 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     }
 
     this._inputKeyword = inputKeyword;
-    const error = parseSearchExpression(inputKeyword).error;
+    const parsed = parseSearchExpression(inputKeyword);
+    const error = parsed.error;
     if (error) {
       this.expressionError = error.message + ' (at ' + (error.position + 1) + ')';
       this.progress.next();
@@ -259,6 +270,13 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     const done = new AsyncSubject<number>();
     this.isSearching = true;
     const graph = this.prepareGraphSearch(inputKeyword, selectedNode);
+    if (!graph && parsed.needsContext) {
+      // judging a node by its surroundings needs the component graph; walking the tree cannot do it
+      this.isSearching = false;
+      this.expressionError = 'This expression is too complex to search here';
+      this.progress.next();
+      return of(-1);
+    }
     if (graph) {
       this.runGraphSearch(graph, inputKeyword, this.generation, done);
     } else {
@@ -277,6 +295,7 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
   resetSearch() {
     this.generation++;
     this.searchKeyword = undefined;
+    this.marksWholeNode = false;
     this.searchResult = [];
     this.queue = [];
     this.queueHead = 0;
@@ -328,7 +347,9 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
         this.fullSearched = result.exact;
         this.searchedItemCount = result.nodes;
         this.searchedUnit = 'nodes';
-        this.searchKeyword = graph.highlightKeyword;
+        // an expression that names nothing to highlight still marks the search as made
+        this.searchKeyword = graph.highlightKeyword || keyword;
+        this.marksWholeNode = graph.marksWholeNode;
         this.searchIndex = 0;
         this.isSearching = false;
         this.progress.next();
@@ -426,7 +447,8 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
       this.queueHead = 0;
     }
 
-    this.searchKeyword = evaluator.keywordForHighlight();
+    this.searchKeyword = evaluator.keywordForHighlight() || this._inputKeyword;
+    this.marksWholeNode = !evaluator.keywordForHighlight();
     this.pendingMatchCount = 0;
     if (matches.length > 0) {
       // The tree only opens up once the pass is over, in one step together with the final count.

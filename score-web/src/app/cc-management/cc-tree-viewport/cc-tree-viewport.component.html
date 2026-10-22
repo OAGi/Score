@@ -12,7 +12,7 @@
           [class.text-danger]="node.state === 'Deleted'"
           [class.text-line-through]="node.state === 'Deleted'"
           [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
-          [innerHTML]="node.name | highlight : searcher.searchKeyword">
+          [innerHTML]="node.name | highlight : searcher.keywordFor(node, node.name)">
     </span>
 
     @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {

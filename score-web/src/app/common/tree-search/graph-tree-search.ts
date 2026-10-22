@@ -1,4 +1,5 @@
-import {DagSearchResult, DagSearchScope} from './dag-path-search';
+import {componentsOf, DagSearchResult, DagSearchScope} from './dag-path-search';
+import {DagContextHost, DagNodeContext} from './dag-node-context';
 import {GraphSearchSession, openGraphSearchSession} from './graph-search-session';
 import {PathPattern, PathPatternMode} from './path-pattern';
 import {SearchDag} from './search-dag';
@@ -74,13 +75,13 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
    * tree is unknown to the DAG), in which case nothing has changed.
    */
   prepare(expr: string, caseSensitive: boolean, scopeNode: N): boolean {
-    const mode: PathPatternMode = this.adapter.strictRootedPaths && expr.startsWith('/') ? {exact: true, anchored: true} : {};
+    const mode: PathPatternMode = this.adapter.strictRootedPaths && expr.startsWith('/') ? {exact: true} : {};
     const pattern = new PathPattern(expr, caseSensitive, mode);
     const dag = this.adapter.dag();
     if (!pattern.supported || !dag) {
       return false;
     }
-    const scope = this.scopeOf(pattern, scopeNode);
+    const scope = this.scopeOf(pattern, dag, scopeNode);
     if (!scope) {
       return false;
     }
@@ -104,6 +105,11 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
   /** The text a result list highlights: the last step of the expression. */
   get highlightKeyword(): string {
     return this.pattern.highlight;
+  }
+
+  /** Whether the results are marked as a whole (the expression names nothing to mark in them). */
+  get marksWholeNode(): boolean {
+    return !!this.pattern?.marksWholeNode;
   }
 
   run(onProgress: (visited: number) => void): Promise<DagSearchResult> {
@@ -160,7 +166,10 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     return this.stepChain(this.pattern, this.chainOf(node));
   }
 
-  private stepChain(pattern: PathPattern, chain: N[]): number {
+  private stepChain(pattern: PathPattern, chain: N[], dag: SearchDag = this.loadedDag): number {
+    if (pattern.needsContext) {
+      return this.stepContexts(pattern, chain, dag);
+    }
     const lookups: (AttrLookup | undefined)[] = pattern.hasPredicates ?
       chain.map(n => this.adapter.attributesOf?.(n)).map(values => values && (attribute => values[attribute])) : undefined;
     return pattern.stepAll(chain.map(n => this.adapter.namesOf(n)), lookups);
@@ -180,7 +189,51 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     return this.adapter.identityOf ? this.adapter.identityOf(node) : node;
   }
 
-  private scopeOf(pattern: PathPattern, scopeNode: N): DagSearchScope | undefined {
+  /**
+   * The matcher state after the chain of nodes, each judged with its surroundings: the contexts are made from the DAG,
+   * so a node's children, siblings and position are what the search itself sees.
+   */
+  private stepContexts(pattern: PathPattern, chain: N[], dag: SearchDag): number {
+    const host = new ChainHost(dag, pattern);
+    let mask = pattern.initialMask;
+    let parent: DagNodeContext | undefined;
+    let parentNode: N | undefined;
+    chain.forEach((node, i) => {
+      const record = this.adapter.recordOf(node);
+      const ctx = parent ?
+        parent.children()[this.indexAmongChildren(dag, this.adapter.recordOf(parentNode), record, parentNode, node)] as DagNodeContext
+        : new DagNodeContext(host, record, undefined, 0, false, mask);
+      mask = pattern.stepContext(mask, ctx);
+      ctx.setStateBelow(mask);
+      parent = ctx;
+      parentNode = node;
+    });
+    return mask;
+  }
+
+  /** The place of the node among the DAG's children of its parent's record (which of several equal records it is). */
+  private indexAmongChildren(dag: SearchDag, parentRecord: number, record: number, parentNode: N, node: N): number {
+    const shown = this.adapter.childrenOf(parentNode);
+    let occurrence = 0;
+    const own = this.identityOf(node);
+    for (const sibling of shown) {
+      if (this.identityOf(sibling) === own) {
+        break;
+      }
+      if (this.adapter.recordOf(sibling) === record) {
+        occurrence++;
+      }
+    }
+    const first = dag.childStart[parentRecord];
+    for (let i = first; i < dag.childStart[parentRecord + 1]; i++) {
+      if (dag.childList[i] === record && occurrence-- === 0) {
+        return i - first;
+      }
+    }
+    return 0;
+  }
+
+  private scopeOf(pattern: PathPattern, dag: SearchDag, scopeNode: N): DagSearchScope | undefined {
     const chain = this.chainOf(scopeNode);
     const records = chain.map(n => this.adapter.recordOf(n));
     if (chain.length === 0 || records.some(r => r < 0)) {
@@ -189,7 +242,7 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     return {
       ancestors: records.slice(0, -1),
       record: records[records.length - 1],
-      mask: this.stepChain(pattern, chain)
+      mask: this.stepChain(pattern, chain, dag)
     };
   }
 
@@ -216,5 +269,46 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
       }
     }
     return node;
+  }
+}
+
+
+/** What the contexts of a chain of nodes ask of the page's thread: no budget to speak of, and nothing is above the chain. */
+class ChainHost implements DagContextHost {
+
+  private readonly components: ReturnType<typeof componentsOf>;
+  private readonly remembered = new Map<string, boolean>();
+  private steps = 0;
+
+  constructor(readonly dag: SearchDag, private readonly pattern: PathPattern) {
+    this.components = componentsOf(dag);
+  }
+
+  identityOf(record: number): number {
+    return this.components.identityOf[record];
+  }
+
+  isCyclic(identity: number): boolean {
+    return this.components.cyclic[identity] === 1;
+  }
+
+  onPath(): boolean {
+    return false;
+  }
+
+  spend(): boolean {
+    return ++this.steps < 5_000_000;
+  }
+
+  recall(test: number, record: number): boolean | undefined {
+    return this.remembered.get(test + ':' + record);
+  }
+
+  remember(test: number, record: number, found: boolean) {
+    this.remembered.set(test + ':' + record, found);
+  }
+
+  flag(mask: number, k: number): boolean {
+    return this.pattern.ancestorFlag(mask, k);
   }
 }

@@ -14,7 +14,7 @@ export class PatternExpressionEvaluator<N extends FlatNode> implements Expressio
   constructor(expr: string,
               private readonly adapter: Pick<TreeGraphAdapter<N>, 'namesOf' | 'attributesOf' | 'strictRootedPaths'>,
               caseSensitive = false) {
-    const mode = adapter.strictRootedPaths && expr.startsWith('/') ? {exact: true, anchored: true} : {};
+    const mode = adapter.strictRootedPaths && expr.startsWith('/') ? {exact: true} : {};
     this.pattern = new PathPattern(expr, caseSensitive, mode);
   }
 

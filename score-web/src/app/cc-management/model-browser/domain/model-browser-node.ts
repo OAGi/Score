@@ -1,3 +1,6 @@
+import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../../common/tree-search/component-search-attributes';
+import {AttrValue} from '../../../common/tree-search/search-expression';
+import {MODEL_BROWSER_SEARCH_ATTRIBUTES} from '../../../common/tree-search/search-suggest';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
@@ -2018,7 +2021,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     const builder = new SearchDagBuilder();
     const representatives: T[] = [];
     const record = (node: T): number => {
-      const {index, created} = builder.record(this.searchKey(node), [node.name], this.searchKey(node), {name: node.name, type: node.type});
+      const {index, created} = builder.record(this.searchKey(node), [node.name], this.identityKey(node), browserSearchAttributes(node));
       if (created) {
         representatives.push(node);
       }
@@ -2034,12 +2037,18 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
 
   /** What makes two tree nodes the same component: they show the same thing and so have the same name and children. */
   private searchKey(node: T): string | undefined {
+    const identity = this.identityKey(node);
+    return identity === undefined ? undefined : identity + cardinalityKey(browserCardinality(node));
+  }
+
+  /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
+  private identityKey(node: T): string | undefined {
     const self = node.self;
     if (self instanceof ModelBrowserAccNode) {
       return 'ASCCP-' + self.asccpNode.manifestId;
     }
     if (self instanceof ModelBrowserBccpNode) {
-      return 'BCCP-' + self.bccpNode.manifestId;
+      return 'BCCP-' + self.bccpNode.manifestId + (self.entityType === 'Attribute' ? '#attribute' : '');
     }
     if (self instanceof ModelBrowserBdtScNode) {
       return 'SC-' + self.bdtScNode.manifestId;
@@ -2064,6 +2073,8 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
   extends TreeNodeSearcher<T, ModelBrowserNodeDataSource<T>>
   implements ChangeListener<ModelBrowserNodeDataSource<T>> {
 
+  override readonly searchAttributes = MODEL_BROWSER_SEARCH_ATTRIBUTES;
+
   constructor(dataSource: ModelBrowserNodeDataSource<T>,
               private database: ModelBrowserNodeDatabase<T>) {
     super(dataSource);
@@ -2076,7 +2087,7 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
       dag: () => graph().dag,
       recordOf: node => graph().recordOf(node),
       namesOf: node => node.isGroup || node.isChoice ? undefined : [node.name],
-      attributesOf: node => ({name: node.name, type: node.type}),
+      attributesOf: node => browserSearchAttributes(node),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -2100,3 +2111,23 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
 
 }
 
+
+/** The model browser shows core components the way a BIE is shown, so a node searches as the BIE node it stands for. */
+const BIE_TYPE_OF_CC_TYPE: Record<string, string> = {ACC: 'ABIE', ASCCP: 'ASBIEP', BCCP: 'BBIEP', BDT_SC: 'BBIE_SC'};
+
+/** What a search predicate can ask about a node of the model browser. */
+function browserSearchAttributes(node: ModelBrowserNode): Record<string, AttrValue> {
+  const self = node.self;
+  const component = self instanceof ModelBrowserBccpNode ? self.bccpNode : self instanceof ModelBrowserBdtScNode ? self.bdtScNode
+    : self instanceof ModelBrowserAsccpNode ? self.asccpNode : self instanceof ModelBrowserAccNode ? self.accNode : undefined;
+  return componentSearchAttributes(BIE_TYPE_OF_CC_TYPE[node.ccType] ?? node.ccType, node.name, component,
+    self instanceof ModelBrowserBccpNode ? self.bccNode : undefined, browserCardinality(node));
+}
+
+/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */
+function browserCardinality(node: ModelBrowserNode): NodeCardinality | undefined {
+  const self = node.self;
+  const edge = self instanceof ModelBrowserBccpNode ? self.bccNode : self instanceof ModelBrowserBdtScNode ? self.bdtScNode
+    : self instanceof ModelBrowserAsccpNode ? self.asccNode : undefined;
+  return edge ? {min: edge.cardinalityMin, max: edge.cardinalityMax} : undefined;
+}

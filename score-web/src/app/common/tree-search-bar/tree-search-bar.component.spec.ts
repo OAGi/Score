@@ -9,6 +9,7 @@ describe('TreeSearchBarComponent', () => {
       tree: {scrollToIndex: vi.fn()},
       selectedNode: 'selected',
       nodeSelect: {emit: vi.fn()},
+      hideSuggestions: vi.fn(),
       ...overrides
     };
   }
@@ -20,6 +21,14 @@ describe('TreeSearchBarComponent', () => {
 
     expect(ctx.searcher.search).toHaveBeenCalledWith('Release', 'selected', true, true);
     expect(ctx.tree.scrollToIndex).toHaveBeenCalledWith(12, {delay: 500, smooth: true});
+  });
+
+  it('puts the suggestions away when it searches', () => {
+    const ctx = bar();
+
+    TreeSearchBarComponent.prototype.onSearch.call(ctx, 'Release');
+
+    expect(ctx.hideSuggestions).toHaveBeenCalled();
   });
 
   it('searches the whole tree when nothing is selected', () => {

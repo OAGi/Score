@@ -1,3 +1,6 @@
+import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {AttrValue} from '../../common/tree-search/search-expression';
+import {BIE_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {
   AccSummary,
   AsccpSummary,
@@ -2664,8 +2667,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     const plain = (node: T): number => {
       const key = keyOf(node);
       const raw = this.unwrapNode(node);
-      const {index} = builder.record(key, [raw.name], key,
-        {name: raw.name, displayName: raw.name, type: raw.bieType, used: false, inherited: false, reused: false});
+      const {index} = builder.record(key, [raw.name], this.identityKey(node),
+        {...bieSearchAttributes(raw, raw.name), used: false, inherited: false, reused: false});
       // A node that is a cycle (it has no children loaded) or shows only some of its children says nothing about
       // what its component's children are.
       if (!represented.has(key) && !this.isCycleNode(node) && !this.hasFilteredChildren(node)) {
@@ -2693,8 +2696,8 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       }
       const raw = this.unwrapNode(node);
       const names = [raw.name, raw.displayName].filter((name, i, all) => !!name && all.indexOf(name) === i);
-      const {index} = builder.record('@' + (cloneCount++), names, keyOf(node), {
-        name: raw.name, displayName: raw.displayName || raw.name, type: raw.bieType,
+      const {index} = builder.record('@' + (cloneCount++), names, this.identityKey(node), {
+        ...bieSearchAttributes(raw, raw.displayName || raw.name),
         used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
       });
       builder.setChildren(index, placed.map(child => child.record));
@@ -2726,12 +2729,18 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   private searchKey(node: T): string | undefined {
+    const identity = this.identityKey(node);
+    return identity === undefined ? undefined : identity + cardinalityKey(bieCardinality(this.unwrapNode(node)));
+  }
+
+  /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
+  private identityKey(node: T): string | undefined {
     const raw = this.unwrapNode(node) as BieFlatNode;
     if (raw instanceof AbieFlatNode) {
       return 'ASCCP-' + raw.asccpNode.manifestId;
     }
     if (raw instanceof BbiepFlatNode) {
-      return 'BCCP-' + raw.bccpNode.manifestId;
+      return 'BCCP-' + raw.bccpNode.manifestId + (raw.bccNode?.entityType === 'Attribute' ? '#attribute' : '');
     }
     if (raw instanceof BbieScFlatNode) {
       return 'SC-' + raw.bdtScNode.manifestId;
@@ -3956,6 +3965,8 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   extends TreeNodeSearcher<T, BieFlatNodeDataSource<T>>
   implements ChangeListener<BieFlatNodeDataSource<T>> {
 
+  override readonly searchAttributes = BIE_SEARCH_ATTRIBUTES;
+
   constructor(dataSource: BieFlatNodeDataSource<T>,
               private database: BieFlatNodeDatabase<T>) {
     super(dataSource);
@@ -3983,7 +3994,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
       attributesOf: node => {
         const raw = node.self || node;
         return {
-          name: raw.name, displayName: raw.displayName || raw.name, type: raw.bieType,
+          ...bieSearchAttributes(raw, raw.displayName || raw.name),
           used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
         };
       },
@@ -4031,4 +4042,21 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
     return this.dataSource.getNodeIndex(node);
   }
 
+}
+
+/** What a search predicate can ask about a BIE node besides its BIE state: its type and the core component it profiles. */
+function bieSearchAttributes(node: BieFlatNode, text: string): Record<string, AttrValue> {
+  const component = node instanceof BbiepFlatNode ? node.bccpNode : node instanceof BbieScFlatNode ? node.bdtScNode
+    : node instanceof AsbiepFlatNode ? node.asccpNode : node instanceof AbieFlatNode ? node.accNode : undefined;
+  return {
+    ...componentSearchAttributes(node.bieType, text, component, node instanceof BbiepFlatNode ? node.bccNode : undefined,
+      bieCardinality(node)),
+    // an ABIE has no display name of its own
+    display_name: node.bieType !== 'ABIE' && node.displayName ? node.displayName : undefined
+  };
+}
+
+/** The cardinality of the ASBIE, BBIE or BBIE_SC that ties a node to its parent (an ABIE has none). */
+function bieCardinality(node: BieFlatNode): NodeCardinality | undefined {
+  return node.bieType === 'ABIE' || node.bieType === undefined ? undefined : {min: node.cardinalityMin, max: node.cardinalityMax};
 }
