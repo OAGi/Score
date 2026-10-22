@@ -15,6 +15,7 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTre
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog} from '@angular/material/dialog';
 import {
   BIEProperties,
   BrowseStandardModeProperties,
@@ -32,6 +33,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   private logoutInProgress = false;
 
 
@@ -261,6 +263,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   redirectToLogin(url?) {
+    this.dialog.closeAll();
     const commands = ['/' + environment.loginPath];
     const next = this.nextParam(url);
     if (!!next) {

@@ -1,11 +1,11 @@
 <score-dialog-page title="{{ title }}">
-  @if (isUpdating) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-  <div class="content dialog-form">
-    <div class="row m-0" (window:resize)="onResize($event)">
+  <div class="content dialog-form position-relative">
+    @if (isUpdating) {
+      <div class="dialog-loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+    }
+    <div class="row m-0" [style.visibility]="isUpdating ? 'hidden' : null" (window:resize)="onResize($event)">
       <div class="col-12 p-0">
         <mat-card class="cc-node-tree-panel">
           <mat-card-content class="mat-card-container">
