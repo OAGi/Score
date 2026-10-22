@@ -134,6 +134,14 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
 
       this.preferencesInfo = preferencesInfo;
 
+      // The browser roots at an ASCCP or a BCCP; any other type or id leaves no root node in the graph.
+      const rootKey = ((this.type || '').toUpperCase() === 'BCCP' ? 'BCCP-' : 'ASCCP-') + this.manifestId;
+      if (!ccGraph.graph.nodes[rootKey]) {
+        this.snackBar.open('The component to browse was not found.', '', {duration: 3000});
+        this.router.navigateByUrl('/core_component');
+        return;
+      }
+
       // Issue #1638: the sibling view order is fetched LAZILY, one view-parent ACC at a time, as nodes
       // are expanded (see onNodeExpanded) — never upfront — so the client only asks for the parents it
       // actually shows, and the view parent is resolved on the client where group flattening happens.

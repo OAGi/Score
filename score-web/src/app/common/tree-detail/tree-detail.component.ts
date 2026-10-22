@@ -1,8 +1,27 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output, ViewEncapsulation} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  inject,
+  Input,
+  OnDestroy,
+  Output,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {AngularSplitModule} from 'angular-split';
 import {TreeScrollTarget, TreeSearcher, TreeSearchBarComponent} from '../tree-search-bar/tree-search-bar.component';
 import {TreeBreadcrumbNode, TreeBreadcrumbsComponent} from '../tree-breadcrumbs/tree-breadcrumbs.component';
+
+/** Below this width (px) the tree is stacked above the detail pane instead of beside it. */
+const NARROW_WIDTH = 768;
+/** Height (px) of the header (search row + breadcrumbs) when it fits on one line; `heightOffset` already counts it. */
+const BASE_HEADER_HEIGHT = 83;
 
 export interface TreeDetailNode extends TreeBreadcrumbNode {
   parents?: TreeBreadcrumbNode[];
@@ -28,7 +47,9 @@ export interface TreeDetailNode extends TreeBreadcrumbNode {
   encapsulation: ViewEncapsulation.None,
   imports: [MatCardModule, AngularSplitModule, TreeSearchBarComponent, TreeBreadcrumbsComponent]
 })
-export class TreeDetailComponent<N extends TreeDetailNode = TreeDetailNode> {
+export class TreeDetailComponent<N extends TreeDetailNode = TreeDetailNode> implements OnDestroy {
+
+  private readonly cdr = inject(ChangeDetectorRef);
 
   /** Show the header once the tree and its searcher are ready. */
   @Input() ready = true;
@@ -45,10 +66,38 @@ export class TreeDetailComponent<N extends TreeDetailNode = TreeDetailNode> {
   @Output() nodeSelect = new EventEmitter<N>();
 
   private viewportHeight = window.innerHeight;
+  private viewportWidth = window.innerWidth;
+  private headerHeight = BASE_HEADER_HEIGHT;
+  private headerObserver?: ResizeObserver;
+
+  /** The header wraps onto more lines on a small screen; its real height keeps the tree from overflowing the page. */
+  @ViewChild('header', {read: ElementRef}) set header(ref: ElementRef<HTMLElement> | undefined) {
+    this.headerObserver?.disconnect();
+    if (!ref || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.headerObserver = new ResizeObserver(() => {
+      const height = ref.nativeElement.offsetHeight;
+      if (height !== this.headerHeight) {
+        this.headerHeight = height;
+        this.cdr.detectChanges();
+      }
+    });
+    this.headerObserver.observe(ref.nativeElement);
+  }
+
+  @HostBinding('class.narrow') get narrow(): boolean {
+    return this.viewportWidth < NARROW_WIDTH;
+  }
 
   @HostListener('window:resize')
   onResize() {
     this.viewportHeight = window.innerHeight;
+    this.viewportWidth = window.innerWidth;
+  }
+
+  ngOnDestroy() {
+    this.headerObserver?.disconnect();
   }
 
   onBreadcrumbClick(node: TreeBreadcrumbNode) {
@@ -56,6 +105,9 @@ export class TreeDetailComponent<N extends TreeDetailNode = TreeDetailNode> {
   }
 
   get treeHeight(): number {
-    return this.viewportHeight - this.heightOffset;
+    if (this.narrow) {
+      return Math.min(480, Math.max(240, Math.round(this.viewportHeight * 0.45)));
+    }
+    return this.viewportHeight - this.heightOffset - Math.max(0, this.headerHeight - BASE_HEADER_HEIGHT);
   }
 }

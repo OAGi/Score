@@ -4,6 +4,63 @@ score-tree-detail {
 
 score-tree-detail .search-box-container {
   padding: 0;
+  height: auto;
+  min-height: 81px;
+}
+
+/* Search and actions share a line while they fit and wrap (never overlap) when they do not. */
+score-tree-detail .tree-detail-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  padding: 0 12px;
+}
+
+score-tree-detail .tree-detail-search {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+score-tree-detail .tree-detail-actions {
+  flex: 0 1 auto;
+  margin-left: auto;
+  min-width: 0;
+}
+
+score-tree-detail .tree-detail-actions .actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 4px;
+}
+
+/* A small screen: the tree sits above the detail pane and the page scrolls. */
+score-tree-detail.narrow .search-box-container {
+  position: static !important;
+}
+
+/* angular-split lays its areas out as a grid: put both areas in one column. */
+score-tree-detail.narrow as-split.tree-detail-stacked {
+  grid-template: auto / 100% !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area {
+  grid-column: 1 !important;
+  height: auto !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area.left-panel {
+  grid-row: 1 !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area.right-panel {
+  grid-row: 2 !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-gutter {
+  display: none !important;
 }
 
 score-tree-detail .tree-panel {
