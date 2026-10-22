@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.ai_management.service;
 
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -56,7 +55,7 @@ public class AiModelQueryService {
         var accQuery = repositoryFactory.accQueryRepository(requester);
         var acc = accQuery.getAccSummary(accManifestId);
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
 
         String systemPrompt = "Generate a concise, business-focused definition of the given object in approximately 2–4 sentences, depending on the complexity of the object. Describe its purpose and structural role within business processes or data exchange. Summarize the nature of the information it captures by abstractly referring to relevant business domains or categories (e.g., product attributes, compliance details, operational parameters), without listing specific elements. Focus on conveying the business intent and utility of the object based on its structure. Output only the refined definition, with no extra commentary.";
         String userPrompt = "The object class term of the given object is '" + acc.objectClassTerm() + "'.\n";
@@ -152,7 +151,7 @@ public class AiModelQueryService {
         var accQuery = repositoryFactory.accQueryRepository(requester);
         var acc = accQuery.getAccSummary(accManifestId);
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
 
         String systemPrompt = "Generate a concise, descriptive name for the given object based on its definition. Preserve the original name if it clearly reflects the object's purpose. If the original name includes the word \"Base,\" retain it in the final name. Use the fewest number of words necessary, avoiding articles and special characters. Capitalize the first letter of each word and separate words with a single space. Return only the final name, with no additional text or explanation.";
         String userPrompt = "The original object class term of the given object is '" + originalName + "'.\n";

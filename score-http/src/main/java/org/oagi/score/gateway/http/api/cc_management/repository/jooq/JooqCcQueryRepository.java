@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.cc_management.controller.payload.CcChange
 import org.oagi.score.gateway.http.api.cc_management.model.CcListEntryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.model.GraphManifestIds;
 import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
@@ -1713,6 +1714,52 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     item.setOwnerUserId(new UserId(e.get(ACC.OWNER_USER_ID).toBigInteger()));
                     return item;
                 }).collect(Collectors.toList());
+    }
+
+    /** The kinds of component a graph walks through, as the numbers {@link #GRAPH_MANIFEST_IDS_SQL} uses for them. */
+    private static final int GRAPH_ACC = 1, GRAPH_ASCCP = 2, GRAPH_BCCP = 3, GRAPH_DT = 4;
+
+    private static final String GRAPH_MANIFEST_IDS_SQL =
+            "with recursive reach(kind, id) as ("
+                    + " select ?, ?"
+                    + " union select 1, am.based_acc_manifest_id from reach r"
+                    + "   join acc_manifest am on r.kind = 1 and am.acc_manifest_id = r.id"
+                    + "   where am.based_acc_manifest_id is not null"
+                    + " union select 2, a.to_asccp_manifest_id from reach r"
+                    + "   join ascc_manifest a on r.kind = 1 and a.from_acc_manifest_id = r.id"
+                    + " union select 3, b.to_bccp_manifest_id from reach r"
+                    + "   join bcc_manifest b on r.kind = 1 and b.from_acc_manifest_id = r.id"
+                    + " union select 1, p.role_of_acc_manifest_id from reach r"
+                    + "   join asccp_manifest p on r.kind = 2 and p.asccp_manifest_id = r.id"
+                    + " union select 4, q.bdt_manifest_id from reach r"
+                    + "   join bccp_manifest q on r.kind = 3 and q.bccp_manifest_id = r.id"
+                    + ") select kind, id from reach";
+
+    @Override
+    public GraphManifestIds getGraphManifestIds(CcType type, ManifestId root) {
+        int kind = switch (type) {
+            case ACC -> GRAPH_ACC;
+            case ASCCP -> GRAPH_ASCCP;
+            case BCCP -> GRAPH_BCCP;
+            case DT -> GRAPH_DT;
+            default -> throw new IllegalArgumentException("No graph is rooted at a " + type);
+        };
+
+        Set<AccManifestId> accs = new LinkedHashSet<>();
+        Set<AsccpManifestId> asccps = new LinkedHashSet<>();
+        Set<BccpManifestId> bccps = new LinkedHashSet<>();
+        Set<DtManifestId> dts = new LinkedHashSet<>();
+        dslContext().fetch(GRAPH_MANIFEST_IDS_SQL, kind, valueOf(root)).forEach(record -> {
+            BigInteger id = record.get(1, ULong.class).toBigInteger();
+            switch (record.get(0, Integer.class)) {
+                case GRAPH_ACC -> accs.add(new AccManifestId(id));
+                case GRAPH_ASCCP -> asccps.add(new AsccpManifestId(id));
+                case GRAPH_BCCP -> bccps.add(new BccpManifestId(id));
+                case GRAPH_DT -> dts.add(new DtManifestId(id));
+                default -> throw new IllegalStateException();
+            }
+        });
+        return new GraphManifestIds(accs, asccps, bccps, dts);
     }
 
     @Override

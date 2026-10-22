@@ -132,6 +132,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <!-- Spring Boot 4 modularized the cache auto-configuration (CacheAutoConfiguration, spring.cache.*)
+             into spring-boot-cache. Caffeine is the local provider it selects with spring.cache.type=caffeine. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
         <!-- Spring Boot 4 modularized autoconfiguration: JooqAutoConfiguration (the DSLContext bean)
              moved out of spring-boot-autoconfigure into the spring-boot-jooq module. starter-jooq
              pulls that autoconfig + starter-jdbc (#1750). -->

@@ -26,7 +26,6 @@ import org.oagi.score.gateway.http.api.bie_management.repository.BieCommandRepos
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.CcAssociation;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.CcMatchingScore;
 import org.oagi.score.gateway.http.api.cc_management.model.CoreComponent;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
@@ -425,7 +424,7 @@ public class BieUpliftingService {
         BieDocument sourceBieDocument = targetAsccp.getValue();
         AsccpManifestId targetAsccpManifestId = targetAsccp.getKey().asccpManifestId();
 
-        CcDocument targetCcDocument = new CcDocumentImpl(requester, repositoryFactory, targetReleaseId);
+        CcDocument targetCcDocument = repositoryFactory.ccDocumentFactory().create(requester, targetReleaseId);
 
         BieDiff bieDiff = new BieDiff(sourceBieDocument, targetCcDocument, targetAsccpManifestId);
         bieDiff.addListener(response);
@@ -1322,7 +1321,7 @@ public class BieUpliftingService {
         if (targetAsccp.release() == null || targetAsccp.release().releaseId() == null) {
             throw new IllegalArgumentException("Target ASCCP release record not found.");
         }
-        CcDocument targetCcDocument = new CcDocumentImpl(requester, repositoryFactory, targetAsccp.release().releaseId());
+        CcDocument targetCcDocument = repositoryFactory.ccDocumentFactory().create(requester, targetAsccp.release().releaseId());
 
         List<BusinessContextId> bizCtxIds = repositoryFactory.topLevelAsbiepQueryRepository(requester)
                 .getAssignedBusinessContextList(request.getTopLevelAsbiepId());
@@ -1646,7 +1645,7 @@ public class BieUpliftingService {
         if (sourceBieDocument == null || sourceBieDocument.getCcDocument() == null) {
             throw new IllegalArgumentException("Source BIE record not found.");
         }
-        CcDocument targetCcDocument = new CcDocumentImpl(requester, repositoryFactory, request.getTargetReleaseId());
+        CcDocument targetCcDocument = repositoryFactory.ccDocumentFactory().create(requester, request.getTargetReleaseId());
         validateTargetMappingShapes(targetCcDocument, request.getMappingList());
         validateReuseMappings(requester, request.getTargetReleaseId(), targetCcDocument, request.getMappingList());
         validateSourceMappings(sourceBieDocument, request.getMappingList());

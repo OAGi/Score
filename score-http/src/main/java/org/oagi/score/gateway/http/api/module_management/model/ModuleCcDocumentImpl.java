@@ -65,7 +65,7 @@ public class ModuleCcDocumentImpl implements ModuleCcDocument {
     public ModuleCcDocumentImpl(ScoreUser requester, RepositoryFactory repositoryFactory, ModuleSetReleaseId moduleSetReleaseId) {
         ModuleSetReleaseQueryRepository query = repositoryFactory.moduleSetReleaseQueryRepository(requester);
         ModuleSetReleaseDetailsRecord moduleSetReleaseDetails = query.getModuleSetReleaseDetails(moduleSetReleaseId);
-        delegate = new CcDocumentImpl(requester, repositoryFactory, moduleSetReleaseDetails.release().releaseId());
+        delegate = repositoryFactory.ccDocumentFactory().create(requester, moduleSetReleaseDetails.release().releaseId());
 
         this.requester = requester;
         this.repositoryFactory = repositoryFactory;

@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.api.graph.model;
 
 import lombok.Data;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
+import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
@@ -101,6 +103,25 @@ public class CoreComponentGraphContext implements GraphContext {
         response.setGraph(graph);
         response.setRootNodeKey(node.getKey());
         return response;
+    }
+
+    @Override
+    public void prefetchGraph(Node root) {
+        switch (root.getType()) {
+            case ACC, ASCCP, BCCP, DT -> ccDocument.prefetchGraph(CcType.valueOf(root.getType().name()), root.getManifestId());
+            default -> {
+            }
+        }
+    }
+
+    @Override
+    public void prefetchChildren(Collection<Node> nodes) {
+        Map<Node.NodeType, List<ManifestId>> manifestIdsByType = nodes.stream()
+                .filter(e -> e.getType() == Node.NodeType.ACC || e.getType() == Node.NodeType.ASCCP
+                        || e.getType() == Node.NodeType.BCCP || e.getType() == Node.NodeType.DT)
+                .collect(Collectors.groupingBy(Node::getType, Collectors.mapping(Node::getManifestId, Collectors.toList())));
+        manifestIdsByType.forEach((type, manifestIds) ->
+                ccDocument.prefetchChildren(CcType.valueOf(type.name()), manifestIds));
     }
 
     @Override

@@ -100,4 +100,19 @@ public interface CcDocument {
 
     BlobContentSummaryRecord getBlobContent(BlobContentManifestId blobContentManifestId);
 
+    /**
+     * A hint that the children of these components are about to be looked up, one by one.
+     * A document that loads on demand can fetch them all at once instead; the default does nothing, and the
+     * answers of the lookups never depend on it.
+     */
+    default void prefetchChildren(CcType type, Collection<? extends ManifestId> manifestIds) {
+    }
+
+    /**
+     * A hint that the graph rooted at this component is about to be walked, so that a document that loads on demand
+     * can fetch everything the graph reaches at once. Like {@link #prefetchChildren} it changes no answer.
+     */
+    default void prefetchGraph(CcType type, ManifestId root) {
+    }
+
 }

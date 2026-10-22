@@ -27,6 +27,8 @@ import org.oagi.score.gateway.http.api.business_term_management.repository.Busin
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermQueryRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermCommandRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermQueryRepository;
+import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
+import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentFactory;
 import org.oagi.score.gateway.http.api.cc_management.repository.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.jooq.*;
 import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListCommandRepository;
@@ -97,8 +99,23 @@ public class RepositoryFactory {
 
     private final DSLContext dslContext;
 
+    @Autowired(required = false)
+    private CcCache ccCache;
+
     public RepositoryFactory(@Autowired DSLContext dslContext) {
         this.dslContext = dslContext;
+    }
+
+    private final CcDocumentFactory ccDocumentFactory = new CcDocumentFactory(this);
+
+    /** Where the code that needs a CcDocument gets one; every document comes from here. */
+    public CcDocumentFactory ccDocumentFactory() {
+        return ccDocumentFactory;
+    }
+
+    /** The cache shared by every request, or one that holds nothing where there is no cache (e.g. a bare factory). */
+    public CcCache ccCache() {
+        return (ccCache != null) ? ccCache : CcCache.DISABLED;
     }
 
     public ScoreUserQueryRepository scoreUserQueryRepository() {

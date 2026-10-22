@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.external.service;
 
 import org.apache.commons.io.FileUtils;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.export.ExportContext;
 import org.oagi.score.gateway.http.api.export.impl.StandaloneExportContextBuilder;
@@ -65,7 +64,7 @@ public class ExternalComponentsService {
 
             Map<AsccpManifestId, ReleaseId> releaseIdMap = repositoryFactory.releaseQueryRepository(requester)
                     .getReleaseIdMapByAsccpManifestIdList(asccpManifestIdList);
-            CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIdMap.values());
+            CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseIdMap.values());
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
             List<Exception> exceptions = new ArrayList<>();
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {

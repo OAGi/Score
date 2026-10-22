@@ -27,6 +27,8 @@ public interface AccQueryRepository {
 
     AccSummaryRecord getAccSummary(AccManifestId accManifestId);
 
+    List<AccSummaryRecord> getAccSummaryListByManifestIds(Collection<AccManifestId> accManifestIdList);
+
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList, String objectClassTerm);
@@ -56,6 +58,8 @@ public interface AccQueryRepository {
 
     List<AsccSummaryRecord> getAsccSummaryList(AccManifestId fromAccManifestId);
 
+    List<AsccSummaryRecord> getAsccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList);
+
     List<AsccSummaryRecord> getAsccSummaryList(AsccpManifestId toAsccpManifestId);
 
     List<AsccSummaryRecord> getAsccSummaryList(LibraryId libraryId, String releaseNum, CcState state);
@@ -76,6 +80,8 @@ public interface AccQueryRepository {
     List<BccSummaryRecord> getBccSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<BccSummaryRecord> getBccSummaryList(AccManifestId fromAccManifestId);
+
+    List<BccSummaryRecord> getBccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList);
 
     List<BccSummaryRecord> getBccSummaryList(BccpManifestId bccpManifestId);
 

@@ -504,6 +504,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     }
 
     @Override
+    public List<DtSummaryRecord> getDtSummaryListByManifestIds(Collection<DtManifestId> dtManifestIdList) {
+        if (dtManifestIdList == null || dtManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_MANIFEST.DT_MANIFEST_ID.in(valueOf(dtManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<DtSummaryRecord> getDtSummaryList(Collection<ReleaseId> releaseIdList) {
         var queryBuilder = new GetDtSummaryQueryBuilder();
         return queryBuilder.select()
@@ -1091,6 +1102,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         var queryBuilder = new GetDtScSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.in(valueOf(basedDtScManifestId)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public List<DtScSummaryRecord> getDtScSummaryListByOwnerDtManifestIds(Collection<DtManifestId> ownerDtManifestIdList) {
+        if (ownerDtManifestIdList == null || ownerDtManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtScSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.in(valueOf(ownerDtManifestIdList)))
                 .fetch(queryBuilder.mapper());
     }
 

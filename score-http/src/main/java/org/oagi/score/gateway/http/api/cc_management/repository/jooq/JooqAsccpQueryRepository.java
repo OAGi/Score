@@ -390,6 +390,17 @@ public class JooqAsccpQueryRepository extends JooqBaseRepository implements Ascc
     }
 
     @Override
+    public List<AsccpSummaryRecord> getAsccpSummaryListByManifestIds(Collection<AsccpManifestId> asccpManifestIdList) {
+        if (asccpManifestIdList == null || asccpManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetAsccpSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.in(valueOf(asccpManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public AsccpSummaryRecord getAsccpSummary(AsccpId asccpId, ReleaseId releaseId) {
         if (asccpId == null || releaseId == null) {
             return null;

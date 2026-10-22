@@ -22,6 +22,8 @@ public interface AsccpQueryRepository {
 
     AsccpSummaryRecord getAsccpSummary(AsccpManifestId asccpManifestId);
 
+    List<AsccpSummaryRecord> getAsccpSummaryListByManifestIds(Collection<AsccpManifestId> asccpManifestIdList);
+
     AsccpSummaryRecord getAsccpSummary(AsccpId asccpId, ReleaseId releaseId);
 
     List<AsccpSummaryRecord> getAsccpSummaryList(Collection<ReleaseId> releaseIdList);

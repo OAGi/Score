@@ -21,6 +21,8 @@ public interface DtQueryRepository {
 
     DtSummaryRecord getDtSummary(DtManifestId dtManifestId);
 
+    List<DtSummaryRecord> getDtSummaryListByManifestIds(Collection<DtManifestId> dtManifestIdList);
+
     List<DtSummaryRecord> getDtSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<DtSummaryRecord> getDtSummaryList(ReleaseId releaseId);
@@ -52,6 +54,8 @@ public interface DtQueryRepository {
     List<DtScSummaryRecord> getDtScSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<DtScSummaryRecord> getDtScSummaryList(DtManifestId ownerDtManifestId);
+
+    List<DtScSummaryRecord> getDtScSummaryListByOwnerDtManifestIds(Collection<DtManifestId> ownerDtManifestIdList);
 
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(Collection<ReleaseId> releaseIdList);
 

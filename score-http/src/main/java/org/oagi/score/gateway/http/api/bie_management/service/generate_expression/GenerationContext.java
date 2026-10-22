@@ -23,7 +23,6 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcAssociation;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
@@ -359,7 +358,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
             throw new IllegalArgumentException("'releaseIds' parameter must not be null.");
         }
 
-        this.ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIds);
+        this.ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseIds);
 
         List<AbieSummaryRecord> abieList = repositoryFactory.abieQueryRepository(requester)
                 .getAbieSummaryList(topLevelAsbiepIds);

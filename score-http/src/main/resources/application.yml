@@ -43,7 +43,12 @@ spring:
     store-type: redis
 
   cache:
-    type: redis
+    # Chooses the provider of every Spring cache; the CC record cache ("cc-records") is one of them.
+    # The CC cache is read thousands of times per request, so a provider in the JVM (caffeine) is the default;
+    # redis or any other provider can be selected here, at the price of a round trip per lookup.
+    type: caffeine
+    caffeine:
+      spec: maximumSize=200000,expireAfterWrite=600s
 
   data:
     redis:

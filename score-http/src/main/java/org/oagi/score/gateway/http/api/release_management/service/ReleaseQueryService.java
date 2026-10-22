@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.release_management.service;
 import org.apache.commons.io.FileUtils;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.export.ExportContext;
@@ -196,7 +195,7 @@ public class ReleaseQueryService {
             List<File> files = Collections.synchronizedList(new ArrayList<>());
 
             Map<AsccpManifestId, ReleaseId> releaseIdMap = getReleaseIdMapByAsccpManifestIdList(requester, asccpManifestIdList);
-            CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIdMap.values());
+            CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseIdMap.values());
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
             List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {

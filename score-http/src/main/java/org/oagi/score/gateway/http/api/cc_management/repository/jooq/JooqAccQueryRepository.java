@@ -259,6 +259,17 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
     }
 
     @Override
+    public List<AccSummaryRecord> getAccSummaryListByManifestIds(Collection<AccManifestId> accManifestIdList) {
+        if (accManifestIdList == null || accManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetAccSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.in(valueOf(accManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList) {
         var queryBuilder = new GetAccSummaryQueryBuilder();
         return queryBuilder.select()
@@ -833,6 +844,17 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
     }
 
     @Override
+    public List<AsccSummaryRecord> getAsccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList) {
+        if (fromAccManifestIdList == null || fromAccManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetAsccSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.in(valueOf(fromAccManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<AsccSummaryRecord> getAsccSummaryList(AsccpManifestId toAsccpManifestId) {
         if (toAsccpManifestId == null) {
             return Collections.emptyList();
@@ -1192,6 +1214,17 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         var queryBuilder = new GetBccSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public List<BccSummaryRecord> getBccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList) {
+        if (fromAccManifestIdList == null || fromAccManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetBccSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.in(valueOf(fromAccManifestIdList)))
                 .fetch(queryBuilder.mapper());
     }
 

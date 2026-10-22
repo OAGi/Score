@@ -48,6 +48,18 @@ public class JooqSeqKeyQueryRepository
     }
 
     @Override
+    public List<SeqKeySummaryRecord> getSeqKeySummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList) {
+        if (fromAccManifestIdList == null || fromAccManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetSeqKeySummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(SEQ_KEY.FROM_ACC_MANIFEST_ID.in(valueOf(fromAccManifestIdList)))
+                .orderBy(SEQ_KEY.SEQ_KEY_ID.asc())
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<SeqKeySummaryRecord> getSeqKeySummaryList(AccManifestId fromAccManifestId) {
         if (fromAccManifestId == null) {
             return null;
