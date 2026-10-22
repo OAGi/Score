@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.cache;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -32,11 +31,7 @@ class CcReleaseSlicesProbe {
 
     @Test
     void probe() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+        try (TestDataSource dataSource = TestDataSource.open(4)) {
             DSLContext dsl = DSL.using(dataSource, SQLDialect.MARIADB);
             RepositoryFactory rf = new RepositoryFactory(dsl);
             CcRecordSerializer serializer = new CcRecordSerializer();

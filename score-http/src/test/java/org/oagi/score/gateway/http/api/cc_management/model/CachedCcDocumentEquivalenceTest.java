@@ -1,8 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -60,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   mvn test -Dtest=CachedCcDocumentEquivalenceTest -Dscore.equivalence=true -DargLine=-Xmx8g
  * </pre>
  * Options: {@code -Dscore.equivalence.releases=76,54} (default: every release),
- * {@code -Dscore.equivalence.threads=8}, {@code -Dscore.db.url=... -Dscore.db.username=... -Dscore.db.password=...}.
+ * {@code -Dscore.equivalence.threads=8}. The database is the one Spring is configured for ({@code spring.datasource.*}).
  */
 @EnabledIfSystemProperty(named = "score.equivalence", matches = "true")
 class CachedCcDocumentEquivalenceTest {
@@ -70,19 +69,14 @@ class CachedCcDocumentEquivalenceTest {
     private static final int EXAMPLES_PER_METHOD = 5;
     private static final int GRAPH_ROOTS_PER_KIND = 3;
 
-    private static HikariDataSource dataSource;
+    private static TestDataSource dataSource;
     private static DSLContext dsl;
     private static final ScoreUser REQUESTER = new ScoreUser(null, "equivalence", "equivalence", null, false, null);
     private static final ObjectMapper JSON = new ObjectMapper().findAndRegisterModules();
 
     @BeforeAll
     static void connect() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(Integer.getInteger("score.equivalence.threads", 8) * 2 + 2);
-        dataSource = new HikariDataSource(config);
+        dataSource = TestDataSource.open(Integer.getInteger("score.equivalence.threads", 8) * 2 + 2);
         dsl = DSL.using(dataSource, SQLDialect.MARIADB);
     }
 

@@ -60,28 +60,28 @@ public class GraphService {
                 AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
                 ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getAcc(accManifestId));
+                node = ccGraphContext.toNode(acc);
                 break;
             case ASCCP:
                 AsccpManifestId asccpManifestId = (AsccpManifestId) request.manifestId();
                 AsccpSummaryRecord asccp = repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId);
                 ccDocument = repositoryFactory.ccDocumentFactory().create(requester, asccp.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getAsccp(asccpManifestId));
+                node = ccGraphContext.toNode(asccp);
                 break;
             case BCCP:
                 BccpManifestId bccpManifestId = (BccpManifestId) request.manifestId();
                 BccpSummaryRecord bccp = repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId);
                 ccDocument = repositoryFactory.ccDocumentFactory().create(requester, bccp.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getBccp(bccpManifestId));
+                node = ccGraphContext.toNode(bccp);
                 break;
             case DT:
                 DtManifestId dtManifestId = (DtManifestId) request.manifestId();
                 DtSummaryRecord dt = repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId);
                 ccDocument = repositoryFactory.ccDocumentFactory().create(requester, dt.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getDt(dtManifestId));
+                node = ccGraphContext.toNode(dt);
                 break;
             default:
                 throw new UnsupportedOperationException();

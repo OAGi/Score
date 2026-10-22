@@ -1,8 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.cache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -48,7 +47,7 @@ class CcCacheFreshnessTest {
     private static final ScoreUser REQUESTER = new ScoreUser(null, "freshness", "freshness", null, false, null);
     private static final ObjectMapper JSON = new ObjectMapper().findAndRegisterModules();
 
-    private static HikariDataSource dataSource;
+    private static TestDataSource dataSource;
     private static DSLContext dsl;
 
     private CcCacheStatus status;
@@ -65,12 +64,7 @@ class CcCacheFreshnessTest {
 
     @BeforeAll
     static void connect() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(6);
-        dataSource = new HikariDataSource(config);
+        dataSource = TestDataSource.open(6);
         dsl = DSL.using(dataSource, SQLDialect.MARIADB);
     }
 

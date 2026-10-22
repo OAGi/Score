@@ -217,6 +217,11 @@ public class CachedCcDocument implements CcDocument {
             return null;
         }
         prefetchFor(CcType.ACC, accManifestId, "acc:" + accManifestId.value());
+        return knownAcc(accManifestId);
+    }
+
+    /** What {@link #getAcc} answers, without reading the dependencies of the component ahead. */
+    private AccSummaryRecord knownAcc(AccManifestId accManifestId) {
         return inScope(cached("acc:" + accManifestId.value(),
                 () -> repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId)),
                 AccSummaryRecord::release);
@@ -248,6 +253,11 @@ public class CachedCcDocument implements CcDocument {
             return null;
         }
         prefetchFor(CcType.ASCCP, asccpManifestId, "asccp:" + asccpManifestId.value());
+        return knownAsccp(asccpManifestId);
+    }
+
+    /** What {@link #getAsccp} answers, without reading the dependencies of the component ahead. */
+    private AsccpSummaryRecord knownAsccp(AsccpManifestId asccpManifestId) {
         return inScope(cached("asccp:" + asccpManifestId.value(),
                 () -> repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId)),
                 AsccpSummaryRecord::release);
@@ -259,6 +269,11 @@ public class CachedCcDocument implements CcDocument {
             return null;
         }
         prefetchFor(CcType.BCCP, bccpManifestId, "bccp:" + bccpManifestId.value());
+        return knownBccp(bccpManifestId);
+    }
+
+    /** What {@link #getBccp} answers, without reading the dependencies of the component ahead. */
+    private BccpSummaryRecord knownBccp(BccpManifestId bccpManifestId) {
         return inScope(cached("bccp:" + bccpManifestId.value(),
                 () -> repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId)),
                 BccpSummaryRecord::release);
@@ -270,6 +285,11 @@ public class CachedCcDocument implements CcDocument {
             return null;
         }
         prefetchFor(CcType.DT, dtManifestId, "dt:" + dtManifestId.value());
+        return knownDt(dtManifestId);
+    }
+
+    /** What {@link #getDt} answers, without reading the dependencies of the component ahead. */
+    private DtSummaryRecord knownDt(DtManifestId dtManifestId) {
         return inScope(cached("dt:" + dtManifestId.value(),
                 () -> repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId)),
                 DtSummaryRecord::release);
@@ -361,28 +381,28 @@ public class CachedCcDocument implements CcDocument {
     @Override
     public List<TagSummaryRecord> getTagListByAccManifestId(AccManifestId accManifestId) {
         // The tags of a component the document does not know (one of another release) are not its to give.
-        return (getAcc(accManifestId) == null) ? Collections.emptyList() : cached("tags:acc:" + accManifestId.value(),
+        return (accManifestId == null || knownAcc(accManifestId) == null) ? Collections.emptyList() : cached("tags:acc:" + accManifestId.value(),
                 () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(accManifestId)));
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByAsccpManifestId(AsccpManifestId asccpManifestId) {
         // The tags of a component the document does not know (one of another release) are not its to give.
-        return (getAsccp(asccpManifestId) == null) ? Collections.emptyList() : cached("tags:asccp:" + asccpManifestId.value(),
+        return (asccpManifestId == null || knownAsccp(asccpManifestId) == null) ? Collections.emptyList() : cached("tags:asccp:" + asccpManifestId.value(),
                 () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(asccpManifestId)));
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByBccpManifestId(BccpManifestId bccpManifestId) {
         // The tags of a component the document does not know (one of another release) are not its to give.
-        return (getBccp(bccpManifestId) == null) ? Collections.emptyList() : cached("tags:bccp:" + bccpManifestId.value(),
+        return (bccpManifestId == null || knownBccp(bccpManifestId) == null) ? Collections.emptyList() : cached("tags:bccp:" + bccpManifestId.value(),
                 () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(bccpManifestId)));
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByDtManifestId(DtManifestId dtManifestId) {
         // The tags of a component the document does not know (one of another release) are not its to give.
-        return (getDt(dtManifestId) == null) ? Collections.emptyList() : cached("tags:dt:" + dtManifestId.value(),
+        return (dtManifestId == null || knownDt(dtManifestId) == null) ? Collections.emptyList() : cached("tags:dt:" + dtManifestId.value(),
                 () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(dtManifestId)));
     }
 
@@ -974,34 +994,71 @@ public class CachedCcDocument implements CcDocument {
         return xbtIndexByName().getOrDefault(name, Collections.emptyList());
     }
 
+    // The usages of a component are the records that point at it. They are not kept in the cache (what would have to forget
+    // them is a change to any of the records that point), but asked of the database by the key that points, which is indexed.
+    // The records that point at a component are in its release, so a component of the releases of this document has its
+    // usages in them, and one of another release has none here: that is checked for the component, not for each record.
+
     @Override
     public List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId) {
-        return eager().getAccListByBasedAccManifestId(basedAccManifestId);
+        if (basedAccManifestId == null || knownAcc(basedAccManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.accQueryRepository(requester).getAccSummaryListByBasedAccManifestId(basedAccManifestId);
     }
 
     @Override
     public List<AsccpSummaryRecord> getAsccpListByRoleOfAccManifestId(AccManifestId roleOfAccManifestId) {
-        return eager().getAsccpListByRoleOfAccManifestId(roleOfAccManifestId);
+        if (roleOfAccManifestId == null || knownAcc(roleOfAccManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.asccpQueryRepository(requester).getAsccpSummaryList(roleOfAccManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.asccpManifestId().value())).collect(Collectors.toList());
     }
 
     @Override
     public List<AccSummaryRecord> getAccListByToAsccpManifestId(AsccpManifestId toAsccpManifestId) {
-        return eager().getAccListByToAsccpManifestId(toAsccpManifestId);
+        if (toAsccpManifestId == null || knownAsccp(toAsccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return accsOf(repositoryFactory.accQueryRepository(requester).getAsccSummaryList(toAsccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.asccManifestId().value()))
+                .map(AsccSummaryRecord::fromAccManifestId).collect(Collectors.toList()));
+    }
+
+    /** The ACCs, one for each id in the order of the ids (an id twice is an ACC twice), read together. */
+    private List<AccSummaryRecord> accsOf(List<AccManifestId> accManifestIds) {
+        Map<AccManifestId, AccSummaryRecord> accs = resolve("acc:", new LinkedHashSet<>(accManifestIds),
+                repositoryFactory.accQueryRepository(requester)::getAccSummaryListByManifestIds, AccSummaryRecord::accManifestId);
+        return accManifestIds.stream().map(accs::get).collect(Collectors.toList());
     }
 
     @Override
     public List<AccSummaryRecord> getAccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
-        return eager().getAccListByToBccpManifestId(toBccpManifestId);
+        if (toBccpManifestId == null || knownBccp(toBccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return accsOf(repositoryFactory.accQueryRepository(requester).getBccSummaryList(toBccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccManifestId().value()))
+                .map(BccSummaryRecord::fromAccManifestId).collect(Collectors.toList()));
     }
 
     @Override
     public List<BccpSummaryRecord> getBccpListByDtManifestId(DtManifestId dtManifestId) {
-        return eager().getBccpListByDtManifestId(dtManifestId);
+        if (dtManifestId == null || knownDt(dtManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.bccpQueryRepository(requester).getBccpSummaryList(dtManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccpManifestId().value())).collect(Collectors.toList());
     }
 
     @Override
     public List<BccSummaryRecord> getBccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
-        return eager().getBccListByToBccpManifestId(toBccpManifestId);
+        if (toBccpManifestId == null || knownBccp(toBccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.accQueryRepository(requester).getBccSummaryList(toBccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccManifestId().value())).collect(Collectors.toList());
     }
 
     @Override

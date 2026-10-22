@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -48,16 +47,11 @@ class CcCacheProviderBenchmark {
     void caffeineAgainstRedis() throws Exception {
         long root = Long.getLong("score.benchmark.root", 786126);
         int runs = Integer.getInteger("score.benchmark.runs", 30);
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(4);
         LettuceConnectionFactory redis = new LettuceConnectionFactory(new RedisStandaloneConfiguration(
                 System.getProperty("score.redis.host", "localhost"), Integer.getInteger("score.redis.port", 6379)));
         redis.afterPropertiesSet();
         String prefix = "{zz-cc-benchmark:" + UUID.randomUUID() + "}:";
-        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+        try (TestDataSource dataSource = TestDataSource.open(4)) {
             DSLContext dsl = DSL.using(dataSource, SQLDialect.MARIADB);
             ReleaseId release = new ReleaseId(dsl.fetchOne("select release_id from acc_manifest where acc_manifest_id = ?", root)
                     .get(0, org.jooq.types.ULong.class).toBigInteger());

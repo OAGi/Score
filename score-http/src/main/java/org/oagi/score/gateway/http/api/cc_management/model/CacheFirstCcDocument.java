@@ -222,32 +222,32 @@ public class CacheFirstCcDocument implements CcDocument {
 
     @Override
     public List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId) {
-        return scan(d -> d.getAccListByBasedAccManifestId(basedAccManifestId));
+        return lookup(d -> d.getAccListByBasedAccManifestId(basedAccManifestId));
     }
 
     @Override
     public List<AsccpSummaryRecord> getAsccpListByRoleOfAccManifestId(AccManifestId roleOfAccManifestId) {
-        return scan(d -> d.getAsccpListByRoleOfAccManifestId(roleOfAccManifestId));
+        return lookup(d -> d.getAsccpListByRoleOfAccManifestId(roleOfAccManifestId));
     }
 
     @Override
     public List<AccSummaryRecord> getAccListByToAsccpManifestId(AsccpManifestId toAsccpManifestId) {
-        return scan(d -> d.getAccListByToAsccpManifestId(toAsccpManifestId));
+        return lookup(d -> d.getAccListByToAsccpManifestId(toAsccpManifestId));
     }
 
     @Override
     public List<AccSummaryRecord> getAccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
-        return scan(d -> d.getAccListByToBccpManifestId(toBccpManifestId));
+        return lookup(d -> d.getAccListByToBccpManifestId(toBccpManifestId));
     }
 
     @Override
     public List<BccpSummaryRecord> getBccpListByDtManifestId(DtManifestId dtManifestId) {
-        return scan(d -> d.getBccpListByDtManifestId(dtManifestId));
+        return lookup(d -> d.getBccpListByDtManifestId(dtManifestId));
     }
 
     @Override
     public List<BccSummaryRecord> getBccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
-        return scan(d -> d.getBccListByToBccpManifestId(toBccpManifestId));
+        return lookup(d -> d.getBccListByToBccpManifestId(toBccpManifestId));
     }
 
     @Override

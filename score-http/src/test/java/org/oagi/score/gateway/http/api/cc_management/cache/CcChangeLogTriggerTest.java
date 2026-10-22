@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.cache;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -32,16 +31,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnabledIfSystemProperty(named = "score.freshness", matches = "true")
 class CcChangeLogTriggerTest {
 
-    private static HikariDataSource dataSource;
+    private static TestDataSource dataSource;
 
     @BeforeAll
     static void connect() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(3);
-        dataSource = new HikariDataSource(config);
+        dataSource = TestDataSource.open(3);
     }
 
     @AfterAll

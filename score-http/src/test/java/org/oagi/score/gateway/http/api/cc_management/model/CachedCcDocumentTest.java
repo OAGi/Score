@@ -170,6 +170,28 @@ class CachedCcDocumentTest {
     }
 
     @Test
+    void theTagsOfAComponentAreAskedForWithoutReadingItsDependencies() {
+        AccSummaryRecord only = acc(100, RELEASE, null);
+        when(accQuery.getAccSummary(accId(100))).thenReturn(only);
+        when(tagQuery.getTagSummaryList(accId(100))).thenReturn(List.of());
+
+        assertEquals(List.of(), document().getTagListByAccManifestId(accId(100)));
+        verify(ccQuery, never()).getDependencyManifestIds(any(), any());
+    }
+
+    @Test
+    void theUsagesOfAComponentOfAnotherReleaseAreNone() {
+        AccSummaryRecord outOfScope = acc(31, OTHER_RELEASE, null);
+        when(accQuery.getAccSummary(accId(31))).thenReturn(outOfScope);
+
+        CachedCcDocument document = document();
+        assertEquals(List.of(), document.getAccListByBasedAccManifestId(accId(31)));
+        assertEquals(List.of(), document.getAsccpListByRoleOfAccManifestId(accId(31)));
+        verify(accQuery, never()).getAccSummaryListByBasedAccManifestId(any());
+        verify(asccpQuery, never()).getAsccpSummaryList(any(AccManifestId.class));
+    }
+
+    @Test
     void aComponentOutsideTheDependenciesAlreadyReadGetsItsOwnButOnlyAFewTimes() {
         when(accQuery.getAccSummary(any())).thenAnswer(invocation -> {
             AccManifestId id = invocation.getArgument(0);

@@ -1,8 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -53,11 +52,6 @@ class CcCacheConcurrencyBenchmark {
         int threads = Integer.getInteger("score.benchmark.threads", 100);
         int requestsPerThread = Integer.getInteger("score.benchmark.requests", 20);
         long thinkMillis = Long.getLong("score.benchmark.thinkMillis", 0);
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(threads);
         LettuceConnectionFactory redis = new LettuceConnectionFactory(new RedisStandaloneConfiguration(
                 System.getProperty("score.redis.host", "localhost"), Integer.getInteger("score.redis.port", 6379)));
         redis.afterPropertiesSet();
@@ -66,7 +60,7 @@ class CcCacheConcurrencyBenchmark {
                 .formatted(threads, requestsPerThread, thinkMillis, root, Runtime.getRuntime().maxMemory() >> 20));
         report.append("%-9s %8s %8s %8s %8s %12s %10s %12s%n".formatted("cache", "p50 ms", "p95 ms", "p99 ms", "max ms",
                 "requests/s", "GC ms", "peak heap MB"));
-        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+        try (TestDataSource dataSource = TestDataSource.open(threads)) {
             DSLContext dsl = DSL.using(dataSource, SQLDialect.MARIADB);
             ReleaseId release = new ReleaseId(dsl.fetchOne("select release_id from acc_manifest where acc_manifest_id = ?", root)
                     .get(0, org.jooq.types.ULong.class).toBigInteger());

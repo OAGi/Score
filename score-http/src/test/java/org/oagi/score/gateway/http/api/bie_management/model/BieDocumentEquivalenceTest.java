@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.model;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -155,12 +154,7 @@ class BieDocumentEquivalenceTest {
 
     @Test
     void everyBieIsReadTheSameOverTheCachedReleaseAsOverTheLoadedOne() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("score.db.url", "jdbc:mariadb://localhost:3306/oagi?useSSL=false"));
-        config.setUsername(System.getProperty("score.db.username", "oagi"));
-        config.setPassword(System.getProperty("score.db.password", "oagi"));
-        config.setMaximumPoolSize(4);
-        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+        try (TestDataSource dataSource = TestDataSource.open(4)) {
             DSLContext dsl = DSL.using(dataSource, SQLDialect.MARIADB);
 
             RepositoryFactory repositoryFactory = new RepositoryFactory(dsl);
