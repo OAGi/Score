@@ -46,6 +46,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtxVa
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContent;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BusinessTerm;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CcChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeList;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest;
@@ -460,6 +461,29 @@ public class Tables {
      * missing.
      */
     public static final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
+
+    /**
+     * Temporary log of the changes to the data core component records are made
+     * of, read by the CC cache (CcChangeFeed) to forget what changed; can be
+     * dropped with its triggers if CDC is introduced. Rows are deleted by the
+     * application after 2 hours (retention policy, checked every 10 minutes)
+     * and the numbering restarts from 1 once the table has stayed empty for 10
+     * minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers
+     * named &lt;table&gt;_cc_change_&lt;insert|update|delete&gt;_trg, in the
+     * transaction of the change (a rollback removes them), whoever makes the
+     * change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest,
+     * bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE:
+     * one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc
+     * on UPDATE and DELETE: one row for every manifest, in every release, that
+     * shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of
+     * kind ACC for the ACC that owns the order; (4) acc_manifest_tag,
+     * asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and
+     * DELETE: one row for the tagged manifest; (5) tag, release, library on
+     * UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep
+     * on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on
+     * UPDATE when login_id or is_developer changes: one row of kind USER.
+     */
+    public static final CcChangeLog CC_CHANGE_LOG = CcChangeLog.CC_CHANGE_LOG;
 
     /**
      * This table stores the CDT primitives.

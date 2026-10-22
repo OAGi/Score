@@ -35,6 +35,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bbie.BbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BbieSc.BbieScPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri.CdtPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
@@ -85,6 +86,13 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
      * table.
      */
     public final TableField<XbtManifestRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the XBT table.");
+
+    /**
+     * The column <code>xbt_manifest.cdt_pri_id</code>. Foreign key referencing
+     * the CDT_PRI table. Specifies how the current record maps to allowed
+     * primitives in CDT.
+     */
+    public final TableField<XbtManifestRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key referencing the CDT_PRI table. Specifies how the current record maps to allowed primitives in CDT.");
 
     /**
      * The column <code>xbt_manifest.conflict</code>. This indicates that there
@@ -191,7 +199,19 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
     @Override
     public List<ForeignKey<XbtManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK);
+        return Arrays.asList(Keys.XBT_MANIFEST_CDT_PRI_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK);
+    }
+
+    private transient CdtPriPath _cdtPri;
+
+    /**
+     * Get the implicit join path to the <code>cdt_pri</code> table.
+     */
+    public CdtPriPath cdtPri() {
+        if (_cdtPri == null)
+            _cdtPri = new CdtPriPath(this, Keys.XBT_MANIFEST_CDT_PRI_ID_FK, null);
+
+        return _cdtPri;
     }
 
     private transient LogPath _log;

@@ -171,12 +171,11 @@ class BieDocumentEquivalenceTest {
                         System.getProperty("score.redis.host", "localhost"), Integer.getInteger("score.redis.port", 6379)));
                 redis.afterPropertiesSet();
                 ReflectionTestUtils.setField(repositoryFactory, "ccCache",
-                        new RedisCcCache(redis, prefix, java.time.Duration.ofMinutes(30)));
+                        new RedisCcCache(redis, prefix, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30)));
             } else {
                 CaffeineCacheManager manager = new CaffeineCacheManager();
                 manager.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache", new SpringCcCache(
-                        manager, new StaticListableBeanFactory().getBeanProvider(org.redisson.api.RedissonClient.class)));
+                ReflectionTestUtils.setField(repositoryFactory, "ccCache", new SpringCcCache(manager, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady()));
             }
 
             int bies = 0;

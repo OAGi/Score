@@ -2,9 +2,6 @@ package org.oagi.score.gateway.http.api.cc_management.cache;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -18,10 +15,8 @@ import static org.mockito.Mockito.when;
 
 class SpringCcCacheTest {
 
-    private final ObjectProvider<RedissonClient> noRedis = new StaticListableBeanFactory().getBeanProvider(RedissonClient.class);
-
     private SpringCcCache cache() {
-        return new SpringCcCache(new ConcurrentMapCacheManager(), noRedis);
+        return new SpringCcCache(new ConcurrentMapCacheManager(), CcCacheStatus.alwaysReady());
     }
 
     @AfterEach
@@ -32,87 +27,80 @@ class SpringCcCacheTest {
         WriteTracker.reset();
     }
 
-    private void completeTransaction(int status) {
+    @Test
+    void aValueIsCachedUnderTheEpochItWasReadIn() {
+        SpringCcCache cache = cache();
+        cache.put(cache.epoch(), "acc:1", "a");
+        assertEquals("a", cache.get("acc:1"));
+        assertNull(cache.get("acc:2"));
+    }
+
+    @Test
+    void forgettingTouchesOnlyTheNamedEntriesAndRejectsWhatWasReadBefore() {
+        SpringCcCache cache = cache();
+        long readIn = cache.epoch();
+        cache.putAll(readIn, java.util.Map.of("acc:1", "a", "acc:2", "b", "acc:3", "c"));
+
+        cache.invalidate(java.util.List.of("acc:1"));
+
+        assertNull(cache.get("acc:1"));
+        assertEquals("b", cache.get("acc:2"), "what did not change stays");
+        assertEquals("c", cache.get("acc:3"));
+        cache.put(readIn, "acc:1", "stale");
+        assertNull(cache.get("acc:1"), "a reader that began before cannot put its value back");
+        cache.put(cache.epoch(), "acc:1", "fresh");
+        assertEquals("fresh", cache.get("acc:1"));
+    }
+
+    @Test
+    void aTransactionBypassesTheCacheFromItsFirstWriteUntilItEnds() {
+        SpringCcCache cache = cache();
+        cache.put(cache.epoch(), "acc:1", "a");
+        TransactionSynchronizationManager.initSynchronization();
+
+        assertFalse(cache.isBypassed());
+        WriteTracker.written(() -> {
+        });
+        assertTrue(cache.isBypassed());
+        assertEquals("a", cache.get("acc:1"), "the other requests still see the committed state");
+
         for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
-            synchronization.afterCompletion(status);
+            synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
         }
         TransactionSynchronizationManager.clearSynchronization();
-    }
-
-    @Test
-    void aValueIsCachedUnderTheGenerationItWasReadIn() {
-        SpringCcCache cache = cache();
-        cache.put(cache.generation(), "acc:1", "a");
-        assertEquals("a", cache.get(cache.generation(), "acc:1"));
-        assertNull(cache.get(cache.generation(), "acc:2"));
-    }
-
-    @Test
-    void aWriteOutsideATransactionEmptiesTheCacheAndRejectsTheValueReadBefore() {
-        SpringCcCache cache = cache();
-        long readIn = cache.generation();
-        cache.put(readIn, "acc:1", "a");
-
-        cache.written();
-
-        assertNull(cache.get(cache.generation(), "acc:1"));
-        cache.put(readIn, "acc:1", "stale");
-        assertNull(cache.get(cache.generation(), "acc:1"));
-        cache.put(cache.generation(), "acc:1", "fresh");
-        assertEquals("fresh", cache.get(cache.generation(), "acc:1"));
-    }
-
-    @Test
-    void aTransactionBypassesTheCacheFromItsFirstWriteAndEmptiesItOnCommit() {
-        SpringCcCache cache = cache();
-        cache.put(cache.generation(), "acc:1", "a");
-        TransactionSynchronizationManager.initSynchronization();
 
         assertFalse(cache.isBypassed());
-        cache.written();
+    }
+
+    @Test
+    void withoutAFeedThatKeepsUpTheCacheIsBypassed() {
+        CcCacheStatus status = new CcCacheStatus();
+        SpringCcCache cache = new SpringCcCache(new ConcurrentMapCacheManager(), status);
+
+        assertTrue(cache.isBypassed(), "nothing has read the change log yet");
+        status.succeeded();
+        assertFalse(cache.isBypassed());
+        status.failed();
         assertTrue(cache.isBypassed());
-        assertEquals("a", cache.get(cache.generation(), "acc:1"), "the other requests still see the committed state until the commit");
-
-        completeTransaction(TransactionSynchronization.STATUS_COMMITTED);
-
-        assertFalse(cache.isBypassed());
-        assertNull(cache.get(cache.generation(), "acc:1"));
-    }
-
-    @Test
-    void aRolledBackTransactionLeavesTheCacheAsItWas() {
-        SpringCcCache cache = cache();
-        cache.put(cache.generation(), "acc:1", "a");
-        long before = cache.generation();
-        TransactionSynchronizationManager.initSynchronization();
-
-        cache.written();
-        completeTransaction(TransactionSynchronization.STATUS_ROLLED_BACK);
-
-        assertFalse(cache.isBypassed());
-        assertEquals(before, cache.generation());
-        assertEquals("a", cache.get(cache.generation(), "acc:1"));
     }
 
     @Test
     void aProviderThatFailsIsAMissAndNeverAnError() {
         Cache failing = mock(Cache.class);
-        when(failing.get("acc:1")).thenThrow(new IllegalStateException("redis is down"));
-        org.mockito.Mockito.doThrow(new IllegalStateException("redis is down")).when(failing).put("acc:1", "a");
-        org.mockito.Mockito.doThrow(new IllegalStateException("redis is down")).when(failing).clear();
+        when(failing.get("acc:1")).thenThrow(new IllegalStateException("provider is down"));
+        org.mockito.Mockito.doThrow(new IllegalStateException("provider is down")).when(failing).put("acc:1", "a");
         CacheManager manager = mock(CacheManager.class);
         when(manager.getCache(SpringCcCache.CACHE_NAME)).thenReturn(failing);
-        SpringCcCache cache = new SpringCcCache(manager, noRedis);
+        SpringCcCache cache = new SpringCcCache(manager, CcCacheStatus.alwaysReady());
 
-        assertNull(cache.get(cache.generation(), "acc:1"));
-        assertDoesNotThrow(() -> cache.put(cache.generation(), "acc:1", "a"));
-        assertDoesNotThrow(cache::written);
+        assertNull(cache.get("acc:1"));
+        assertDoesNotThrow(() -> cache.put(cache.epoch(), "acc:1", "a"));
     }
 
     @Test
     void withoutACacheTheApplicationDoesNotStart() {
         CacheManager manager = mock(CacheManager.class);
-        assertThrows(IllegalStateException.class, () -> new SpringCcCache(manager, noRedis));
+        assertThrows(IllegalStateException.class, () -> new SpringCcCache(manager, CcCacheStatus.alwaysReady()));
     }
 
     @Test
@@ -131,14 +119,14 @@ class SpringCcCacheTest {
                 } catch (InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
-                cache.put(cache.generation(), "acc:1", "a");
+                cache.put(cache.epoch(), "acc:1", "a");
             }));
             started.await();
             java.util.List<java.util.concurrent.Future<Object>> waiters = new java.util.ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 waiters.add(pool.submit(() -> {
                     cache.singleFlight("graph:acc:1", runs::incrementAndGet);
-                    return cache.get(cache.generation(), "acc:1");
+                    return cache.get("acc:1");
                 }));
             }
             Thread.sleep(100);
@@ -175,7 +163,7 @@ class SpringCcCacheTest {
         assertEquals(1, runs.get());
         assertTrue(CcCache.DISABLED.isBypassed());
         CcCache.DISABLED.put(0, "acc:1", "a");
-        assertNull(CcCache.DISABLED.get(0, "acc:1"));
+        assertNull(CcCache.DISABLED.get("acc:1"));
     }
 
 }

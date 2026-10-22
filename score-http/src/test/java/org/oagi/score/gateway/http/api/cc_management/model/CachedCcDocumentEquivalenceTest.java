@@ -402,11 +402,11 @@ class CachedCcDocumentEquivalenceTest {
                     redis.afterPropertiesSet();
                 }
             }
-            return new RedisCcCache(redis, RUN_PREFIX + CACHES.incrementAndGet() + ":", java.time.Duration.ofMinutes(30));
+            return new RedisCcCache(redis, RUN_PREFIX + CACHES.incrementAndGet() + ":", org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30));
         }
         CaffeineCacheManager manager = new CaffeineCacheManager();
         manager.setCacheSpecification(CACHE_SPEC);
-        return new SpringCcCache(manager, new StaticListableBeanFactory().getBeanProvider(org.redisson.api.RedissonClient.class));
+        return new SpringCcCache(manager, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady());
     }
 
     @AfterAll

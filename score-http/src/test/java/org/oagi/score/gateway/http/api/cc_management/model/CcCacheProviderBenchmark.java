@@ -65,9 +65,8 @@ class CcCacheProviderBenchmark {
             CaffeineCacheManager caffeine = new CaffeineCacheManager();
             caffeine.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
             Map<String, CcCache> caches = new LinkedHashMap<>();
-            caches.put("caffeine", new SpringCcCache(caffeine,
-                    new StaticListableBeanFactory().getBeanProvider(org.redisson.api.RedissonClient.class)));
-            caches.put("redis", new RedisCcCache(redis, prefix, Duration.ofMinutes(10)));
+            caches.put("caffeine", new SpringCcCache(caffeine, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady()));
+            caches.put("redis", new RedisCcCache(redis, prefix, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), Duration.ofMinutes(10)));
 
             StringBuilder report = new StringBuilder("\ngraph rooted at ACC %d, %d warm runs; milliseconds, median%n".formatted(root, runs));
             report.append("%-9s %9s %9s %9s %9s %9s%n".formatted("cache", "cold", "document", "read", "walk", "total"));
@@ -77,7 +76,7 @@ class CcCacheProviderBenchmark {
                     ReflectionTestUtils.setField(repositoryFactory, "ccCache", entry.getValue());
                     GraphService graphService = new GraphService();
                     ReflectionTestUtils.setField(graphService, "repositoryFactory", repositoryFactory);
-                    ((org.oagi.score.gateway.http.api.cc_management.cache.CcCacheWriteObserver) entry.getValue()).written();
+                    entry.getValue().invalidate(java.util.List.of());
 
                     double[] cold = one(graphService, repositoryFactory, release, root);
                     one(graphService, repositoryFactory, release, root);

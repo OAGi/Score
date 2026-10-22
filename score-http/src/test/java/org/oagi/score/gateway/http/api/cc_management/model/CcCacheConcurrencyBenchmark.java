@@ -73,16 +73,15 @@ class CcCacheConcurrencyBenchmark {
             CaffeineCacheManager caffeine = new CaffeineCacheManager();
             caffeine.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
             Map<String, CcCache> caches = new LinkedHashMap<>();
-            caches.put("caffeine", new SpringCcCache(caffeine,
-                    new StaticListableBeanFactory().getBeanProvider(org.redisson.api.RedissonClient.class)));
-            caches.put("redis", new RedisCcCache(redis, prefix, Duration.ofMinutes(10)));
+            caches.put("caffeine", new SpringCcCache(caffeine, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady()));
+            caches.put("redis", new RedisCcCache(redis, prefix, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), Duration.ofMinutes(10)));
             try {
                 for (Map.Entry<String, CcCache> entry : caches.entrySet()) {
                     RepositoryFactory repositoryFactory = new RepositoryFactory(dsl);
                     ReflectionTestUtils.setField(repositoryFactory, "ccCache", entry.getValue());
                     GraphService graphService = new GraphService();
                     ReflectionTestUtils.setField(graphService, "repositoryFactory", repositoryFactory);
-                    ((CcCacheWriteObserver) entry.getValue()).written();
+                    entry.getValue().invalidate(java.util.List.of());
                     request(graphService, repositoryFactory, release, root);   // fills the cache
                     for (int i = 0; i < 20; i++) {
                         request(graphService, repositoryFactory, release, root);   // warms the JVM

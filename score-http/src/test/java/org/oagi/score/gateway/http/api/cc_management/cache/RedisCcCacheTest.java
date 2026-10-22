@@ -58,7 +58,7 @@ class RedisCcCacheTest {
         }
         Assumptions.assumeTrue(available, "no Redis to test with");
         prefix = "{zz-cc-test:" + UUID.randomUUID() + "}:";
-        cache = new RedisCcCache(factory, prefix, Duration.ofSeconds(60));
+        cache = new RedisCcCache(factory, prefix, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), Duration.ofSeconds(60));
     }
 
     @AfterEach
@@ -84,63 +84,68 @@ class RedisCcCacheTest {
 
     @Test
     void whatIsPutComesBackInBulkAndAMissingKeyIsNotInTheResult() {
-        long generation = cache.generation();
-        cache.putAll(generation, Map.of("tags:acc:1", List.of(tag(1), tag(2)), "acc:2", tag(3)));
+        long epoch = cache.epoch();
+        cache.putAll(epoch, Map.of("tags:acc:1", List.of(tag(1), tag(2)), "acc:2", tag(3)));
 
-        Map<String, Object> found = cache.getAll(generation, List.of("tags:acc:1", "acc:2", "acc:9"));
+        Map<String, Object> found = cache.getAll(List.of("tags:acc:1", "acc:2", "acc:9"));
 
         assertEquals(Set.of("tags:acc:1", "acc:2"), found.keySet());
         assertEquals(List.of(tag(1), tag(2)), found.get("tags:acc:1"));
-        assertEquals(tag(3), cache.get(generation, "acc:2"));
-        assertNull(cache.get(generation, "acc:9"));
+        assertEquals(tag(3), cache.get("acc:2"));
+        assertNull(cache.get("acc:9"));
     }
 
     @Test
     void manyKeysAreReadAndWrittenInSeveralCommands() {
-        long generation = cache.generation();
+        long epoch = cache.epoch();
         Map<String, Object> values = new HashMap<>();
         for (int i = 0; i < 2500; i++) {
             values.put("acc:" + i, tag(i));
         }
-        cache.putAll(generation, values);
+        cache.putAll(epoch, values);
 
-        assertEquals(2500, cache.getAll(generation, values.keySet()).size());
+        assertEquals(2500, cache.getAll(values.keySet()).size());
     }
 
     @Test
-    void aWriteStartsANewGenerationThatNobodyOfTheOldOneCanSee() {
-        long before = cache.generation();
-        cache.put(before, "acc:1", tag(1));
+    void forgettingTouchesOnlyTheNamedEntriesAndRejectsWhatWasReadBefore() {
+        long before = cache.epoch();
+        cache.putAll(before, Map.of("acc:1", tag(1), "acc:2", tag(2)));
 
-        cache.written();
+        cache.invalidate(List.of("acc:1", "acc:404"));
 
-        long after = cache.generation();
-        assertEquals(before + 1, after);
-        assertNull(cache.get(after, "acc:1"));
-        // what a reader that started before the write stores afterwards goes where nobody looks
-        cache.put(before, "acc:2", tag(2));
-        assertNull(cache.get(after, "acc:2"));
+        long after = cache.epoch();
+        assertTrue(after > before);
+        assertNull(cache.get("acc:1"));
+        assertEquals(tag(2), cache.get("acc:2"), "what did not change stays");
+        // what a reader that started before the change stores afterwards is refused
+        cache.put(before, "acc:1", tag(9));
+        assertNull(cache.get("acc:1"));
+        cache.put(after, "acc:1", tag(1));
+        assertEquals(tag(1), cache.get("acc:1"));
     }
 
     @Test
-    void theGenerationIsSharedByEveryInstanceOfTheCache() {
-        RedisCcCache other = new RedisCcCache(factory, prefix, Duration.ofSeconds(60));
-        long before = other.generation();
+    void theEpochAndWhatWasForgottenAreSharedByEveryInstanceOfTheCache() {
+        RedisCcCache other = new RedisCcCache(factory, prefix, CcCacheStatus.alwaysReady(), Duration.ofSeconds(60));
+        long before = other.epoch();
+        cache.putAll(cache.epoch(), Map.of("acc:1", tag(1)));
+        assertEquals(tag(1), other.get("acc:1"));
 
-        cache.written();
+        cache.invalidate(List.of("acc:1"));
 
-        assertEquals(before + 1, other.generation());
+        assertTrue(other.epoch() > before);
+        assertNull(other.get("acc:1"));
     }
 
     @Test
-    void aTransactionBypassesTheCacheFromItsFirstWriteAndStartsTheGenerationWhenItCommits() {
-        long before = cache.generation();
+    void aTransactionBypassesTheCacheFromItsFirstWriteUntilItEnds() {
         TransactionSynchronizationManager.initSynchronization();
 
         assertFalse(cache.isBypassed());
-        cache.written();
+        WriteTracker.written(() -> {
+        });
         assertTrue(cache.isBypassed());
-        assertEquals(before, cache.generation());
 
         for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
             synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
@@ -148,47 +153,51 @@ class RedisCcCacheTest {
         TransactionSynchronizationManager.clearSynchronization();
 
         assertFalse(cache.isBypassed());
-        assertEquals(before + 1, cache.generation());
     }
 
     @Test
-    void aGenerationNeverGoesBackAfterTheKeysOfRedisAreGone() {
-        cache.written();
-        long before = cache.generation();
-        cache.putAll(before, Map.of("acc:1", tag(1)));
-        TransactionSynchronizationManager.initSynchronization();
-        cache.written();
-        for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
-            synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-        }
-        TransactionSynchronizationManager.clearSynchronization();
-        long reached = cache.generation();
+    void anEpochNeverGoesBackAfterTheKeysOfRedisAreGone() {
+        cache.invalidate(List.of());
+        long reached = cache.epoch();
+        cache.putAll(reached, Map.of("acc:1", tag(1)));
 
         try (RedisConnection connection = factory.getConnection()) {
             // what FLUSHALL does at the start of an instance
-            connection.keyCommands().del((prefix + "generation").getBytes(), (prefix + reached + ":acc:1").getBytes());
+            connection.keyCommands().del((prefix + "epoch").getBytes(), (prefix + "acc:1").getBytes());
         }
 
-        long afterwards = cache.generation();
-        assertTrue(afterwards > reached, "generation " + afterwards + " must be after " + reached);
-        assertNull(cache.get(afterwards, "acc:1"));
-        assertEquals(afterwards, cache.generation());
+        long afterwards = cache.epoch();
+        assertTrue(afterwards > reached, "epoch " + afterwards + " must be after " + reached);
+        assertNull(cache.get("acc:1"));
+        // a reader that took the epoch before the flush cannot store after it
+        cache.put(reached, "acc:2", tag(2));
+        assertNull(cache.get("acc:2"));
+        assertEquals(afterwards, cache.epoch());
+    }
+
+    @Test
+    void forgettingFailsWhenRedisCannotBeReachedSoThatTheFeedTriesAgain() {
+        LettuceConnectionFactory dead = new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 1));
+        dead.afterPropertiesSet();
+        RedisCcCache broken = new RedisCcCache(dead, "zz-cc-test:dead:", CcCacheStatus.alwaysReady(), Duration.ofSeconds(60));
+
+        assertThrows(RuntimeException.class, () -> broken.invalidate(List.of("acc:1")));
+        dead.destroy();
     }
 
     @Test
     void aRedisThatDoesNotAnswerIsAMissAndTheCacheIsBypassed() {
         LettuceConnectionFactory dead = new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 1));
         dead.afterPropertiesSet();
-        RedisCcCache broken = new RedisCcCache(dead, "zz-cc-test:dead:", Duration.ofSeconds(60));
+        RedisCcCache broken = new RedisCcCache(dead, "zz-cc-test:dead:", CcCacheStatus.alwaysReady(), Duration.ofSeconds(60));
 
-        long generation = broken.generation();
+        long epoch = broken.epoch();
 
-        assertTrue(generation < 0);
+        assertTrue(epoch < 0);
         assertTrue(broken.isBypassed());
-        assertNull(broken.get(generation, "acc:1"));
-        assertTrue(broken.getAll(generation, List.of("acc:1")).isEmpty());
-        assertDoesNotThrow(() -> broken.put(generation, "acc:1", tag(1)));
-        assertDoesNotThrow(broken::written);
+        assertNull(broken.get("acc:1"));
+        assertTrue(broken.getAll(List.of("acc:1")).isEmpty());
+        assertDoesNotThrow(() -> broken.put(epoch, "acc:1", tag(1)));
         dead.destroy();
     }
 

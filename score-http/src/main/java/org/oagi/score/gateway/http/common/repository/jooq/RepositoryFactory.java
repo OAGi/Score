@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.common.repository.jooq;
 import org.oagi.score.gateway.http.api.account_management.repository.PendingQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.jooq.JooqPendingQueryRepository;
 import org.jooq.DSLContext;
+import org.oagi.score.gateway.http.api.cc_management.repository.CcChangeLogRepository;
+import org.oagi.score.gateway.http.api.cc_management.repository.jooq.JooqCcChangeLogRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyQueryRepository;
@@ -102,8 +104,17 @@ public class RepositoryFactory {
     @Autowired(required = false)
     private CcCache ccCache;
 
+    /** The same connection and settings, without the log of every statement: the change feed asks twice a second. */
+    private final DSLContext quietDslContext;
+
     public RepositoryFactory(@Autowired DSLContext dslContext) {
         this.dslContext = dslContext;
+        this.quietDslContext = dslContext.configuration()
+                .derive(dslContext.settings().withExecuteLogging(false)).dsl();
+    }
+
+    public CcChangeLogRepository ccChangeLogRepository() {
+        return new JooqCcChangeLogRepository(quietDslContext);
     }
 
     private final CcDocumentFactory ccDocumentFactory = new CcDocumentFactory(this);

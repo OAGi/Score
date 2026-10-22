@@ -5,6 +5,7 @@ import org.jooq.ExecuteListener;
 import org.jooq.ExecuteListenerProvider;
 import org.jooq.ExecuteType;
 import org.jooq.impl.DefaultExecuteListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -15,9 +16,10 @@ import java.util.regex.Pattern;
 /**
  * Tells the {@link CcCacheWriteObserver} about every statement that writes to a table the cached records are made of.
  * <p>
- * The records are joined from the component tables and their manifests, the sequence keys, the tags, the revision log,
- * the release and its dependencies, the library and the owner, so a write to any of them can make an entry stale.
- * Every write goes through the {@code DSLContext}, which is why one listener covers all the places that write.
+ * It is only a hint, for this instance: the thread that wrote does not use the cache until its transaction ends, and the
+ * change log is read at once when it commits. What the cache forgets comes from the change log, which the triggers on these
+ * tables write whoever makes the change, so a write this listener does not recognise (a statement through other means, one
+ * whose first table is not listed) is still forgotten, only a moment later.
  */
 @Component
 public class CcCacheWriteListener implements ExecuteListenerProvider {
@@ -36,7 +38,8 @@ public class CcCacheWriteListener implements ExecuteListenerProvider {
 
     private final CcCacheWriteObserver cache;
 
-    public CcCacheWriteListener(CcCacheWriteObserver cache) {
+    /** Lazy: the DSLContext that this listener is part of is what the observer reads the change log with. */
+    public CcCacheWriteListener(@Lazy CcCacheWriteObserver cache) {
         this.cache = cache;
     }
 

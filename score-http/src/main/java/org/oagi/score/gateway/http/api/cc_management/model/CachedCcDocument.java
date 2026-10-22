@@ -76,8 +76,8 @@ public class CachedCcDocument implements CcDocument {
     private final CcCache cache;
     private final List<ReleaseId> releaseIdList;
 
-    /** The generation of the cache this document reads and writes in, pinned when it was made. */
-    private final long generation;
+    /** The epoch of the cache when this document was made: it stores nothing once entries have been forgotten since. */
+    private final long epoch;
 
     /**
      * What this document has already got from the cache or the database. A graph reads the same entries thousands of
@@ -100,7 +100,7 @@ public class CachedCcDocument implements CcDocument {
         this.requester = requester;
         this.repositoryFactory = repositoryFactory;
         this.cache = repositoryFactory.ccCache();
-        this.generation = cache.generation();
+        this.epoch = cache.epoch();
         this.releaseIdList = new ArrayList<>(releaseIdList);
         this.eagerDocument = new LoadOnce<>(() -> new CcDocumentImpl(requester, repositoryFactory, this.releaseIdList));
     }
@@ -138,7 +138,7 @@ public class CachedCcDocument implements CcDocument {
     private Object recall(String key) {
         Object value = memo.get(key);
         if (value == null) {
-            value = cache.get(generation, key);
+            value = cache.get(key);
             if (value != null) {
                 memo.put(key, value);
             }
@@ -159,7 +159,7 @@ public class CachedCcDocument implements CcDocument {
             }
         }
         if (!missing.isEmpty()) {
-            Map<String, Object> fromCache = cache.getAll(generation, missing);
+            Map<String, Object> fromCache = cache.getAll(missing);
             memo.putAll(fromCache);
             found.putAll(fromCache);
         }
@@ -167,13 +167,13 @@ public class CachedCcDocument implements CcDocument {
     }
 
     private void remember(String key, Object value) {
-        cache.put(generation, key, value);
+        cache.put(epoch, key, value);
         memo.put(key, value);
     }
 
     private void rememberAll(Map<String, Object> values) {
         if (!values.isEmpty()) {
-            cache.putAll(generation, values);
+            cache.putAll(epoch, values);
             memo.putAll(values);
         }
     }

@@ -1,11 +1,14 @@
 package org.oagi.score.gateway.http.api.cc_management.cache;
 
-/** Told by {@link CcCacheWriteListener} that a statement has written to the data the cached records are made of. */
+/**
+ * Told by {@link CcCacheWriteListener} that a statement has written to a table the cached records are made of. It is a hint
+ * for this instance only; what changed is in the change log, which every instance reads.
+ */
 public interface CcCacheWriteObserver {
 
     /**
-     * Inside a transaction the cache starts a new generation when it commits, and until then the writing thread bypasses
-     * the cache; outside one the write is already visible and the new generation starts at once.
+     * Inside a transaction the writing thread bypasses the cache until the transaction ends, and a commit reads the change log
+     * at once so that the writer sees its own change; outside one the write is already visible and the log is read at once.
      */
     void written();
 

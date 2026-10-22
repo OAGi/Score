@@ -56,8 +56,7 @@ class CachedCcDocumentTest {
 
     @BeforeEach
     void setUp() {
-        cache = new SpringCcCache(new ConcurrentMapCacheManager(),
-                new StaticListableBeanFactory().getBeanProvider(RedissonClient.class));
+        cache = new SpringCcCache(new ConcurrentMapCacheManager(), org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady());
         when(repositoryFactory.ccCache()).thenReturn(cache);
         when(repositoryFactory.accQueryRepository(requester)).thenReturn(accQuery);
         when(repositoryFactory.asccpQueryRepository(requester)).thenReturn(asccpQuery);
@@ -175,7 +174,7 @@ class CachedCcDocumentTest {
         assertNotNull(uncached.getAcc(accId(5)));
 
         verify(accQuery, times(2)).getAccSummary(accId(5));
-        assertNull(cache.get(cache.generation(), "acc:5"));
+        assertNull(cache.get("acc:5"));
     }
 
     @Test

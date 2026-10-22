@@ -21,25 +21,28 @@ import java.util.*;
 /**
  * The {@link CcCache} in Redis ({@code spring.cache.type=redis}), with nothing of it in the JVM.
  * <p>
- * <b>Generations.</b> The generation is a counter in Redis, and it is part of every key
- * ({@code {cc:<application version>}:<generation>:<key>}; the braces make all keys of the cache one slot of a Redis cluster). A write that has been committed adds one to it, which at once
- * makes every entry of the old generation unreachable for everyone, on every instance, and the entries of it expire
- * by themselves. A reader that pinned a generation before a write can only store what it read under the old one, which
- * nobody reads any more: so there is nothing to compare when storing, and no message to send to the other instances.
- * The version of the application is part of the key as well, so a deployment starts from an empty cache.
+ * <b>Keys.</b> {@code {cc:<application version>}:<key>}; the braces make all keys of the cache one slot of a Redis cluster,
+ * which the commands that take several keys need. The version of the application is part of the key, so a deployment starts
+ * from an empty cache.
  * <p>
- * <b>Cost.</b> The entries are read and written in bulk ({@code MGET}, a pipeline of {@code SET}), because a round trip
+ * <b>Forgetting.</b> {@link CcChangeFeed} names the keys of the records that changed. An epoch counter in Redis changes
+ * first and the keys are removed after, and a store is a script that stores only if the epoch is still the one the reader
+ * took: so what a reader read before a change can never be put back after the entry was forgotten, on any instance.
+ * The entries of everything that did not change stay.
+ * <p>
+ * <b>Cost.</b> The entries are read and written in bulk ({@code MGET}, a script of {@code SET}s), because a round trip
  * per entry takes seconds for a graph.
  * <p>
  * <b>Failure.</b> Redis that does not answer is a miss, never an error; for a few seconds afterwards the cache is
- * bypassed altogether, so that a dead Redis does not add its time-out to every lookup.
+ * bypassed altogether, so that a dead Redis does not add its time-out to every lookup. Forgetting is the exception: it
+ * fails, so that the feed tries again.
  * <p>
  * The cache shares its Redis with whatever else uses it (the sessions): it never scans or flushes it, it only counts
- * generations and gives every entry an expiry.
+ * epochs and gives every entry an expiry. When Redis is flushed the epoch starts again from the clock, not from zero.
  */
 @Component
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
-public class RedisCcCache implements CcCache, CcCacheWriteObserver {
+public class RedisCcCache implements CcCache {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisCcCache.class);
 
@@ -47,16 +50,21 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
     private static final int CHUNK = 1000;
     /** The most entries one script call stores. */
     private static final int STORE_CHUNK = 500;
+    /** KEYS[1] is the epoch and the others the entries; ARGV[1] the epoch of the reader, ARGV[i] the value of KEYS[i], the last ARGV the expiry. */
     private static final byte[] STORE_SCRIPT = (
-            "for i = 1, #KEYS do redis.call('SET', KEYS[i], ARGV[i], 'PX', ARGV[#ARGV]) end return #KEYS")
+            "local e = redis.call('GET', KEYS[1]) "
+                    + "if e ~= ARGV[1] then return 0 end "
+                    + "for i = 2, #KEYS do redis.call('SET', KEYS[i], ARGV[i], 'PX', ARGV[#ARGV]) end "
+                    + "return #KEYS - 1")
             .getBytes(StandardCharsets.US_ASCII);
     private static final long BYPASS_AFTER_FAILURE_NANOS = Duration.ofSeconds(5).toNanos();
 
     private final RedisConnectionFactory connectionFactory;
+    private final CcCacheStatus status;
     private final CcRecordSerializer serializer = new CcRecordSerializer();
     private final SingleFlight singleFlight = new SingleFlight();
     private final String prefix;
-    private final byte[] generationKey;
+    private final byte[] epochKey;
     private final long ttlMillis;
 
     /** The {@link System#nanoTime()} until which Redis is not asked, after a failure. */
@@ -65,8 +73,9 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
     @Autowired
     public RedisCcCache(RedisConnectionFactory connectionFactory,
                         ObjectProvider<BuildProperties> buildProperties,
+                        CcCacheStatus status,
                         @Value("${spring.cache.redis.time-to-live:10m}") Duration timeToLive) {
-        this(connectionFactory, "{cc:" + version(buildProperties) + "}:", timeToLive);
+        this(connectionFactory, "{cc:" + version(buildProperties) + "}:", status, timeToLive);
     }
 
     private static String version(ObjectProvider<BuildProperties> buildProperties) {
@@ -79,17 +88,18 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
      *               need them in one slot, so the part of the prefix that is the same for all keys is in braces
      *               (a hash tag), as the application's prefix is
      */
-    public RedisCcCache(RedisConnectionFactory connectionFactory, String prefix, Duration timeToLive) {
+    public RedisCcCache(RedisConnectionFactory connectionFactory, String prefix, CcCacheStatus status, Duration timeToLive) {
         this.connectionFactory = connectionFactory;
         this.prefix = prefix;
-        this.generationKey = (this.prefix + "generation").getBytes(StandardCharsets.UTF_8);
+        this.status = status;
+        this.epochKey = (this.prefix + "epoch").getBytes(StandardCharsets.UTF_8);
         this.ttlMillis = timeToLive.toMillis();
     }
 
     // ---- the keys ------------------------------------------------------------------------------------------------
 
-    private byte[] keyOf(long generation, String key) {
-        return (prefix + generation + ":" + key).getBytes(StandardCharsets.UTF_8);
+    private byte[] keyOf(String key) {
+        return (prefix + key).getBytes(StandardCharsets.UTF_8);
     }
 
     // ---- failure -------------------------------------------------------------------------------------------------
@@ -109,34 +119,35 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
     // ---- CcCache -------------------------------------------------------------------------------------------------
 
     @Override
-    public long generation() {
+    public long epoch() {
+        status.freshen();
         if (unavailable()) {
             return -1;
         }
         try (RedisConnection connection = connectionFactory.getConnection()) {
-            byte[] value = connection.stringCommands().get(generationKey);
+            byte[] value = connection.stringCommands().get(epochKey);
             if (value == null) {
                 // The counter is gone (Redis was flushed, as an instance does when it starts). It starts again from the
-                // time, not from zero, so that a reader that still holds a generation of before cannot meet it again.
-                connection.stringCommands().set(generationKey, Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII),
+                // time, not from zero, so that a reader that still holds an epoch of before cannot meet it again.
+                connection.stringCommands().set(epochKey, Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII),
                         Expiration.persistent(), SetOption.SET_IF_ABSENT);
-                value = connection.stringCommands().get(generationKey);
+                value = connection.stringCommands().get(epochKey);
             }
-            return (value == null) ? 0 : Long.parseLong(new String(value, StandardCharsets.US_ASCII));
+            return (value == null) ? -1 : Long.parseLong(new String(value, StandardCharsets.US_ASCII));
         } catch (RuntimeException e) {
-            failed("read its generation", e);
+            failed("read its epoch", e);
             return -1;
         }
     }
 
     @Override
-    public Object get(long generation, String key) {
-        return getAll(generation, List.of(key)).get(key);
+    public Object get(String key) {
+        return getAll(List.of(key)).get(key);
     }
 
     @Override
-    public Map<String, Object> getAll(long generation, Collection<String> keys) {
-        if (generation < 0 || keys.isEmpty() || unavailable()) {
+    public Map<String, Object> getAll(Collection<String> keys) {
+        if (keys.isEmpty() || unavailable()) {
             return Collections.emptyMap();
         }
         Map<String, Object> found = new HashMap<>();
@@ -144,7 +155,7 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
         try (RedisConnection connection = connectionFactory.getConnection()) {
             for (int from = 0; from < all.size(); from += CHUNK) {
                 List<String> chunk = all.subList(from, Math.min(from + CHUNK, all.size()));
-                byte[][] redisKeys = chunk.stream().map(e -> keyOf(generation, e)).toArray(byte[][]::new);
+                byte[][] redisKeys = chunk.stream().map(this::keyOf).toArray(byte[][]::new);
                 List<byte[]> values = connection.stringCommands().mGet(redisKeys);
                 for (int i = 0; i < chunk.size(); i++) {
                     byte[] value = (values != null) ? values.get(i) : null;
@@ -173,16 +184,20 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
     }
 
     @Override
-    public void put(long generation, String key, Object value) {
-        putAll(generation, Map.of(key, value));
+    public void put(long epoch, String key, Object value) {
+        if (value != null) {
+            putAll(epoch, Map.of(key, value));
+        }
     }
 
     @Override
-    public void putAll(long generation, Map<String, Object> values) {
-        if (generation < 0 || values.isEmpty() || unavailable()) {
+    public void putAll(long epoch, Map<String, Object> values) {
+        if (epoch < 0 || values.isEmpty() || unavailable()) {
             return;
         }
         List<Map.Entry<String, Object>> entries = new ArrayList<>(values.entrySet());
+        byte[] epochArgument = Long.toString(epoch).getBytes(StandardCharsets.US_ASCII);
+        byte[] ttlArgument = Long.toString(ttlMillis).getBytes(StandardCharsets.US_ASCII);
         try (RedisConnection connection = connectionFactory.getConnection()) {
             for (int from = 0; from < entries.size(); from += STORE_CHUNK) {
                 List<byte[]> keys = new ArrayList<>();
@@ -190,21 +205,25 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
                 for (Map.Entry<String, Object> entry : entries.subList(from, Math.min(from + STORE_CHUNK, entries.size()))) {
                     byte[] value = write(entry.getKey(), entry.getValue());
                     if (value != null) {
-                        keys.add(keyOf(generation, entry.getKey()));
+                        keys.add(keyOf(entry.getKey()));
                         bytes.add(value);
                     }
                 }
-                if (keys.size() == 1) {
-                    connection.stringCommands().set(keys.get(0), bytes.get(0), Expiration.milliseconds(ttlMillis), SetOption.UPSERT);
-                } else if (!keys.isEmpty()) {
+                if (!keys.isEmpty()) {
                     // One round trip for the chunk, on the shared connection (a pipeline would open a connection of its own).
-                    byte[][] keysAndArguments = new byte[keys.size() * 2 + 1][];
-                    for (int i = 0; i < keys.size(); i++) {
-                        keysAndArguments[i] = keys.get(i);
-                        keysAndArguments[keys.size() + i] = bytes.get(i);
+                    // KEYS: the epoch, then the entries. ARGV: the reader's epoch, then the value of each entry, then the expiry.
+                    int n = keys.size();
+                    byte[][] keysAndArguments = new byte[(n + 1) * 2 + 1][];
+                    keysAndArguments[0] = epochKey;
+                    for (int i = 0; i < n; i++) {
+                        keysAndArguments[i + 1] = keys.get(i);
                     }
-                    keysAndArguments[keys.size() * 2] = Long.toString(ttlMillis).getBytes(StandardCharsets.US_ASCII);
-                    connection.scriptingCommands().eval(STORE_SCRIPT, ReturnType.INTEGER, keys.size(), keysAndArguments);
+                    keysAndArguments[n + 1] = epochArgument;
+                    for (int i = 0; i < n; i++) {
+                        keysAndArguments[n + 2 + i] = bytes.get(i);
+                    }
+                    keysAndArguments[2 * n + 2] = ttlArgument;
+                    connection.scriptingCommands().eval(STORE_SCRIPT, ReturnType.INTEGER, n + 1, keysAndArguments);
                 }
             }
         } catch (RuntimeException e) {
@@ -222,28 +241,31 @@ public class RedisCcCache implements CcCache, CcCacheWriteObserver {
     }
 
     @Override
+    public void invalidate(Collection<String> keys) {
+        try (RedisConnection connection = connectionFactory.getConnection()) {
+            // First the epoch: a store that began before this is refused by the script, so none can land after the removal.
+            if (connection.stringCommands().get(epochKey) == null) {
+                connection.stringCommands().set(epochKey, Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII),
+                        Expiration.persistent(), SetOption.SET_IF_ABSENT);
+            }
+            connection.stringCommands().incr(epochKey);
+            List<String> all = new ArrayList<>(keys);
+            for (int from = 0; from < all.size(); from += CHUNK) {
+                byte[][] redisKeys = all.subList(from, Math.min(from + CHUNK, all.size())).stream()
+                        .map(this::keyOf).toArray(byte[][]::new);
+                connection.keyCommands().unlink(redisKeys);
+            }
+        }
+    }
+
+    @Override
     public boolean isBypassed() {
-        return WriteTracker.isDirty() || unavailable();
+        return WriteTracker.isDirty() || unavailable() || !status.isReady();
     }
 
     @Override
     public void singleFlight(String key, Runnable task) {
         singleFlight.run(key, task);
-    }
-
-    // ---- CcCacheWriteObserver --------------------------------------------------------------------------------------
-
-    @Override
-    public void written() {
-        WriteTracker.written(this::startNewGeneration);
-    }
-
-    private void startNewGeneration() {
-        try (RedisConnection connection = connectionFactory.getConnection()) {
-            connection.stringCommands().incr(generationKey);
-        } catch (RuntimeException e) {
-            failed("start a new generation", e);
-        }
     }
 
 }
