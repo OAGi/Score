@@ -70,12 +70,29 @@ class DenUtilsTest {
                 .isEqualTo("Line Item Type. Line Item Type_ Code");
     }
 
+
     @Test
-    void denWithQualifierLeavesTheDenAloneWithoutAQualifier() {
-        assertThat(Utility.denWithQualifier(null, "Date Time. Type")).isEqualTo("Date Time. Type");
-        assertThat(Utility.denWithQualifier("", "Date Time. Type")).isEqualTo("Date Time. Type");
-        assertThat(Utility.denWithQualifier(" ", "Date Time. Type")).isEqualTo("Date Time. Type");
-        assertThat(Utility.denWithQualifier("Open", "Number. Type")).isEqualTo("Open_ Number. Type");
+    void bccpDenFromTheDtDenDropsTheTypeEnding() {
+        assertThat(DenUtils.bccpDen("Frequency Number", "Open_ Number. Type")).isEqualTo("Frequency Number. Open_ Number");
     }
 
+    @Test
+    void componentDens() {
+        assertThat(DenUtils.accDen("Invoice")).isEqualTo("Invoice. Details");
+        assertThat(DenUtils.asccpDen("Party", "Party Details")).isEqualTo("Party. Party Details");
+        assertThat(DenUtils.asccDen("Invoice", "Party. Party Details")).isEqualTo("Invoice. Party. Party Details");
+        assertThat(DenUtils.bccDen("Invoice", "Amount. Amount")).isEqualTo("Invoice. Amount. Amount");
+    }
+
+    @Test
+    void asccpDenIsNotCutAtTheLongestTerms() {
+        String den = DenUtils.asccpDen("P".repeat(100), "O".repeat(100));
+        assertThat(den).hasSize(202).startsWith("P").endsWith("O");
+    }
+
+    @Test
+    void dtScUniquenessDenDropsTheRepresentationTermFromThePropertyTerm() {
+        assertThat(DenUtils.dtScUniquenessDen("Amount. Type", "Currency Code", "Code")).isEqualTo("Amount. Type. Currency. Code");
+        assertThat(DenUtils.dtScUniquenessDen("Amount. Type", null, "Code")).isEqualTo("Amount. Type. Code");
+    }
 }

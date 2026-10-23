@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import jakarta.annotation.Nullable;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccCreateRequest;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccUpdateRequest;
@@ -1261,7 +1262,7 @@ public class CcCommandService {
                                        String representationTerm) {
         var dtQuery = repositoryFactory.dtQueryRepository(requester);
         if (dtQuery.hasSameDen(dtSc.dtScManifestId(), objectClassTerm, propertyTerm, representationTerm)) {
-            String den = getDen(objectClassTerm, propertyTerm, representationTerm);
+            String den = DenUtils.dtScUniquenessDen(objectClassTerm, propertyTerm, representationTerm);
             throw new IllegalArgumentException("There is an another supplementary component whose DEN is same with the request: " + den);
         }
 
@@ -1269,20 +1270,6 @@ public class CcCommandService {
             DtScSummaryRecord basedDtSc = dtQuery.getDtScSummary(dtSc.basedDtScManifestId());
             ensureUniquenessOfDen(requester, basedDtSc, objectClassTerm, propertyTerm, representationTerm);
         }
-    }
-
-    private String getDen(
-            String objectClassTerm,
-            String propertyTerm,
-            String representationTerm) {
-        String middleTerm = null;
-        if (hasLength(propertyTerm)) {
-            middleTerm = propertyTerm.replaceAll(representationTerm, "").trim();
-        }
-        if (middleTerm != null) {
-            return objectClassTerm + ". " + middleTerm + ". " + representationTerm;
-        }
-        return objectClassTerm + ". " + representationTerm;
     }
 
     public boolean updateBasedAccManifestId(

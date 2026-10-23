@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -126,7 +127,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         if (basedAccManifest != null) {
             accManifest.setBasedAccManifestId(basedAccManifest.getAccManifestId());
         }
-        accManifest.setDen(acc.getObjectClassTerm() + ". Details");
+        accManifest.setDen(DenUtils.accDen(acc.getObjectClassTerm()));
 
         return new AccManifestId(
                 dslContext().insertInto(ACC_MANIFEST)
@@ -438,7 +439,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         asccManifestRecord.setReleaseId(valueOf(fromAcc.release().releaseId()));
         asccManifestRecord.setFromAccManifestId(valueOf(fromAcc.accManifestId()));
         asccManifestRecord.setToAsccpManifestId(valueOf(toAsccp.asccpManifestId()));
-        asccManifestRecord.setDen(fromAcc.objectClassTerm() + ". " + toAsccp.den());
+        asccManifestRecord.setDen(DenUtils.asccDen(fromAcc.objectClassTerm(), toAsccp.den()));
         AsccManifestId asccManifestId = new AsccManifestId(
                 dslContext().insertInto(ASCC_MANIFEST)
                         .set(asccManifestRecord)
@@ -667,7 +668,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         asccManifestRecord.setReleaseId(valueOf(fromAcc.release().releaseId()));
         asccManifestRecord.setFromAccManifestId(valueOf(fromAcc.accManifestId()));
         asccManifestRecord.setToBccpManifestId(valueOf(toBccp.bccpManifestId()));
-        asccManifestRecord.setDen(fromAcc.objectClassTerm() + ". " + toBccp.den());
+        asccManifestRecord.setDen(DenUtils.bccDen(fromAcc.objectClassTerm(), toBccp.den()));
         BccManifestId bccManifestId = new BccManifestId(
                 dslContext().insertInto(BCC_MANIFEST)
                         .set(asccManifestRecord)
@@ -863,7 +864,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .set(ACC.OBJECT_CLASS_TERM, objectClassTerm);
 
-            String den = objectClassTerm + ". Details";
+            String den = DenUtils.accDen(objectClassTerm);
             dslContext().update(ACC_MANIFEST)
                     .set(ACC_MANIFEST.DEN, den)
                     .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))
@@ -929,7 +930,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                         .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(asccManifestRecord.getToAsccpManifestId()))
                         .fetchOneInto(String.class);
 
-                asccManifestRecord.setDen(objectClassTerm + ". " + asccpDen);
+                asccManifestRecord.setDen(DenUtils.asccDen(objectClassTerm, asccpDen));
                 asccManifestRecord.update(ASCC_MANIFEST.DEN);
             }
 
@@ -942,7 +943,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                         .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccManifestRecord.getToBccpManifestId()))
                         .fetchOneInto(String.class);
 
-                bccManifestRecord.setDen(objectClassTerm + ". " + bccpDen);
+                bccManifestRecord.setDen(DenUtils.bccDen(objectClassTerm, bccpDen));
                 bccManifestRecord.update(BCC_MANIFEST.DEN);
             }
 
@@ -954,7 +955,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                         .where(ASCCP.ASCCP_ID.eq(asccpManifestRecord.getAsccpId()))
                         .fetchOne();
 
-                asccpManifestRecord.setDen(asccpRecord.getPropertyTerm() + ". " + objectClassTerm);
+                asccpManifestRecord.setDen(DenUtils.asccpDen(asccpRecord.getPropertyTerm(), objectClassTerm));
                 asccpManifestRecord.update(ASCCP_MANIFEST.DEN);
 
                 for (AsccManifestRecord asccManifestRecord : dslContext().selectFrom(ASCC_MANIFEST)
@@ -966,7 +967,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                             .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                             .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(asccManifestRecord.getFromAccManifestId()))
                             .fetchOneInto(String.class);
-                    asccManifestRecord.setDen(_objectClassTerm + ". " + asccpManifestRecord.getDen());
+                    asccManifestRecord.setDen(DenUtils.asccDen(_objectClassTerm, asccpManifestRecord.getDen()));
                     asccManifestRecord.update(ASCC_MANIFEST.DEN);
                 }
             }
@@ -995,10 +996,10 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         UpdateSetFirstStep<AsccRecord> firstStep = dslContext().update(ASCC);
         UpdateSetMoreStep<AsccRecord> moreStep = null;
 
-        String den = acc.objectClassTerm() + ". " + dslContext().select(ASCCP_MANIFEST.DEN)
+        String den = DenUtils.asccDen(acc.objectClassTerm(), dslContext().select(ASCCP_MANIFEST.DEN)
                 .from(ASCCP_MANIFEST)
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(ascc.toAsccpManifestId())))
-                .fetchOneInto(String.class);
+                .fetchOneInto(String.class));
         boolean denChanged = compare(ascc.den(), den) != 0;
 
         if (definition != null) {
@@ -1085,7 +1086,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .join(ASCC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID))
                 .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
                 .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
-                .fetchOne(record -> record.get(ACC.OBJECT_CLASS_TERM) + ". " + record.get(ASCCP_MANIFEST.DEN));
+                .fetchOne(record -> DenUtils.asccDen(record.get(ACC.OBJECT_CLASS_TERM), record.get(ASCCP_MANIFEST.DEN)));
 
         int numOfUpdatedRecords = dslContext().update(ASCC_MANIFEST)
                 .set(ASCC_MANIFEST.DEN, den)
@@ -1122,10 +1123,10 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         UpdateSetFirstStep<BccRecord> firstStep = dslContext().update(BCC);
         UpdateSetMoreStep<BccRecord> moreStep = null;
 
-        String den = acc.objectClassTerm() + ". " + dslContext().select(BCCP_MANIFEST.DEN)
+        String den = DenUtils.bccDen(acc.objectClassTerm(), dslContext().select(BCCP_MANIFEST.DEN)
                 .from(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bcc.toBccpManifestId())))
-                .fetchOneInto(String.class);
+                .fetchOneInto(String.class));
         boolean denChanged = compare(bcc.den(), den) != 0;
 
         if (definition != null) {
@@ -1247,7 +1248,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .join(BCC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(BCC_MANIFEST.FROM_ACC_MANIFEST_ID))
                 .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
                 .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))
-                .fetchOne(record -> record.get(ACC.OBJECT_CLASS_TERM) + ". " + record.get(BCCP_MANIFEST.DEN));
+                .fetchOne(record -> DenUtils.bccDen(record.get(ACC.OBJECT_CLASS_TERM), record.get(BCCP_MANIFEST.DEN)));
 
         int numOfUpdatedRecords = dslContext().update(BCC_MANIFEST)
                 .set(BCC_MANIFEST.DEN, den)
@@ -1754,7 +1755,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             newAsccManifestRecord.setFromAccManifestId(valueOf(acc.accManifestId()));
             newAsccManifestRecord.setToAsccpManifestId(valueOf(toAsccp.nextAsccpManifestId()));
             String toAsccpDen = toAsccp.den();
-            newAsccManifestRecord.setDen(acc.objectClassTerm() + ". " + toAsccpDen);
+            newAsccManifestRecord.setDen(DenUtils.asccDen(acc.objectClassTerm(), toAsccpDen));
             newAsccManifestRecord.setPrevAsccManifestId(asccManifestRecord.getAsccManifestId());
             dslContext().insertInto(ASCC_MANIFEST).set(newAsccManifestRecord).execute();
         }
@@ -1802,7 +1803,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             newBccManifestRecord.setFromAccManifestId(valueOf(acc.accManifestId()));
             newBccManifestRecord.setToBccpManifestId(valueOf(toBccp.nextBccpManifestId()));
             String toBccpDen = toBccp.den();
-            newBccManifestRecord.setDen(acc.objectClassTerm() + ". " + toBccpDen);
+            newBccManifestRecord.setDen(DenUtils.bccDen(acc.objectClassTerm(), toBccpDen));
             newBccManifestRecord.setPrevBccManifestId(bccManifestRecord.getBccManifestId());
             dslContext().insertInto(BCC_MANIFEST).set(newBccManifestRecord).execute();
         }

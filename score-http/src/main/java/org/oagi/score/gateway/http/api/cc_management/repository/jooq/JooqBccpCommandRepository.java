@@ -95,7 +95,7 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
         bccpManifest.setBccpId(bccp.getBccpId());
         bccpManifest.setBdtManifestId(valueOf(dt.dtManifestId()));
         bccpManifest.setReleaseId(valueOf(releaseId));
-        String den = bccp.getPropertyTerm() + ". " + DenUtils.withoutTypeSuffix(dt.den());
+        String den = DenUtils.bccpDen(bccp.getPropertyTerm(), dt.den());
         bccpManifest.setDen(den);
 
         return new BccpManifestId(

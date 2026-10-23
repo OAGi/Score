@@ -505,7 +505,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(valueOf(dtManifestId)))
                     .fetch()) {
 
-                String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + DenUtils.withoutTypeSuffix(newDen);
+                String newBccpDen = DenUtils.bccpDen(bccp.get(BCCP.PROPERTY_TERM), newDen);
                 dslContext().update(BCCP_MANIFEST)
                         .set(BCCP_MANIFEST.DEN, newBccpDen)
                         .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
@@ -518,7 +518,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
                         .fetch()) {
 
-                    String newBccDen = bcc.get(ACC.OBJECT_CLASS_TERM) + ". " + newBccpDen;
+                    String newBccDen = DenUtils.bccDen(bcc.get(ACC.OBJECT_CLASS_TERM), newBccpDen);
                     dslContext().update(BCC_MANIFEST)
                             .set(BCC_MANIFEST.DEN, newBccDen)
                             .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bcc.get(BCC_MANIFEST.BCC_MANIFEST_ID)))

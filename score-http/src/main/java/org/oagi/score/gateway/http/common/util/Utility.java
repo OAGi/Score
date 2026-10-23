@@ -226,22 +226,6 @@ public class Utility {
 
     }
 
-    public static String denWithQualifier(String qualifier, String baseDen) {
-        String denWithQualifier = "";
-        baseDen = denWithoutUUID(baseDen);
-        if (qualifier == null || qualifier.isBlank()) {
-            return baseDen;
-        }
-
-        if (!baseDen.equals("Code Content. Type") && baseDen.endsWith("Code Content. Type")) {
-            denWithQualifier = qualifier + "_ " + "Code. Type";
-        } else {
-            denWithQualifier = qualifier + "_ " + baseDen;
-        }
-
-        return denWithQualifier;
-    }
-
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
         /*
          * [exception in Fields.xsd at line 4081]

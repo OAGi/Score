@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.types.UInteger;
@@ -913,7 +914,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         getDtScSummary(since(dtScManifestId)),
                         getDtScSummary(lastChanged(dtScManifestId)),
 
-                        record.get(DT_SC.PROPERTY_TERM) + ". " + record.get(DT_SC.REPRESENTATION_TERM),
+                        DenUtils.dtScDen(record.get(DT_SC.PROPERTY_TERM), record.get(DT_SC.REPRESENTATION_TERM)),
                         record.get(DT_SC.OBJECT_CLASS_TERM),
                         record.get(DT_SC.PROPERTY_TERM),
                         record.get(DT_SC.REPRESENTATION_TERM),
@@ -1205,7 +1206,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         ownerDtManifestId,
                         basedDtScManifestId,
 
-                        record.get(DT_SC.PROPERTY_TERM) + ". " + record.get(DT_SC.REPRESENTATION_TERM),
+                        DenUtils.dtScDen(record.get(DT_SC.PROPERTY_TERM), record.get(DT_SC.REPRESENTATION_TERM)),
                         record.get(DT_SC.OBJECT_CLASS_TERM),
                         record.get(DT_SC.PROPERTY_TERM),
                         record.get(DT_SC.REPRESENTATION_TERM),
