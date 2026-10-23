@@ -109,7 +109,7 @@ export class AsccpDetailComponent implements OnInit {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -227,6 +227,7 @@ export class AsccpDetailComponent implements OnInit {
       this.rootNode.access = asccpDetails.access;
       this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(asccpDetails);
 
       // Issue #1254
       // Initial expanding by the query path
@@ -251,6 +252,11 @@ export class AsccpDetailComponent implements OnInit {
         duration: 3000
       });
     });
+  }
+
+  /* The root node has no ASCC, so its detail is built from the already fetched ASCCP without another request. */
+  private seedRootDetail(asccpDetails: AsccpDetails) {
+    this.rootNode.detail = new CcAsccpNodeInfo(this.rootNode, undefined, asccpDetails);
   }
 
   goToPath(path: string) {
@@ -360,6 +366,7 @@ export class AsccpDetailComponent implements OnInit {
       this.rootNode.access = asccpDetails.access;
       this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(asccpDetails);
 
       this.onClick(this.dataSource.data[0]);
 

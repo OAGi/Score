@@ -103,7 +103,7 @@ export class BccpDetailComponent implements OnInit {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -218,6 +218,7 @@ export class BccpDetailComponent implements OnInit {
       this.rootNode.access = bccpDetails.access;
       this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
+      this.rootNode.prefetchedBccpDetails = bccpDetails;
 
       // Issue #1254
       // Initial expanding by the query path
@@ -351,6 +352,7 @@ export class BccpDetailComponent implements OnInit {
       this.rootNode.access = bccpDetails.access;
       this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
+      this.rootNode.prefetchedBccpDetails = bccpDetails;
 
       this.onClick(this.dataSource.data[0]);
 

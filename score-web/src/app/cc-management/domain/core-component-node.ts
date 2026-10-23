@@ -1724,7 +1724,6 @@ export class CcXbt {
 export interface DtPrimitiveAware {
   codeLists: CodeListSummary[];
   agencyIdLists: AgencyIdListSummary[];
-  xbtList: XbtSummary[];
 }
 
 export interface ValueDomainEntity {

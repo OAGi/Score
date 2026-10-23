@@ -14,7 +14,6 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {CcListService} from '../cc-list/domain/cc-list.service';
 import {
   CcFlatNode,
   CcFlatNodeDatabase,
@@ -53,8 +52,7 @@ import {
   EntityType,
   EntityTypes,
   OagisComponentType,
-  OagisComponentTypes,
-  XbtSummary
+  OagisComponentTypes
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
@@ -90,7 +88,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
   private agencyIdListservice = inject(AgencyIdListService);
-  private ccListService = inject(CcListService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
@@ -126,7 +123,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -139,9 +136,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
 
   selectedValueDomain: any;
 
-  codeLists: CodeListSummary[];
-  agencyIdLists: AgencyIdListSummary[];
-  xbtList: XbtSummary[];
+  codeLists: CodeListSummary[] = [];
+  agencyIdLists: AgencyIdListSummary[] = [];
 
   restrictionDataSource = new MatTableDataSource<any>();
 
@@ -262,30 +258,30 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.rootNode.access = dtDetails.access;
       this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(dtDetails);
 
+      // The value-domain pickers only need these to list their options, so the panel does not wait for them.
       forkJoin([
         this.codeListService.getCodeListSummaries(dtDetails.release.releaseId),
         this.agencyIdListservice.getAgencyIdListSummaries(dtDetails.release.releaseId),
-        this.ccListService.getXbtListSummaries(dtDetails.release.releaseId),
-      ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
+      ]).subscribe(([codeLists, agencyIdLists]) => {
         this.codeLists = codeLists;
         this.agencyIdLists = agencyIdLists;
-        this.xbtList = xbtList;
-
-        // Issue #1254
-        // Initial expanding by the query path
-        const url = this.router.url;
-        const manifestId = this.manifestId.toString();
-        const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
-
-        if (!!queryPath) {
-          this.goToPath(queryPath);
-        } else {
-          this.onClick(this.dataSource.data[0]);
-        }
-
-        this.isUpdating = false;
       });
+
+      // Issue #1254
+      // Initial expanding by the query path
+      const url = this.router.url;
+      const manifestId = this.manifestId.toString();
+      const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
+
+      if (!!queryPath) {
+        this.goToPath(queryPath);
+      } else {
+        this.onClick(this.dataSource.data[0]);
+      }
+
+      this.isUpdating = false;
     }, err => {
       this.isUpdating = false;
       if (err.status === 404) {
@@ -296,6 +292,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         duration: 3000
       });
     });
+  }
+
+  /* The root node is the DT itself, so its detail is built from the already fetched DT without another request. */
+  private seedRootDetail(dtDetails: DtDetails) {
+    this.rootNode.detail = new CcDtNodeInfo(this.rootNode as DtFlatNode, dtDetails);
   }
 
   goToPath(path: string) {
@@ -420,6 +421,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.rootNode.access = dtDetails.access;
       this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(dtDetails);
 
       this.onClick(this.dataSource.data[0]);
 

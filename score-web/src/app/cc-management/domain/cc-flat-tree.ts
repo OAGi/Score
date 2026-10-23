@@ -7,6 +7,7 @@ import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
 import {FlatNode, getKey, next} from '../../common/flat-tree';
 import {
+  BccpDetails,
   CcAccNodeInfo,
   CcAsccpNodeInfo,
   CcBccpNodeInfo,
@@ -443,6 +444,8 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   bccNode?: CcGraphNode;
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
+  /* The BCCP details the caller already holds; used once by CcNodeService.getDetail to skip fetching them again. */
+  prefetchedBccpDetails?: BccpDetails;
   private _path: string;
   private _hashPath: string;
 

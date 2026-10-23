@@ -148,7 +148,7 @@ export class AccDetailComponent implements OnInit {
   /* End cardinality management */
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -273,6 +273,7 @@ export class AccDetailComponent implements OnInit {
         this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
       }
       this.rootNode.reset();
+      this.seedRootDetail(accDetails);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -299,6 +300,11 @@ export class AccDetailComponent implements OnInit {
         duration: 3000
       });
     });
+  }
+
+  /* The root node has no parent relation, so its detail is built from the already fetched ACC without another request. */
+  private seedRootDetail(accDetails: AccDetails) {
+    this.rootNode.detail = new CcAccNodeInfo(this.rootNode as AccFlatNode, accDetails);
   }
 
   goToPath(path: string) {
@@ -411,6 +417,7 @@ export class AccDetailComponent implements OnInit {
         this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
       }
       this.rootNode.reset();
+      this.seedRootDetail(rootNode);
 
       this.onClick(this.dataSource.data[0]);
 

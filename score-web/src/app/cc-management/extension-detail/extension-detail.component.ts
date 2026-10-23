@@ -133,7 +133,7 @@ export class ExtensionDetailComponent implements OnInit {
   /* End cardinality management */
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -239,6 +239,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.rootNode.access = accDetails.access;
       this.rootNode.state = accDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(accDetails);
 
       // Issue #1254
       // Initial expanding by the query path
@@ -275,6 +276,11 @@ export class ExtensionDetailComponent implements OnInit {
       duration: 3000
     });
     this.router.navigateByUrl('/core_component');
+  }
+
+  /* The root node has no parent relation, so its detail is built from the already fetched ACC without another request. */
+  private seedRootDetail(accDetails: AccDetails) {
+    this.rootNode.detail = new CcAccNodeInfo(this.rootNode as AccFlatNode, accDetails);
   }
 
   goToPath(path: string) {
@@ -384,6 +390,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
       this.rootNode.reset();
+      this.seedRootDetail(rootNode);
 
       this.onClick(this.dataSource.data[0]);
 
