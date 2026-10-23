@@ -1,4 +1,4 @@
-import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../common/tree-search/search-expression';
 import {COMPONENT_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
@@ -1062,7 +1062,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
   /** What makes two nodes the same component: they show the same thing and so have the same children. */
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node));
+    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node)) + associationKey(ccAssociation(node));
   }
 
   /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
@@ -1492,7 +1492,22 @@ function ccSearchAttributes(node: CcFlatNode, text: string): Record<string, Attr
   const component = node instanceof AccFlatNode ? node.accNode : node instanceof AsccpFlatNode ? node.asccpNode
     : node instanceof BccpFlatNode ? node.bccpNode : node instanceof DtFlatNode ? node.dtNode
       : node instanceof DtScFlatNode ? node.dtScNode : undefined;
-  return componentSearchAttributes(node.type, text, component, node instanceof BccpFlatNode ? node.bccNode : undefined, ccCardinality(node));
+  const association = ccAssociation(node);
+  return {
+    ...componentSearchAttributes(node.type, text, component, association, ccCardinality(node)),
+    // `definition` is the one the node is about: the ASCC's or BCC's of a node that is tied to its parent by one, else its component's
+    ...definitionAttributes({
+      definition: association ?? component,
+      association_definition: association,
+      component_definition: node instanceof AsccpFlatNode || node instanceof BccpFlatNode ? component : undefined,
+      type_definition: node instanceof BccpFlatNode ? node.bdtNode : undefined
+    })
+  };
+}
+
+/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+function ccAssociation(node: CcFlatNode): CcGraphNode | undefined {
+  return node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode : undefined;
 }
 
 /** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */

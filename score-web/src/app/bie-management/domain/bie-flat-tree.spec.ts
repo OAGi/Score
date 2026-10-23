@@ -592,6 +592,62 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     expect(search(new FixedDatabase(), root, '/Parent-1/Bo', {exact: true, anchored: true}).found.total).toBe(0);
   });
 
+  it('tells the places of a component apart by the definition of their BIE', () => {
+    const {root, item, item2} = tree();
+    item2.definition = 'The second item';
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    expect(found('Item')).toBe(2);
+    expect(found("Item[definition = '']")).toBe(1);
+    expect(found("Item[definition != '']")).toBe(1);
+    expect(found('Item[contains(definition, "second")]')).toBe(1);
+    // the place without one shares the record of its component, the other is a record of its own
+    const {graph} = search(new FixedDatabase(), root, 'Item');
+    expect(graph.recordOf(item2)).not.toBe(graph.recordOf(item));
+  });
+
+  it('reads the definition of the loaded details before the one the tree was loaded with', () => {
+    const {root, item2} = tree();
+    item2.definition = 'Old text';
+    item2._detail = {asbie: {definition: 'New text'}} as any;
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    expect(found("Item[definition = 'New text']")).toBe(1);
+    expect(found("Item[definition = 'Old text']")).toBe(0);
+    // a definition that is loaded but has no text is empty
+    item2._detail = {asbie: {definition: null}} as any;
+    expect(found("Item[definition = '']")).toBe(2);
+  });
+
+  it('asks for the definitions of the core components a row shows by their own names', () => {
+    const {root, item, item2} = tree();
+    item.asccpNode.definition = 'Item component';
+    item.accNode.definition = 'Item type';
+    item.asccNode.definition = 'An association';
+    item2.asccNode.definition = 'Another association';
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    // the component and its type are the same in both places, the association is not
+    expect(found("Item[component_definition = 'Item component']")).toBe(2);
+    expect(found("Item[type_definition = 'Item type']")).toBe(2);
+    expect(found("Item[association_definition = 'An association']")).toBe(1);
+    expect(found("Item[association_definition = 'Another association']")).toBe(1);
+    expect(found("Item[association_definition = '']")).toBe(0);
+    // the BIE's own definition is not the core component's
+    expect(found("Item[definition = 'Item component']")).toBe(0);
+    expect(found("Item[definition = '']")).toBe(2);
+  });
+
+  it('does not say the definition of a part a row does not have is empty', () => {
+    const {root} = tree();
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+
+    // a BBIEP has an association and a component, but no type
+    expect(found("Code[association_definition = '' and component_definition = '']")).toBe(2);
+    expect(found("Code[type_definition = '']")).toBe(0);
+    expect(found("Item[type_definition = '']")).toBe(2);
+  });
+
   it('keeps a place that shows only some of its children apart from its component', () => {
     class FilteringDatabase extends FixedDatabase {
       constructor(private readonly filtered: Set<any>) {

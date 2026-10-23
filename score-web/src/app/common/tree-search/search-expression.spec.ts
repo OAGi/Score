@@ -1,5 +1,6 @@
 import {AttrValue, parseSearchExpression} from './search-expression';
 import {PathPattern} from './path-pattern';
+import {associationKey, componentSearchAttributes, definitionAttributes} from './component-search-attributes';
 
 /** The mask after a path of nodes, each given as its name and attributes. */
 function matches(expr: string, ...path: {name: string, [attribute: string]: AttrValue}[]): boolean {
@@ -112,5 +113,45 @@ describe('search predicates', () => {
     expect(matches('*[entity_type = attribute]', node)).toBe(true);
     expect(matches('*[entity_type != Element]', node)).toBe(true);
     expect(matches('*[used = false]', {name: 'A', used: false})).toBe(true);
+  });
+});
+
+describe('the definitions of a row', () => {
+  type Part = {definition?: string};
+  const found = (expr: string, parts: Record<string, Part | undefined>) =>
+    matches(expr, {name: 'Code', ...componentSearchAttributes('BCCP', 'Code'), ...definitionAttributes(parts)});
+
+  it('are asked for by their own names, each empty for a part that has none', () => {
+    const parts = {definition: {definition: 'A code'}, association_definition: {}, type_definition: {definition: 'A type'}};
+    expect(found("*[definition = '']", parts)).toBe(false);
+    expect(found("*[association_definition = '']", parts)).toBe(true);
+    expect(found("*[type_definition = '']", parts)).toBe(false);
+    expect(found("*[definition != '' and association_definition = '' and type_definition != '']", parts)).toBe(true);
+  });
+
+  it('are not asked of a part the row does not have', () => {
+    const parts = {definition: {definition: 'A code'}, association_definition: undefined, type_definition: undefined};
+    expect(found("*[association_definition = '']", parts)).toBe(false);
+    expect(found("*[type_definition = '']", parts)).toBe(false);
+    expect(found("*[association_definition != '']", parts)).toBe(false);
+  });
+
+  it('are empty for a part without one, whether it has none or an empty one', () => {
+    for (const part of [{}, {definition: ''}, {definition: undefined}]) {
+      expect(found("*[definition = '']", {definition: part})).withContext(JSON.stringify(part)).toBe(true);
+      expect(found("*[definition != '']", {definition: part})).withContext(JSON.stringify(part)).toBe(false);
+    }
+  });
+
+  it('is found by its words when there is one', () => {
+    const parts = {definition: {definition: 'A code that identifies a Party'}};
+    expect(found("*[definition != '']", parts)).toBe(true);
+    expect(found('*[contains(definition, "Party")]', parts)).toBe(true);
+  });
+
+  it('is made into keys that tell associations apart by their definition', () => {
+    expect(associationKey({definition: 'A'})).not.toBe(associationKey({definition: 'B'}));
+    expect(associationKey({})).toBe(associationKey(undefined));
+    expect(associationKey({definition: ''})).toBe('');
   });
 });

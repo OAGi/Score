@@ -616,6 +616,8 @@ export class CcAccNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    // the search reads what a component's definition is from the graph, which has to follow what is being edited
+    (this._node as AccFlatNode).accNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -838,6 +840,7 @@ export class AsccNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as AsccpFlatNode).asccNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -999,6 +1002,7 @@ export class AsccpNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as AsccpFlatNode).asccpNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -1228,6 +1232,7 @@ export class BccNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as BccpFlatNode).bccNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -1420,6 +1425,7 @@ export class BccpNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as BccpFlatNode).bccpNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -2124,6 +2130,7 @@ export class CcDtNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as DtFlatNode).dtNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -2709,6 +2716,7 @@ export class CcDtScNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as DtScFlatNode).dtScNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -2767,6 +2775,8 @@ export class CcGraphNode {
   cardinalityMin?: number;
   cardinalityMax?: number;
   basedDtScManifestId?: number;
+  /** The definition of a component or of an association; one without a definition has no such property. */
+  definition?: string;
   locked?: boolean;
   tagList?: ShortTag[];
 }

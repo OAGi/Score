@@ -1,4 +1,4 @@
-import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../../common/tree-search/component-search-attributes';
+import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../../common/tree-search/search-expression';
 import {MODEL_BROWSER_SEARCH_ATTRIBUTES} from '../../../common/tree-search/search-suggest';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
@@ -2038,7 +2038,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   /** What makes two tree nodes the same component: they show the same thing and so have the same name and children. */
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(browserCardinality(node));
+    return identity === undefined ? undefined : identity + cardinalityKey(browserCardinality(node)) + associationKey(browserAssociation(node));
   }
 
   /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
@@ -2120,8 +2120,24 @@ function browserSearchAttributes(node: ModelBrowserNode): Record<string, AttrVal
   const self = node.self;
   const component = self instanceof ModelBrowserBccpNode ? self.bccpNode : self instanceof ModelBrowserBdtScNode ? self.bdtScNode
     : self instanceof ModelBrowserAsccpNode ? self.asccpNode : self instanceof ModelBrowserAccNode ? self.accNode : undefined;
-  return componentSearchAttributes(BIE_TYPE_OF_CC_TYPE[node.ccType] ?? node.ccType, node.name, component,
-    self instanceof ModelBrowserBccpNode ? self.bccNode : undefined, browserCardinality(node));
+  const association = browserAssociation(node);
+  return {
+    ...componentSearchAttributes(BIE_TYPE_OF_CC_TYPE[node.ccType] ?? node.ccType, node.name, component, association,
+      browserCardinality(node)),
+    // `definition` is the one the node is about: the ASCC's or BCC's of a node that is tied to its parent by one, else its component's
+    ...definitionAttributes({
+      definition: association ?? component,
+      association_definition: association,
+      component_definition: self instanceof ModelBrowserAsccpNode || self instanceof ModelBrowserBccpNode ? component : undefined,
+      type_definition: self instanceof ModelBrowserBccpNode ? self.bdtNode : undefined
+    })
+  };
+}
+
+/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+function browserAssociation(node: ModelBrowserNode): CcGraphNode | undefined {
+  const self = node.self;
+  return self instanceof ModelBrowserBccpNode ? self.bccNode : self instanceof ModelBrowserAsccpNode ? self.asccNode : undefined;
 }
 
 /** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */

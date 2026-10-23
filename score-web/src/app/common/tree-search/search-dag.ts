@@ -27,6 +27,25 @@ export interface SearchDag {
   attributes?: Record<string, AttrValue[]>;
 }
 
+/** Whether two DAGs are the same to a search: they have the same records, in the same order, with the same names, children and attributes. */
+export function sameSearchDag(a: SearchDag, b: SearchDag): boolean {
+  if (a === b) {
+    return true;
+  }
+  const same = <T>(x: ArrayLike<T> | undefined, y: ArrayLike<T> | undefined): boolean =>
+    x === y || (!!x && !!y && x.length === y.length && Array.prototype.every.call(x, (value, i) => value === y[i]));
+  if (a.names.length !== b.names.length || !a.names.every((names, i) => same(names, b.names[i]))) {
+    return false;
+  }
+  if (!same(a.childStart, b.childStart) || !same(a.childList, b.childList) || !same(a.identity, b.identity)) {
+    return false;
+  }
+  const attributesA = a.attributes ?? {};
+  const attributesB = b.attributes ?? {};
+  const attributeNames = Object.keys(attributesA);
+  return attributeNames.length === Object.keys(attributesB).length && attributeNames.every(name => same(attributesA[name], attributesB[name]));
+}
+
 /** Builds a `SearchDag` record by record; a record is identified by a key so that equal components are shared. */
 export class SearchDagBuilder {
 

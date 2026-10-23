@@ -180,3 +180,101 @@ describe('TreeNodeSearcher on a graph', () => {
     expect(searcher.resultCount).toBe(0);
   });
 });
+
+/** A tree whose components have a definition that can be edited, as the BIE tree's nodes have. */
+class EditableSearcher extends TreeNodeSearcher<Node, TestDataSource> {
+  readonly definitions: {[key: string]: string} = {};
+  dagBuilt = 0;
+
+  constructor(dataSource: TestDataSource, private readonly forest: Forest, private readonly shape: {[key: string]: string[]}) {
+    super(dataSource);
+  }
+
+  protected override graphAdapter(): TreeGraphAdapter<Node> {
+    let builder: SearchDagBuilder;
+    const attributes = (key: string) => ({definition: this.definitions[key] ?? ''});
+    return {
+      dag: () => {
+        this.dagBuilt++;
+        builder = new SearchDagBuilder();
+        const keys = [...new Set([...Object.keys(this.shape), ...Object.values(this.shape).flat()])];
+        keys.forEach(key => builder.record(key, [this.forest.make(key).name], key, attributes(key)));
+        Object.entries(this.shape).forEach(([key, children]) => builder.setChildren(builder.indexOf(key), children.map(c => builder.indexOf(c))));
+        return builder.build();
+      },
+      recordOf: node => builder?.indexOf(node.key) ?? -1,
+      namesOf: node => [node.name],
+      attributesOf: node => attributes(node.key),
+      childrenOf: node => this.forest.childrenOf(node)
+    };
+  }
+
+  protected visibleIndex(node: Node): number {
+    return this.dataSource.data.indexOf(node);
+  }
+
+  protected visit(): TreeSearchVisit<Node> {
+    throw new Error('the node walk must not be used for a tree that has a graph');
+  }
+}
+
+describe('TreeNodeSearcher on a graph whose values are edited', () => {
+  const shape = {root: ['a', 'b'], a: ['x'], b: ['y'], x: [], y: []};
+  const expression = "*[definition != '']";
+
+  function editable() {
+    const forest = new Forest(shape);
+    const root = forest.make('root');
+    const searcher = new EditableSearcher(new TestDataSource(forest, root), forest, shape);
+    searcher.definitions['a'] = 'The first';
+    searcher.definitions['y'] = 'The last';
+    return {searcher, root};
+  }
+
+  const search = (searcher: EditableSearcher, force = false) => new Promise<number>((resolve, reject) =>
+    searcher.search(expression, undefined, false, force).subscribe({next: resolve, error: reject, complete: () => resolve(undefined)}));
+
+  it('steps through the matches while nothing a search asks about has changed', async () => {
+    const {searcher} = editable();
+    await search(searcher);
+    expect(searcher.resultCount).toBe(2);
+
+    await search(searcher);
+
+    expect(searcher.resultCount).toBe(2);
+    expect(searcher.searchIndex).toBe(1);
+  });
+
+  it('searches again, from where it started, when an edit has changed what a search finds', async () => {
+    const {searcher} = editable();
+    await search(searcher);
+    searcher.definitions['a'] = '';
+
+    const index = await search(searcher);
+
+    expect(searcher.resultCount).toBe(1);
+    expect(searcher.searchIndex).toBe(0);
+    expect(index).toBeGreaterThanOrEqual(0);
+    searcher.definitions['x'] = 'Added';
+    await search(searcher);
+    expect(searcher.resultCount).toBe(2);
+  });
+
+  it('searches again when the arrows are used after an edit', async () => {
+    const {searcher} = editable();
+    await search(searcher);
+    searcher.definitions['y'] = '';
+
+    await new Promise<void>(resolve => searcher.go(1).subscribe({complete: resolve}));
+
+    expect(searcher.resultCount).toBe(1);
+    expect(searcher.searchIndex).toBe(0);
+  });
+
+  it('does not describe the tree again while a search is running or before there is one', async () => {
+    const {searcher} = editable();
+    const before = searcher.dagBuilt;
+    searcher.go(1);
+    expect(searcher.dagBuilt).toBe(before);
+  });
+});

@@ -424,22 +424,42 @@ const COMPONENT_COLUMNS: SearchAttribute[] = [
   {name: 'deprecated', kind: 'flag', description: 'the component is deprecated'}
 ];
 
+/** The definitions of the core components a row of the component tree (or the model browser) shows. */
+const CC_DEFINITION_COLUMNS: SearchAttribute[] = [
+  {
+    name: 'definition', kind: 'text',
+    description: 'the definition of what the node is: its ASCC or BCC when it is tied to its parent by one, else its component; empty when it has none, e.g. definition = \'\''
+  },
+  {name: 'association_definition', kind: 'text', description: 'ASCCP / BCCP: the definition of the ASCC or BCC that ties it to its parent'},
+  {name: 'component_definition', kind: 'text', description: 'ASCCP / BCCP: the definition of the ASCCP or BCCP'},
+  {name: 'type_definition', kind: 'text', description: 'BCCP: the definition of its data type'}
+];
+
 /** The attributes of the nodes of a core component tree (the ACC, ASCCP, BCCP, DT and extension screens). */
 export const COMPONENT_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ACC', 'ASCCP', 'BCCP', 'DT', 'DT_SC']},
-  ...COMPONENT_COLUMNS
+  ...COMPONENT_COLUMNS,
+  ...CC_DEFINITION_COLUMNS
 ];
 
 /** The attributes of the nodes of a tree that shows core components the way a BIE is shown (the model browser). */
 export const MODEL_BROWSER_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
-  ...COMPONENT_COLUMNS
+  ...COMPONENT_COLUMNS,
+  ...CC_DEFINITION_COLUMNS
 ];
 
 /** The attributes of the nodes of a BIE tree. */
 export const BIE_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
   {name: 'display_name', kind: 'text', description: 'ASBIEP / BBIEP / BBIE_SC: the display name set on the BIE'},
+  {
+    name: 'definition', kind: 'text',
+    description: 'the definition set on the BIE (its Context Definition); empty when it has none, e.g. definition = \'\''
+  },
+  {name: 'association_definition', kind: 'text', description: 'ASBIEP / BBIEP: the definition of the ASCC or BCC that ties it to its parent'},
+  {name: 'component_definition', kind: 'text', description: 'ABIE / ASBIEP / BBIEP / BBIE_SC: the definition of the ASCCP, BCCP or DT_SC it profiles'},
+  {name: 'type_definition', kind: 'text', description: 'ABIE / ASBIEP: the definition of its ACC'},
   ...COMPONENT_COLUMNS,
   {name: 'used', kind: 'flag', description: 'the node is used in the BIE'},
   {name: 'inherited', kind: 'flag', description: 'the node is inherited'},

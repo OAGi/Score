@@ -2,7 +2,7 @@ import {componentsOf, DagSearchResult, DagSearchScope} from './dag-path-search';
 import {DagContextHost, DagNodeContext} from './dag-node-context';
 import {GraphSearchSession, openGraphSearchSession} from './graph-search-session';
 import {PathPattern, PathPatternMode} from './path-pattern';
-import {SearchDag} from './search-dag';
+import {SearchDag, sameSearchDag} from './search-dag';
 import {AttrLookup, AttrValue} from './search-expression';
 
 /** The node shape a tree must offer to be searched through its DAG. */
@@ -100,6 +100,24 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     this.mode = mode;
     this.highlighted = new WeakMap();
     return true;
+  }
+
+  /** The node the latest search started from. */
+  get startedFrom(): N | undefined {
+    return this.scopeNode;
+  }
+
+  /**
+   * Whether the tree, as it is now, shows a search something else than the DAG the latest search ran on: a value it asks
+   * about (a definition, whether a node is used, ...) or the structure has changed since, so that the same search would
+   * find other nodes. The tree is described anew for the answer, which is what a search does first anyway.
+   */
+  isStale(): boolean {
+    if (!this.loadedDag) {
+      return false;
+    }
+    const dag = this.adapter.dag();
+    return !dag || !sameSearchDag(dag, this.loadedDag);
   }
 
   /** The text a result list highlights: the last step of the expression. */

@@ -1,5 +1,5 @@
-import {CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
-import {CcGraph} from './core-component-node';
+import {AccFlatNode, CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
+import {CcAccNodeInfo, CcGraph} from './core-component-node';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
 import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 import {PathPattern} from '../../common/tree-search/path-pattern';
@@ -113,6 +113,35 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
     }).total;
   }
 
+  it('asks for the definitions of a node by what it is: its association when it has one, else its component', () => {
+    const withDefinitions = graph();
+    const nodes = withDefinitions.graph.nodes as any;
+    nodes['ASCC-2'].definition = 'The association';
+    nodes['ASCCP-3'].definition = 'The release component';
+    nodes['ACC-4'].definition = 'The item type';
+    nodes['BCC-9'].definition = 'The bcc';
+    nodes['BCCP-6'].definition = 'The bccp';
+    nodes['DT-7'].definition = 'The data type';
+    const database = new CcFlatNodeDatabase<CcFlatNode>(withDefinitions, 'ACC', 1);
+    const root = database.rootNode;
+    const count = (expr: string) => found(database, root, expr);
+
+    // an ASCCP that is tied to its parent by an ASCC: the ASCC's definition is the one it is about
+    expect(count("Release[definition = 'The association']")).toBe(1);
+    expect(count("Release[association_definition = 'The association']")).toBe(1);
+    expect(count("Release[component_definition = 'The release component']")).toBe(1);
+    expect(count("Release[definition = 'The release component']")).toBe(0);
+    // a BCCP appears twice: with a BCC that has a definition and with one that has none
+    expect(count("Identifier[type = BCCP and definition = 'The bcc']")).toBe(1);
+    expect(count("Identifier[type = BCCP and definition = '']")).toBe(1);
+    expect(count("Identifier[type = BCCP and component_definition = 'The bccp']")).toBe(2);
+    expect(count("Identifier[type = BCCP and type_definition = 'The data type']")).toBe(2);
+    // an ACC has no association and no component of its own to ask for
+    expect(count("Item[definition = 'The item type']")).toBe(1);
+    expect(count("Item[component_definition = '']")).toBe(0);
+    expect(count("Item[association_definition = '']")).toBe(0);
+  });
+
   it('counts what walking the tree finds, for single names and for paths', () => {
     const database = new CcFlatNodeDatabase<CcFlatNode>(graph(), 'ACC', 1);
     const root = database.rootNode;
@@ -153,5 +182,19 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
 
     // a prohibited supplementary component is not part of the tree at all (see getChildren)
     expect(found(database, database.rootNode, 'Scheme')).toBe(walkedMatches(database, database.rootNode, 'Scheme'));
+  });
+});
+
+describe('the definition of a component that is being edited', () => {
+  it('is what the graph says about the component, so that a search finds what is in the details', () => {
+    const accNode = {type: 'ACC', manifestId: 1, objectClassTerm: 'Party', deprecated: false, definition: 'As loaded'} as any;
+    const node = new AccFlatNode(accNode);
+    const info = new CcAccNodeInfo(node, {accManifestId: 1, objectClassTerm: 'Party', definition: {content: 'As loaded'}, owner: {loginId: 'oagis'}} as any);
+
+    info.definition = 'Being edited';
+    expect(accNode.definition).toBe('Being edited');
+
+    info.definition = '';
+    expect(accNode.definition).toBeUndefined();
   });
 });

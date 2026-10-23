@@ -1,4 +1,4 @@
-import {cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../common/tree-search/search-expression';
 import {BIE_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {
@@ -44,6 +44,8 @@ export interface BieFlatNode extends FlatNode {
   deprecated: boolean;
   ccDeprecated: boolean;
   rootNode: BieEditAbieNode;
+  /** The definition of the BIE (its Context Definition); undefined where the tree does not know it. */
+  definition?: string;
   inverseMode: boolean;
 
   used: boolean | undefined;
@@ -435,6 +437,12 @@ export class AbieFlatNode extends BieFlatNodeImpl {
     this.bieId = abieId;
   }
 
+  /** The definition of the root's ASBIEP, which the tree is not loaded with: known once the details are loaded. */
+  get definition(): string | undefined {
+    const loaded = (this._detail as BieEditAbieNodeDetail)?.asbiep.definition;
+    return loaded !== undefined ? loaded ?? '' : undefined;
+  }
+
   get asbiepPath(): string {
     if (!this._asbiepPath) {
       this._asbiepPath = 'ASCCP-' + this.asccpNode.manifestId;
@@ -498,6 +506,7 @@ export class AsbiepFlatNode extends AbieFlatNode {
   intermediateAccNodes: CcGraphNode[];
   asccNode: CcGraphNode;
 
+  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -600,6 +609,16 @@ export class AsbiepFlatNode extends AbieFlatNode {
     this._cardinalityMax = cardinalityMax;
   }
 
+  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
+  override get definition(): string {
+    const loaded = (this._detail as BieEditAsbiepNodeDetail)?.asbie.definition;
+    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
+  }
+
+  override set definition(definition: string) {
+    this._definition = definition;
+  }
+
   get ccDeprecated(): boolean {
     return this.asccpNode.deprecated || this.accNode.deprecated || this.asccNode.deprecated;
   }
@@ -621,6 +640,7 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
 
+  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -743,6 +763,16 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
     this._cardinalityMax = cardinalityMax;
   }
 
+  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
+  get definition(): string {
+    const loaded = (this._detail as BieEditBbiepNodeDetail)?.bbie.definition;
+    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
+  }
+
+  set definition(definition: string) {
+    this._definition = definition;
+  }
+
   get ccDeprecated(): boolean {
     return this.bccpNode.deprecated || this.bdtNode.deprecated || this.bccNode.deprecated;
   }
@@ -757,6 +787,7 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
   bdtScNode: CcGraphNode;
   bdtNode: CcGraphNode;
 
+  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -821,6 +852,16 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
 
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
+  }
+
+  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
+  get definition(): string {
+    const loaded = (this._detail as BieEditBbieScNodeDetail)?.bbieSc.definition;
+    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
+  }
+
+  set definition(definition: string) {
+    this._definition = definition;
   }
 
   get ccDeprecated(): boolean {
@@ -2668,7 +2709,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       const key = keyOf(node);
       const raw = this.unwrapNode(node);
       const {index} = builder.record(key, [raw.name], this.identityKey(node),
-        {...bieSearchAttributes(raw, raw.name), used: false, inherited: false, reused: false});
+        {...bieSearchAttributes(raw, raw.name), ...blankBieDefinition(raw), used: false, inherited: false, reused: false});
       // A node that is a cycle (it has no children loaded) or shows only some of its children says nothing about
       // what its component's children are.
       if (!represented.has(key) && !this.isCycleNode(node) && !this.hasFilteredChildren(node)) {
@@ -2678,9 +2719,11 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       return index;
     };
 
+    // a place with a definition of its BIE, and the places above it, have to be found by walking from the root
+    const definedPlaces = this.placesWithBieDefinition(root);
     const carriesBieData = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return hideUnused || !!(raw.used || raw.inherited || raw.reused);
+      return hideUnused || !!(raw.used || raw.inherited || raw.reused) || definedPlaces.has(raw);
     };
 
     const isSpecial = (node: T): boolean => {
@@ -2730,7 +2773,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(bieCardinality(this.unwrapNode(node)));
+    return identity === undefined ? undefined : identity + cardinalityKey(bieCardinality(this.unwrapNode(node))) + associationKey(bieAssociation(this.unwrapNode(node)));
   }
 
   /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
@@ -2756,6 +2799,31 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       next = raw.self as N;
     }
     return raw;
+  }
+
+  /**
+   * The loaded nodes that have a definition of their BIE, and the ones above them. (A node used in the BIE has its
+   * parents used, but a definition can be set on a node that is not used.)
+   */
+  private placesWithBieDefinition(root: T): Set<unknown> {
+    const places = new Set<unknown>();
+    const visited = new Set<unknown>();
+    const visit = (node: T): boolean => {
+      const raw = this.unwrapNode(node);
+      if (!raw || visited.has(raw)) {
+        return places.has(raw);
+      }
+      visited.add(raw);
+      const children = raw.getChildren ? raw.getChildren() : raw.children;
+      // every child is visited, so that all the places below a node are found
+      const below = children.map(child => visit(child as T)).some(found => found);
+      if (below || !!raw.definition) {
+        places.add(raw);
+      }
+      return places.has(raw);
+    };
+    visit(root);
+    return places;
   }
 
   hasUsedOrInheritedDescendant(node: T, visited: Set<unknown> = new Set()): boolean {
@@ -2976,6 +3044,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
+        node.definition = used[0].definition;
       }
     }
 
@@ -3014,6 +3083,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
+        node.definition = used[0].definition;
       }
     }
 
@@ -3044,6 +3114,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
+        node.definition = used[0].definition;
       }
     }
 
@@ -4044,16 +4115,39 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
 
 }
 
-/** What a search predicate can ask about a BIE node besides its BIE state: its type and the core component it profiles. */
+/**
+ * What a search predicate can ask about a BIE node besides its BIE state: its type and the core component it profiles.
+ * `definition` is the one of the BIE (the "Context Definition" of the details); the others are those of the core
+ * components the row shows: `association_definition` (ASCC or BCC), `component_definition` (ASCCP, BCCP or DT_SC) and
+ * `type_definition` (ACC).
+ */
 function bieSearchAttributes(node: BieFlatNode, text: string): Record<string, AttrValue> {
   const component = node instanceof BbiepFlatNode ? node.bccpNode : node instanceof BbieScFlatNode ? node.bdtScNode
     : node instanceof AsbiepFlatNode ? node.asccpNode : node instanceof AbieFlatNode ? node.accNode : undefined;
+  const association = bieAssociation(node);
+  const bieDefinition = node.definition;
   return {
-    ...componentSearchAttributes(node.bieType, text, component, node instanceof BbiepFlatNode ? node.bccNode : undefined,
-      bieCardinality(node)),
+    ...componentSearchAttributes(node.bieType, text, component, association, bieCardinality(node)),
     // an ABIE has no display name of its own
-    display_name: node.bieType !== 'ABIE' && node.displayName ? node.displayName : undefined
+    display_name: node.bieType !== 'ABIE' && node.displayName ? node.displayName : undefined,
+    ...definitionAttributes({
+      definition: bieDefinition === undefined ? undefined : {definition: bieDefinition},
+      association_definition: association,
+      component_definition: node instanceof AbieFlatNode ? node.asccpNode : node instanceof BbiepFlatNode ? node.bccpNode
+        : node instanceof BbieScFlatNode ? node.bdtScNode : undefined,
+      type_definition: node instanceof AbieFlatNode ? node.accNode : undefined
+    })
   };
+}
+
+/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+function bieAssociation(node: BieFlatNode): CcGraphNode | undefined {
+  return node instanceof BbiepFlatNode ? node.bccNode : node instanceof AsbiepFlatNode ? node.asccNode : undefined;
+}
+
+/** What a place that carries no BIE data says about its definition: nothing, where there is a BIE definition to have. */
+function blankBieDefinition(node: BieFlatNode): Record<string, AttrValue> {
+  return {definition: node.definition === undefined ? undefined : ''};
 }
 
 /** The cardinality of the ASBIE, BBIE or BBIE_SC that ties a node to its parent (an ABIE has none). */

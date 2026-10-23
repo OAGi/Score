@@ -197,8 +197,24 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
   }
 
   go(val: number): Observable<number> {
+    if (this.resultsStale) {
+      return this.searchAgain();
+    }
     this.searchIndex = this.wrapIndex(this.searchIndex + val);
     return this.currentMatch();
+  }
+
+  /**
+   * Whether the finished search no longer describes the tree, because something a search asks about has changed since (a
+   * definition being edited, a node being used, ...): stepping on would go through matches the tree no longer has.
+   */
+  private get resultsStale(): boolean {
+    return this.fullSearched && this.usingGraph && !this.isSearching && !!this.graph?.isStale();
+  }
+
+  /** The finished search made again, from where it started, over the tree as it is now. */
+  private searchAgain(): Observable<number> {
+    return this.search(this._inputKeyword, this.graph.startedFrom, false, true);
   }
 
   /** The node shown in a row. */
@@ -254,6 +270,9 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     }
 
     if (this.fullSearched && !force) {
+      if (this.resultsStale) {
+        return this.searchAgain();
+      }
       this.searchIndex = this.wrapIndex(this.searchIndex + (backward ? -1 : 1));
       return this.currentMatch();
     }
