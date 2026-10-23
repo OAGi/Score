@@ -17,6 +17,11 @@ ENV DB_HOST=localhost \
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
+# The Ubuntu 26.04 base ships /usr/bin/pebble (a service manager, not owned by any dpkg package)
+# built with a Go stdlib that Trivy flags (HIGH). This image starts Tomcat via catalina.sh and
+# never runs pebble, so drop it. Re-check when the base image changes.
+RUN rm -f /usr/bin/pebble
+
 COPY mariadb-java-client-${MARIADB_CLIENT_VERSION}.jar /usr/local/tomcat/lib/mariadb-java-client-${MARIADB_CLIENT_VERSION}.jar
 
 # The WAR runs on this Tomcat, so Spring Boot's server.compression.* is not applied; compress
