@@ -974,18 +974,6 @@
                       </mat-form-field>
                     </div>
                   </div>
-                  <div class="row pb-3">
-                    <div class="col-12">
-                      <div class="checkbox">
-                        <mat-checkbox color="primary"
-                          [checked]="asDtSc(assoc.before).deprecated"
-                          [disabled]="true">
-                    <span [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
-                        diffClass(asDtSc(assoc.before).deprecated, asDtSc(assoc.after).deprecated)">Deprecated</span>
-                        </mat-checkbox>
-                      </div>
-                    </div>
-                  </div>
                   <mat-form-field>
                     <mat-label>Default Value</mat-label>
                     <input matInput placeholder="Default Value" maxlength="200"
@@ -1146,18 +1134,6 @@
                           [value]="asDtSc(assoc.after).cardinalityMax | unbounded"
                           [disabled]="true">
                       </mat-form-field>
-                    </div>
-                  </div>
-                  <div class="row pb-3">
-                    <div class="col-12">
-                      <div class="checkbox">
-                        <mat-checkbox color="primary"
-                          [checked]="assoc.after.deprecated"
-                          [disabled]="true">
-                    <span [class]="asDtSc(assoc.before).color !== 'Modified' ? asDtSc(assoc.before).color :
-                              diffClass(asDtSc(assoc.before).deprecated, asDtSc(assoc.after).deprecated)">Deprecated</span>
-                        </mat-checkbox>
-                      </div>
                     </div>
                   </div>
                   <mat-form-field>

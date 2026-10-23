@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtxAssignment.BizCtxAssignmentPath;
@@ -53,7 +54,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.biz_ctx</code>
+     * The reference instance of <code>biz_ctx</code>
      */
     public static final BizCtx BIZ_CTX = new BizCtx();
 
@@ -66,45 +67,45 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     }
 
     /**
-     * The column <code>oagi.biz_ctx.biz_ctx_id</code>. Primary, internal
-     * database key.
+     * The column <code>biz_ctx.biz_ctx_id</code>. Primary, internal database
+     * key.
      */
-    public final TableField<BizCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<BizCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.biz_ctx.guid</code>. A globally unique identifier
+     * The column <code>biz_ctx.guid</code>. A globally unique identifier
      * (GUID).
      */
     public final TableField<BizCtxRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.biz_ctx.name</code>. Short, descriptive name of the
+     * The column <code>biz_ctx.name</code>. Short, descriptive name of the
      * business context.
      */
     public final TableField<BizCtxRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Short, descriptive name of the business context.");
 
     /**
-     * The column <code>oagi.biz_ctx.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * The column <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      */
     public final TableField<BizCtxRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the entity. ");
 
     /**
-     * The column <code>oagi.biz_ctx.last_updated_by</code>. Foreign key to the
+     * The column <code>biz_ctx.last_updated_by</code>. Foreign key to the
      * APP_USER table  referring to the last user who has updated the business
      * context.
      */
     public final TableField<BizCtxRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table  referring to the last user who has updated the business context.");
 
     /**
-     * The column <code>oagi.biz_ctx.creation_timestamp</code>. Timestamp when
-     * the business context record was first created. 
+     * The column <code>biz_ctx.creation_timestamp</code>. Timestamp when the
+     * business context record was first created. 
      */
     public final TableField<BizCtxRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the business context record was first created. ");
 
     /**
-     * The column <code>oagi.biz_ctx.last_update_timestamp</code>. The timestamp
-     * when the business context was last updated.
+     * The column <code>biz_ctx.last_update_timestamp</code>. The timestamp when
+     * the business context was last updated.
      */
     public final TableField<BizCtxRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the business context was last updated.");
 
@@ -117,21 +118,21 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.biz_ctx</code> table reference
+     * Create an aliased <code>biz_ctx</code> table reference
      */
     public BizCtx(String alias) {
         this(DSL.name(alias), BIZ_CTX);
     }
 
     /**
-     * Create an aliased <code>oagi.biz_ctx</code> table reference
+     * Create an aliased <code>biz_ctx</code> table reference
      */
     public BizCtx(Name alias) {
         this(alias, BIZ_CTX);
     }
 
     /**
-     * Create a <code>oagi.biz_ctx</code> table reference
+     * Create a <code>biz_ctx</code> table reference
      */
     public BizCtx() {
         this(DSL.name("biz_ctx"), null);
@@ -172,7 +173,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -198,8 +199,8 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private transient AppUserPath _bizCtxCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>biz_ctx_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>biz_ctx_created_by_fk</code> key.
      */
     public AppUserPath bizCtxCreatedByFk() {
         if (_bizCtxCreatedByFk == null)
@@ -211,8 +212,8 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private transient AppUserPath _bizCtxLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>biz_ctx_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>biz_ctx_last_updated_by_fk</code> key.
      */
     public AppUserPath bizCtxLastUpdatedByFk() {
         if (_bizCtxLastUpdatedByFk == null)
@@ -224,7 +225,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.abie</code> table
+     * Get the implicit to-many join path to the <code>abie</code> table
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -236,8 +237,8 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private transient BizCtxAssignmentPath _bizCtxAssignment;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.biz_ctx_assignment</code> table
+     * Get the implicit to-many join path to the <code>biz_ctx_assignment</code>
+     * table
      */
     public BizCtxAssignmentPath bizCtxAssignment() {
         if (_bizCtxAssignment == null)
@@ -249,7 +250,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     private transient BizCtxValuePath _bizCtxValue;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.biz_ctx_value</code>
+     * Get the implicit to-many join path to the <code>biz_ctx_value</code>
      * table
      */
     public BizCtxValuePath bizCtxValue() {
@@ -263,7 +264,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.tenant_business_ctx</code> table
+     * <code>tenant_business_ctx</code> table
      */
     public TenantBusinessCtxPath tenantBusinessCtx() {
         if (_tenantBusinessCtx == null)
@@ -274,15 +275,14 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     /**
      * Get the implicit many-to-many join path to the
-     * <code>oagi.top_level_asbiep</code> table
+     * <code>top_level_asbiep</code> table
      */
     public TopLevelAsbiepPath topLevelAsbiep() {
         return bizCtxAssignment().topLevelAsbiep();
     }
 
     /**
-     * Get the implicit many-to-many join path to the <code>oagi.tenant</code>
-     * table
+     * Get the implicit many-to-many join path to the <code>tenant</code> table
      */
     public TenantPath tenant() {
         return tenantBusinessCtx().tenant();
@@ -332,7 +332,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
      */
     @Override
     public BizCtx where(Condition condition) {
-        return new BizCtx(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new BizCtx(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -399,7 +399,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BizCtx whereExists(Select<?> select) {
+    public BizCtx whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -407,7 +407,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BizCtx whereNotExists(Select<?> select) {
+    public BizCtx whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

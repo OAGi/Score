@@ -73,6 +73,11 @@ export class CodeListService {
       params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
     }
 
+    return this.getCodeListListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getCodeListListPage(params: HttpParams): Observable<PageResponse<CodeListListEntry>> {
     return this.http.get<PageResponse<CodeListListEntry>>('/api/code-lists', {params}).pipe(
         map((res: PageResponse<CodeListListEntry>) => ({
           ...res,

@@ -25,16 +25,6 @@
   width: 100%;
 }
 
-.close {
-  position: relative;
-  margin-left: auto;
-  left: 12px;
-}
-
-.close button {
-  outline: none;
-}
-
 .content {
   display: inline-block;
   box-sizing: border-box;
@@ -55,15 +45,6 @@
 
 .content p {
   margin-bottom: 0;
-}
-
-.actions {
-  bottom: 0;
-  left: 0;
-  overflow: visible;
-  width: 100%;
-  opacity: 1;
-  direction: rtl;
 }
 
 .btn {

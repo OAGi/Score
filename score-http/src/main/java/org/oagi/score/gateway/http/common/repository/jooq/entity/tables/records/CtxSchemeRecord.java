@@ -22,7 +22,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary,
+     * Setter for <code>ctx_scheme.ctx_scheme_id</code>. Internal, primary,
      * database key.
      */
     public void setCtxSchemeId(ULong value) {
@@ -30,7 +30,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary,
+     * Getter for <code>ctx_scheme.ctx_scheme_id</code>. Internal, primary,
      * database key.
      */
     public ULong getCtxSchemeId() {
@@ -38,55 +38,55 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>ctx_scheme.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.guid</code>. A globally unique
-     * identifier (GUID).
+     * Getter for <code>ctx_scheme.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.scheme_id</code>. External
-     * identification of the scheme. 
+     * Setter for <code>ctx_scheme.scheme_id</code>. External identification of
+     * the scheme. 
      */
     public void setSchemeId(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_id</code>. External
-     * identification of the scheme. 
+     * Getter for <code>ctx_scheme.scheme_id</code>. External identification of
+     * the scheme. 
      */
     public String getSchemeId() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
-     * the context scheme.
+     * Setter for <code>ctx_scheme.scheme_name</code>. Pretty print name of the
+     * context scheme.
      */
     public void setSchemeName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_name</code>. Pretty print name of
-     * the context scheme.
+     * Getter for <code>ctx_scheme.scheme_name</code>. Pretty print name of the
+     * context scheme.
      */
     public String getSchemeName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.description</code>. Description of the
+     * Setter for <code>ctx_scheme.description</code>. Description of the
      * context scheme.
      */
     public void setDescription(String value) {
@@ -94,7 +94,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.description</code>. Description of the
+     * Getter for <code>ctx_scheme.description</code>. Description of the
      * context scheme.
      */
     public String getDescription() {
@@ -102,41 +102,41 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
-     * of the agency maintaining the scheme. This column currently does not use
-     * the AGENCY_ID_LIST table. It is just a free form text at this point.
+     * Setter for <code>ctx_scheme.scheme_agency_id</code>. Identification of
+     * the agency maintaining the scheme. This column currently does not use the
+     * AGENCY_ID_LIST table. It is just a free form text at this point.
      */
     public void setSchemeAgencyId(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_agency_id</code>. Identification
-     * of the agency maintaining the scheme. This column currently does not use
-     * the AGENCY_ID_LIST table. It is just a free form text at this point.
+     * Getter for <code>ctx_scheme.scheme_agency_id</code>. Identification of
+     * the agency maintaining the scheme. This column currently does not use the
+     * AGENCY_ID_LIST table. It is just a free form text at this point.
      */
     public String getSchemeAgencyId() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.scheme_version_id</code>. Version number
-     * of the context scheme.
+     * Setter for <code>ctx_scheme.scheme_version_id</code>. Version number of
+     * the context scheme.
      */
     public void setSchemeVersionId(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.scheme_version_id</code>. Version number
-     * of the context scheme.
+     * Getter for <code>ctx_scheme.scheme_version_id</code>. Version number of
+     * the context scheme.
      */
     public String getSchemeVersionId() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.ctx_category_id</code>. This the foreign
+     * Setter for <code>ctx_scheme.ctx_category_id</code>. This is the foreign
      * key to the CTX_CATEGORY table. It identifies the context category
      * associated with this context scheme.
      */
@@ -145,7 +145,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.ctx_category_id</code>. This the foreign
+     * Getter for <code>ctx_scheme.ctx_category_id</code>. This is the foreign
      * key to the CTX_CATEGORY table. It identifies the context category
      * associated with this context scheme.
      */
@@ -154,25 +154,25 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.code_list_id</code>. This is the foreign
-     * key to the CODE_LIST table. It identifies the code list associated with
-     * this context scheme.
+     * Setter for <code>ctx_scheme.code_list_id</code>. This is the foreign key
+     * to the CODE_LIST table. It identifies the code list associated with this
+     * context scheme.
      */
     public void setCodeListId(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.code_list_id</code>. This is the foreign
-     * key to the CODE_LIST table. It identifies the code list associated with
-     * this context scheme.
+     * Getter for <code>ctx_scheme.code_list_id</code>. This is the foreign key
+     * to the CODE_LIST table. It identifies the code list associated with this
+     * context scheme.
      */
     public ULong getCodeListId() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.created_by</code>. Foreign key to the
+     * Setter for <code>ctx_scheme.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who created this context scheme.
      */
     public void setCreatedBy(ULong value) {
@@ -180,7 +180,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.created_by</code>. Foreign key to the
+     * Getter for <code>ctx_scheme.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who created this context scheme.
      */
     public ULong getCreatedBy() {
@@ -188,8 +188,8 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
+     * Setter for <code>ctx_scheme.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the context
      * scheme.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -197,8 +197,8 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
+     * Getter for <code>ctx_scheme.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the context
      * scheme.
      */
     public ULong getLastUpdatedBy() {
@@ -206,32 +206,32 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.creation_timestamp</code>. Timestamp
-     * when the scheme was created.
+     * Setter for <code>ctx_scheme.creation_timestamp</code>. Timestamp when the
+     * scheme was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.creation_timestamp</code>. Timestamp
-     * when the scheme was created.
+     * Getter for <code>ctx_scheme.creation_timestamp</code>. Timestamp when the
+     * scheme was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
-     * when the scheme was last updated.
+     * Setter for <code>ctx_scheme.last_update_timestamp</code>. Timestamp when
+     * the scheme was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_scheme.last_update_timestamp</code>. Timestamp
-     * when the scheme was last updated.
+     * Getter for <code>ctx_scheme.last_update_timestamp</code>. Timestamp when
+     * the scheme was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(12);

@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import { Component, Injectable, OnInit, inject } from '@angular/core';
+import { Component, Injectable, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {map} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 import {AuthService} from '../../authentication/auth.service';
@@ -37,6 +37,7 @@ export class DisabledActivate implements CanActivate {
   standalone: false,
   selector: 'score-disabled',
   templateUrl: './disabled.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./disabled.component.css']
 })
 export class DisabledComponent implements OnInit {

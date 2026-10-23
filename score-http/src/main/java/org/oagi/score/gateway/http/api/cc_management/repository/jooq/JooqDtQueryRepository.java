@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.types.UInteger;
@@ -504,6 +505,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     }
 
     @Override
+    public List<DtSummaryRecord> getDtSummaryListByManifestIds(Collection<DtManifestId> dtManifestIdList) {
+        if (dtManifestIdList == null || dtManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_MANIFEST.DT_MANIFEST_ID.in(valueOf(dtManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<DtSummaryRecord> getDtSummaryList(Collection<ReleaseId> releaseIdList) {
         var queryBuilder = new GetDtSummaryQueryBuilder();
         return queryBuilder.select()
@@ -636,6 +648,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         var queryBuilder = new GetDtAwdPriSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(DT_AWD_PRI.RELEASE_ID.in(valueOf(releaseIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public List<DtAwdPriSummaryRecord> getDtAwdPriSummaryListByDtIds(Collection<DtId> dtIds) {
+        if (dtIds == null || dtIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtAwdPriSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_AWD_PRI.DT_ID.in(valueOf(dtIds)))
                 .fetch(queryBuilder.mapper());
     }
 
@@ -891,7 +914,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         getDtScSummary(since(dtScManifestId)),
                         getDtScSummary(lastChanged(dtScManifestId)),
 
-                        record.get(DT_SC.PROPERTY_TERM) + ". " + record.get(DT_SC.REPRESENTATION_TERM),
+                        DenUtils.dtScDen(record.get(DT_SC.PROPERTY_TERM), record.get(DT_SC.REPRESENTATION_TERM)),
                         record.get(DT_SC.OBJECT_CLASS_TERM),
                         record.get(DT_SC.PROPERTY_TERM),
                         record.get(DT_SC.REPRESENTATION_TERM),
@@ -1095,6 +1118,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     }
 
     @Override
+    public List<DtScSummaryRecord> getDtScSummaryListByOwnerDtManifestIds(Collection<DtManifestId> ownerDtManifestIdList) {
+        if (ownerDtManifestIdList == null || ownerDtManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtScSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.in(valueOf(ownerDtManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<DtScSummaryRecord> getDtScSummaryList(Collection<ReleaseId> releaseIdList) {
         var queryBuilder = new GetDtScSummaryQueryBuilder();
         return queryBuilder.select()
@@ -1172,7 +1206,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         ownerDtManifestId,
                         basedDtScManifestId,
 
-                        record.get(DT_SC.PROPERTY_TERM) + ". " + record.get(DT_SC.REPRESENTATION_TERM),
+                        DenUtils.dtScDen(record.get(DT_SC.PROPERTY_TERM), record.get(DT_SC.REPRESENTATION_TERM)),
                         record.get(DT_SC.OBJECT_CLASS_TERM),
                         record.get(DT_SC.PROPERTY_TERM),
                         record.get(DT_SC.REPRESENTATION_TERM),
@@ -1206,6 +1240,17 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         var queryBuilder = new GetDtScAwdPriSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(DT_SC_AWD_PRI.RELEASE_ID.in(valueOf(releaseIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryListByDtScIds(Collection<DtScId> dtScIds) {
+        if (dtScIds == null || dtScIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetDtScAwdPriSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(DT_SC_AWD_PRI.DT_SC_ID.in(valueOf(dtScIds)))
                 .fetch(queryBuilder.mapper());
     }
 

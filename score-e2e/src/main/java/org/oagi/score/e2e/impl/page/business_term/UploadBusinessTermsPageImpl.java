@@ -33,7 +33,7 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
             By.xpath("//mat-dialog-container//div[contains(@class, \"preview-summary\")]");
 
     private static final By NEXT_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//button[normalize-space(.)=\"Next\"]");
+            By.xpath("//mat-dialog-container//button[.//span[normalize-space(.)=\"Next\"]]");
 
     private static final By IMPORT_BUTTON_LOCATOR =
             By.xpath("//mat-dialog-container//button[contains(normalize-space(.), \"Import\")]");
@@ -51,7 +51,7 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
             By.xpath("//mat-dialog-container//mat-form-field[contains(@class, \"sheet-select\")]//mat-select");
 
     private static final By BACK_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//button[normalize-space(.)=\"Back\"]");
+            By.xpath("//mat-dialog-container//button[.//span[normalize-space(.)=\"Back\"]]");
 
     private static final By DROP_ZONE_LOCATOR =
             By.xpath("//mat-dialog-container//div[contains(@class, \"drop-zone\")]");
@@ -69,7 +69,7 @@ public class UploadBusinessTermsPageImpl extends BasePageImpl implements UploadB
             By.xpath("//mat-dialog-container//mat-form-field[contains(@class, \"uri-base\")]//input");
 
     private static final By CLOSE_BUTTON_LOCATOR =
-            By.xpath("//mat-dialog-container//button[@aria-label=\"Cancel and close\"]");
+            By.xpath("//mat-dialog-container//button[@aria-label=\"Close\" and contains(@class, \"dialog-close\")]");
 
     private static final By IMPORT_ERROR_LOCATOR =
             By.xpath("//mat-dialog-container//div[contains(@class, \"import-error\")]");

@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.bie_management.model;
 
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
 import org.oagi.score.gateway.http.api.bie_management.service.BieDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
@@ -39,7 +38,7 @@ public final class BieDocumentBuilder {
         TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
 
         BieDocumentImpl bieDocument = new BieDocumentImpl(bieSet);
-        bieDocument.with(new CcDocumentImpl(requester, repositoryFactory, topLevelAsbiep.release().releaseId()));
+        bieDocument.with(repositoryFactory.ccDocumentFactory().create(requester, topLevelAsbiep.release().releaseId()));
 
         return bieDocument;
     }

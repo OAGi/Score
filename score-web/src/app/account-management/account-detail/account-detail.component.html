@@ -1,11 +1,4 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
-
+<score-detail-page [title]="title" [showActions]="false">
   <div class="p-3 container-fluid">
     <div class="row">
       <div class="{{ isOAuth2User ? 'col-6' : 'col-12' }}">
@@ -133,6 +126,7 @@
     </div>
   </div>
 
+
   <div class="row action-group m-0">
     <div class="{{ isOAuth2User ? 'col-6' : 'col-12' }} actions-wrap">
       <div class="actions">
@@ -172,4 +166,4 @@
       </div>
     }
   </div>
-</div>
+</score-detail-page>

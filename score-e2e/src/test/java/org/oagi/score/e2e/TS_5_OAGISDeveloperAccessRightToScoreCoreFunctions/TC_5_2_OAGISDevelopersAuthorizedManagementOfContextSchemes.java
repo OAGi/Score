@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.oagi.score.e2e.AssertionHelper.assertChecked;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -349,10 +350,12 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
             createContextSchemePage.createContextScheme(randomContextCategory, randomContextScheme);
         });
         WebElement createAnywayButton =
-                elementToBeClickable(getDriver(), By.xpath("//span[contains(text(), \"Create anyway\")]"));
+                elementToBeClickable(getDriver(), By.xpath("//mat-dialog-actions//button[contains(., \"Create anyway\")] | //button[contains(., \"Create anyway\")]"));
         assertNotNull(createAnywayButton);
 
-        click(createAnywayButton);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", createAnywayButton);
+        invisibilityOfLoadingContainerElement(getDriver());
+        waitFor(ofMillis(2000L));
         EditContextSchemePage editContextSchemePage =
                 viewEditContextSchemePage.openEditContextSchemePageByContextSchemeName(newName);
         assertEquals(randomContextCategory.getName(), editContextSchemePage.getContextCategorySelectField().getText());

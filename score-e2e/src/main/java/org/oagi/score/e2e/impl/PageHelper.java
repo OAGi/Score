@@ -178,6 +178,11 @@ public abstract class PageHelper {
 
     public static WebElement clear(WebElement element) {
         if (element != null) {
+            // A tree search box is disabled while it searches.
+            new FluentWait<>(element)
+                    .withTimeout(Duration.ofSeconds(60L))
+                    .pollingEvery(Duration.ofMillis(100L))
+                    .until(WebElement::isEnabled);
             element.clear();
             // ng-reflect-model attribute in some elements couldn't reflect this clear text.
             element.sendKeys(" ");
@@ -427,12 +432,13 @@ public abstract class PageHelper {
      * @return the UI element of the snackbar
      */
     public static WebElement getSnackBar(WebDriver driver, String message) {
-        String xpathExpr = "//simple-snack-bar//div[contains(text(), \"" + message + "\")]";
+        String xpathExpr = "//mat-snack-bar-container//*[contains(text(), \"" + message + "\") or contains(., \"" + message + "\")] | " +
+                "//simple-snack-bar//*[contains(text(), \"" + message + "\") or contains(., \"" + message + "\")]";
         return visibilityOfElementLocated(driver, By.xpath(xpathExpr));
     }
 
     public static String getDialogTitle(WebDriver driver) {
-        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]/span";
+        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]//span";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
     }
@@ -449,7 +455,7 @@ public abstract class PageHelper {
     }
 
     public static WebElement getDialogButtonByName(WebDriver driver, String buttonName) {
-        String xpathExpr = "//score-confirm-dialog//span[contains(text(), \"" + buttonName + "\")]//ancestor::button[1]";
+        String xpathExpr = "//score-confirm-dialog//button[contains(., \"" + buttonName + "\")]";
         return retry(() -> elementToBeClickable(driver, By.xpath(xpathExpr)));
     }
 

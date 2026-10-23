@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {TagService} from '../domain/tag.service';
 import {Tag} from '../domain/tag';
@@ -9,6 +9,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   standalone: false,
   selector: 'score-edit-tags-dialog',
   templateUrl: './edit-tags-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./edit-tags-dialog.component.css']
 })
 export class EditTagsDialogComponent implements OnInit {

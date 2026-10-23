@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.export.impl;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jdom2.CDATA;
@@ -709,7 +710,7 @@ public class XMLExportSchemaModuleVisitor implements ExportSchemaModuleVisitor {
         String dataTypeTerm = bdtSimple.getDataType().dataTypeTerm();
         String propertyTerm = bdtSc.propertyTerm();
         String representationTerm = bdtSc.representationTerm();
-        String dictionaryEntryName = dataTypeTerm + ". " + propertyTerm + ". " + representationTerm;
+        String dictionaryEntryName = DenUtils.dtScQualifiedDen(dataTypeTerm, propertyTerm, representationTerm);
         ccts_DictionaryEntryName.setText(dictionaryEntryName);
 
         if (bdtSc.definition() != null) {

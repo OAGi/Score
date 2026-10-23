@@ -1,109 +1,87 @@
-<div class="context-section">
-  @if (loading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
+<score-detail-page [title]="title" [loading]="loading">
+  <score-detail-card>
+    <mat-form-field floatLabel="always">
+      <mat-label>Name</mat-label>
+      <input matInput required [(ngModel)]="library.name" maxlength="100"
+        placeholder="Library name, e.g. OAGIS"
+        [disabled]="!isAdmin"/>
+    </mat-form-field>
 
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
+    <mat-form-field floatLabel="always">
+      <mat-label>Type</mat-label>
+      <input matInput required [(ngModel)]="library.type" maxlength="100"
+        placeholder="Library type, e.g. Standard"
+        [disabled]="!isAdmin"/>
+    </mat-form-field>
 
-  <div class="p-3">
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field floatLabel="always">
-          <mat-label>Name</mat-label>
-          <input matInput required [(ngModel)]="library.name" maxlength="100"
-            placeholder="Library name, e.g. OAGIS"
-            [disabled]="!isAdmin"/>
-        </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Organization</mat-label>
+      <input matInput required [(ngModel)]="library.organization" maxlength="100"
+        placeholder="Maintaining organization, e.g. Open Applications Group"
+        [disabled]="!isAdmin"/>
+    </mat-form-field>
 
-        <mat-form-field floatLabel="always">
-          <mat-label>Type</mat-label>
-          <input matInput required [(ngModel)]="library.type" maxlength="100"
-            placeholder="Library type, e.g. Standard"
-            [disabled]="!isAdmin"/>
-        </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Link</mat-label>
+      <input matInput
+        [formControl]="linkForm"
+        placeholder="Reference URL, e.g. https://oagi.org"
+        [value]="linkForm.value">
+      @if (linkForm.hasError('pattern')) {
+        <mat-error>
+          '{{ linkForm.value }}' is not allow for URI format
+        </mat-error>
+      }
+    </mat-form-field>
 
-        <mat-form-field floatLabel="always">
-          <mat-label>Organization</mat-label>
-          <input matInput required [(ngModel)]="library.organization" maxlength="100"
-            placeholder="Maintaining organization, e.g. Open Applications Group"
-            [disabled]="!isAdmin"/>
-        </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Domain</mat-label>
+      <input matInput required [(ngModel)]="library.domain" maxlength="100"
+        placeholder="Subject area, e.g. Interoperability Standards"
+        [disabled]="!isAdmin"/>
+    </mat-form-field>
 
-        <mat-form-field floatLabel="always">
-          <mat-label>Link</mat-label>
-          <input matInput
-            [formControl]="linkForm"
-            placeholder="Reference URL, e.g. https://oagi.org"
-            [value]="linkForm.value">
-          @if (linkForm.hasError('pattern')) {
-            <mat-error>
-              '{{ linkForm.value }}' is not allow for URI format
-            </mat-error>
-          }
-        </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea rows="6" cols="30" matInput [(ngModel)]="library.description"
+      [disabled]="!isAdmin"></textarea>
+    </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Standard Namespace URI</mat-label>
+      <input matInput required
+             [formControl]="namespaceUriForm"
+             placeholder="Namespace URI, e.g. urn:oagi:xsd"
+             [value]="namespaceUriForm.value">
+      @if (namespaceUriForm.hasError('required')) {
+        <mat-error>
+          Namespace URI is required.
+        </mat-error>
+      }
+      @if (namespaceUriForm.hasError('pattern')) {
+        <mat-error>
+          '{{ namespaceUriForm.value }}' is not allow for URI format
+        </mat-error>
+      }
+    </mat-form-field>
 
-        <mat-form-field floatLabel="always">
-          <mat-label>Domain</mat-label>
-          <input matInput required [(ngModel)]="library.domain" maxlength="100"
-            placeholder="Subject area, e.g. Interoperability Standards"
-            [disabled]="!isAdmin"/>
-        </mat-form-field>
+    <mat-form-field floatLabel="always">
+      <mat-label>Standard Namespace Prefix</mat-label>
+      <input matInput
+             [formControl]="namespacePrefixForm"
+             maxlength="45"
+             placeholder="Namespace prefix, e.g. oagis"
+             [value]="namespacePrefixForm.value">
+    </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Description</mat-label>
-          <textarea rows="6" cols="30" matInput [(ngModel)]="library.description"
-          [disabled]="!isAdmin"></textarea>
-        </mat-form-field>
-        <mat-form-field floatLabel="always">
-          <mat-label>Standard Namespace URI</mat-label>
-          <input matInput required
-                 [formControl]="namespaceUriForm"
-                 placeholder="Namespace URI, e.g. urn:oagi:xsd"
-                 [value]="namespaceUriForm.value">
-          @if (namespaceUriForm.hasError('required')) {
-            <mat-error>
-              Namespace URI is required.
-            </mat-error>
-          }
-          @if (namespaceUriForm.hasError('pattern')) {
-            <mat-error>
-              '{{ namespaceUriForm.value }}' is not allow for URI format
-            </mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field floatLabel="always">
-          <mat-label>Standard Namespace Prefix</mat-label>
-          <input matInput
-                 [formControl]="namespacePrefixForm"
-                 maxlength="45"
-                 placeholder="Namespace prefix, e.g. oagis"
-                 [value]="namespacePrefixForm.value">
-        </mat-form-field>
-
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button (click)="back()">Back</button>
-        @if (isAdmin) {
-          <button mat-raised-button color="primary"
-            [disabled]="isDisabled"
-            (click)="create()">
-            Create
-          </button>
-        }
-      </div>
-    </div>
-  </div>
-</div>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button mat-raised-button (click)="back()">Back</button>
+    @if (isAdmin) {
+      <button mat-raised-button color="primary"
+        [disabled]="isDisabled"
+        (click)="create()">
+        Create
+      </button>
+    }
+  </ng-container>
+</score-detail-page>

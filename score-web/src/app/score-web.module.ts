@@ -4,8 +4,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatIconRegistry} from '@angular/material/icon';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {TranslatePipe, provideTranslateService} from '@ngx-translate/core';
+import {provideTranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MarkdownModule, MARKED_OPTIONS} from 'ngx-markdown';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -41,11 +41,6 @@ const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: ErrorAlertInterceptor, multi: true},
 ];
 
-// AoT requires an exported function for factories
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
-
 class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
   shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
     return false;
@@ -58,13 +53,6 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
     BrowserAnimationsModule,
     RouterModule.forRoot(SCORE_WEBAPP_ROUTES, { onSameUrlNavigation: 'reload' }),
     HttpClientModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
     FormsModule,
     ReactiveFormsModule,
     MarkdownModule.forRoot({
@@ -99,6 +87,9 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
     ScoreWebComponent
   ],
   providers: [
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({prefix: './assets/i18n/', suffix: '.json'})
+    }),
     MatIconRegistry,
     {
       provide: RouteReuseStrategy,
@@ -120,8 +111,7 @@ class ShouldReuseRouteFalseRouteReuseStrategy extends BaseRouteReuseStrategy {
   ],
   bootstrap: [
     ScoreWebComponent
-  ],
-  exports: [TranslateModule]
+  ]
 })
 export class ScoreWebModule {
 }

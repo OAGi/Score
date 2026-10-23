@@ -1,3 +1,4 @@
+import {SCORE_TABLE} from '../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatBadgeModule} from '@angular/material/badge';
@@ -22,16 +23,18 @@ import {BieCopyService} from './bie-copy/domain/bie-copy.service';
 import {OasDocModule} from './openapi-doc/oas-doc.module';
 import {ReleaseService} from '../release-management/domain/release.service';
 
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {BieReportComponent} from './bie-report/bie-report.component';
 import {BieReportService} from './bie-report/domain/bie-report.service';
 import {BieUpliftComponent} from './bie-uplift/bie-uplift.component';
+import {BieUpliftTreeViewportComponent} from './bie-uplift/bie-uplift-tree-viewport/bie-uplift-tree-viewport.component';
 import {BieUpliftService} from './bie-uplift/domain/bie-uplift.service';
 import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.component';
 import {ReportDialogComponent} from './bie-uplift/report-dialog/report-dialog.component';
 import {BieEditComponent} from './bie-edit/bie-edit.component';
+import {BieTreeViewportComponent} from './bie-edit/bie-tree-viewport/bie-tree-viewport.component';
 import {ReuseBieDialogComponent} from './bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {BieOasDocAddDialogComponent} from './bie-edit/bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
 import {BieBusinessTermAssignDialogComponent} from './bie-edit/bie-business-term-assign-dialog/bie-business-term-assign-dialog.component';
@@ -155,7 +158,7 @@ const routes: Routes = [
         BiePackageModule,
         OasDocModule,
         TransferOwnershipDialogModule,
-        TranslateModule,
+        TranslatePipe,
         CommonModule,
         ScoreCommonModule,
         MatBadgeModule,
@@ -163,9 +166,12 @@ const routes: Routes = [
         NgxMatSelectSearchModule,
         AngularSplitModule,
         FontAwesomeModule,
+        BieTreeViewportComponent,
+        BieUpliftTreeViewportComponent,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        ...SCORE_TABLE
     ],
   declarations: [
     BieCreateBizCtxComponent,

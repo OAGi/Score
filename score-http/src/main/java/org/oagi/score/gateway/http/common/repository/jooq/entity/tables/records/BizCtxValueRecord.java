@@ -21,23 +21,23 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
-     * internal database key.
+     * Setter for <code>biz_ctx_value.biz_ctx_value_id</code>. Primary, internal
+     * database key.
      */
     public void setBizCtxValueId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
-     * internal database key.
+     * Getter for <code>biz_ctx_value.biz_ctx_value_id</code>. Primary, internal
+     * database key.
      */
     public ULong getBizCtxValueId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
+     * Setter for <code>biz_ctx_value.biz_ctx_id</code>. Foreign key to the
      * biz_ctx table.
      */
     public void setBizCtxId(ULong value) {
@@ -45,7 +45,7 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
+     * Getter for <code>biz_ctx_value.biz_ctx_id</code>. Foreign key to the
      * biz_ctx table.
      */
     public ULong getBizCtxId() {
@@ -53,16 +53,16 @@ public class BizCtxValueRecord extends UpdatableRecordImpl<BizCtxValueRecord> {
     }
 
     /**
-     * Setter for <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
-     * key to the CTX_SCHEME_VALUE table.
+     * Setter for <code>biz_ctx_value.ctx_scheme_value_id</code>. Foreign key to
+     * the CTX_SCHEME_VALUE table.
      */
     public void setCtxSchemeValueId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
-     * key to the CTX_SCHEME_VALUE table.
+     * Getter for <code>biz_ctx_value.ctx_scheme_value_id</code>. Foreign key to
+     * the CTX_SCHEME_VALUE table.
      */
     public ULong getCtxSchemeValueId() {
         return (ULong) get(2);

@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild, inject} from '@angular/core';
+import {Component, OnDestroy, ViewChild, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatTableDataSource} from '@angular/material/table';
@@ -31,6 +31,7 @@ type ImportPhase = 'upload' | 'map' | 'preview' | 'result';
   standalone: false,
   selector: 'score-business-term-import-dialog',
   templateUrl: './business-term-import-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./business-term-import-dialog.component.scss'],
 })
 export class BusinessTermImportDialogComponent implements OnDestroy {

@@ -16,7 +16,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class ModuleMenuImpl extends DelegateBasePageImpl implements ModuleMenu {
 
     private final By MODULE_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Module\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Module\")]");
 
     private final AppUserObject user;
 
@@ -27,12 +27,12 @@ public class ModuleMenuImpl extends DelegateBasePageImpl implements ModuleMenu {
 
     private By VIEW_EDIT_MODULE_SET_SUB_MENU_LOCATOR() {
         String menuName = this.user.isDeveloper() ? "View/Edit Module Set" : "View Module Set";
-        return By.xpath("//span[contains(text(), \"" + menuName + "\")]");
+        return By.xpath("//button[contains(., \"" + menuName + "\")]");
     }
 
     private By VIEW_EDIT_MODULE_SET_RELEASE_SUB_MENU_LOCATOR() {
         String menuName = this.user.isDeveloper() ? "View/Edit Module Set Release" : "View Module Set Release";
-        return By.xpath("//span[contains(text(), \"" + menuName + "\")]");
+        return By.xpath("//button[contains(., \"" + menuName + "\")]");
     }
 
     private boolean isExpanded() {

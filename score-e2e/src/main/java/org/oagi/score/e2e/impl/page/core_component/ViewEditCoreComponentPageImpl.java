@@ -92,11 +92,11 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public void setTypeSelect(String type) {
         retry(() -> {
             click(getDriver(), getTypeSelectField());
-            visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"cdk-overlay-container\"]"));
+            visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]"));
         });
         waitFor(ofMillis(2000L));
         WebElement optionField = elementToBeClickable(getDriver(),
-                By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]//span[text() = \"" + type + "\"]//ancestor::mat-checkbox"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]//span[text() = \"" + type + "\"]//ancestor::mat-checkbox"));
         click(getDriver(), optionField);
         escape(getDriver());
     }
@@ -509,13 +509,13 @@ public class ViewEditCoreComponentPageImpl extends BaseSearchBarPageImpl impleme
     public void selectAllComponentTypes() {
         retry(() -> {
             click(getDriver(), getTypeSelectField());
-            visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"cdk-overlay-container\"]"));
+            visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]"));
         });
         List<String> componentTypes = new ArrayList<>(List.of("ACC", "ASCCP", "BCCP"));
         boolean selected;
         for (String componentType : componentTypes) {
             WebElement optionField = elementToBeClickable(getDriver(),
-                    By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]//span[text() = \"" + componentType + "\"]//ancestor::mat-checkbox"));
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]//span[text() = \"" + componentType + "\"]//ancestor::mat-checkbox"));
             selected = isChecked(optionField);
             if (!selected) {
                 click(getDriver(), optionField);

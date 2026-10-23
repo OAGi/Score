@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {OasDoc} from '../domain/openapi-doc';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -14,6 +14,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
   standalone: false,
   selector: 'score-oas-doc-create',
   templateUrl: './oas-doc-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-create.component.css']
 })
 export class OasDocCreateComponent implements OnInit {

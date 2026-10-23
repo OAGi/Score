@@ -579,7 +579,7 @@ public class TC_3_1_EndUsersAuthorizedFunctionalities extends BaseTest {
         LoginPage loginPage = loginIDMenu.logout();
 
         assertTrue(loginPage.getUsernameInput().isDisplayed());
-        assertTrue(loginPage.getPasswordInput().isDisplayed());
+        assertTrue(loginPage.getPasswordInputOrContinueButton().isDisplayed());
 
         URI baseURL = this.getConfig().getBaseUrl().resolve("/");
         URI currentURL = new URI(getDriver().getCurrentUrl()).resolve("/");

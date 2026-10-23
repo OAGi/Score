@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, NgZone, HostListener } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
@@ -21,9 +21,10 @@ import {LibraryService} from '../../library-management/domain/library.service';
   standalone: false,
   selector: 'score-navbar',
   templateUrl: './navbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private aboutService = inject(AboutService);
   private libraryService = inject(LibraryService);
@@ -32,9 +33,15 @@ export class NavbarComponent implements OnInit {
   private router = inject(Router);
   private message = inject(MessageService);
   private stompService = inject(RxStompService);
+  private elementRef = inject(ElementRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
   webPageInfo = inject(WebPageInfoService);
   translate = inject(TranslateService);
 
+  private resizeObserver?: ResizeObserver;
+  public navbarWidth = 1400;
+  public isDrawerOpen = false;
 
   private _notiCount = -1;
   public notiMatIcon = 'notifications_none';
@@ -46,7 +53,7 @@ export class NavbarComponent implements OnInit {
     const translate = this.translate;
 
     translate.addLangs(['ccts', 'oagis']);
-    translate.setDefaultLang('ccts');
+    translate.setFallbackLang('ccts');
     const browserLang = translate.getBrowserLang();
     const savedLang = localStorage.getItem('score.lang');
     translate.use((savedLang && savedLang.match(/ccts|oagis/)) ? savedLang
@@ -87,12 +94,63 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  get isCompact(): boolean {
+    return this.navbarWidth < 1100;
+  }
+
+  get showFullUserRole(): boolean {
+    return this.navbarWidth >= 750;
+  }
+
+  get showNistLogo(): boolean {
+    return this.navbarWidth >= 1100;
+  }
+
+  toggleDrawer(): void {
+    this.isDrawerOpen = !this.isDrawerOpen;
+  }
+
+  openDrawer(): void {
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer(): void {
+    this.isDrawerOpen = false;
+  }
+
+  @HostListener('window:keydown.escape')
+  onEscape(): void {
+    if (this.isDrawerOpen) {
+      this.closeDrawer();
+    }
+  }
+
   ngOnInit() {
     this.ensureDefaultLibrarySelection();
     this.webPageInfo.load().subscribe(_ => {
       this.refreshBranding();
     });
     this.reloadNotiCount();
+
+    if (typeof ResizeObserver !== 'undefined' && this.elementRef?.nativeElement) {
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeObserver = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const width = entry.contentRect.width;
+            if (width > 0 && Math.abs(this.navbarWidth - width) >= 5) {
+              this.ngZone.run(() => {
+                this.navbarWidth = width;
+                if (!this.isCompact && this.isDrawerOpen) {
+                  this.isDrawerOpen = false;
+                }
+                this.changeDetectorRef.markForCheck();
+              });
+            }
+          }
+        });
+        this.resizeObserver.observe(this.elementRef.nativeElement);
+      });
+    }
 
     // subscribe an event
     const userToken = this.auth.getUserToken();
@@ -110,6 +168,10 @@ export class NavbarComponent implements OnInit {
         this.refreshBranding();
       });
     });
+  }
+
+  ngOnDestroy() {
+    this.resizeObserver?.disconnect();
   }
 
   refreshBranding() {
@@ -203,7 +265,7 @@ export class NavbarComponent implements OnInit {
   }
 
   getActiveCcts(translate: TranslateService): boolean {
-    return translate.currentLang === 'ccts';
+    return translate.currentLang() === 'ccts';
   }
 
   q(set: any): string {

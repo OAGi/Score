@@ -1,92 +1,74 @@
-<div class="context-section">
-  @if (isUpdating) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <span class="title">{{ title }}</span>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
+<score-detail-page [title]="title" [loading]="isUpdating" [actionsWrapper]="false">
+  <score-detail-card>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input [(ngModel)]="moduleSet.name" data-id="moduleSet.name" matInput maxlength="100" required
+        [disabled]="!roles.includes('developer')"/>
+    </mat-form-field>
 
-  <div class="p-3">
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
+      rows="6" [disabled]="!roles.includes('developer')"></textarea>
+    </mat-form-field>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button (click)="updateModuleSet()" [disabled]="updateDisabled"
+      mat-raised-button color="primary">Update</button>
+  </ng-container>
+  <ng-container ngProjectAs="[detailAfterActions]">
     <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input [(ngModel)]="moduleSet.name" data-id="moduleSet.name" matInput maxlength="100" required
-            [disabled]="!roles.includes('developer')"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Description</mat-label>
-          <textarea [(ngModel)]="moduleSet.description" cols="30" data-id="moduleSet.description" matInput
-          rows="6" [disabled]="!roles.includes('developer')"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <button (click)="updateModuleSet()" [disabled]="updateDisabled"
-        mat-raised-button color="primary">Update</button>
-    </div>
-  </div>
-
-  <mat-card>
-    <mat-toolbar class="bg-white" style="box-shadow: none;">
-      <div class="title">
-        <span>Modules</span>
-        <span class="ps-2" style="font-size: 14px;">(Total directory: {{ moduleSetMetadata.numberOfDirectories }}, Total file: {{ moduleSetMetadata.numberOfFiles }})</span>
-      </div>
-    </mat-toolbar>
-    <mat-card class="mb-2">
-      <mat-card-content class="mat-card-container">
-        <div class="finder-wrapper">
-          <div class="finder-content">
-            @for (tile of tiles; track tile) {
-              <div class="finder-grid">
-                <div class="finder-grid-left">
-                  @for (element of tile.elements; track element) {
-                    <div class="grid-element">
-                      <div (click)="onClickElement(tile, element)"
-                        [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
-                        @if (element.directory) {
-                          <mat-icon class="float-start" inline=true>folder_open</mat-icon>
-                        }
-                        @if (!element.directory) {
-                          <mat-icon class="float-start" inline=true>insert_drive_file</mat-icon>
-                        }
-                        <div class="float-start element-title">
-                          <span>{{ element.name }}</span>
-                        </div>
-                        @if (roles.includes('developer')) {
-                          <mat-icon
-                            (click)="openEditDialog(element, tile)" [inline]="true" class="element-edit-icon">edit
-                          </mat-icon>
-                        }
-                      </div>
-                    </div>
-                  }
-                  @if (roles.includes('developer')) {
-                    <div class="grid-element">
-                      <div (click)="openAddDialog(tile)" class="grid-element-content">
-                        <mat-icon class="float-start" inline=true>add</mat-icon>
-                        <div class="float-start element-title">
-                          <span>Add</span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
+      <mat-toolbar class="bg-white" style="box-shadow: none;">
+        <div class="title">
+          <span>Modules</span>
+          <span class="ps-2" style="font-size: 14px;">(Total directory: {{ moduleSetMetadata.numberOfDirectories }}, Total file: {{ moduleSetMetadata.numberOfFiles }})</span>
         </div>
-      </mat-card-content>
+      </mat-toolbar>
+      <mat-card class="mb-2">
+        <mat-card-content class="mat-card-container">
+          <div class="finder-wrapper">
+            <div class="finder-content">
+              @for (tile of tiles; track tile) {
+                <div class="finder-grid">
+                  <div class="finder-grid-left">
+                    @for (element of tile.elements; track element) {
+                      <div class="grid-element">
+                        <div (click)="onClickElement(tile, element)"
+                          [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                          @if (element.directory) {
+                            <mat-icon class="float-start" inline=true>folder_open</mat-icon>
+                          }
+                          @if (!element.directory) {
+                            <mat-icon class="float-start" inline=true>insert_drive_file</mat-icon>
+                          }
+                          <div class="float-start element-title">
+                            <span>{{ element.name }}</span>
+                          </div>
+                          @if (roles.includes('developer')) {
+                            <mat-icon
+                              (click)="openEditDialog(element, tile)" [inline]="true" class="element-edit-icon">edit
+                            </mat-icon>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @if (roles.includes('developer')) {
+                      <div class="grid-element">
+                        <div (click)="openAddDialog(tile)" class="grid-element-content">
+                          <mat-icon class="float-start" inline=true>add</mat-icon>
+                          <div class="float-start element-title">
+                            <span>Add</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </mat-card>
-  </mat-card>
-</div>
+  </ng-container>
+</score-detail-page>

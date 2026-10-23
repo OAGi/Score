@@ -4,6 +4,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
@@ -21,6 +22,8 @@ public interface DtQueryRepository {
 
     DtSummaryRecord getDtSummary(DtManifestId dtManifestId);
 
+    List<DtSummaryRecord> getDtSummaryListByManifestIds(Collection<DtManifestId> dtManifestIdList);
+
     List<DtSummaryRecord> getDtSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<DtSummaryRecord> getDtSummaryList(ReleaseId releaseId);
@@ -34,6 +37,9 @@ public interface DtQueryRepository {
     List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(ReleaseId releaseId);
 
     List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(DtManifestId dtManifestId);
+
+    /** The allowed primitives of these data types in every release that has them; the caller picks the release. */
+    List<DtAwdPriSummaryRecord> getDtAwdPriSummaryListByDtIds(Collection<DtId> dtIds);
 
     DtAwdPriSummaryRecord getDefaultDtAwdPriSummary(DtManifestId dtManifestId);
 
@@ -53,11 +59,16 @@ public interface DtQueryRepository {
 
     List<DtScSummaryRecord> getDtScSummaryList(DtManifestId ownerDtManifestId);
 
+    List<DtScSummaryRecord> getDtScSummaryListByOwnerDtManifestIds(Collection<DtManifestId> ownerDtManifestIdList);
+
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(ReleaseId releaseId);
 
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(DtScManifestId dtScManifestId);
+
+    /** The allowed primitives of these supplementary components in every release that has them; the caller picks the release. */
+    List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryListByDtScIds(Collection<DtScId> dtScIds);
 
     DtScAwdPriSummaryRecord getDefaultDtScAwdPriSummary(DtScManifestId dtScManifestId);
 

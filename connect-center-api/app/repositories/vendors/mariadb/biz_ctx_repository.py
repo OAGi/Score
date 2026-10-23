@@ -18,7 +18,7 @@ from app.repositories.contracts.biz_ctx import BizCtxRepositoryContract
 from app.repositories.models import BizCtxValueRow, CtxSchemeValueSummaryRow
 from app.repositories.models.biz_ctx import BizCtxRow, BizCtxValueDetailRow
 from app.repositories.vendors.mariadb.models.app_user import AppUser
-from app.repositories.vendors.mariadb.models.biz_ctx import BizCtx, BizCtxValue
+from app.repositories.vendors.mariadb.models.biz_ctx import BizCtx, BizCtxAssignment, BizCtxValue
 from app.repositories.vendors.mariadb.models.ctx_scheme import CtxSchemeValue
 from app.types.identifiers import (
     AppUserId,
@@ -170,6 +170,23 @@ class MariaDbBizCtxRepository(BizCtxRepositoryContract):
         obj.last_updated_by = last_updated_by
         obj.last_update_timestamp = last_update_timestamp
         return True
+
+    async def get_top_level_asbiep_ids_using_biz_ctx(self, biz_ctx_id: BizCtxId) -> list[int]:
+        """Handle get top level asbiep ids using biz ctx.
+
+        Args:
+            biz_ctx_id: Business context identifier.
+
+        Returns:
+            Identifiers of the top-level ASBIEPs that use the business context.
+        """
+        stmt = (
+            select(BizCtxAssignment.top_level_asbiep_id)
+            .where(BizCtxAssignment.biz_ctx_id == biz_ctx_id)
+            .order_by(BizCtxAssignment.top_level_asbiep_id)
+        )
+        res = await self._session.execute(stmt)
+        return [int(row[0]) for row in res.all()]
 
     async def delete(self, biz_ctx_id: BizCtxId) -> bool:
         """Handle delete.

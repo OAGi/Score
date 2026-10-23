@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ContextSchemeValue} from '../domain/context-scheme';
 
@@ -6,6 +6,7 @@ import {ContextSchemeValue} from '../domain/context-scheme';
   standalone: false,
   selector: 'score-context-scheme-value-dialog',
   templateUrl: './context-scheme-value-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./context-scheme-value-dialog.component.css']
 })
 export class ContextSchemeValueDialogComponent implements OnInit {

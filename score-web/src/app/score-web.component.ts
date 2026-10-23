@@ -1,4 +1,4 @@
-import {Component, DoCheck, OnInit, inject} from '@angular/core';
+import {Component, DoCheck, OnInit, inject, ChangeDetectionStrategy} from '@angular/core';
 import {AuthService} from './authentication/auth.service';
 import {Router} from '@angular/router';
 import WebFont from 'webfontloader';
@@ -14,6 +14,7 @@ const EXPORT_NOTES_ICON = `<svg xmlns="http://www.w3.org/2000/svg" height="48" v
   standalone: false,
   selector: 'score-web',
   templateUrl: './score-web.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./score-web.component.css']
 })
 export class ScoreWebComponent implements OnInit, DoCheck {

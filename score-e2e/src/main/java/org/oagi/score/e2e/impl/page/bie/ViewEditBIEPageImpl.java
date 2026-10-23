@@ -260,7 +260,7 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
         click(td.findElement(By.tagName("button")));
 
         WebElement createInheritedBIEButton = elementToBeClickable(getDriver(), By.xpath(
-                "//div[@class=\"cdk-overlay-container\"]" +
+                "//div[contains(@class, \"cdk-overlay-pane\")]" +
                         "//span[text() = \"Create Inherited BIE\"]//ancestor::button[1]"));
         click(createInheritedBIEButton);
 

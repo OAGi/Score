@@ -1,7 +1,6 @@
 spring:
   devtools:
-    livereload:
-      enabled: true
+    # spring.devtools.livereload.* was removed in Spring Boot 4 (LiveReload dropped, no replacement) (#1750).
     restart:
       enabled: true
       additional-paths:

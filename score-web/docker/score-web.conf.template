@@ -13,8 +13,29 @@ server {
     server_name  _;
     client_max_body_size 0;
 
+    gzip            on;
+    gzip_vary       on;
+    gzip_http_version 1.0;
+    gzip_proxied    any;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_types      application/json application/javascript text/css text/plain text/javascript application/xml image/svg+xml;
+
+    root   /usr/share/nginx/score-web;
+
+    # index.html names the hashed bundles, so it must be revalidated on every load; otherwise a
+    # cached copy keeps the browser on the previous release after a deploy. The SPA fallback below
+    # and the "index" directive reach this location through an internal redirect.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # Build output whose file name carries a content hash never changes, so cache it for good.
+    location ~ "^/(media/)?[^/]+-[A-Z0-9]{8}\.(js|css|woff2?)$" {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
     location / {
-        root   /usr/share/nginx/score-web;
         try_files $uri $uri/ /index.html;
         index  index.html index.htm;
     }

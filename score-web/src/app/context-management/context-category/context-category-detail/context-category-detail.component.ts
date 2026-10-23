@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
@@ -16,6 +16,7 @@ import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
   standalone: false,
   selector: 'score-context-category-detail',
   templateUrl: './context-category-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./context-category-detail.component.css']
 })
 export class ContextCategoryDetailComponent implements OnInit {

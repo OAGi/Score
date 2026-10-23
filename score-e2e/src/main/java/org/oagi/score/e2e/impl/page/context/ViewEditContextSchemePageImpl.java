@@ -176,9 +176,8 @@ public class ViewEditContextSchemePageImpl extends BaseSearchBarPageImpl impleme
 
     @Override
     public EditContextSchemePage openEditContextSchemePageByContextSchemeName(String contextSchemeName) throws NoSuchElementException {
-        setName(contextSchemeName);
-
         return retry(() -> {
+            setName(contextSchemeName);
             hitSearchButton();
 
             WebElement td;

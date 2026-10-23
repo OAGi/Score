@@ -1,0 +1,160 @@
+<mat-expansion-panel #expansion style="margin-bottom: 8px !important;">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Value Domain</mat-panel-title>
+    @if (!expansion.expanded && detail.defaultValueDomain !== undefined) {
+      <mat-panel-description>
+        <span>Default - {{ detail.defaultValueDomain.name }}</span>
+      </mat-panel-description>
+    }
+  </mat-expansion-panel-header>
+  @if (hasToken && editable) {
+    <mat-action-row>
+      <button mat-stroked-button class="ms-auto" matTooltip="Add Value Domain"
+        [disabled]="!editable"
+        (click)="add.emit()">Add
+      </button>
+      <button mat-stroked-button class="ms-2" matTooltip="Discard Value Domain"
+        [disabled]="!selected || selected.isDefault || selected.inherited"
+        (click)="discard.emit()">Discard
+      </button>
+    </mat-action-row>
+  }
+  <table mat-table [dataSource]="dataSource">
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()"
+          [disabled]="!editable || row.type === 'Primitive' || row[awdPri].inherited"
+          (change)="$event ? toggle.emit(row) : null"
+          [checked]="selected === row">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef> Value Domain Type</th>
+      <td mat-cell *matCellDef="let element">
+        @if (element.type === 'Primitive') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element.type">
+              @for (type of [element.type,]; track type) {
+                <mat-option [value]="type"
+                [disabled]="true">{{ type }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+        @if (element.type !== 'Primitive') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element.type"
+              (ngModelChange)="valueDomainChange.emit()">
+              @for (type of ['Code List', 'Agency ID List']; track type) {
+                <mat-option [value]="type"
+                  [disabled]="!editable || element[awdPri].inherited">
+                  {{ type }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element">
+        @if (element.type === 'Primitive') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element.name">
+              @for (primitive of primitiveList; track primitive) {
+                <mat-option [value]="primitive" [disabled]="true">
+                  <span>{{ primitive }}</span>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+        @if (element.type === 'Code List') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element[awdPri].codeList"
+              [required]="true"
+              [compareWith]="compareCodeList"
+              (ngModelChange)="valueDomainChange.emit()">
+              @for (codeList of filteredCodeLists(element); track codeList) {
+                <mat-option [value]="codeList"
+                  [disabled]="!editable || element[awdPri].inherited">
+                  <span class="{{ codeList.state === 'Deleted' ? 'text-line-through' : '' }}">{{ codeList.name }}</span>
+                  <span class="f12 ms-auto pe-2"> ({{ codeList.versionId }}@if (codeList.deprecated) {
+                      <span>, Deprecated</span>
+                    }@if (codeList.state === 'Deleted') {
+                      <span>, Deleted</span>
+                    })</span>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+        @if (element.type === 'Agency ID List') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element[awdPri].agencyIdList"
+              [required]="true"
+              [compareWith]="compareAgencyIdList"
+              (ngModelChange)="valueDomainChange.emit()">
+              @for (agencyIdList of filteredAgencyIdLists(element); track agencyIdList) {
+                <mat-option [value]="agencyIdList"
+                  [disabled]="!editable || element[awdPri].inherited">
+                  <span>{{ agencyIdList.name }}</span>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="xbt">
+      <th mat-header-cell *matHeaderCellDef> XSD Expression</th>
+      <td mat-cell *matCellDef="let element">
+        @if (element.type === 'Primitive') {
+          <mat-form-field>
+            <mat-select [(ngModel)]="element.xbtList" multiple>
+              @if ((element.xbtList.length || 0) > 2) {
+                <mat-select-trigger class="d-flex">
+                  <span>{{ ((element.xbtList.length || 0) > 0) ? element.xbtList[0].name : '' }}</span>
+                  @if ((element.xbtList.length || 0) > 1) {
+                    <span class="ms-2 additional-selection">
+                      (+{{ (element.xbtList.length || 0) - 1 }} {{ element.xbtList.length === 2 ? 'other' : 'others' }})
+                    </span>
+                  }
+                </mat-select-trigger>
+              }
+              @for (xbt of element.xbtList; track xbt) {
+                <mat-option [value]="xbt" [disabled]="true">
+                  <span>{{ xbt.name }}</span>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *cdkRowDef="let row; columns: columns;"></tr>
+  </table>
+  <mat-toolbar>
+    <mat-toolbar-row class="p-0">
+      <mat-form-field class="pt-2 w-50 ps-2">
+        <mat-label>Default</mat-label>
+        <mat-select [(ngModel)]="detail.defaultValueDomain">
+          @for (valueDomain of groups; track valueDomain) {
+            <mat-optgroup
+              [label]="valueDomain.label">
+              @for (item of valueDomain.list; track item) {
+                <mat-option [value]="item" [disabled]="!editable">
+                  {{ (item.type === 'Primitive') ? item.self.cdtPriName + ' - ' + item.name : item.name }}
+                </mat-option>
+              }
+            </mat-optgroup>
+          }
+        </mat-select>
+      </mat-form-field>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</mat-expansion-panel>

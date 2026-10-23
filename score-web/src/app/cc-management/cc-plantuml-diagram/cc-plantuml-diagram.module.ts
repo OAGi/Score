@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MaterialModule} from '../../material.module';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
@@ -16,7 +16,7 @@ import {PlantUmlService} from '../../common/plantuml-diagram/plantuml.service';
     ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule,
     MatDialogModule

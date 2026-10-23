@@ -5,6 +5,9 @@ set -eu
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
+# shellcheck source=../../docker/buildx.sh
+. "$project_dir/../docker/buildx.sh"
+
 project_version=
 if [ -f "$project_dir/VERSION" ]; then
   project_version=$(tr -d '[:space:]' < "$project_dir/VERSION")
@@ -27,19 +30,13 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Building docker image $image_name..."
 (
   cd "$script_dir"
-  docker build --no-cache -f Dockerfile -t "$image_name" .
+  buildx_build "$image_name" Dockerfile . --no-cache
 )
 
-if command -v trivy >/dev/null 2>&1; then
-  echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
-  # Skip the base-image gosu helper because we intentionally inherit it from mariadb
-  # and do not manage patching that upstream binary in this image build.
-  trivy image --format table --scanners vuln --skip-files /usr/local/bin/gosu --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
-else
-  echo "Info: trivy is not installed. Install Trivy to scan vulnerabilities for $image_name."
-fi
+# Skip the base-image gosu helper because we intentionally inherit it from mariadb
+# and do not manage patching that upstream binary in this image build.
+buildx_scan "$image_name" --format table --scanners vuln --skip-files /usr/local/bin/gosu --severity HIGH,CRITICAL --ignore-unfixed
 
 echo "Done."

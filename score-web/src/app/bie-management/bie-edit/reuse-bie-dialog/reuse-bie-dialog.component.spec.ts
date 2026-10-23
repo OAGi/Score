@@ -1,8 +1,4 @@
-import {ReuseBieDialogComponent} from './reuse-bie-dialog.component';
-import {FormControl} from '@angular/forms';
-import {MatTableDataSource} from '@angular/material/table';
-import {of, ReplaySubject, Subject} from 'rxjs';
-import {vi} from 'vitest';
+import {ReuseBieDialogComponent, reuseBieParams} from './reuse-bie-dialog.component';
 
 describe('ReuseBieDialogComponent', () => {
   it('should be defined', () => {
@@ -10,38 +6,22 @@ describe('ReuseBieDialogComponent', () => {
   });
 
   it('builds an unscoped inheritance filter while retaining the target ASCCP and release filters', () => {
-    const component = Object.create(ReuseBieDialogComponent.prototype) as ReuseBieDialogComponent;
-    const candidates = [
-      {topLevelAsbiepId: 10, basedTopLevelAsbiepId: undefined},
-      {topLevelAsbiepId: 11, basedTopLevelAsbiepId: 10}
-    ];
-    const getBieListWithRequest = vi.fn(() => of({length: candidates.length, list: candidates}));
-    const sortChange = new Subject<void>();
+    const params = reuseBieParams({asccpManifestId: 77, libraryId: 3, releaseId: 4, topLevelAsbiepId: 9}, false);
 
-    Object.assign(component as any, {
-      data: {asccpManifestId: 77, libraryId: 3, releaseId: 4, topLevelAsbiepId: 9},
-      route: {snapshot: {queryParamMap: {get: () => undefined}}},
-      accountService: {getAccountNames: () => of([])},
-      preferencesService: {load: () => of({tableColumnsInfo: {columnsOfBiePage: []}})},
-      auth: {getUserToken: () => ({roles: []})},
-      bieListService: {getBieListWithRequest},
-      dataSource: new MatTableDataSource(),
-      paginator: {pageIndex: 0, pageSize: 10, length: 0},
-      sort: {active: '', direction: '', sortChange, sort: vi.fn()},
-      loginIdList: [],
-      loginIdListFilterCtrl: new FormControl(),
-      updaterIdListFilterCtrl: new FormControl(),
-      filteredLoginIdList: new ReplaySubject<string[]>(1),
-      filteredUpdaterIdList: new ReplaySubject<string[]>(1)
-    });
+    expect(params['asccpManifestId']).toBe('77');
+    expect(params['libraryId']).toBe('3');
+    expect(params['releaseIds']).toBe('4');
+    expect(params['excludeTopLevelAsbiepIds']).toBe('9');
+    expect(params['basedTopLevelAsbiepIds']).toBeUndefined();
+    expect(params['ownedByDeveloper']).toBeUndefined();
+  });
 
-    component.ngOnInit();
+  it('asks for the BIEs that are based on a BIE only when there is one, and for the developers\' only of a developer', () => {
+    const params = reuseBieParams({libraryId: 3, releaseId: 4, topLevelAsbiepId: 9, basedTopLevelAsbiepId: 10}, true);
 
-    const request = getBieListWithRequest.mock.calls[0][0];
-    expect(request.filters.asccpManifestId).toBe(77);
-    expect(request.releases.map(release => release.releaseId)).toEqual([4]);
-    expect(request.basedTopLevelAsbiepIds).toEqual([]);
-    expect(component.dataSource.data.map(row => row.topLevelAsbiepId)).toEqual([10, 11]);
-    expect(component.dataSource.data.map(row => row.basedTopLevelAsbiepId)).toEqual([undefined, 10]);
+    expect(params['basedTopLevelAsbiepIds']).toBe('10');
+    expect(params['ownedByDeveloper']).toBe('true');
+    expect(reuseBieParams({libraryId: 3, releaseId: 4, topLevelAsbiepId: 9, basedTopLevelAsbiepId: 0}, false)['basedTopLevelAsbiepIds'])
+      .toBeUndefined();
   });
 });

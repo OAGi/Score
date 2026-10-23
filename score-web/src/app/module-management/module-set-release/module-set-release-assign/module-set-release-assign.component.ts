@@ -1,6 +1,6 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {Location} from '@angular/common';
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
@@ -22,6 +22,7 @@ import {WebPageInfoService} from '../../../basis/basis.service';
   standalone: false,
   selector: 'score-module-set-assign',
   templateUrl: './module-set-release-assign.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-release-assign.component.css']
 })
 export class ModuleSetReleaseAssignComponent implements OnInit {
@@ -48,11 +49,11 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
   rootElement: ModuleElement;
   selectedModuleElement: ModuleElement;
 
-  leftDataSource = new MatTableDataSource();
+  leftDataSource = new MatTableDataSource<AssignableNode>();
   leftSelection = new SelectionModel<AssignableNode>(true, []);
   leftFilteredValues = {types: [], states: [], den: ''};
 
-  rightDataSource = new MatTableDataSource();
+  rightDataSource = new MatTableDataSource<AssignableNode>();
   rightSelection = new SelectionModel<AssignableNode>(true, []);
   rightFilteredValues = {types: [], states: [], den: ''};
 

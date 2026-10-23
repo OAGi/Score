@@ -1,5 +1,5 @@
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {faAngleDoubleLeft, faAngleDoubleRight, faSort} from '@fortawesome/free-solid-svg-icons';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -27,6 +27,7 @@ import {WebPageInfoService} from '../../basis/basis.service';
   standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-assign.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./release-assign.component.css']
 })
 export class ReleaseAssignComponent implements OnInit {

@@ -1,3 +1,7 @@
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {BccpDetailComponent} from './bccp-detail.component';
@@ -6,8 +10,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
@@ -34,13 +39,18 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     MatInputModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule,
+    CcTreeViewportComponent,
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    DtPanelComponent,
+    BccPanelComponent,
+    BccpPanelComponent,
+    DtScPanelComponent
   ],
   declarations: [
     BccpDetailComponent

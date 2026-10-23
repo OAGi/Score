@@ -1,0 +1,79 @@
+score-model-browser-tree-viewport .choice-branch-guide {
+  display: inline-block;
+  position: relative;
+  width: 16px;
+  min-width: 16px;
+  height: 33px;
+  left: calc(-1 * var(--choice-guide-extra-offset, 0px));
+  margin-left: -16px;
+  margin-right: 0;
+  padding-right: 0 !important;
+  overflow: visible;
+}
+
+score-model-browser-tree-viewport .mat-tree-node > span.choice-branch-guide {
+  cursor: default;
+  margin-right: 0;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide::before,
+score-model-browser-tree-viewport .choice-branch-guide::after {
+  content: '';
+  position: absolute;
+  background-color: #c62828;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide::before {
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 0.5px;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide::after {
+  left: 7px;
+  top: 16px;
+  width: 10px;
+  height: 0.5px;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide.choice-branch-guide-first::before {
+  top: 16px;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide.choice-branch-guide-only::before,
+score-model-browser-tree-viewport .choice-branch-guide.choice-branch-guide-last::before {
+  bottom: 15px;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide.choice-branch-guide-only::before {
+  display: none;
+}
+
+score-model-browser-tree-viewport .choice-branch-guide-continue::after {
+  display: none;
+}
+
+/* Small badge to the right of the cardinality showing a sibling's custom order weight — issue #1638. */
+score-model-browser-tree-viewport .order-weight-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: rgba(63, 81, 181, 0.12);
+  color: #3f51b5;
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* In the model browser an ACC is blue like an ASCCP (a CC screen draws it red). */
+score-model-browser-tree-viewport .mat-tree-node .node-label.acc {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+}

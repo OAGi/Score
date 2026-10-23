@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AccountListService} from '../domain/account-list.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -9,6 +9,7 @@ import {PendingAccount} from '../domain/pending-list';
   standalone: false,
   selector: 'score-account-create',
   templateUrl: './account-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./account-create.component.css']
 })
 export class AccountCreateComponent implements OnInit {

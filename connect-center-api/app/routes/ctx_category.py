@@ -243,7 +243,13 @@ async def delete_ctx_category(
     Returns:
         Empty HTTP 204 response when deletion succeeds.
     """
-    deleted = await context_category_service.delete(context_category_id)
+    try:
+        deleted = await context_category_service.delete(context_category_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "The context category cannot be deleted.", "cause": str(e)},
+        )
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

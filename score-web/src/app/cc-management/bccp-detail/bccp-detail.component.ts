@@ -1,6 +1,6 @@
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -9,6 +9,8 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
@@ -47,7 +49,6 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
@@ -61,6 +62,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   standalone: false,
   selector: 'score-bccp-detail',
   templateUrl: './bccp-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bccp-detail.component.css']
 })
 export class BccpDetailComponent implements OnInit {
@@ -86,8 +88,6 @@ export class BccpDetailComponent implements OnInit {
   protected readonly trim = trim;
 
   title: string;
-  _innerHeight: number = window.innerHeight;
-  paddingPixel = 12;
   manifestId: number;
   type = 'BCCP';
   isUpdating: boolean;
@@ -103,7 +103,7 @@ export class BccpDetailComponent implements OnInit {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -112,19 +112,13 @@ export class BccpDetailComponent implements OnInit {
 
   initialExpandDepth = 10;
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
-  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
+  get sidenav(): MatSidenav {
+    return this.sidenavPage.sidenav;
   }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
@@ -224,6 +218,7 @@ export class BccpDetailComponent implements OnInit {
       this.rootNode.access = bccpDetails.access;
       this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
+      this.rootNode.prefetchedBccpDetails = bccpDetails;
 
       // Issue #1254
       // Initial expanding by the query path
@@ -267,7 +262,7 @@ export class BccpDetailComponent implements OnInit {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -357,6 +352,7 @@ export class BccpDetailComponent implements OnInit {
       this.rootNode.access = bccpDetails.access;
       this.rootNode.state = bccpDetails.state;
       this.rootNode.reset();
+      this.rootNode.prefetchedBccpDetails = bccpDetails;
 
       this.onClick(this.dataSource.data[0]);
 
@@ -395,13 +391,7 @@ export class BccpDetailComponent implements OnInit {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (this.rootNode) ? this.rootNode.state : '';
@@ -435,14 +425,6 @@ export class BccpDetailComponent implements OnInit {
     });
   }
 
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   /* For type casting of detail property */
   isAccDetail(node?: CcFlatNode): boolean {
@@ -967,67 +949,12 @@ export class BccpDetailComponent implements OnInit {
     }
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 
@@ -1086,16 +1013,4 @@ export class BccpDetailComponent implements OnInit {
       });
   }
 
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
 }

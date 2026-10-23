@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingsApplicationSettingsService} from '../settings-application-settings/domain/settings-application-settings.service';
@@ -7,6 +7,7 @@ import {SettingsApplicationSettingsService} from '../settings-application-settin
   standalone: false,
   selector: 'score-email-validation',
   templateUrl: 'email-validation.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['email-validation.component.css']
 })
 export class EmailValidationComponent implements OnInit {

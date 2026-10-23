@@ -5,7 +5,6 @@ import {
   AssignableMap,
   ReleaseDetails,
   ReleaseListEntry,
-  ReleaseListRequest,
   ReleaseResponse,
   ReleaseSummary,
   ReleaseValidationRequest,
@@ -17,7 +16,6 @@ import {map} from 'rxjs/operators';
 @Injectable()
 export class ReleaseService {
   private http = inject(HttpClient);
-
 
   getReleaseSummaryList(libraryId: number, states?: string[]): Observable<ReleaseSummary[]> {
     let params = new HttpParams().set('libraryId', libraryId);
@@ -32,43 +30,7 @@ export class ReleaseService {
     return this.http.get<ReleaseSummary>('/api/releases/working', {params});
   }
 
-  getReleaseList(request: ReleaseListRequest): Observable<PageResponse<ReleaseListEntry>> {
-    let params = new HttpParams()
-        .set('libraryId', '' + request.library.libraryId)
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.creatorLoginIdList.length > 0) {
-      params = params.set('creatorLoginIdList', request.creatorLoginIdList.join(','));
-    }
-    if (!!request.createdDate.start || !!request.createdDate.end) {
-      params = params.set('createdOn',
-          '[' + (!!request.createdDate.start ? request.createdDate.start.getTime() : '') + '~' +
-          (!!request.createdDate.end ? request.createdDate.end.getTime() : '') + ']');
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.releaseNum) {
-      params = params.set('releaseNum', request.filters.releaseNum);
-    }
-    if (request.states.length > 0) {
-      params = params.set('releaseStates', request.states.join(','));
-    }
-    if (request.excludes.length > 0) {
-      params = params.set('excludeReleaseNums', request.excludes.join(','));
-    }
-    if (request.namespaces && request.namespaces.length > 0) {
-      params = params.set('namespaceIds', request.namespaces.map(e => '' + e).join(','));
-    }
+  getReleaseListPage(params: HttpParams): Observable<PageResponse<ReleaseListEntry>> {
     return this.http.get<PageResponse<ReleaseListEntry>>('/api/releases', {params}).pipe(
         map((res: PageResponse<ReleaseListEntry>) => ({
           ...res,

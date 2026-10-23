@@ -1,7 +1,7 @@
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
+import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {MatTableDataSource} from '@angular/material/table';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -14,7 +14,6 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {CcListService} from '../cc-list/domain/cc-list.service';
 import {
   CcFlatNode,
   CcFlatNodeDatabase,
@@ -23,6 +22,8 @@ import {
   DtFlatNode,
   DtScFlatNode
 } from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
@@ -51,8 +52,7 @@ import {
   EntityType,
   EntityTypes,
   OagisComponentType,
-  OagisComponentTypes,
-  XbtSummary
+  OagisComponentTypes
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
@@ -65,7 +65,6 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
@@ -81,6 +80,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   standalone: false,
   selector: 'score-bccp-detail',
   templateUrl: './bdt-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bdt-detail.component.css']
 })
 export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
@@ -88,7 +88,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
   private agencyIdListservice = inject(AgencyIdListService);
-  private ccListService = inject(CcListService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
@@ -109,8 +108,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   protected readonly trim = trim;
 
   title: string;
-  _innerHeight: number = window.innerHeight;
-  paddingPixel = 12;
   manifestId: number;
   type = 'DT';
   isUpdating: boolean;
@@ -126,7 +123,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -136,30 +133,21 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   initialExpandDepth = 10;
 
   primitiveTypeList = ['Primitive', 'Code List', 'Agency ID List'];
-  primitiveList = ['Binary', 'Boolean', 'Decimal', 'Double', 'Float', 'Integer', 'NormalizedString', 'String', 'TimeDuration', 'TimePoint', 'Token'];
 
   selectedValueDomain: any;
 
-  codeLists: CodeListSummary[];
-  agencyIdLists: AgencyIdListSummary[];
-  xbtList: XbtSummary[];
+  codeLists: CodeListSummary[] = [];
+  agencyIdLists: AgencyIdListSummary[] = [];
 
-  restrictionListDisplayedColumns: string[] = ['select', 'type', 'name', 'xbt'];
   restrictionDataSource = new MatTableDataSource<any>();
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
-  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
+  get sidenav(): MatSidenav {
+    return this.sidenavPage.sidenav;
   }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
@@ -270,30 +258,30 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.rootNode.access = dtDetails.access;
       this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(dtDetails);
 
+      // The value-domain pickers only need these to list their options, so the panel does not wait for them.
       forkJoin([
         this.codeListService.getCodeListSummaries(dtDetails.release.releaseId),
         this.agencyIdListservice.getAgencyIdListSummaries(dtDetails.release.releaseId),
-        this.ccListService.getXbtListSummaries(dtDetails.release.releaseId),
-      ]).subscribe(([codeLists, agencyIdLists, xbtList]) => {
+      ]).subscribe(([codeLists, agencyIdLists]) => {
         this.codeLists = codeLists;
         this.agencyIdLists = agencyIdLists;
-        this.xbtList = xbtList;
-
-        // Issue #1254
-        // Initial expanding by the query path
-        const url = this.router.url;
-        const manifestId = this.manifestId.toString();
-        const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
-
-        if (!!queryPath) {
-          this.goToPath(queryPath);
-        } else {
-          this.onClick(this.dataSource.data[0]);
-        }
-
-        this.isUpdating = false;
       });
+
+      // Issue #1254
+      // Initial expanding by the query path
+      const url = this.router.url;
+      const manifestId = this.manifestId.toString();
+      const queryPath = url.substring(url.indexOf(manifestId) + manifestId.length + 1);
+
+      if (!!queryPath) {
+        this.goToPath(queryPath);
+      } else {
+        this.onClick(this.dataSource.data[0]);
+      }
+
+      this.isUpdating = false;
     }, err => {
       this.isUpdating = false;
       if (err.status === 404) {
@@ -304,6 +292,11 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         duration: 3000
       });
     });
+  }
+
+  /* The root node is the DT itself, so its detail is built from the already fetched DT without another request. */
+  private seedRootDetail(dtDetails: DtDetails) {
+    this.rootNode.detail = new CcDtNodeInfo(this.rootNode as DtFlatNode, dtDetails);
   }
 
   goToPath(path: string) {
@@ -323,7 +316,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -428,6 +421,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.rootNode.access = dtDetails.access;
       this.rootNode.state = dtDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(dtDetails);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -467,13 +461,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (!!this.rootNode) ? this.rootNode.state : '';
@@ -1116,67 +1104,12 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     }
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 
@@ -1235,35 +1168,6 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       });
   }
 
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
-
-  isEmpty(str: string): boolean {
-    return str === undefined || str === null || str.trim() === '';
-  }
-
-  randSixDigitId(): string {
-    return (Math.random() + 1).toString(36).substring(2, 8).toUpperCase();
-  }
-
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   hasTokenPrimitive(detail: CcDtNodeInfo | CcDtScNodeInfo) {
     if (detail instanceof CcDtNodeInfo) {
@@ -1382,7 +1286,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
     this.onChangeValueDomain(detail);
   }
 
-  filteredCodeLists(element: any): CodeListSummary[] {
+  /** An arrow function: the value domain calls it without the screen as `this`. */
+  filteredCodeLists = (element: any): CodeListSummary[] => {
     let selfCodeListManifestId;
     if (!!element.dtAwdPri) {
       selfCodeListManifestId = element.dtAwdPri.codeList.codeListManifestId;
@@ -1403,9 +1308,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         .filter(e => !!e).map(e => e.codeListManifestId);
 
     return this.codeLists.filter(e => !selectedCodeLists.includes(e.codeListManifestId) || e.codeListManifestId === selfCodeListManifestId);
-  }
+  };
 
-  filteredAgencyIdLists(element: any): AgencyIdListSummary[] {
+  /** An arrow function: the value domain calls it without the screen as `this`. */
+  filteredAgencyIdLists = (element: any): AgencyIdListSummary[] => {
     let selfAgencyIdListManifestId;
     if (!!element.dtAwdPri && !!element.dtAwdPri.agencyIdList) {
       selfAgencyIdListManifestId = element.dtAwdPri.agencyIdList.agencyIdListManifestId;
@@ -1426,15 +1332,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
         .filter(e => !!e).map(e => e.agencyIdListManifestId);
 
     return this.agencyIdLists.filter(e => !selectedAgencyIdLists.includes(e.agencyIdListManifestId) || e.agencyIdListManifestId === selfAgencyIdListManifestId);
-  }
-
-  compareCodeList(a: CodeListSummary, b: CodeListSummary): boolean {
-    return !!a && !!b && a.codeListManifestId === b.codeListManifestId;
-  }
-
-  compareAgencyIdList(a: AgencyIdListSummary, b: AgencyIdListSummary): boolean {
-    return !!a && !!b && a.agencyIdListManifestId === b.agencyIdListManifestId;
-  }
+  };
 
   onChangeValueDomain(detail: CcNodeInfo) {
     if (detail instanceof CcDtNodeInfo) {

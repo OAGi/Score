@@ -19,46 +19,44 @@ public class UserTenantRecord extends UpdatableRecordImpl<UserTenantRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.user_tenant.user_tenant_id</code>. Primary key
-     * column.
+     * Setter for <code>user_tenant.user_tenant_id</code>. Primary key column.
      */
     public void setUserTenantId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.user_tenant.user_tenant_id</code>. Primary key
-     * column.
+     * Getter for <code>user_tenant.user_tenant_id</code>. Primary key column.
      */
     public ULong getUserTenantId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
-     * the user.
+     * Setter for <code>user_tenant.tenant_id</code>. Assigned tenant to the
+     * user.
      */
     public void setTenantId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
-     * the user.
+     * Getter for <code>user_tenant.tenant_id</code>. Assigned tenant to the
+     * user.
      */
     public ULong getTenantId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.user_tenant.app_user_id</code>. Application user.
+     * Setter for <code>user_tenant.app_user_id</code>. Application user.
      */
     public void setAppUserId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.user_tenant.app_user_id</code>. Application user.
+     * Getter for <code>user_tenant.app_user_id</code>. Application user.
      */
     public ULong getAppUserId() {
         return (ULong) get(2);

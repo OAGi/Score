@@ -2,6 +2,9 @@ package org.oagi.score.gateway.http.api.graph.model;
 
 import lombok.Data;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
+import org.oagi.score.gateway.http.api.cc_management.model.CcType;
+import org.oagi.score.gateway.http.api.cc_management.model.Definition;
+import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
@@ -17,8 +20,9 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryReco
 import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySupportable;
 import org.oagi.score.gateway.http.api.cc_management.service.SeqKeyHandler;
 
+import org.springframework.util.StringUtils;
+
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 @Data
@@ -37,25 +41,25 @@ public class CoreComponentGraphContext implements GraphContext {
         graph.addNode(node);
 
         if (node.getType() == Node.NodeType.ACC) {
-            Queue<Node> queue = new LinkedBlockingQueue();
-            queue.offer(node);
+            // One level of the ACCs derived from the node at a time, asked in one read.
+            List<Node> level = List.of(node);
+            while (!level.isEmpty()) {
+                Map<AccManifestId, List<AccSummaryRecord>> usagesByBase = ccDocument.getAccListByBasedAccManifestIds(
+                        level.stream().map(e -> (AccManifestId) e.getManifestId()).collect(Collectors.toList()));
 
-            while (!queue.isEmpty()) {
-                Node currentNode = queue.poll();
-                switch (currentNode.getType()) {
-                    case ACC:
-                        List<Node> accUsages = ccDocument.getAccListByBasedAccManifestId((AccManifestId) currentNode.getManifestId())
-                                .stream().map(e -> toNode(e)).collect(Collectors.toList());
+                List<Node> nextLevel = new ArrayList<>();
+                for (Node currentNode : level) {
+                    List<Node> accUsages = usagesByBase.getOrDefault(currentNode.getManifestId(), Collections.emptyList())
+                            .stream().map(e -> toNode(e)).collect(Collectors.toList());
 
-                        accUsages.forEach(_node -> {
-                            graph.addNode(_node);
-                        });
+                    accUsages.forEach(_node -> {
+                        graph.addNode(_node);
+                    });
 
-                        graph.addEdges(currentNode, accUsages);
-                        queue.addAll(accUsages);
-
-                        break;
+                    graph.addEdges(currentNode, accUsages);
+                    nextLevel.addAll(accUsages);
                 }
+                level = nextLevel;
             }
 
             List<Node> asccpUsages = ccDocument.getAsccpListByRoleOfAccManifestId((AccManifestId) node.getManifestId())
@@ -101,6 +105,25 @@ public class CoreComponentGraphContext implements GraphContext {
         response.setGraph(graph);
         response.setRootNodeKey(node.getKey());
         return response;
+    }
+
+    @Override
+    public void prefetchGraph(Node root) {
+        switch (root.getType()) {
+            case ACC, ASCCP, BCCP, DT -> ccDocument.prefetchDependencies(CcType.valueOf(root.getType().name()), root.getManifestId());
+            default -> {
+            }
+        }
+    }
+
+    @Override
+    public void prefetchChildren(Collection<Node> nodes) {
+        Map<Node.NodeType, List<ManifestId>> manifestIdsByType = nodes.stream()
+                .filter(e -> e.getType() == Node.NodeType.ACC || e.getType() == Node.NodeType.ASCCP
+                        || e.getType() == Node.NodeType.BCCP || e.getType() == Node.NodeType.DT)
+                .collect(Collectors.groupingBy(Node::getType, Collectors.mapping(Node::getManifestId, Collectors.toList())));
+        manifestIdsByType.forEach((type, manifestIds) ->
+                ccDocument.prefetchChildren(CcType.valueOf(type.name()), manifestIds));
     }
 
     @Override
@@ -219,6 +242,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("objectClassTerm", acc.objectClassTerm());
         node.put("den", acc.den());
         node.put("componentType", acc.componentType().name());
+        putDefinition(node, acc.definition());
         return node;
     }
 
@@ -233,6 +257,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put(Node.GUID_PROPERTY, asccp.guid());
         node.put("propertyTerm", asccp.propertyTerm());
         node.put("den", asccp.den());
+        putDefinition(node, asccp.definition());
         return node;
     }
 
@@ -247,6 +272,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put(Node.GUID_PROPERTY, bccp.guid());
         node.put("propertyTerm", bccp.propertyTerm());
         node.put("den", bccp.den());
+        putDefinition(node, bccp.definition());
         return node;
     }
 
@@ -259,6 +285,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("cardinalityMin", ascc.cardinality().min());
         node.put("cardinalityMax", ascc.cardinality().max());
         node.put("den", ascc.den());
+        putDefinition(node, ascc.definition());
         return node;
     }
 
@@ -272,6 +299,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("cardinalityMax", bcc.cardinality().max());
         node.put("entityType", bcc.entityType().name());
         node.put("den", bcc.den());
+        putDefinition(node, bcc.definition());
         return node;
     }
 
@@ -286,6 +314,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("dataTypeTerm", dt.dataTypeTerm());
         node.put("den", dt.den());
         node.put("qualifier", dt.qualifier());
+        putDefinition(node, dt.definition());
         return node;
     }
 
@@ -304,6 +333,14 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("representationTerm", dtSc.representationTerm());
         node.put("cardinalityMin", dtSc.cardinality().min());
         node.put("cardinalityMax", dtSc.cardinality().max());
+        putDefinition(node, dtSc.definition());
         return node;
+    }
+
+    /** A definition is sent only when there is one: a node without it reads as an empty definition. */
+    private static void putDefinition(Node node, Definition definition) {
+        if (definition != null && StringUtils.hasLength(definition.content())) {
+            node.put("definition", definition.content());
+        }
     }
 }

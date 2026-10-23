@@ -18,6 +18,15 @@ import java.util.List;
 
 public interface CodeListQueryRepository {
 
+    /** The code lists with these manifest ids (each with its values). */
+    List<CodeListSummaryRecord> getCodeListSummaryListByManifestIds(Collection<CodeListManifestId> codeListManifestIds);
+
+    /** The release of each of these code list manifests; a manifest that does not exist is not in the map. */
+    java.util.Map<CodeListManifestId, ReleaseId> getCodeListReleaseIds(Collection<CodeListManifestId> codeListManifestIds);
+
+    /** The release of the code list manifest, or null when there is none. */
+    ReleaseId getCodeListReleaseId(CodeListManifestId codeListManifestId);
+
     CodeListSummaryRecord getCodeListSummary(
             CodeListManifestId codeListManifestId);
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AboutService} from './domain/about.service';
 import {ProductInfo} from './domain/about';
 import {projectVersion} from '../../../environments/version';
@@ -7,6 +7,7 @@ import {projectVersion} from '../../../environments/version';
   standalone: false,
   selector: 'score-about',
   templateUrl: './about.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -28,6 +28,7 @@ import {LibraryService} from '../../../library-management/domain/library.service
   standalone: false,
   selector: 'score-bie-package-uplift-dialog',
   templateUrl: './bie-package-uplift-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-package-uplift-dialog.component.css']
 })
 export class BiePackageUpliftDialogComponent implements OnInit {

@@ -15,12 +15,14 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTre
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog} from '@angular/material/dialog';
 import {
   BIEProperties,
   BrowseStandardModeProperties,
   BusinessTermProperties,
   FunctionsRequiringEmailTransmissionProperties,
   OAuth2AppInfo,
+  PasskeyProperties,
   TenantProperties,
   UserToken
 } from './domain/auth';
@@ -31,6 +33,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   private logoutInProgress = false;
 
 
@@ -126,6 +129,15 @@ export class AuthService implements OnInit, CanActivate {
     localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
   }
 
+  /**
+   * Whether the signed-in user can manage passkeys: passkey sign-in is on, and the account signs in with a username
+   * and password (single sign-on accounts use their provider's own passkeys).
+   */
+  canUsePasskeys(): boolean {
+    const token = this.getUserToken();
+    return !!token?.passkey?.enabled && (token.authentication === 'basic' || token.authentication === 'passkey');
+  }
+
   getUserToken(): UserToken {
     let value;
     try {
@@ -155,6 +167,11 @@ export class AuthService implements OnInit, CanActivate {
       if (!value.browseStandardMode) {
         value.browseStandardMode = new BrowseStandardModeProperties();
         value.browseStandardMode.enabled = false;
+        this.storeUserInfo(value);
+      }
+      if (!value.passkey) {
+        value.passkey = new PasskeyProperties();
+        value.passkey.enabled = false;
         this.storeUserInfo(value);
       }
     } catch (ignore) {
@@ -246,6 +263,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   redirectToLogin(url?) {
+    this.dialog.closeAll();
     const commands = ['/' + environment.loginPath];
     const next = this.nextParam(url);
     if (!!next) {

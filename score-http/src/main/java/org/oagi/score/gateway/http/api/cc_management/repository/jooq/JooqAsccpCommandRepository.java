@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import jakarta.annotation.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.UpdateSetFirstStep;
@@ -64,7 +65,7 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
         AsccpRecord asccp = new AsccpRecord();
         asccp.setGuid(ScoreGuidUtils.randomGuid());
         String propertyTerm = hasLength(initialPropertyTerm) ? initialPropertyTerm : "Property Term";
-        String den = makeDen(propertyTerm, roleOfAcc.objectClassTerm());
+        String den = DenUtils.asccpDen(propertyTerm, roleOfAcc.objectClassTerm());
         asccp.setPropertyTerm(propertyTerm);
         asccp.setRoleOfAccId(valueOf(roleOfAcc.accId()));
         asccp.setState(((initialState != null) ? initialState : WIP).name());
@@ -106,25 +107,6 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
                         .fetchOne().getAsccpManifestId().toBigInteger());
     }
 
-    private String makeDen(String propertyTerm, String objectClassTerm) {
-
-        String den = propertyTerm + ". " + objectClassTerm;
-        // Check the length of den and shorten propertyTerm if necessary
-        if (den.length() > 200) {
-            // Calculate max length for propertyTerm to fit within 200 characters
-            int maxPropertyTermLength = 200 - objectClassTerm.length() - 2; // 2 accounts for the ". " separator
-
-            // Truncate propertyTerm if it exceeds the calculated max length
-            if (propertyTerm.length() > maxPropertyTermLength) {
-                propertyTerm = propertyTerm.substring(0, maxPropertyTermLength);
-            }
-
-            // Rebuild den with truncated propertyTerm
-            den = propertyTerm + ". " + objectClassTerm;
-        }
-        return den;
-    }
-
     @Override
     public boolean update(AsccpManifestId asccpManifestId,
                           @Nullable String propertyTerm,
@@ -156,7 +138,7 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
 
             AccSummaryRecord roleOfAcc = repositoryFactory().accQueryRepository(requester())
                     .getAccSummary(asccp.roleOfAccManifestId());
-            String den = propertyTerm + ". " + roleOfAcc.objectClassTerm();
+            String den = DenUtils.asccpDen(propertyTerm, roleOfAcc.objectClassTerm());
             dslContext().update(AsccpManifest.ASCCP_MANIFEST)
                     .set(AsccpManifest.ASCCP_MANIFEST.DEN, den)
                     .where(AsccpManifest.ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())))
@@ -249,7 +231,7 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
         if (numOfUpdatedRecords == 1) {
             numOfUpdatedRecords = dslContext().update(ASCCP_MANIFEST)
                     .set(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, valueOf(roleOfAcc.accManifestId()))
-                    .set(ASCCP_MANIFEST.DEN, asccp.propertyTerm() + ". " + roleOfAcc.objectClassTerm())
+                    .set(ASCCP_MANIFEST.DEN, DenUtils.asccpDen(asccp.propertyTerm(), roleOfAcc.objectClassTerm()))
                     .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())))
                     .execute();
         }

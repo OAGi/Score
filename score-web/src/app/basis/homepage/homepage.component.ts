@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import { AfterViewInit, Component, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -37,6 +37,7 @@ export interface UserStatesItem {
   standalone: false,
   selector: 'score-homepage',
   templateUrl: './homepage.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent implements OnInit, AfterViewInit {

@@ -22,23 +22,23 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Indexes;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc.AccPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Ascc.AsccPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asccp.AsccpPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AsccpRecord;
@@ -53,7 +53,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.asccp</code>
+     * The reference instance of <code>asccp</code>
      */
     public static final Asccp ASCCP = new Asccp();
 
@@ -66,51 +66,50 @@ public class Asccp extends TableImpl<AsccpRecord> {
     }
 
     /**
-     * The column <code>oagi.asccp.asccp_id</code>. An internal, primary
-     * database key of an ASCCP.
+     * The column <code>asccp.asccp_id</code>. An internal, primary database key
+     * of an ASCCP.
      */
-    public final TableField<AsccpRecord, ULong> ASCCP_ID = createField(DSL.name("asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "An internal, primary database key of an ASCCP.");
+    public final TableField<AsccpRecord, ULong> ASCCP_ID = createField(DSL.name("asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "An internal, primary database key of an ASCCP.");
 
     /**
-     * The column <code>oagi.asccp.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>asccp.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<AsccpRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.asccp.type</code>. The Type of the ASCCP. List:
-     * Default, Extension 
+     * The column <code>asccp.type</code>. The Type of the ASCCP. List: Default,
+     * Extension 
      */
     public final TableField<AsccpRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("'Default'"), SQLDataType.VARCHAR)), this, "The Type of the ASCCP. List: Default, Extension ");
 
     /**
-     * The column <code>oagi.asccp.property_term</code>. The role (or property)
-     * the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used
-     * by another ACC. There must be only one ASCCP without a Property_Term for
-     * a particular ACC.
+     * The column <code>asccp.property_term</code>. The role (or property) the
+     * ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by
+     * another ACC. There must be only one ASCCP without a Property_Term for a
+     * particular ACC.
      */
     public final TableField<AsccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.");
 
     /**
-     * The column <code>oagi.asccp.definition</code>. Description of the ASCCP.
+     * The column <code>asccp.definition</code>. Description of the ASCCP.
      */
     public final TableField<AsccpRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the ASCCP.");
 
     /**
-     * The column <code>oagi.asccp.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * The column <code>asccp.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public final TableField<AsccpRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
-     * The column <code>oagi.asccp.role_of_acc_id</code>. The ACC from which
-     * this ASCCP is created (ASCCP applies role to the ACC).
+     * The column <code>asccp.role_of_acc_id</code>. The ACC from which this
+     * ASCCP is created (ASCCP applies role to the ACC).
      */
     public final TableField<AsccpRecord, ULong> ROLE_OF_ACC_ID = createField(DSL.name("role_of_acc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "The ACC from which this ASCCP is created (ASCCP applies role to the ACC).");
 
     /**
-     * The column <code>oagi.asccp.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * The column <code>asccp.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -119,9 +118,9 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the entity. \n\nThis column never change between the history and the current record for a given revision. The history record should have the same value as that of its current record.");
 
     /**
-     * The column <code>oagi.asccp.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * The column <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -129,7 +128,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
-     * The column <code>oagi.asccp.last_updated_by</code>. Foreign key to the
+     * The column <code>asccp.last_updated_by</code>. Foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -138,7 +137,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who has updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).");
 
     /**
-     * The column <code>oagi.asccp.creation_timestamp</code>. Timestamp when the
+     * The column <code>asccp.creation_timestamp</code>. Timestamp when the
      * revision of the ASCCP was created. 
      * 
      * This never change for a revision.
@@ -146,8 +145,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the ASCCP was created. \n\nThis never change for a revision.");
 
     /**
-     * The column <code>oagi.asccp.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * The column <code>asccp.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -156,9 +155,9 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.\n\nThe value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the revision has occurred.");
 
     /**
-     * The column <code>oagi.asccp.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the ASCCP.
+     * The column <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCCP.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -166,50 +165,49 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ASCCP.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
-     * The column <code>oagi.asccp.namespace_id</code>. Foreign key to the
-     * Namespace table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * The column <code>asccp.namespace_id</code>. Foreign key to the Namespace
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public final TableField<AsccpRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the Namespace table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
-     * The column <code>oagi.asccp.reusable_indicator</code>. This indicates
-     * whether the ASCCP can be used by more than one ASCC. This maps directly
-     * to the XML schema local element declaration.
+     * The column <code>asccp.reusable_indicator</code>. This indicates whether
+     * the ASCCP can be used by more than one ASCC. This maps directly to the
+     * XML schema local element declaration.
      */
     public final TableField<AsccpRecord, Byte> REUSABLE_INDICATOR = createField(DSL.name("reusable_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "This indicates whether the ASCCP can be used by more than one ASCC. This maps directly to the XML schema local element declaration.");
 
     /**
-     * The column <code>oagi.asccp.is_deprecated</code>. Indicates whether the
-     * CC is deprecated and should not be reused (i.e., no new reference to this
+     * The column <code>asccp.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public final TableField<AsccpRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
-     * The column <code>oagi.asccp.replacement_asccp_id</code>. This refers to a
+     * The column <code>asccp.replacement_asccp_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public final TableField<AsccpRecord, ULong> REPLACEMENT_ASCCP_ID = createField(DSL.name("replacement_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
-     * The column <code>oagi.asccp.is_nillable</code>. This is corresponding to
-     * the XML schema nillable flag. Although the nillable may not apply in
-     * certain cases of the ASCCP (e.g., when it corresponds to an XSD group),
-     * the value is default to false for simplification.
+     * The column <code>asccp.is_nillable</code>. This is corresponding to the
+     * XML schema nillable flag. Although the nillable may not apply in certain
+     * cases of the ASCCP (e.g., when it corresponds to an XSD group), the value
+     * is default to false for simplification.
      */
     public final TableField<AsccpRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "This is corresponding to the XML schema nillable flag. Although the nillable may not apply in certain cases of the ASCCP (e.g., when it corresponds to an XSD group), the value is default to false for simplification.");
 
     /**
-     * The column <code>oagi.asccp.prev_asccp_id</code>. A self-foreign key to
+     * The column <code>asccp.prev_asccp_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
     public final TableField<AsccpRecord, ULong> PREV_ASCCP_ID = createField(DSL.name("prev_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
-     * The column <code>oagi.asccp.next_asccp_id</code>. A self-foreign key to
+     * The column <code>asccp.next_asccp_id</code>. A self-foreign key to
      * indicate the next history record.
      */
     public final TableField<AsccpRecord, ULong> NEXT_ASCCP_ID = createField(DSL.name("next_asccp_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
@@ -223,21 +221,21 @@ public class Asccp extends TableImpl<AsccpRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.asccp</code> table reference
+     * Create an aliased <code>asccp</code> table reference
      */
     public Asccp(String alias) {
         this(DSL.name(alias), ASCCP);
     }
 
     /**
-     * Create an aliased <code>oagi.asccp</code> table reference
+     * Create an aliased <code>asccp</code> table reference
      */
     public Asccp(Name alias) {
         this(alias, ASCCP);
     }
 
     /**
-     * Create a <code>oagi.asccp</code> table reference
+     * Create a <code>asccp</code> table reference
      */
     public Asccp() {
         this(DSL.name("asccp"), null);
@@ -278,7 +276,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -304,8 +302,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AppUserPath _asccpCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asccp_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asccp_created_by_fk</code> key.
      */
     public AppUserPath asccpCreatedByFk() {
         if (_asccpCreatedByFk == null)
@@ -317,8 +315,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AppUserPath _asccpLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asccp_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asccp_last_updated_by_fk</code> key.
      */
     public AppUserPath asccpLastUpdatedByFk() {
         if (_asccpLastUpdatedByFk == null)
@@ -330,7 +328,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     * Get the implicit join path to the <code>namespace</code> table.
      */
     public NamespacePath namespace() {
         if (_namespace == null)
@@ -342,7 +340,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AsccpPath _asccpNextAsccpIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table, via the
+     * Get the implicit join path to the <code>asccp</code> table, via the
      * <code>asccp_next_asccp_id_fk</code> key.
      */
     public AsccpPath asccpNextAsccpIdFk() {
@@ -355,8 +353,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AppUserPath _asccpOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asccp_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asccp_owner_user_id_fk</code> key.
      */
     public AppUserPath asccpOwnerUserIdFk() {
         if (_asccpOwnerUserIdFk == null)
@@ -368,7 +366,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AsccpPath _asccpPrevAsccpIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table, via the
+     * Get the implicit join path to the <code>asccp</code> table, via the
      * <code>asccp_prev_asccp_id_fk</code> key.
      */
     public AsccpPath asccpPrevAsccpIdFk() {
@@ -381,7 +379,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AsccpPath _asccpReplacementAsccpIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table, via the
+     * Get the implicit join path to the <code>asccp</code> table, via the
      * <code>asccp_replacement_asccp_id_fk</code> key.
      */
     public AsccpPath asccpReplacementAsccpIdFk() {
@@ -394,7 +392,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AccPath _acc;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc</code> table.
+     * Get the implicit join path to the <code>acc</code> table.
      */
     public AccPath acc() {
         if (_acc == null)
@@ -406,7 +404,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AsccPath _ascc;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table
+     * Get the implicit to-many join path to the <code>ascc</code> table
      */
     public AsccPath ascc() {
         if (_ascc == null)
@@ -418,8 +416,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
     private transient AsccpManifestPath _asccpManifest;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest</code> table
+     * Get the implicit to-many join path to the <code>asccp_manifest</code>
+     * table
      */
     public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
@@ -472,7 +470,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      */
     @Override
     public Asccp where(Condition condition) {
-        return new Asccp(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Asccp(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -539,7 +537,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Asccp whereExists(Select<?> select) {
+    public Asccp whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -547,7 +545,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Asccp whereNotExists(Select<?> select) {
+    public Asccp whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

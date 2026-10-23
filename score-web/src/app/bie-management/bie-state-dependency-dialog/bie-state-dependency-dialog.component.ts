@@ -1,4 +1,4 @@
-import { Component, QueryList, ViewChildren, inject } from '@angular/core';
+import { Component, QueryList, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatTable} from '@angular/material/table';
 import {Observable} from 'rxjs';
@@ -24,6 +24,7 @@ export interface BieStateDependencyDialogData {
   standalone: false,
   selector: 'score-bie-state-dependency-dialog',
   templateUrl: './bie-state-dependency-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-state-dependency-dialog.component.css']
 })
 export class BieStateDependencyDialogComponent {

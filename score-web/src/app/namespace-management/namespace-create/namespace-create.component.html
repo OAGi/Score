@@ -1,50 +1,37 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <score-title-with-library-selector [title]="title"
-        [libraries]="mappedLibraries"
-        (libraryChange)="onLibraryChange($event)"/>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
+<score-detail-page>
+  <ng-container ngProjectAs="[detailTitle]">
+    <score-title-with-library-selector [title]="title"
+      [libraries]="mappedLibraries"
+      (libraryChange)="onLibraryChange($event)"/>
+  </ng-container>
+  <score-detail-card>
+    <mat-form-field>
+      <mat-label>URI</mat-label>
+      <input matInput required
+        [formControl]="uriForm"
+        [value]="uriForm.value">
+      @if (uriForm.hasError('pattern')) {
+        <mat-error>
+          '{{ uriForm.value }}' is not allow for URI format
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Prefix</mat-label>
+      <input matInput [(ngModel)]="namespace.prefix" maxlength="45"/>
+    </mat-form-field>
 
-  <div class="p-3">
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field>
-          <mat-label>URI</mat-label>
-          <input matInput required
-            [formControl]="uriForm"
-            [value]="uriForm.value">
-          @if (uriForm.hasError('pattern')) {
-            <mat-error>
-              '{{ uriForm.value }}' is not allow for URI format
-            </mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Prefix</mat-label>
-          <input matInput [(ngModel)]="namespace.prefix" maxlength="45"/>
-        </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea rows="6" cols="30" matInput [(ngModel)]="namespace.description"></textarea>
+    </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Description</mat-label>
-          <textarea rows="6" cols="30" matInput [(ngModel)]="namespace.description"></textarea>
-        </mat-form-field>
-
-        <mat-checkbox [checked]="isDeveloper" [disabled]="true">Standard</mat-checkbox>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button (click)="back()">Back</button>
-        <button mat-raised-button color="primary" [disabled]="isDisabled()" (click)="create()">
-          Create
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    <mat-checkbox [checked]="isDeveloper" [disabled]="true">Standard</mat-checkbox>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button mat-raised-button (click)="back()">Back</button>
+    <button mat-raised-button color="primary" [disabled]="isDisabled()" (click)="create()">
+      Create
+    </button>
+  </ng-container>
+</score-detail-page>

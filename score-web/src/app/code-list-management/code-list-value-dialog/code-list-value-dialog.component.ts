@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {CodeListValue} from '../domain/code-list';
 import {hashCode} from '../../common/utility';
@@ -7,6 +7,7 @@ import {hashCode} from '../../common/utility';
   standalone: false,
   selector: 'score-code-list-value-dialog',
   templateUrl: './code-list-value-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-list-value-dialog.component.css']
 })
 export class CodeListValueDialogComponent implements OnInit {

@@ -22,19 +22,20 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Indexes;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie.AsbiePath;
@@ -55,7 +56,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.asbiep</code>
+     * The reference instance of <code>asbiep</code>
      */
     public static final Asbiep ASBIEP = new Asbiep();
 
@@ -68,55 +69,55 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     }
 
     /**
-     * The column <code>oagi.asbiep.asbiep_id</code>. A internal, primary
-     * database key of an ASBIEP.
+     * The column <code>asbiep.asbiep_id</code>. A internal, primary database
+     * key of an ASBIEP.
      */
-    public final TableField<AsbiepRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "A internal, primary database key of an ASBIEP.");
+    public final TableField<AsbiepRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "A internal, primary database key of an ASBIEP.");
 
     /**
-     * The column <code>oagi.asbiep.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>asbiep.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<AsbiepRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.asbiep.based_asccp_manifest_id</code>. A foreign
-     * key pointing to the ASCCP_MANIFEST record. It is the ASCCP, on which the
+     * The column <code>asbiep.based_asccp_manifest_id</code>. A foreign key
+     * pointing to the ASCCP_MANIFEST record. It is the ASCCP, on which the
      * ASBIEP contextualizes.
      */
     public final TableField<AsbiepRecord, ULong> BASED_ASCCP_MANIFEST_ID = createField(DSL.name("based_asccp_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to the ASCCP_MANIFEST record. It is the ASCCP, on which the ASBIEP contextualizes.");
 
     /**
-     * The column <code>oagi.asbiep.path</code>.
+     * The column <code>asbiep.path</code>. The path of this node within the
+     * component graph; used together with HASH_PATH to locate the node.
      */
-    public final TableField<AsbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<AsbiepRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The path of this node within the component graph; used together with HASH_PATH to locate the node.");
 
     /**
-     * The column <code>oagi.asbiep.hash_path</code>. hash_path generated from
-     * the path of the component graph using hash function, so that it is unique
-     * in the graph.
+     * The column <code>asbiep.hash_path</code>. hash_path generated from the
+     * path of the component graph using hash function, so that it is unique in
+     * the graph.
      */
     public final TableField<AsbiepRecord, String> HASH_PATH = createField(DSL.name("hash_path"), SQLDataType.VARCHAR(64).nullable(false), this, "hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.");
 
     /**
-     * The column <code>oagi.asbiep.role_of_abie_id</code>. A foreign key
-     * pointing to the ABIE record. It is the ABIE, which the property term in
-     * the based ASCCP qualifies. Note that the ABIE has to be derived from the
-     * ACC used by the based ASCCP.
+     * The column <code>asbiep.role_of_abie_id</code>. A foreign key pointing to
+     * the ABIE record. It is the ABIE, which the property term in the based
+     * ASCCP qualifies. Note that the ABIE has to be derived from the ACC used
+     * by the based ASCCP.
      */
     public final TableField<AsbiepRecord, ULong> ROLE_OF_ABIE_ID = createField(DSL.name("role_of_abie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to the ABIE record. It is the ABIE, which the property term in the based ASCCP qualifies. Note that the ABIE has to be derived from the ACC used by the based ASCCP.");
 
     /**
-     * The column <code>oagi.asbiep.definition</code>. A definition to override
-     * the ASCCP's definition. If NULL, it means that the definition should be
+     * The column <code>asbiep.definition</code>. A definition to override the
+     * ASCCP's definition. If NULL, it means that the definition should be
      * derived from the based ASCCP on the UI, expression generation, and any
      * API.
      */
     public final TableField<AsbiepRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A definition to override the ASCCP's definition. If NULL, it means that the definition should be derived from the based ASCCP on the UI, expression generation, and any API.");
 
     /**
-     * The column <code>oagi.asbiep.remark</code>. This column allows the user
-     * to specify a context-specific usage of the BIE. It is different from the
+     * The column <code>asbiep.remark</code>. This column allows the user to
+     * specify a context-specific usage of the BIE. It is different from the
      * DEFINITION column in that the DEFINITION column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
      * implementation specific instruction or others. For example, BOM BOD, as
@@ -128,7 +129,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     public final TableField<AsbiepRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify a context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ASBIEP can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ASBIEP. A remark about that ASBIEP may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
 
     /**
-     * The column <code>oagi.asbiep.biz_term</code>. This column represents a
+     * The column <code>asbiep.biz_term</code>. This column represents a
      * business term to indicate what the BIE is called in a particular business
      * context. With this current design, only one business term is allowed per
      * business context.
@@ -136,40 +137,40 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     public final TableField<AsbiepRecord, String> BIZ_TERM = createField(DSL.name("biz_term"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column represents a business term to indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.");
 
     /**
-     * The column <code>oagi.asbiep.display_name</code>. The display name of the
+     * The column <code>asbiep.display_name</code>. The display name of the
      * ASBIEP
      */
     public final TableField<AsbiepRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The display name of the ASBIEP");
 
     /**
-     * The column <code>oagi.asbiep.created_by</code>. A foreign key referring
-     * to the user who creates the ASBIEP. The creator of the ASBIEP is also its
-     * owner by default. ASBIEPs created as children of another ABIE have the
-     * same CREATED_BY.
+     * The column <code>asbiep.created_by</code>. A foreign key referring to the
+     * user who creates the ASBIEP. The creator of the ASBIEP is also its owner
+     * by default. ASBIEPs created as children of another ABIE have the same
+     * CREATED_BY.
      */
     public final TableField<AsbiepRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the ASBIEP. The creator of the ASBIEP is also its owner by default. ASBIEPs created as children of another ABIE have the same CREATED_BY.");
 
     /**
-     * The column <code>oagi.asbiep.last_updated_by</code>. A foreign key
-     * referring to the last user who has updated the ASBIEP record. 
+     * The column <code>asbiep.last_updated_by</code>. A foreign key referring
+     * to the last user who has updated the ASBIEP record. 
      */
     public final TableField<AsbiepRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the ASBIEP record. ");
 
     /**
-     * The column <code>oagi.asbiep.creation_timestamp</code>. Timestamp when
-     * the ASBIEP record was first created. ASBIEPs created as children of
-     * another ABIE have the same CREATION_TIMESTAMP.
+     * The column <code>asbiep.creation_timestamp</code>. Timestamp when the
+     * ASBIEP record was first created. ASBIEPs created as children of another
+     * ABIE have the same CREATION_TIMESTAMP.
      */
     public final TableField<AsbiepRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the ASBIEP record was first created. ASBIEPs created as children of another ABIE have the same CREATION_TIMESTAMP.");
 
     /**
-     * The column <code>oagi.asbiep.last_update_timestamp</code>. The timestamp
-     * when the ASBIEP was last updated.
+     * The column <code>asbiep.last_update_timestamp</code>. The timestamp when
+     * the ASBIEP was last updated.
      */
     public final TableField<AsbiepRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the ASBIEP was last updated.");
 
     /**
-     * The column <code>oagi.asbiep.owner_top_level_asbiep_id</code>. This is a
+     * The column <code>asbiep.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public final TableField<AsbiepRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
@@ -183,21 +184,21 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.asbiep</code> table reference
+     * Create an aliased <code>asbiep</code> table reference
      */
     public Asbiep(String alias) {
         this(DSL.name(alias), ASBIEP);
     }
 
     /**
-     * Create an aliased <code>oagi.asbiep</code> table reference
+     * Create an aliased <code>asbiep</code> table reference
      */
     public Asbiep(Name alias) {
         this(alias, ASBIEP);
     }
 
     /**
-     * Create a <code>oagi.asbiep</code> table reference
+     * Create a <code>asbiep</code> table reference
      */
     public Asbiep() {
         this(DSL.name("asbiep"), null);
@@ -238,7 +239,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -264,7 +265,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AsccpManifestPath _asccpManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.asccp_manifest</code> table.
+     * Get the implicit join path to the <code>asccp_manifest</code> table.
      */
     public AsccpManifestPath asccpManifest() {
         if (_asccpManifest == null)
@@ -276,8 +277,8 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AppUserPath _asbiepCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asbiep_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asbiep_created_by_fk</code> key.
      */
     public AppUserPath asbiepCreatedByFk() {
         if (_asbiepCreatedByFk == null)
@@ -289,8 +290,8 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AppUserPath _asbiepLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asbiep_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asbiep_last_updated_by_fk</code> key.
      */
     public AppUserPath asbiepLastUpdatedByFk() {
         if (_asbiepLastUpdatedByFk == null)
@@ -302,8 +303,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table.
+     * Get the implicit join path to the <code>top_level_asbiep</code> table.
      */
     public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
@@ -315,7 +315,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
+     * Get the implicit join path to the <code>abie</code> table.
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -327,7 +327,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AsbiePath _asbie;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie</code> table
+     * Get the implicit to-many join path to the <code>asbie</code> table
      */
     public AsbiePath asbie() {
         if (_asbie == null)
@@ -339,8 +339,8 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient AsbiepSupportDocPath _asbiepSupportDoc;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asbiep_support_doc</code> table
+     * Get the implicit to-many join path to the <code>asbiep_support_doc</code>
+     * table
      */
     public AsbiepSupportDocPath asbiepSupportDoc() {
         if (_asbiepSupportDoc == null)
@@ -352,8 +352,8 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     private transient BieUsageRulePath _bieUsageRule;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_usage_rule</code> table
+     * Get the implicit to-many join path to the <code>bie_usage_rule</code>
+     * table
      */
     public BieUsageRulePath bieUsageRule() {
         if (_bieUsageRule == null)
@@ -406,7 +406,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      */
     @Override
     public Asbiep where(Condition condition) {
-        return new Asbiep(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Asbiep(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -473,7 +473,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Asbiep whereExists(Select<?> select) {
+    public Asbiep whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -481,7 +481,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Asbiep whereNotExists(Select<?> select) {
+    public Asbiep whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

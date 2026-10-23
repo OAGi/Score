@@ -1,16 +1,7 @@
-<mat-tab-group mat-align-tabs="start" animationDuration="0ms">
-  <mat-tab label="What's New">
-    <div class="d-block">
-      <div class="header d-flex align-items-center" mat-dialog-title>
-        <span>What's New</span>
-        <div class="close pe-2">
-          <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="content" mat-dialog-content>
+<score-dialog-page title="What's Changed">
+  <mat-tab-group mat-align-tabs="start" animationDuration="0ms">
+    <mat-tab label="What's New">
+      <div class="content dialog-form">
         @if (newACCs.length > 0) {
           <div class="new-components-container container-fluid pt-2 pb-2">
             <h2 class="title pb-2">{{ newACCs.length }} new ACC{{ newACCs.length > 1 ? 's' : ''}} {{ getTagInfo(newACCs) }}</h2>
@@ -194,20 +185,9 @@
           </div>
         }
       </div>
-    </div>
-  </mat-tab>
-  <mat-tab label="What's Revised">
-    <div class="d-block">
-      <div class="header d-flex align-items-center" mat-dialog-title>
-        <span>What's Revised</span>
-        <div class="close pe-2">
-          <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="content" mat-dialog-content>
+    </mat-tab>
+    <mat-tab label="What's Revised">
+      <div class="content dialog-form">
         @if (revisedACCs.length > 0) {
           <div class="revised-components-container container-fluid pt-2 pb-2">
             <h2 class="title pb-2">{{ revisedACCs.length }} revised ACC{{ revisedACCs.length > 1 ? 's' : ''}} {{ getTagInfo(revisedACCs) }}</h2>
@@ -391,6 +371,6 @@
           </div>
         }
       </div>
-    </div>
-  </mat-tab>
-</mat-tab-group>
+    </mat-tab>
+  </mat-tab-group>
+</score-dialog-page>

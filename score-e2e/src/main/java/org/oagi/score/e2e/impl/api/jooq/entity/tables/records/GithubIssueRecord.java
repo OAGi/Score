@@ -22,23 +22,21 @@ public class GithubIssueRecord extends UpdatableRecordImpl<GithubIssueRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.github_issue.github_issue_id</code>. Primary key
-     * column.
+     * Setter for <code>github_issue.github_issue_id</code>. Primary key column.
      */
     public void setGithubIssueId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.github_issue_id</code>. Primary key
-     * column.
+     * Getter for <code>github_issue.github_issue_id</code>. Primary key column.
      */
     public ULong getGithubIssueId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.github_issue.repo_owner</code>. GitHub repository
+     * Setter for <code>github_issue.repo_owner</code>. GitHub repository
      * owner/org, e.g. OAGi.
      */
     public void setRepoOwner(String value) {
@@ -46,7 +44,7 @@ public class GithubIssueRecord extends UpdatableRecordImpl<GithubIssueRecord> {
     }
 
     /**
-     * Getter for <code>oagi.github_issue.repo_owner</code>. GitHub repository
+     * Getter for <code>github_issue.repo_owner</code>. GitHub repository
      * owner/org, e.g. OAGi.
      */
     public String getRepoOwner() {
@@ -54,63 +52,61 @@ public class GithubIssueRecord extends UpdatableRecordImpl<GithubIssueRecord> {
     }
 
     /**
-     * Setter for <code>oagi.github_issue.repo_name</code>. GitHub repository
-     * name, e.g. Score.
+     * Setter for <code>github_issue.repo_name</code>. GitHub repository name,
+     * e.g. Score.
      */
     public void setRepoName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.repo_name</code>. GitHub repository
-     * name, e.g. Score.
+     * Getter for <code>github_issue.repo_name</code>. GitHub repository name,
+     * e.g. Score.
      */
     public String getRepoName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.github_issue.issue_number</code>. GitHub issue
-     * number within the repository.
+     * Setter for <code>github_issue.issue_number</code>. GitHub issue number
+     * within the repository.
      */
     public void setIssueNumber(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.issue_number</code>. GitHub issue
-     * number within the repository.
+     * Getter for <code>github_issue.issue_number</code>. GitHub issue number
+     * within the repository.
      */
     public Integer getIssueNumber() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>oagi.github_issue.cached_metadata</code>. Cached GitHub
-     * issue metadata as JSON: title, state, type, milestone {title,state},
-     * labels [{name,color,description}], assignees
-     * [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first
-     * synced. Project (Projects v2) is excluded (not available via the REST
-     * issue endpoint).
+     * Setter for <code>github_issue.cached_metadata</code>. Cached GitHub issue
+     * metadata as JSON: title, state, type, milestone {title,state}, labels
+     * [{name,color,description}], assignees [{login,html_url,avatar_url}],
+     * html_url, node_id, etc. NULL until first synced. Project (Projects v2) is
+     * excluded (not available via the REST issue endpoint).
      */
     public void setCachedMetadata(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.cached_metadata</code>. Cached GitHub
-     * issue metadata as JSON: title, state, type, milestone {title,state},
-     * labels [{name,color,description}], assignees
-     * [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first
-     * synced. Project (Projects v2) is excluded (not available via the REST
-     * issue endpoint).
+     * Getter for <code>github_issue.cached_metadata</code>. Cached GitHub issue
+     * metadata as JSON: title, state, type, milestone {title,state}, labels
+     * [{name,color,description}], assignees [{login,html_url,avatar_url}],
+     * html_url, node_id, etc. NULL until first synced. Project (Projects v2) is
+     * excluded (not available via the REST issue endpoint).
      */
     public String getCachedMetadata() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.github_issue.cached_synced_timestamp</code>. When
+     * Setter for <code>github_issue.cached_synced_timestamp</code>. When
      * cached_metadata was last refreshed from GitHub.
      */
     public void setCachedSyncedTimestamp(LocalDateTime value) {
@@ -118,7 +114,7 @@ public class GithubIssueRecord extends UpdatableRecordImpl<GithubIssueRecord> {
     }
 
     /**
-     * Getter for <code>oagi.github_issue.cached_synced_timestamp</code>. When
+     * Getter for <code>github_issue.cached_synced_timestamp</code>. When
      * cached_metadata was last refreshed from GitHub.
      */
     public LocalDateTime getCachedSyncedTimestamp() {
@@ -126,32 +122,32 @@ public class GithubIssueRecord extends UpdatableRecordImpl<GithubIssueRecord> {
     }
 
     /**
-     * Setter for <code>oagi.github_issue.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * Setter for <code>github_issue.creation_timestamp</code>. Timestamp when
+     * this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * Getter for <code>github_issue.creation_timestamp</code>. Timestamp when
+     * this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>oagi.github_issue.last_update_timestamp</code>.
-     * Timestamp when this record was last updated.
+     * Setter for <code>github_issue.last_update_timestamp</code>. Timestamp
+     * when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue.last_update_timestamp</code>.
-     * Timestamp when this record was last updated.
+     * Getter for <code>github_issue.last_update_timestamp</code>. Timestamp
+     * when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(7);

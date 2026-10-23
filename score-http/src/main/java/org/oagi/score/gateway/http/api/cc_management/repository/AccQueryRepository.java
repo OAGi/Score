@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface AccQueryRepository {
 
@@ -27,7 +28,15 @@ public interface AccQueryRepository {
 
     AccSummaryRecord getAccSummary(AccManifestId accManifestId);
 
+    List<AccSummaryRecord> getAccSummaryListByManifestIds(Collection<AccManifestId> accManifestIdList);
+
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList);
+
+    /** The ACCs of the given releases that are the base of another ACC. */
+    Set<AccManifestId> getBasedAccManifestIds(Collection<ReleaseId> releaseIdList);
+
+    /** The ACCs that have any of the given ACCs as their base, in the order of their manifest ids. */
+    List<AccSummaryRecord> getAccSummaryListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds);
 
     List<AccSummaryRecord> getAccSummaryList(Collection<ReleaseId> releaseIdList, String objectClassTerm);
 
@@ -56,6 +65,8 @@ public interface AccQueryRepository {
 
     List<AsccSummaryRecord> getAsccSummaryList(AccManifestId fromAccManifestId);
 
+    List<AsccSummaryRecord> getAsccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList);
+
     List<AsccSummaryRecord> getAsccSummaryList(AsccpManifestId toAsccpManifestId);
 
     List<AsccSummaryRecord> getAsccSummaryList(LibraryId libraryId, String releaseNum, CcState state);
@@ -76,6 +87,8 @@ public interface AccQueryRepository {
     List<BccSummaryRecord> getBccSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<BccSummaryRecord> getBccSummaryList(AccManifestId fromAccManifestId);
+
+    List<BccSummaryRecord> getBccSummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList);
 
     List<BccSummaryRecord> getBccSummaryList(BccpManifestId bccpManifestId);
 

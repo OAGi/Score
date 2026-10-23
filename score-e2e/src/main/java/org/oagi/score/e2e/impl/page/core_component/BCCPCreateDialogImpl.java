@@ -76,7 +76,7 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
     public void setCommonlyUsed(boolean commonlyUsed) {
         click(getCommonlyUsedSelectField());
         WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-option//span[contains(text(), \"" + (commonlyUsed ? "True" : "False") + "\")]"));
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//mat-option//span[contains(text(), \"" + (commonlyUsed ? "True" : "False") + "\")]"));
         click(optionField);
         escape(getDriver());
     }

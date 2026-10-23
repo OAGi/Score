@@ -22,79 +22,75 @@ public class BieViewOrderRecord extends UpdatableRecordImpl<BieViewOrderRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bie_view_order.bie_view_order_id</code>. The
-     * primary key of the record.
+     * Setter for <code>bie_view_order.bie_view_order_id</code>. The primary key
+     * of the record.
      */
     public void setBieViewOrderId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.bie_view_order_id</code>. The
-     * primary key of the record.
+     * Getter for <code>bie_view_order.bie_view_order_id</code>. The primary key
+     * of the record.
      */
     public ULong getBieViewOrderId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.from_acc_manifest_id</code>. View
-     * parent: the ACC manifest under which the child is shown as a flattened
-     * sibling. MAY differ from seq_key.from_acc_manifest_id due to group
-     * flattening.
+     * Setter for <code>bie_view_order.from_acc_manifest_id</code>. View parent:
+     * the ACC manifest under which the child is shown as a flattened sibling.
+     * MAY differ from seq_key.from_acc_manifest_id due to group flattening.
      */
     public void setFromAccManifestId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.from_acc_manifest_id</code>. View
-     * parent: the ACC manifest under which the child is shown as a flattened
-     * sibling. MAY differ from seq_key.from_acc_manifest_id due to group
-     * flattening.
+     * Getter for <code>bie_view_order.from_acc_manifest_id</code>. View parent:
+     * the ACC manifest under which the child is shown as a flattened sibling.
+     * MAY differ from seq_key.from_acc_manifest_id due to group flattening.
      */
     public ULong getFromAccManifestId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.ascc_manifest_id</code>. The
-     * reordered ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id
-     * is non-null.
+     * Setter for <code>bie_view_order.ascc_manifest_id</code>. The reordered
+     * ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
+     * non-null.
      */
     public void setAsccManifestId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.ascc_manifest_id</code>. The
-     * reordered ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id
-     * is non-null.
+     * Getter for <code>bie_view_order.ascc_manifest_id</code>. The reordered
+     * ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
+     * non-null.
      */
     public ULong getAsccManifestId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.bcc_manifest_id</code>. The
-     * reordered BCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
-     * non-null.
+     * Setter for <code>bie_view_order.bcc_manifest_id</code>. The reordered BCC
+     * child. Exactly one of ascc_manifest_id / bcc_manifest_id is non-null.
      */
     public void setBccManifestId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.bcc_manifest_id</code>. The
-     * reordered BCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
-     * non-null.
+     * Getter for <code>bie_view_order.bcc_manifest_id</code>. The reordered BCC
+     * child. Exactly one of ascc_manifest_id / bcc_manifest_id is non-null.
      */
     public ULong getBccManifestId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.weight</code>. Browse/BIE-edit sort
+     * Setter for <code>bie_view_order.weight</code>. Browse/BIE-edit sort
      * weight, applied DESCENDING within the attributes-first partition.
      * User-entered; need not be unique or sequential. NOT used for schema /
      * BIE-expression output.
@@ -104,7 +100,7 @@ public class BieViewOrderRecord extends UpdatableRecordImpl<BieViewOrderRecord> 
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.weight</code>. Browse/BIE-edit sort
+     * Getter for <code>bie_view_order.weight</code>. Browse/BIE-edit sort
      * weight, applied DESCENDING within the attributes-first partition.
      * User-entered; need not be unique or sequential. NOT used for schema /
      * BIE-expression output.
@@ -114,55 +110,55 @@ public class BieViewOrderRecord extends UpdatableRecordImpl<BieViewOrderRecord> 
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.created_by</code>. The user who
-     * creates the record.
+     * Setter for <code>bie_view_order.created_by</code>. The user who creates
+     * the record.
      */
     public void setCreatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.created_by</code>. The user who
-     * creates the record.
+     * Getter for <code>bie_view_order.created_by</code>. The user who creates
+     * the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.last_updated_by</code>. The user who
-     * last updates the record.
+     * Setter for <code>bie_view_order.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.last_updated_by</code>. The user who
-     * last updates the record.
+     * Getter for <code>bie_view_order.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Setter for <code>bie_view_order.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Getter for <code>bie_view_order.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>oagi.bie_view_order.last_update_timestamp</code>. The
+     * Setter for <code>bie_view_order.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -170,7 +166,7 @@ public class BieViewOrderRecord extends UpdatableRecordImpl<BieViewOrderRecord> 
     }
 
     /**
-     * Getter for <code>oagi.bie_view_order.last_update_timestamp</code>. The
+     * Getter for <code>bie_view_order.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

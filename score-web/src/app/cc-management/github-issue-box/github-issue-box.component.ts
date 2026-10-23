@@ -1,4 +1,4 @@
-import {Component, HostListener, Input, OnInit, OnChanges, SimpleChanges, inject} from '@angular/core';
+import {Component, HostListener, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectionStrategy} from '@angular/core';
 
 import {FormsModule} from '@angular/forms';
 import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/github-integration.service';
@@ -15,6 +15,7 @@ import {GithubIntegrationService, GithubStatus, LinkedIssue} from '../domain/git
   selector: 'score-github-issue-box',
   imports: [FormsModule],
   templateUrl: './github-issue-box.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./github-issue-box.component.css'],
 })
 export class GithubIssueBoxComponent implements OnInit, OnChanges {

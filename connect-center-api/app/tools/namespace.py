@@ -67,7 +67,8 @@ from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.namespace_service import NamespaceService
-from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, str_to_bool, tool_session
 from app.tools.models.namespace import (
     CreateNamespaceResponse,
     GetNamespacePaginationResponse,
@@ -729,10 +730,12 @@ async def transfer_namespace_ownership(
     if row is None:
         raise ToolError(f"The namespace with ID {namespace_id} was not found. Please check the ID and try again.")
 
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(f"Are you sure you want to transfer ownership of namespace '{row.uri}' to {target_login_id.strip()}?"),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             pass
@@ -766,13 +769,15 @@ async def discard_namespace(
     if row is None:
         raise ToolError(f"The namespace with ID {namespace_id} was not found. Please check the ID and try again.")
 
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(
             f"Are you sure you want to discard namespace '{row.uri}' permanently?\n\n"
             "This removes the namespace record and cannot be undone."
         ),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             pass

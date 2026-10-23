@@ -175,7 +175,7 @@ public class TC_15_11_EditingBrandNewEndUserASCCP extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> asccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
 

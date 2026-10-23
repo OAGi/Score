@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
@@ -14,6 +14,7 @@ import {initFilter} from '../../../../common/utility';
   standalone: false,
   selector: 'score-module-add-dialog',
   templateUrl: './module-add-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-add-dialog.component.css']
 })
 export class ModuleAddDialogComponent implements OnInit {

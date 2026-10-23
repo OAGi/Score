@@ -54,6 +54,13 @@ public class JooqMessageCommandRepository extends JooqBaseRepository implements 
     }
 
     @Override
+    public int deleteMessagesReceivedBy(UserId userId) {
+        return dslContext().deleteFrom(MESSAGE)
+                .where(MESSAGE.RECIPIENT_ID.eq(valueOf(userId)))
+                .execute();
+    }
+
+    @Override
     public int deleteMessages(Collection<MessageId> messageIdList) {
         if (messageIdList == null || messageIdList.isEmpty()) {
             return 0;

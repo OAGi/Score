@@ -13,6 +13,17 @@ public interface SettingsAccountPage extends Page {
      *
      * @return the UI element of 'Old Password' field
      */
+    /**
+     * Opens the "Password" page under "Account" in the settings menu (the old-password, new-password and
+     * confirm-password fields are on it). The password methods below do this themselves when needed.
+     */
+    void openPasswordPage();
+
+    /**
+     * Opens the "Passkeys" page under "Account" in the settings menu, which lists the user's passkeys.
+     */
+    void openPasskeysPage();
+
     WebElement getOldPasswordField();
 
     /**

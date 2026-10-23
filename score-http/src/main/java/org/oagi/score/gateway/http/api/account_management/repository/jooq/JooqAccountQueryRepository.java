@@ -164,6 +164,10 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
                         field = APP_USER.IS_ENABLED;
                         break;
 
+                    case "appOauth2UserId":
+                        field = APP_OAUTH2_USER.APP_OAUTH2_USER_ID;
+                        break;
+
                     default:
                         continue;
                 }

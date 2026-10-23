@@ -6,6 +6,6 @@
   background: #fff;
 }
 
-mat-dialog-content {
+.dialog-form {
   min-width: 640px;
 }

@@ -13,24 +13,22 @@
              score-e2e has no VERSION file of its own; keep this in sync with the
              score-http VERSION file (single source of truth). score-http/docker/build.sh
              verifies this matches before building. -->
-        <revision>3.5.3</revision>
+        <revision>3.6.0-dev</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <!-- Java 21 to match score-http after the Spring Boot 4 upgrade (#1750). -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
-
-        <db.url>jdbc:mariadb://localhost:3306/oagi</db.url>
-        <db.user>oagi</db.user>
-        <db.password>oagi</db.password>
 
         <selenium.version>4.49.0</selenium.version>
         <junit.version>5.14.2</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>
         <slf4j.version>2.0.18</slf4j.version>
-        <jackson-bom.version>2.21.6</jackson-bom.version>
+        <jackson-bom.version>2.21.7</jackson-bom.version>
         <commons-lang.version>3.20.0</commons-lang.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.21.0</commons-io.version>
@@ -39,7 +37,10 @@
         <awaitility.version>4.3.0</awaitility.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <mariadb-client.version>3.5.10</mariadb-client.version>
-        <hikariCP.version>6.3.3</hikariCP.version>
+        <!-- Match the HikariCP the Spring Boot 4.1 BOM resolves in score-http (#1750): the Boot 4.1
+             upgrade bumped it 6.3.3 → 7.0.2. HikariCP 7 requires Java 17+, satisfied by the Java 21
+             bump above. Keeps the e2e connection-pool library identical to the backend. -->
+        <hikariCP.version>7.0.2</hikariCP.version>
         <jOOQ.version>3.20.20</jOOQ.version>
         <json.version>20250517</json.version>
         <!-- Matches the score-http poi.version: e2e generates multi-worksheet .xlsx upload
@@ -51,7 +52,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.11.1</version>
+            <version>1.11.4</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -78,7 +79,7 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
-        <!-- avro 1.11.1 drags in commons-compress 1.21, which shadows the newer version POI needs
+        <!-- avro 1.11.x drags in commons-compress 1.21, which shadows the newer version POI needs
              (NoSuchMethodError: ZipArchiveOutputStream.putArchiveEntry). Pin it explicitly. -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -185,6 +186,22 @@
 
     <build>
         <plugins>
+            <!-- Java 21 + explicit Lombok annotation processor path (#1750): newer JDKs/compiler
+                 plugins no longer reliably auto-discover Lombok on the classpath. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <!-- jOOQ -->
             <plugin>
                 <groupId>org.jooq</groupId>
@@ -218,7 +235,9 @@
 
                         <database>
                             <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
-                            <inputSchema>oagi</inputSchema>
+                            <inputSchema>${db.name}</inputSchema>
+                            <!-- generate into the default schema, so the generated code carries no database name -->
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
                             <includes>.*</includes>
                             <excludes></excludes>
                         </database>

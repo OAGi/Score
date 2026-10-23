@@ -4,11 +4,10 @@ import {Observable} from 'rxjs';
 import {PageResponse} from '../../../basis/basis';
 import {
   ReviseBiePackageResponse,
-  BieListInBiePackageRequest, BiePackageDetails, BiePackageListEntry, BiePackageListRequest, BiePackageManifest
+  BieListInBiePackageRequest, BiePackageDetails, BiePackageListEntry, BiePackageManifest
 } from './bie-package';
 import {map} from 'rxjs/operators';
 import {BieListEntry} from '../../bie-list/domain/bie-list';
-import {zip} from '../../../common/utility';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 
 @Injectable()
@@ -16,63 +15,8 @@ export class BiePackageService {
   private http = inject(HttpClient);
 
 
-  getBiePackageList(request: BiePackageListRequest): Observable<PageResponse<BiePackageListEntry>> {
-    let params = new HttpParams()
-        .set('libraryId', '' + request.library.libraryId)
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    const { sortActives, sortDirections } = request.page;
-
-    if (sortActives?.length && sortDirections?.length) {
-      const orderBy = zip(sortActives, sortDirections)
-          .map(([active, direction]) => `${direction === 'desc' ? '-' : '+'}${active}`)
-          .join(',');
-
-      params = params.set('orderBy', orderBy);
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-    if (request.filters.versionId) {
-      params = params.set('versionId', request.filters.versionId);
-    }
-    if (request.filters.versionName) {
-      params = params.set('versionName', request.filters.versionName);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
-    if (request.filters.den) {
-      params = params.set('den', request.filters.den);
-    }
-    if (request.filters.businessTerm) {
-      params = params.set('businessTerm', request.filters.businessTerm);
-    }
-    if (request.filters.version) {
-      params = params.set('version', request.filters.version);
-    }
-    if (request.filters.remark) {
-      params = params.set('remark', request.filters.remark);
-    }
-    if (request.states.length > 0) {
-      params = params.set('states', request.states.join(','));
-    }
-    if (request.releases && request.releases.length > 0) {
-      params = params.set('releaseIds', request.releases.map(e => e.releaseId.toString()).join(','));
-    }
-    if (request.ownerLoginIdList.length > 0) {
-      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
-    }
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBiePackageListPage(params: HttpParams): Observable<PageResponse<BiePackageListEntry>> {
     return this.http.get<PageResponse<BiePackageListEntry>>('/api/bie-packages', {params}).pipe(
         map((res: PageResponse<BiePackageListEntry>) => ({
           ...res,
@@ -144,7 +88,12 @@ export class BiePackageService {
       params = params.set('remark', request.filters.remark);
     }
 
-    return this.http.get<PageResponse<BieListEntry>>('/api/bie-packages/' + request.biePackageId + '/bies', {params}).pipe(
+    return this.getBieListInBiePackagePage(request.biePackageId, params);
+  }
+
+  /** A page of the BIEs of a package, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBieListInBiePackagePage(biePackageId: number, params: HttpParams): Observable<PageResponse<BieListEntry>> {
+    return this.http.get<PageResponse<BieListEntry>>('/api/bie-packages/' + biePackageId + '/bies', {params}).pipe(
         map((res: PageResponse<BieListEntry>) => ({
           ...res,
           list: res.list.map(elm => ({

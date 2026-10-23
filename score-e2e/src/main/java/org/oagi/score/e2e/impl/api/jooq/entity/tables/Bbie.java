@@ -33,9 +33,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
@@ -65,7 +65,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.bbie</code>
+     * The reference instance of <code>bbie</code>
      */
     public static final Bbie BBIE = new Bbie();
 
@@ -78,152 +78,152 @@ public class Bbie extends TableImpl<BbieRecord> {
     }
 
     /**
-     * The column <code>oagi.bbie.bbie_id</code>. A internal, primary database
-     * key of a BBIE.
+     * The column <code>bbie.bbie_id</code>. A internal, primary database key of
+     * a BBIE.
      */
     public final TableField<BbieRecord, ULong> BBIE_ID = createField(DSL.name("bbie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "A internal, primary database key of a BBIE.");
 
     /**
-     * The column <code>oagi.bbie.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>bbie.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<BbieRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.bbie.based_bcc_manifest_id</code>. The
+     * The column <code>bbie.based_bcc_manifest_id</code>. The
      * BASED_BCC_MANIFEST_ID column refers to the BCC_MANIFEST record, which
      * this BBIE contextualizes.
      */
     public final TableField<BbieRecord, ULong> BASED_BCC_MANIFEST_ID = createField(DSL.name("based_bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The BASED_BCC_MANIFEST_ID column refers to the BCC_MANIFEST record, which this BBIE contextualizes.");
 
     /**
-     * The column <code>oagi.bbie.path</code>.
+     * The column <code>bbie.path</code>. The path of this node within the
+     * component graph; used together with HASH_PATH to locate the node.
      */
-    public final TableField<BbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<BbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The path of this node within the component graph; used together with HASH_PATH to locate the node.");
 
     /**
-     * The column <code>oagi.bbie.hash_path</code>. hash_path generated from the
-     * path of the component graph using hash function, so that it is unique in
-     * the graph.
+     * The column <code>bbie.hash_path</code>. hash_path generated from the path
+     * of the component graph using hash function, so that it is unique in the
+     * graph.
      */
     public final TableField<BbieRecord, String> HASH_PATH = createField(DSL.name("hash_path"), SQLDataType.VARCHAR(64).nullable(false), this, "hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.");
 
     /**
-     * The column <code>oagi.bbie.from_abie_id</code>. FROM_ABIE_ID must be
-     * based on the FROM_ACC_ID in the BASED_BCC_ID.
+     * The column <code>bbie.from_abie_id</code>. FROM_ABIE_ID must be based on
+     * the FROM_ACC_ID in the BASED_BCC_ID.
      */
     public final TableField<BbieRecord, ULong> FROM_ABIE_ID = createField(DSL.name("from_abie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "FROM_ABIE_ID must be based on the FROM_ACC_ID in the BASED_BCC_ID.");
 
     /**
-     * The column <code>oagi.bbie.to_bbiep_id</code>. TO_BBIEP_ID is a foreign
-     * key to the BBIEP table. TO_BBIEP_ID basically refers to a child data
-     * element of the FROM_ABIE_ID. TO_BBIEP_ID must be based on the TO_BCCP_ID
-     * in the based BCC.
+     * The column <code>bbie.to_bbiep_id</code>. TO_BBIEP_ID is a foreign key to
+     * the BBIEP table. TO_BBIEP_ID basically refers to a child data element of
+     * the FROM_ABIE_ID. TO_BBIEP_ID must be based on the TO_BCCP_ID in the
+     * based BCC.
      */
     public final TableField<BbieRecord, ULong> TO_BBIEP_ID = createField(DSL.name("to_bbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "TO_BBIEP_ID is a foreign key to the BBIEP table. TO_BBIEP_ID basically refers to a child data element of the FROM_ABIE_ID. TO_BBIEP_ID must be based on the TO_BCCP_ID in the based BCC.");
 
     /**
-     * The column <code>oagi.bbie.xbt_manifest_id</code>. This is the foreign
-     * key to the XBT_MANIFEST table. It indicates the primitive assigned to the
-     * BBIE (or also can be viewed as assigned to the BBIEP for this specific
+     * The column <code>bbie.xbt_manifest_id</code>. This is the foreign key to
+     * the XBT_MANIFEST table. It indicates the primitive assigned to the BBIE
+     * (or also can be viewed as assigned to the BBIEP for this specific
      * association). This is assigned by the user who authors the BIE. The
      * assignment would override the default from the DT_AWD_PRI side.
      */
     public final TableField<BbieRecord, ULong> XBT_MANIFEST_ID = createField(DSL.name("xbt_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is the foreign key to the XBT_MANIFEST table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the DT_AWD_PRI side.");
 
     /**
-     * The column <code>oagi.bbie.code_list_manifest_id</code>. This is a
-     * foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned
-     * to the BBIE (or also can be viewed as assigned to the BBIEP for this
-     * association), then this column stores the assigned code list. It should
-     * be noted that one of the possible primitives assignable to the
-     * BDT_PRI_RESTRI_ID column may also be a code list. So this column is
-     * typically used when the user wants to assign another code list different
-     * from the one permissible by the CC model.
+     * The column <code>bbie.code_list_manifest_id</code>. This is a foreign key
+     * to the CODE_LIST_MANIFEST table. If a code list is assigned to the BBIE
+     * (or also can be viewed as assigned to the BBIEP for this association),
+     * then this column stores the assigned code list. It should be noted that
+     * one of the possible primitives assignable to the BDT_PRI_RESTRI_ID column
+     * may also be a code list. So this column is typically used when the user
+     * wants to assign another code list different from the one permissible by
+     * the CC model.
      */
     public final TableField<BbieRecord, ULong> CODE_LIST_MANIFEST_ID = createField(DSL.name("code_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the CODE_LIST_MANIFEST table. If a code list is assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the BDT_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.");
 
     /**
-     * The column <code>oagi.bbie.agency_id_list_manifest_id</code>. This is a
+     * The column <code>bbie.agency_id_list_manifest_id</code>. This is a
      * foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case
      * that the BDT content can be restricted to an agency identification.
      */
     public final TableField<BbieRecord, ULong> AGENCY_ID_LIST_MANIFEST_ID = createField(DSL.name("agency_id_list_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the AGENCY_ID_LIST_MANIFEST table. It is used in the case that the BDT content can be restricted to an agency identification.");
 
     /**
-     * The column <code>oagi.bbie.cardinality_min</code>. The minimum occurrence
+     * The column <code>bbie.cardinality_min</code>. The minimum occurrence
      * constraint for the BBIE. A valid value is a non-negative integer.
      */
     public final TableField<BbieRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false), this, "The minimum occurrence constraint for the BBIE. A valid value is a non-negative integer.");
 
     /**
-     * The column <code>oagi.bbie.cardinality_max</code>. Maximum occurence
+     * The column <code>bbie.cardinality_max</code>. Maximum occurrence
      * constraint of the TO_BBIEP_ID. A valid value is an integer from -1 and
      * up. Specifically, -1 means unbounded. 0 means prohibited or not to use.
      */
-    public final TableField<BbieRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "Maximum occurence constraint of the TO_BBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.");
+    public final TableField<BbieRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "Maximum occurrence constraint of the TO_BBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.");
 
     /**
-     * The column <code>oagi.bbie.facet_min_length</code>. Defines the minimum
-     * number of units of length.
+     * The column <code>bbie.facet_min_length</code>. Defines the minimum number
+     * of units of length.
      */
     public final TableField<BbieRecord, ULong> FACET_MIN_LENGTH = createField(DSL.name("facet_min_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
 
     /**
-     * The column <code>oagi.bbie.facet_max_length</code>. Defines the minimum
-     * number of units of length.
+     * The column <code>bbie.facet_max_length</code>. Defines the maximum number
+     * of units of length.
      */
-    public final TableField<BbieRecord, ULong> FACET_MAX_LENGTH = createField(DSL.name("facet_max_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the minimum number of units of length.");
+    public final TableField<BbieRecord, ULong> FACET_MAX_LENGTH = createField(DSL.name("facet_max_length"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Defines the maximum number of units of length.");
 
     /**
-     * The column <code>oagi.bbie.facet_pattern</code>. Defines a constraint on
-     * the lexical space of a datatype to literals in a specific pattern.
+     * The column <code>bbie.facet_pattern</code>. Defines a constraint on the
+     * lexical space of a datatype to literals in a specific pattern.
      */
     public final TableField<BbieRecord, String> FACET_PATTERN = createField(DSL.name("facet_pattern"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Defines a constraint on the lexical space of a datatype to literals in a specific pattern.");
 
     /**
-     * The column <code>oagi.bbie.default_value</code>. This column specifies
-     * the default value constraint. Default and fixed value constraints cannot
-     * be used at the same time.
+     * The column <code>bbie.default_value</code>. This column specifies the
+     * default value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
     public final TableField<BbieRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
-     * The column <code>oagi.bbie.is_nillable</code>. Indicate whether the field
-     * can have a null  This is corresponding to the nillable flag in the XML
+     * The column <code>bbie.is_nillable</code>. Indicate whether the field can
+     * have a null value. This corresponds to the nillable flag in the XML
      * schema.
      */
-    public final TableField<BbieRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicate whether the field can have a null  This is corresponding to the nillable flag in the XML schema.");
+    public final TableField<BbieRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicate whether the field can have a null value. This corresponds to the nillable flag in the XML schema.");
 
     /**
-     * The column <code>oagi.bbie.fixed_value</code>. This column captures the
-     * fixed value constraint. Default and fixed value constraints cannot be
-     * used at the same time.
+     * The column <code>bbie.fixed_value</code>. This column captures the fixed
+     * value constraint. Default and fixed value constraints cannot be used at
+     * the same time.
      */
     public final TableField<BbieRecord, String> FIXED_VALUE = createField(DSL.name("fixed_value"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.");
 
     /**
-     * The column <code>oagi.bbie.is_null</code>. This column indicates whether
-     * the field is fixed to NULL. IS_NULLl can be true only if the IS_NILLABLE
-     * is true. If IS_NULL is true then the FIX_VALUE and DEFAULT_VALUE columns
+     * The column <code>bbie.is_null</code>. This column indicates whether the
+     * field is fixed to NULL. IS_NULL can be true only if the IS_NILLABLE is
+     * true. If IS_NULL is true then the FIX_VALUE and DEFAULT_VALUE columns
      * cannot have a value.
      */
-    public final TableField<BbieRecord, Byte> IS_NULL = createField(DSL.name("is_null"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This column indicates whether the field is fixed to NULL. IS_NULLl can be true only if the IS_NILLABLE is true. If IS_NULL is true then the FIX_VALUE and DEFAULT_VALUE columns cannot have a value.");
+    public final TableField<BbieRecord, Byte> IS_NULL = createField(DSL.name("is_null"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This column indicates whether the field is fixed to NULL. IS_NULL can be true only if the IS_NILLABLE is true. If IS_NULL is true then the FIX_VALUE and DEFAULT_VALUE columns cannot have a value.");
 
     /**
-     * The column <code>oagi.bbie.definition</code>. Description to override the
-     * BCC definition. If NULLl, it means that the definition should be
-     * inherited from the based BCC.
+     * The column <code>bbie.definition</code>. Description to override the BCC
+     * definition. If NULL, it means that the definition should be inherited
+     * from the based BCC.
      */
-    public final TableField<BbieRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description to override the BCC definition. If NULLl, it means that the definition should be inherited from the based BCC.");
+    public final TableField<BbieRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC.");
 
     /**
-     * The column <code>oagi.bbie.example</code>.
+     * The column <code>bbie.example</code>. An example value for the BBIE.
      */
-    public final TableField<BbieRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<BbieRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "An example value for the BBIE.");
 
     /**
-     * The column <code>oagi.bbie.remark</code>. This column allows the user to
+     * The column <code>bbie.remark</code>. This column allows the user to
      * specify very context-specific usage of the BIE. It is different from the
      * DEFINITION column in that the DEFINITION column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
@@ -236,58 +236,59 @@ public class Bbie extends TableImpl<BbieRecord> {
     public final TableField<BbieRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
 
     /**
-     * The column <code>oagi.bbie.created_by</code>. A foreign key referring to
-     * the user who creates the BBIE. The creator of the BBIE is also its owner
-     * by default. BBIEs created as children of another ABIE have the same
+     * The column <code>bbie.created_by</code>. A foreign key referring to the
+     * user who creates the BBIE. The creator of the BBIE is also its owner by
+     * default. BBIEs created as children of another ABIE have the same
      * CREATED_BY.
      */
     public final TableField<BbieRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the BBIE. The creator of the BBIE is also its owner by default. BBIEs created as children of another ABIE have the same CREATED_BY.");
 
     /**
-     * The column <code>oagi.bbie.last_updated_by</code>. A foreign key
-     * referring to the user who has last updated the ASBIE record. 
+     * The column <code>bbie.last_updated_by</code>. A foreign key referring to
+     * the user who has last updated the BBIE record.
      */
-    public final TableField<BbieRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who has last updated the ASBIE record. ");
+    public final TableField<BbieRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who has last updated the BBIE record.");
 
     /**
-     * The column <code>oagi.bbie.creation_timestamp</code>. Timestamp when the
-     * BBIE record was first created. BBIEs created as children of another ABIE
-     * have the same CREATION_TIMESTAMP.
+     * The column <code>bbie.creation_timestamp</code>. Timestamp when the BBIE
+     * record was first created. BBIEs created as children of another ABIE have
+     * the same CREATION_TIMESTAMP.
      */
     public final TableField<BbieRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the BBIE record was first created. BBIEs created as children of another ABIE have the same CREATION_TIMESTAMP.");
 
     /**
-     * The column <code>oagi.bbie.last_update_timestamp</code>. The timestamp
-     * when the ASBIE was last updated.
+     * The column <code>bbie.last_update_timestamp</code>. The timestamp when
+     * the BBIE was last updated.
      */
-    public final TableField<BbieRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the ASBIE was last updated.");
+    public final TableField<BbieRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the BBIE was last updated.");
 
     /**
-     * The column <code>oagi.bbie.seq_key</code>. This indicates the order of
-     * the associations among other siblings. The SEQ_KEY for BIEs is decimal in
-     * order to accomodate the removal of inheritance hierarchy and group. For
-     * example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2,
-     * 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have
-     * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
+     * The column <code>bbie.seq_key</code>. DEPRECATED. Instead, use `seq_key`
+     * table. This indicates the order of the associations among other siblings.
+     * The SEQ_KEY for BIEs is decimal in order to accommodate the removal of
+     * inheritance hierarchy and group. For example, children of the most
+     * abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of
+     * the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so
+     * on so forth.
      */
-    public final TableField<BbieRecord, BigDecimal> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.DECIMAL(10, 2).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.DECIMAL)), this, "This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.");
+    public final TableField<BbieRecord, BigDecimal> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.DECIMAL(10, 2).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.DECIMAL)), this, "DEPRECATED. Instead, use `seq_key` table. This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accommodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.");
 
     /**
-     * The column <code>oagi.bbie.is_used</code>. Flag to indicate whether the
+     * The column <code>bbie.is_used</code>. Flag to indicate whether the
      * field/component is used in the content model. It indicates whether the
      * field/component should be generated in the expression generation.
      */
     public final TableField<BbieRecord, Byte> IS_USED = createField(DSL.name("is_used"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated in the expression generation.");
 
     /**
-     * The column <code>oagi.bbie.is_deprecated</code>. Indicates whether the
-     * BBIE is deprecated.
+     * The column <code>bbie.is_deprecated</code>. Indicates whether the BBIE is
+     * deprecated.
      */
     public final TableField<BbieRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the BBIE is deprecated.");
 
     /**
-     * The column <code>oagi.bbie.owner_top_level_asbiep_id</code>. This is a
-     * foreign key to the top-level ASBIEP.
+     * The column <code>bbie.owner_top_level_asbiep_id</code>. This is a foreign
+     * key to the top-level ASBIEP.
      */
     public final TableField<BbieRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
 
@@ -300,21 +301,21 @@ public class Bbie extends TableImpl<BbieRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.bbie</code> table reference
+     * Create an aliased <code>bbie</code> table reference
      */
     public Bbie(String alias) {
         this(DSL.name(alias), BBIE);
     }
 
     /**
-     * Create an aliased <code>oagi.bbie</code> table reference
+     * Create an aliased <code>bbie</code> table reference
      */
     public Bbie(Name alias) {
         this(alias, BBIE);
     }
 
     /**
-     * Create a <code>oagi.bbie</code> table reference
+     * Create a <code>bbie</code> table reference
      */
     public Bbie() {
         this(DSL.name("bbie"), null);
@@ -355,7 +356,7 @@ public class Bbie extends TableImpl<BbieRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -381,8 +382,8 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient AgencyIdListManifestPath _agencyIdListManifest;
 
     /**
-     * Get the implicit join path to the
-     * <code>oagi.agency_id_list_manifest</code> table.
+     * Get the implicit join path to the <code>agency_id_list_manifest</code>
+     * table.
      */
     public AgencyIdListManifestPath agencyIdListManifest() {
         if (_agencyIdListManifest == null)
@@ -394,7 +395,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient BccManifestPath _bccManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table.
+     * Get the implicit join path to the <code>bcc_manifest</code> table.
      */
     public BccManifestPath bccManifest() {
         if (_bccManifest == null)
@@ -406,8 +407,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient CodeListManifestPath _codeListManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list_manifest</code>
-     * table.
+     * Get the implicit join path to the <code>code_list_manifest</code> table.
      */
     public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
@@ -419,8 +419,8 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient AppUserPath _bbieCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bbie_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>bbie_created_by_fk</code> key.
      */
     public AppUserPath bbieCreatedByFk() {
         if (_bbieCreatedByFk == null)
@@ -432,7 +432,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
+     * Get the implicit join path to the <code>abie</code> table.
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -444,8 +444,8 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient AppUserPath _bbieLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bbie_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>bbie_last_updated_by_fk</code> key.
      */
     public AppUserPath bbieLastUpdatedByFk() {
         if (_bbieLastUpdatedByFk == null)
@@ -457,8 +457,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table.
+     * Get the implicit join path to the <code>top_level_asbiep</code> table.
      */
     public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
@@ -470,7 +469,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient BbiepPath _bbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.bbiep</code> table.
+     * Get the implicit join path to the <code>bbiep</code> table.
      */
     public BbiepPath bbiep() {
         if (_bbiep == null)
@@ -482,7 +481,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient XbtManifestPath _xbtManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.xbt_manifest</code> table.
+     * Get the implicit join path to the <code>xbt_manifest</code> table.
      */
     public XbtManifestPath xbtManifest() {
         if (_xbtManifest == null)
@@ -494,8 +493,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient BbieBiztermPath _bbieBizterm;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie_bizterm</code>
-     * table
+     * Get the implicit to-many join path to the <code>bbie_bizterm</code> table
      */
     public BbieBiztermPath bbieBizterm() {
         if (_bbieBizterm == null)
@@ -507,7 +505,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient BbieScPath _bbieSc;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code> table
+     * Get the implicit to-many join path to the <code>bbie_sc</code> table
      */
     public BbieScPath bbieSc() {
         if (_bbieSc == null)
@@ -519,8 +517,8 @@ public class Bbie extends TableImpl<BbieRecord> {
     private transient BieUsageRulePath _bieUsageRule;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_usage_rule</code> table
+     * Get the implicit to-many join path to the <code>bie_usage_rule</code>
+     * table
      */
     public BieUsageRulePath bieUsageRule() {
         if (_bieUsageRule == null)

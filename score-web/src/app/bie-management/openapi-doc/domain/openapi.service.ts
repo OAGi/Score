@@ -41,6 +41,11 @@ export class OpenAPIService {
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
+    return this.getOasDocListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getOasDocListPage(params: HttpParams): Observable<PageResponse<OasDoc>> {
     return this.http.get<PageResponse<OasDoc>>('/api/oas_docs', {params});
   }
 
@@ -205,6 +210,11 @@ export class OpenAPIService {
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/bie_list', {params});
   }
 
+  /** A page of the operations of a document, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBieForOasDocPage(oasDocId: number, params: HttpParams): Observable<PageResponse<BieForOasDoc>> {
+    return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDocId + '/bie_list', {params});
+  }
+
   // Issue #1347: the document's distinct BIE releases, computed by the backend in a single SELECT DISTINCT
   // query. The Error Response "apply to all" ConfirmMessage Branch selector uses this instead of fetching
   // the whole paginated BIE list only to derive its releases client-side.
@@ -269,6 +279,11 @@ export class OpenAPIService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
+    return this.selectBieForOasDocListPage(params, oasDoc);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  selectBieForOasDocListPage(params: HttpParams, oasDoc: OasDoc): Observable<PageResponse<BieForOasDoc>> {
     return this.http.get<PageResponse<BieForOasDoc>>('/api/oas_doc/' + oasDoc.oasDocId + '/select_bie', {params});
   }
 

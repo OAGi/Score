@@ -52,6 +52,11 @@ export class BusinessContextService implements OnInit {
     if (request.filters.isBieEditing) {
       params = params.set('isBieEditing', 'true');
     }
+    return this.getBusinessContextListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBusinessContextListPage(params: HttpParams): Observable<PageResponse<BusinessContextListEntry>> {
     return this.http.get<PageResponse<BusinessContextListEntry>>('/api/business-contexts', {params}).pipe(
         map((res: PageResponse<BusinessContextListEntry>) => ({
           ...res,
@@ -108,7 +113,7 @@ export class BusinessContextService implements OnInit {
     return this.http.post('/api/business-contexts/' + businessContext.businessContextId + '/assignments/' + topLevelAsbiepId, {});
   }
 
-  unassign(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
+  unassign(topLevelAsbiepId: number, businessContext: BusinessContextSummary): Observable<any> {
     return this.http.delete('/api/business-contexts/' + businessContext.businessContextId + '/assignments/' + topLevelAsbiepId, {});
   }
 

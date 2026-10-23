@@ -12,6 +12,7 @@ import {ScoreCommonModule} from '../common/score-common.module';
 import {MarkdownModule} from 'ngx-markdown';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
+import {SCORE_TABLE} from '../common/score-table';
 
 const routes: Routes = [
   {
@@ -44,7 +45,8 @@ const routes: Routes = [
     ScoreCommonModule,
     MarkdownModule,
     SearchBarModule,
-    ColumnSelectorModule
+    ColumnSelectorModule,
+    ...SCORE_TABLE
   ],
   declarations: [
     MessageViewComponent,

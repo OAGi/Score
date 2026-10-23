@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.integration_management.github.repository
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Table;
@@ -296,7 +297,7 @@ public class JooqGitHubIssueLinkQueryRepository extends JooqBaseRepository
                 record.get(GITHUB_ISSUE.REPO_OWNER),
                 record.get(GITHUB_ISSUE.REPO_NAME),
                 record.get(GITHUB_ISSUE.ISSUE_NUMBER),
-                record.get(GITHUB_ISSUE.CACHED_METADATA));
+                (record.get(GITHUB_ISSUE.CACHED_METADATA) != null) ? record.get(GITHUB_ISSUE.CACHED_METADATA).data() : null);
     }
 
     private boolean isLinked(Table<?> linkTable, Field<ULong> manifestIdField, Field<ULong> issueIdField,

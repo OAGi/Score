@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.configuration.redis;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -14,6 +16,7 @@ import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.PlaceholderResolutionException;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -84,7 +88,20 @@ public class RedisConfiguration {
         org.springframework.data.redis.connection.RedisConfiguration redisConfiguration;
         List<String> redisClusterNodes = getRedisClusterNodes();
         if (!redisClusterNodes.isEmpty()) {
-            redisConfiguration = new RedisClusterConfiguration(redisClusterNodes);
+            // Without these a failed node keeps being asked, and every command to it waits for the (one minute) time-out,
+            // because the client learns of the new master only when told to look at the cluster again.
+            ClusterClientOptions clusterClientOptions = ClusterClientOptions.builder()
+                    .topologyRefreshOptions(ClusterTopologyRefreshOptions.builder()
+                            .enablePeriodicRefresh(Duration.ofSeconds(30))
+                            .enableAllAdaptiveRefreshTriggers()
+                            .adaptiveRefreshTriggersTimeout(Duration.ofSeconds(5))
+                            .build())
+                    .build();
+            LettuceClientConfiguration clientConfiguration = LettuceClientConfiguration.builder()
+                    .clientOptions(clusterClientOptions)
+                    .commandTimeout(Duration.ofSeconds(5))
+                    .build();
+            return new LettuceConnectionFactory(new RedisClusterConfiguration(redisClusterNodes), clientConfiguration);
         } else if (StringUtils.hasLength(redisSentinelMaster())) {
             Set<String> redisSentinelNodes = getRedisSentinelNodes();
             redisConfiguration = new RedisSentinelConfiguration(redisSentinelMaster(), redisSentinelNodes);

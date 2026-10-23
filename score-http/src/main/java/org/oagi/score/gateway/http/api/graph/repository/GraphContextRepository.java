@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.graph.repository;
 
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.graph.model.CodeListGraphContext;
 import org.oagi.score.gateway.http.api.graph.model.CoreComponentGraphContext;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -26,7 +25,7 @@ public class GraphContextRepository {
     private TagQueryService tagQueryService;
 
     public CoreComponentGraphContext buildGraphContext(ScoreUser requester, ReleaseId releaseId) {
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseId);
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseId);
         return new CoreComponentGraphContext(ccDocument);
     }
 

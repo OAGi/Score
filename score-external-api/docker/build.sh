@@ -15,15 +15,24 @@ if ! [[ -x "$(command -v docker)" ]]; then
   exit 1
 fi
 
-cd ..
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# shellcheck source=../../docker/buildx.sh
+. "$script_dir/../../docker/buildx.sh"
+
+cd "$script_dir/.."
 
 echo "Building project..."
 rm -rf dist
 
-echo "Building docker image..."
-docker build --no-cache -f docker/Dockerfile --target runner -t oagi1docker/srt-external-api:3.4.2 .
+image_name="oagi1docker/srt-external-api:3.4.2"
+buildx_build "$image_name" docker/Dockerfile . --no-cache --target runner
 
-echo "Scanning vulnerabilities..."
-docker scout cves oagi1docker/srt-external-api:3.4.2
+if [ "${PUSH_IMAGE:-0}" = 1 ] || [ "${PUSH_IMAGE:-0}" = true ]; then
+  echo "Info: pushed multi-arch image; scan it with: docker scout cves registry://$image_name"
+else
+  echo "Scanning vulnerabilities..."
+  docker scout cves "$image_name"
+fi
 
 echo "Done."

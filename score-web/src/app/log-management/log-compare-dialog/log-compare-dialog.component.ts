@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {OagisComponentTypes} from '../../cc-management/domain/core-component-node';
 import {LogChangeSummaryDialogComponent} from '../log-change-summary-dialog/log-change-summary-dialog.component';
@@ -19,6 +19,7 @@ import {forkJoin} from 'rxjs';
   standalone: false,
   selector: 'score-log-compare-dialog',
   templateUrl: './log-compare-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./log-compare-dialog.component.css'],
 })
 export class LogCompareDialogComponent implements OnInit {

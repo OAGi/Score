@@ -1,10 +1,11 @@
+import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {DtListComponent} from './dt-list.component';
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 import {CcNodeService} from '../domain/core-component-node.service';
@@ -32,12 +33,13 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    TranslateModule,
+    TranslatePipe,
     ScoreCommonModule,
     SearchBarModule,
     ColumnSelectorModule,
     FontAwesomeModule,
-    TitleWithLibrarySelector
+    TitleWithLibrarySelector,
+    ...SCORE_TABLE
   ],
   declarations: [
     DtListComponent,

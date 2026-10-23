@@ -22,7 +22,7 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Setter for
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_scope_id</code>.
+     * <code>oas_operation_security_scope.oas_operation_security_scope_id</code>.
      * The primary key of the record.
      */
     public void setOasOperationSecurityScopeId(ULong value) {
@@ -31,7 +31,7 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Getter for
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_scope_id</code>.
+     * <code>oas_operation_security_scope.oas_operation_security_scope_id</code>.
      * The primary key of the record.
      */
     public ULong getOasOperationSecurityScopeId() {
@@ -39,16 +39,16 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security_scope.guid</code>. The GUID
-     * of the record.
+     * Setter for <code>oas_operation_security_scope.guid</code>. The GUID of
+     * the record.
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security_scope.guid</code>. The GUID
-     * of the record.
+     * Getter for <code>oas_operation_security_scope.guid</code>. The GUID of
+     * the record.
      */
     public String getGuid() {
         return (String) get(1);
@@ -56,8 +56,8 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Setter for
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_id</code>.
-     * The owning operation-level security entry.
+     * <code>oas_operation_security_scope.oas_operation_security_id</code>. The
+     * owning operation-level security entry.
      */
     public void setOasOperationSecurityId(ULong value) {
         set(2, value);
@@ -65,16 +65,16 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Getter for
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_id</code>.
-     * The owning operation-level security entry.
+     * <code>oas_operation_security_scope.oas_operation_security_id</code>. The
+     * owning operation-level security entry.
      */
     public ULong getOasOperationSecurityId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security_scope.scope_name</code>. A
-     * scope name required by this entry (oauth2: from the scheme's flows;
+     * Setter for <code>oas_operation_security_scope.scope_name</code>. A scope
+     * name required by this entry (oauth2: from the scheme's flows;
      * openIdConnect: from the provider).
      */
     public void setScopeName(String value) {
@@ -82,8 +82,8 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security_scope.scope_name</code>. A
-     * scope name required by this entry (oauth2: from the scheme's flows;
+     * Getter for <code>oas_operation_security_scope.scope_name</code>. A scope
+     * name required by this entry (oauth2: from the scheme's flows;
      * openIdConnect: from the provider).
      */
     public String getScopeName() {
@@ -91,52 +91,48 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security_scope.created_by</code>. The
-     * user who creates the record.
+     * Setter for <code>oas_operation_security_scope.created_by</code>. The user
+     * who creates the record.
      */
     public void setCreatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security_scope.created_by</code>. The
-     * user who creates the record.
+     * Getter for <code>oas_operation_security_scope.created_by</code>. The user
+     * who creates the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_operation_security_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * Setter for <code>oas_operation_security_scope.last_updated_by</code>. The
+     * user who last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_operation_security_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * Getter for <code>oas_operation_security_scope.last_updated_by</code>. The
+     * user who last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_operation_security_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Setter for <code>oas_operation_security_scope.creation_timestamp</code>.
+     * The timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_operation_security_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Getter for <code>oas_operation_security_scope.creation_timestamp</code>.
+     * The timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
@@ -144,7 +140,7 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Setter for
-     * <code>oagi.oas_operation_security_scope.last_update_timestamp</code>. The
+     * <code>oas_operation_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -153,7 +149,7 @@ public class OasOperationSecurityScopeRecord extends UpdatableRecordImpl<OasOper
 
     /**
      * Getter for
-     * <code>oagi.oas_operation_security_scope.last_update_timestamp</code>. The
+     * <code>oas_operation_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

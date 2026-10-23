@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -16,6 +16,7 @@ import {HttpErrorResponse} from '@angular/common/http';
   standalone: false,
   selector: 'score-settings-application-settings',
   templateUrl: './settings-application-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./settings-application-settings.component.css']
 })
 export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {

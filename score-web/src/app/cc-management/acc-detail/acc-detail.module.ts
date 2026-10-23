@@ -1,4 +1,12 @@
+import {SCORE_TABLE} from '../../common/score-table';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {AccPanelComponent} from '../detail-panels/acc-panel.component';
+import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
+import {AsccpPanelComponent} from '../detail-panels/asccp-panel.component';
+import {BccPanelComponent} from '../detail-panels/bcc-panel.component';
+import {BccpPanelComponent} from '../detail-panels/bccp-panel.component';
+import {DtPanelComponent} from '../detail-panels/dt-panel.component';
+import {DtScPanelComponent} from '../detail-panels/dt-sc-panel.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AccDetailComponent} from './acc-detail.component';
@@ -7,10 +15,11 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 import {FindUsagesDialogModule} from '../find-usages-dialog/find-usages-dialog.module';
@@ -42,8 +51,9 @@ const routes: Routes = [
         MaterialModule,
         MatInputModule,
         CommonModule,
-        TranslateModule,
+        TranslatePipe,
         ScoreCommonModule,
+        CcTreeViewportComponent,
         SearchOptionsDialogModule,
         FindUsagesDialogModule,
         DragDropModule,
@@ -51,7 +61,15 @@ const routes: Routes = [
         FontAwesomeModule,
         SearchBarModule,
         ColumnSelectorModule,
-        GithubIssueBoxComponent
+        GithubIssueBoxComponent,
+        DtPanelComponent,
+        AccPanelComponent,
+        AsccPanelComponent,
+        AsccpPanelComponent,
+        BccPanelComponent,
+        BccpPanelComponent,
+        DtScPanelComponent,
+        ...SCORE_TABLE
     ],
   declarations: [
     AccDetailComponent,

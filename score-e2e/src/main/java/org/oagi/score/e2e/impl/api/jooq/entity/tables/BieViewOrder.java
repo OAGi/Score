@@ -32,9 +32,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifest.AccManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest.AsccManifestPath;
@@ -52,7 +52,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.bie_view_order</code>
+     * The reference instance of <code>bie_view_order</code>
      */
     public static final BieViewOrder BIE_VIEW_ORDER = new BieViewOrder();
 
@@ -65,35 +65,33 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     }
 
     /**
-     * The column <code>oagi.bie_view_order.bie_view_order_id</code>. The
-     * primary key of the record.
+     * The column <code>bie_view_order.bie_view_order_id</code>. The primary key
+     * of the record.
      */
     public final TableField<BieViewOrderRecord, ULong> BIE_VIEW_ORDER_ID = createField(DSL.name("bie_view_order_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.bie_view_order.from_acc_manifest_id</code>. View
-     * parent: the ACC manifest under which the child is shown as a flattened
-     * sibling. MAY differ from seq_key.from_acc_manifest_id due to group
-     * flattening.
+     * The column <code>bie_view_order.from_acc_manifest_id</code>. View parent:
+     * the ACC manifest under which the child is shown as a flattened sibling.
+     * MAY differ from seq_key.from_acc_manifest_id due to group flattening.
      */
     public final TableField<BieViewOrderRecord, ULong> FROM_ACC_MANIFEST_ID = createField(DSL.name("from_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "View parent: the ACC manifest under which the child is shown as a flattened sibling. MAY differ from seq_key.from_acc_manifest_id due to group flattening.");
 
     /**
-     * The column <code>oagi.bie_view_order.ascc_manifest_id</code>. The
-     * reordered ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id
-     * is non-null.
+     * The column <code>bie_view_order.ascc_manifest_id</code>. The reordered
+     * ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
+     * non-null.
      */
     public final TableField<BieViewOrderRecord, ULong> ASCC_MANIFEST_ID = createField(DSL.name("ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "The reordered ASCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is non-null.");
 
     /**
-     * The column <code>oagi.bie_view_order.bcc_manifest_id</code>. The
-     * reordered BCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is
-     * non-null.
+     * The column <code>bie_view_order.bcc_manifest_id</code>. The reordered BCC
+     * child. Exactly one of ascc_manifest_id / bcc_manifest_id is non-null.
      */
     public final TableField<BieViewOrderRecord, ULong> BCC_MANIFEST_ID = createField(DSL.name("bcc_manifest_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "The reordered BCC child. Exactly one of ascc_manifest_id / bcc_manifest_id is non-null.");
 
     /**
-     * The column <code>oagi.bie_view_order.weight</code>. Browse/BIE-edit sort
+     * The column <code>bie_view_order.weight</code>. Browse/BIE-edit sort
      * weight, applied DESCENDING within the attributes-first partition.
      * User-entered; need not be unique or sequential. NOT used for schema /
      * BIE-expression output.
@@ -101,25 +99,25 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     public final TableField<BieViewOrderRecord, Integer> WEIGHT = createField(DSL.name("weight"), SQLDataType.INTEGER.nullable(false), this, "Browse/BIE-edit sort weight, applied DESCENDING within the attributes-first partition. User-entered; need not be unique or sequential. NOT used for schema / BIE-expression output.");
 
     /**
-     * The column <code>oagi.bie_view_order.created_by</code>. The user who
-     * creates the record.
+     * The column <code>bie_view_order.created_by</code>. The user who creates
+     * the record.
      */
     public final TableField<BieViewOrderRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.bie_view_order.last_updated_by</code>. The user who
-     * last updates the record.
+     * The column <code>bie_view_order.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public final TableField<BieViewOrderRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.bie_view_order.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * The column <code>bie_view_order.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public final TableField<BieViewOrderRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.bie_view_order.last_update_timestamp</code>. The
+     * The column <code>bie_view_order.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<BieViewOrderRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -133,21 +131,21 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.bie_view_order</code> table reference
+     * Create an aliased <code>bie_view_order</code> table reference
      */
     public BieViewOrder(String alias) {
         this(DSL.name(alias), BIE_VIEW_ORDER);
     }
 
     /**
-     * Create an aliased <code>oagi.bie_view_order</code> table reference
+     * Create an aliased <code>bie_view_order</code> table reference
      */
     public BieViewOrder(Name alias) {
         this(alias, BIE_VIEW_ORDER);
     }
 
     /**
-     * Create a <code>oagi.bie_view_order</code> table reference
+     * Create a <code>bie_view_order</code> table reference
      */
     public BieViewOrder() {
         this(DSL.name("bie_view_order"), null);
@@ -188,7 +186,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -219,7 +217,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private transient AsccManifestPath _asccManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table.
+     * Get the implicit join path to the <code>ascc_manifest</code> table.
      */
     public AsccManifestPath asccManifest() {
         if (_asccManifest == null)
@@ -231,7 +229,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private transient BccManifestPath _bccManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.bcc_manifest</code> table.
+     * Get the implicit join path to the <code>bcc_manifest</code> table.
      */
     public BccManifestPath bccManifest() {
         if (_bccManifest == null)
@@ -243,8 +241,8 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private transient AppUserPath _bieViewOrderCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bie_view_order_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>bie_view_order_created_by_fk</code> key.
      */
     public AppUserPath bieViewOrderCreatedByFk() {
         if (_bieViewOrderCreatedByFk == null)
@@ -256,7 +254,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private transient AccManifestPath _accManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     * Get the implicit join path to the <code>acc_manifest</code> table.
      */
     public AccManifestPath accManifest() {
         if (_accManifest == null)
@@ -268,8 +266,8 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     private transient AppUserPath _bieViewOrderLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>bie_view_order_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>bie_view_order_last_updated_by_fk</code> key.
      */
     public AppUserPath bieViewOrderLastUpdatedByFk() {
         if (_bieViewOrderLastUpdatedByFk == null)

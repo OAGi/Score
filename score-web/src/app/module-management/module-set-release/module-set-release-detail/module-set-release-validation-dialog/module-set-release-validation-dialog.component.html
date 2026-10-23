@@ -1,16 +1,5 @@
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Module Set Release - {{ schemaTypeLabel }} Validation</span>
-    <div class="close pe-2">
-      @if (resp.done) {
-        <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-    </div>
-  </div>
-
-  <div class="content" mat-dialog-content>
+<score-dialog-page title="Module Set Release - {{ schemaTypeLabel }} Validation">
+  <div class="content dialog-form">
     @if (!determinate) {
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
@@ -51,12 +40,15 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="actions ms-auto" mat-dialog-actions>
-    <button mat-button class="btn" color="warn" (click)="onNoClick()" [disabled]="!resp.done">
-      <span>Close</span>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button color="warn" (click)="onNoClick()" [disabled]="!resp.done">
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Close</span>
     </button>
-    <button mat-button class="btn" color="primary" (click)="copyToClipboard()" [disabled]="!resp.done">
-      <span>Copy to clipboard</span>
+    <button mat-raised-button color="primary" (click)="copyToClipboard()" [disabled]="!resp.done">
+      <mat-icon>content_copy</mat-icon>
+      <span class="ps-2">Copy to clipboard</span>
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

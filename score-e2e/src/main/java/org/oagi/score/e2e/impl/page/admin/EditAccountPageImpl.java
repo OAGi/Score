@@ -25,8 +25,9 @@ public class EditAccountPageImpl extends BasePageImpl implements EditAccountPage
     private static final By DEVELOPER_CHECKBOX_LOCATOR =
             By.xpath("//span[contains(text(), \"Standard Developer\")]");
 
+    // Anchored on the checkbox's data-id: a bare "Admin" text match hits the Admin toolbar menu first.
     private static final By ADMIN_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Admin\")]");
+            By.xpath("//mat-checkbox[@data-id=\"user.admin\"]//label");
 
     private static final By PASSWORD_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"New password\")]//ancestor::div[1]/input");

@@ -165,6 +165,10 @@ public class JooqBusinessTermQueryRepository
                         field = BUSINESS_TERM.COMMENT;
                         break;
 
+                    case "lastUpdateTimestamp":
+                        field = BUSINESS_TERM.LAST_UPDATE_TIMESTAMP;
+                        break;
+
                     default:
                         continue;
                 }
@@ -397,11 +401,11 @@ public class JooqBusinessTermQueryRepository
                         break;
 
                     case "externalReferenceUri":
-                        field = BUSINESS_TERM.EXTERNAL_REF_URI;
+                        field = field("external_reference_uri");
                         break;
 
                     case "externalReferenceId":
-                        field = BUSINESS_TERM.EXTERNAL_REF_ID;
+                        field = field("external_reference_id");
                         break;
 
                     case "typeCode":

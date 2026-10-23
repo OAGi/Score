@@ -123,6 +123,11 @@ export class BieListService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
+    return this.getBieListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBieListPage(params: HttpParams): Observable<PageResponse<BieListEntry>> {
     return this.http.get<PageResponse<BieListEntry>>('/api/bies', {params}).pipe(
         map((res: PageResponse<BieListEntry>) => ({
           ...res,

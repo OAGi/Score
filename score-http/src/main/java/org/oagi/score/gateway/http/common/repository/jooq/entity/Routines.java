@@ -10,13 +10,14 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.routines.Levens
 
 
 /**
- * Convenience access to all stored procedures and functions in oagi.
+ * Convenience access to all stored procedures and functions in the default
+ * schema.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Routines {
 
     /**
-     * Call <code>oagi.levenshtein</code>
+     * Call <code>levenshtein</code>
      */
     public static Integer levenshtein(
           Configuration configuration
@@ -32,7 +33,7 @@ public class Routines {
     }
 
     /**
-     * Get <code>oagi.levenshtein</code> as a field.
+     * Get <code>levenshtein</code> as a field.
      */
     public static Field<Integer> levenshtein(
           String s1
@@ -46,7 +47,7 @@ public class Routines {
     }
 
     /**
-     * Get <code>oagi.levenshtein</code> as a field.
+     * Get <code>levenshtein</code> as a field.
      */
     public static Field<Integer> levenshtein(
           Field<String> s1

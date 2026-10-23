@@ -1,5 +1,5 @@
 import {HttpClient, HttpContext, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnDestroy, OnInit, inject} from '@angular/core';
+import {Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy} from '@angular/core';
 import {Router} from '@angular/router';
 import {ActivatedRoute} from '@angular/router';
 import {catchError, map, switchMap, takeUntil} from 'rxjs/operators';
@@ -16,6 +16,7 @@ interface GatewayHealthResponse {
   standalone: false,
   selector: 'score-service-unavailable',
   templateUrl: './service-unavailable.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./service-unavailable.component.css']
 })
 export class ServiceUnavailableComponent implements OnInit, OnDestroy {

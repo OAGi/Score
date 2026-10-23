@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -30,6 +30,7 @@ export interface BieOasDocAddDialogData {
   standalone: false,
   selector: 'score-bie-oas-doc-add-dialog',
   templateUrl: './bie-oas-doc-add-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-oas-doc-add-dialog.component.css']
 })
 export class BieOasDocAddDialogComponent implements OnInit {

@@ -24,87 +24,81 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.dt_sc.dt_sc_id</code>. Internal, primary database
-     * key.
+     * Setter for <code>dt_sc.dt_sc_id</code>. Internal, primary database key.
      */
     public void setDtScId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.dt_sc_id</code>. Internal, primary database
-     * key.
+     * Getter for <code>dt_sc.dt_sc_id</code>. Internal, primary database key.
      */
     public ULong getDtScId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>dt_sc.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>dt_sc.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.object_class_term</code>. Object class term
-     * of the SC.
+     * Setter for <code>dt_sc.object_class_term</code>. Object class term of the
+     * SC.
      */
     public void setObjectClassTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.object_class_term</code>. Object class term
-     * of the SC.
+     * Getter for <code>dt_sc.object_class_term</code>. Object class term of the
+     * SC.
      */
     public String getObjectClassTerm() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.property_term</code>. Property term of the
-     * SC.
+     * Setter for <code>dt_sc.property_term</code>. Property term of the SC.
      */
     public void setPropertyTerm(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.property_term</code>. Property term of the
-     * SC.
+     * Getter for <code>dt_sc.property_term</code>. Property term of the SC.
      */
     public String getPropertyTerm() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.representation_term</code>. Representation of
-     * the supplementary component.
+     * Setter for <code>dt_sc.representation_term</code>. Representation of the
+     * supplementary component.
      */
     public void setRepresentationTerm(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.representation_term</code>. Representation of
-     * the supplementary component.
+     * Getter for <code>dt_sc.representation_term</code>. Representation of the
+     * supplementary component.
      */
     public String getRepresentationTerm() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.definition</code>. Description of the
+     * Setter for <code>dt_sc.definition</code>. Description of the
      * supplementary component.
      */
     public void setDefinition(String value) {
@@ -112,7 +106,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.definition</code>. Description of the
+     * Getter for <code>dt_sc.definition</code>. Description of the
      * supplementary component.
      */
     public String getDefinition() {
@@ -120,134 +114,132 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>dt_sc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>dt_sc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.owner_dt_id</code>. Foreigned key to the DT
-     * table indicating the data type, to which this supplementary component
-     * belongs.
+     * Setter for <code>dt_sc.owner_dt_id</code>. Foreign key to the DT table
+     * indicating the data type, to which this supplementary component belongs.
      */
     public void setOwnerDtId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.owner_dt_id</code>. Foreigned key to the DT
-     * table indicating the data type, to which this supplementary component
-     * belongs.
+     * Getter for <code>dt_sc.owner_dt_id</code>. Foreign key to the DT table
+     * indicating the data type, to which this supplementary component belongs.
      */
     public ULong getOwnerDtId() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.cardinality_min</code>. The minimum
-     * occurrence constraint associated with the supplementary component. The
-     * valid values zero or one.
+     * Setter for <code>dt_sc.cardinality_min</code>. The minimum occurrence
+     * constraint associated with the supplementary component. The valid values
+     * are zero or one.
      */
     public void setCardinalityMin(Integer value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.cardinality_min</code>. The minimum
-     * occurrence constraint associated with the supplementary component. The
-     * valid values zero or one.
+     * Getter for <code>dt_sc.cardinality_min</code>. The minimum occurrence
+     * constraint associated with the supplementary component. The valid values
+     * are zero or one.
      */
     public Integer getCardinalityMin() {
         return (Integer) get(8);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.cardinality_max</code>. The maximum
-     * occurrence constraint associated with the supplementary component. The
-     * valid values are zero or one. Zero is used when the SC is restricted from
-     * an instantiation in the data type.
+     * Setter for <code>dt_sc.cardinality_max</code>. The maximum occurrence
+     * constraint associated with the supplementary component. The valid values
+     * are zero or one. Zero is used when the SC is restricted from an
+     * instantiation in the data type.
      */
     public void setCardinalityMax(Integer value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.cardinality_max</code>. The maximum
-     * occurrence constraint associated with the supplementary component. The
-     * valid values are zero or one. Zero is used when the SC is restricted from
-     * an instantiation in the data type.
+     * Getter for <code>dt_sc.cardinality_max</code>. The maximum occurrence
+     * constraint associated with the supplementary component. The valid values
+     * are zero or one. Zero is used when the SC is restricted from an
+     * instantiation in the data type.
      */
     public Integer getCardinalityMax() {
         return (Integer) get(9);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.based_dt_sc_id</code>. Foreign key to the
-     * DT_SC table itself. This column is used when the SC is derived from the
-     * based DT.
+     * Setter for <code>dt_sc.based_dt_sc_id</code>. Foreign key to the DT_SC
+     * table itself. This column is used when the SC is derived from the based
+     * DT.
      */
     public void setBasedDtScId(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.based_dt_sc_id</code>. Foreign key to the
-     * DT_SC table itself. This column is used when the SC is derived from the
-     * based DT.
+     * Getter for <code>dt_sc.based_dt_sc_id</code>. Foreign key to the DT_SC
+     * table itself. This column is used when the SC is derived from the based
+     * DT.
      */
     public ULong getBasedDtScId() {
         return (ULong) get(10);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.default_value</code>. This column specifies
-     * the default value constraint. Default and fixed value constraints cannot
-     * be used at the same time.
+     * Setter for <code>dt_sc.default_value</code>. This column specifies the
+     * default value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
     public void setDefaultValue(String value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.default_value</code>. This column specifies
-     * the default value constraint. Default and fixed value constraints cannot
-     * be used at the same time.
+     * Getter for <code>dt_sc.default_value</code>. This column specifies the
+     * default value constraint. Default and fixed value constraints cannot be
+     * used at the same time.
      */
     public String getDefaultValue() {
         return (String) get(11);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.fixed_value</code>. This column captures the
-     * fixed value constraint. Default and fixed value constraints cannot be
-     * used at the same time.
+     * Setter for <code>dt_sc.fixed_value</code>. This column captures the fixed
+     * value constraint. Default and fixed value constraints cannot be used at
+     * the same time.
      */
     public void setFixedValue(String value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.fixed_value</code>. This column captures the
-     * fixed value constraint. Default and fixed value constraints cannot be
-     * used at the same time.
+     * Getter for <code>dt_sc.fixed_value</code>. This column captures the fixed
+     * value constraint. Default and fixed value constraints cannot be used at
+     * the same time.
      */
     public String getFixedValue() {
         return (String) get(12);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Setter for <code>dt_sc.is_deprecated</code>. Indicates whether this is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
@@ -255,8 +247,8 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.is_deprecated</code>. Indicates whether this
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Getter for <code>dt_sc.is_deprecated</code>. Indicates whether this is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public Byte getIsDeprecated() {
@@ -264,7 +256,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.replacement_dt_sc_id</code>. This refers to a
+     * Setter for <code>dt_sc.replacement_dt_sc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public void setReplacementDtScId(ULong value) {
@@ -272,7 +264,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.replacement_dt_sc_id</code>. This refers to a
+     * Getter for <code>dt_sc.replacement_dt_sc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtScId() {
@@ -280,25 +272,25 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the code list.
+     * Setter for <code>dt_sc.created_by</code>. Foreign key to the APP_USER
+     * table. It indicates the user who created the supplementary component.
      */
     public void setCreatedBy(ULong value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the code list.
+     * Getter for <code>dt_sc.created_by</code>. Foreign key to the APP_USER
+     * table. It indicates the user who created the supplementary component.
      */
     public ULong getCreatedBy() {
         return (ULong) get(15);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Setter for <code>dt_sc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
@@ -308,9 +300,9 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Getter for <code>dt_sc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
@@ -320,55 +312,57 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.last_updated_by</code>. Foreign key to the
-     * APP_USER table. It identifies the user who last updated the code list.
+     * Setter for <code>dt_sc.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the supplementary
+     * component.
      */
     public void setLastUpdatedBy(ULong value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.last_updated_by</code>. Foreign key to the
-     * APP_USER table. It identifies the user who last updated the code list.
+     * Getter for <code>dt_sc.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the supplementary
+     * component.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(17);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
-     * code list was created.
+     * Setter for <code>dt_sc.creation_timestamp</code>. Timestamp when the
+     * supplementary component was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.creation_timestamp</code>. Timestamp when the
-     * code list was created.
+     * Getter for <code>dt_sc.creation_timestamp</code>. Timestamp when the
+     * supplementary component was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(18);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
-     * the code list was last updated.
+     * Setter for <code>dt_sc.last_update_timestamp</code>. Timestamp when the
+     * supplementary component was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.last_update_timestamp</code>. Timestamp when
-     * the code list was last updated.
+     * Getter for <code>dt_sc.last_update_timestamp</code>. Timestamp when the
+     * supplementary component was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(19);
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to
+     * Setter for <code>dt_sc.prev_dt_sc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
     public void setPrevDtScId(ULong value) {
@@ -376,7 +370,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.prev_dt_sc_id</code>. A self-foreign key to
+     * Getter for <code>dt_sc.prev_dt_sc_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
     public ULong getPrevDtScId() {
@@ -384,7 +378,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
+     * Setter for <code>dt_sc.next_dt_sc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
     public void setNextDtScId(ULong value) {
@@ -392,7 +386,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt_sc.next_dt_sc_id</code>. A self-foreign key to
+     * Getter for <code>dt_sc.next_dt_sc_id</code>. A self-foreign key to
      * indicate the next history record.
      */
     public ULong getNextDtScId() {

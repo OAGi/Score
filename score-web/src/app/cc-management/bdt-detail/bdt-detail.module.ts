@@ -6,11 +6,15 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AngularSplitModule} from 'angular-split';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {BdtPanelComponent} from '../detail-panels/bdt-panel.component';
+import {BdtScPanelComponent} from '../detail-panels/bdt-sc-panel.component';
+import {ValueDomainComponent} from '../detail-panels/value-domain.component';
 import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
@@ -34,13 +38,17 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     MatInputModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule,
+    CcTreeViewportComponent,
     SearchOptionsDialogModule,
     DragDropModule,
     AngularSplitModule,
-    GithubIssueBoxComponent
+    GithubIssueBoxComponent,
+    BdtPanelComponent,
+    BdtScPanelComponent,
+    ValueDomainComponent
   ],
   declarations: [
     BdtDetailComponent

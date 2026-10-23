@@ -12,6 +12,12 @@ import org.oagi.score.gateway.http.api.application_management.service.Applicatio
 import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
+import org.oagi.score.gateway.http.configuration.security.webauthn.ClientAddressResolver;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyAuthenticationProvider;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyFeatureFilter;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyProperties;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyRateLimitFilter;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyRateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,9 +26,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +40,11 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyConfiguration;
+import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationFilter;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -76,6 +86,18 @@ public class SecurityConfiguration {
 
     @Autowired
     private GitHubIntegrationProperties gitHubIntegrationProperties;
+
+    @Autowired
+    private PasskeyProperties passkeyProperties;
+
+    @Autowired
+    private PasskeyAuthenticationProvider passkeyAuthenticationProvider;
+
+    @Autowired
+    private PasskeyRateLimiter passkeyRateLimiter;
+
+    @Autowired
+    private ClientAddressResolver clientAddressResolver;
 
     @Value("${resource-server.jwk-set-uri}")
     private String jwkSetUri;
@@ -134,14 +156,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/favicon.ico", "/resources/**", "/error", "/ws/**");
-    }
-
-    @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
+        // Spring Security 7 removed the no-arg constructor and setUserDetailsService(...) (#1750).
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
@@ -212,8 +229,14 @@ public class SecurityConfiguration {
                             });
                 })
                 .authorizeHttpRequests(requestMatcherRegistry -> {
+                    // Spring Security 7 discourages web.ignoring(); these static/handshake paths are
+                    // permitAll here so they still pass through the filter chain (#1750).
                     List<String> permitAllPaths = new ArrayList<>(
-                            Arrays.asList("/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**"));
+                            Arrays.asList("/favicon.ico", "/resources/**", "/error",
+                                    "/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**",
+                                    // Passkey sign-in is available before authentication. When score.passkey.* is
+                                    // not set, PasskeyFeatureFilter answers 404 for these paths.
+                                    "/webauthn/authenticate/options", "/login/webauthn"));
                     // The GitHub OAuth callback and webhook are reached without a Score session, so they
                     // must be permitAll — but only when the integration is enabled (SCORE_GITHUB_ENABLED);
                     // otherwise the feature is off and these endpoints should not be exposed
@@ -262,6 +285,22 @@ public class SecurityConfiguration {
                 .rememberMe(rememberMeConfigurer -> {
                     rememberMeConfigurer.rememberMeServices(rememberMeServices());
                 })
+                // Passkey (WebAuthn) sign-in. The relying party operations bean reads the RP ID, RP name and
+                // allowed origins from score.passkey.* (PasskeyProperties), and PasskeyFeatureFilter switches
+                // the endpoints off while they are not set.
+                .webAuthn(webAuthn -> webAuthn
+                        .disableDefaultRegistrationPage(true)
+                        .withObjectPostProcessor(new ObjectPostProcessor<WebAuthnAuthenticationFilter>() {
+                            @Override
+                            public <O extends WebAuthnAuthenticationFilter> O postProcess(O filter) {
+                                PasskeyConfiguration.customizeAuthenticationFilter(filter,
+                                        passkeyAuthenticationProvider, authenticationSuccessHandler, rememberMeServices());
+                                return filter;
+                            }
+                        }))
+                .addFilterBefore(new PasskeyFeatureFilter(passkeyProperties::isEnabled, passkeyProperties::allowedOrigins),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new PasskeyRateLimitFilter(passkeyRateLimiter, clientAddressResolver::resolve), PasskeyFeatureFilter.class)
                 .oauth2Login(oAuth2LoginConfigurer -> {
                     oAuth2LoginConfigurer
                             .loginPage("/login")

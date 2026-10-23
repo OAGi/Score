@@ -1,0 +1,13 @@
+<div class="p-3">
+  @if (heading) {
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ heading }}</span>
+    </mat-toolbar>
+  }
+  <mat-card [class]="cardClass">
+    <mat-card-content class="mat-card-container">
+      <ng-content></ng-content>
+    </mat-card-content>
+    <ng-content select="[cardActions]"></ng-content>
+  </mat-card>
+</div>

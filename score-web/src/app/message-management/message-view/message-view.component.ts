@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
@@ -13,6 +13,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   standalone: false,
   selector: 'score-message-view',
   templateUrl: './message-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./message-view.component.css']
 })
 export class MessageViewComponent implements OnInit {

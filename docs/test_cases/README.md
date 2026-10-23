@@ -248,3 +248,6 @@
 	- [Test Case 47.3 - Expression generation applies Inverse Mode without changing explicit BIE profiling](/docs/test_cases/TestSuite47.md#test-case-473)
 	- [Test Case 47.4 - Recursive references terminate safely in every BIE Expression format](/docs/test_cases/TestSuite47.md#test-case-474)
 	- [Test Case 47.5 - Inverse Mode with inherited and reused BIEs](/docs/test_cases/TestSuite47.md#test-case-475)
+- [Test Suite 48 - Passkey Sign-in](/docs/test_cases/TestSuite48.md)
+	- [Test Case 48.1 - Passkey sign-in, registration and the passkey offer](/docs/test_cases/TestSuite48.md#test-case-481)
+	- [Test Case 48.2 - Server-side passkey rules](/docs/test_cases/TestSuite48.md#test-case-482)

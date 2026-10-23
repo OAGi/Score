@@ -396,7 +396,7 @@ public class TC_15_4_AmendEndUserACC extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
 
     }
 }

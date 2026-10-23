@@ -119,6 +119,10 @@ public class Configuration {
         chromeOptions.addArguments("--remote-allow-origins=*");
         // Fixed large viewport so headless detail panels keep top tabs / CDK overlays in the clickable region.
         chromeOptions.addArguments("--window-size=1920,1200");
+        // Signing in with a weak built-in account (e.g. oagis/oagis) makes Chrome raise its native
+        // "Change your password" leak-detection bubble. That bubble is browser UI, not page content,
+        // so it silently swallows the pointer input of the next click without any WebDriver error.
+        chromeOptions.addArguments("--disable-features=PasswordLeakDetection,PasswordChange,AutofillServerCommunication");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> chromePrefs = new HashMap<>();
@@ -144,6 +148,8 @@ public class Configuration {
         edgeOptions.addArguments("--remote-allow-origins=*");
         // Fixed large viewport so headless detail panels keep top tabs / CDK overlays in the clickable region.
         edgeOptions.addArguments("--window-size=1920,1200");
+        // See the Chrome options: the leak-detection bubble is native browser UI and eats the next click.
+        edgeOptions.addArguments("--disable-features=PasswordLeakDetection,PasswordChange,AutofillServerCommunication");
 
         // To support TC_6_3 TC_6_3_TA_6
         Map<String, Object> edgePrefs = new HashMap<>();

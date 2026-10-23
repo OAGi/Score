@@ -363,8 +363,8 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         editBIEPage.openPage();
         reusedASCCPNode = editBIEPage.getNodeByPath(reusedAsccpPath);
-        asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
-        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
+        EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(reusedASCCPNode);
+        assertEquals("aRemark", getText(reusedASBIEPanel.getRemarkField()));
     }
 
     @Test

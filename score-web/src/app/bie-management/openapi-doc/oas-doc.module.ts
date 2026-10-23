@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {OasDocCreateComponent} from './oas-doc-create/oas-doc-create.component';
 import {OasDocListComponent} from './oas-doc-list/oas-doc-list.component';
@@ -19,6 +19,7 @@ import {ScoreCommonModule} from '../../common/score-common.module';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
+import {SCORE_TABLE} from '../../common/score-table';
 
 
 const routes: Routes = [
@@ -78,14 +79,15 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     CommonModule,
     MaterialModule,
-    TranslateModule,
+    TranslatePipe,
     FormsModule,
     ReactiveFormsModule,
     ScoreCommonModule,
     MatMultiSortModule,
     SearchBarModule,
     ColumnSelectorModule,
-    TitleWithLibrarySelector
+    TitleWithLibrarySelector,
+    ...SCORE_TABLE
   ],
   exports: [
     OasDocCreateComponent,

@@ -616,6 +616,8 @@ export class CcAccNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    // the search reads what a component's definition is from the graph, which has to follow what is being edited
+    (this._node as AccFlatNode).accNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -729,7 +731,7 @@ export const OagisComponentTypeMap = {
   12: AttributeGroup
 };
 
-class AsccNodeInfo {
+export class AsccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   prevAsccManifestId: number;
@@ -838,6 +840,7 @@ class AsccNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as AsccpFlatNode).asccNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -852,7 +855,7 @@ class AsccNodeInfo {
   }
 }
 
-class AsccpNodeInfo {
+export class AsccpNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   asccpId: number;
@@ -999,6 +1002,7 @@ class AsccpNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as AsccpFlatNode).asccpNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -1046,7 +1050,7 @@ export const EntityTypes: EntityType[] = [
   Attribute, Element
 ];
 
-class BccNodeInfo {
+export class BccNodeInfo {
   private _node: CcFlatNode;
   manifestId: number;
   prevBccManifestId: number;
@@ -1228,6 +1232,7 @@ class BccNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as BccpFlatNode).bccNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -1242,7 +1247,7 @@ class BccNodeInfo {
   }
 }
 
-class BccpNodeInfo {
+export class BccpNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;
@@ -1420,6 +1425,7 @@ class BccpNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as BccpFlatNode).bccpNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -1434,7 +1440,7 @@ class BccpNodeInfo {
   }
 }
 
-class DtNodeInfo {
+export class DtNodeInfo {
   private _node: BccpFlatNode;
 
   manifestId: number;
@@ -1724,7 +1730,6 @@ export class CcXbt {
 export interface DtPrimitiveAware {
   codeLists: CodeListSummary[];
   agencyIdLists: AgencyIdListSummary[];
-  xbtList: XbtSummary[];
 }
 
 export interface ValueDomainEntity {
@@ -2125,6 +2130,7 @@ export class CcDtNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as DtFlatNode).dtNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -2710,6 +2716,7 @@ export class CcDtScNodeInfo extends CcNodeInfo {
   set definition(value: string) {
     value = emptyToUndefined(value);
     this._definition = value;
+    (this._node as DtScFlatNode).dtScNode.definition = value;
     this._node.fireChangeEvent('definition', value);
   }
 
@@ -2768,6 +2775,8 @@ export class CcGraphNode {
   cardinalityMin?: number;
   cardinalityMax?: number;
   basedDtScManifestId?: number;
+  /** The definition of a component or of an association; one without a definition has no such property. */
+  definition?: string;
   locked?: boolean;
   tagList?: ShortTag[];
 }

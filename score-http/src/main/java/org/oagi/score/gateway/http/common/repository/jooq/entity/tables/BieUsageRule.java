@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbie.AsbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep.AsbiepPath;
@@ -53,7 +54,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.bie_usage_rule</code>
+     * The reference instance of <code>bie_usage_rule</code>
      */
     public static final BieUsageRule BIE_USAGE_RULE = new BieUsageRule();
 
@@ -66,52 +67,47 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     }
 
     /**
-     * The column <code>oagi.bie_usage_rule.bie_usage_rule_id</code>. Primary
-     * key of the table.
+     * The column <code>bie_usage_rule.bie_usage_rule_id</code>. Primary key of
+     * the table.
      */
-    public final TableField<BieUsageRuleRecord, ULong> BIE_USAGE_RULE_ID = createField(DSL.name("bie_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the table.");
+    public final TableField<BieUsageRuleRecord, ULong> BIE_USAGE_RULE_ID = createField(DSL.name("bie_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key of the table.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.assigned_usage_rule_id</code>.
-     * Foreign key to the USAGE_RULE table indicating the usage rule assigned to
-     * a BIE.
+     * The column <code>bie_usage_rule.assigned_usage_rule_id</code>. Foreign
+     * key to the USAGE_RULE table indicating the usage rule assigned to a BIE.
      */
     public final TableField<BieUsageRuleRecord, ULong> ASSIGNED_USAGE_RULE_ID = createField(DSL.name("assigned_usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the USAGE_RULE table indicating the usage rule assigned to a BIE.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.target_abie_id</code>. Foreign key
-     * to the ABIE table indicating the ABIE, to which the usage rule is
-     * applied.
+     * The column <code>bie_usage_rule.target_abie_id</code>. Foreign key to the
+     * ABIE table indicating the ABIE, to which the usage rule is applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ABIE_ID = createField(DSL.name("target_abie_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the ABIE table indicating the ABIE, to which the usage rule is applied.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.target_asbie_id</code>. Foreign key
-     * to the ASBIE table indicating the ASBIE, to which the usage rule is
-     * applied.
+     * The column <code>bie_usage_rule.target_asbie_id</code>. Foreign key to
+     * the ASBIE table indicating the ASBIE, to which the usage rule is applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ASBIE_ID = createField(DSL.name("target_asbie_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.target_asbiep_id</code>. Foreign key
-     * to the ASBIEP table indicating the ASBIEP, to which the usage rule is
+     * The column <code>bie_usage_rule.target_asbiep_id</code>. Foreign key to
+     * the ASBIEP table indicating the ASBIEP, to which the usage rule is
      * applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_ASBIEP_ID = createField(DSL.name("target_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.target_bbie_id</code>. Foreign key
-     * to the BBIE table indicating the BBIE, to which the usage rule is
-     * applied.
+     * The column <code>bie_usage_rule.target_bbie_id</code>. Foreign key to the
+     * BBIE table indicating the BBIE, to which the usage rule is applied.
      */
     public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIE_ID = createField(DSL.name("target_bbie_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.");
 
     /**
-     * The column <code>oagi.bie_usage_rule.target_bbiep_id</code>. Foreign key
-     * to the BBIEP table indicating the ABIEP, to which the usage rule is
-     * applied.
+     * The column <code>bie_usage_rule.target_bbiep_id</code>. Foreign key to
+     * the BBIEP table indicating the BBIEP, to which the usage rule is applied.
      */
-    public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIEP_ID = createField(DSL.name("target_bbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.");
+    public final TableField<BieUsageRuleRecord, ULong> TARGET_BBIEP_ID = createField(DSL.name("target_bbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the BBIEP table indicating the BBIEP, to which the usage rule is applied.");
 
     private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -122,21 +118,21 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.bie_usage_rule</code> table reference
+     * Create an aliased <code>bie_usage_rule</code> table reference
      */
     public BieUsageRule(String alias) {
         this(DSL.name(alias), BIE_USAGE_RULE);
     }
 
     /**
-     * Create an aliased <code>oagi.bie_usage_rule</code> table reference
+     * Create an aliased <code>bie_usage_rule</code> table reference
      */
     public BieUsageRule(Name alias) {
         this(alias, BIE_USAGE_RULE);
     }
 
     /**
-     * Create a <code>oagi.bie_usage_rule</code> table reference
+     * Create a <code>bie_usage_rule</code> table reference
      */
     public BieUsageRule() {
         this(DSL.name("bie_usage_rule"), null);
@@ -177,7 +173,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -198,7 +194,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient UsageRulePath _usageRule;
 
     /**
-     * Get the implicit join path to the <code>oagi.usage_rule</code> table.
+     * Get the implicit join path to the <code>usage_rule</code> table.
      */
     public UsageRulePath usageRule() {
         if (_usageRule == null)
@@ -210,7 +206,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
+     * Get the implicit join path to the <code>abie</code> table.
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -222,7 +218,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient AsbiePath _asbie;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbie</code> table.
+     * Get the implicit join path to the <code>asbie</code> table.
      */
     public AsbiePath asbie() {
         if (_asbie == null)
@@ -234,7 +230,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient AsbiepPath _asbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbiep</code> table.
+     * Get the implicit join path to the <code>asbiep</code> table.
      */
     public AsbiepPath asbiep() {
         if (_asbiep == null)
@@ -246,7 +242,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient BbiePath _bbie;
 
     /**
-     * Get the implicit join path to the <code>oagi.bbie</code> table.
+     * Get the implicit join path to the <code>bbie</code> table.
      */
     public BbiePath bbie() {
         if (_bbie == null)
@@ -258,7 +254,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     private transient BbiepPath _bbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.bbiep</code> table.
+     * Get the implicit join path to the <code>bbiep</code> table.
      */
     public BbiepPath bbiep() {
         if (_bbiep == null)
@@ -311,7 +307,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
      */
     @Override
     public BieUsageRule where(Condition condition) {
-        return new BieUsageRule(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new BieUsageRule(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -378,7 +374,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BieUsageRule whereExists(Select<?> select) {
+    public BieUsageRule whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -386,7 +382,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BieUsageRule whereNotExists(Select<?> select) {
+    public BieUsageRule whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

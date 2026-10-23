@@ -20,13 +20,13 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final By ADMIN_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Admin\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Admin\")]");
 
     private final By ACCOUNT_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"Account\")]//ancestor::button[1]");
+            By.xpath("//button[contains(., \"Account\")]");
 
     private final By PENDING_SSO_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"Pending SSO\")]//ancestor::button[1]");
+            By.xpath("//button[contains(., \"Pending SSO\")]");
 
     public AdminMenuImpl(BasePageImpl delegate) {
         super(delegate);

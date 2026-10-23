@@ -6,14 +6,98 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator
 
 from fastapi import HTTPException
+from fastmcp import Context
 from fastmcp.exceptions import ToolError
+from fastmcp.server.elicitation import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+)
 from fastmcp.server.dependencies import get_access_token as get_fastmcp_access_token
+from mcp.types import ElicitRequest, ElicitRequestFormParams, InputRequiredResult
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_sessionmaker
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.security import AuthenticatedUser, OAuth2Identity, _build_user_summary
 from app.settings import settings
+
+
+class ConfirmationForm(BaseModel):
+    # Empty elicitation form: the user only accepts, declines, or cancels.
+    # (No docstring: it would be published as the form's description.)
+    pass
+
+
+_FORM_KEY = "form"
+_MODERN_PROTOCOL_VERSION = "2026-07-28"  # ISO dates, so string comparison orders versions
+
+Elicitation = AcceptedElicitation[Any] | DeclinedElicitation | CancelledElicitation
+
+
+async def elicit_form(
+    ctx: Context, message: str, response_type: type[BaseModel]
+) -> Elicitation | InputRequiredResult:
+    """Ask the user to fill in a form described by ``response_type``.
+
+    Handshake-era connections (up to 2025-11-25) pause the tool and ask over the session. The
+    modern protocol (2026-07-28) has no such back-channel, so the tool must return the
+    ``InputRequiredResult`` this function yields; the client answers and calls the tool again.
+    Callers therefore return an ``InputRequiredResult`` unchanged instead of continuing.
+
+    Clients may accept without sending any form content; that is still an acceptance.
+
+    Args:
+        ctx: FastMCP tool context used to send the elicitation.
+        message: Question shown to the user.
+        response_type: Model describing the requested form fields.
+
+    Returns:
+        The user's accepted, declined, or cancelled answer, or the request to send to the client.
+    """
+    request_context = ctx.request_context
+    if request_context is not None and request_context.protocol_version >= _MODERN_PROTOCOL_VERSION:
+        answer = (ctx.input_responses or {}).get(_FORM_KEY)
+        if answer is None:
+            schema = response_type.model_json_schema()
+            form = ElicitRequestFormParams(
+                message=message,
+                requested_schema={key: value for key, value in schema.items() if key in ("type", "properties", "required")},
+            )
+            return InputRequiredResult(
+                result_type="input_required",
+                input_requests={_FORM_KEY: ElicitRequest(method="elicitation/create", params=form)},
+            )
+        if answer.action == "accept":
+            try:
+                return AcceptedElicitation(data=response_type.model_validate(answer.content or {}))
+            except ValidationError:
+                return DeclinedElicitation()
+        return DeclinedElicitation() if answer.action == "decline" else CancelledElicitation()
+    try:
+        return await ctx.elicit(message=message, response_type=response_type)
+    except ValidationError:
+        return AcceptedElicitation(data=response_type.model_construct())
+
+
+class ConfirmationForm(BaseModel):
+    # Empty elicitation form: the user only accepts, declines, or cancels.
+    # (No docstring: it would be published as the form's description.)
+    pass
+
+
+async def elicit_confirmation(ctx: Context, message: str) -> Elicitation | InputRequiredResult:
+    """Ask the user to confirm an action through an empty form (see :func:`elicit_form`).
+
+    Args:
+        ctx: FastMCP tool context used to send the elicitation.
+        message: Question shown to the user.
+
+    Returns:
+        The user's accepted, declined, or cancelled answer, or the request to send to the client.
+    """
+    return await elicit_form(ctx, message, ConfirmationForm)
 
 
 def tool_error_detail(detail: Any) -> str:

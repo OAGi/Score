@@ -1,19 +1,11 @@
-<div class="d-block">
-  @if (isUpdating) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>{{ title }}</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content" mat-dialog-content>
-    <div class="row m-0" (window:resize)="onResize($event)">
+<score-dialog-page title="{{ title }}">
+  <div class="content dialog-form position-relative">
+    @if (isUpdating) {
+      <div class="dialog-loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+    }
+    <div class="row m-0" [style.visibility]="isUpdating ? 'hidden' : null" (window:resize)="onResize($event)">
       <div class="col-12 p-0">
         <mat-card class="cc-node-tree-panel">
           <mat-card-content class="mat-card-container">
@@ -57,4 +49,4 @@
       </div>
     </div>
   </div>
-</div>
+</score-dialog-page>

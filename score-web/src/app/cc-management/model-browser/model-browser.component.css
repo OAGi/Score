@@ -1,226 +1,14 @@
-/* Issue #1638 — drag&drop sibling reorder */
-.dragHandle {
-  cursor: grab;
-  color: rgba(0, 0, 0, 0.4);
-}
-
-.cdk-drag:not(.cdk-drag-disabled):active .dragHandle {
-  cursor: grabbing;
-}
-
-.dragPlaceholder {
-  background: #e8eaf6;
-  border: dashed 2px #9fa8da;
-  min-height: 33px;
-}
-
 /* The drop slot is shown red when dropping at the current position would be invalid
    (cross-level, or attribute<->element/ASCCP crossing) — issue #1638. */
-.dragPlaceholder.dragPlaceholder-invalid {
-  background: rgba(211, 47, 47, 0.18);
-  border-color: rgba(211, 47, 47, 0.75);
-}
-
 /* Small badge to the right of the cardinality showing a sibling's custom order weight — issue #1638. */
-.order-weight-badge {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 9px;
-  background: rgba(63, 81, 181, 0.12);
-  color: #3f51b5;
-  font-size: 11px;
-  line-height: 18px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: default;
-}
-
-.cdk-drag-preview {
-  background: #fff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  opacity: 0.95;
-  /* let elementFromPoint() during drag hit the row beneath the cursor, not the preview clone */
-  pointer-events: none;
-}
-
-.cdk-drag-animating {
-  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
-}
-
 .node-progress-bar {
   margin-left: 30px;
-}
-
-.mat-tree-node {
-  font-size: 13px;
-  min-height: 33px;
-  font-family: Roboto;
-  align-items: center;
-}
-
-.mat-tree-node .deprecated, .mat-option .deprecated {
-  text-decoration: line-through;
-  background-color: #ececec;
-}
-
-.mat-tree-node .material-icons {
-  font-size: 20px;
-}
-
-.mat-tree-node .mat-icon-button {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  outline: none;
-}
-
-.choice-branch-guide {
-  display: inline-block;
-  position: relative;
-  width: 16px;
-  min-width: 16px;
-  height: 33px;
-  left: calc(-1 * var(--choice-guide-extra-offset, 0px));
-  margin-left: -16px;
-  margin-right: 0;
-  padding-right: 0 !important;
-  overflow: visible;
-}
-
-.mat-tree-node > span.choice-branch-guide {
-  cursor: default;
-  margin-right: 0;
-}
-
-.choice-branch-guide::before,
-.choice-branch-guide::after {
-  content: '';
-  position: absolute;
-  background-color: #c62828;
-}
-
-.choice-branch-guide::before {
-  left: 7px;
-  top: 0;
-  bottom: 0;
-  width: 0.5px;
-}
-
-.choice-branch-guide::after {
-  left: 7px;
-  top: 16px;
-  width: 10px;
-  height: 0.5px;
-}
-
-.choice-branch-guide.choice-branch-guide-first::before {
-  top: 16px;
-}
-
-.choice-branch-guide.choice-branch-guide-only::before,
-.choice-branch-guide.choice-branch-guide-last::before {
-  bottom: 15px;
-}
-
-.choice-branch-guide.choice-branch-guide-only::before {
-  display: none;
-}
-
-.choice-branch-guide-continue::after {
-  display: none;
-}
-
-.mat-tree-node div {
-  height: 16px;
-}
-
-.mat-tree-node > span {
-  cursor: pointer;
-  padding-right: 2px !important;
-  margin-right: 10px;
-}
-
-.mat-tree-node .acc, .mat-tree-node .asccp, .mat-tree-node .asccp-extension {
-  color: #4078c0 !important;
-  font-weight: bold !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bccp {
-  color: #006400 !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bccp-attribute {
-  color: #666 !important;
-  font-style: italic !important;
-  text-shadow: inherit !important;
-}
-
-.mat-tree-node .bdt_sc {
-  color: #bd2c00 !important;
-  text-shadow: inherit !important;
 }
 
 .sticky {
   position: sticky;
   position: -webkit-sticky;
   top: 10px;
-}
-
-.bie-node-header {
-  display: block;
-  padding: 4px 10px 5px;
-  margin: 0px;
-  font-size: 14px;
-  line-height: 17px;
-  background-color: #f5f5f5;
-  border: 1px solid #e5e5e5;
-  border-radius: 3px;
-  color: #333;
-  font-weight: 600;
-  -webkit-margin-before: 1em;
-  -webkit-margin-after: 1em;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-}
-
-.bie-node-header span, .mat-tree-node span {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 {
-  min-width: 0;
-  width: 100%;
-}
-
-.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > span:first-child {
-  min-width: 0;
-  flex: 0 1 auto;
-}
-
-.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > span.ps-4,
-.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > .ms-auto.me-2 {
-  flex: 0 0 auto;
-}
-
-.mat-tree-node > .d-inline-flex.align-items-center.flex-grow-1 > .ms-auto.me-2 {
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
-}
-
-.bie-node-title {
-  display: flex;
-  margin: 5px 0;
 }
 
 .comment.mat-icon {
@@ -231,65 +19,12 @@
   margin-left: 8px;
 }
 
-.bie-node-tree-panel {
-  margin-bottom: 4px;
-  padding: 8px;
-}
-
-.bie-node-tree-panel mat-card-content {
-  margin-bottom: 0;
-}
-
-.bie-edit-detail-container {
-  padding: 1.25em;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-top: 0;
-  background-color: white;
-}
-
-.bie-edit-detail-container {
-  padding: 10px 15px;
-}
-
-.bie-edit-detail-container div.checkbox {
-  padding: 8px 0 18px 0;
-}
-
-.bie-edit-detail-panel {
-  padding: 0 12px;
-}
-
-.left-panel, .right-panel {
-  margin-bottom: 0;
-}
-
 .external-link {
   cursor: pointer;
 }
 
 .mt-24 {
   margin-top: 24px;
-}
-
-.tree-search-box {
-  align-items: center;
-}
-
-.tree-search-box .mat-form-field-wrapper {
-  padding: 0 !important;
-}
-
-.tree-search-box .mat-mdc-form-field {
-  font-size: 12px;
-}
-
-.tree-search-box .mat-form-field-wrapper {
-  width: 16px;
-  padding-bottom: 0;
-}
-
-.tree-search-box .mat-icon {
-  cursor: pointer;
 }
 
 .ui.header {
@@ -302,59 +37,10 @@
   cursor: pointer;
 }
 
-.search-box-container {
-  padding: 0;
-}
-
-.dragHandle {
-  margin-left: auto;
-  cursor: grab;
-}
-
-.cdk-drag:not(.cdk-drag-disabled):active .dragHandle {
-  cursor: grabbing;
-}
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.cdk-drop-list-dragging .mat-tree-node:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.dragPlaceholder {
-  background: #ccc;
-  border: dashed 2px #999;
-  min-height: 33px;
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.bie-edit-header {
-  display: block;
-  padding: 4px 10px 5px;
-  margin: 0px;
-  font-size: 14px;
-  line-height: 17px;
-  background-color: #f5f5f5;
-  border: 1px solid #e5e5e5;
-  border-radius: 3px;
-  color: #333;
-  font-weight: 600;
-  -webkit-margin-before: 1em;
-  -webkit-margin-after: 1em;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-}
-
 .form-field-box {
   padding-bottom: 16px;
 }
 
-
-.bie-edit-detail-panel {
-  padding: 0 12px;
-}
 
 .detail-reused {
   border: 1px solid #c8c8c8;

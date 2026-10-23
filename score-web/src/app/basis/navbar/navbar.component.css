@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .header {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -9,6 +14,27 @@
 .score-navbar .dropdown-menu, .score-navbar a {
   font-size: 13px;
   color: #333;
+}
+
+mat-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mat-toolbar-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.mat-toolbar-row button,
+.navbar-brand,
+.mat-toolbar-row a,
+.mat-toolbar-row mat-icon {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
 }
 
 mat-toolbar button:focus, .mat-mdc-menu-item:focus {
@@ -68,4 +94,167 @@ mat-toolbar button:focus, .mat-mdc-menu-item:focus {
 
 .notIcon {
   vertical-align: middle;
+}
+
+.hamburger-button {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.nist-logo {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Side Sidenav (Drawer) styles */
+.nav-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: navDrawerFadeIn 0.2s ease;
+}
+
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  max-width: 85vw;
+  height: 100vh;
+  background-color: #ffffff;
+  color: #212529;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.25);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  animation: navDrawerSlideIn 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+@keyframes navDrawerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes navDrawerSlideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.nav-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  min-height: 56px;
+  box-sizing: border-box;
+}
+
+.nav-drawer-header .nav-drawer-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.nav-drawer-body mat-accordion {
+  display: block;
+}
+
+.nav-drawer-body .mat-expansion-panel,
+.nav-drawer-body .mat-expansion-panel.mat-expanded,
+.nav-drawer-body .mat-expansion-panel.mat-expansion-panel-spacing,
+.nav-drawer-body .mat-expansion-panel:first-of-type,
+.nav-drawer-body .mat-expansion-panel:last-of-type {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #f0f0f0;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.nav-drawer-body .mat-expansion-panel:last-of-type,
+.nav-drawer-body .mat-expansion-panel:last-child {
+  border-bottom: none !important;
+}
+
+.nav-drawer-body .mat-expansion-panel-header,
+.nav-drawer-body .mat-expansion-panel-header.mat-expanded {
+  padding: 0 16px;
+  height: 48px !important;
+  min-height: 48px !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: #212529;
+}
+
+.nav-drawer-body .mat-expansion-panel-body,
+.nav-drawer-body ::ng-deep .mat-expansion-panel-body {
+  padding: 0 8px 0 8px !important;
+  padding-bottom: 0 !important;
+}
+
+.drawer-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.drawer-item {
+  width: 100%;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  font-size: 13px !important;
+  color: #495057;
+  padding: 0 12px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  border-radius: 4px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.drawer-item:hover:not(:disabled):not([disabled]) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.drawer-item:disabled,
+.drawer-item[disabled],
+.drawer-item[disabled="true"],
+.drawer-item[aria-disabled="true"],
+.drawer-item.mat-mdc-button-disabled {
+  color: rgba(0, 0, 0, 0.38) !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  background-color: transparent !important;
+}
+
+.drawer-item:disabled ::ng-deep *,
+.drawer-item[disabled] ::ng-deep *,
+.drawer-item[aria-disabled="true"] ::ng-deep *,
+.drawer-item.mat-mdc-button-disabled ::ng-deep * {
+  color: rgba(0, 0, 0, 0.38) !important;
+}
+
+.drawer-direct-item {
+  padding: 4px 8px;
+  border-bottom: 1px solid #f0f0f0;
 }

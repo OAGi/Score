@@ -6,6 +6,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.release.ReleaseAssignmentPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
@@ -131,6 +132,13 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
 
         click(elementToBeClickable(getDriver(), CONTINUE_CREATE_BUTTON_IN_DIALOG_LOCATOR));
         invisibilityOfLoadingContainerElement(getDriver());
+        // The draft is made on the server: the page leaves the assignment screen, or it shows why it did not.
+        try {
+            PageHelper.wait(getDriver(), Duration.ofSeconds(60L), ofMillis(200L)).until(driver ->
+                    !driver.getCurrentUrl().contains("/assign")
+                            || !driver.findElements(By.cssSelector(".errors .message")).isEmpty());
+        } catch (TimeoutException ignored) {
+        }
     }
 
     @Override

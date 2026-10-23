@@ -56,6 +56,43 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
     }
 
     @Override
+    public List<CodeListSummaryRecord> getCodeListSummaryListByManifestIds(Collection<CodeListManifestId> codeListManifestIds) {
+        if (codeListManifestIds == null || codeListManifestIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetCodeListSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.in(valueOf(codeListManifestIds)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public Map<CodeListManifestId, ReleaseId> getCodeListReleaseIds(Collection<CodeListManifestId> codeListManifestIds) {
+        if (codeListManifestIds == null || codeListManifestIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<CodeListManifestId, ReleaseId> releaseIds = new HashMap<>();
+        dslContext().select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.RELEASE_ID)
+                .from(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.in(valueOf(codeListManifestIds)))
+                .forEach(r -> releaseIds.put(new CodeListManifestId(r.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()),
+                        new ReleaseId(r.get(CODE_LIST_MANIFEST.RELEASE_ID).toBigInteger())));
+        return releaseIds;
+    }
+
+    @Override
+    public ReleaseId getCodeListReleaseId(CodeListManifestId codeListManifestId) {
+        if (codeListManifestId == null) {
+            return null;
+        }
+        ULong releaseId = dslContext().select(CODE_LIST_MANIFEST.RELEASE_ID)
+                .from(CODE_LIST_MANIFEST)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
+                .fetchOne(CODE_LIST_MANIFEST.RELEASE_ID);
+        return (releaseId != null) ? new ReleaseId(releaseId.toBigInteger()) : null;
+    }
+
+    @Override
     public CodeListSummaryRecord getCodeListSummary(CodeListManifestId codeListManifestId) {
         if (codeListManifestId == null) {
             return null;
@@ -759,7 +796,8 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                             CODE_LIST_VALUE.LAST_UPDATE_TIMESTAMP,
 
                             CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID,
-                            CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID
+                            CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(CODE_LIST_VALUE_MANIFEST)
                     .join(CODE_LIST_MANIFEST).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
@@ -784,7 +822,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         record.get(CODE_LIST_VALUE.MEANING),
                         new Definition(record.get(CODE_LIST_VALUE.DEFINITION), record.get(CODE_LIST_VALUE.DEFINITION_SOURCE)),
                         (byte) 1 == record.get(CODE_LIST_VALUE.IS_DEPRECATED),
-                        isUsed(codeListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
                         CcState.valueOf(record.get(CODE_LIST.STATE)),
 
                         fetchOwnerSummary(record),
@@ -825,18 +863,26 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         .fetchOneInto(Integer.class) > 0;
     }
 
-    private boolean isUsed(CodeListValueManifestId codeListValueManifestId) {
-        return dslContext().selectCount()
-                .from(CODE_LIST_VALUE_MANIFEST)
-                .where(CODE_LIST_VALUE_MANIFEST.BASED_CODE_LIST_VALUE_MANIFEST_ID.eq(valueOf(codeListValueManifestId)))
-                .fetchOneInto(Integer.class) > 0 ||
-                dslContext().selectCount()
-                        .from(CTX_SCHEME)
-                        .join(CODE_LIST).on(CTX_SCHEME.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
-                        .join(CODE_LIST_MANIFEST).on(CODE_LIST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_ID))
-                        .join(CODE_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID))
-                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID.eq(valueOf(codeListValueManifestId)))
-                        .fetchOneInto(Integer.class) > 0;
+    private static final String VALUE_USED_FIELD_NAME = "used";
+
+    private Field<Boolean> valueUsedField() {
+        var valueManifestId =
+                CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID;
+
+        var based = CODE_LIST_VALUE_MANIFEST.as("based_value_manifest");
+        var replacement = CODE_LIST_VALUE_MANIFEST.as("replacement_value_manifest");
+
+        return field(
+                exists(selectOne()
+                        .from(based)
+                        .where(based.BASED_CODE_LIST_VALUE_MANIFEST_ID
+                                .eq(valueManifestId)))
+                        .or(exists(selectOne()
+                                .from(replacement)
+                                .where(replacement.REPLACEMENT_CODE_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId)))
+                        )
+        ).as(VALUE_USED_FIELD_NAME);
     }
 
     private List<CodeListValueDetailsRecord> getPrevCodeListValueDetailsList(
@@ -867,7 +913,8 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                             CODE_LIST_VALUE.as("prev").LAST_UPDATE_TIMESTAMP,
 
                             CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID,
-                            CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID
+                            CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(CODE_LIST_VALUE_MANIFEST)
                     .join(CODE_LIST_MANIFEST).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
@@ -899,7 +946,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         record.get(CODE_LIST_VALUE.as("prev").MEANING),
                         new Definition(record.get(CODE_LIST_VALUE.as("prev").DEFINITION), record.get(CODE_LIST_VALUE.as("prev").DEFINITION_SOURCE)),
                         (byte) 1 == record.get(CODE_LIST_VALUE.as("prev").IS_DEPRECATED),
-                        isUsed(codeListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
                         CcState.valueOf(record.get(CODE_LIST.as("prev_code_list").STATE)),
 
                         fetchOwnerSummary(record),
@@ -978,6 +1025,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .leftJoin(CODE_LIST_MANIFEST.as("based_code_list_manifest")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                    .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .leftJoin(MODULE_CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
@@ -1073,7 +1121,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         break;
 
                     case "agencyId":
-                        field = AGENCY_ID_LIST_VALUE.NAME;
+                        field = AGENCY_ID_LIST_VALUE.VALUE;
                         break;
 
                     case "version":

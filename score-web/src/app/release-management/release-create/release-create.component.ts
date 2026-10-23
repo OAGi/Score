@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -17,6 +17,7 @@ import {loadLibrary, saveLibrary} from '../../common/utility';
   standalone: false,
   selector: 'score-release-list',
   templateUrl: './release-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./release-create.component.css']
 })
 export class ReleaseCreateComponent implements OnInit {

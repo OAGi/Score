@@ -84,7 +84,8 @@ from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.biz_ctx_service import BizCtxService
 from app.services.ctx_scheme_service import CtxSchemeService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, tool_session
 from app.tools.models.biz_ctx import (
     BizCtxResponseEntry,
     CreateBizCtxResponse,
@@ -943,13 +944,15 @@ async def delete_business_context(
         biz_ctx_name = row.name or f"business context {biz_ctx_id}"
 
         # Create confirmation message with business-context details.
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{biz_ctx_name}' business context?\n\n"
                 "It will be permanently removed.\n"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         # Check whether the user confirmed the deletion.
         match elicit_result:
@@ -959,7 +962,10 @@ async def delete_business_context(
                     raise ToolError(
                         f"The business context with ID {biz_ctx_id} was not found. Please check the ID and try again."
                     )
-                return DeleteBizCtxResponse(biz_ctx_id=biz_ctx_id)
+                return DeleteBizCtxResponse(
+                    biz_ctx_id=biz_ctx_id,
+                    message=f"Deleted business context '{biz_ctx_name}' (biz_ctx_id={biz_ctx_id}).",
+                )
             case DeclinedElicitation():
                 return DeleteBizCtxResponse(biz_ctx_id=None, message="Deletion declined by user")
             case CancelledElicitation():
@@ -1052,13 +1058,15 @@ async def delete_business_context_value(
         )
 
         # Create confirmation message with business-context value details.
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{ctx_scheme_value_name}' from '{biz_ctx_name}' business context?\n\n"
                 "It will be permanently removed.\n"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         # Check whether the user confirmed the deletion.
         match elicit_result:
@@ -1068,7 +1076,13 @@ async def delete_business_context_value(
                     raise ToolError(
                         f"The business context value with ID {biz_ctx_value_id} was not found. Please check the ID and try again."
                     )
-                return DeleteBizCtxValueResponse(biz_ctx_value_id=biz_ctx_value_id)
+                return DeleteBizCtxValueResponse(
+                    biz_ctx_value_id=biz_ctx_value_id,
+                    message=(
+                        f"Deleted '{ctx_scheme_value_name}' from business context '{biz_ctx_name}' "
+                        f"(biz_ctx_value_id={biz_ctx_value_id})."
+                    ),
+                )
             case DeclinedElicitation():
                 return DeleteBizCtxValueResponse(biz_ctx_value_id=None, message="Deletion declined by user")
             case CancelledElicitation():

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {finalize} from 'rxjs/operators';
@@ -15,6 +15,7 @@ import {ReplaySubject} from 'rxjs';
   standalone: false,
   selector: 'score-module-edit-dialog',
   templateUrl: './module-edit-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-edit-dialog.component.css']
 })
 export class ModuleEditDialogComponent implements OnInit {

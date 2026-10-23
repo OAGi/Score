@@ -44,7 +44,7 @@ public class TransferBIEOwnershipDialogImpl extends SearchBarPageImpl implements
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]/span"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]//span"));
     }
 
     @Override

@@ -1,0 +1,66 @@
+<div class="tree-search-box">
+  <div class="tree-search-controls">
+    <div class="tree-search-input">
+      <mat-form-field>
+        <mat-label>{{ scopeLabel ? 'Search > ' + scopeLabel : 'Search' }}</mat-label>
+        <input matInput #searchInput type="search" [(ngModel)]="searcher.inputKeyword"
+          autocomplete="off" spellcheck="false"
+          [matAutocomplete]="suggest" [matAutocompleteDisabled]="suggestions.length === 0"
+          [disabled]="searcher.isSearching"
+          (blur)="onBlur()" (input)="updateSuggestions()" (focus)="updateSuggestions()" (click)="updateSuggestions()"
+          (keyup.arrowleft)="updateSuggestions()" (keyup.arrowright)="updateSuggestions()"
+          (keyup.enter)="onEnter(searcher.inputKeyword)">
+        <mat-autocomplete #suggest="matAutocomplete" class="tree-search-suggestions" [autoActiveFirstOption]="false" [panelWidth]="panelWidth"
+          (optionSelected)="onSuggestionSelected($event)">
+          @for (s of suggestions; track s.suggestion.label) {
+            <mat-option [value]="s.expression" [title]="s.suggestion.detail">
+              <span class="tree-search-suggestion-label">{{ s.suggestion.label }}</span>
+              <span class="tree-search-suggestion-detail">{{ s.suggestion.detail }}</span>
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (searcher.isSearching) {
+          <mat-hint matSuffix class="tree-search-count" align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}+ {{ searcher.searchedUnit }}</span>}</mat-hint>
+        }
+        @if (!searcher.isSearching && searcher.searchKeyword && searcher.resultCount > 0) {
+          <mat-hint matSuffix class="tree-search-count" align="end">{{searcher.searchIndex + 1}}/{{searcher.resultCount}}{{ searcher.fullSearched ? '' : '+' }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}{{ searcher.fullSearched ? '' : '+' }} {{ searcher.searchedUnit }}</span>}</mat-hint>
+        }
+        @if (!searcher.isSearching && searcher.searchKeyword && !searcher.fullSearched && searcher.resultCount === 0) {
+          <mat-hint matSuffix class="tree-search-count" align="end">0 results@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }} {{ searcher.searchedUnit }}</span>}</mat-hint>
+        }
+        @if (!searcher.isSearching && searcher.searchKeyword && searcher.fullSearched && searcher.resultCount === 0) {
+          <mat-hint matSuffix class="tree-search-count" align="end">0 results</mat-hint>
+        }
+      </mat-form-field>
+    </div>
+    <div class="tree-search-buttons">
+      <button mat-icon-button mat-medium-icon-button type="button" aria-label="Previous search result"
+        [disabled]="searcher.isSearching || searcher.resultCount === 0"
+        (click)="onMove(-1)">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+      <button mat-icon-button mat-medium-icon-button type="button" aria-label="Next search result"
+        [disabled]="searcher.isSearching || searcher.resultCount === 0"
+        (click)="onMove(1)">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+      <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-submit" [attr.aria-label]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more' : 'Search'"
+        [hidden]="searcher.fullSearched"
+        [disabled]="searcher.isSearching"
+        [matTooltip]="(searcher.searchKeyword && !searcher.fullSearched) ? 'Search more...' : 'Search'"
+        (click)="onSearch(searcher.inputKeyword, false, true)">
+        <mat-icon>{{ (searcher.searchKeyword && !searcher.fullSearched) ? 'repeat' : 'search' }}</mat-icon>
+      </button>
+      <button mat-icon-button mat-medium-icon-button type="button" class="tree-search-clear" aria-label="Clear search"
+        [disabled]="searcher.isSearching"
+        [hidden]="!searcher.inputKeyword"
+        (click)="searcher.inputKeyword = ''; searcher.resetSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <ng-content select="[treeSearchSettings]"></ng-content>
+  </div>
+  @if (searcher.expressionError) {
+    <div class="tree-search-error" role="alert">{{ searcher.expressionError }}</div>
+  }
+</div>

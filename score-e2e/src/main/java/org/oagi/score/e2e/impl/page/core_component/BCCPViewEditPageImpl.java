@@ -388,12 +388,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new BCCPPanelContainer() {
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new BCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
+                    return new DTPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[3]");
                 }
             };
         });
@@ -428,7 +428,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+            return new ACCPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[1]");
         });
     }
 
@@ -440,12 +440,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
-                    return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new ASCCPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[1]");
                 }
 
                 @Override
                 public ASCCPPanel getASCCPPanel() {
-                    return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new ASCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
                 }
             };
         });
@@ -499,17 +499,17 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {
-                    return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new BCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCC\"]]");
                 }
 
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCCP\"]]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
+                    return new DTPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BDT\"]]");
                 }
             };
         });
@@ -573,17 +573,20 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//input | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]//input | " +
+                baseXPath + "//input[contains(@placeholder, \"" + name + "\")]"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//mat-select | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]/mat-select"));
     }
 
     private WebElement getCheckboxByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+                baseXPath + "//mat-checkbox[contains(., \"" + name + "\")]"));
     }
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {

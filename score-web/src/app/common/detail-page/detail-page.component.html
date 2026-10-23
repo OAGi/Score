@@ -1,0 +1,31 @@
+<score-base-page [title]="title" [subtitle]="subtitle" [toolbarClass]="toolbarClass" [spacer]="spacer"
+  [loading]="loading">
+  <ng-container ngProjectAs="[baseTitle]">
+    <ng-content select="[detailTitle]"></ng-content>
+  </ng-container>
+  <ng-container ngProjectAs="[baseActions]">
+    <ng-content select="[detailToolbar]"></ng-content>
+  </ng-container>
+
+  <ng-content></ng-content>
+
+  @if (showActions) {
+    <div class="row action-group m-0">
+      <div class="{{ actionsColumn }} actions-wrap">
+        @if (actionsWrapper) {
+          <div class="actions">
+            <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+          </div>
+        } @else {
+          <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+        }
+      </div>
+    </div>
+  }
+
+  <ng-content select="[detailAfterActions]"></ng-content>
+</score-base-page>
+
+<ng-template #actionButtons>
+  <ng-content select="[detailActions]"></ng-content>
+</ng-template>

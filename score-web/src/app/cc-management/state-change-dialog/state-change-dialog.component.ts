@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChildren, inject} from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, ViewChildren, inject, ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -8,6 +8,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MarkdownComponent} from 'ngx-markdown';
+import {DialogPageComponent} from '../../common/dialog-page/dialog-page.component';
 import {GithubIntegrationService, GithubStatus, LinkedIssue, ProjectField, ProjectFieldOption, IssueRepoAccess} from '../domain/github-integration.service';
 import {LogService} from '../../log-management/domain/log.service';
 import {candidatePost, cancelPost, revertPost} from './github-status-post-renderer';
@@ -87,9 +88,10 @@ const OCTICON_PATHS: { [name: string]: string } = {
   standalone: true,
   selector: 'score-state-change-dialog',
   imports: [CommonModule, FormsModule, MatDialogModule,
-    MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent],
+    MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent, DialogPageComponent],
   providers: [LogService],
   templateUrl: './state-change-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./state-change-dialog.component.css'],
 })
 export class StateChangeDialogComponent implements OnInit {

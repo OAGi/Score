@@ -30,8 +30,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Release.ReleasePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseDepRecord;
 
@@ -45,7 +45,7 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.release_dep</code>
+     * The reference instance of <code>release_dep</code>
      */
     public static final ReleaseDep RELEASE_DEP = new ReleaseDep();
 
@@ -58,20 +58,20 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
     }
 
     /**
-     * The column <code>oagi.release_dep.release_dep_id</code>. Primary,
-     * internal database key.
+     * The column <code>release_dep.release_dep_id</code>. Primary, internal
+     * database key.
      */
     public final TableField<ReleaseDepRecord, ULong> RELEASE_DEP_ID = createField(DSL.name("release_dep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.release_dep.release_id</code>. A foreign key
-     * pointing to a release record.
+     * The column <code>release_dep.release_id</code>. A foreign key pointing to
+     * a release record.
      */
     public final TableField<ReleaseDepRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to a release record.");
 
     /**
-     * The column <code>oagi.release_dep.depend_on_release_id</code>. A foreign
-     * key pointing to dependent release records of the release specified in
+     * The column <code>release_dep.depend_on_release_id</code>. A foreign key
+     * pointing to dependent release records of the release specified in
      * release_id.
      */
     public final TableField<ReleaseDepRecord, ULong> DEPEND_ON_RELEASE_ID = createField(DSL.name("depend_on_release_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to dependent release records of the release specified in release_id.");
@@ -85,21 +85,21 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.release_dep</code> table reference
+     * Create an aliased <code>release_dep</code> table reference
      */
     public ReleaseDep(String alias) {
         this(DSL.name(alias), RELEASE_DEP);
     }
 
     /**
-     * Create an aliased <code>oagi.release_dep</code> table reference
+     * Create an aliased <code>release_dep</code> table reference
      */
     public ReleaseDep(Name alias) {
         this(alias, RELEASE_DEP);
     }
 
     /**
-     * Create a <code>oagi.release_dep</code> table reference
+     * Create a <code>release_dep</code> table reference
      */
     public ReleaseDep() {
         this(DSL.name("release_dep"), null);
@@ -140,7 +140,7 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -161,8 +161,8 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
     private transient ReleasePath _releaseDepDependOnReleaseIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.release</code> table, via
-     * the <code>release_dep_depend_on_release_id_fk</code> key.
+     * Get the implicit join path to the <code>release</code> table, via the
+     * <code>release_dep_depend_on_release_id_fk</code> key.
      */
     public ReleasePath releaseDepDependOnReleaseIdFk() {
         if (_releaseDepDependOnReleaseIdFk == null)
@@ -174,8 +174,8 @@ public class ReleaseDep extends TableImpl<ReleaseDepRecord> {
     private transient ReleasePath _releaseDepReleaseIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.release</code> table, via
-     * the <code>release_dep_release_id_fk</code> key.
+     * Get the implicit join path to the <code>release</code> table, via the
+     * <code>release_dep_release_id_fk</code> key.
      */
     public ReleasePath releaseDepReleaseIdFk() {
         if (_releaseDepReleaseIdFk == null)

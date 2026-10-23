@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {interval, mergeMap, Subject, takeUntil} from 'rxjs';
 import {ModuleService} from '../../../domain/module.service';
@@ -11,6 +11,7 @@ import {HttpErrorResponse} from '@angular/common/http';
   standalone: false,
   selector: 'score-module-set-release-validation-dialog',
   templateUrl: './module-set-release-validation-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-release-validation-dialog.component.css']
 })
 export class ModuleSetReleaseValidationDialogComponent implements OnInit {

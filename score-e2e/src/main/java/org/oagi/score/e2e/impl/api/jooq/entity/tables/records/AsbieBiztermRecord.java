@@ -22,7 +22,7 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.asbie_bizterm_id</code>. An internal,
+     * Setter for <code>asbie_bizterm.asbie_bizterm_id</code>. An internal,
      * primary database key of an asbie_bizterm record.
      */
     public void setAsbieBiztermId(ULong value) {
@@ -30,7 +30,7 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.asbie_bizterm_id</code>. An internal,
+     * Getter for <code>asbie_bizterm.asbie_bizterm_id</code>. An internal,
      * primary database key of an asbie_bizterm record.
      */
     public ULong getAsbieBiztermId() {
@@ -38,89 +38,89 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.ascc_bizterm_id</code>. An internal
-     * ID of the ascc_business_term record.
+     * Setter for <code>asbie_bizterm.ascc_bizterm_id</code>. An internal ID of
+     * the ascc_business_term record.
      */
     public void setAsccBiztermId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.ascc_bizterm_id</code>. An internal
-     * ID of the ascc_business_term record.
+     * Getter for <code>asbie_bizterm.ascc_bizterm_id</code>. An internal ID of
+     * the ascc_business_term record.
      */
     public ULong getAsccBiztermId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.asbie_id</code>. An internal ID of
-     * the associated ASBIE
+     * Setter for <code>asbie_bizterm.asbie_id</code>. An internal ID of the
+     * associated ASBIE
      */
     public void setAsbieId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.asbie_id</code>. An internal ID of
-     * the associated ASBIE
+     * Getter for <code>asbie_bizterm.asbie_id</code>. An internal ID of the
+     * associated ASBIE
      */
     public ULong getAsbieId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned ASBIE.
+     * Setter for <code>asbie_bizterm.primary_indicator</code>. The indicator
+     * shows if the business term is primary for the assigned ASBIE.
      */
     public void setPrimaryIndicator(Byte value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned ASBIE.
+     * Getter for <code>asbie_bizterm.primary_indicator</code>. The indicator
+     * shows if the business term is primary for the assigned ASBIE.
      */
     public Byte getPrimaryIndicator() {
         return (Byte) get(3);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.type_code</code>. The type code of
-     * the assignment.
+     * Setter for <code>asbie_bizterm.type_code</code>. The type code of the
+     * assignment.
      */
     public void setTypeCode(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.type_code</code>. The type code of
-     * the assignment.
+     * Getter for <code>asbie_bizterm.type_code</code>. The type code of the
+     * assignment.
      */
     public String getTypeCode() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the asbie_bizterm record. The creator
-     * of the asbie_bizterm is also its owner by default.
+     * Setter for <code>asbie_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the asbie_bizterm record. The creator of the
+     * asbie_bizterm is also its owner by default.
      */
     public void setCreatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the asbie_bizterm record. The creator
-     * of the asbie_bizterm is also its owner by default.
+     * Getter for <code>asbie_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the asbie_bizterm record. The creator of the
+     * asbie_bizterm is also its owner by default.
      */
     public ULong getCreatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.last_updated_by</code>. A foreign key
+     * Setter for <code>asbie_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the asbie_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
@@ -129,7 +129,7 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.last_updated_by</code>. A foreign key
+     * Getter for <code>asbie_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the asbie_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
@@ -138,23 +138,23 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the asbie_bizterm record was first created.
+     * Setter for <code>asbie_bizterm.creation_timestamp</code>. Timestamp when
+     * the asbie_bizterm record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the asbie_bizterm record was first created.
+     * Getter for <code>asbie_bizterm.creation_timestamp</code>. Timestamp when
+     * the asbie_bizterm record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>oagi.asbie_bizterm.last_update_timestamp</code>. The
+     * Setter for <code>asbie_bizterm.last_update_timestamp</code>. The
      * timestamp when the asbie_bizterm was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -162,7 +162,7 @@ public class AsbieBiztermRecord extends UpdatableRecordImpl<AsbieBiztermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.asbie_bizterm.last_update_timestamp</code>. The
+     * Getter for <code>asbie_bizterm.last_update_timestamp</code>. The
      * timestamp when the asbie_bizterm was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

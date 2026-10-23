@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TenantListService} from '../domain/tenant-list.service';
@@ -7,6 +7,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 @Component({
   standalone: false,
   selector: 'score-tenant-create-component',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tenant-create.component.html'
 })
 export class TenantCreateComponent implements OnInit {

@@ -1,0 +1,271 @@
+@if (hasSearch) {
+  <score-search-bar [showAdvancedSearch]="initialAdvancedSearch" [placeholder]="def.search?.placeholder ?? 'Search'"
+    [advancedSearch]="hasAdvancedSearch" [disabled]="searchDisabled()"
+    [model]="def.search ? $any(query.values[def.search.key]) : ''"
+    (modelChange)="def.search && onSearchModelChange($event)"
+    (searchTriggered)="onSearch()">
+    <ng-container ngProjectAs="[branchSelector]">
+      <ng-content select="[searchPrefix]"></ng-content>
+    </ng-container>
+    <div advancedSearchContent [style.padding-left]="advancedSearchOffset()">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <ng-content select="[advancedFilters]"></ng-content>
+            @for (f of def.filters; track f.key) {
+              @if (!f.hidden) {
+                @switch (f.type) {
+                  @case ('text') {
+                    <div class="col-md-2 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>{{ f.label | translate }}</mat-label>
+                        <input matInput [(ngModel)]="query.values[f.key]" (keyup.enter)="onSearch()" [placeholder]="f.label | translate">
+                      </mat-form-field>
+                    </div>
+                  }
+                  @case ('updater') {
+                    <div class="col-md-2 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>{{ f.label }}</mat-label>
+                        <mat-select [(ngModel)]="query.values[f.key]" multiple>
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="updaterFilters[f.key].ctrl"
+                              [placeholderLabel]="'Search...'"
+                              [noEntriesFoundLabel]="'No matching ' + f.label.toLowerCase() + ' found.'"></ngx-mat-select-search>
+                          </mat-option>
+                          @for (loginId of updaterFilters[f.key].options | async; track loginId) {
+                            <mat-option [value]="loginId">{{ loginId }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  }
+                  @case ('select') {
+                    <div class="col-md-2 col-sm-12">
+                      <mat-form-field>
+                        <mat-label>{{ f.label }}</mat-label>
+                        <mat-select [(ngModel)]="query.values[f.key]" multiple>
+                          @if ($any(f).searchable) {
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="selectSearch[f.key]"
+                                [placeholderLabel]="'Search...'"
+                                [noEntriesFoundLabel]="'No matching ' + f.label.toLowerCase() + ' found.'"></ngx-mat-select-search>
+                            </mat-option>
+                          }
+                          @for (option of visibleOptions(f); track option.value) {
+                            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  }
+                  @case ('boolean') {
+                    <div class="col-md-2 col-sm-12 d-flex align-items-center">
+                      <mat-checkbox [(ngModel)]="query.values[f.key]">{{ f.label }}</mat-checkbox>
+                    </div>
+                  }
+                  @case ('dateRange') {
+                    <div class="col-md-2 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>{{ f.label }} start date</mat-label>
+                        <input matInput [matDatepicker]="dateStart" [placeholder]="f.label + ' start date'"
+                          [(ngModel)]="dateRange(f.key).start" [max]="dateRange(f.key).end">
+                        <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                        <mat-datepicker #dateStart></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="dateRange(f.key).start = null">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 d-flex">
+                      <mat-form-field>
+                        <mat-label>{{ f.label }} end date</mat-label>
+                        <input matInput [matDatepicker]="dateEnd" [placeholder]="f.label + ' end date'"
+                          [(ngModel)]="dateRange(f.key).end" [min]="dateRange(f.key).start">
+                        <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                        <mat-datepicker #dateEnd></mat-datepicker>
+                      </mat-form-field>
+                      <div class="mat-form-field-wrapper" style="width: 14px; padding-bottom: 4px;">
+                        <div class="mat-form-field-flex">
+                          <div class="mat-form-field-infix">
+                            <mat-icon class="datepicker-cancel" (click)="dateRange(f.key).end = null">cancel</mat-icon>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                }
+              }
+            }
+            <ng-content select="[advancedFiltersEnd]"></ng-content>
+          </div>
+        </div>
+      </mat-card-content>
+    </div>
+  </score-search-bar>
+}
+
+<mat-card-content class="mat-card-container">
+  @if (loading() || busy()) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
+
+  <div class="table-container">
+    @if (multiSort()) {
+      <div class="d-flex">
+        @if (multiSortSettings() && tableData(); as tableData) {
+          <mat-multi-sort-table-settings [tableData]="tableData" [closeDialogOnChoice]="false">
+            <ng-template #sortIndicator let-direction='direction' let-columnName='columnName'>
+              <div class="d-inline-flex align-items-center">
+                <span class="p-1 f12">{{ columnName }}</span>
+                @if (direction) {
+                  <mat-icon>{{ direction === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                }
+              </div>
+            </ng-template>
+          </mat-multi-sort-table-settings>
+        }
+        <div class="score-column-container flex-grow-1">
+          <ng-container *ngTemplateOutlet="toolbar"></ng-container>
+        </div>
+      </div>
+    } @else {
+      <div class="score-column-container align-items-center">
+        <ng-container *ngTemplateOutlet="toolbar"></ng-container>
+      </div>
+    }
+    <ng-template #toolbar>
+      @if (columnSelector()) {
+        <score-column-selector [state]="table()"></score-column-selector>
+        <ng-content select="[toolbar]"></ng-content>
+      }
+    </ng-template>
+    <div class="mat-elevation-z1 table-wrapper mt-3">
+      <!-- Before the table: the headers have to be there when the table draws its header row. -->
+      @for (column of defaultHeaderColumns(); track column) {
+        <ng-template [scoreDefaultHeader]="column">
+          <ng-container *ngTemplateOutlet="defaultHeader; context: {$implicit: columnOf(column.id)}; injector: column.injector"></ng-container>
+        </ng-template>
+      }
+      <ng-template #defaultHeader let-column>
+        @if (multiSort()) {
+          @if (column?.sortable) {
+            <th score-header-cell [mat-multi-sort-header]="column.id">{{ column.header ?? column.label }}</th>
+          } @else {
+            <th score-header-cell>{{ column?.header ?? column?.label }}</th>
+          }
+        } @else {
+          @if (column?.sortable) {
+            <th score-header-cell mat-sort-header>{{ column.header ?? column.label }}</th>
+          } @else {
+            <th score-header-cell>{{ column?.header ?? column?.label }}</th>
+          }
+        }
+      </ng-template>
+
+      @if (multiSort()) {
+        <table mat-table scoreTable matMultiSort (matSortChange)="onMultiSortChange()" [dataSource]="dataSource"
+          [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.row-hover]="rowHover()">
+          @if (selection()) {
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                @if (!singleSelect() && selectAll()) {
+                  <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection().hasValue() && isAllSelected()"
+                    [indeterminate]="selection().hasValue() && !isAllSelected()">
+                  </mat-checkbox>
+                }
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!rowSelectable()(row)"
+                  [matTooltip]="unselectableTooltip()"
+                  [matTooltipDisabled]="rowSelectable()(row)"
+                  (change)="$event ? toggle(row) : null"
+                  [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+          }
+
+          @if (detailDef(); as detail) {
+            <ng-container matColumnDef="expandedDetail">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns().length">
+                <div class="element-detail" [@detailExpand]="element === expanded() ? 'expanded' : 'collapsed'">
+                  <div class="element-detail-wrapper">
+                    <ng-container *ngTemplateOutlet="detail.template; context: {$implicit: element}"></ng-container>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+          }
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="element-row"
+            [class.expanded-row]="detailDef() && row === expanded()" [ngClass]="rowClass()(row)"
+            (click)="onRowClick(row)"></tr>
+          @if (detailDef()) {
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+              (click)="onDetailClick(row)"></tr>
+          }
+        </table>
+      } @else {
+        <table mat-table scoreTable
+          matSort [matSortActive]="query.sorts[0]?.active" [matSortDirection]="$any(query.sorts[0]?.direction)" [matSortStart]="sortStart()"
+          [dataSource]="dataSource" [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.row-hover]="rowHover()">
+          @if (selection()) {
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                @if (!singleSelect() && selectAll()) {
+                  <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection().hasValue() && isAllSelected()"
+                    [indeterminate]="selection().hasValue() && !isAllSelected()">
+                  </mat-checkbox>
+                }
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" [disabled]="!rowSelectable()(row)"
+                  [matTooltip]="unselectableTooltip()"
+                  [matTooltipDisabled]="rowSelectable()(row)"
+                  (change)="$event ? toggle(row) : null"
+                  [checked]="isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+          }
+
+          @if (detailDef(); as detail) {
+            <ng-container matColumnDef="expandedDetail">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns().length">
+                <div class="element-detail" [@detailExpand]="element === expanded() ? 'expanded' : 'collapsed'">
+                  <div class="element-detail-wrapper">
+                    <ng-container *ngTemplateOutlet="detail.template; context: {$implicit: element}"></ng-container>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+          }
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="element-row"
+            [class.expanded-row]="detailDef() && row === expanded()" [ngClass]="rowClass()(row)"
+            (click)="onRowClick(row)"></tr>
+          @if (detailDef()) {
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+              (click)="onDetailClick(row)"></tr>
+          }
+        </table>
+      }
+
+      <mat-paginator
+        [pageSizeOptions]="pageSizeOptions()"
+        (page)="onPage()"
+        showFirstLastButtons></mat-paginator>
+    </div>
+  </div>
+</mat-card-content>

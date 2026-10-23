@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
@@ -14,6 +14,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 @Component({
   standalone: false,
   selector: 'score-tenant-update-component',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tenant-update.component.html'
 })
 export class UpdateTenantComponent implements OnInit {

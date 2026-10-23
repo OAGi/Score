@@ -80,7 +80,8 @@ from app.repositories.vendor_plugins import get_vendor_plugin
 from app.utils.date import parse_date_range
 from app.security import AuthenticatedUser
 from app.services.ctx_scheme_service import CtxSchemeService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, tool_session
 from app.tools.models.ctx_scheme import (
     CtxSchemeListEntryResponse,
     CreateCtxSchemeResponse,
@@ -1004,13 +1005,15 @@ async def delete_context_scheme_value(
         )
 
         # Create confirmation message with context scheme value details.
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{value_row.value}' from '{scheme_name}' context scheme?\n\n"
                 "It will be permanently removed.\n"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         # Check whether the user confirmed the deletion.
         match elicit_result:
@@ -1020,7 +1023,13 @@ async def delete_context_scheme_value(
                     raise ToolError(
                         f"The context scheme value with ID {ctx_scheme_value_id} was not found. Please check the ID and try again."
                     )
-                return DeleteCtxSchemeValueResponse(ctx_scheme_value_id=ctx_scheme_value_id)
+                return DeleteCtxSchemeValueResponse(
+                    ctx_scheme_value_id=ctx_scheme_value_id,
+                    message=(
+                        f"Deleted '{value_row.value}' from context scheme '{scheme_name}' "
+                        f"(ctx_scheme_value_id={ctx_scheme_value_id})."
+                    ),
+                )
             case DeclinedElicitation():
                 return DeleteCtxSchemeValueResponse(ctx_scheme_value_id=None, message="Deletion declined by user")
             case CancelledElicitation():
@@ -1203,13 +1212,15 @@ async def delete_context_scheme(
         scheme_name = row.scheme_name or row.scheme_id
 
         # Create confirmation message with context scheme details.
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(
                 f"Are you sure you want to discard '{scheme_name}' context scheme?\n\n"
                 "It will be permanently removed along with all associated context scheme values.\n"
             ),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
 
         # Check whether the user confirmed the deletion.
         match elicit_result:
@@ -1219,7 +1230,10 @@ async def delete_context_scheme(
                     raise ToolError(
                         f"The context scheme with ID {ctx_scheme_id} was not found. Please check the ID and try again."
                     )
-                return DeleteCtxSchemeResponse(ctx_scheme_id=ctx_scheme_id)
+                return DeleteCtxSchemeResponse(
+                    ctx_scheme_id=ctx_scheme_id,
+                    message=f"Deleted context scheme '{scheme_name}' (ctx_scheme_id={ctx_scheme_id}).",
+                )
             case DeclinedElicitation():
                 return DeleteCtxSchemeResponse(ctx_scheme_id=None, message="Deletion declined by user")
             case CancelledElicitation():

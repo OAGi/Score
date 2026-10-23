@@ -19,6 +19,15 @@ public interface AgencyIdListQueryRepository {
 
     // Summary
 
+    /** The agency identification lists with these manifest ids (each with its values). */
+    List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListByManifestIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds);
+
+    /** The release of each of these manifests; a manifest that does not exist is not in the map. */
+    java.util.Map<AgencyIdListManifestId, ReleaseId> getAgencyIdListReleaseIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds);
+
+    /** The release of the agency identification list manifest, or null when there is none. */
+    ReleaseId getAgencyIdListReleaseId(AgencyIdListManifestId agencyIdListManifestId);
+
     AgencyIdListSummaryRecord getAgencyIdListSummary(
             AgencyIdListManifestId agencyIdListManifestId);
 

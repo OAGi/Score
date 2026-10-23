@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -14,6 +14,7 @@ import {loadLibrary, saveLibrary} from '../../common/utility';
   standalone: false,
   selector: 'score-namespace-create',
   templateUrl: './namespace-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./namespace-create.component.css']
 })
 export class NamespaceCreateComponent implements OnInit {

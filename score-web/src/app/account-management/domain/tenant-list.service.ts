@@ -1,26 +1,17 @@
 import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {TenantInfo, TenantList, TenantListRequest} from './tenants';
+import {TenantInfo, TenantList} from './tenants';
 import {PageResponse} from '../../basis/basis';
 
 @Injectable()
 export class TenantListService implements OnInit {
   private http = inject(HttpClient);
 
-
   ngOnInit() {
   }
 
-  getTenants(request: TenantListRequest): Observable<PageResponse<TenantList>> {
-    let params = new HttpParams()
-      .set('sortDirection', request.page.sortDirection)
-      .set('pageIndex', '' + request.page.pageIndex)
-      .set('pageSize', '' + request.page.pageSize);
-    if (request.name) {
-      params = params.set('name', request.name);
-    }
-
+  getTenants(params: HttpParams): Observable<PageResponse<TenantList>> {
     return this.http.get<PageResponse<TenantList>>('/api/tenants', {params});
   }
 

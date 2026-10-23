@@ -1,6 +1,13 @@
+import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {AttrValue} from '../../common/tree-search/search-expression';
+import {COMPONENT_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
-import {ExpressionEvaluator, FlatNode, getKey, next, PathLikeExpressionEvaluator} from '../../common/flat-tree';
+import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
+import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
+import {FlatNode, getKey, next} from '../../common/flat-tree';
 import {
+  BccpDetails,
   CcAccNodeInfo,
   CcAsccpNodeInfo,
   CcBccpNodeInfo,
@@ -12,7 +19,7 @@ import {
 } from './core-component-node';
 import {CcNodeService} from './core-component-node.service';
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
-import {BehaviorSubject, empty, Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {sha256} from '../../common/utility';
 import {ShortTag} from '../../tag-management/domain/tag';
 
@@ -437,6 +444,8 @@ export class BccpFlatNode extends CcFlatNodeImpl {
   bccNode?: CcGraphNode;
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
+  /* The BCCP details the caller already holds; used once by CcNodeService.getDetail to skip fetching them again. */
+  prefetchedBccpDetails?: BccpDetails;
   private _path: string;
   private _hashPath: string;
 
@@ -969,6 +978,131 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     return node;
   }
 
+  /**
+   * The tree as a `SearchDag` (see `ModelBrowserNodeDatabase.searchGraph`), for searching the components instead of
+   * the millions of nodes they unfold into.
+   *
+   * The components and their children are taken from the CC graph (through fresh nodes, as the tree's own nodes can be
+   * edited). The nodes the tree has already built are then compared with them: a node whose name (its loaded details)
+   * or children differ gets a record of its own, a "clone" showing the same component, so that a search sees the tree
+   * as it is on screen. The result is built anew for every search.
+   *
+   * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
+   */
+  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+    const builder = new SearchDagBuilder();
+    const clones = new WeakMap<object, number>();
+    const hideProhibited = !!this.dataSource && this.dataSource.hideProhibited;
+    const shown = (nodes: T[]): T[] => hideProhibited ? nodes.filter(e => !e.inhibited) : nodes;
+    const representatives: T[] = [];
+    let cloneCount = 0;
+
+    const keyOf = (node: T): string => {
+      const key = this.searchKey(node);
+      if (key === undefined) {
+        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+      }
+      return key;
+    };
+
+    const plain = (node: T): number => {
+      const {index, created} = builder.record(keyOf(node), [this.plainName(node)], this.identityKey(node),
+        ccSearchAttributes(node, this.plainName(node)));
+      if (created) {
+        representatives.push(node);
+      }
+      return index;
+    };
+
+    const place = (node: T): {record: number, clone: boolean} => {
+      const key = keyOf(node);
+      const plainIndex = builder.indexOf(key);
+      if (plainIndex === undefined) {
+        throw new Error('A node the graph does not know cannot be searched through its graph.');
+      }
+      // A node that was found to have no children (loadChildren marks it not expandable) is as materialized as one with some.
+      const materialized = node.getChildren().length > 0 || (node as unknown as CcFlatNodeImpl)._expandable === false;
+      const children = materialized ? shown(node.children as T[]).map(place) : undefined;
+      const plainChildren = builder.childrenOf(plainIndex);
+      const sameChildren = !children || (children.length === plainChildren.length
+        && children.every((child, i) => child.record === plainChildren[i]));
+      if (node.name === this.plainName(node) && sameChildren) {
+        return {record: plainIndex, clone: false};
+      }
+      const {index} = builder.record('@' + (cloneCount++), [node.name], this.identityKey(node), ccSearchAttributes(node, node.name));
+      builder.setChildren(index, children ? children.map(child => child.record) : plainChildren);
+      clones.set(node, index);
+      return {record: index, clone: true};
+    };
+
+    try {
+      plain(root);
+      for (let i = 0; i < representatives.length; i++) {
+        const node = representatives[i];
+        builder.setChildren(builder.indexOf(keyOf(node)), shown(this.getChildren(node)).map(child => plain(child)));
+      }
+      place(root);
+    } catch (e) {
+      return undefined;
+    }
+
+    return {
+      dag: builder.build(),
+      recordOf: node => {
+        const clone = clones.get(node);
+        if (clone !== undefined) {
+          return clone;
+        }
+        const key = this.searchKey(node);
+        return key === undefined ? -1 : (builder.indexOf(key) ?? -1);
+      }
+    };
+  }
+
+  /** What makes two nodes the same component: they show the same thing and so have the same children. */
+  private searchKey(node: T): string | undefined {
+    const identity = this.identityKey(node);
+    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node)) + associationKey(ccAssociation(node));
+  }
+
+  /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
+  private identityKey(node: T): string | undefined {
+    if (node instanceof AccFlatNode) {
+      return 'ACC-' + node.accNode.manifestId;
+    }
+    if (node instanceof AsccpFlatNode) {
+      return 'ASCCP-' + node.asccpNode.manifestId;
+    }
+    if (node instanceof BccpFlatNode) {
+      // an attribute has no supplementary components below it, the same property as an element does
+      return 'BCCP-' + node.bccpNode.manifestId + (node.bccNode?.entityType === 'Attribute' ? '#attribute' : '');
+    }
+    if (node instanceof DtFlatNode) {
+      return 'DT-' + node.dtNode.manifestId;
+    }
+    if (node instanceof DtScFlatNode) {
+      return 'SC-' + node.dtScNode.manifestId;
+    }
+    return undefined;
+  }
+
+  /** The name a node of the component has before its details are loaded (which can replace it). */
+  private plainName(node: T): string {
+    if (node instanceof AccFlatNode) {
+      return node.accNode.objectClassTerm + '. Details';
+    }
+    if (node instanceof AsccpFlatNode) {
+      return node.asccpNode.propertyTerm;
+    }
+    if (node instanceof BccpFlatNode) {
+      return node.bccpNode.propertyTerm;
+    }
+    if (node instanceof DtFlatNode) {
+      return node.dtNode.den;
+    }
+    return node.name;
+  }
+
   detectCycle(node: AsccpFlatNode): boolean {
     const asccpManifestId = node.asccpNode.manifestId;
     let cur = node.parent;
@@ -1225,8 +1359,42 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
   }
 
   toggleNode(node: T, expand: boolean) {
-    if (!node) {
+    if (!this.applyToggle(node, expand)) {
       return;
+    }
+
+    // notify the change
+    this.dataChange.next(this.data);
+    node.expanded = expand;
+  }
+
+  /**
+   * Expands the node and every collapsed ancestor, announcing the change once. Expanding them one by one announces
+   * each, and every announcement re-renders the rows on screen.
+   */
+  expandTo(node: T) {
+    const chain: T[] = [];
+    for (let n = node; n; n = n.parent as T) {
+      if (!this.isExpanded(n)) {
+        chain.push(n);
+      }
+    }
+    const expanded = chain.reverse().filter(n => {
+      const applied = this.applyToggle(n, true);
+      if (applied) {
+        n.expanded = true;
+      }
+      return applied;
+    });
+    if (expanded.length > 0) {
+      this.dataChange.next(this.data);
+    }
+  }
+
+  /** Changes the rows for the toggle without announcing it; false when there is nothing to change. */
+  private applyToggle(node: T, expand: boolean): boolean {
+    if (!node) {
+      return false;
     }
 
     let children = this._database.children(node);
@@ -1236,7 +1404,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
     const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
-      return;
+      return false;
     }
 
     if (expand) {
@@ -1258,10 +1426,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
         e.removeChangeListener(this);
       });
     }
-
-    // notify the change
-    this.dataChange.next(this.data);
-    node.expanded = expand;
+    return true;
   }
 
   loadDetail(node: T, callbackFn?) {
@@ -1277,33 +1442,29 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
 }
 
 export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
+  extends TreeNodeSearcher<T, CcFlatNodeDataSource<T>>
   implements ChangeListener<CcFlatNodeDataSource<T>> {
 
-  searchKeyword = '';
-  _inputKeyword = '';
-  selectedNode: T;
-  searchResult: T[] = [];
-  searchedData: T[];
-  fullSearched = false;
-  searchedItemCount = 0;
-  searchIndex = 0;
-  isSearching = false;
-  searchPrefix = '';
+  override readonly searchAttributes = COMPONENT_SEARCH_ATTRIBUTES;
 
-  constructor(private dataSource: CcFlatNodeDataSource<T>,
+  constructor(dataSource: CcFlatNodeDataSource<T>,
               private database: CcFlatNodeDatabase<T>) {
-    this.dataSource.addListener(this);
+    super(dataSource);
+    dataSource.addListener(this);
   }
 
-  get inputKeyword(): string {
-    return this._inputKeyword;
-  }
-
-  set inputKeyword(inputKeyword: string) {
-    if (inputKeyword !== this._inputKeyword) {
-      this.resetSearch();
-    }
-    this._inputKeyword = inputKeyword;
+  protected override graphAdapter(): TreeGraphAdapter<T> {
+    let graph: ReturnType<CcFlatNodeDatabase<T>['searchGraph']>;
+    return {
+      dag: () => {
+        graph = this.database.searchGraph(this.dataSource.data[0]);
+        return graph?.dag;
+      },
+      recordOf: node => graph ? graph.recordOf(node) : -1,
+      namesOf: node => [node.name],
+      attributesOf: node => ccSearchAttributes(node, node.name),
+      childrenOf: node => this.database.children(node)
+    };
   }
 
   onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
@@ -1312,142 +1473,46 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
     }
   }
 
-  prev(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index > 0) {
-      return this.dataSource.data[index - 1];
+  protected override visit(node: T): TreeSearchVisit<T> {
+    const expanded = node.expandable;
+    if (expanded) {
+      this.database.loadChildren(node);
     }
-    return node;
+    return {children: node.children as T[], expanded};
   }
 
-  next(node: T): T {
-    const index = this.getNodeIndex(node);
-    if (index < this.dataSource.data.length - 1) {
-      return this.dataSource.data[index + 1];
-    }
-    return node;
-  }
-
-  go(val: number): Observable<number> {
-    this.searchIndex += val;
-    if (this.searchResult.length <= this.searchIndex) {
-      this.searchIndex = 0;
-    }
-    if (this.searchIndex < 0) {
-      this.searchIndex = this.searchResult.length - 1;
-    }
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  search(inputKeyword: string, selectedNode: T, backward?: boolean, force?: boolean): Observable<number> {
-    if (this.isSearching) {
-      return empty();
-    }
-    if (!inputKeyword || inputKeyword.length === 0) {
-      this.resetSearch();
-      return empty();
-    }
-
-    this.isSearching = true;
-    if (!this.fullSearched || force) {
-      const searchResult = [];
-      const evaluator = this.getEvaluator(inputKeyword);
-
-      const threshold = 100;
-      let expandingLimit = 1000;
-      let data = (!this.searchedData || this.searchedData.length === 0) ?
-        ((this.inputKeyword.charAt(0) === '/') ? [this.dataSource.data[0], ] : [selectedNode, ]) :
-        this.searchedData;
-      while (searchResult.length < threshold && expandingLimit > 0 && data.length > 0) {
-        const item = data.shift();
-        this.searchedItemCount++;
-        if (evaluator.eval(item)) {
-          searchResult.push(item);
-        }
-        if (item.expandable) {
-          expandingLimit--;
-        }
-
-        if (item.children.length > 0) {
-          data = data.concat(item.children as T[]);
-        }
-      }
-
-      if (data.length === 0) {
-        this.fullSearched = true;
-      } else {
-        this.searchedData = data;
-      }
-
-      this.searchResult = this.searchResult.concat(searchResult);
-      this.searchKeyword = evaluator.keywordForHighlight();
-      if (searchResult.length > 0) {
-        searchResult.forEach(e => this.dataSource.expand(e));
-        this.searchResult = this.sort(this.searchResult);
-      }
-    } else {
-      if (backward) {
-        this.searchIndex -= 1;
-      } else {
-        this.searchIndex += 1;
-      }
-      if (this.searchResult.length <= this.searchIndex) {
-        this.searchIndex = 0;
-      }
-      if (this.searchIndex < 0) {
-        this.searchIndex = this.searchResult.length - 1;
-      }
-    }
-
-    this.isSearching = false;
-
-    return new Observable(subscriber => {
-      if (!!this.searchResult && this.searchResult.length > 0) {
-        subscriber.next(this.getNodeIndex(this.searchResult[this.searchIndex]));
-      } else {
-        subscriber.next(-1);
-      }
-      subscriber.complete();
-    });
-  }
-
-  sort(searchResult: T[]): T[] {
-    return searchResult.sort((a, b) => {
-      const aIdx = this.dataSource.data.indexOf(a);
-      const bIdx = this.dataSource.data.indexOf(b);
-      return aIdx - bIdx;
-    });
-  }
-
-  resetSearch() {
-    this.searchKeyword = undefined;
-    this.selectedNode = undefined;
-    this.searchResult = [];
-    this.searchedData = [];
-    this.fullSearched = false;
-    this.searchedItemCount = 0;
-    this.searchIndex = 0;
-    this.isSearching = false;
-    this.searchPrefix = '';
-  }
-
-  getNodeIndex(node: T) {
-    if (!this.dataSource.isExpanded(node)) {
-      this.dataSource.expand(node);
-    }
+  protected visibleIndex(node: T): number {
     return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
   }
 
-  protected getEvaluator(expr: string): ExpressionEvaluator<T> {
-    return new PathLikeExpressionEvaluator(expr, false);
-  }
+}
 
+/** What a search predicate can ask about a node of the component tree. */
+function ccSearchAttributes(node: CcFlatNode, text: string): Record<string, AttrValue> {
+  const component = node instanceof AccFlatNode ? node.accNode : node instanceof AsccpFlatNode ? node.asccpNode
+    : node instanceof BccpFlatNode ? node.bccpNode : node instanceof DtFlatNode ? node.dtNode
+      : node instanceof DtScFlatNode ? node.dtScNode : undefined;
+  const association = ccAssociation(node);
+  return {
+    ...componentSearchAttributes(node.type, text, component, association, ccCardinality(node)),
+    // `definition` is the one the node is about: the ASCC's or BCC's of a node that is tied to its parent by one, else its component's
+    ...definitionAttributes({
+      definition: association ?? component,
+      association_definition: association,
+      component_definition: node instanceof AsccpFlatNode || node instanceof BccpFlatNode ? component : undefined,
+      type_definition: node instanceof BccpFlatNode ? node.bdtNode : undefined
+    })
+  };
+}
+
+/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+function ccAssociation(node: CcFlatNode): CcGraphNode | undefined {
+  return node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode : undefined;
+}
+
+/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */
+function ccCardinality(node: CcFlatNode): NodeCardinality | undefined {
+  const edge = node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode
+    : node instanceof DtScFlatNode ? node.dtScNode : undefined;
+  return edge ? {min: edge.cardinalityMin, max: edge.cardinalityMax} : undefined;
 }

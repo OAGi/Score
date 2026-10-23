@@ -246,7 +246,7 @@ public class JooqAsbieQueryRepository extends JooqBaseRepository implements Asbi
                         ASBIE.HASH_PATH, ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
                         ASBIEP.DISPLAY_NAME,
                         ASBIE.CARDINALITY_MIN, ASBIE.CARDINALITY_MAX,
-                        ASBIE.IS_DEPRECATED)
+                        ASBIE.IS_DEPRECATED, ASBIE.DEFINITION)
                 .from(ASBIE)
                 .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
                 .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId.value())))
@@ -262,6 +262,7 @@ public class JooqAsbieQueryRepository extends JooqBaseRepository implements Asbi
                     bieEditUsed.setCardinalityMin(record.get(ASBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(ASBIE.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(ASBIE.IS_DEPRECATED) == 1);
+                    bieEditUsed.setDefinition(record.get(ASBIE.DEFINITION));
                     return bieEditUsed;
                 }).collect(Collectors.toList());
     }

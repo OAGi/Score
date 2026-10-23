@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {catchError, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -25,9 +25,7 @@ import {
   ModelBrowserNodeDataSource,
   ModelBrowserNodeDataSourceSearcher
 } from './domain/model-browser-node';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {CdkDragDrop, CdkDragMove} from '@angular/cdk/drag-drop';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
@@ -41,15 +39,20 @@ import {
   reorderRejectReason
 } from './domain/bie-view-order';
 import {SetWeightDialogComponent, SetWeightDialogData} from './set-weight-dialog/set-weight-dialog.component';
+import {
+  ModelBrowserTreeRowHost,
+  ModelBrowserTreeViewportComponent
+} from './model-browser-tree-viewport/model-browser-tree-viewport.component';
 
 
 @Component({
   standalone: false,
   selector: 'score-model-browser',
   templateUrl: './model-browser.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./model-browser.component.css']
 })
-export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowserNode> {
+export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<ModelBrowserNode>, ModelBrowserTreeRowHost {
   private ccNodeService = inject(CcNodeService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
@@ -72,24 +75,13 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
   type: string;
   manifestId: number;
 
-  innerY: number = window.innerHeight;
   dataSource: ModelBrowserNodeDataSource<ModelBrowserNode>;
   searcher: ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>;
   cursorNode: ModelBrowserNode;
   selectedNode: ModelBrowserNode;
 
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(ModelBrowserTreeViewportComponent, {static: true}) treeViewport: ModelBrowserTreeViewportComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
-
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: ModelBrowserNode;
 
   // Issue #1638 — drag state: hover-only handle, and a red drop-slot (placeholder) on an invalid drop.
@@ -123,6 +115,10 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     saveBooleanProperty(this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, hideOrderWeights);
   }
 
+  ngOnDestroy(): void {
+    this.searcher?.dispose();
+  }
+
   ngOnInit(): void {
     this.loading = true;
     this.route.paramMap.pipe(
@@ -138,6 +134,14 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
       this.preferencesInfo = preferencesInfo;
 
+      // The browser roots at an ASCCP or a BCCP; any other type or id leaves no root node in the graph.
+      const rootKey = ((this.type || '').toUpperCase() === 'BCCP' ? 'BCCP-' : 'ASCCP-') + this.manifestId;
+      if (!ccGraph.graph.nodes[rootKey]) {
+        this.snackBar.open('The component to browse was not found.', '', {duration: 3000});
+        this.router.navigateByUrl('/core_component');
+        return;
+      }
+
       // Issue #1638: the sibling view order is fetched LAZILY, one view-parent ACC at a time, as nodes
       // are expanded (see onNodeExpanded) — never upfront — so the client only asks for the parents it
       // actually shows, and the view parent is resolved on the client where group flattening happens.
@@ -145,6 +149,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       const database = new ModelBrowserNodeDatabase<ModelBrowserNode>(ccGraph, this.type, this.manifestId);
       this.dataSource = new ModelBrowserNodeDataSource<ModelBrowserNode>(database, this.ccNodeService, [this,]);
       this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
+      this.searcher?.dispose();
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
       this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
@@ -171,22 +176,8 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     });
   }
 
-  onResize(event) {
-    this.innerY = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this.innerY - 200;
-  }
 
-  toggle(node: ModelBrowserNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   onClick(node: ModelBrowserNode, $event?: MouseEvent) {
     if (!!$event) {
@@ -199,12 +190,6 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
       this.cursorNode = node;
     });
 
-  }
-
-  scrollToNode(node: ModelBrowserNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
   }
 
   private visibleChoiceChildrenOf(choiceNode: ModelBrowserNode): ModelBrowserNode[] {
@@ -311,69 +296,9 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
 
   }
 
-  keyNavigation(node: ModelBrowserNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
 
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
 
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-    }
-  }
-
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
+  readonly canReorderNode = (node: ModelBrowserNode) => this.canReorder(node);
 
   copyPath(node: ModelBrowserNode) {
     if (!node) {
@@ -729,8 +654,7 @@ export class ModelBrowserComponent implements OnInit, ChangeListener<ModelBrowse
     let next = false;
     if (this.validTargetHashPaths.size > 0) {
       const pointerY = event.pointerPosition.y;
-      const viewport: HTMLElement = this.virtualScroll && this.virtualScroll.elementRef
-        ? this.virtualScroll.elementRef.nativeElement : null;
+      const viewport = this.treeViewport.viewportElement;
       const rows = viewport ? Array.from(viewport.querySelectorAll('.mat-tree-node[data-hash-path]')) : [];
       let aboveHash: string | null = null, aboveBottom = -Infinity;
       let belowHash: string | null = null, belowTop = Infinity;

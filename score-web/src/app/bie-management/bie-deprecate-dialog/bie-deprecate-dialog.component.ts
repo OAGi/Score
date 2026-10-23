@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {AuthService} from '../../authentication/auth.service';
 
@@ -6,6 +6,7 @@ import {AuthService} from '../../authentication/auth.service';
   standalone: false,
   selector: 'score-bie-deprecate-dialog',
   templateUrl: './bie-deprecate-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-deprecate-dialog.component.css']
 })
 export class BieDeprecateDialogComponent implements OnInit {

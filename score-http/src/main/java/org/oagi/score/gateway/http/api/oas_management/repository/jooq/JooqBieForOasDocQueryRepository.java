@@ -266,7 +266,7 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
                 bieForOasDoc.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
                 bieForOasDoc.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
                 bieForOasDoc.setDen(record.get(ASCCP_MANIFEST.DEN));
-                // Issue #1492: feed the assign dialog's client-side duplicate-body pre-check.
+                // Issue #1492: watchdog the assign dialog's client-side duplicate-body pre-check.
                 bieForOasDoc.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
                 bieForOasDoc.setReleaseNum(record.get(RELEASE.RELEASE_NUM));
                 bieForOasDoc.setRemark(record.get(ASBIEP.REMARK));

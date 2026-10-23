@@ -1,0 +1,1154 @@
+package org.oagi.score.gateway.http.api.cc_management.model;
+
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceRecordKeys;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListRecordKeys;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListRecordKeys;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtRecordKeys;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RecordCacheProperties;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.blob_content.BlobContentManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.blob_content.BlobContentSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySupportable;
+import org.oagi.score.gateway.http.api.cc_management.service.SeqKeyHandler;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSummaryRecord;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.oagi.score.gateway.http.api.tag_management.model.TagSummaryRecord;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.math.BigInteger;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+/**
+ * A {@link CcDocument} that answers from a cache shared by every request and reads the database only for what is
+ * missing, instead of loading every component of the release the way {@link CcDocumentImpl} does.
+ * <p>
+ * Its lookups are safe to call from several threads.
+ * <p>
+ * It answers like {@link CcDocumentImpl}: a component outside the releases the document was made for (and the
+ * releases they depend on) is not found. What it caches is the lookups by manifest id and the lists under a parent
+ * (the associations of an ACC and their order, the supplementary components of a DT, the tags) and the records that point at
+ * a component, which it asks the database for. It does not answer the two lookups that need the whole release
+ * ({@link #getAsccpList()} and {@link #getBlobContent}); {@link CacheFirstCcDocument}, which is what the factory hands out,
+ * answers them from the loaded releases.
+ */
+public class CachedCcDocument implements CcDocument {
+
+    private final ScoreUser requester;
+    private final RepositoryFactory repositoryFactory;
+    private final RecordCache cache;
+    private final List<ReleaseId> releaseIdList;
+
+    /** The epoch of the cache when this document was made: it stores nothing once entries have been forgotten since. */
+    private final long epoch;
+
+    /**
+     * What this document has already got from the cache or the database. Reading the dependencies reads the same entries thousands of
+     * times, and when the cache is not in the JVM each of those reads would be a round trip. It lives as long as the
+     * document, which is as long as one operation.
+     */
+    private final ConcurrentMap<String, Object> memo = new ConcurrentHashMap<>();
+
+    private volatile Set<ReleaseId> scope;
+
+    /** The keys of the components in the dependencies this document has prefetched: asking for one of them needs no prefetch of its own. */
+    private final Set<String> prefetchedKeys = ConcurrentHashMap.newKeySet();
+    private final AtomicInteger prefetchedDependencies = new AtomicInteger();
+    /** The most ids sent to the database in one {@code IN} list; see {@link RecordCacheProperties#getBatchSize()}. */
+    private final int batchSize;
+    /** The most times the dependencies of a component are read ahead; see {@link RecordCacheProperties#getMaxPrefetchedDependencies()}. */
+    private final int maxPrefetchedDependencies;
+
+    public CachedCcDocument(ScoreUser requester, RepositoryFactory repositoryFactory, ReleaseId releaseId) {
+        this(requester, repositoryFactory, Arrays.asList(releaseId));
+    }
+
+    public CachedCcDocument(ScoreUser requester, RepositoryFactory repositoryFactory, Collection<ReleaseId> releaseIdList) {
+        this.requester = requester;
+        this.repositoryFactory = repositoryFactory;
+        this.cache = repositoryFactory.recordCache();
+        this.epoch = cache.epoch();
+        this.releaseIdList = new ArrayList<>(releaseIdList);
+        this.batchSize = repositoryFactory.recordCacheProperties().getBatchSize();
+        this.maxPrefetchedDependencies = repositoryFactory.recordCacheProperties().getMaxPrefetchedDependencies();
+    }
+
+    // ---- the cache -----------------------------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    private <T> T cached(String key, Supplier<T> loader) {
+        boolean bypassed = cache.isBypassed();
+        if (!bypassed) {
+            Object hit = recall(key);
+            if (hit != null) {
+                return (T) hit;
+            }
+        }
+        T value = loader.get();
+        if (value != null && !bypassed) {
+            remember(key, value);
+        }
+        return value;
+    }
+
+    private Object recall(String key) {
+        Object value = memo.get(key);
+        if (value == null) {
+            value = cache.get(key);
+            if (value != null) {
+                memo.put(key, value);
+            }
+        }
+        return value;
+    }
+
+    /** The values of the keys that have one, the cache asked once for all the ones the document does not have yet. */
+    private Map<String, Object> recallAll(Collection<String> keys) {
+        Map<String, Object> found = new HashMap<>();
+        List<String> missing = new ArrayList<>();
+        for (String key : keys) {
+            Object value = memo.get(key);
+            if (value != null) {
+                found.put(key, value);
+            } else {
+                missing.add(key);
+            }
+        }
+        if (!missing.isEmpty()) {
+            Map<String, Object> fromCache = cache.getAll(missing);
+            memo.putAll(fromCache);
+            found.putAll(fromCache);
+        }
+        return found;
+    }
+
+    private void remember(String key, Object value) {
+        cache.put(epoch, key, value);
+        memo.put(key, value);
+    }
+
+    private void rememberAll(Map<String, Object> values) {
+        if (!values.isEmpty()) {
+            cache.putAll(epoch, values);
+            memo.putAll(values);
+        }
+    }
+
+    /**
+     * Prefetches the dependencies of a component the first time the document asks for it, unless that component is among dependencies that were read
+     * already. The consumers of this document (a schema export, a BIE, the graph screen) all go on to ask for most of
+     * what the component reaches, and asking the cache for each of those one by one costs a round trip each when the cache is in
+     * Redis, and a query each when the cache is empty; the dependencies are read in a few bulk reads, or loaded in a few queries.
+     */
+    private void prefetchFor(CcType type, ManifestId manifestId, String key) {
+        if (memo.containsKey(key) || prefetchedKeys.contains(key) || cache.isBypassed()) {
+            return;
+        }
+        if (prefetchedDependencies.incrementAndGet() > maxPrefetchedDependencies) {
+            return;
+        }
+        try {
+            prefetch(type, manifestId, true);
+        } catch (RuntimeException e) {
+            // Only a speed-up: what could not be read now is read, or fails, where it is looked up.
+        }
+    }
+
+    /** The ACCs of the scope that are the base of another ACC; read when first asked. */
+    private volatile Set<AccManifestId> basedAccManifestIds;
+
+    /** The releases this document answers for: the given ones and everything they depend on. */
+    private Set<ReleaseId> scope() {
+        Set<ReleaseId> scope = this.scope;
+        if (scope == null) {
+            var releaseQuery = repositoryFactory.releaseQueryRepository(requester);
+            Set<ReleaseId> releaseIds = new HashSet<>();
+            for (ReleaseId releaseId : releaseIdList) {
+                List<ReleaseId> included = cached(CcRecordKeys.scope(releaseId.value()), () ->
+                        releaseQuery.getIncludedReleaseSummaryList(releaseId).stream()
+                                .map(ReleaseSummaryRecord::releaseId)
+                                .collect(Collectors.toList()));
+                releaseIds.addAll(included);
+            }
+            scope = releaseIds;
+            this.scope = scope;
+        }
+        return scope;
+    }
+
+    private <T> T inScope(T record, Function<T, ReleaseSummaryRecord> releaseOf) {
+        return (record != null && scope().contains(releaseOf.apply(record).releaseId())) ? record : null;
+    }
+
+    private <T> List<T> inScope(List<T> records, Function<T, ReleaseSummaryRecord> releaseOf) {
+        return records.stream().filter(e -> scope().contains(releaseOf.apply(e).releaseId())).collect(Collectors.toList());
+    }
+
+    // ---- lookups by manifest id ----------------------------------------------------------------------------------
+
+    @Override
+    public AccSummaryRecord getAcc(AccManifestId accManifestId) {
+        if (accManifestId == null) {
+            return null;
+        }
+        prefetchFor(CcType.ACC, accManifestId, CcRecordKeys.acc(accManifestId.value()));
+        return knownAcc(accManifestId);
+    }
+
+    /** What {@link #getAcc} answers, without reading the dependencies of the component ahead. */
+    private AccSummaryRecord knownAcc(AccManifestId accManifestId) {
+        return inScope(cached(CcRecordKeys.acc(accManifestId.value()),
+                () -> repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId)),
+                AccSummaryRecord::release);
+    }
+
+    @Override
+    public AsccSummaryRecord getAscc(AsccManifestId asccManifestId) {
+        if (asccManifestId == null) {
+            return null;
+        }
+        return inScope(cached(CcRecordKeys.ascc(asccManifestId.value()),
+                () -> repositoryFactory.accQueryRepository(requester).getAsccSummary(asccManifestId)),
+                AsccSummaryRecord::release);
+    }
+
+    @Override
+    public BccSummaryRecord getBcc(BccManifestId bccManifestId) {
+        if (bccManifestId == null) {
+            return null;
+        }
+        return inScope(cached(CcRecordKeys.bcc(bccManifestId.value()),
+                () -> repositoryFactory.accQueryRepository(requester).getBccSummary(bccManifestId)),
+                BccSummaryRecord::release);
+    }
+
+    @Override
+    public AsccpSummaryRecord getAsccp(AsccpManifestId asccpManifestId) {
+        if (asccpManifestId == null) {
+            return null;
+        }
+        prefetchFor(CcType.ASCCP, asccpManifestId, CcRecordKeys.asccp(asccpManifestId.value()));
+        return knownAsccp(asccpManifestId);
+    }
+
+    /** What {@link #getAsccp} answers, without reading the dependencies of the component ahead. */
+    private AsccpSummaryRecord knownAsccp(AsccpManifestId asccpManifestId) {
+        return inScope(cached(CcRecordKeys.asccp(asccpManifestId.value()),
+                () -> repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId)),
+                AsccpSummaryRecord::release);
+    }
+
+    @Override
+    public BccpSummaryRecord getBccp(BccpManifestId bccpManifestId) {
+        if (bccpManifestId == null) {
+            return null;
+        }
+        prefetchFor(CcType.BCCP, bccpManifestId, CcRecordKeys.bccp(bccpManifestId.value()));
+        return knownBccp(bccpManifestId);
+    }
+
+    /** What {@link #getBccp} answers, without reading the dependencies of the component ahead. */
+    private BccpSummaryRecord knownBccp(BccpManifestId bccpManifestId) {
+        return inScope(cached(CcRecordKeys.bccp(bccpManifestId.value()),
+                () -> repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId)),
+                BccpSummaryRecord::release);
+    }
+
+    @Override
+    public DtSummaryRecord getDt(DtManifestId dtManifestId) {
+        if (dtManifestId == null) {
+            return null;
+        }
+        prefetchFor(CcType.DT, dtManifestId, CcRecordKeys.dt(dtManifestId.value()));
+        return knownDt(dtManifestId);
+    }
+
+    /** What {@link #getDt} answers, without reading the dependencies of the component ahead. */
+    private DtSummaryRecord knownDt(DtManifestId dtManifestId) {
+        return inScope(cached(CcRecordKeys.dt(dtManifestId.value()),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId)),
+                DtSummaryRecord::release);
+    }
+
+    @Override
+    public DtScSummaryRecord getDtSc(DtScManifestId dtScManifestId) {
+        if (dtScManifestId == null) {
+            return null;
+        }
+        return inScope(cached(CcRecordKeys.dtSc(dtScManifestId.value()),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtScSummary(dtScManifestId)),
+                DtScSummaryRecord::release);
+    }
+
+    // ---- lists under a parent ------------------------------------------------------------------------------------
+
+    @Override
+    public List<AsccSummaryRecord> getAsccListByFromAccManifestId(AccManifestId fromAccManifestId) {
+        if (fromAccManifestId == null) {
+            return Collections.emptyList();
+        }
+        return inScope(cached(CcRecordKeys.asccFromAcc(fromAccManifestId.value()),
+                () -> List.copyOf(repositoryFactory.accQueryRepository(requester).getAsccSummaryList(fromAccManifestId))),
+                AsccSummaryRecord::release);
+    }
+
+    @Override
+    public List<BccSummaryRecord> getBccListByFromAccManifestId(AccManifestId fromAccManifestId) {
+        if (fromAccManifestId == null) {
+            return Collections.emptyList();
+        }
+        return inScope(cached(CcRecordKeys.bccFromAcc(fromAccManifestId.value()),
+                () -> List.copyOf(repositoryFactory.accQueryRepository(requester).getBccSummaryList(fromAccManifestId))),
+                BccSummaryRecord::release);
+    }
+
+    @Override
+    public List<DtScSummaryRecord> getDtScList(DtManifestId dtManifestId) {
+        return getDtScListByDtManifestId(dtManifestId);
+    }
+
+    @Override
+    public List<DtScSummaryRecord> getDtScListByDtManifestId(DtManifestId dtManifestId) {
+        if (dtManifestId == null) {
+            return Collections.emptyList();
+        }
+        return inScope(cached(CcRecordKeys.dtScOfDt(dtManifestId.value()),
+                () -> List.copyOf(repositoryFactory.dtQueryRepository(requester).getDtScSummaryList(dtManifestId))),
+                DtScSummaryRecord::release);
+    }
+
+    @Override
+    public List<CcAssociation> getAssociations(AccSummaryRecord accManifest) {
+        if (accManifest == null || getAcc(accManifest.accManifestId()) == null) {
+            return Collections.emptyList();
+        }
+        AccManifestId accManifestId = accManifest.accManifestId();
+        List<SeqKeySummaryRecord> seqKeys = cached(CcRecordKeys.seqKeyFromAcc(accManifestId.value()),
+                () -> List.copyOf(repositoryFactory.seqKeyQueryRepository(requester).getSeqKeySummaryList(accManifestId)));
+
+        // The ASCCs and BCCs of the ACC are in the cache as lists (and are read together with the dependencies).
+        Map<AsccManifestId, AsccSummaryRecord> asccs = new HashMap<>();
+        getAsccListByFromAccManifestId(accManifestId).forEach(e -> asccs.put(e.asccManifestId(), e));
+        Map<BccManifestId, BccSummaryRecord> bccs = new HashMap<>();
+        getBccListByFromAccManifestId(accManifestId).forEach(e -> bccs.put(e.bccManifestId(), e));
+
+        List<CcAssociation> associations = new ArrayList<>();
+        SeqKeyHandler.sort(seqKeys).forEach(seqKey -> {
+            if (seqKey.asccManifestId() != null) {
+                AsccSummaryRecord ascc = asccs.get(seqKey.asccManifestId());
+                associations.add((ascc != null) ? ascc : getAscc(seqKey.asccManifestId()));
+            } else if (seqKey.bccManifestId() != null) {
+                BccSummaryRecord bcc = bccs.get(seqKey.bccManifestId());
+                associations.add((bcc != null) ? bcc : getBcc(seqKey.bccManifestId()));
+            }
+        });
+        return associations;
+    }
+
+    @Override
+    public List<SeqKeySupportable> getAssociationListByFromAccManifestId(AccManifestId fromAccManifestId) {
+        List<SeqKeySupportable> associations = new ArrayList<>();
+        associations.addAll(getAsccListByFromAccManifestId(fromAccManifestId));
+        associations.addAll(getBccListByFromAccManifestId(fromAccManifestId));
+        return SeqKeyHandler.sort(associations);
+    }
+
+    @Override
+    public List<TagSummaryRecord> getTagListByAccManifestId(AccManifestId accManifestId) {
+        // The tags of a component the document does not know (one of another release) are not its to give.
+        return (accManifestId == null || knownAcc(accManifestId) == null) ? Collections.emptyList() : cached(CcRecordKeys.tags(CcType.ACC, accManifestId.value()),
+                () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(accManifestId)));
+    }
+
+    @Override
+    public List<TagSummaryRecord> getTagListByAsccpManifestId(AsccpManifestId asccpManifestId) {
+        // The tags of a component the document does not know (one of another release) are not its to give.
+        return (asccpManifestId == null || knownAsccp(asccpManifestId) == null) ? Collections.emptyList() : cached(CcRecordKeys.tags(CcType.ASCCP, asccpManifestId.value()),
+                () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(asccpManifestId)));
+    }
+
+    @Override
+    public List<TagSummaryRecord> getTagListByBccpManifestId(BccpManifestId bccpManifestId) {
+        // The tags of a component the document does not know (one of another release) are not its to give.
+        return (bccpManifestId == null || knownBccp(bccpManifestId) == null) ? Collections.emptyList() : cached(CcRecordKeys.tags(CcType.BCCP, bccpManifestId.value()),
+                () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(bccpManifestId)));
+    }
+
+    @Override
+    public List<TagSummaryRecord> getTagListByDtManifestId(DtManifestId dtManifestId) {
+        // The tags of a component the document does not know (one of another release) are not its to give.
+        return (dtManifestId == null || knownDt(dtManifestId) == null) ? Collections.emptyList() : cached(CcRecordKeys.tags(CcType.DT, dtManifestId.value()),
+                () -> inTagOrder(repositoryFactory.tagQueryRepository(requester).getTagSummaryList(dtManifestId)));
+    }
+
+    // ---- prefetching ---------------------------------------------------------------------------------------------
+
+    @Override
+    public void prefetchChildren(CcType type, Collection<? extends ManifestId> manifestIds) {
+        if (cache.isBypassed() || manifestIds == null || manifestIds.isEmpty()) {
+            return;
+        }
+        switch (type) {
+            case ACC -> prefetchAccChildren(cast(manifestIds, AccManifestId.class));
+            case ASCCP -> prefetchAsccpChildren(cast(manifestIds, AsccpManifestId.class));
+            case BCCP -> prefetchBccpChildren(cast(manifestIds, BccpManifestId.class));
+            case DT -> prefetchDtChildren(cast(manifestIds, DtManifestId.class));
+            default -> {
+            }
+        }
+    }
+
+    private static <I extends ManifestId> List<I> cast(Collection<? extends ManifestId> ids, Class<I> type) {
+        return ids.stream().filter(type::isInstance).map(type::cast).distinct().collect(Collectors.toList());
+    }
+
+    /** The components that a component depends on, not what their data types need besides (the screen showing the graph needs only the components). */
+    @Override
+    public void prefetchDependencies(CcType type, ManifestId root) {
+        prefetch(type, root, false);
+    }
+
+    /** @param withDtRelated also what the data types need: their supplementary components, allowed primitives, namespaces, code lists... */
+    private void prefetch(CcType type, ManifestId root, boolean withDtRelated) {
+        if (cache.isBypassed() || root == null) {
+            return;
+        }
+        String marker = CcRecordKeys.dependencies(withDtRelated, type, root.value());
+        if (!readDependencies(marker)) {
+            cache.singleFlight(marker, () -> {
+                if (!readDependencies(marker)) {
+                    loadDependencies(type, root, marker, withDtRelated);
+                }
+            });
+            readDependencies(marker);
+        }
+    }
+
+    /** Reads all the dependencies that the marker stands for, in a few bulk reads. @return whether there was one */
+    private boolean readDependencies(String marker) {
+        Object found = recall(marker);
+        if (!(found instanceof DependencyManifestIds dependencies)) {
+            return false;
+        }
+        List<String> keys = new ArrayList<>();
+        for (AccManifestId id : dependencies.accs()) {
+            keys.add(CcRecordKeys.acc(id.value()));
+            keys.add(CcRecordKeys.asccFromAcc(id.value()));
+            keys.add(CcRecordKeys.bccFromAcc(id.value()));
+            keys.add(CcRecordKeys.seqKeyFromAcc(id.value()));
+            keys.add(CcRecordKeys.tags(CcType.ACC, id.value()));
+            prefetchedKeys.add(CcRecordKeys.acc(id.value()));
+        }
+        for (AsccpManifestId id : dependencies.asccps()) {
+            keys.add(CcRecordKeys.asccp(id.value()));
+            keys.add(CcRecordKeys.tags(CcType.ASCCP, id.value()));
+            prefetchedKeys.add(CcRecordKeys.asccp(id.value()));
+        }
+        for (BccpManifestId id : dependencies.bccps()) {
+            keys.add(CcRecordKeys.bccp(id.value()));
+            keys.add(CcRecordKeys.tags(CcType.BCCP, id.value()));
+            prefetchedKeys.add(CcRecordKeys.bccp(id.value()));
+        }
+        for (DtManifestId id : dependencies.dts()) {
+            keys.add(CcRecordKeys.dt(id.value()));
+            keys.add(CcRecordKeys.dtScOfDt(id.value()));
+            keys.add(CcRecordKeys.tags(CcType.DT, id.value()));
+            if (dependencies.hasDtRelated()) {
+                keys.add(CcRecordKeys.dtAwdPri(id.value()));
+            }
+            prefetchedKeys.add(CcRecordKeys.dt(id.value()));
+        }
+        for (AccManifestId id : dependencies.prevAccs()) {
+            keys.add(CcRecordKeys.asccFromAcc(id.value()));
+            keys.add(CcRecordKeys.bccFromAcc(id.value()));
+        }
+        for (DtManifestId id : dependencies.prevDts()) {
+            keys.add(CcRecordKeys.dt(id.value()));
+            keys.add(CcRecordKeys.dtScOfDt(id.value()));
+            keys.add(CcRecordKeys.dtAwdPri(id.value()));
+            prefetchedKeys.add(CcRecordKeys.dt(id.value()));
+        }
+        for (DtManifestId id : dependencies.basedDts()) {
+            keys.add(CcRecordKeys.dt(id.value()));
+            keys.add(CcRecordKeys.dtScOfDt(id.value()));
+            keys.add(CcRecordKeys.dtAwdPri(id.value()));
+            prefetchedKeys.add(CcRecordKeys.dt(id.value()));
+        }
+        for (DtScManifestId id : dependencies.dtScs()) {
+            keys.add(CcRecordKeys.dtSc(id.value()));
+            keys.add(CcRecordKeys.dtScAwdPri(id.value()));
+        }
+        for (NamespaceId id : dependencies.namespaces()) {
+            keys.add(NamespaceRecordKeys.key(id.value()));
+        }
+        for (CodeListManifestId id : dependencies.codeLists()) {
+            keys.add(CodeListRecordKeys.key(id.value()));
+            keys.add(CodeListRecordKeys.releaseKey(id.value()));
+        }
+        for (AgencyIdListManifestId id : dependencies.agencyIdLists()) {
+            keys.add(AgencyIdListRecordKeys.key(id.value()));
+            keys.add(AgencyIdListRecordKeys.releaseKey(id.value()));
+        }
+        if (dependencies.hasDtRelated()) {
+            for (ReleaseId releaseId : scope()) {
+                keys.add(XbtRecordKeys.key(releaseId.value()));
+                keys.add(CcRecordKeys.dts(releaseId.value()));
+            }
+        }
+        recallAll(keys);
+        return true;
+    }
+
+    private void loadDependencies(CcType type, ManifestId root, String marker, boolean withDtRelated) {
+        DependencyManifestIds reached = repositoryFactory.ccQueryRepository(requester).getDependencyManifestIds(type, root);
+        Set<AccManifestId> prevAccs = prefetchAccChildren(List.copyOf(reached.accs()));
+        prefetchAsccpChildren(List.copyOf(reached.asccps()));
+        prefetchBccpChildren(List.copyOf(reached.bccps()));
+        Set<DtManifestId> prevDts = prefetchDtChildren(List.copyOf(reached.dts()));
+        resolveTags(List.of(Pair.of(type, root)));
+        DependencyManifestIds dtRelated = withDtRelated ? prefetchDtRelated(reached.dts(), prevDts) : reached;
+        if (withDtRelated) {
+            // what the document will ask for besides the components: the XBTs and the data types of its releases
+            xbtIndex();
+            dtIndex();
+        }
+        remember(marker, new DependencyManifestIds(
+                Set.copyOf(reached.accs()), Set.copyOf(reached.asccps()), Set.copyOf(reached.bccps()), Set.copyOf(reached.dts()),
+                Set.copyOf(prevAccs), Set.copyOf(prevDts),
+                Set.copyOf(dtRelated.dtScs()), Set.copyOf(dtRelated.basedDts()), Set.copyOf(dtRelated.namespaces()),
+                Set.copyOf(dtRelated.codeLists()), Set.copyOf(dtRelated.agencyIdLists())));
+    }
+
+    /**
+     * Reads, in bulk, what the data types among the dependencies lead to: the supplementary components, the data types they are based on, the
+     * allowed primitives of both (and so the code lists and agency identification lists those refer to, with their releases) and
+     * the namespaces. These tables are small, and a schema export asks for all of it, one record at a time.
+     */
+    private DependencyManifestIds prefetchDtRelated(Collection<DtManifestId> reachedDts, Set<DtManifestId> prevDts) {
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+
+        // the data types: the ones reached, the ones they stand in for, and the ones they are based on (and so on)
+        Set<DtManifestId> all = new LinkedHashSet<>(reachedDts);
+        all.addAll(prevDts);
+        Map<DtManifestId, DtSummaryRecord> dts = new LinkedHashMap<>(resolve(CcRecordKeys::dt, all,
+                dtQuery::getDtSummaryListByManifestIds, DtSummaryRecord::dtManifestId));
+        Set<DtManifestId> basedDts = new LinkedHashSet<>();
+        Map<DtManifestId, DtSummaryRecord> pending = dts;
+        for (int depth = 0; depth < 8; depth++) {
+            Set<DtManifestId> next = pending.values().stream().map(DtSummaryRecord::basedDtManifestId)
+                    .filter(Objects::nonNull).filter(e -> !dts.containsKey(e)).collect(Collectors.toCollection(LinkedHashSet::new));
+            if (next.isEmpty()) {
+                break;
+            }
+            Map<DtManifestId, DtSummaryRecord> found = resolve(CcRecordKeys::dt, next,
+                    dtQuery::getDtSummaryListByManifestIds, DtSummaryRecord::dtManifestId);
+            resolveLists(CcRecordKeys::dtScOfDt, next,
+                    dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+            basedDts.addAll(found.keySet());
+            dts.putAll(found);
+            pending = found;
+        }
+
+        // the supplementary components, each also under its own key
+        Map<DtManifestId, List<DtScSummaryRecord>> dtScLists = resolveLists(CcRecordKeys::dtScOfDt, dts.keySet(),
+                dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+        Map<DtScManifestId, DtScSummaryRecord> dtScs = new LinkedHashMap<>();
+        dtScLists.values().forEach(list -> list.forEach(e -> dtScs.put(e.dtScManifestId(), e)));
+        Map<String, Object> dtScEntries = new HashMap<>();
+        dtScs.forEach((id, record) -> {
+            if (!memo.containsKey(CcRecordKeys.dtSc(id.value()))) {
+                dtScEntries.put(CcRecordKeys.dtSc(id.value()), record);
+            }
+        });
+        rememberAll(dtScEntries);
+
+        // the allowed primitives
+        List<DtAwdPriSummaryRecord> awdPris = new ArrayList<>();
+        awdPriOf(dts, awdPris);
+        List<DtScAwdPriSummaryRecord> dtScAwdPris = new ArrayList<>();
+        dtScAwdPriOf(dtScs, dtScAwdPris);
+
+        // the code lists and agency identification lists they refer to, and the release of each
+        Set<CodeListManifestId> codeLists = new LinkedHashSet<>();
+        Set<AgencyIdListManifestId> agencyIdLists = new LinkedHashSet<>();
+        awdPris.forEach(e -> {
+            if (e.codeListManifestId() != null) {
+                codeLists.add(e.codeListManifestId());
+            }
+            if (e.agencyIdListManifestId() != null) {
+                agencyIdLists.add(e.agencyIdListManifestId());
+            }
+        });
+        dtScAwdPris.forEach(e -> {
+            if (e.codeListManifestId() != null) {
+                codeLists.add(e.codeListManifestId());
+            }
+            if (e.agencyIdListManifestId() != null) {
+                agencyIdLists.add(e.agencyIdListManifestId());
+            }
+        });
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+        resolve(CodeListRecordKeys::key, codeLists, codeListQuery::getCodeListSummaryListByManifestIds, CodeListSummaryRecord::codeListManifestId);
+        resolveReleases(CodeListRecordKeys::releaseKey, codeLists, codeListQuery::getCodeListReleaseIds);
+        var agencyQuery = repositoryFactory.agencyIdListQueryRepository(requester);
+        resolve(AgencyIdListRecordKeys::key, agencyIdLists, agencyQuery::getAgencyIdListSummaryListByManifestIds, AgencyIdListSummaryRecord::agencyIdListManifestId);
+        resolveReleases(AgencyIdListRecordKeys::releaseKey, agencyIdLists, agencyQuery::getAgencyIdListReleaseIds);
+
+        // the namespaces: a few, all of them
+        List<NamespaceSummaryRecord> namespaces = repositoryFactory.namespaceQueryRepository(requester).getNamespaceSummaryList();
+        Map<String, Object> namespaceEntries = new HashMap<>();
+        namespaces.forEach(e -> namespaceEntries.put(NamespaceRecordKeys.key(e.namespaceId().value()), e));
+        rememberAll(namespaceEntries);
+
+        return new DependencyManifestIds(Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
+                Set.copyOf(dtScs.keySet()),
+                Set.copyOf(basedDts),
+                namespaces.stream().map(NamespaceSummaryRecord::namespaceId).collect(Collectors.toUnmodifiableSet()),
+                Set.copyOf(codeLists),
+                Set.copyOf(agencyIdLists));
+    }
+
+    /** The allowed primitives of each data type, read like {@link #resolveLists}; they are added to {@code collected}. */
+    @SuppressWarnings("unchecked")
+    private void awdPriOf(Map<DtManifestId, DtSummaryRecord> dts, List<DtAwdPriSummaryRecord> collected) {
+        Map<String, Object> hits = recallAll(dts.keySet().stream().map(e -> CcRecordKeys.dtAwdPri(e.value())).collect(Collectors.toList()));
+        List<DtSummaryRecord> missing = new ArrayList<>();
+        dts.forEach((id, dt) -> {
+            Object hit = hits.get(CcRecordKeys.dtAwdPri(id.value()));
+            if (hit != null) {
+                collected.addAll((List<DtAwdPriSummaryRecord>) hit);
+            } else {
+                missing.add(dt);
+            }
+        });
+        if (missing.isEmpty()) {
+            return;
+        }
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        Map<Pair<ReleaseId, org.oagi.score.gateway.http.api.cc_management.model.dt.DtId>, List<DtAwdPriSummaryRecord>> byDt = new HashMap<>();
+        for (List<org.oagi.score.gateway.http.api.cc_management.model.dt.DtId> batch :
+                partition(missing.stream().map(DtSummaryRecord::dtId).distinct().collect(Collectors.toList()))) {
+            for (DtAwdPriSummaryRecord record : dtQuery.getDtAwdPriSummaryListByDtIds(batch)) {
+                byDt.computeIfAbsent(Pair.of(record.releaseId(), record.dtId()), k -> new ArrayList<>()).add(record);
+            }
+        }
+        Map<String, Object> remembered = new HashMap<>();
+        for (DtSummaryRecord dt : missing) {
+            // the loaded releases list them by id
+            List<DtAwdPriSummaryRecord> list = byDt.getOrDefault(Pair.of(dt.release().releaseId(), dt.dtId()), Collections.emptyList()).stream()
+                    .sorted(Comparator.comparing(e -> e.dtAwdPriId().value())).collect(Collectors.toUnmodifiableList());
+            remembered.put(CcRecordKeys.dtAwdPri(dt.dtManifestId().value()), list);
+            collected.addAll(list);
+        }
+        rememberAll(remembered);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void dtScAwdPriOf(Map<DtScManifestId, DtScSummaryRecord> dtScs, List<DtScAwdPriSummaryRecord> collected) {
+        Map<String, Object> hits = recallAll(dtScs.keySet().stream().map(e -> CcRecordKeys.dtScAwdPri(e.value())).collect(Collectors.toList()));
+        List<DtScSummaryRecord> missing = new ArrayList<>();
+        dtScs.forEach((id, dtSc) -> {
+            Object hit = hits.get(CcRecordKeys.dtScAwdPri(id.value()));
+            if (hit != null) {
+                collected.addAll((List<DtScAwdPriSummaryRecord>) hit);
+            } else {
+                missing.add(dtSc);
+            }
+        });
+        if (missing.isEmpty()) {
+            return;
+        }
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        Map<Pair<ReleaseId, org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId>, List<DtScAwdPriSummaryRecord>> byDtSc = new HashMap<>();
+        for (List<org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScId> batch :
+                partition(missing.stream().map(DtScSummaryRecord::dtScId).distinct().collect(Collectors.toList()))) {
+            for (DtScAwdPriSummaryRecord record : dtQuery.getDtScAwdPriSummaryListByDtScIds(batch)) {
+                byDtSc.computeIfAbsent(Pair.of(record.releaseId(), record.dtScId()), k -> new ArrayList<>()).add(record);
+            }
+        }
+        Map<String, Object> remembered = new HashMap<>();
+        for (DtScSummaryRecord dtSc : missing) {
+            List<DtScAwdPriSummaryRecord> list = byDtSc.getOrDefault(Pair.of(dtSc.release().releaseId(), dtSc.dtScId()), Collections.emptyList()).stream()
+                    .sorted(Comparator.comparing(e -> e.dtScAwdPriId().value())).collect(Collectors.toUnmodifiableList());
+            remembered.put(CcRecordKeys.dtScAwdPri(dtSc.dtScManifestId().value()), list);
+            collected.addAll(list);
+        }
+        rememberAll(remembered);
+    }
+
+    /** The release of each manifest: the cached ones read together, the missing ones read in batches (and cached). */
+    private <I extends ManifestId> void resolveReleases(Function<BigInteger, String> key, Collection<I> ids,
+                                                       Function<List<I>, Map<I, ReleaseId>> loader) {
+        Map<String, Object> hits = recallAll(ids.stream().map(e -> key.apply(e.value())).collect(Collectors.toList()));
+        List<I> missing = ids.stream().filter(e -> !hits.containsKey(key.apply(e.value()))).collect(Collectors.toList());
+        for (List<I> batch : partition(missing)) {
+            Map<String, Object> remembered = new HashMap<>();
+            loader.apply(batch).forEach((id, releaseId) -> remembered.put(key.apply(id.value()), releaseId));
+            rememberAll(remembered);
+        }
+    }
+
+    /** @return the components the ACCs without associations stand in for */
+    private Set<AccManifestId> prefetchAccChildren(List<AccManifestId> accManifestIds) {
+        var accQuery = repositoryFactory.accQueryRepository(requester);
+
+        Map<AccManifestId, AccSummaryRecord> accs = resolve(CcRecordKeys::acc, accManifestIds,
+                accQuery::getAccSummaryListByManifestIds, AccSummaryRecord::accManifestId);
+        Set<AccManifestId> basedAccManifestIds = accs.values().stream()
+                .map(AccSummaryRecord::basedAccManifestId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<AccManifestId, AccSummaryRecord> basedAccs = resolve(CcRecordKeys::acc, basedAccManifestIds,
+                accQuery::getAccSummaryListByManifestIds, AccSummaryRecord::accManifestId);
+
+        Map<AccManifestId, List<AsccSummaryRecord>> asccs = resolveLists(CcRecordKeys::asccFromAcc, accManifestIds,
+                accQuery::getAsccSummaryListByFromAccManifestIds, AsccSummaryRecord::fromAccManifestId);
+        Map<AccManifestId, List<BccSummaryRecord>> bccs = resolveLists(CcRecordKeys::bccFromAcc, accManifestIds,
+                accQuery::getBccSummaryListByFromAccManifestIds, BccSummaryRecord::fromAccManifestId);
+        resolveLists(CcRecordKeys::seqKeyFromAcc, accManifestIds,
+                repositoryFactory.seqKeyQueryRepository(requester)::getSeqKeySummaryListByFromAccManifestIds,
+                SeqKeySummaryRecord::fromAccManifestId);
+
+        // A component without associations of its own is looked up under the component it was made from.
+        Set<AccManifestId> previous = new LinkedHashSet<>(previousOf(accs, asccs));
+        previous.addAll(previousOf(accs, bccs));
+        resolveLists(CcRecordKeys::asccFromAcc, previousOf(accs, asccs),
+                accQuery::getAsccSummaryListByFromAccManifestIds, AsccSummaryRecord::fromAccManifestId);
+        resolveLists(CcRecordKeys::bccFromAcc, previousOf(accs, bccs),
+                accQuery::getBccSummaryListByFromAccManifestIds, BccSummaryRecord::fromAccManifestId);
+
+        Set<AsccpManifestId> asccpManifestIds = asccs.values().stream().flatMap(List::stream)
+                .map(AsccSummaryRecord::toAsccpManifestId).collect(Collectors.toSet());
+        Set<BccpManifestId> bccpManifestIds = bccs.values().stream().flatMap(List::stream)
+                .map(BccSummaryRecord::toBccpManifestId).collect(Collectors.toSet());
+        resolve(CcRecordKeys::asccp, asccpManifestIds,
+                repositoryFactory.asccpQueryRepository(requester)::getAsccpSummaryListByManifestIds,
+                AsccpSummaryRecord::asccpManifestId);
+        resolve(CcRecordKeys::bccp, bccpManifestIds,
+                repositoryFactory.bccpQueryRepository(requester)::getBccpSummaryListByManifestIds,
+                BccpSummaryRecord::bccpManifestId);
+
+        List<Pair<CcType, ManifestId>> tagged = new ArrayList<>();
+        basedAccs.keySet().forEach(e -> tagged.add(Pair.of(CcType.ACC, e)));
+        asccpManifestIds.forEach(e -> tagged.add(Pair.of(CcType.ASCCP, e)));
+        bccpManifestIds.forEach(e -> tagged.add(Pair.of(CcType.BCCP, e)));
+        resolveTags(tagged);
+        return previous;
+    }
+
+    /** The components that were made from the ACCs that have no associations in {@code associationsByAcc}. */
+    private static <T> Set<AccManifestId> previousOf(Map<AccManifestId, AccSummaryRecord> accs,
+                                                     Map<AccManifestId, List<T>> associationsByAcc) {
+        return accs.values().stream()
+                .filter(acc -> associationsByAcc.getOrDefault(acc.accManifestId(), Collections.emptyList()).isEmpty())
+                .map(AccSummaryRecord::prevAccManifestId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    /** @return the data types the ones without supplementary components stand in for */
+    private Set<DtManifestId> prefetchDtChildren(List<DtManifestId> dtManifestIds) {
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        Map<DtManifestId, List<DtScSummaryRecord>> dtScs = resolveLists(CcRecordKeys::dtScOfDt, dtManifestIds,
+                dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+
+        // A data type without supplementary components of its own is looked up under the one it was made from.
+        List<DtManifestId> withoutDtScs = dtScs.entrySet().stream()
+                .filter(e -> e.getValue().isEmpty()).map(Map.Entry::getKey).collect(Collectors.toList());
+        Set<DtManifestId> previous = resolve(CcRecordKeys::dt, withoutDtScs,
+                dtQuery::getDtSummaryListByManifestIds, DtSummaryRecord::dtManifestId).values().stream()
+                .map(DtSummaryRecord::prevDtManifestId).filter(Objects::nonNull).collect(Collectors.toSet());
+        resolveLists(CcRecordKeys::dtScOfDt, previous,
+                dtQuery::getDtScSummaryListByOwnerDtManifestIds, DtScSummaryRecord::ownerDtManifestId);
+        return previous;
+    }
+
+    private void prefetchAsccpChildren(List<AsccpManifestId> asccpManifestIds) {
+        Map<AsccpManifestId, AsccpSummaryRecord> asccps = resolve(CcRecordKeys::asccp, asccpManifestIds,
+                repositoryFactory.asccpQueryRepository(requester)::getAsccpSummaryListByManifestIds,
+                AsccpSummaryRecord::asccpManifestId);
+        Map<AccManifestId, AccSummaryRecord> accs = resolve(CcRecordKeys::acc,
+                asccps.values().stream().map(AsccpSummaryRecord::roleOfAccManifestId).collect(Collectors.toSet()),
+                repositoryFactory.accQueryRepository(requester)::getAccSummaryListByManifestIds,
+                AccSummaryRecord::accManifestId);
+        resolveTags(accs.keySet().stream()
+                .map(e -> Pair.<CcType, ManifestId>of(CcType.ACC, e)).collect(Collectors.toList()));
+    }
+
+    private void prefetchBccpChildren(List<BccpManifestId> bccpManifestIds) {
+        Map<BccpManifestId, BccpSummaryRecord> bccps = resolve(CcRecordKeys::bccp, bccpManifestIds,
+                repositoryFactory.bccpQueryRepository(requester)::getBccpSummaryListByManifestIds,
+                BccpSummaryRecord::bccpManifestId);
+        Map<DtManifestId, DtSummaryRecord> dts = resolve(CcRecordKeys::dt,
+                bccps.values().stream().map(BccpSummaryRecord::dtManifestId).collect(Collectors.toSet()),
+                repositoryFactory.dtQueryRepository(requester)::getDtSummaryListByManifestIds,
+                DtSummaryRecord::dtManifestId);
+        resolveTags(dts.keySet().stream()
+                .map(e -> Pair.<CcType, ManifestId>of(CcType.DT, e)).collect(Collectors.toList()));
+    }
+
+    /** The records for the ids: the cached ones, read together, and the missing ones read in batches (and cached). */
+    @SuppressWarnings("unchecked")
+    private <I extends ManifestId, R> Map<I, R> resolve(Function<BigInteger, String> key, Collection<I> ids,
+                                                       Function<List<I>, List<R>> batchLoader, Function<R, I> idOf) {
+        Map<I, R> resolved = new LinkedHashMap<>();
+        Map<String, Object> hits = recallAll(ids.stream().map(e -> key.apply(e.value())).collect(Collectors.toList()));
+        List<I> missing = new ArrayList<>();
+        for (I id : ids) {
+            Object hit = hits.get(key.apply(id.value()));
+            if (hit != null) {
+                resolved.put(id, (R) hit);
+            } else {
+                missing.add(id);
+            }
+        }
+        for (List<I> batch : partition(missing)) {
+            Map<String, Object> loaded = new HashMap<>();
+            for (R record : batchLoader.apply(batch)) {
+                I id = idOf.apply(record);
+                resolved.put(id, record);
+                loaded.put(key.apply(id.value()), record);
+            }
+            rememberAll(loaded);
+        }
+        return resolved;
+    }
+
+    /** The records under each parent id, an empty list for a parent without any; read like {@link #resolve}. */
+    @SuppressWarnings("unchecked")
+    private <I extends ManifestId, R> Map<I, List<R>> resolveLists(Function<BigInteger, String> key, Collection<I> parentIds,
+                                                                  Function<List<I>, List<R>> batchLoader, Function<R, I> parentOf) {
+        Map<I, List<R>> resolved = new LinkedHashMap<>();
+        Map<String, Object> hits = recallAll(parentIds.stream().map(e -> key.apply(e.value())).collect(Collectors.toList()));
+        List<I> missing = new ArrayList<>();
+        for (I parentId : parentIds) {
+            Object hit = hits.get(key.apply(parentId.value()));
+            if (hit != null) {
+                resolved.put(parentId, (List<R>) hit);
+            } else {
+                missing.add(parentId);
+            }
+        }
+        for (List<I> batch : partition(missing)) {
+            Map<I, List<R>> loaded = new HashMap<>();
+            for (R record : batchLoader.apply(batch)) {
+                loaded.computeIfAbsent(parentOf.apply(record), k -> new ArrayList<>()).add(record);
+            }
+            Map<String, Object> remembered = new HashMap<>();
+            for (I parentId : batch) {
+                List<R> list = List.copyOf(loaded.getOrDefault(parentId, Collections.emptyList()));
+                resolved.put(parentId, list);
+                remembered.put(key.apply(parentId.value()), list);
+            }
+            rememberAll(remembered);
+        }
+        return resolved;
+    }
+
+    private void resolveTags(List<Pair<CcType, ManifestId>> pairs) {
+        Map<String, Object> hits = recallAll(pairs.stream().map(CachedCcDocument::tagKey).collect(Collectors.toList()));
+        List<Pair<CcType, ManifestId>> missing = pairs.stream()
+                .filter(e -> !hits.containsKey(tagKey(e))).collect(Collectors.toList());
+        var tagQuery = repositoryFactory.tagQueryRepository(requester);
+        for (List<Pair<CcType, ManifestId>> batch : partition(missing)) {
+            Map<Pair<CcType, ManifestId>, List<TagSummaryRecord>> loaded =
+                    tagQuery.getTagSummariesByPairsOfTypeAndManifestId(batch);
+            Map<String, Object> remembered = new HashMap<>();
+            for (Pair<CcType, ManifestId> pair : batch) {
+                remembered.put(tagKey(pair), inTagOrder(loaded.getOrDefault(pair, Collections.emptyList())));
+            }
+            rememberAll(remembered);
+        }
+    }
+
+    /** The tags in the order {@link CcDocumentImpl} lists them: by tag id, whatever order the database answered in. */
+    static List<TagSummaryRecord> inTagOrder(List<TagSummaryRecord> tags) {
+        return tags.stream().sorted(Comparator.comparing(e -> e.tagId().value())).collect(Collectors.toUnmodifiableList());
+    }
+
+    private static String tagKey(Pair<CcType, ManifestId> pair) {
+        return CcRecordKeys.tags(pair.getLeft(), pair.getRight().value());
+    }
+
+    private <T> List<List<T>> partition(List<T> list) {
+        List<List<T>> batches = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += batchSize) {
+            batches.add(list.subList(i, Math.min(i + batchSize, list.size())));
+        }
+        return batches;
+    }
+
+    // ---- everything else: answered by the document that loads the releases ---------------------------------------
+
+    // ---- the XBTs of the releases in scope: a list per release, which is what they are cached as -----------------------
+
+    private volatile Map<XbtManifestId, XbtSummaryRecord> xbtIndex;
+    private volatile Map<String, List<XbtSummaryRecord>> xbtIndexByName;
+
+    private void indexXbts() {
+        Map<XbtManifestId, XbtSummaryRecord> byId = new HashMap<>();
+        Map<String, List<XbtSummaryRecord>> byName = new HashMap<>();
+        var xbtQuery = repositoryFactory.xbtQueryRepository(requester);
+        for (ReleaseId releaseId : scope().stream().sorted(Comparator.comparing(e -> e.value())).collect(Collectors.toList())) {
+            List<XbtSummaryRecord> xbts = cached(XbtRecordKeys.key(releaseId.value()), () -> List.copyOf(xbtQuery.getXbtSummaryList(releaseId)));
+            for (XbtSummaryRecord xbt : xbts) {
+                byId.put(xbt.xbtManifestId(), xbt);
+                byName.computeIfAbsent(xbt.name(), k -> new ArrayList<>()).add(xbt);
+            }
+        }
+        xbtIndexByName = byName;
+        xbtIndex = byId;
+    }
+
+    private Map<XbtManifestId, XbtSummaryRecord> xbtIndex() {
+        if (xbtIndex == null) {
+            indexXbts();
+        }
+        return xbtIndex;
+    }
+
+    private volatile Map<DtManifestId, DtSummaryRecord> dtIndex;
+
+    /** The data types of the releases in scope: a list per release, which is what they are cached as. */
+    private Map<DtManifestId, DtSummaryRecord> dtIndex() {
+        Map<DtManifestId, DtSummaryRecord> index = dtIndex;
+        if (index == null) {
+            index = new HashMap<>();
+            var dtQuery = repositoryFactory.dtQueryRepository(requester);
+            for (ReleaseId releaseId : scope().stream().sorted(Comparator.comparing(e -> e.value())).collect(Collectors.toList())) {
+                for (DtSummaryRecord dt : cached(CcRecordKeys.dts(releaseId.value()), () -> List.copyOf(dtQuery.getDtSummaryList(releaseId)))) {
+                    index.put(dt.dtManifestId(), dt);
+                }
+            }
+            dtIndex = index;
+        }
+        return index;
+    }
+
+    private Map<String, List<XbtSummaryRecord>> xbtIndexByName() {
+        xbtIndex();
+        return xbtIndexByName;
+    }
+
+    @Override
+    public Collection<AsccpSummaryRecord> getAsccpList() {
+        throw new UnsupportedOperationException("The list of every ASCCP of the releases is answered from the loaded releases, by CacheFirstCcDocument.");
+    }
+
+    @Override
+    public List<DtSummaryRecord> getDtList() {
+        return new ArrayList<>(dtIndex().values());
+    }
+
+    @Override
+    public List<DtAwdPriSummaryRecord> getDtAwdPriList(DtManifestId dtManifestId) {
+        if (dtManifestId == null || getDt(dtManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return cached(CcRecordKeys.dtAwdPri(dtManifestId.value()),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtAwdPriSummaryList(dtManifestId).stream()
+                        // the query has no order of its own; the loaded releases list them by id
+                        .sorted(Comparator.comparing(e -> e.dtAwdPriId().value())).collect(Collectors.toUnmodifiableList()));
+    }
+
+    @Override
+    public List<DtScAwdPriSummaryRecord> getDtScAwdPriList(DtScManifestId dtScManifestId) {
+        if (dtScManifestId == null || getDtSc(dtScManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return cached(CcRecordKeys.dtScAwdPri(dtScManifestId.value()),
+                () -> repositoryFactory.dtQueryRepository(requester).getDtScAwdPriSummaryList(dtScManifestId).stream()
+                        .sorted(Comparator.comparing(e -> e.dtScAwdPriId().value())).collect(Collectors.toUnmodifiableList()));
+    }
+
+    @Override
+    public XbtSummaryRecord getXbt(XbtManifestId xbtManifestId) {
+        return xbtIndex().get(xbtManifestId);
+    }
+
+    @Override
+    public List<XbtSummaryRecord> getXbtListByName(String name) {
+        return xbtIndexByName().getOrDefault(name, Collections.emptyList());
+    }
+
+    // The usages of a component are the records that point at it. They are not kept in the cache (what would have to forget
+    // them is a change to any of the records that point), but asked of the database by the key that points, which is indexed.
+    // The records that point at a component are in its release, so a component of the releases of this document has its
+    // usages in them, and one of another release has none here: that is checked for the component, not for each record.
+
+    @Override
+    public List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        if (basedAccManifestId == null || knownAcc(basedAccManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.accQueryRepository(requester).getAccSummaryListByBasedAccManifestIds(List.of(basedAccManifestId));
+    }
+
+    @Override
+    public boolean hasAccByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        if (basedAccManifestId == null) {
+            return false;
+        }
+        // The ACCs of the releases the document answers for that are the base of another one, read once: the answer for a
+        // component of another release is false, as its derived ACCs are of that release.
+        Set<AccManifestId> based = this.basedAccManifestIds;
+        if (based == null) {
+            based = repositoryFactory.accQueryRepository(requester).getBasedAccManifestIds(scope());
+            this.basedAccManifestIds = based;
+        }
+        return based.contains(basedAccManifestId);
+    }
+
+    @Override
+    public Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        Map<AccManifestId, List<AccSummaryRecord>> result = new LinkedHashMap<>();
+        List<AccManifestId> ids = basedAccManifestIds.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        ids.forEach(id -> result.put(id, new ArrayList<>()));
+        for (List<AccManifestId> batch : partition(ids)) {
+            // The ACCs based on a component of another release are of that release, so the scope leaves them out.
+            List<AccSummaryRecord> accs = inScope(repositoryFactory.accQueryRepository(requester)
+                    .getAccSummaryListByBasedAccManifestIds(batch), AccSummaryRecord::release);
+            for (AccSummaryRecord acc : accs) {
+                result.get(acc.basedAccManifestId()).add(acc);
+            }
+            if (!cache.isBypassed()) {
+                // The caller asks for the tags of each of them next. They are what getAcc answers, so they are
+                // remembered, and their tags are read in bulk, instead of one lookup of the cache for each.
+                Map<String, Object> known = new HashMap<>();
+                accs.forEach(e -> known.put(CcRecordKeys.acc(e.accManifestId().value()), e));
+                rememberAll(known);
+                resolveTags(accs.stream().map(e -> Pair.<CcType, ManifestId>of(CcType.ACC, e.accManifestId()))
+                        .collect(Collectors.toList()));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<AsccpSummaryRecord> getAsccpListByRoleOfAccManifestId(AccManifestId roleOfAccManifestId) {
+        if (roleOfAccManifestId == null || knownAcc(roleOfAccManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.asccpQueryRepository(requester).getAsccpSummaryList(roleOfAccManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.asccpManifestId().value())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AccSummaryRecord> getAccListByToAsccpManifestId(AsccpManifestId toAsccpManifestId) {
+        if (toAsccpManifestId == null || knownAsccp(toAsccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return accsOf(repositoryFactory.accQueryRepository(requester).getAsccSummaryList(toAsccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.asccManifestId().value()))
+                .map(AsccSummaryRecord::fromAccManifestId).collect(Collectors.toList()));
+    }
+
+    /** The ACCs, one for each id in the order of the ids (an id twice is an ACC twice), read together. */
+    private List<AccSummaryRecord> accsOf(List<AccManifestId> accManifestIds) {
+        Map<AccManifestId, AccSummaryRecord> accs = resolve(CcRecordKeys::acc, new LinkedHashSet<>(accManifestIds),
+                repositoryFactory.accQueryRepository(requester)::getAccSummaryListByManifestIds, AccSummaryRecord::accManifestId);
+        return accManifestIds.stream().map(accs::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AccSummaryRecord> getAccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
+        if (toBccpManifestId == null || knownBccp(toBccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return accsOf(repositoryFactory.accQueryRepository(requester).getBccSummaryList(toBccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccManifestId().value()))
+                .map(BccSummaryRecord::fromAccManifestId).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<BccpSummaryRecord> getBccpListByDtManifestId(DtManifestId dtManifestId) {
+        if (dtManifestId == null || knownDt(dtManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.bccpQueryRepository(requester).getBccpSummaryList(dtManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccpManifestId().value())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BccSummaryRecord> getBccListByToBccpManifestId(BccpManifestId toBccpManifestId) {
+        if (toBccpManifestId == null || knownBccp(toBccpManifestId) == null) {
+            return Collections.emptyList();
+        }
+        return repositoryFactory.accQueryRepository(requester).getBccSummaryList(toBccpManifestId).stream()
+                .sorted(Comparator.comparing(e -> e.bccManifestId().value())).collect(Collectors.toList());
+    }
+
+    @Override
+    public NamespaceSummaryRecord getNamespace(NamespaceId namespaceId) {
+        if (namespaceId == null) {
+            return null;
+        }
+        return cached(NamespaceRecordKeys.key(namespaceId.value()),
+                () -> repositoryFactory.namespaceQueryRepository(requester).getNamespaceSummary(namespaceId));
+    }
+
+    @Override
+    public CodeListSummaryRecord getCodeList(CodeListManifestId codeListManifestId) {
+        if (codeListManifestId == null) {
+            return null;
+        }
+        var query = repositoryFactory.codeListQueryRepository(requester);
+        // the record carries no release; the release of a manifest never changes
+        ReleaseId releaseId = cached(CodeListRecordKeys.releaseKey(codeListManifestId.value()), () -> query.getCodeListReleaseId(codeListManifestId));
+        if (releaseId == null || !scope().contains(releaseId)) {
+            return null;
+        }
+        return cached(CodeListRecordKeys.key(codeListManifestId.value()), () -> query.getCodeListSummary(codeListManifestId));
+    }
+
+    @Override
+    public AgencyIdListSummaryRecord getAgencyIdList(AgencyIdListManifestId agencyIdListManifestId) {
+        if (agencyIdListManifestId == null) {
+            return null;
+        }
+        var query = repositoryFactory.agencyIdListQueryRepository(requester);
+        ReleaseId releaseId = cached(AgencyIdListRecordKeys.releaseKey(agencyIdListManifestId.value()), () -> query.getAgencyIdListReleaseId(agencyIdListManifestId));
+        if (releaseId == null || !scope().contains(releaseId)) {
+            return null;
+        }
+        return cached(AgencyIdListRecordKeys.key(agencyIdListManifestId.value()), () -> query.getAgencyIdListSummary(agencyIdListManifestId));
+    }
+
+    @Override
+    public BlobContentSummaryRecord getBlobContent(BlobContentManifestId blobContentManifestId) {
+        throw new UnsupportedOperationException("A blob is answered from the loaded releases, by CacheFirstCcDocument.");
+    }
+
+}

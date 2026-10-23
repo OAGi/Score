@@ -1,0 +1,86 @@
+<div class="p-0 passkeys-section">
+  <mat-toolbar class="bg-white">
+    <span class="title">Passkeys</span>
+    <span class="flex-11-auto"></span>
+  </mat-toolbar>
+  <mat-card class="mb-2">
+    <mat-card-content class="mat-card-container">
+      <p class="passkeys-intro">
+        A passkey lets you sign in with your fingerprint, face, screen lock, or a security key instead of typing your
+        password.
+      </p>
+
+      @if (loading) {
+        <div class="passkeys-loading"><mat-spinner [diameter]="24"></mat-spinner></div>
+      }
+
+      @if (!loading && passkeys.length === 0) {
+        <p class="passkeys-empty">You have not added a passkey yet.</p>
+      }
+
+      @for (passkey of passkeys; track passkey.id) {
+        <div class="passkey-row">
+          @if (providerIcon(passkey); as icon) {
+            <img class="passkey-icon passkey-provider-icon" [src]="icon" [alt]="passkey.provider"
+              [title]="passkey.provider" width="24" height="24" />
+          } @else {
+            <mat-icon class="passkey-icon" aria-hidden="true">fingerprint</mat-icon>
+          }
+          <div class="passkey-main">
+            @if (editingId === passkey.id) {
+              <div class="passkey-rename">
+                <input class="passkey-label-input" maxlength="100" [(ngModel)]="editingLabel"
+                  (keydown.enter)="saveRename(passkey)" (keydown.escape)="cancelRename()"
+                  aria-label="Passkey name" placeholder="Name" />
+                <button mat-button color="primary" (click)="saveRename(passkey)" [disabled]="!editingLabel.trim()">Save</button>
+                <button mat-button (click)="cancelRename()">Cancel</button>
+              </div>
+            } @else {
+              <div class="passkey-label">{{ title(passkey) }}
+                @if (hasProviderTitle(passkey) && passkey.label) {
+                  <span class="passkey-name">{{ passkey.label }}</span>
+                }
+              </div>
+            }
+            <div class="passkey-meta passkey-created">
+              Created: {{ passkey.creationTimestamp | date: 'mediumDate' }}
+              @if (!passkey.usable) {
+                <span class="passkey-chip passkey-chip-warn"
+                  [title]="'Registered for ' + passkey.rpId + ', so it cannot be used here.'">Cannot be used here</span>
+              }
+            </div>
+            <div class="passkey-meta passkey-last-used">
+              @if (passkey.lastUsedTimestamp) {
+                Last used: {{ passkey.lastUsedTimestamp | date: 'medium' }}
+                @if (lastUsedFrom(passkey); as from) {
+                  · {{ from }}
+                }
+              } @else {
+                Not used yet
+              }
+            </div>
+          </div>
+          @if (editingId !== passkey.id) {
+            <button mat-icon-button aria-label="Rename passkey" (click)="startRename(passkey)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Remove passkey" (click)="remove(passkey)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="passkey-add">
+        @if (supported) {
+          <button mat-raised-button color="primary" class="btn-add-passkey" (click)="add()"
+            [disabled]="adding">
+            Add a passkey
+          </button>
+        } @else {
+          <span class="passkeys-empty">This browser does not support passkeys.</span>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

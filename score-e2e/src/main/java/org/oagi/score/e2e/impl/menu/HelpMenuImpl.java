@@ -15,13 +15,13 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class HelpMenuImpl extends DelegateBasePageImpl implements HelpMenu {
 
     private final By HELP_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Help\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Help\")]");
 
     private final By ABOUT_SUB_MENU_LOCATOR =
-            By.xpath("//button/span[contains(text(), \"About\")]");
+            By.xpath("//button[contains(., \"About\")]");
 
     private final By USER_GUIDE_SUB_MENU_LOCATOR =
-            By.xpath("//button/span[contains(text(), \"User Guide\")]");
+            By.xpath("//button[contains(., \"User Guide\")]");
 
     public HelpMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

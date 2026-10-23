@@ -8,6 +8,7 @@ import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.message_management.service.MessageCommandService;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AppOauth2UserRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.Oauth2AppRecord;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyAuthenticationToken;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -62,7 +63,7 @@ public class ScoreAuthenticationSuccessHandler
             Map<String, Object> resp = new HashMap();
             UserDetails userDetails = (UserDetails) principal;
             resp.put("username", userDetails.getUsername());
-            resp.put("authentication", "basic");
+            resp.put("authentication", (authentication instanceof PasskeyAuthenticationToken) ? "passkey" : "basic");
             resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
 
             ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();

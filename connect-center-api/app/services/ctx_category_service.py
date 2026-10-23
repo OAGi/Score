@@ -225,6 +225,13 @@ class ContextCategoryService:
         Returns:
             Result of the operation.
         """
+        scheme_ids = await self._repo.get_ctx_scheme_ids_using_category(context_category_id)
+        if scheme_ids:
+            joined = ", ".join(str(x) for x in scheme_ids)
+            raise ValueError(
+                "Cannot delete context category because it is used by context schemes: "
+                f"{joined}. Delete those context schemes first."
+            )
         deleted = await self._repo.delete(context_category_id)
         logger.info("delete ctx_category id=%d → %s", int(context_category_id), "deleted" if deleted else "not found")
         return deleted

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {BusinessContextValue} from '../domain/business-context';
 import {ContextSchemeSummary, ContextSchemeValueListRequest, ContextSchemeValueSummary} from '../../context-scheme/domain/context-scheme';
@@ -15,6 +15,7 @@ import {finalize} from 'rxjs/operators';
   standalone: false,
   selector: 'score-business-context-value-dialog',
   templateUrl: './business-context-value-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./business-context-value-dialog.component.css']
 })
 export class BusinessContextValueDialogComponent implements OnInit {

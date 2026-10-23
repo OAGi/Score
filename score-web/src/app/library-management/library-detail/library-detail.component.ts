@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -9,7 +9,7 @@ import {AuthService} from '../../authentication/auth.service';
 import {switchMap} from 'rxjs/operators';
 import {LibraryDetails, LibraryReleaseDependency, LibraryReleaseDependenciesResponse} from '../domain/library';
 import {LibraryService} from '../domain/library.service';
-import {hashCode} from 'src/app/common/utility';
+import {hashCode} from '../../common/utility';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {forkJoin, Observable} from 'rxjs';
@@ -20,6 +20,7 @@ import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
   standalone: false,
   selector: 'score-library-detail',
   templateUrl: './library-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './library-detail.component.css'
 })
 export class LibraryDetailComponent {

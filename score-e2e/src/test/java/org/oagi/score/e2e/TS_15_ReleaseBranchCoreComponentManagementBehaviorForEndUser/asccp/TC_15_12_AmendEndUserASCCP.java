@@ -211,7 +211,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         viewEditCoreComponentPage.showAdvancedSearchPanel();
         waitFor(Duration.ofMillis(3000L));
         click(viewEditCoreComponentPage.getTypeSelectField());
-        List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+        List<WebElement> options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
         for (String ccState : Arrays.asList("ACC")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
@@ -227,7 +227,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         invisibilityOfLoadingContainerElement(getDriver());
         viewEditCoreComponentPage.showAdvancedSearchPanel();
         click(viewEditCoreComponentPage.getTypeSelectField());
-        options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+        options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
         for (String ccState : Arrays.asList("ACC")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
@@ -413,6 +413,10 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_not_reusable.getAsccpManifestId());
         WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
+        // Material no longer covers a disabled checkbox with an overlay, so clicking it reaches the
+        // disabled input and is dropped by the browser instead of raising an interception. Assert
+        // the disabled state and that the click leaves the value untouched.
+        assertDisabled(asccpPanel.getReusableCheckbox());
         asccpPanel.toggleReusable();
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
@@ -672,7 +676,7 @@ public class TC_15_12_AmendEndUserASCCP extends BaseTest {
         ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
 
     }
 

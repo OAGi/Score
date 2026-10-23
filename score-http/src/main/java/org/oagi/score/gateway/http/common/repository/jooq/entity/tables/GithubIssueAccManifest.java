@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManifest.AccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.GithubIssue.GithubIssuePath;
@@ -48,7 +49,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.github_issue_acc_manifest</code>
+     * The reference instance of <code>github_issue_acc_manifest</code>
      */
     public static final GithubIssueAccManifest GITHUB_ISSUE_ACC_MANIFEST = new GithubIssueAccManifest();
 
@@ -62,46 +63,44 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
 
     /**
      * The column
-     * <code>oagi.github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
+     * <code>github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
      * Primary key column.
      */
-    public final TableField<GithubIssueAccManifestRecord, ULong> GITHUB_ISSUE_ACC_MANIFEST_ID = createField(DSL.name("github_issue_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+    public final TableField<GithubIssueAccManifestRecord, ULong> GITHUB_ISSUE_ACC_MANIFEST_ID = createField(DSL.name("github_issue_acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.github_issue_acc_manifest.acc_manifest_id</code>.
+     * The column <code>github_issue_acc_manifest.acc_manifest_id</code>.
      * Foreign key to acc_manifest; the ACC (in a given release) linked to a
      * GitHub issue.
      */
     public final TableField<GithubIssueAccManifestRecord, ULong> ACC_MANIFEST_ID = createField(DSL.name("acc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to acc_manifest; the ACC (in a given release) linked to a GitHub issue.");
 
     /**
-     * The column <code>oagi.github_issue_acc_manifest.github_issue_id</code>.
+     * The column <code>github_issue_acc_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public final TableField<GithubIssueAccManifestRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to github_issue; the linked GitHub issue.");
 
     /**
-     * The column <code>oagi.github_issue_acc_manifest.created_by</code>.
-     * Foreign key to app_user; who created the link.
+     * The column <code>github_issue_acc_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public final TableField<GithubIssueAccManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who created the link.");
 
     /**
-     * The column <code>oagi.github_issue_acc_manifest.last_updated_by</code>.
+     * The column <code>github_issue_acc_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public final TableField<GithubIssueAccManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who last updated the link.");
 
     /**
-     * The column
-     * <code>oagi.github_issue_acc_manifest.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * The column <code>github_issue_acc_manifest.creation_timestamp</code>.
+     * Timestamp when this record was created.
      */
     public final TableField<GithubIssueAccManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
-     * The column
-     * <code>oagi.github_issue_acc_manifest.last_update_timestamp</code>.
+     * The column <code>github_issue_acc_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public final TableField<GithubIssueAccManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
@@ -115,23 +114,21 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_acc_manifest</code> table
-     * reference
+     * Create an aliased <code>github_issue_acc_manifest</code> table reference
      */
     public GithubIssueAccManifest(String alias) {
         this(DSL.name(alias), GITHUB_ISSUE_ACC_MANIFEST);
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_acc_manifest</code> table
-     * reference
+     * Create an aliased <code>github_issue_acc_manifest</code> table reference
      */
     public GithubIssueAccManifest(Name alias) {
         this(alias, GITHUB_ISSUE_ACC_MANIFEST);
     }
 
     /**
-     * Create a <code>oagi.github_issue_acc_manifest</code> table reference
+     * Create a <code>github_issue_acc_manifest</code> table reference
      */
     public GithubIssueAccManifest() {
         this(DSL.name("github_issue_acc_manifest"), null);
@@ -172,7 +169,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -198,7 +195,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     private transient AccManifestPath _accManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc_manifest</code> table.
+     * Get the implicit join path to the <code>acc_manifest</code> table.
      */
     public AccManifestPath accManifest() {
         if (_accManifest == null)
@@ -210,8 +207,8 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     private transient AppUserPath _githubIssueAccManifestCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_acc_manifest_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_acc_manifest_created_by_fk</code> key.
      */
     public AppUserPath githubIssueAccManifestCreatedByFk() {
         if (_githubIssueAccManifestCreatedByFk == null)
@@ -223,7 +220,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     private transient GithubIssuePath _githubIssue;
 
     /**
-     * Get the implicit join path to the <code>oagi.github_issue</code> table.
+     * Get the implicit join path to the <code>github_issue</code> table.
      */
     public GithubIssuePath githubIssue() {
         if (_githubIssue == null)
@@ -235,8 +232,8 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     private transient AppUserPath _githubIssueAccManifestLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_acc_manifest_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_acc_manifest_last_updated_by_fk</code> key.
      */
     public AppUserPath githubIssueAccManifestLastUpdatedByFk() {
         if (_githubIssueAccManifestLastUpdatedByFk == null)
@@ -289,7 +286,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
      */
     @Override
     public GithubIssueAccManifest where(Condition condition) {
-        return new GithubIssueAccManifest(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new GithubIssueAccManifest(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -356,7 +353,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssueAccManifest whereExists(Select<?> select) {
+    public GithubIssueAccManifest whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -364,7 +361,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssueAccManifest whereNotExists(Select<?> select) {
+    public GithubIssueAccManifest whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

@@ -22,7 +22,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.namespace.namespace_id</code>. Primary, internal
+     * Setter for <code>namespace.namespace_id</code>. Primary, internal
      * database key.
      */
     public void setNamespaceId(ULong value) {
@@ -30,7 +30,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     }
 
     /**
-     * Getter for <code>oagi.namespace.namespace_id</code>. Primary, internal
+     * Getter for <code>namespace.namespace_id</code>. Primary, internal
      * database key.
      */
     public ULong getNamespaceId() {
@@ -38,95 +38,93 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     }
 
     /**
-     * Setter for <code>oagi.namespace.library_id</code>. A foreign key pointed
-     * to a library of the current record.
+     * Setter for <code>namespace.library_id</code>. A foreign key pointed to a
+     * library of the current record.
      */
     public void setLibraryId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.library_id</code>. A foreign key pointed
-     * to a library of the current record.
+     * Getter for <code>namespace.library_id</code>. A foreign key pointed to a
+     * library of the current record.
      */
     public ULong getLibraryId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.namespace.uri</code>. This is the URI of the
-     * namespace.
+     * Setter for <code>namespace.uri</code>. This is the URI of the namespace.
      */
     public void setUri(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.uri</code>. This is the URI of the
-     * namespace.
+     * Getter for <code>namespace.uri</code>. This is the URI of the namespace.
      */
     public String getUri() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.namespace.prefix</code>. This is a default short
-     * name to represent the URI. It may be overridden during the expression
-     * generation. Null or empty means the same thing like the default prefix in
-     * an XML schema.
+     * Setter for <code>namespace.prefix</code>. This is a default short name to
+     * represent the URI. It may be overridden during the expression generation.
+     * Null or empty means the same thing like the default prefix in an XML
+     * schema.
      */
     public void setPrefix(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.prefix</code>. This is a default short
-     * name to represent the URI. It may be overridden during the expression
-     * generation. Null or empty means the same thing like the default prefix in
-     * an XML schema.
+     * Getter for <code>namespace.prefix</code>. This is a default short name to
+     * represent the URI. It may be overridden during the expression generation.
+     * Null or empty means the same thing like the default prefix in an XML
+     * schema.
      */
     public String getPrefix() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.namespace.description</code>. Description or
-     * explanation about the namespace or use of the namespace.
+     * Setter for <code>namespace.description</code>. Description or explanation
+     * about the namespace or use of the namespace.
      */
     public void setDescription(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.description</code>. Description or
-     * explanation about the namespace or use of the namespace.
+     * Getter for <code>namespace.description</code>. Description or explanation
+     * about the namespace or use of the namespace.
      */
     public String getDescription() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.namespace.is_std_nmsp</code>. This indicates
-     * whether the namespace is reserved for standard used (i.e., whether it is
-     * an OAGIS namespace). If it is true, then end users cannot user the
-     * namespace for the end user CCs.
+     * Setter for <code>namespace.is_std_nmsp</code>. This indicates whether the
+     * namespace is reserved for standard use (i.e., whether it is an OAGIS
+     * namespace). If it is true, then end users cannot use the namespace for
+     * the end user CCs.
      */
     public void setIsStdNmsp(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.is_std_nmsp</code>. This indicates
-     * whether the namespace is reserved for standard used (i.e., whether it is
-     * an OAGIS namespace). If it is true, then end users cannot user the
-     * namespace for the end user CCs.
+     * Getter for <code>namespace.is_std_nmsp</code>. This indicates whether the
+     * namespace is reserved for standard use (i.e., whether it is an OAGIS
+     * namespace). If it is true, then end users cannot use the namespace for
+     * the end user CCs.
      */
     public Byte getIsStdNmsp() {
         return (Byte) get(5);
     }
 
     /**
-     * Setter for <code>oagi.namespace.owner_user_id</code>. Foreign key to the
+     * Setter for <code>namespace.owner_user_id</code>. Foreign key to the
      * APP_USER table identifying the user who can update or delete the record.
      */
     public void setOwnerUserId(ULong value) {
@@ -134,7 +132,7 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     }
 
     /**
-     * Getter for <code>oagi.namespace.owner_user_id</code>. Foreign key to the
+     * Getter for <code>namespace.owner_user_id</code>. Foreign key to the
      * APP_USER table identifying the user who can update or delete the record.
      */
     public ULong getOwnerUserId() {
@@ -142,64 +140,64 @@ public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> {
     }
 
     /**
-     * Setter for <code>oagi.namespace.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Setter for <code>namespace.created_by</code>. Foreign key to the APP_USER
+     * table identifying user who created the namespace.
      */
     public void setCreatedBy(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Getter for <code>namespace.created_by</code>. Foreign key to the APP_USER
+     * table identifying user who created the namespace.
      */
     public ULong getCreatedBy() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oagi.namespace.last_updated_by</code>. Foreign key to
-     * the APP_USER table identifying the user who last updated the record.
+     * Setter for <code>namespace.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.last_updated_by</code>. Foreign key to
-     * the APP_USER table identifying the user who last updated the record.
+     * Getter for <code>namespace.last_updated_by</code>. Foreign key to the
+     * APP_USER table identifying the user who last updated the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.namespace.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Setter for <code>namespace.creation_timestamp</code>. The timestamp when
+     * the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Getter for <code>namespace.creation_timestamp</code>. The timestamp when
+     * the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>oagi.namespace.last_update_timestamp</code>. The
-     * timestamp when the record was last updated.
+     * Setter for <code>namespace.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.namespace.last_update_timestamp</code>. The
-     * timestamp when the record was last updated.
+     * Getter for <code>namespace.last_update_timestamp</code>. The timestamp
+     * when the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(10);

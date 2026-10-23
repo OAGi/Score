@@ -1,4 +1,4 @@
-import {Component, Inject, inject} from '@angular/core';
+import {Component, Inject, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
@@ -13,6 +13,7 @@ import {AddOperationForOasDoc, OasDoc} from '../domain/openapi-doc';
   standalone: false,
   selector: 'score-oas-doc-add-operation-dialog',
   templateUrl: './oas-doc-add-operation-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-add-operation-dialog.component.css']
 })
 export class OasDocAddOperationDialogComponent {

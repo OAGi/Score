@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {LibraryDetails} from '../domain/library';
 import {FormControl, Validators} from '@angular/forms';
 import {LibraryService} from '../domain/library.service';
@@ -12,6 +12,7 @@ import {AuthService} from '../../authentication/auth.service';
   standalone: false,
   selector: 'score-library-create',
   templateUrl: './library-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './library-create.component.css'
 })
 export class LibraryCreateComponent {

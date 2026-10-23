@@ -1,9 +1,10 @@
 package org.oagi.score.gateway.http.api.account_management.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import org.oagi.score.gateway.http.api.account_management.controller.payload.PendingListRequest;
+import org.oagi.score.gateway.http.api.account_management.repository.criteria.PendingListFilterCriteria;
 import org.oagi.score.gateway.http.api.account_management.model.AppOauth2User;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
+import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
@@ -13,11 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 
 import static org.oagi.score.gateway.http.common.util.ControllerUtils.pageRequest;
@@ -39,8 +37,23 @@ public class PendingListController {
             @RequestParam(name = "preferredUsername", required = false) String preferredUsername,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "providerName", required = false) String providerName,
-            @RequestParam(name = "createStart", required = false) String createStart,
-            @RequestParam(name = "createEnd", required = false) String createEnd,
+
+            @RequestParam(name = "createStart", required = false)
+            @Parameter(deprecated = true,
+                    description = "Deprecated. Replaced by 'createdOn'. " +
+                            "Filter results to include only records created after this timestamp (milliseconds since epoch).")
+            String createStart,
+
+            @RequestParam(name = "createEnd", required = false)
+            @Parameter(deprecated = true,
+                    description = "Deprecated. Replaced by 'createdOn'. " +
+                            "Filter results to include only records created before this timestamp (milliseconds since epoch).")
+            String createEnd,
+
+            @RequestParam(name = "createdOn", required = false)
+            @Parameter(description = "Filter results by create timestamp range in epoch milliseconds. " +
+                    "Format: `[after~before]`. Use `after` to specify the lower bound and `before` for the upper bound.")
+            String createdOn,
 
             @RequestParam(name = "sortActive", required = false)
             @Parameter(deprecated = true,
@@ -69,28 +82,30 @@ public class PendingListController {
                     "If a negative value is provided, pagination is ignored and all results are returned.")
             Integer pageSize) {
 
-        PendingListRequest request = new PendingListRequest();
-
-        request.setPreferredUsername(preferredUsername);
-        request.setEmail(email);
-        request.setProviderName(providerName);
-
-        if (StringUtils.hasLength(createStart)) {
-            request.setCreateStartDate(new Date(Long.valueOf(createStart)));
-        }
-        if (StringUtils.hasLength(createEnd)) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(Long.valueOf(createEnd));
-            calendar.add(Calendar.DATE, 1);
-            request.setCreateEndDate(calendar.getTime());
-        }
+        PendingListFilterCriteria filterCriteria = new PendingListFilterCriteria(
+                preferredUsername,
+                email,
+                providerName,
+                (hasLength(createdOn)) ?
+                        DateRangeCriteria.create(createdOn) :
+                        (hasLength(createStart) || hasLength(createEnd)) ?
+                                DateRangeCriteria.create(
+                                        hasLength(createStart) ? Long.valueOf(createStart) : null,
+                                        hasLength(createEnd) ? Long.valueOf(createEnd) : null) : null
+        );
 
         PageRequest pageRequest =
                 (hasLength(orderBy)) ? pageRequest(pageIndex, pageSize, orderBy) :
                         pageRequest(pageIndex, pageSize, sortActive, sortDirection);
-        request.setPageRequest(pageRequest);
 
-        return service.getPendingList(sessionService.asScoreUser(user), request);
+        var resultAndCount = service.getPendingList(sessionService.asScoreUser(user), filterCriteria, pageRequest);
+
+        PageResponse<AppOauth2User> response = new PageResponse<>();
+        response.setList(resultAndCount.result());
+        response.setPage(pageRequest.pageIndex());
+        response.setSize(pageRequest.pageSize());
+        response.setLength(resultAndCount.count());
+        return response;
     }
 
     @RequestMapping(value = "/pending/{appOauth2UserId:[\\d]+}", method = RequestMethod.GET,

@@ -31,10 +31,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeList.CodeListPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListManifest.CodeListManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CodeListValue.CodeListValuePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.CtxScheme.CtxSchemePath;
@@ -53,7 +52,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.code_list</code>
+     * The reference instance of <code>code_list</code>
      */
     public static final CodeList CODE_LIST = new CodeList();
 
@@ -66,20 +65,20 @@ public class CodeList extends TableImpl<CodeListRecord> {
     }
 
     /**
-     * The column <code>oagi.code_list.code_list_id</code>. Internal, primary
+     * The column <code>code_list.code_list_id</code>. Internal, primary
      * database key.
      */
     public final TableField<CodeListRecord, ULong> CODE_LIST_ID = createField(DSL.name("code_list_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
 
     /**
-     * The column <code>oagi.code_list.guid</code>. A globally unique identifier
+     * The column <code>code_list.guid</code>. A globally unique identifier
      * (GUID).
      */
     public final TableField<CodeListRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.code_list.enum_type_guid</code>. In the OAGIS Model
-     * XML schema, a type, which keeps all the enumerated values, is  defined
+     * The column <code>code_list.enum_type_guid</code>. In the OAGIS Model XML
+     * schema, a type, which keeps all the enumerated values, is  defined
      * separately from the type that represents a code list. This only applies
      * to some code lists. When that is the case, this column stores the GUID of
      * that enumeration type.
@@ -87,41 +86,40 @@ public class CodeList extends TableImpl<CodeListRecord> {
     public final TableField<CodeListRecord, String> ENUM_TYPE_GUID = createField(DSL.name("enum_type_guid"), SQLDataType.VARCHAR(41).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "In the OAGIS Model XML schema, a type, which keeps all the enumerated values, is  defined separately from the type that represents a code list. This only applies to some code lists. When that is the case, this column stores the GUID of that enumeration type.");
 
     /**
-     * The column <code>oagi.code_list.name</code>. Name of the code list.
+     * The column <code>code_list.name</code>. Name of the code list.
      */
     public final TableField<CodeListRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Name of the code list.");
 
     /**
-     * The column <code>oagi.code_list.list_id</code>. External identifier.
+     * The column <code>code_list.list_id</code>. External identifier.
      */
     public final TableField<CodeListRecord, String> LIST_ID = createField(DSL.name("list_id"), SQLDataType.VARCHAR(100).nullable(false), this, "External identifier.");
 
     /**
-     * The column <code>oagi.code_list.version_id</code>. Code list version
-     * number.
+     * The column <code>code_list.version_id</code>. Code list version number.
      */
     public final TableField<CodeListRecord, String> VERSION_ID = createField(DSL.name("version_id"), SQLDataType.VARCHAR(100).nullable(false), this, "Code list version number.");
 
     /**
-     * The column <code>oagi.code_list.definition</code>. Description of the
-     * code list.
+     * The column <code>code_list.definition</code>. Description of the code
+     * list.
      */
     public final TableField<CodeListRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the code list.");
 
     /**
-     * The column <code>oagi.code_list.remark</code>. Usage information about
-     * the code list.
+     * The column <code>code_list.remark</code>. Usage information about the
+     * code list.
      */
     public final TableField<CodeListRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Usage information about the code list.");
 
     /**
-     * The column <code>oagi.code_list.definition_source</code>. This is
-     * typically a URL which indicates the source of the code list's DEFINITION.
+     * The column <code>code_list.definition_source</code>. This is typically a
+     * URL which indicates the source of the code list's DEFINITION.
      */
     public final TableField<CodeListRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL which indicates the source of the code list's DEFINITION.");
 
     /**
-     * The column <code>oagi.code_list.namespace_id</code>. Foreign key to the
+     * The column <code>code_list.namespace_id</code>. Foreign key to the
      * NAMESPACE table. This is the namespace to which the entity belongs. This
      * namespace column is primarily used in the case the component is a user's
      * component because there is also a namespace assigned at the release
@@ -130,41 +128,42 @@ public class CodeList extends TableImpl<CodeListRecord> {
     public final TableField<CodeListRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
-     * The column <code>oagi.code_list.based_code_list_id</code>. This is a
-     * foreign key to the CODE_LIST table itself. This identifies the code list
-     * on which this code list is based, if any. The derivation may be
-     * restriction and/or extension.
+     * The column <code>code_list.based_code_list_id</code>. This is a foreign
+     * key to the CODE_LIST table itself. This identifies the code list on which
+     * this code list is based, if any. The derivation may be restriction and/or
+     * extension.
      */
     public final TableField<CodeListRecord, ULong> BASED_CODE_LIST_ID = createField(DSL.name("based_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This is a foreign key to the CODE_LIST table itself. This identifies the code list on which this code list is based, if any. The derivation may be restriction and/or extension.");
 
     /**
-     * The column <code>oagi.code_list.extensible_indicator</code>. This is a
-     * flag to indicate whether the code list is final and shall not be further
-     * derived.
+     * The column <code>code_list.extensible_indicator</code>. This is a flag to
+     * indicate whether the code list is extensible, i.e., whether additional
+     * code values may be added or the code list may be further derived. When
+     * false, the code list is final.
      */
-    public final TableField<CodeListRecord, Byte> EXTENSIBLE_INDICATOR = createField(DSL.name("extensible_indicator"), SQLDataType.TINYINT.nullable(false), this, "This is a flag to indicate whether the code list is final and shall not be further derived.");
+    public final TableField<CodeListRecord, Byte> EXTENSIBLE_INDICATOR = createField(DSL.name("extensible_indicator"), SQLDataType.TINYINT.nullable(false), this, "This is a flag to indicate whether the code list is extensible, i.e., whether additional code values may be added or the code list may be further derived. When false, the code list is final.");
 
     /**
-     * The column <code>oagi.code_list.is_deprecated</code>. Indicates whether
-     * the code list is deprecated and should not be reused (i.e., no new
-     * reference to this record should be allowed).
+     * The column <code>code_list.is_deprecated</code>. Indicates whether the
+     * code list is deprecated and should not be reused (i.e., no new reference
+     * to this record should be allowed).
      */
     public final TableField<CodeListRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the code list is deprecated and should not be reused (i.e., no new reference to this record should be allowed).");
 
     /**
-     * The column <code>oagi.code_list.replacement_code_list_id</code>. This
-     * refers to a replacement if the record is deprecated.
+     * The column <code>code_list.replacement_code_list_id</code>. This refers
+     * to a replacement if the record is deprecated.
      */
     public final TableField<CodeListRecord, ULong> REPLACEMENT_CODE_LIST_ID = createField(DSL.name("replacement_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
-     * The column <code>oagi.code_list.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created the code list.
+     * The column <code>code_list.created_by</code>. Foreign key to the APP_USER
+     * table. It indicates the user who created the code list.
      */
     public final TableField<CodeListRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created the code list.");
 
     /**
-     * The column <code>oagi.code_list.owner_user_id</code>. Foreign key to the
+     * The column <code>code_list.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
      * 
@@ -174,38 +173,42 @@ public class CodeList extends TableImpl<CodeListRecord> {
     public final TableField<CodeListRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership.");
 
     /**
-     * The column <code>oagi.code_list.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the code
-     * list.
+     * The column <code>code_list.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the code list.
      */
     public final TableField<CodeListRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It identifies the user who last updated the code list.");
 
     /**
-     * The column <code>oagi.code_list.creation_timestamp</code>. Timestamp when
-     * the code list was created.
+     * The column <code>code_list.creation_timestamp</code>. Timestamp when the
+     * code list was created.
      */
     public final TableField<CodeListRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the code list was created.");
 
     /**
-     * The column <code>oagi.code_list.last_update_timestamp</code>. Timestamp
-     * when the code list was last updated.
+     * The column <code>code_list.last_update_timestamp</code>. Timestamp when
+     * the code list was last updated.
      */
     public final TableField<CodeListRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the code list was last updated.");
 
     /**
-     * The column <code>oagi.code_list.state</code>.
+     * The column <code>code_list.state</code>. Deleted, WIP, Draft, QA,
+     * Candidate, Production, Release Draft, Published. This the revision life
+     * cycle state of the code list.
+     * 
+     * State change can't be undone. But the history record can still keep the
+     * records of when the state was changed.
      */
-    public final TableField<CodeListRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<CodeListRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the code list.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
-     * The column <code>oagi.code_list.prev_code_list_id</code>. A self-foreign
-     * key to indicate the previous history record.
+     * The column <code>code_list.prev_code_list_id</code>. A self-foreign key
+     * to indicate the previous history record.
      */
     public final TableField<CodeListRecord, ULong> PREV_CODE_LIST_ID = createField(DSL.name("prev_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
-     * The column <code>oagi.code_list.next_code_list_id</code>. A self-foreign
-     * key to indicate the next history record.
+     * The column <code>code_list.next_code_list_id</code>. A self-foreign key
+     * to indicate the next history record.
      */
     public final TableField<CodeListRecord, ULong> NEXT_CODE_LIST_ID = createField(DSL.name("next_code_list_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
@@ -218,21 +221,21 @@ public class CodeList extends TableImpl<CodeListRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.code_list</code> table reference
+     * Create an aliased <code>code_list</code> table reference
      */
     public CodeList(String alias) {
         this(DSL.name(alias), CODE_LIST);
     }
 
     /**
-     * Create an aliased <code>oagi.code_list</code> table reference
+     * Create an aliased <code>code_list</code> table reference
      */
     public CodeList(Name alias) {
         this(alias, CODE_LIST);
     }
 
     /**
-     * Create a <code>oagi.code_list</code> table reference
+     * Create a <code>code_list</code> table reference
      */
     public CodeList() {
         this(DSL.name("code_list"), null);
@@ -273,7 +276,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -294,8 +297,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListPath _codeListBasedCodeListIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_based_code_list_id_fk</code> key.
+     * Get the implicit join path to the <code>code_list</code> table, via the
+     * <code>code_list_based_code_list_id_fk</code> key.
      */
     public CodeListPath codeListBasedCodeListIdFk() {
         if (_codeListBasedCodeListIdFk == null)
@@ -307,8 +310,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient AppUserPath _codeListCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>code_list_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>code_list_created_by_fk</code> key.
      */
     public AppUserPath codeListCreatedByFk() {
         if (_codeListCreatedByFk == null)
@@ -320,8 +323,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient AppUserPath _codeListLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>code_list_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>code_list_last_updated_by_fk</code> key.
      */
     public AppUserPath codeListLastUpdatedByFk() {
         if (_codeListLastUpdatedByFk == null)
@@ -333,7 +336,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     * Get the implicit join path to the <code>namespace</code> table.
      */
     public NamespacePath namespace() {
         if (_namespace == null)
@@ -345,8 +348,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListPath _codeListNextCodeListIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_next_code_list_id_fk</code> key.
+     * Get the implicit join path to the <code>code_list</code> table, via the
+     * <code>code_list_next_code_list_id_fk</code> key.
      */
     public CodeListPath codeListNextCodeListIdFk() {
         if (_codeListNextCodeListIdFk == null)
@@ -358,8 +361,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient AppUserPath _codeListOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>code_list_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>code_list_owner_user_id_fk</code> key.
      */
     public AppUserPath codeListOwnerUserIdFk() {
         if (_codeListOwnerUserIdFk == null)
@@ -371,8 +374,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListPath _codeListPrevCodeListIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_prev_code_list_id_fk</code> key.
+     * Get the implicit join path to the <code>code_list</code> table, via the
+     * <code>code_list_prev_code_list_id_fk</code> key.
      */
     public CodeListPath codeListPrevCodeListIdFk() {
         if (_codeListPrevCodeListIdFk == null)
@@ -384,8 +387,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListPath _codeListReplacementCodeListIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.code_list</code> table, via
-     * the <code>code_list_replacement_code_list_id_fk</code> key.
+     * Get the implicit join path to the <code>code_list</code> table, via the
+     * <code>code_list_replacement_code_list_id_fk</code> key.
      */
     public CodeListPath codeListReplacementCodeListIdFk() {
         if (_codeListReplacementCodeListIdFk == null)
@@ -397,8 +400,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListManifestPath _codeListManifest;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.code_list_manifest</code> table
+     * Get the implicit to-many join path to the <code>code_list_manifest</code>
+     * table
      */
     public CodeListManifestPath codeListManifest() {
         if (_codeListManifest == null)
@@ -410,8 +413,8 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CodeListValuePath _codeListValue;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.code_list_value</code> table
+     * Get the implicit to-many join path to the <code>code_list_value</code>
+     * table
      */
     public CodeListValuePath codeListValue() {
         if (_codeListValue == null)
@@ -423,8 +426,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
     private transient CtxSchemePath _ctxScheme;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
-     * table
+     * Get the implicit to-many join path to the <code>ctx_scheme</code> table
      */
     public CtxSchemePath ctxScheme() {
         if (_ctxScheme == null)

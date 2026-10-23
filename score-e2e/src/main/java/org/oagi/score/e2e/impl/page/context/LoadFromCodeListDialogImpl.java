@@ -70,7 +70,7 @@ public class LoadFromCodeListDialogImpl extends SearchBarPageImpl implements Loa
             try {
                 click(getDriver(), getBranchSelectField());
                 optionField = visibilityOfElementLocated(getDriver(),
-                        By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
+                        By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//mat-option//span[text() = \"" + branch + "\"]"));
             } catch (Exception e) {
                 throw new NoSuchElementException("Cannot locate a branch using " + branch, e);
             }

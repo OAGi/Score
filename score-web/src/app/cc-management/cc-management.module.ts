@@ -11,7 +11,7 @@ import {BdtDetailModule} from './bdt-detail/bdt-detail.module';
 import {ExtensionDetailModule} from './extension-detail/extension-detail.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
 
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {CcListModule} from './cc-list/cc-list.module';
 import {FindUsagesDialogModule} from './find-usages-dialog/find-usages-dialog.module';
 import {RefactorDialogModule} from './refactor-dialog/refactor-dialog.module';
@@ -35,7 +35,7 @@ import {DtListModule} from './dt-list/dt-list.module';
     TransferOwnershipDialogModule,
     FindUsagesDialogModule,
     RefactorDialogModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule,
     EditTagsDialogModule

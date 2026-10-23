@@ -1,0 +1,53 @@
+<div class="branch-selector d-flex" [style.width]="width()">
+  <mat-form-field appearance="outline">
+    <mat-label>Branch</mat-label>
+    @if (readonly()) {
+      <input matInput [disabled]="true" [value]="single()?.releaseNum ?? ''"/>
+    } @else if (multiple()) {
+      <mat-select [ngModel]="selectedList()" (ngModelChange)="selectedChange.emit($event)" [compareWith]="compareRelease"
+                  [multiple]="true" placeholder="Branch" panelClass="score-branch-selector-panel">
+        <mat-select-trigger class="d-flex">
+          <span>{{ selectedList().length > 0 ? selectedList()[0].releaseNum : '' }}</span>
+          @if (selectedList().length > 1) {
+            <span class="ms-2 additional-selection">
+              (+{{ selectedList().length - 1 }} {{ selectedList().length === 2 ? 'other' : 'others' }})
+            </span>
+          }
+        </mat-select-trigger>
+        <mat-option>
+          <ngx-mat-select-search [formControl]="filterCtrl" [placeholderLabel]="'Search...'"
+                                 [showToggleAllCheckbox]="true" (toggleAll)="toggleAll($event)"
+                                 [toggleAllCheckboxTooltipMessage]="'Select All / Unselect All'"
+                                 [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+        </mat-option>
+        @for (r of filtered(); track r.releaseId) {
+          <mat-option [value]="r">
+            <div class="d-flex">
+              <span class="ps-2 release-num">{{ r.releaseNum }}</span>
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+    } @else {
+      <mat-select [ngModel]="single()" (ngModelChange)="selectedChange.emit($event)" [compareWith]="compareRelease"
+                  [required]="required()" panelClass="score-branch-selector-panel">
+        <mat-select-trigger class="d-flex">
+          <span>{{ single()?.releaseNum }}</span>
+        </mat-select-trigger>
+        @if (searchable()) {
+          <mat-option>
+            <ngx-mat-select-search [formControl]="filterCtrl" [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching branch found.'"></ngx-mat-select-search>
+          </mat-option>
+        }
+        @for (r of filtered(); track r.releaseId) {
+          <mat-option [value]="r">
+            <div class="d-flex">
+              <span class="release-num">{{ r.releaseNum }}</span>
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+    }
+  </mat-form-field>
+</div>

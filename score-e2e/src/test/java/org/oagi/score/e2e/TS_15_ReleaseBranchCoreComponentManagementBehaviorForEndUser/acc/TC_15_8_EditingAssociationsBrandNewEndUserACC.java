@@ -137,7 +137,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
@@ -431,7 +431,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         asccPanel.setCardinalityMaxField("222");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
 
@@ -585,7 +585,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         asccPanel.setCardinalityMaxField("111");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
@@ -730,7 +730,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
@@ -1063,7 +1063,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         bccPanel.setCardinalityMaxField("111");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
@@ -1522,7 +1522,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test

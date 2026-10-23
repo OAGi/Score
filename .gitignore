@@ -5,6 +5,9 @@
 .claude/
 .playwright-mcp/
 
+### Deploy toolkit — local, environment-specific secrets (AWS SG ids, cred overrides)
+deploy/deploy.env
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

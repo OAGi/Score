@@ -43,3 +43,8 @@ yarn.lock
 .DS_Store
 Thumbs.db
 /backup
+
+# Playwright
+/test-results/
+/playwright-report/
+/.playwright-mcp/

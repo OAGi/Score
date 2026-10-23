@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FindUsagesDialogService} from './domain/find-usages-dialog.service';
 import {AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, DtFlatNode} from '../domain/cc-flat-tree';
 import {getKey, next} from '../../common/flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {forkJoin} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 import {CcGraph, CcGraphNode} from '../domain/core-component-node';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {PreferencesInfo} from '../../settings-management/settings-preferences/domain/preferences';
@@ -92,6 +93,7 @@ export class FindUsagesCcFlatNodeDatabase<T extends CcFlatNode> extends CcFlatNo
   standalone: false,
   selector: 'score-find-usages-dialog',
   templateUrl: './find-usages-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./find-usages-dialog.component.css']
 })
 export class FindUsagesDialogComponent implements OnInit {
@@ -106,7 +108,7 @@ export class FindUsagesDialogComponent implements OnInit {
   title: string;
   _innerHeight: number = window.innerHeight;
   paddingPixel = 12;
-  isUpdating: boolean;
+  isUpdating = true;
 
   dataSource: CcFlatNodeDataSource<CcFlatNode>;
 
@@ -140,7 +142,7 @@ export class FindUsagesDialogComponent implements OnInit {
     forkJoin([
       this.service.findUsages(this.data.type, this.data.manifestId),
       this.preferencesService.load(this.auth.getUserToken())
-    ]).subscribe(([findUsagesResp, preferencesInfo]) => {
+    ]).pipe(finalize(() => this.isUpdating = false)).subscribe(([findUsagesResp, preferencesInfo]) => {
       this.preferencesInfo = preferencesInfo;
 
       const edge = findUsagesResp.graph.edges[findUsagesResp.rootNodeKey];
@@ -161,8 +163,6 @@ export class FindUsagesDialogComponent implements OnInit {
       const database = new FindUsagesCcFlatNodeDatabase<CcFlatNode>(ccGraph, keys[0], Number(keys[1]));
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.ccNodeService);
       this.dataSource.data = database.rootNode.children as CcFlatNode[];
-
-      this.isUpdating = false;
     });
   }
 

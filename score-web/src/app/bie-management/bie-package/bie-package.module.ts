@@ -1,7 +1,8 @@
+import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
@@ -54,14 +55,15 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         CommonModule,
         MaterialModule,
-        TranslateModule,
+        TranslatePipe,
         FormsModule,
         ReactiveFormsModule,
         ScoreCommonModule,
         MatMultiSortModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        ...SCORE_TABLE
     ],
   exports: [
     BiePackageListComponent,

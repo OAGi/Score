@@ -8,12 +8,17 @@ import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.LoginPage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static java.time.Duration.ofSeconds;
 import static org.apache.commons.lang3.StringUtils.trim;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class LoginPageImpl extends BasePageImpl implements LoginPage {
+
+    /** Set once the login page showed the passkey flow (username step first), so the post-sign-in offer is expected. */
+    private boolean passkeysDetected;
 
     public LoginPageImpl(BasePage parent) {
         super(parent);
@@ -65,6 +70,12 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
     }
 
     @Override
+    public WebElement getPasswordInputOrContinueButton() {
+        By locator = By.cssSelector("input[id=\"password\"], .passkey-continue-button");
+        return visibilityOfElementLocated(getDriver(), locator);
+    }
+
+    @Override
     public WebElement getSignInButton() {
         By locator = By.xpath("//button[@type=\"submit\" and contains(normalize-space(.), \"Sign in\")]"
                 + " | //input[@value=\"Sign in\"]");
@@ -78,7 +89,32 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
 
     @Override
     public void setPassword(String password) {
+        revealPasswordField();
         sendKeys(getPasswordInput(), password);
+    }
+
+    /**
+     * On an instance with passkey sign-in configured, the login page first asks for the username only. Continue
+     * shows the password field, or, for an account with a passkey, the passkey prompt; when that prompt cannot be
+     * answered the page offers "Try another way", which shows the password field.
+     */
+    private void revealPasswordField() {
+        By password = By.cssSelector("input[id=\"password\"]");
+        By continueButton = By.cssSelector(".passkey-continue-button");
+        // The Continue button exists only when the instance has passkey sign-in on, whatever the property says.
+        new WebDriverWait(getDriver(), ofSeconds(12L)).until(
+                d -> !d.findElements(password).isEmpty() || !d.findElements(continueButton).isEmpty());
+        if (!getDriver().findElements(password).isEmpty()) {
+            return;
+        }
+        passkeysDetected = true;
+        click(getDriver(), elementToBeClickable(getDriver(), By.cssSelector(".passkey-continue-button")));
+        By anotherWay = By.cssSelector(".passkey-another-way-button");
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(20)).until(
+                d -> !d.findElements(password).isEmpty() || !d.findElements(anotherWay).isEmpty());
+        if (getDriver().findElements(password).isEmpty()) {
+            click(getDriver(), elementToBeClickable(getDriver(), anotherWay));
+        }
     }
 
     @Override
@@ -108,11 +144,34 @@ public class LoginPageImpl extends BasePageImpl implements LoginPage {
             }
         }
 
+        dismissPasskeyOfferIfEnabled();
+
         /*
          * To make the 'connectSpec' as a default selected library.
          */
         homePage.setLibrary("connectSpec");
 
         return homePage;
+    }
+
+    /**
+     * On an instance with passkey sign-in configured, a user without a passkey is offered one right after signing in
+     * with a password, in a dialog that would cover the page. Tests that are not about passkeys answer "Not now".
+     * <p>
+     * It is only looked for when {@code org.oagi.score.e2e.passkeys.enabled} is {@code true} in
+     * {@code score-e2e.properties}, so instances without passkeys pay no waiting time.
+     */
+    private void dismissPasskeyOfferIfEnabled() {
+        if (!passkeysDetected && !getConfig().getBooleanProperty("org.oagi.score.e2e.passkeys.enabled")) {
+            return;
+        }
+
+        By notNow = By.cssSelector(".passkey-offer-later");
+        try {
+            new WebDriverWait(getDriver(), ofSeconds(5L)).until(ExpectedConditions.elementToBeClickable(notNow)).click();
+            new WebDriverWait(getDriver(), ofSeconds(10L)).until(ExpectedConditions.invisibilityOfElementLocated(notNow));
+        } catch (TimeoutException ignore) {
+            // No offer: the account already has a passkey, or it was dismissed before.
+        }
     }
 }

@@ -696,7 +696,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
         ViewEditCoreComponentPage viewEditCoreComponentPage = coreComponentMenu.openViewEditCoreComponentSubMenu();
         viewEditCoreComponentPage.openPage();
         click(viewEditCoreComponentPage.getTypeSelectField());
-        List<WebElement> options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+        List<WebElement> options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
         for (String ccState : Arrays.asList("ACC", "ASCCP")) {
             List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
             result.get(0).click();
@@ -718,7 +718,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             waitFor(ofMillis(2000L));
             viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
             for (String ccState : Arrays.asList("BCCP", "ACC")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
@@ -733,7 +733,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             waitFor(ofMillis(2000L));
             viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
             for (String ccState : Arrays.asList("ACC", "ASCCP")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();
@@ -748,7 +748,7 @@ public class TC_10_1_Core_Component_Access extends BaseTest {
             waitFor(ofMillis(2000L));
             viewEditCoreComponentPage.showAdvancedSearchPanel();
             click(viewEditCoreComponentPage.getTypeSelectField());
-            options = getDriver().findElements(By.xpath("//div[@class=\"cdk-overlay-container\"]//div[contains(@class, \"column\")]"));
+            options = getDriver().findElements(By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//div[contains(@class, \"column\")]"));
             for (String ccState : Arrays.asList("ASCCP", "BCCP")) {
                 List<WebElement> result = options.stream().filter(e -> ccState.equals(getText(e))).collect(Collectors.toList());
                 result.get(0).click();

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -10,6 +10,7 @@ import {compare} from '../../../common/utility';
   standalone: false,
   selector: 'score-release-whats-changed-dialog',
   templateUrl: './release-whats-changed-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./release-whats-changed-dialog.component.css']
 })
 export class ReleaseWhatsChangedDialogComponent implements OnInit {

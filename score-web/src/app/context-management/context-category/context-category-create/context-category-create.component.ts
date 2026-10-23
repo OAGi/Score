@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextCategoryService} from '../domain/context-category.service';
@@ -9,6 +9,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   standalone: false,
   selector: 'score-context-category-create',
   templateUrl: './context-category-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./context-category-create.component.css']
 })
 export class ContextCategoryCreateComponent implements OnInit {

@@ -32,12 +32,11 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Bccp.BccpPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.Dt.DtPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtSc.DtScPath;
@@ -56,7 +55,7 @@ public class Dt extends TableImpl<DtRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.dt</code>
+     * The reference instance of <code>dt</code>
      */
     public static final Dt DT = new Dt();
 
@@ -69,29 +68,28 @@ public class Dt extends TableImpl<DtRecord> {
     }
 
     /**
-     * The column <code>oagi.dt.dt_id</code>. Internal, primary database key.
+     * The column <code>dt.dt_id</code>. Internal, primary database key.
      */
     public final TableField<DtRecord, ULong> DT_ID = createField(DSL.name("dt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Internal, primary database key.");
 
     /**
-     * The column <code>oagi.dt.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>dt.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<DtRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.dt.data_type_term</code>. This is the data type
-     * term assigned to the DT. The allowed set of data type terms are defined
-     * in the DTC specification. This column is derived from the Based_DT_ID
-     * when the column is not blank. 
+     * The column <code>dt.data_type_term</code>. This is the data type term
+     * assigned to the DT. The allowed set of data type terms are defined in the
+     * DTC specification. This column is derived from the Based_DT_ID when the
+     * column is not blank. 
      */
     public final TableField<DtRecord, String> DATA_TYPE_TERM = createField(DSL.name("data_type_term"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the data type term assigned to the DT. The allowed set of data type terms are defined in the DTC specification. This column is derived from the Based_DT_ID when the column is not blank. ");
 
     /**
-     * The column <code>oagi.dt.qualifier</code>. This column shall be blank
-     * when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If
-     * the column is not blank it is a qualified BDT. If blank then the row may
-     * be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete
+     * The column <code>dt.qualifier</code>. This column shall be blank when the
+     * DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column
+     * is not blank it is a qualified BDT. If blank then the row may be a
+     * default BDT or an unqualified BDT. Default BDT is OAGIS concrete
      * implementation of the CDT, these are the DT with numbers in the name,
      * e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are
      * almost like permutation of the CDT options into concrete data types.
@@ -103,53 +101,53 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, String> QUALIFIER = createField(DSL.name("qualifier"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these \"unqualified BDTs\". ");
 
     /**
-     * The column <code>oagi.dt.representation_term</code>.
+     * The column <code>dt.representation_term</code>. This is the
+     * representation term assigned to the DT.
      */
-    public final TableField<DtRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<DtRecord, String> REPRESENTATION_TERM = createField(DSL.name("representation_term"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the representation term assigned to the DT.");
 
     /**
-     * The column <code>oagi.dt.six_digit_id</code>. The six number suffix comes
-     * from the UN/CEFACT XML Schema NDR.
+     * The column <code>dt.six_digit_id</code>. The six number suffix comes from
+     * the UN/CEFACT XML Schema NDR.
      */
     public final TableField<DtRecord, String> SIX_DIGIT_ID = createField(DSL.name("six_digit_id"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The six number suffix comes from the UN/CEFACT XML Schema NDR.");
 
     /**
-     * The column <code>oagi.dt.based_dt_id</code>. Foreign key pointing to the
-     * DT table itself. This column must be blank when the DT_TYPE is CDT. This
+     * The column <code>dt.based_dt_id</code>. Foreign key pointing to the DT
+     * table itself. This column must be blank when the DT_TYPE is CDT. This
      * column must not be blank when the DT_TYPE is BDT.
      */
     public final TableField<DtRecord, ULong> BASED_DT_ID = createField(DSL.name("based_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key pointing to the DT table itself. This column must be blank when the DT_TYPE is CDT. This column must not be blank when the DT_TYPE is BDT.");
 
     /**
-     * The column <code>oagi.dt.definition</code>. Description of the data type.
+     * The column <code>dt.definition</code>. Description of the data type.
      */
     public final TableField<DtRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the data type.");
 
     /**
-     * The column <code>oagi.dt.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * The column <code>dt.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public final TableField<DtRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
-     * The column <code>oagi.dt.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * The column <code>dt.namespace_id</code>. Foreign key to the NAMESPACE
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public final TableField<DtRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user's component because there is also a namespace assigned at the release level.");
 
     /**
-     * The column <code>oagi.dt.content_component_definition</code>. Description
-     * of the content component of the data type.
+     * The column <code>dt.content_component_definition</code>. Description of
+     * the content component of the data type.
      */
     public final TableField<DtRecord, String> CONTENT_COMPONENT_DEFINITION = createField(DSL.name("content_component_definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Description of the content component of the data type.");
 
     /**
-     * The column <code>oagi.dt.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the DT.
+     * The column <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the DT.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -157,20 +155,20 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the DT.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
-     * The column <code>oagi.dt.commonly_used</code>. This is a flag to indicate
+     * The column <code>dt.commonly_used</code>. This is a flag to indicate
      * commonly used DT(s) by BCCPs.
      */
     public final TableField<DtRecord, Byte> COMMONLY_USED = createField(DSL.name("commonly_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "This is a flag to indicate commonly used DT(s) by BCCPs.");
 
     /**
-     * The column <code>oagi.dt.created_by</code>. Foreign key to the APP_USER
-     * table. It indicates the user who created this DT.
+     * The column <code>dt.created_by</code>. Foreign key to the APP_USER table.
+     * It indicates the user who created this DT.
      */
     public final TableField<DtRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this DT.");
 
     /**
-     * The column <code>oagi.dt.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
+     * The column <code>dt.last_updated_by</code>. Foreign key to the APP_USER
+     * table referring to the last user who updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
@@ -178,16 +176,16 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).");
 
     /**
-     * The column <code>oagi.dt.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.\n\nThe
+     * The column <code>dt.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
      */
     public final TableField<DtRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\\n\\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
-     * The column <code>oagi.dt.creation_timestamp</code>. Timestamp when the
+     * The column <code>dt.creation_timestamp</code>. Timestamp when the
      * revision of the DT was created. 
      * 
      * This never change for a revision.
@@ -195,7 +193,7 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the DT was created. \n\nThis never change for a revision.");
 
     /**
-     * The column <code>oagi.dt.last_update_timestamp</code>. Timestamp when the
+     * The column <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
      * 
      * The value of this column in the latest history record should be the same
@@ -205,27 +203,27 @@ public class Dt extends TableImpl<DtRecord> {
     public final TableField<DtRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the record was last updated.\n\nThe value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the revision has occurred.");
 
     /**
-     * The column <code>oagi.dt.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * The column <code>dt.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public final TableField<DtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
-     * The column <code>oagi.dt.replacement_dt_id</code>. This refers to a
+     * The column <code>dt.replacement_dt_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public final TableField<DtRecord, ULong> REPLACEMENT_DT_ID = createField(DSL.name("replacement_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
-     * The column <code>oagi.dt.prev_dt_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * The column <code>dt.prev_dt_id</code>. A self-foreign key to indicate the
+     * previous history record.
      */
     public final TableField<DtRecord, ULong> PREV_DT_ID = createField(DSL.name("prev_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
-     * The column <code>oagi.dt.next_dt_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * The column <code>dt.next_dt_id</code>. A self-foreign key to indicate the
+     * next history record.
      */
     public final TableField<DtRecord, ULong> NEXT_DT_ID = createField(DSL.name("next_dt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
@@ -238,21 +236,21 @@ public class Dt extends TableImpl<DtRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.dt</code> table reference
+     * Create an aliased <code>dt</code> table reference
      */
     public Dt(String alias) {
         this(DSL.name(alias), DT);
     }
 
     /**
-     * Create an aliased <code>oagi.dt</code> table reference
+     * Create an aliased <code>dt</code> table reference
      */
     public Dt(Name alias) {
         this(alias, DT);
     }
 
     /**
-     * Create a <code>oagi.dt</code> table reference
+     * Create a <code>dt</code> table reference
      */
     public Dt() {
         this(DSL.name("dt"), null);
@@ -293,7 +291,7 @@ public class Dt extends TableImpl<DtRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -319,7 +317,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtPath _dtBasedDtIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table, via the
+     * Get the implicit join path to the <code>dt</code> table, via the
      * <code>dt_based_dt_id_fk</code> key.
      */
     public DtPath dtBasedDtIdFk() {
@@ -332,8 +330,8 @@ public class Dt extends TableImpl<DtRecord> {
     private transient AppUserPath _dtCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>dt_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>dt_created_by_fk</code> key.
      */
     public AppUserPath dtCreatedByFk() {
         if (_dtCreatedByFk == null)
@@ -345,8 +343,8 @@ public class Dt extends TableImpl<DtRecord> {
     private transient AppUserPath _dtLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>dt_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>dt_last_updated_by_fk</code> key.
      */
     public AppUserPath dtLastUpdatedByFk() {
         if (_dtLastUpdatedByFk == null)
@@ -358,7 +356,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     * Get the implicit join path to the <code>namespace</code> table.
      */
     public NamespacePath namespace() {
         if (_namespace == null)
@@ -370,7 +368,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtPath _dtNextDtIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table, via the
+     * Get the implicit join path to the <code>dt</code> table, via the
      * <code>dt_next_dt_id_fk</code> key.
      */
     public DtPath dtNextDtIdFk() {
@@ -383,8 +381,8 @@ public class Dt extends TableImpl<DtRecord> {
     private transient AppUserPath _dtOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>dt_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>dt_owner_user_id_fk</code> key.
      */
     public AppUserPath dtOwnerUserIdFk() {
         if (_dtOwnerUserIdFk == null)
@@ -396,7 +394,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtPath _dtPrevDtIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table, via the
+     * Get the implicit join path to the <code>dt</code> table, via the
      * <code>dt_prev_dt_id_fk</code> key.
      */
     public DtPath dtPrevDtIdFk() {
@@ -409,7 +407,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtPath _dtReplacementDtIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt</code> table, via the
+     * Get the implicit join path to the <code>dt</code> table, via the
      * <code>dt_replacement_dt_id_fk</code> key.
      */
     public DtPath dtReplacementDtIdFk() {
@@ -422,7 +420,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient BccpPath _bccp;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp</code> table
+     * Get the implicit to-many join path to the <code>bccp</code> table
      */
     public BccpPath bccp() {
         if (_bccp == null)
@@ -434,8 +432,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtAwdPriPath _dtAwdPri;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_awd_pri</code>
-     * table
+     * Get the implicit to-many join path to the <code>dt_awd_pri</code> table
      */
     public DtAwdPriPath dtAwdPri() {
         if (_dtAwdPri == null)
@@ -447,8 +444,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtManifestPath _dtManifest;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_manifest</code>
-     * table
+     * Get the implicit to-many join path to the <code>dt_manifest</code> table
      */
     public DtManifestPath dtManifest() {
         if (_dtManifest == null)
@@ -460,7 +456,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtScPath _dtSc;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table
+     * Get the implicit to-many join path to the <code>dt_sc</code> table
      */
     public DtScPath dtSc() {
         if (_dtSc == null)
@@ -472,7 +468,7 @@ public class Dt extends TableImpl<DtRecord> {
     private transient DtUsageRulePath _dtUsageRule;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_usage_rule</code>
+     * Get the implicit to-many join path to the <code>dt_usage_rule</code>
      * table
      */
     public DtUsageRulePath dtUsageRule() {

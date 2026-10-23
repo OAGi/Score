@@ -706,7 +706,7 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     public OpenAPIExpressionOptions selectOpenAPIExpression() {
         WebElement radioButton = getOpenAPIExpressionRadioButton();
         if (!radioButton.getAttribute("class").contains("mat-mdc-radio-checked")) {
-            click(radioButton.findElement(By.cssSelector("label.mdc-label")));
+            click(radioButton.findElement(By.tagName("input")));
         }
         // The Version/Format controls are conditionally rendered from the selected radio value.
         // Wait for Angular's @if block before exposing the options to callers.
