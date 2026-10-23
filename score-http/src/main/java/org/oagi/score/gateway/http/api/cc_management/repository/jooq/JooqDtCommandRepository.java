@@ -18,6 +18,7 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
@@ -63,7 +64,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         DtRecord dt = new DtRecord();
         dt.setGuid(ScoreGuidUtils.randomGuid());
         dt.setDataTypeTerm(basedDt.dataTypeTerm());
-        if (basedDt.qualifier() != null) {
+        if (StringUtils.hasLength(basedDt.qualifier())) {
             dt.setQualifier_(basedDt.qualifier());
         }
 
@@ -101,7 +102,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         dtManifest.setDtId(valueOf(dtId));
         dtManifest.setBasedDtManifestId(valueOf(basedDt.dtManifestId()));
         dtManifest.setReleaseId(valueOf(releaseId));
-        dtManifest.setDen(((dt.getQualifier_() != null) ? (dt.getQualifier_() + "_ ") : "") + dt.getDataTypeTerm() + ". Type");
+        dtManifest.setDen(DenUtils.dtDen(dt.getQualifier_(), dt.getDataTypeTerm()));
         DtManifestId dtManifestId = new DtManifestId(
                 dslContext().insertInto(DT_MANIFEST)
                         .set(dtManifest)
@@ -505,7 +506,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(valueOf(dtManifestId)))
                     .fetch()) {
 
-                String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + newDen.replaceAll(". Type", "");
+                String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + DenUtils.withoutTypeSuffix(newDen);
                 dslContext().update(BCCP_MANIFEST)
                         .set(BCCP_MANIFEST.DEN, newBccpDen)
                         .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
