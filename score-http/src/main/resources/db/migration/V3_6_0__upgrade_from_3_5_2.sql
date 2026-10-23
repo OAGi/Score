@@ -212,22 +212,26 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
     collation_connection = @OLD_COLLATION_CONNECTION_LEVENSHTEIN;
 
 -- ------------------------------------------------------------------
--- cc_change_log: what changed in the data core component records are made of (#1818)
+-- record_change_log: what changed in the data core component records are made of (#1818)
 -- ------------------------------------------------------------------
 --
 -- The cache of core component records (see CcCacheWatchdog in score-http) must forget a record when the data it was made of
--- changes. The triggers below (named `<table>_cc_change_<event>_trg`) write one row here, in the transaction of the change,
+-- changes. The triggers below (named `<table>_record_change_<event>_trg`) write one row here, in the transaction of the change,
 -- for every row that changes in a table those records are made of, whoever makes the change (the application, a script, a
 -- person with a SQL client). Every instance reads the rows and deletes the old ones; nothing else uses them.
 --
 -- This is TEMPORARY data. The application deletes the rows older than two hours (retention policy, checked every ten
--- minutes), and when the table has stayed empty for ten minutes it starts the numbering of CC_CHANGE_LOG_ID again from 1
+-- minutes), and when the table has stayed empty for ten minutes it starts the numbering of RECORD_CHANGE_LOG_ID again from 1
 -- (`ALTER TABLE ... AUTO_INCREMENT = 1`), so that the numbers stay small. If change data capture (CDC) of the binary log is
 -- introduced to tell the cache what changed, this table and its triggers can be dropped.
 --
--- Which triggers write rows (KIND is what changed; TARGET_ID the manifest id, or the id of the release, library, user or tag):
+-- The UPDATE triggers of the component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and DT_SC also write CHANGED: the names of the
+-- columns whose value changed (compared with <=>, so a NULL becomes a value and back is a change). Whatever is derived from a column is
+-- spread only when that column changed (the DEN of an ASCCP when the object class term of its role-of ACC changed, not when a definition did).
+--
+-- Which triggers write rows (RECORD_TYPE is what changed; RECORD_ID the manifest id, or the id of the release, library, user or tag):
 --   1. acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest:
---      INSERT, UPDATE, DELETE. One row for the manifest (kind ACC, ASCC, BCC, ASCCP, BCCP, DT, DT_SC). PARENT_MANIFEST_ID
+--      INSERT, UPDATE, DELETE. One row for the manifest (type ACC, ASCC, BCC, ASCCP, BCCP, DT, DT_SC). PARENT_ID
 --      is the ACC of an ASCC or a BCC and the DT of a DT_SC, whose list of children changes with it.
 --   2. acc, ascc, bcc, asccp, bccp, dt, dt_sc: UPDATE, DELETE. One row for every manifest, in every release, that shows the
 --      changed row (none for a row that no manifest shows).
@@ -248,432 +252,433 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
 -- Creating a trigger needs the TRIGGER privilege, and, when the binary log is on, also SUPER or
 -- log_bin_trust_function_creators=1.
 
-DROP TABLE IF EXISTS `cc_change_log`;
+DROP TABLE IF EXISTS `record_change_log`;
 
-CREATE TABLE `cc_change_log`
+CREATE TABLE `record_change_log`
 (
-    `cc_change_log_id`    bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key. Given when a row is written, but rows become visible in the order of their transactions'' commits, not of this number. Deleting rows does not lower it; the application starts the numbering again from 1 when the table has stayed empty for 10 minutes.',
-    `kind`                varchar(16)         NOT NULL COMMENT 'What changed: ACC, ASCC, BCC, ASCCP, BCCP, DT or DT_SC (a manifest of that kind; written by the triggers on the manifest tables, on the component tables, on seq_key (always ACC) and on the manifest tag tables (ACC, ASCCP, BCCP, DT)); RELEASE (trigger on release), RELEASE_DEP (release_dep), LIBRARY (library), USER (app_user, when login_id or is_developer changes), TAG (tag), XBT, CODE_LIST or AGENCY_ID_LIST (a manifest; triggers on the manifest and the component table) or NAMESPACE (namespace). DT and DT_SC are also written by the triggers on dt_awd_pri and dt_sc_awd_pri.',
-    `target_id`            bigint(20) unsigned NOT NULL COMMENT 'The manifest id of the changed record (kind ACC to DT_SC), or the id of the release (RELEASE; for RELEASE_DEP the release that depends on others), the library (LIBRARY), the user (USER) or the tag (TAG) that changed.',
-    `parent_manifest_id`  bigint(20) unsigned          DEFAULT NULL COMMENT 'The ACC_MANIFEST_ID that owns the changed ASCC or BCC, or the DT_MANIFEST_ID that owns the changed DT_SC; NULL for the other kinds.',
-    `release_id`          bigint(20) unsigned          DEFAULT NULL COMMENT 'The release of the changed record, when it is known. No foreign key: a release may be deleted while its rows are still here.',
-    `creation_timestamp`  datetime(6)         NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'Timestamp when this record is created. Rows older than two hours are deleted by the application.',
-    PRIMARY KEY (`cc_change_log_id`),
-    KEY `cc_change_log_creation_timestamp_idx` (`creation_timestamp`)
+    `record_change_log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key. Given when a row is written, but rows become visible in the order of their transactions'' commits, not of this number. Deleting rows does not lower it; the application starts the numbering again from 1 when the table has stayed empty for 10 minutes.',
+    `record_type`          varchar(16)         NOT NULL COMMENT 'What changed: ACC, ASCC, BCC, ASCCP, BCCP, DT or DT_SC (a manifest of that kind; written by the triggers on the manifest tables, on the component tables, on seq_key (always ACC) and on the manifest tag tables (ACC, ASCCP, BCCP, DT)); RELEASE (trigger on release), RELEASE_DEP (release_dep), LIBRARY (library), USER (app_user, when login_id or is_developer changes), TAG (tag), XBT, CODE_LIST or AGENCY_ID_LIST (a manifest; triggers on the manifest and the component table) or NAMESPACE (namespace). DT and DT_SC are also written by the triggers on dt_awd_pri and dt_sc_awd_pri.',
+    `record_id`            bigint(20) unsigned NOT NULL COMMENT 'The manifest id of the changed record (kind ACC to DT_SC), or the id of the release (RELEASE; for RELEASE_DEP the release that depends on others), the library (LIBRARY), the user (USER) or the tag (TAG) that changed.',
+    `parent_id`            bigint(20) unsigned          DEFAULT NULL COMMENT 'The ACC_MANIFEST_ID that owns the changed ASCC or BCC, or the DT_MANIFEST_ID that owns the changed DT_SC; NULL for the other kinds.',
+    `release_id`           bigint(20) unsigned          DEFAULT NULL COMMENT 'The release of the changed record, when it is known. No foreign key: a release may be deleted while its rows are still here.',
+    `changed`              varchar(1000)                DEFAULT NULL COMMENT 'The columns of the row that an UPDATE changed, separated by commas (the triggers on the component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and DT_SC write them); an empty string when the UPDATE changed none of them. NULL when the row does not say (INSERT, DELETE, other tables): everything may have changed. The propagation of a change to the records that depend on it looks at it.',
+    `creation_timestamp`   datetime(6)         NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'Timestamp when this record is created. Rows older than two hours are deleted by the application.',
+    PRIMARY KEY (`record_change_log_id`),
+    KEY `record_change_log_creation_timestamp_idx` (`creation_timestamp`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci
-  ROW_FORMAT = DYNAMIC COMMENT ='Temporary log of the changes to the data core component records are made of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_cc_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9) namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b) code_list_value_manifest, code_list_value, agency_id_list_value_manifest and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of the data type in the release of the changed row.';
+  ROW_FORMAT = DYNAMIC COMMENT ='Temporary log of the changes to the data core component records are made of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_record_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9) namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b) code_list_value_manifest, code_list_value, agency_id_list_value_manifest and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of the data type in the release of the changed row.';
 
-DROP TRIGGER IF EXISTS `acc_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `acc_manifest_cc_change_insert_trg` AFTER INSERT ON `acc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `acc_manifest_record_change_insert_trg`;
+CREATE TRIGGER `acc_manifest_record_change_insert_trg` AFTER INSERT ON `acc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `acc_manifest_cc_change_update_trg`;
-CREATE TRIGGER `acc_manifest_cc_change_update_trg` AFTER UPDATE ON `acc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `acc_manifest_record_change_update_trg`;
+CREATE TRIGGER `acc_manifest_record_change_update_trg` AFTER UPDATE ON `acc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`acc_manifest_id` <=> NEW.`acc_manifest_id`), 'acc_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`acc_id` <=> NEW.`acc_id`), 'acc_id', NULL), IF(NOT (OLD.`based_acc_manifest_id` <=> NEW.`based_acc_manifest_id`), 'based_acc_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`log_id` <=> NEW.`log_id`), 'log_id', NULL), IF(NOT (OLD.`replacement_acc_manifest_id` <=> NEW.`replacement_acc_manifest_id`), 'replacement_acc_manifest_id', NULL), IF(NOT (OLD.`prev_acc_manifest_id` <=> NEW.`prev_acc_manifest_id`), 'prev_acc_manifest_id', NULL), IF(NOT (OLD.`next_acc_manifest_id` <=> NEW.`next_acc_manifest_id`), 'next_acc_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `acc_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `acc_manifest_cc_change_delete_trg` AFTER DELETE ON `acc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `acc_manifest_record_change_delete_trg`;
+CREATE TRIGGER `acc_manifest_record_change_delete_trg` AFTER DELETE ON `acc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `asccp_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `asccp_manifest_cc_change_insert_trg` AFTER INSERT ON `asccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `asccp_manifest_record_change_insert_trg`;
+CREATE TRIGGER `asccp_manifest_record_change_insert_trg` AFTER INSERT ON `asccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `asccp_manifest_cc_change_update_trg`;
-CREATE TRIGGER `asccp_manifest_cc_change_update_trg` AFTER UPDATE ON `asccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `asccp_manifest_record_change_update_trg`;
+CREATE TRIGGER `asccp_manifest_record_change_update_trg` AFTER UPDATE ON `asccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`asccp_manifest_id` <=> NEW.`asccp_manifest_id`), 'asccp_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`asccp_id` <=> NEW.`asccp_id`), 'asccp_id', NULL), IF(NOT (OLD.`role_of_acc_manifest_id` <=> NEW.`role_of_acc_manifest_id`), 'role_of_acc_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`log_id` <=> NEW.`log_id`), 'log_id', NULL), IF(NOT (OLD.`replacement_asccp_manifest_id` <=> NEW.`replacement_asccp_manifest_id`), 'replacement_asccp_manifest_id', NULL), IF(NOT (OLD.`prev_asccp_manifest_id` <=> NEW.`prev_asccp_manifest_id`), 'prev_asccp_manifest_id', NULL), IF(NOT (OLD.`next_asccp_manifest_id` <=> NEW.`next_asccp_manifest_id`), 'next_asccp_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `asccp_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `asccp_manifest_cc_change_delete_trg` AFTER DELETE ON `asccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `asccp_manifest_record_change_delete_trg`;
+CREATE TRIGGER `asccp_manifest_record_change_delete_trg` AFTER DELETE ON `asccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `bccp_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `bccp_manifest_cc_change_insert_trg` AFTER INSERT ON `bccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `bccp_manifest_record_change_insert_trg`;
+CREATE TRIGGER `bccp_manifest_record_change_insert_trg` AFTER INSERT ON `bccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `bccp_manifest_cc_change_update_trg`;
-CREATE TRIGGER `bccp_manifest_cc_change_update_trg` AFTER UPDATE ON `bccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `bccp_manifest_record_change_update_trg`;
+CREATE TRIGGER `bccp_manifest_record_change_update_trg` AFTER UPDATE ON `bccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`bccp_manifest_id` <=> NEW.`bccp_manifest_id`), 'bccp_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`bccp_id` <=> NEW.`bccp_id`), 'bccp_id', NULL), IF(NOT (OLD.`bdt_manifest_id` <=> NEW.`bdt_manifest_id`), 'bdt_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`log_id` <=> NEW.`log_id`), 'log_id', NULL), IF(NOT (OLD.`replacement_bccp_manifest_id` <=> NEW.`replacement_bccp_manifest_id`), 'replacement_bccp_manifest_id', NULL), IF(NOT (OLD.`prev_bccp_manifest_id` <=> NEW.`prev_bccp_manifest_id`), 'prev_bccp_manifest_id', NULL), IF(NOT (OLD.`next_bccp_manifest_id` <=> NEW.`next_bccp_manifest_id`), 'next_bccp_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `bccp_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `bccp_manifest_cc_change_delete_trg` AFTER DELETE ON `bccp_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `bccp_manifest_record_change_delete_trg`;
+CREATE TRIGGER `bccp_manifest_record_change_delete_trg` AFTER DELETE ON `bccp_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `dt_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `dt_manifest_cc_change_insert_trg` AFTER INSERT ON `dt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `dt_manifest_record_change_insert_trg`;
+CREATE TRIGGER `dt_manifest_record_change_insert_trg` AFTER INSERT ON `dt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `dt_manifest_cc_change_update_trg`;
-CREATE TRIGGER `dt_manifest_cc_change_update_trg` AFTER UPDATE ON `dt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `dt_manifest_record_change_update_trg`;
+CREATE TRIGGER `dt_manifest_record_change_update_trg` AFTER UPDATE ON `dt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`dt_manifest_id` <=> NEW.`dt_manifest_id`), 'dt_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`dt_id` <=> NEW.`dt_id`), 'dt_id', NULL), IF(NOT (OLD.`based_dt_manifest_id` <=> NEW.`based_dt_manifest_id`), 'based_dt_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`log_id` <=> NEW.`log_id`), 'log_id', NULL), IF(NOT (OLD.`replacement_dt_manifest_id` <=> NEW.`replacement_dt_manifest_id`), 'replacement_dt_manifest_id', NULL), IF(NOT (OLD.`prev_dt_manifest_id` <=> NEW.`prev_dt_manifest_id`), 'prev_dt_manifest_id', NULL), IF(NOT (OLD.`next_dt_manifest_id` <=> NEW.`next_dt_manifest_id`), 'next_dt_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `dt_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `dt_manifest_cc_change_delete_trg` AFTER DELETE ON `dt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `dt_manifest_record_change_delete_trg`;
+CREATE TRIGGER `dt_manifest_record_change_delete_trg` AFTER DELETE ON `dt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `ascc_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `ascc_manifest_cc_change_insert_trg` AFTER INSERT ON `ascc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCC', NEW.`ascc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `ascc_manifest_record_change_insert_trg`;
+CREATE TRIGGER `ascc_manifest_record_change_insert_trg` AFTER INSERT ON `ascc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCC', NEW.`ascc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `ascc_manifest_cc_change_update_trg`;
-CREATE TRIGGER `ascc_manifest_cc_change_update_trg` AFTER UPDATE ON `ascc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCC', NEW.`ascc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `ascc_manifest_record_change_update_trg`;
+CREATE TRIGGER `ascc_manifest_record_change_update_trg` AFTER UPDATE ON `ascc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ASCC', NEW.`ascc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`ascc_manifest_id` <=> NEW.`ascc_manifest_id`), 'ascc_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`ascc_id` <=> NEW.`ascc_id`), 'ascc_id', NULL), IF(NOT (OLD.`seq_key_id` <=> NEW.`seq_key_id`), 'seq_key_id', NULL), IF(NOT (OLD.`from_acc_manifest_id` <=> NEW.`from_acc_manifest_id`), 'from_acc_manifest_id', NULL), IF(NOT (OLD.`to_asccp_manifest_id` <=> NEW.`to_asccp_manifest_id`), 'to_asccp_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`replacement_ascc_manifest_id` <=> NEW.`replacement_ascc_manifest_id`), 'replacement_ascc_manifest_id', NULL), IF(NOT (OLD.`prev_ascc_manifest_id` <=> NEW.`prev_ascc_manifest_id`), 'prev_ascc_manifest_id', NULL), IF(NOT (OLD.`next_ascc_manifest_id` <=> NEW.`next_ascc_manifest_id`), 'next_ascc_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `ascc_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `ascc_manifest_cc_change_delete_trg` AFTER DELETE ON `ascc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCC', OLD.`ascc_manifest_id`, OLD.`from_acc_manifest_id`, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `ascc_manifest_record_change_delete_trg`;
+CREATE TRIGGER `ascc_manifest_record_change_delete_trg` AFTER DELETE ON `ascc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCC', OLD.`ascc_manifest_id`, OLD.`from_acc_manifest_id`, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `bcc_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `bcc_manifest_cc_change_insert_trg` AFTER INSERT ON `bcc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCC', NEW.`bcc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `bcc_manifest_record_change_insert_trg`;
+CREATE TRIGGER `bcc_manifest_record_change_insert_trg` AFTER INSERT ON `bcc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCC', NEW.`bcc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `bcc_manifest_cc_change_update_trg`;
-CREATE TRIGGER `bcc_manifest_cc_change_update_trg` AFTER UPDATE ON `bcc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCC', NEW.`bcc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `bcc_manifest_record_change_update_trg`;
+CREATE TRIGGER `bcc_manifest_record_change_update_trg` AFTER UPDATE ON `bcc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('BCC', NEW.`bcc_manifest_id`, NEW.`from_acc_manifest_id`, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`bcc_manifest_id` <=> NEW.`bcc_manifest_id`), 'bcc_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`bcc_id` <=> NEW.`bcc_id`), 'bcc_id', NULL), IF(NOT (OLD.`seq_key_id` <=> NEW.`seq_key_id`), 'seq_key_id', NULL), IF(NOT (OLD.`from_acc_manifest_id` <=> NEW.`from_acc_manifest_id`), 'from_acc_manifest_id', NULL), IF(NOT (OLD.`to_bccp_manifest_id` <=> NEW.`to_bccp_manifest_id`), 'to_bccp_manifest_id', NULL), IF(NOT (OLD.`den` <=> NEW.`den`), 'den', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`replacement_bcc_manifest_id` <=> NEW.`replacement_bcc_manifest_id`), 'replacement_bcc_manifest_id', NULL), IF(NOT (OLD.`prev_bcc_manifest_id` <=> NEW.`prev_bcc_manifest_id`), 'prev_bcc_manifest_id', NULL), IF(NOT (OLD.`next_bcc_manifest_id` <=> NEW.`next_bcc_manifest_id`), 'next_bcc_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `bcc_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `bcc_manifest_cc_change_delete_trg` AFTER DELETE ON `bcc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCC', OLD.`bcc_manifest_id`, OLD.`from_acc_manifest_id`, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `bcc_manifest_record_change_delete_trg`;
+CREATE TRIGGER `bcc_manifest_record_change_delete_trg` AFTER DELETE ON `bcc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCC', OLD.`bcc_manifest_id`, OLD.`from_acc_manifest_id`, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `dt_sc_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `dt_sc_manifest_cc_change_insert_trg` AFTER INSERT ON `dt_sc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT_SC', NEW.`dt_sc_manifest_id`, NEW.`owner_dt_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `dt_sc_manifest_record_change_insert_trg`;
+CREATE TRIGGER `dt_sc_manifest_record_change_insert_trg` AFTER INSERT ON `dt_sc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT_SC', NEW.`dt_sc_manifest_id`, NEW.`owner_dt_manifest_id`, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `dt_sc_manifest_cc_change_update_trg`;
-CREATE TRIGGER `dt_sc_manifest_cc_change_update_trg` AFTER UPDATE ON `dt_sc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT_SC', NEW.`dt_sc_manifest_id`, NEW.`owner_dt_manifest_id`, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `dt_sc_manifest_record_change_update_trg`;
+CREATE TRIGGER `dt_sc_manifest_record_change_update_trg` AFTER UPDATE ON `dt_sc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('DT_SC', NEW.`dt_sc_manifest_id`, NEW.`owner_dt_manifest_id`, NEW.`release_id`, CONCAT_WS(',', IF(NOT (OLD.`dt_sc_manifest_id` <=> NEW.`dt_sc_manifest_id`), 'dt_sc_manifest_id', NULL), IF(NOT (OLD.`release_id` <=> NEW.`release_id`), 'release_id', NULL), IF(NOT (OLD.`dt_sc_id` <=> NEW.`dt_sc_id`), 'dt_sc_id', NULL), IF(NOT (OLD.`owner_dt_manifest_id` <=> NEW.`owner_dt_manifest_id`), 'owner_dt_manifest_id', NULL), IF(NOT (OLD.`based_dt_sc_manifest_id` <=> NEW.`based_dt_sc_manifest_id`), 'based_dt_sc_manifest_id', NULL), IF(NOT (OLD.`conflict` <=> NEW.`conflict`), 'conflict', NULL), IF(NOT (OLD.`replacement_dt_sc_manifest_id` <=> NEW.`replacement_dt_sc_manifest_id`), 'replacement_dt_sc_manifest_id', NULL), IF(NOT (OLD.`prev_dt_sc_manifest_id` <=> NEW.`prev_dt_sc_manifest_id`), 'prev_dt_sc_manifest_id', NULL), IF(NOT (OLD.`next_dt_sc_manifest_id` <=> NEW.`next_dt_sc_manifest_id`), 'next_dt_sc_manifest_id', NULL)));
 
-DROP TRIGGER IF EXISTS `dt_sc_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `dt_sc_manifest_cc_change_delete_trg` AFTER DELETE ON `dt_sc_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT_SC', OLD.`dt_sc_manifest_id`, OLD.`owner_dt_manifest_id`, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `dt_sc_manifest_record_change_delete_trg`;
+CREATE TRIGGER `dt_sc_manifest_record_change_delete_trg` AFTER DELETE ON `dt_sc_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT_SC', OLD.`dt_sc_manifest_id`, OLD.`owner_dt_manifest_id`, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `acc_cc_change_update_trg`;
-CREATE TRIGGER `acc_cc_change_update_trg` AFTER UPDATE ON `acc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'ACC', `acc_manifest_id`, NULL, `release_id` FROM `acc_manifest` WHERE `acc_id` = NEW.`acc_id`;
+DROP TRIGGER IF EXISTS `acc_record_change_update_trg`;
+CREATE TRIGGER `acc_record_change_update_trg` AFTER UPDATE ON `acc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'ACC', `acc_manifest_id`, NULL, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`acc_id` <=> NEW.`acc_id`), 'acc_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`type` <=> NEW.`type`), 'type', NULL), IF(NOT (OLD.`object_class_term` <=> NEW.`object_class_term`), 'object_class_term', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`based_acc_id` <=> NEW.`based_acc_id`), 'based_acc_id', NULL), IF(NOT (OLD.`object_class_qualifier` <=> NEW.`object_class_qualifier`), 'object_class_qualifier', NULL), IF(NOT (OLD.`oagis_component_type` <=> NEW.`oagis_component_type`), 'oagis_component_type', NULL), IF(NOT (OLD.`namespace_id` <=> NEW.`namespace_id`), 'namespace_id', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_acc_id` <=> NEW.`replacement_acc_id`), 'replacement_acc_id', NULL), IF(NOT (OLD.`is_abstract` <=> NEW.`is_abstract`), 'is_abstract', NULL), IF(NOT (OLD.`prev_acc_id` <=> NEW.`prev_acc_id`), 'prev_acc_id', NULL), IF(NOT (OLD.`next_acc_id` <=> NEW.`next_acc_id`), 'next_acc_id', NULL)) FROM `acc_manifest` WHERE `acc_id` = NEW.`acc_id`;
 
-DROP TRIGGER IF EXISTS `acc_cc_change_delete_trg`;
-CREATE TRIGGER `acc_cc_change_delete_trg` AFTER DELETE ON `acc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `acc_record_change_delete_trg`;
+CREATE TRIGGER `acc_record_change_delete_trg` AFTER DELETE ON `acc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'ACC', `acc_manifest_id`, NULL, `release_id` FROM `acc_manifest` WHERE `acc_id` = OLD.`acc_id`;
 
-DROP TRIGGER IF EXISTS `asccp_cc_change_update_trg`;
-CREATE TRIGGER `asccp_cc_change_update_trg` AFTER UPDATE ON `asccp` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'ASCCP', `asccp_manifest_id`, NULL, `release_id` FROM `asccp_manifest` WHERE `asccp_id` = NEW.`asccp_id`;
+DROP TRIGGER IF EXISTS `asccp_record_change_update_trg`;
+CREATE TRIGGER `asccp_record_change_update_trg` AFTER UPDATE ON `asccp` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'ASCCP', `asccp_manifest_id`, NULL, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`asccp_id` <=> NEW.`asccp_id`), 'asccp_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`type` <=> NEW.`type`), 'type', NULL), IF(NOT (OLD.`property_term` <=> NEW.`property_term`), 'property_term', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`role_of_acc_id` <=> NEW.`role_of_acc_id`), 'role_of_acc_id', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`namespace_id` <=> NEW.`namespace_id`), 'namespace_id', NULL), IF(NOT (OLD.`reusable_indicator` <=> NEW.`reusable_indicator`), 'reusable_indicator', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_asccp_id` <=> NEW.`replacement_asccp_id`), 'replacement_asccp_id', NULL), IF(NOT (OLD.`is_nillable` <=> NEW.`is_nillable`), 'is_nillable', NULL), IF(NOT (OLD.`prev_asccp_id` <=> NEW.`prev_asccp_id`), 'prev_asccp_id', NULL), IF(NOT (OLD.`next_asccp_id` <=> NEW.`next_asccp_id`), 'next_asccp_id', NULL)) FROM `asccp_manifest` WHERE `asccp_id` = NEW.`asccp_id`;
 
-DROP TRIGGER IF EXISTS `asccp_cc_change_delete_trg`;
-CREATE TRIGGER `asccp_cc_change_delete_trg` AFTER DELETE ON `asccp` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `asccp_record_change_delete_trg`;
+CREATE TRIGGER `asccp_record_change_delete_trg` AFTER DELETE ON `asccp` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'ASCCP', `asccp_manifest_id`, NULL, `release_id` FROM `asccp_manifest` WHERE `asccp_id` = OLD.`asccp_id`;
 
-DROP TRIGGER IF EXISTS `bccp_cc_change_update_trg`;
-CREATE TRIGGER `bccp_cc_change_update_trg` AFTER UPDATE ON `bccp` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'BCCP', `bccp_manifest_id`, NULL, `release_id` FROM `bccp_manifest` WHERE `bccp_id` = NEW.`bccp_id`;
+DROP TRIGGER IF EXISTS `bccp_record_change_update_trg`;
+CREATE TRIGGER `bccp_record_change_update_trg` AFTER UPDATE ON `bccp` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'BCCP', `bccp_manifest_id`, NULL, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`bccp_id` <=> NEW.`bccp_id`), 'bccp_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`property_term` <=> NEW.`property_term`), 'property_term', NULL), IF(NOT (OLD.`representation_term` <=> NEW.`representation_term`), 'representation_term', NULL), IF(NOT (OLD.`bdt_id` <=> NEW.`bdt_id`), 'bdt_id', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`namespace_id` <=> NEW.`namespace_id`), 'namespace_id', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_bccp_id` <=> NEW.`replacement_bccp_id`), 'replacement_bccp_id', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`is_nillable` <=> NEW.`is_nillable`), 'is_nillable', NULL), IF(NOT (OLD.`default_value` <=> NEW.`default_value`), 'default_value', NULL), IF(NOT (OLD.`fixed_value` <=> NEW.`fixed_value`), 'fixed_value', NULL), IF(NOT (OLD.`prev_bccp_id` <=> NEW.`prev_bccp_id`), 'prev_bccp_id', NULL), IF(NOT (OLD.`next_bccp_id` <=> NEW.`next_bccp_id`), 'next_bccp_id', NULL)) FROM `bccp_manifest` WHERE `bccp_id` = NEW.`bccp_id`;
 
-DROP TRIGGER IF EXISTS `bccp_cc_change_delete_trg`;
-CREATE TRIGGER `bccp_cc_change_delete_trg` AFTER DELETE ON `bccp` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `bccp_record_change_delete_trg`;
+CREATE TRIGGER `bccp_record_change_delete_trg` AFTER DELETE ON `bccp` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'BCCP', `bccp_manifest_id`, NULL, `release_id` FROM `bccp_manifest` WHERE `bccp_id` = OLD.`bccp_id`;
 
-DROP TRIGGER IF EXISTS `dt_cc_change_update_trg`;
-CREATE TRIGGER `dt_cc_change_update_trg` AFTER UPDATE ON `dt` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest` WHERE `dt_id` = NEW.`dt_id`;
+DROP TRIGGER IF EXISTS `dt_record_change_update_trg`;
+CREATE TRIGGER `dt_record_change_update_trg` AFTER UPDATE ON `dt` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`dt_id` <=> NEW.`dt_id`), 'dt_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`data_type_term` <=> NEW.`data_type_term`), 'data_type_term', NULL), IF(NOT (OLD.`qualifier` <=> NEW.`qualifier`), 'qualifier', NULL), IF(NOT (OLD.`representation_term` <=> NEW.`representation_term`), 'representation_term', NULL), IF(NOT (OLD.`six_digit_id` <=> NEW.`six_digit_id`), 'six_digit_id', NULL), IF(NOT (OLD.`based_dt_id` <=> NEW.`based_dt_id`), 'based_dt_id', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`namespace_id` <=> NEW.`namespace_id`), 'namespace_id', NULL), IF(NOT (OLD.`content_component_definition` <=> NEW.`content_component_definition`), 'content_component_definition', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`commonly_used` <=> NEW.`commonly_used`), 'commonly_used', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_dt_id` <=> NEW.`replacement_dt_id`), 'replacement_dt_id', NULL), IF(NOT (OLD.`prev_dt_id` <=> NEW.`prev_dt_id`), 'prev_dt_id', NULL), IF(NOT (OLD.`next_dt_id` <=> NEW.`next_dt_id`), 'next_dt_id', NULL)) FROM `dt_manifest` WHERE `dt_id` = NEW.`dt_id`;
 
-DROP TRIGGER IF EXISTS `dt_cc_change_delete_trg`;
-CREATE TRIGGER `dt_cc_change_delete_trg` AFTER DELETE ON `dt` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_record_change_delete_trg`;
+CREATE TRIGGER `dt_record_change_delete_trg` AFTER DELETE ON `dt` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest` WHERE `dt_id` = OLD.`dt_id`;
 
-DROP TRIGGER IF EXISTS `ascc_cc_change_update_trg`;
-CREATE TRIGGER `ascc_cc_change_update_trg` AFTER UPDATE ON `ascc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'ASCC', `ascc_manifest_id`, `from_acc_manifest_id`, `release_id` FROM `ascc_manifest` WHERE `ascc_id` = NEW.`ascc_id`;
+DROP TRIGGER IF EXISTS `ascc_record_change_update_trg`;
+CREATE TRIGGER `ascc_record_change_update_trg` AFTER UPDATE ON `ascc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'ASCC', `ascc_manifest_id`, `from_acc_manifest_id`, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`ascc_id` <=> NEW.`ascc_id`), 'ascc_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`cardinality_min` <=> NEW.`cardinality_min`), 'cardinality_min', NULL), IF(NOT (OLD.`cardinality_max` <=> NEW.`cardinality_max`), 'cardinality_max', NULL), IF(NOT (OLD.`seq_key` <=> NEW.`seq_key`), 'seq_key', NULL), IF(NOT (OLD.`from_acc_id` <=> NEW.`from_acc_id`), 'from_acc_id', NULL), IF(NOT (OLD.`to_asccp_id` <=> NEW.`to_asccp_id`), 'to_asccp_id', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_ascc_id` <=> NEW.`replacement_ascc_id`), 'replacement_ascc_id', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`prev_ascc_id` <=> NEW.`prev_ascc_id`), 'prev_ascc_id', NULL), IF(NOT (OLD.`next_ascc_id` <=> NEW.`next_ascc_id`), 'next_ascc_id', NULL)) FROM `ascc_manifest` WHERE `ascc_id` = NEW.`ascc_id`;
 
-DROP TRIGGER IF EXISTS `ascc_cc_change_delete_trg`;
-CREATE TRIGGER `ascc_cc_change_delete_trg` AFTER DELETE ON `ascc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `ascc_record_change_delete_trg`;
+CREATE TRIGGER `ascc_record_change_delete_trg` AFTER DELETE ON `ascc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'ASCC', `ascc_manifest_id`, `from_acc_manifest_id`, `release_id` FROM `ascc_manifest` WHERE `ascc_id` = OLD.`ascc_id`;
 
-DROP TRIGGER IF EXISTS `bcc_cc_change_update_trg`;
-CREATE TRIGGER `bcc_cc_change_update_trg` AFTER UPDATE ON `bcc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'BCC', `bcc_manifest_id`, `from_acc_manifest_id`, `release_id` FROM `bcc_manifest` WHERE `bcc_id` = NEW.`bcc_id`;
+DROP TRIGGER IF EXISTS `bcc_record_change_update_trg`;
+CREATE TRIGGER `bcc_record_change_update_trg` AFTER UPDATE ON `bcc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'BCC', `bcc_manifest_id`, `from_acc_manifest_id`, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`bcc_id` <=> NEW.`bcc_id`), 'bcc_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`cardinality_min` <=> NEW.`cardinality_min`), 'cardinality_min', NULL), IF(NOT (OLD.`cardinality_max` <=> NEW.`cardinality_max`), 'cardinality_max', NULL), IF(NOT (OLD.`to_bccp_id` <=> NEW.`to_bccp_id`), 'to_bccp_id', NULL), IF(NOT (OLD.`from_acc_id` <=> NEW.`from_acc_id`), 'from_acc_id', NULL), IF(NOT (OLD.`seq_key` <=> NEW.`seq_key`), 'seq_key', NULL), IF(NOT (OLD.`entity_type` <=> NEW.`entity_type`), 'entity_type', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`state` <=> NEW.`state`), 'state', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_bcc_id` <=> NEW.`replacement_bcc_id`), 'replacement_bcc_id', NULL), IF(NOT (OLD.`is_nillable` <=> NEW.`is_nillable`), 'is_nillable', NULL), IF(NOT (OLD.`default_value` <=> NEW.`default_value`), 'default_value', NULL), IF(NOT (OLD.`fixed_value` <=> NEW.`fixed_value`), 'fixed_value', NULL), IF(NOT (OLD.`prev_bcc_id` <=> NEW.`prev_bcc_id`), 'prev_bcc_id', NULL), IF(NOT (OLD.`next_bcc_id` <=> NEW.`next_bcc_id`), 'next_bcc_id', NULL)) FROM `bcc_manifest` WHERE `bcc_id` = NEW.`bcc_id`;
 
-DROP TRIGGER IF EXISTS `bcc_cc_change_delete_trg`;
-CREATE TRIGGER `bcc_cc_change_delete_trg` AFTER DELETE ON `bcc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `bcc_record_change_delete_trg`;
+CREATE TRIGGER `bcc_record_change_delete_trg` AFTER DELETE ON `bcc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'BCC', `bcc_manifest_id`, `from_acc_manifest_id`, `release_id` FROM `bcc_manifest` WHERE `bcc_id` = OLD.`bcc_id`;
 
-DROP TRIGGER IF EXISTS `dt_sc_cc_change_update_trg`;
-CREATE TRIGGER `dt_sc_cc_change_update_trg` AFTER UPDATE ON `dt_sc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
-    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest` WHERE `dt_sc_id` = NEW.`dt_sc_id`;
+DROP TRIGGER IF EXISTS `dt_sc_record_change_update_trg`;
+CREATE TRIGGER `dt_sc_record_change_update_trg` AFTER UPDATE ON `dt_sc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id`, CONCAT_WS(',', IF(NOT (OLD.`dt_sc_id` <=> NEW.`dt_sc_id`), 'dt_sc_id', NULL), IF(NOT (OLD.`guid` <=> NEW.`guid`), 'guid', NULL), IF(NOT (OLD.`object_class_term` <=> NEW.`object_class_term`), 'object_class_term', NULL), IF(NOT (OLD.`property_term` <=> NEW.`property_term`), 'property_term', NULL), IF(NOT (OLD.`representation_term` <=> NEW.`representation_term`), 'representation_term', NULL), IF(NOT (OLD.`definition` <=> NEW.`definition`), 'definition', NULL), IF(NOT (OLD.`definition_source` <=> NEW.`definition_source`), 'definition_source', NULL), IF(NOT (OLD.`owner_dt_id` <=> NEW.`owner_dt_id`), 'owner_dt_id', NULL), IF(NOT (OLD.`cardinality_min` <=> NEW.`cardinality_min`), 'cardinality_min', NULL), IF(NOT (OLD.`cardinality_max` <=> NEW.`cardinality_max`), 'cardinality_max', NULL), IF(NOT (OLD.`based_dt_sc_id` <=> NEW.`based_dt_sc_id`), 'based_dt_sc_id', NULL), IF(NOT (OLD.`default_value` <=> NEW.`default_value`), 'default_value', NULL), IF(NOT (OLD.`fixed_value` <=> NEW.`fixed_value`), 'fixed_value', NULL), IF(NOT (OLD.`is_deprecated` <=> NEW.`is_deprecated`), 'is_deprecated', NULL), IF(NOT (OLD.`replacement_dt_sc_id` <=> NEW.`replacement_dt_sc_id`), 'replacement_dt_sc_id', NULL), IF(NOT (OLD.`created_by` <=> NEW.`created_by`), 'created_by', NULL), IF(NOT (OLD.`owner_user_id` <=> NEW.`owner_user_id`), 'owner_user_id', NULL), IF(NOT (OLD.`last_updated_by` <=> NEW.`last_updated_by`), 'last_updated_by', NULL), IF(NOT (OLD.`creation_timestamp` <=> NEW.`creation_timestamp`), 'creation_timestamp', NULL), IF(NOT (OLD.`last_update_timestamp` <=> NEW.`last_update_timestamp`), 'last_update_timestamp', NULL), IF(NOT (OLD.`prev_dt_sc_id` <=> NEW.`prev_dt_sc_id`), 'prev_dt_sc_id', NULL), IF(NOT (OLD.`next_dt_sc_id` <=> NEW.`next_dt_sc_id`), 'next_dt_sc_id', NULL)) FROM `dt_sc_manifest` WHERE `dt_sc_id` = NEW.`dt_sc_id`;
 
-DROP TRIGGER IF EXISTS `dt_sc_cc_change_delete_trg`;
-CREATE TRIGGER `dt_sc_cc_change_delete_trg` AFTER DELETE ON `dt_sc` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_sc_record_change_delete_trg`;
+CREATE TRIGGER `dt_sc_record_change_delete_trg` AFTER DELETE ON `dt_sc` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest` WHERE `dt_sc_id` = OLD.`dt_sc_id`;
 
-DROP TRIGGER IF EXISTS `seq_key_cc_change_insert_trg`;
-CREATE TRIGGER `seq_key_cc_change_insert_trg` AFTER INSERT ON `seq_key` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `seq_key_record_change_insert_trg`;
+CREATE TRIGGER `seq_key_record_change_insert_trg` AFTER INSERT ON `seq_key` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `seq_key_cc_change_update_trg`;
-CREATE TRIGGER `seq_key_cc_change_update_trg` AFTER UPDATE ON `seq_key` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `seq_key_record_change_update_trg`;
+CREATE TRIGGER `seq_key_record_change_update_trg` AFTER UPDATE ON `seq_key` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `seq_key_cc_change_delete_trg`;
-CREATE TRIGGER `seq_key_cc_change_delete_trg` AFTER DELETE ON `seq_key` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', OLD.`from_acc_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `seq_key_record_change_delete_trg`;
+CREATE TRIGGER `seq_key_record_change_delete_trg` AFTER DELETE ON `seq_key` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', OLD.`from_acc_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `acc_manifest_tag_cc_change_insert_trg`;
-CREATE TRIGGER `acc_manifest_tag_cc_change_insert_trg` AFTER INSERT ON `acc_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `acc_manifest_tag_record_change_insert_trg`;
+CREATE TRIGGER `acc_manifest_tag_record_change_insert_trg` AFTER INSERT ON `acc_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `acc_manifest_tag_cc_change_delete_trg`;
-CREATE TRIGGER `acc_manifest_tag_cc_change_delete_trg` AFTER DELETE ON `acc_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `acc_manifest_tag_record_change_delete_trg`;
+CREATE TRIGGER `acc_manifest_tag_record_change_delete_trg` AFTER DELETE ON `acc_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `asccp_manifest_tag_cc_change_insert_trg`;
-CREATE TRIGGER `asccp_manifest_tag_cc_change_insert_trg` AFTER INSERT ON `asccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `asccp_manifest_tag_record_change_insert_trg`;
+CREATE TRIGGER `asccp_manifest_tag_record_change_insert_trg` AFTER INSERT ON `asccp_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `asccp_manifest_tag_cc_change_delete_trg`;
-CREATE TRIGGER `asccp_manifest_tag_cc_change_delete_trg` AFTER DELETE ON `asccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `asccp_manifest_tag_record_change_delete_trg`;
+CREATE TRIGGER `asccp_manifest_tag_record_change_delete_trg` AFTER DELETE ON `asccp_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `bccp_manifest_tag_cc_change_insert_trg`;
-CREATE TRIGGER `bccp_manifest_tag_cc_change_insert_trg` AFTER INSERT ON `bccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `bccp_manifest_tag_record_change_insert_trg`;
+CREATE TRIGGER `bccp_manifest_tag_record_change_insert_trg` AFTER INSERT ON `bccp_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `bccp_manifest_tag_cc_change_delete_trg`;
-CREATE TRIGGER `bccp_manifest_tag_cc_change_delete_trg` AFTER DELETE ON `bccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `bccp_manifest_tag_record_change_delete_trg`;
+CREATE TRIGGER `bccp_manifest_tag_record_change_delete_trg` AFTER DELETE ON `bccp_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `dt_manifest_tag_cc_change_insert_trg`;
-CREATE TRIGGER `dt_manifest_tag_cc_change_insert_trg` AFTER INSERT ON `dt_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `dt_manifest_tag_record_change_insert_trg`;
+CREATE TRIGGER `dt_manifest_tag_record_change_insert_trg` AFTER INSERT ON `dt_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `dt_manifest_tag_cc_change_delete_trg`;
-CREATE TRIGGER `dt_manifest_tag_cc_change_delete_trg` AFTER DELETE ON `dt_manifest_tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `dt_manifest_tag_record_change_delete_trg`;
+CREATE TRIGGER `dt_manifest_tag_record_change_delete_trg` AFTER DELETE ON `dt_manifest_tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `tag_cc_change_update_trg`;
-CREATE TRIGGER `tag_cc_change_update_trg` AFTER UPDATE ON `tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('TAG', NEW.`tag_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `tag_record_change_update_trg`;
+CREATE TRIGGER `tag_record_change_update_trg` AFTER UPDATE ON `tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('TAG', NEW.`tag_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `release_cc_change_update_trg`;
-CREATE TRIGGER `release_cc_change_update_trg` AFTER UPDATE ON `release` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('RELEASE', NEW.`release_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `release_record_change_update_trg`;
+CREATE TRIGGER `release_record_change_update_trg` AFTER UPDATE ON `release` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('RELEASE', NEW.`release_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `library_cc_change_update_trg`;
-CREATE TRIGGER `library_cc_change_update_trg` AFTER UPDATE ON `library` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('LIBRARY', NEW.`library_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `library_record_change_update_trg`;
+CREATE TRIGGER `library_record_change_update_trg` AFTER UPDATE ON `library` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('LIBRARY', NEW.`library_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `tag_cc_change_delete_trg`;
-CREATE TRIGGER `tag_cc_change_delete_trg` AFTER DELETE ON `tag` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('TAG', OLD.`tag_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `tag_record_change_delete_trg`;
+CREATE TRIGGER `tag_record_change_delete_trg` AFTER DELETE ON `tag` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('TAG', OLD.`tag_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `release_cc_change_delete_trg`;
-CREATE TRIGGER `release_cc_change_delete_trg` AFTER DELETE ON `release` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('RELEASE', OLD.`release_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `release_record_change_delete_trg`;
+CREATE TRIGGER `release_record_change_delete_trg` AFTER DELETE ON `release` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('RELEASE', OLD.`release_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `library_cc_change_delete_trg`;
-CREATE TRIGGER `library_cc_change_delete_trg` AFTER DELETE ON `library` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('LIBRARY', OLD.`library_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `library_record_change_delete_trg`;
+CREATE TRIGGER `library_record_change_delete_trg` AFTER DELETE ON `library` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('LIBRARY', OLD.`library_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `release_dep_cc_change_insert_trg`;
-CREATE TRIGGER `release_dep_cc_change_insert_trg` AFTER INSERT ON `release_dep` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('RELEASE_DEP', NEW.`release_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `release_dep_record_change_insert_trg`;
+CREATE TRIGGER `release_dep_record_change_insert_trg` AFTER INSERT ON `release_dep` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('RELEASE_DEP', NEW.`release_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `release_dep_cc_change_update_trg`;
-CREATE TRIGGER `release_dep_cc_change_update_trg` AFTER UPDATE ON `release_dep` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('RELEASE_DEP', NEW.`release_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `release_dep_record_change_update_trg`;
+CREATE TRIGGER `release_dep_record_change_update_trg` AFTER UPDATE ON `release_dep` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('RELEASE_DEP', NEW.`release_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `release_dep_cc_change_delete_trg`;
-CREATE TRIGGER `release_dep_cc_change_delete_trg` AFTER DELETE ON `release_dep` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('RELEASE_DEP', OLD.`release_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `release_dep_record_change_delete_trg`;
+CREATE TRIGGER `release_dep_record_change_delete_trg` AFTER DELETE ON `release_dep` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('RELEASE_DEP', OLD.`release_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `app_user_cc_change_update_trg`;
-CREATE TRIGGER `app_user_cc_change_update_trg` AFTER UPDATE ON `app_user` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `app_user_record_change_update_trg`;
+CREATE TRIGGER `app_user_record_change_update_trg` AFTER UPDATE ON `app_user` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'USER', NEW.`app_user_id`, NULL, NULL FROM DUAL
     WHERE NOT (OLD.`login_id` <=> NEW.`login_id` AND OLD.`is_developer` <=> NEW.`is_developer`);
 
 
-DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `xbt_manifest_cc_change_insert_trg` AFTER INSERT ON `xbt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `xbt_manifest_record_change_insert_trg`;
+CREATE TRIGGER `xbt_manifest_record_change_insert_trg` AFTER INSERT ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_update_trg`;
-CREATE TRIGGER `xbt_manifest_cc_change_update_trg` AFTER UPDATE ON `xbt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `xbt_manifest_record_change_update_trg`;
+CREATE TRIGGER `xbt_manifest_record_change_update_trg` AFTER UPDATE ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('XBT', NEW.`xbt_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `xbt_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `xbt_manifest_cc_change_delete_trg` AFTER DELETE ON `xbt_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('XBT', OLD.`xbt_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `xbt_manifest_record_change_delete_trg`;
+CREATE TRIGGER `xbt_manifest_record_change_delete_trg` AFTER DELETE ON `xbt_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('XBT', OLD.`xbt_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `xbt_cc_change_update_trg`;
-CREATE TRIGGER `xbt_cc_change_update_trg` AFTER UPDATE ON `xbt` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `xbt_record_change_update_trg`;
+CREATE TRIGGER `xbt_record_change_update_trg` AFTER UPDATE ON `xbt` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'XBT', `xbt_manifest_id`, NULL, `release_id` FROM `xbt_manifest` WHERE `xbt_id` = NEW.`xbt_id`;
 
-DROP TRIGGER IF EXISTS `xbt_cc_change_delete_trg`;
-CREATE TRIGGER `xbt_cc_change_delete_trg` AFTER DELETE ON `xbt` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `xbt_record_change_delete_trg`;
+CREATE TRIGGER `xbt_record_change_delete_trg` AFTER DELETE ON `xbt` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'XBT', `xbt_manifest_id`, NULL, `release_id` FROM `xbt_manifest` WHERE `xbt_id` = OLD.`xbt_id`;
 
-DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `code_list_manifest_cc_change_insert_trg` AFTER INSERT ON `code_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_manifest_record_change_insert_trg`;
+CREATE TRIGGER `code_list_manifest_record_change_insert_trg` AFTER INSERT ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_update_trg`;
-CREATE TRIGGER `code_list_manifest_cc_change_update_trg` AFTER UPDATE ON `code_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_manifest_record_change_update_trg`;
+CREATE TRIGGER `code_list_manifest_record_change_update_trg` AFTER UPDATE ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `code_list_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `code_list_manifest_cc_change_delete_trg` AFTER DELETE ON `code_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_manifest_record_change_delete_trg`;
+CREATE TRIGGER `code_list_manifest_record_change_delete_trg` AFTER DELETE ON `code_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `code_list_cc_change_update_trg`;
-CREATE TRIGGER `code_list_cc_change_update_trg` AFTER UPDATE ON `code_list` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `code_list_record_change_update_trg`;
+CREATE TRIGGER `code_list_record_change_update_trg` AFTER UPDATE ON `code_list` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'CODE_LIST', `code_list_manifest_id`, NULL, `release_id` FROM `code_list_manifest` WHERE `code_list_id` = NEW.`code_list_id`;
 
-DROP TRIGGER IF EXISTS `code_list_cc_change_delete_trg`;
-CREATE TRIGGER `code_list_cc_change_delete_trg` AFTER DELETE ON `code_list` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `code_list_record_change_delete_trg`;
+CREATE TRIGGER `code_list_record_change_delete_trg` AFTER DELETE ON `code_list` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'CODE_LIST', `code_list_manifest_id`, NULL, `release_id` FROM `code_list_manifest` WHERE `code_list_id` = OLD.`code_list_id`;
 
-DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `agency_id_list_manifest_cc_change_insert_trg` AFTER INSERT ON `agency_id_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_record_change_insert_trg`;
+CREATE TRIGGER `agency_id_list_manifest_record_change_insert_trg` AFTER INSERT ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_update_trg`;
-CREATE TRIGGER `agency_id_list_manifest_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_record_change_update_trg`;
+CREATE TRIGGER `agency_id_list_manifest_record_change_update_trg` AFTER UPDATE ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('AGENCY_ID_LIST', NEW.`agency_id_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `agency_id_list_manifest_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('AGENCY_ID_LIST', OLD.`agency_id_list_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `agency_id_list_manifest_record_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_manifest_record_change_delete_trg` AFTER DELETE ON `agency_id_list_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('AGENCY_ID_LIST', OLD.`agency_id_list_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_cc_change_update_trg`;
-CREATE TRIGGER `agency_id_list_cc_change_update_trg` AFTER UPDATE ON `agency_id_list` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_record_change_update_trg`;
+CREATE TRIGGER `agency_id_list_record_change_update_trg` AFTER UPDATE ON `agency_id_list` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest` WHERE `agency_id_list_id` = NEW.`agency_id_list_id`;
 
-DROP TRIGGER IF EXISTS `agency_id_list_cc_change_delete_trg`;
-CREATE TRIGGER `agency_id_list_cc_change_delete_trg` AFTER DELETE ON `agency_id_list` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_record_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_record_change_delete_trg` AFTER DELETE ON `agency_id_list` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest` WHERE `agency_id_list_id` = OLD.`agency_id_list_id`;
 
-DROP TRIGGER IF EXISTS `namespace_cc_change_update_trg`;
-CREATE TRIGGER `namespace_cc_change_update_trg` AFTER UPDATE ON `namespace` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('NAMESPACE', NEW.`namespace_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `namespace_record_change_update_trg`;
+CREATE TRIGGER `namespace_record_change_update_trg` AFTER UPDATE ON `namespace` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('NAMESPACE', NEW.`namespace_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `namespace_cc_change_delete_trg`;
-CREATE TRIGGER `namespace_cc_change_delete_trg` AFTER DELETE ON `namespace` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('NAMESPACE', OLD.`namespace_id`, NULL, NULL);
+DROP TRIGGER IF EXISTS `namespace_record_change_delete_trg`;
+CREATE TRIGGER `namespace_record_change_delete_trg` AFTER DELETE ON `namespace` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('NAMESPACE', OLD.`namespace_id`, NULL, NULL);
 
-DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_insert_trg`;
-CREATE TRIGGER `dt_awd_pri_cc_change_insert_trg` AFTER INSERT ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_insert_trg`;
+CREATE TRIGGER `dt_awd_pri_record_change_insert_trg` AFTER INSERT ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
     WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
 
-DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_insert_trg`;
-CREATE TRIGGER `dt_sc_awd_pri_cc_change_insert_trg` AFTER INSERT ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_insert_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_record_change_insert_trg` AFTER INSERT ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
 
-DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_update_trg`;
-CREATE TRIGGER `dt_awd_pri_cc_change_update_trg` AFTER UPDATE ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_update_trg`;
+CREATE TRIGGER `dt_awd_pri_record_change_update_trg` AFTER UPDATE ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
     WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
 
-DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_update_trg`;
-CREATE TRIGGER `dt_sc_awd_pri_cc_change_update_trg` AFTER UPDATE ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_update_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_record_change_update_trg` AFTER UPDATE ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
 
-DROP TRIGGER IF EXISTS `dt_awd_pri_cc_change_delete_trg`;
-CREATE TRIGGER `dt_awd_pri_cc_change_delete_trg` AFTER DELETE ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_delete_trg`;
+CREATE TRIGGER `dt_awd_pri_record_change_delete_trg` AFTER DELETE ON `dt_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
     WHERE `dt_id` = OLD.`dt_id` AND `release_id` = OLD.`release_id`;
 
-DROP TRIGGER IF EXISTS `dt_sc_awd_pri_cc_change_delete_trg`;
-CREATE TRIGGER `dt_sc_awd_pri_cc_change_delete_trg` AFTER DELETE ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_delete_trg`;
+CREATE TRIGGER `dt_sc_awd_pri_record_change_delete_trg` AFTER DELETE ON `dt_sc_awd_pri` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = OLD.`dt_sc_id` AND `release_id` = OLD.`release_id`;
 
 
-DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `code_list_value_manifest_cc_change_insert_trg` AFTER INSERT ON `code_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_value_manifest_record_change_insert_trg`;
+CREATE TRIGGER `code_list_value_manifest_record_change_insert_trg` AFTER INSERT ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_insert_trg`;
-CREATE TRIGGER `agency_id_list_value_manifest_cc_change_insert_trg` AFTER INSERT ON `agency_id_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_record_change_insert_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_record_change_insert_trg` AFTER INSERT ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
     WHERE `agency_id_list_manifest_id` = NEW.`agency_id_list_manifest_id`
        OR `agency_id_list_value_manifest_id` = NEW.`agency_id_list_value_manifest_id`;
 
-DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_update_trg`;
-CREATE TRIGGER `code_list_value_manifest_cc_change_update_trg` AFTER UPDATE ON `code_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_value_manifest_record_change_update_trg`;
+CREATE TRIGGER `code_list_value_manifest_record_change_update_trg` AFTER UPDATE ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', NEW.`code_list_manifest_id`, NULL, NEW.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_update_trg`;
-CREATE TRIGGER `agency_id_list_value_manifest_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_record_change_update_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_record_change_update_trg` AFTER UPDATE ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
     WHERE `agency_id_list_manifest_id` = NEW.`agency_id_list_manifest_id`
        OR `agency_id_list_value_manifest_id` = NEW.`agency_id_list_value_manifest_id`;
 
-DROP TRIGGER IF EXISTS `code_list_value_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `code_list_value_manifest_cc_change_delete_trg` AFTER DELETE ON `code_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
+DROP TRIGGER IF EXISTS `code_list_value_manifest_record_change_delete_trg`;
+CREATE TRIGGER `code_list_value_manifest_record_change_delete_trg` AFTER DELETE ON `code_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('CODE_LIST', OLD.`code_list_manifest_id`, NULL, OLD.`release_id`);
 
-DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_cc_change_delete_trg`;
-CREATE TRIGGER `agency_id_list_value_manifest_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_value_manifest` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_value_manifest_record_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_value_manifest_record_change_delete_trg` AFTER DELETE ON `agency_id_list_value_manifest` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', `agency_id_list_manifest_id`, NULL, `release_id` FROM `agency_id_list_manifest`
     WHERE `agency_id_list_manifest_id` = OLD.`agency_id_list_manifest_id`
        OR `agency_id_list_value_manifest_id` = OLD.`agency_id_list_value_manifest_id`;
 
-DROP TRIGGER IF EXISTS `code_list_value_cc_change_update_trg`;
-CREATE TRIGGER `code_list_value_cc_change_update_trg` AFTER UPDATE ON `code_list_value` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `code_list_value_record_change_update_trg`;
+CREATE TRIGGER `code_list_value_record_change_update_trg` AFTER UPDATE ON `code_list_value` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'CODE_LIST', m.`code_list_manifest_id`, NULL, m.`release_id` FROM `code_list_value_manifest` vm
     JOIN `code_list_manifest` m ON m.`code_list_manifest_id` = vm.`code_list_manifest_id`
     WHERE vm.`code_list_value_id` = NEW.`code_list_value_id`;
 
-DROP TRIGGER IF EXISTS `agency_id_list_value_cc_change_update_trg`;
-CREATE TRIGGER `agency_id_list_value_cc_change_update_trg` AFTER UPDATE ON `agency_id_list_value` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_value_record_change_update_trg`;
+CREATE TRIGGER `agency_id_list_value_record_change_update_trg` AFTER UPDATE ON `agency_id_list_value` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', m.`agency_id_list_manifest_id`, NULL, m.`release_id` FROM `agency_id_list_manifest` m
     WHERE m.`agency_id_list_manifest_id` IN (SELECT vm.`agency_id_list_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = NEW.`agency_id_list_value_id`)
        OR m.`agency_id_list_value_manifest_id` IN (SELECT vm.`agency_id_list_value_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = NEW.`agency_id_list_value_id`);
 
-DROP TRIGGER IF EXISTS `code_list_value_cc_change_delete_trg`;
-CREATE TRIGGER `code_list_value_cc_change_delete_trg` AFTER DELETE ON `code_list_value` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `code_list_value_record_change_delete_trg`;
+CREATE TRIGGER `code_list_value_record_change_delete_trg` AFTER DELETE ON `code_list_value` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'CODE_LIST', m.`code_list_manifest_id`, NULL, m.`release_id` FROM `code_list_value_manifest` vm
     JOIN `code_list_manifest` m ON m.`code_list_manifest_id` = vm.`code_list_manifest_id`
     WHERE vm.`code_list_value_id` = OLD.`code_list_value_id`;
 
-DROP TRIGGER IF EXISTS `agency_id_list_value_cc_change_delete_trg`;
-CREATE TRIGGER `agency_id_list_value_cc_change_delete_trg` AFTER DELETE ON `agency_id_list_value` FOR EACH ROW
-    INSERT INTO `cc_change_log` (`kind`, `target_id`, `parent_manifest_id`, `release_id`)
+DROP TRIGGER IF EXISTS `agency_id_list_value_record_change_delete_trg`;
+CREATE TRIGGER `agency_id_list_value_record_change_delete_trg` AFTER DELETE ON `agency_id_list_value` FOR EACH ROW
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
     SELECT 'AGENCY_ID_LIST', m.`agency_id_list_manifest_id`, NULL, m.`release_id` FROM `agency_id_list_manifest` m
     WHERE m.`agency_id_list_manifest_id` IN (SELECT vm.`agency_id_list_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = OLD.`agency_id_list_value_id`)
        OR m.`agency_id_list_value_manifest_id` IN (SELECT vm.`agency_id_list_value_manifest_id` FROM `agency_id_list_value_manifest` vm WHERE vm.`agency_id_list_value_id` = OLD.`agency_id_list_value_id`);

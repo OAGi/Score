@@ -17,8 +17,8 @@ import org.oagi.score.gateway.http.api.bie_management.service.BieDocument;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitContext;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitResult;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitor;
-import org.oagi.score.gateway.http.api.cc_management.cache.RedisCcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
+import org.oagi.score.gateway.http.cache.RedisRecordCache;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.api.cc_management.model.CachedCcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -28,7 +28,6 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -164,12 +163,10 @@ class BieDocumentEquivalenceTest {
                 redis = new LettuceConnectionFactory(new RedisStandaloneConfiguration(
                         System.getProperty("score.redis.host", "localhost"), Integer.getInteger("score.redis.port", 6379)));
                 redis.afterPropertiesSet();
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache",
-                        new RedisCcCache(redis, prefix, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30)));
+                ReflectionTestUtils.setField(repositoryFactory, "recordCache",
+                        new RedisRecordCache(redis, prefix, org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30)));
             } else {
-                CaffeineCacheManager manager = new CaffeineCacheManager();
-                manager.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache", new SpringCcCache(manager, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady()));
+                                ReflectionTestUtils.setField(repositoryFactory, "recordCache", new CaffeineRecordCache("maximumSize=200000,expireAfterWrite=600s", org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady()));
             }
 
             int bies = 0;

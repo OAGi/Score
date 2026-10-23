@@ -10,9 +10,9 @@ import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateE
 import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieReadService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitor;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus;
-import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RecordCacheStatus;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.graph.model.FindUsagesRequest;
@@ -23,7 +23,6 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
@@ -63,14 +62,14 @@ class CcSingleReadAnalysis {
     private static final StackWalker WALKER = StackWalker.getInstance();
 
     /** Counts what is asked of the cache. */
-    private static final class Observing implements CcCache {
-        final CcCache inner;
+    private static final class Observing implements RecordCache {
+        final RecordCache inner;
         final Map<String, LongAdder> byKind = new ConcurrentHashMap<>();
         final Map<String, LongAdder> byConsumer = new ConcurrentHashMap<>();
         final Set<String> distinct = ConcurrentHashMap.newKeySet();
         final LongAdder singles = new LongAdder(), hits = new LongAdder(), bulkCalls = new LongAdder(), bulkKeys = new LongAdder();
 
-        Observing(CcCache inner) {
+        Observing(RecordCache inner) {
             this.inner = inner;
         }
 
@@ -190,14 +189,12 @@ class CcSingleReadAnalysis {
         scenarios.put("export.standalone.xml (middle)", () -> releaseQueryService.exportStandaloneSchema(admin, List.of(new AsccpManifestId(BigInteger.valueOf(middle)))));
         scenarios.put("export.standalone.xml (large)", () -> releaseQueryService.exportStandaloneSchema(admin, List.of(new AsccpManifestId(BigInteger.valueOf(large)))));
 
-        CcCache original = (CcCache) ReflectionTestUtils.getField(repositoryFactory, "ccCache");
+        RecordCache original = (RecordCache) ReflectionTestUtils.getField(repositoryFactory, "recordCache");
         StringBuilder out = new StringBuilder("# Single reads of the cache, by consumer (" + new Date() + ")\n\n");
         try {
             for (var scenario : scenarios.entrySet()) {
-                CaffeineCacheManager manager = new CaffeineCacheManager();
-                manager.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
-                Observing observing = new Observing(new SpringCcCache(manager, CcCacheStatus.alwaysReady()));
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache", observing);
+                                Observing observing = new Observing(new CaffeineRecordCache("maximumSize=200000,expireAfterWrite=600s", RecordCacheStatus.alwaysReady()));
+                ReflectionTestUtils.setField(repositoryFactory, "recordCache", observing);
                 System.out.println("SINGLEREADS " + scenario.getKey());
                 for (String pass : List.of("cold (empty cache)", "warm (cache filled)")) {
                     observing.reset();
@@ -215,7 +212,7 @@ class CcSingleReadAnalysis {
                 }
             }
         } finally {
-            ReflectionTestUtils.setField(repositoryFactory, "ccCache", original);
+            ReflectionTestUtils.setField(repositoryFactory, "recordCache", original);
         }
         Path file = Path.of(System.getProperty("score.singlereads.out", "target/cc-single-reads.md"));
         Files.createDirectories(file.toAbsolutePath().getParent());

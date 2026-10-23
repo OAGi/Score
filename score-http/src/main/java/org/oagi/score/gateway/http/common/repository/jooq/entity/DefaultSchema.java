@@ -53,7 +53,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtxVa
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContent;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BusinessTerm;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CcChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeList;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest;
@@ -125,6 +124,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Oauth2App;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Oauth2AppScope;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ReleaseDep;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.SeqKey;
@@ -475,29 +475,6 @@ public class DefaultSchema extends SchemaImpl {
      * missing.
      */
     public final BusinessTerm BUSINESS_TERM = BusinessTerm.BUSINESS_TERM;
-
-    /**
-     * Temporary log of the changes to the data core component records are made
-     * of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be
-     * dropped with its triggers if CDC is introduced. Rows are deleted by the
-     * application after 2 hours (retention policy, checked every 10 minutes)
-     * and the numbering restarts from 1 once the table has stayed empty for 10
-     * minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers
-     * named &lt;table&gt;_cc_change_&lt;insert|update|delete&gt;_trg, in the
-     * transaction of the change (a rollback removes them), whoever makes the
-     * change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest,
-     * bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE:
-     * one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc
-     * on UPDATE and DELETE: one row for every manifest, in every release, that
-     * shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of
-     * kind ACC for the ACC that owns the order; (4) acc_manifest_tag,
-     * asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and
-     * DELETE: one row for the tagged manifest; (5) tag, release, library on
-     * UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep
-     * on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on
-     * UPDATE when login_id or is_developer changes: one row of kind USER.
-     */
-    public final CcChangeLog CC_CHANGE_LOG = CcChangeLog.CC_CHANGE_LOG;
 
     /**
      * This table stores the CDT primitives.
@@ -1005,6 +982,39 @@ public class DefaultSchema extends SchemaImpl {
     public final Oauth2AppScope OAUTH2_APP_SCOPE = Oauth2AppScope.OAUTH2_APP_SCOPE;
 
     /**
+     * Temporary log of the changes to the data core component records are made
+     * of, read by the CC cache (RecordChangeWatchdog) to forget what changed; can be
+     * dropped with its triggers if CDC is introduced. Rows are deleted by the
+     * application after 2 hours (retention policy, checked every 10 minutes)
+     * and the numbering restarts from 1 once the table has stayed empty for 10
+     * minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers
+     * named &lt;table&gt;_record_change_&lt;insert|update|delete&gt;_trg, in
+     * the transaction of the change (a rollback removes them), whoever makes
+     * the change: (1) acc_manifest, ascc_manifest, bcc_manifest,
+     * asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT,
+     * UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc,
+     * asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest,
+     * in every release, that shows the changed row; (3) seq_key on INSERT,
+     * UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4)
+     * acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag
+     * on INSERT and DELETE: one row for the tagged manifest; (5) tag, release,
+     * library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6)
+     * release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7)
+     * app_user on UPDATE when login_id or is_developer changes: one row of kind
+     * USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on
+     * INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and
+     * DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9)
+     * namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b)
+     * code_list_value_manifest, code_list_value, agency_id_list_value_manifest
+     * and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on
+     * UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every
+     * list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on
+     * INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of
+     * the data type in the release of the changed row.
+     */
+    public final RecordChangeLog RECORD_CHANGE_LOG = RecordChangeLog.RECORD_CHANGE_LOG;
+
+    /**
      * The is table store the release information.
      */
     public final Release RELEASE = Release.RELEASE;
@@ -1158,7 +1168,6 @@ public class DefaultSchema extends SchemaImpl {
             BlobContent.BLOB_CONTENT,
             BlobContentManifest.BLOB_CONTENT_MANIFEST,
             BusinessTerm.BUSINESS_TERM,
-            CcChangeLog.CC_CHANGE_LOG,
             CdtPri.CDT_PRI,
             CodeList.CODE_LIST,
             CodeListManifest.CODE_LIST_MANIFEST,
@@ -1230,6 +1239,7 @@ public class DefaultSchema extends SchemaImpl {
             OasTag.OAS_TAG,
             Oauth2App.OAUTH2_APP,
             Oauth2AppScope.OAUTH2_APP_SCOPE,
+            RecordChangeLog.RECORD_CHANGE_LOG,
             Release.RELEASE,
             ReleaseDep.RELEASE_DEP,
             SeqKey.SEQ_KEY,

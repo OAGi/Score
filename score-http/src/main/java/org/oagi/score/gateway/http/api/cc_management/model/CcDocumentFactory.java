@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -29,7 +29,7 @@ public class CcDocumentFactory {
     }
 
     public CcDocument create(ScoreUser requester, Collection<ReleaseId> releaseIds) {
-        if (repositoryFactory.ccCache() == CcCache.DISABLED) {
+        if (repositoryFactory.recordCache() == RecordCache.DISABLED) {
             return new CcDocumentImpl(requester, repositoryFactory, releaseIds);
         }
         return new CacheFirstCcDocument(new CachedCcDocument(requester, repositoryFactory, releaseIds),

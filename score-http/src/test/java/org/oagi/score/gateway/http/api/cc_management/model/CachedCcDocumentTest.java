@@ -2,9 +2,9 @@ package org.oagi.score.gateway.http.api.cc_management.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheProperties;
-import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RecordCacheProperties;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
@@ -26,7 +26,6 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.redisson.api.RedissonClient;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -53,7 +52,7 @@ class CachedCcDocumentTest {
     private final SeqKeyQueryRepository seqKeyQuery = mock(SeqKeyQueryRepository.class);
     private final TagQueryRepository tagQuery = mock(TagQueryRepository.class);
     private final ReleaseQueryRepository releaseQuery = mock(ReleaseQueryRepository.class);
-    private SpringCcCache cache;
+    private CaffeineRecordCache cache;
     private final org.oagi.score.gateway.http.api.xbt_management.repository.XbtQueryRepository xbtQuery = mock(org.oagi.score.gateway.http.api.xbt_management.repository.XbtQueryRepository.class);
     private final org.oagi.score.gateway.http.api.namespace_management.repository.NamespaceQueryRepository namespaceQuery = mock(org.oagi.score.gateway.http.api.namespace_management.repository.NamespaceQueryRepository.class);
     private final org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository codeListQuery = mock(org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository.class);
@@ -61,9 +60,9 @@ class CachedCcDocumentTest {
 
     @BeforeEach
     void setUp() {
-        cache = new SpringCcCache(new ConcurrentMapCacheManager(), org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady());
-        when(repositoryFactory.ccCache()).thenReturn(cache);
-        when(repositoryFactory.ccCacheProperties()).thenReturn(new CcCacheProperties());
+        cache = new CaffeineRecordCache("", org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady());
+        when(repositoryFactory.recordCache()).thenReturn(cache);
+        when(repositoryFactory.recordCacheProperties()).thenReturn(new RecordCacheProperties());
         when(repositoryFactory.accQueryRepository(requester)).thenReturn(accQuery);
         when(repositoryFactory.asccpQueryRepository(requester)).thenReturn(asccpQuery);
         when(repositoryFactory.bccpQueryRepository(requester)).thenReturn(bccpQuery);
@@ -240,13 +239,13 @@ class CachedCcDocumentTest {
             document.getAcc(accId(1000 + i));
         }
 
-        verify(ccQuery, times(new CcCacheProperties().getMaxPrefetchedDependencies())).getDependencyManifestIds(any(), any());
+        verify(ccQuery, times(new RecordCacheProperties().getMaxPrefetchedDependencies())).getDependencyManifestIds(any(), any());
     }
 
     @Test
     void aTransactionThatHasWrittenReadsTheDatabaseAndCachesNothing() {
-        when(repositoryFactory.ccCache()).thenReturn(CcCache.DISABLED);
-        when(repositoryFactory.ccCacheProperties()).thenReturn(new CcCacheProperties());
+        when(repositoryFactory.recordCache()).thenReturn(RecordCache.DISABLED);
+        when(repositoryFactory.recordCacheProperties()).thenReturn(new RecordCacheProperties());
         CachedCcDocument uncached = new CachedCcDocument(requester, repositoryFactory, RELEASE);
         AccSummaryRecord acc5 = acc(5, RELEASE, null);
         when(accQuery.getAccSummary(accId(5))).thenReturn(acc5);

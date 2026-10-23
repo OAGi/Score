@@ -43,9 +43,10 @@ spring:
     store-type: redis
 
   cache:
-    # Chooses the provider of every Spring cache; the CC record cache ("cc-records") is one of them.
-    # The CC cache is read thousands of times per request, so a provider in the JVM (caffeine) is the default;
-    # redis or any other provider can be selected here, at the price of a round trip per lookup.
+    # Chooses the provider of the record cache (the cache of the records of core components and of what they show). It is read
+    # thousands of times per request, so a provider in the JVM (caffeine) is the default; redis can be selected here, at the
+    # price of a round trip per lookup. none turns the cache off. In Redis every key of the cache starts with score:cache:, so
+    # the cache alone is removed with: redis-cli --scan --pattern 'score:cache:*' | xargs redis-cli unlink
     type: caffeine
     caffeine:
       spec: maximumSize=200000,expireAfterWrite=600s
@@ -96,17 +97,22 @@ springdoc:
     tags-sorter: alpha
 
 score:
-  # The CC cache (see spring.cache above). The defaults are the smallest values measured to be enough
-  # (CcCacheTuningBenchmark); there is rarely a reason to change them.
+  # What the readers of cached records are told (see spring.cache above). The defaults are the smallest values measured to be enough
+  # (CcDocumentTuningBenchmark); there is rarely a reason to change them.
   #   batch-size                    the most ids sent to the database in one IN list. Smaller lists are no heavier for the
   #                                 database but take more statements: 100 made a large graph read with the cache empty
   #                                 about 40% slower than 500, and over 500 nothing was gained.
   #   max-prefetched-dependencies   how many times one request reads the dependencies of a component ahead, when it asks for
   #                                 components that have nothing to do with each other. 0 reads nothing ahead, which costs
   #                                 seconds for a schema export of a few ASCCPs; over 4 nothing was gained.
-  cc-cache:
+  #   propagation                   on (default): when a record changes, the records that derive a value from it are forgotten
+  #                                 too (an ACC term -> the ASCCPs whose role-of it is, the ASCCs and BCCs of it, the ASCCs that
+  #                                 point to those ASCCPs, and so on). shadow only logs which keys that would be; off forgets
+  #                                 only the records that changed.
+  cache:
     batch-size: 500
     max-prefetched-dependencies: 4
+    propagation: "on"   # quoted: YAML reads a bare on as true
 
   # Passkey (WebAuthn) sign-in for local accounts. It is on exactly when BOTH rp-id and allowed-origins are set, and
   # off when they are empty; there is no separate flag. Set them for a Docker deployment through the environment

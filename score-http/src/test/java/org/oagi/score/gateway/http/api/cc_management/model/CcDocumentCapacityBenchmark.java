@@ -15,10 +15,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateE
 import org.oagi.score.gateway.http.api.bie_management.service.BieGenerateService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieReadService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieVisitor;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus;
-import org.oagi.score.gateway.http.api.cc_management.cache.RedisCcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RecordCacheStatus;
+import org.oagi.score.gateway.http.cache.RedisRecordCache;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.graph.model.FindUsagesRequest;
@@ -29,7 +29,6 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -87,7 +86,7 @@ class CcDocumentCapacityBenchmark {
     private final ThreadMXBean threads = (ThreadMXBean) ManagementFactory.getThreadMXBean();
     private final AtomicLong statements = new AtomicLong();
     private String redisPrefix;
-    private CcCache originalCache;
+    private RecordCache originalCache;
 
     private record Work(String name, int weight, Callable<?> call) {
     }
@@ -146,16 +145,14 @@ class CcDocumentCapacityBenchmark {
 
     private void setCache(String mode) {
         switch (mode) {
-            case "A" -> ReflectionTestUtils.setField(repositoryFactory, "ccCache", CcCache.DISABLED);
+            case "A" -> ReflectionTestUtils.setField(repositoryFactory, "recordCache", RecordCache.DISABLED);
             case "B" -> {
-                CaffeineCacheManager manager = new CaffeineCacheManager();
-                manager.setCacheSpecification("maximumSize=200000,expireAfterWrite=600s");
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache", new SpringCcCache(manager, CcCacheStatus.alwaysReady()));
+                                ReflectionTestUtils.setField(repositoryFactory, "recordCache", new CaffeineRecordCache("maximumSize=200000,expireAfterWrite=600s", RecordCacheStatus.alwaysReady()));
             }
             case "C" -> {
                 removeRedisKeys();
-                ReflectionTestUtils.setField(repositoryFactory, "ccCache",
-                        new RedisCcCache(redisConnectionFactory, redisPrefix, CcCacheStatus.alwaysReady(), Duration.ofMinutes(30)));
+                ReflectionTestUtils.setField(repositoryFactory, "recordCache",
+                        new RedisRecordCache(redisConnectionFactory, redisPrefix, RecordCacheStatus.alwaysReady(), Duration.ofMinutes(30)));
             }
             default -> throw new IllegalArgumentException(mode);
         }
@@ -321,7 +318,7 @@ class CcDocumentCapacityBenchmark {
 
     @Test
     void measureTheCapacity() throws Exception {
-        originalCache = (CcCache) ReflectionTestUtils.getField(repositoryFactory, "ccCache");
+        originalCache = (RecordCache) ReflectionTestUtils.getField(repositoryFactory, "recordCache");
         redisPrefix = "{zz-cc-capacity:" + UUID.randomUUID() + "}:";
         int users = Integer.getInteger("score.capacity.users", 100);
         int seconds = Integer.getInteger("score.capacity.seconds", 40);
@@ -352,7 +349,7 @@ class CcDocumentCapacityBenchmark {
                 }
             }
         } finally {
-            ReflectionTestUtils.setField(repositoryFactory, "ccCache", originalCache);
+            ReflectionTestUtils.setField(repositoryFactory, "recordCache", originalCache);
             dsl.configuration().set(old);
             removeRedisKeys();
         }

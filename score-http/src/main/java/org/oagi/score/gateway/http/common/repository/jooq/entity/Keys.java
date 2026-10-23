@@ -52,7 +52,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtxVa
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContent;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BusinessTerm;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CcChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeList;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest;
@@ -124,6 +123,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasServe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasTag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Oauth2App;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Oauth2AppScope;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ReleaseDep;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.SeqKey;
@@ -180,7 +180,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BlobContentManifestRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BlobContentRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BusinessTermRecord;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CcChangeLogRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CdtPriRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CodeListManifestRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CodeListRecord;
@@ -252,6 +251,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasTagRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.Oauth2AppRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.Oauth2AppScopeRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.RecordChangeLogRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ReleaseDepRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ReleaseRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.SeqKeyRecord;
@@ -330,7 +330,6 @@ public class Keys {
     public static final UniqueKey<BlobContentRecord> KEY_BLOB_CONTENT_PRIMARY = Internal.createUniqueKey(BlobContent.BLOB_CONTENT, DSL.name("KEY_blob_content_PRIMARY"), new TableField[] { BlobContent.BLOB_CONTENT.BLOB_CONTENT_ID }, true);
     public static final UniqueKey<BlobContentManifestRecord> KEY_BLOB_CONTENT_MANIFEST_PRIMARY = Internal.createUniqueKey(BlobContentManifest.BLOB_CONTENT_MANIFEST, DSL.name("KEY_blob_content_manifest_PRIMARY"), new TableField[] { BlobContentManifest.BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID }, true);
     public static final UniqueKey<BusinessTermRecord> KEY_BUSINESS_TERM_PRIMARY = Internal.createUniqueKey(BusinessTerm.BUSINESS_TERM, DSL.name("KEY_business_term_PRIMARY"), new TableField[] { BusinessTerm.BUSINESS_TERM.BUSINESS_TERM_ID }, true);
-    public static final UniqueKey<CcChangeLogRecord> KEY_CC_CHANGE_LOG_PRIMARY = Internal.createUniqueKey(CcChangeLog.CC_CHANGE_LOG, DSL.name("KEY_cc_change_log_PRIMARY"), new TableField[] { CcChangeLog.CC_CHANGE_LOG.CC_CHANGE_LOG_ID }, true);
     public static final UniqueKey<CdtPriRecord> KEY_CDT_PRI_CDT_PRI_UK1 = Internal.createUniqueKey(CdtPri.CDT_PRI, DSL.name("KEY_cdt_pri_cdt_pri_uk1"), new TableField[] { CdtPri.CDT_PRI.NAME }, true);
     public static final UniqueKey<CdtPriRecord> KEY_CDT_PRI_PRIMARY = Internal.createUniqueKey(CdtPri.CDT_PRI, DSL.name("KEY_cdt_pri_PRIMARY"), new TableField[] { CdtPri.CDT_PRI.CDT_PRI_ID }, true);
     public static final UniqueKey<CodeListRecord> KEY_CODE_LIST_PRIMARY = Internal.createUniqueKey(CodeList.CODE_LIST, DSL.name("KEY_code_list_PRIMARY"), new TableField[] { CodeList.CODE_LIST.CODE_LIST_ID }, true);
@@ -422,6 +421,7 @@ public class Keys {
     public static final UniqueKey<OasTagRecord> KEY_OAS_TAG_PRIMARY = Internal.createUniqueKey(OasTag.OAS_TAG, DSL.name("KEY_oas_tag_PRIMARY"), new TableField[] { OasTag.OAS_TAG.OAS_TAG_ID }, true);
     public static final UniqueKey<Oauth2AppRecord> KEY_OAUTH2_APP_PRIMARY = Internal.createUniqueKey(Oauth2App.OAUTH2_APP, DSL.name("KEY_oauth2_app_PRIMARY"), new TableField[] { Oauth2App.OAUTH2_APP.OAUTH2_APP_ID }, true);
     public static final UniqueKey<Oauth2AppScopeRecord> KEY_OAUTH2_APP_SCOPE_PRIMARY = Internal.createUniqueKey(Oauth2AppScope.OAUTH2_APP_SCOPE, DSL.name("KEY_oauth2_app_scope_PRIMARY"), new TableField[] { Oauth2AppScope.OAUTH2_APP_SCOPE.OAUTH2_APP_SCOPE_ID }, true);
+    public static final UniqueKey<RecordChangeLogRecord> KEY_RECORD_CHANGE_LOG_PRIMARY = Internal.createUniqueKey(RecordChangeLog.RECORD_CHANGE_LOG, DSL.name("KEY_record_change_log_PRIMARY"), new TableField[] { RecordChangeLog.RECORD_CHANGE_LOG.RECORD_CHANGE_LOG_ID }, true);
     public static final UniqueKey<ReleaseRecord> KEY_RELEASE_PRIMARY = Internal.createUniqueKey(Release.RELEASE, DSL.name("KEY_release_PRIMARY"), new TableField[] { Release.RELEASE.RELEASE_ID }, true);
     public static final UniqueKey<ReleaseDepRecord> KEY_RELEASE_DEP_PRIMARY = Internal.createUniqueKey(ReleaseDep.RELEASE_DEP, DSL.name("KEY_release_dep_PRIMARY"), new TableField[] { ReleaseDep.RELEASE_DEP.RELEASE_DEP_ID }, true);
     public static final UniqueKey<SeqKeyRecord> KEY_SEQ_KEY_PRIMARY = Internal.createUniqueKey(SeqKey.SEQ_KEY, DSL.name("KEY_seq_key_PRIMARY"), new TableField[] { SeqKey.SEQ_KEY.SEQ_KEY_ID }, true);

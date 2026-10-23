@@ -1,7 +1,10 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
+import org.oagi.score.gateway.http.cache.RecordCacheProperties;
+
+import org.oagi.score.gateway.http.cache.RecordCache;
+
 import org.junit.jupiter.api.Test;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -17,8 +20,9 @@ class CcDocumentFactoryTest {
     @Test
     void withACacheTheDocumentIsTheCachedOneWithTheFallback() {
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CcCache cache = mock(CcCache.class);
-        when(repositoryFactory.ccCache()).thenReturn(cache);
+        RecordCache cache = mock(RecordCache.class);
+        when(repositoryFactory.recordCache()).thenReturn(cache);
+        when(repositoryFactory.recordCacheProperties()).thenReturn(new RecordCacheProperties());
 
         CcDocument document = new CcDocumentFactory(repositoryFactory)
                 .create(mock(ScoreUser.class), new ReleaseId(BigInteger.ONE));

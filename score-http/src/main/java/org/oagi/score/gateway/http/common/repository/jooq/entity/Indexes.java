@@ -22,7 +22,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bcc;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bccp;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BieViewOrder;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtxAssignment;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CcChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Comment;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Dt;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri;
@@ -33,6 +32,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.FlywaySc
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleBlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.SeqKey;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt;
 
@@ -74,7 +74,6 @@ public class Indexes {
     public static final Index BIE_VIEW_ORDER_BIE_VIEW_ORDER_BCC_MANIFEST_ID = Internal.createIndex(DSL.name("bie_view_order_bcc_manifest_id"), BieViewOrder.BIE_VIEW_ORDER, new OrderField[] { BieViewOrder.BIE_VIEW_ORDER.BCC_MANIFEST_ID }, false);
     public static final Index BIE_VIEW_ORDER_BIE_VIEW_ORDER_FROM_ACC_MANIFEST_ID = Internal.createIndex(DSL.name("bie_view_order_from_acc_manifest_id"), BieViewOrder.BIE_VIEW_ORDER, new OrderField[] { BieViewOrder.BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID }, false);
     public static final Index BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID = Internal.createIndex(DSL.name("biz_ctx_id"), BizCtxAssignment.BIZ_CTX_ASSIGNMENT, new OrderField[] { BizCtxAssignment.BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID }, false);
-    public static final Index CC_CHANGE_LOG_CC_CHANGE_LOG_CREATION_TIMESTAMP_IDX = Internal.createIndex(DSL.name("cc_change_log_creation_timestamp_idx"), CcChangeLog.CC_CHANGE_LOG, new OrderField[] { CcChangeLog.CC_CHANGE_LOG.CREATION_TIMESTAMP }, false);
     public static final Index DT_AWD_PRI_DT_AWD_PRI_DT_ID_RELEASE_ID_IS_DEFAULT_IDX = Internal.createIndex(DSL.name("dt_awd_pri_dt_id_release_id_is_default_idx"), DtAwdPri.DT_AWD_PRI, new OrderField[] { DtAwdPri.DT_AWD_PRI.DT_ID, DtAwdPri.DT_AWD_PRI.RELEASE_ID, DtAwdPri.DT_AWD_PRI.IS_DEFAULT }, false);
     public static final Index DT_DT_GUID_IDX = Internal.createIndex(DSL.name("dt_guid_idx"), Dt.DT, new OrderField[] { Dt.DT.GUID }, false);
     public static final Index DT_DT_LAST_UPDATE_TIMESTAMP_DESC_IDX = Internal.createIndex(DSL.name("dt_last_update_timestamp_desc_idx"), Dt.DT, new OrderField[] { Dt.DT.LAST_UPDATE_TIMESTAMP }, false);
@@ -85,6 +84,7 @@ public class Indexes {
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MMODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK = Internal.createIndex(DSL.name("mmodule_blob_content_manifest_last_updated_by_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.LAST_UPDATED_BY }, false);
     public static final Index MODULE_BLOB_CONTENT_MANIFEST_MODULE_BLOB_CONTENT_MANIFEST_BLOB_CONTENT_MANIFEST_ID_FK = Internal.createIndex(DSL.name("module_blob_content_manifest_blob_content_manifest_id_fk"), ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST, new OrderField[] { ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID }, false);
     public static final Index OAS_MESSAGE_BODY_OAS_MESSAGE_BODY_OAS_ASBIEP_ID_FK = Internal.createIndex(DSL.name("oas_message_body_oas_asbiep_id_fk"), OasMessageBody.OAS_MESSAGE_BODY, new OrderField[] { OasMessageBody.OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID }, false);
+    public static final Index RECORD_CHANGE_LOG_RECORD_CHANGE_LOG_CREATION_TIMESTAMP_IDX = Internal.createIndex(DSL.name("record_change_log_creation_timestamp_idx"), RecordChangeLog.RECORD_CHANGE_LOG, new OrderField[] { RecordChangeLog.RECORD_CHANGE_LOG.CREATION_TIMESTAMP }, false);
     public static final Index COMMENT_REFERENCE = Internal.createIndex(DSL.name("reference"), Comment.COMMENT, new OrderField[] { Comment.COMMENT.REFERENCE }, false);
     public static final Index LOG_REFERENCE = Internal.createIndex(DSL.name("reference"), Log.LOG, new OrderField[] { Log.LOG.REFERENCE }, false);
     public static final Index SEQ_KEY_SEQ_KEY_ASCC_MANIFEST_ID = Internal.createIndex(DSL.name("seq_key_ascc_manifest_id"), SeqKey.SEQ_KEY, new OrderField[] { SeqKey.SEQ_KEY.ASCC_MANIFEST_ID }, false);

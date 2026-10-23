@@ -1,10 +1,16 @@
 package org.oagi.score.gateway.http.common.repository.jooq;
 
+import org.oagi.score.gateway.http.cache.RecordCacheProperties;
+import org.oagi.score.gateway.http.api.cc_management.repository.AffectedRecordsRepository;
+import org.oagi.score.gateway.http.api.cc_management.repository.jooq.JooqAffectedRecordsRepository;
+
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.change.repository.JooqRecordChangeLogRepository;
+import org.oagi.score.gateway.http.change.repository.RecordChangeLogRepository;
+
 import org.oagi.score.gateway.http.api.account_management.repository.PendingQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.jooq.JooqPendingQueryRepository;
 import org.jooq.DSLContext;
-import org.oagi.score.gateway.http.api.cc_management.repository.CcChangeLogRepository;
-import org.oagi.score.gateway.http.api.cc_management.repository.jooq.JooqCcChangeLogRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyQueryRepository;
@@ -29,8 +35,6 @@ import org.oagi.score.gateway.http.api.business_term_management.repository.Busin
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermQueryRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermCommandRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.jooq.JooqBusinessTermQueryRepository;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCacheProperties;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentFactory;
 import org.oagi.score.gateway.http.api.cc_management.repository.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.jooq.*;
@@ -103,10 +107,10 @@ public class RepositoryFactory {
     private final DSLContext dslContext;
 
     @Autowired(required = false)
-    private CcCache ccCache;
+    private RecordCache recordCache;
 
     @Autowired(required = false)
-    private CcCacheProperties ccCacheProperties;
+    private RecordCacheProperties recordCacheProperties;
 
     /** The same connection and settings, without the log of every statement: the change watchdog asks twice a second. */
     private final DSLContext quietDslContext;
@@ -117,8 +121,13 @@ public class RepositoryFactory {
                 .derive(dslContext.settings().withExecuteLogging(false)).dsl();
     }
 
-    public CcChangeLogRepository ccChangeLogRepository() {
-        return new JooqCcChangeLogRepository(quietDslContext);
+    public RecordChangeLogRepository recordChangeLogRepository() {
+        return new JooqRecordChangeLogRepository(quietDslContext);
+    }
+
+    /** Without the log of every statement, like the change log: it is asked for by the one that reads the change log. */
+    public AffectedRecordsRepository affectedRecordsRepository() {
+        return new JooqAffectedRecordsRepository(quietDslContext);
     }
 
     private final CcDocumentFactory ccDocumentFactory = new CcDocumentFactory(this);
@@ -129,13 +138,13 @@ public class RepositoryFactory {
     }
 
     /** The cache shared by every request, or one that holds nothing where there is no cache (e.g. a bare factory). */
-    public CcCache ccCache() {
-        return (ccCache != null) ? ccCache : CcCache.DISABLED;
+    public RecordCache recordCache() {
+        return (recordCache != null) ? recordCache : RecordCache.DISABLED;
     }
 
     /** What a cached document is told, or the defaults where nothing is configured (e.g. a bare factory). */
-    public CcCacheProperties ccCacheProperties() {
-        return (ccCacheProperties != null) ? ccCacheProperties : new CcCacheProperties();
+    public RecordCacheProperties recordCacheProperties() {
+        return (recordCacheProperties != null) ? recordCacheProperties : new RecordCacheProperties();
     }
 
     public ScoreUserQueryRepository scoreUserQueryRepository() {

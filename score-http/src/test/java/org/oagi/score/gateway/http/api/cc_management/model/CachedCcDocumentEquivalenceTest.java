@@ -11,9 +11,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
-import org.oagi.score.gateway.http.api.cc_management.cache.CcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.RedisCcCache;
-import org.oagi.score.gateway.http.api.cc_management.cache.SpringCcCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RedisRecordCache;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
@@ -34,7 +34,6 @@ import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -391,7 +390,7 @@ class CachedCcDocumentEquivalenceTest {
     private static LettuceConnectionFactory redis;
 
     /** The cache the application would use: Caffeine, or Redis with {@code -Dscore.equivalence.cache=redis}. */
-    private static CcCache freshCache() {
+    private static RecordCache freshCache() {
         if ("redis".equals(System.getProperty("score.equivalence.cache"))) {
             synchronized (CACHES) {
                 if (redis == null) {
@@ -400,11 +399,9 @@ class CachedCcDocumentEquivalenceTest {
                     redis.afterPropertiesSet();
                 }
             }
-            return new RedisCcCache(redis, RUN_PREFIX + CACHES.incrementAndGet() + ":", org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30));
+            return new RedisRecordCache(redis, RUN_PREFIX + CACHES.incrementAndGet() + ":", org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady(), java.time.Duration.ofMinutes(30));
         }
-        CaffeineCacheManager manager = new CaffeineCacheManager();
-        manager.setCacheSpecification(CACHE_SPEC);
-        return new SpringCcCache(manager, org.oagi.score.gateway.http.api.cc_management.cache.CcCacheStatus.alwaysReady());
+        return new CaffeineRecordCache(CACHE_SPEC, org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady());
     }
 
     @AfterAll
@@ -422,7 +419,7 @@ class CachedCcDocumentEquivalenceTest {
 
     private RepositoryFactory repositoryFactoryWithFreshCache() {
         RepositoryFactory repositoryFactory = new RepositoryFactory(dsl);
-        ReflectionTestUtils.setField(repositoryFactory, "ccCache", freshCache());
+        ReflectionTestUtils.setField(repositoryFactory, "recordCache", freshCache());
         return repositoryFactory;
     }
 
