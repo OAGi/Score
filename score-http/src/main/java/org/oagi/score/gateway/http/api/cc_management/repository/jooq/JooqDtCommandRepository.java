@@ -421,12 +421,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         String newDen = null;
         if (qualifier != null && compare(dt.qualifier(), qualifier) != 0) {
             denChanged = true;
+            newDen = DenUtils.dtDen(qualifier, dt.dataTypeTerm());
             if (StringUtils.hasLength(qualifier)) {
-                newDen = qualifier + "_ " + dt.representationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.QUALIFIER, qualifier);
             } else {
-                newDen = dt.representationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .setNull(DT.QUALIFIER);
             }

@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.common.model.Id;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,6 +80,19 @@ public abstract class LookupPropagationHandler implements PropagationHandler {
     @Override
     public String name() {
         return name;
+    }
+
+    /** For each type of record this handler hears, the columns its rules look at; a null set means that every change concerns the rule. */
+    public Map<RecordType, Set<String>> columnsHeard() {
+        Map<RecordType, Set<String>> heard = new HashMap<>();
+        for (Rule<?, ?> rule : rules) {
+            if (rule.whenChanged == null) {
+                heard.put(rule.hears, null);
+            } else if (!heard.containsKey(rule.hears) || heard.get(rule.hears) != null) {
+                heard.computeIfAbsent(rule.hears, type -> new HashSet<>()).addAll(rule.whenChanged);
+            }
+        }
+        return heard;
     }
 
     @Override

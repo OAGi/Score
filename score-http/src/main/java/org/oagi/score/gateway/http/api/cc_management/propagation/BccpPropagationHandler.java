@@ -13,6 +13,6 @@ public final class BccpPropagationHandler extends LookupPropagationHandler {
     public BccpPropagationHandler(CcDependencyLookup lookup) {
         super("BCCP", CcRecordTypes.BCCP,
                 new Rule<>(CcRecordTypes.DT, DtManifestId::new, lookup::bccpsOfDt)
-                        .whenChanged("qualifier", "data_type_term", "den").producing("den"));
+                        .whenChanged("qualifier", "data_type_term", "den").producing("den", "representation_term"));
     }
 }

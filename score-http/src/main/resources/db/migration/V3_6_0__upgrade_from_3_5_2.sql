@@ -228,6 +228,9 @@ SET SQL_MODE = @OLD_SQL_MODE_LEVENSHTEIN,
 -- The UPDATE triggers of the component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and DT_SC also write CHANGED: the names of the
 -- columns whose value changed (compared with <=>, so a NULL becomes a value and back is a change). Whatever is derived from a column is
 -- spread only when that column changed (the DEN of an ASCCP when the object class term of its role-of ACC changed, not when a definition did).
+-- The triggers of seq_key, the tag tables, dt_awd_pri and dt_sc_awd_pri write CHANGED too, with one marker ('seq_key', 'tag', 'dt_awd_pri',
+-- 'dt_sc_awd_pri'), so that no rule that derives a value from a column takes them for a change of every column. INSERT and DELETE of a
+-- component or manifest row still leave CHANGED empty, which means "any column".
 --
 -- Which triggers write rows (RECORD_TYPE is what changed; RECORD_ID the manifest id, or the id of the release, library, user or tag):
 --   1. acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest:
@@ -426,47 +429,47 @@ CREATE TRIGGER `dt_sc_record_change_delete_trg` AFTER DELETE ON `dt_sc` FOR EACH
 
 DROP TRIGGER IF EXISTS `seq_key_record_change_insert_trg`;
 CREATE TRIGGER `seq_key_record_change_insert_trg` AFTER INSERT ON `seq_key` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL, 'seq_key');
 
 DROP TRIGGER IF EXISTS `seq_key_record_change_update_trg`;
 CREATE TRIGGER `seq_key_record_change_update_trg` AFTER UPDATE ON `seq_key` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', NEW.`from_acc_manifest_id`, NULL, NULL, 'seq_key');
 
 DROP TRIGGER IF EXISTS `seq_key_record_change_delete_trg`;
 CREATE TRIGGER `seq_key_record_change_delete_trg` AFTER DELETE ON `seq_key` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', OLD.`from_acc_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', OLD.`from_acc_manifest_id`, NULL, NULL, 'seq_key');
 
 DROP TRIGGER IF EXISTS `acc_manifest_tag_record_change_insert_trg`;
 CREATE TRIGGER `acc_manifest_tag_record_change_insert_trg` AFTER INSERT ON `acc_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', NEW.`acc_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `acc_manifest_tag_record_change_delete_trg`;
 CREATE TRIGGER `acc_manifest_tag_record_change_delete_trg` AFTER DELETE ON `acc_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ACC', OLD.`acc_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `asccp_manifest_tag_record_change_insert_trg`;
 CREATE TRIGGER `asccp_manifest_tag_record_change_insert_trg` AFTER INSERT ON `asccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ASCCP', NEW.`asccp_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `asccp_manifest_tag_record_change_delete_trg`;
 CREATE TRIGGER `asccp_manifest_tag_record_change_delete_trg` AFTER DELETE ON `asccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('ASCCP', OLD.`asccp_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `bccp_manifest_tag_record_change_insert_trg`;
 CREATE TRIGGER `bccp_manifest_tag_record_change_insert_trg` AFTER INSERT ON `bccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('BCCP', NEW.`bccp_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `bccp_manifest_tag_record_change_delete_trg`;
 CREATE TRIGGER `bccp_manifest_tag_record_change_delete_trg` AFTER DELETE ON `bccp_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('BCCP', OLD.`bccp_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `dt_manifest_tag_record_change_insert_trg`;
 CREATE TRIGGER `dt_manifest_tag_record_change_insert_trg` AFTER INSERT ON `dt_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('DT', NEW.`dt_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `dt_manifest_tag_record_change_delete_trg`;
 CREATE TRIGGER `dt_manifest_tag_record_change_delete_trg` AFTER DELETE ON `dt_manifest_tag` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, NULL);
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`) VALUES ('DT', OLD.`dt_manifest_id`, NULL, NULL, 'tag');
 
 DROP TRIGGER IF EXISTS `tag_record_change_update_trg`;
 CREATE TRIGGER `tag_record_change_update_trg` AFTER UPDATE ON `tag` FOR EACH ROW
@@ -587,38 +590,38 @@ CREATE TRIGGER `namespace_record_change_delete_trg` AFTER DELETE ON `namespace` 
 
 DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_insert_trg`;
 CREATE TRIGGER `dt_awd_pri_record_change_insert_trg` AFTER INSERT ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id`, 'dt_awd_pri' FROM `dt_manifest`
     WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
 
 DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_insert_trg`;
 CREATE TRIGGER `dt_sc_awd_pri_record_change_insert_trg` AFTER INSERT ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id`, 'dt_sc_awd_pri' FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
 
 DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_update_trg`;
 CREATE TRIGGER `dt_awd_pri_record_change_update_trg` AFTER UPDATE ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id`, 'dt_awd_pri' FROM `dt_manifest`
     WHERE `dt_id` = NEW.`dt_id` AND `release_id` = NEW.`release_id`;
 
 DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_update_trg`;
 CREATE TRIGGER `dt_sc_awd_pri_record_change_update_trg` AFTER UPDATE ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id`, 'dt_sc_awd_pri' FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = NEW.`dt_sc_id` AND `release_id` = NEW.`release_id`;
 
 DROP TRIGGER IF EXISTS `dt_awd_pri_record_change_delete_trg`;
 CREATE TRIGGER `dt_awd_pri_record_change_delete_trg` AFTER DELETE ON `dt_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT', `dt_manifest_id`, NULL, `release_id` FROM `dt_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT', `dt_manifest_id`, NULL, `release_id`, 'dt_awd_pri' FROM `dt_manifest`
     WHERE `dt_id` = OLD.`dt_id` AND `release_id` = OLD.`release_id`;
 
 DROP TRIGGER IF EXISTS `dt_sc_awd_pri_record_change_delete_trg`;
 CREATE TRIGGER `dt_sc_awd_pri_record_change_delete_trg` AFTER DELETE ON `dt_sc_awd_pri` FOR EACH ROW
-    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`)
-    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id` FROM `dt_sc_manifest`
+    INSERT INTO `record_change_log` (`record_type`, `record_id`, `parent_id`, `release_id`, `changed`)
+    SELECT 'DT_SC', `dt_sc_manifest_id`, `owner_dt_manifest_id`, `release_id`, 'dt_sc_awd_pri' FROM `dt_sc_manifest`
     WHERE `dt_sc_id` = OLD.`dt_sc_id` AND `release_id` = OLD.`release_id`;
 
 
