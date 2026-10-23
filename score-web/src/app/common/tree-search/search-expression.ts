@@ -3,6 +3,9 @@ import {
   pathExists
 } from './search-eval';
 
+import type {CstNode, IToken} from 'chevrotain';
+import {Dot, Ident, NumberLit, ParseError, Star, StringLit, parsePredicate} from './search-grammar';
+
 export type {AttrLookup, AttrValue} from './search-eval';
 
 /** A malformed search expression: what is wrong and where (an offset into the expression). */
@@ -40,18 +43,6 @@ export const SEARCH_AXES: Axis[] = ['child', 'descendant', 'descendant-or-self',
   'following-sibling', 'preceding-sibling'];
 
 type Node = (frame: Frame, env: Env) => AttrValue;
-
-interface Token {
-  kind: 'ident' | 'string' | 'number' | 'op' | 'punct';
-  text: string;
-  position: number;
-}
-
-class ParseError extends Error {
-  constructor(message: string, readonly position: number) {
-    super(message);
-  }
-}
 
 /** `ReleaseID` -> `Release ID`: the way a keyword is spelled out before it is compared with a name. */
 export function splitCamelCase(token: string): string {
@@ -221,7 +212,8 @@ function readStep(text: string, position: number, sep: '/' | '//', state: Compil
   while (at < text.length) {
     const close = closingBracket(text, at);
     const inner = text.substring(at + 1, close);
-    const compiled = new PredicateParser(tokenize(inner, position + at + 1), position + close, state).parse();
+    const base = position + at + 1;
+    const compiled = new PredicateCompiler(state, base).compile(parsePredicate(inner, base, position + close));
     raw.predicates.push(compiled.predicate);
     mergeFlags(raw.flags, compiled.flags);
     at = close + 1;
@@ -417,61 +409,61 @@ function rewriteReverse(out: CompiledStep[], r: RawStep, axis: Axis, firstAnchor
 
 // ---- predicates ---------------------------------------------------------------------------------------------------
 
-function tokenize(text: string, offset: number): Token[] {
-  const tokens: Token[] = [];
-  let i = 0;
-  while (i < text.length) {
-    const c = text[i];
-    if (/\s/.test(c)) {
-      i++;
-    } else if (c === '"' || c === '\'') {
-      const end = text.indexOf(c, i + 1);
-      if (end < 0) {
-        throw new ParseError('Unterminated string', offset + i);
-      }
-      tokens.push({kind: 'string', text: text.substring(i + 1, end), position: offset + i});
-      i = end + 1;
-    } else if (/[0-9]/.test(c) || (c === '-' && /[0-9]/.test(text[i + 1] || ''))) {
-      const m = /^-?[0-9]+(\.[0-9]+)?/.exec(text.substring(i));
-      tokens.push({kind: 'number', text: m[0], position: offset + i});
-      i += m[0].length;
-    } else if (/[A-Za-z_]/.test(c)) {
-      const m = /^[A-Za-z_][A-Za-z0-9_-]*/.exec(text.substring(i));
-      tokens.push({kind: 'ident', text: m[0], position: offset + i});
-      i += m[0].length;
-    } else if (c === '∞') {
-      tokens.push({kind: 'ident', text: c, position: offset + i});
-      i++;
-    } else if (c === '!' || c === '<' || c === '>' || c === '=') {
-      const two = text.substr(i, 2);
-      const op = two === '!=' || two === '<=' || two === '>=' ? two : c;
-      if (op === '!') {
-        throw new ParseError('Unexpected !', offset + i);
-      }
-      tokens.push({kind: 'op', text: op, position: offset + i});
-      i += op.length;
-    } else if (text.startsWith('::', i) || text.startsWith('//', i) || text.startsWith('..', i)) {
-      tokens.push({kind: 'punct', text: text.substr(i, 2), position: offset + i});
-      i += 2;
-    } else if ('(),[]/.*'.includes(c)) {
-      tokens.push({kind: 'punct', text: c, position: offset + i});
-      i++;
-    } else {
-      throw new ParseError('Unexpected ' + c, offset + i);
-    }
-  }
-  return tokens;
-}
-
 interface Compiled {
   predicate: CompiledPredicate;
   flags: Partial<CompiledStep>;
 }
 
-/** Recursive descent over `or > and > not > comparison > operand`; every node compiles to a closure. */
-class PredicateParser {
+type CstElement = CstNode | IToken;
 
-  private at = 0;
+function nodeOf(cst: CstNode, key: string): CstNode | undefined {
+  return cst.children[key]?.[0] as CstNode | undefined;
+}
+
+function nodesOf(cst: CstNode, key: string): CstNode[] {
+  return (cst.children[key] ?? []) as CstNode[];
+}
+
+function tokenOf(cst: CstNode, key: string): IToken | undefined {
+  return cst.children[key]?.[0] as IToken | undefined;
+}
+
+function isToken(element: CstElement): element is IToken {
+  return 'image' in element;
+}
+
+/** The only child of a node, if it has just one. */
+function soleChild(cst: CstNode): CstElement | undefined {
+  const all = Object.values(cst.children).flat();
+  return all.length === 1 ? all[0] : undefined;
+}
+
+/** The only token a node is made of, if it is made of one token and nothing else (`2`, but not `(2)`). */
+function soleToken(cst: CstNode): IToken | undefined {
+  const only = soleChild(cst);
+  return only === undefined ? undefined : isToken(only) ? only : soleToken(only);
+}
+
+/** The node called `name` that the node is nothing but (`count(a/b)`: the argument is nothing but a path). */
+function descend(cst: CstNode, name: string): CstNode | undefined {
+  let current: CstNode | undefined = cst;
+  while (current && current.name !== name) {
+    const only = soleChild(current);
+    current = only !== undefined && !isToken(only) ? only : undefined;
+  }
+  return current;
+}
+
+function firstOffset(cst: CstNode): number {
+  return Math.min(...Object.values(cst.children).flat().map(e => isToken(e) ? e.startOffset : firstOffset(e)));
+}
+
+/**
+ * Compiles the syntax tree of one predicate (`search-grammar.ts`) into a closure: every node of the tree becomes a
+ * function of the node being judged. `base` is where the predicate's text begins in the whole expression.
+ */
+class PredicateCompiler {
+
   /** The operands that are paths: they can be tested or counted, but not compared. */
   private readonly paths = new WeakSet<Node>();
   /** The nodes whose value is a count, which a predicate takes for a position. */
@@ -479,29 +471,24 @@ class PredicateParser {
   /** The literal strings the predicate looks for. */
   private readonly literals: string[] = [];
 
-  constructor(private readonly tokens: Token[], private readonly end: number, private readonly state: CompileState) {
+  constructor(private readonly state: CompileState, private readonly base: number) {
   }
 
-  parse(): Compiled {
-    if (this.tokens.length === 0) {
-      throw new ParseError('Empty predicate', this.end);
-    }
+  compile(body: CstNode): Compiled {
     const before = {...this.state};
     this.state.positional = false;
     this.state.impure = false;
     this.state.ancestral = false;
     this.state.local = true;
     let predicate: CompiledPredicate;
-    if (this.tokens.length === 1 && this.tokens[0].kind === 'number') {
-      const wanted = Number(this.tokens[0].text);
+    const sole = soleToken(body);
+    if (sole && sole.tokenType === NumberLit) {
+      const wanted = Number(sole.image);
       this.state.positional = true;
       this.state.local = false;
       predicate = frame => frame.position === wanted;
     } else {
-      const node = this.or();
-      if (this.at < this.tokens.length) {
-        throw new ParseError('Unexpected ' + this.tokens[this.at].text, this.tokens[this.at].position);
-      }
+      const node = this.or(body);
       // a number is a position (`[last()]`), anything else is true or false
       predicate = this.numbers.has(node) ?
         (frame, env) => node(frame, env) === frame.position : (frame, env) => truthy(node(frame, env));
@@ -517,66 +504,47 @@ class PredicateParser {
     return {predicate, flags};
   }
 
-  private peek(offset = 0): Token | undefined {
-    return this.tokens[this.at + offset];
+  private at(token: IToken): number {
+    return this.base + token.startOffset;
   }
 
-  private isWord(word: string): boolean {
-    const t = this.peek();
-    return !!t && t.kind === 'ident' && t.text.toLowerCase() === word;
+  private text(token: IToken): string {
+    return token.tokenType === StringLit ? token.image.slice(1, -1) : token.image;
   }
 
-  private position(): number {
-    return this.peek()?.position ?? this.end;
+  private or(cst: CstNode): Node {
+    return nodesOf(cst, 'andExpr').map(part => this.and(part)).reduce((a, b) => (f, e) => truthy(a(f, e)) || truthy(b(f, e)));
   }
 
-  private or(): Node {
-    let left = this.and();
-    while (this.isWord('or')) {
-      this.at++;
-      const a = left;
-      const b = this.and();
-      left = (f, e) => truthy(a(f, e)) || truthy(b(f, e));
-    }
-    return left;
+  private and(cst: CstNode): Node {
+    return nodesOf(cst, 'notExpr').map(part => this.not(part)).reduce((a, b) => (f, e) => truthy(a(f, e)) && truthy(b(f, e)));
   }
 
-  private and(): Node {
-    let left = this.not();
-    while (this.isWord('and')) {
-      this.at++;
-      const a = left;
-      const b = this.not();
-      left = (f, e) => truthy(a(f, e)) && truthy(b(f, e));
-    }
-    return left;
-  }
-
-  private not(): Node {
-    if (this.isWord('not') && this.peek(1)?.text !== '(') {
-      this.at++;
-      const inner = this.not();
+  private not(cst: CstNode): Node {
+    const negated = nodeOf(cst, 'notExpr');
+    if (negated) {
+      const inner = this.not(negated);
       return (f, e) => !truthy(inner(f, e));
     }
-    return this.comparison();
+    return this.comparison(nodeOf(cst, 'comparison'));
   }
 
-  private comparison(): Node {
-    const first = this.peek();
-    const after = this.peek(1);
-    if (first?.kind === 'ident' && first.text.toLowerCase() === 'cardinality' && after?.kind === 'op') {
-      return this.cardinalityComparison(after);
+  private comparison(cst: CstNode): Node {
+    if (tokenOf(cst, 'cardinality')) {
+      return this.cardinalityComparison(cst);
     }
-    const left = this.operand();
-    const t = this.peek();
-    if (t && t.kind === 'op') {
-      this.at++;
-      const right = this.comparisonValue();
+    const leftCst = nodeOf(cst, 'left');
+    const left = this.operand(leftCst);
+    const op = tokenOf(cst, 'op');
+    if (op) {
+      // what a GUID is compared with is text, even when it is all digits
+      const textual = soleToken(leftCst)?.tokenType === Ident && soleToken(leftCst).image === 'guid';
+      const right = this.comparisonValue(nodeOf(cst, 'right'), textual);
       if (this.paths.has(left) || this.paths.has(right)) {
-        throw new ParseError('A path can only be tested for existence, or counted with count()', t.position);
+        throw new ParseError('A path can only be tested for existence, or counted with count()', this.at(op));
       }
-      const op = t.text;
-      return (f, e) => compare(op, left(f, e), right(f, e), e.caseSensitive);
+      const operator = op.image;
+      return (f, e) => compare(operator, left(f, e), right(f, e), e.caseSensitive);
     }
     return left;
   }
@@ -585,13 +553,13 @@ class PredicateParser {
    * `cardinality = 0..1` is `cardinality_min = 0 and cardinality_max = 1` (and `!=` is its negation); the right side may be
    * a range (`1..*`, `0..unbounded`, `"0..1"`) or a name for one: Optional (0..1), Required (1..1), Prohibited (0..0).
    */
-  private cardinalityComparison(op: Token): Node {
-    if (op.text !== '=' && op.text !== '!=') {
-      throw new ParseError('cardinality can be compared with = and != only; use cardinality_min and cardinality_max for the rest', op.position);
+  private cardinalityComparison(cst: CstNode): Node {
+    const op = tokenOf(cst, 'cardinalityOp');
+    if (op.image !== '=' && op.image !== '!=') {
+      throw new ParseError('cardinality can be compared with = and != only; use cardinality_min and cardinality_max for the rest', this.at(op));
     }
-    this.at += 2;
-    const {min, max} = this.cardinalityRange();
-    const equal = op.text === '=';
+    const {min, max} = this.cardinalityRange(nodeOf(cst, 'cardinalityValue'));
+    const equal = op.image === '=';
     return (f: Frame) => {
       const actualMin = f.ctx.attr('cardinality_min');
       const actualMax = f.ctx.attr('cardinality_max');
@@ -599,171 +567,151 @@ class PredicateParser {
     };
   }
 
-  private cardinalityRange(): {min: number, max: number} {
-    const t = this.peek();
-    if (!t) {
-      throw new ParseError('Unexpected end of predicate', this.end);
-    }
-    this.at++;
-    if (t.kind === 'ident') {
-      const named = CARDINALITY_NAMES[t.text.toLowerCase()];
+  private cardinalityRange(cst: CstNode): {min: number, max: number} {
+    const t = tokenOf(cst, 'value');
+    const dots = tokenOf(cst, 'DotDot');
+    const upper = tokenOf(cst, 'upper');
+    const malformed = new ParseError('A cardinality is a range such as 0..1 or 1..*, or Optional, Required or Prohibited', this.at(t));
+    if (t.tokenType === Ident) {
+      if (dots) {
+        throw malformed;
+      }
+      const named = namedCardinality(t.image);
       if (!named) {
-        throw new ParseError('Unknown cardinality ' + t.text + ': write a range such as 0..1, or Optional, Required or Prohibited', t.position);
+        throw new ParseError('Unknown cardinality ' + t.image + ': write a range such as 0..1, or Optional, Required or Prohibited', this.at(t));
       }
       return named;
     }
-    if (t.kind === 'string') {
-      const m = /^\s*(\d+)\s*\.\.\s*(\d+|\*|unbounded|∞)\s*$/i.exec(t.text) ?? undefined;
-      const named = CARDINALITY_NAMES[t.text.trim().toLowerCase()];
+    if (t.tokenType === StringLit) {
+      if (dots) {
+        throw malformed;
+      }
+      const text = this.text(t);
+      const m = /^\s*(\d+)\s*\.\.\s*(\d+|\*|unbounded|∞)\s*$/i.exec(text) ?? undefined;
+      const named = namedCardinality(text.trim());
       if (named) {
         return named;
       }
       if (!m) {
-        throw new ParseError('Unknown cardinality "' + t.text + '": write a range such as 0..1, or Optional, Required or Prohibited', t.position);
+        throw new ParseError('Unknown cardinality "' + text + '": write a range such as 0..1, or Optional, Required or Prohibited', this.at(t));
       }
       return {min: Number(m[1]), max: /^\d+$/.test(m[2]) ? Number(m[2]) : Infinity};
     }
-    if (t.kind === 'number' && this.peek()?.text === '..') {
-      this.at++;
-      const upper = this.peek();
-      if (upper && (upper.kind === 'number' || upper.text === '*' || upper.kind === 'ident' && /^(unbounded|∞)$/i.test(upper.text))) {
-        this.at++;
-        return {min: Number(t.text), max: upper.kind === 'number' ? Number(upper.text) : Infinity};
-      }
+    if (dots && upper && (upper.tokenType === NumberLit || upper.tokenType === Star
+      || upper.tokenType === Ident && /^(unbounded|∞)$/i.test(upper.image))) {
+      return {min: Number(t.image), max: upper.tokenType === NumberLit ? Number(upper.image) : Infinity};
     }
-    throw new ParseError('A cardinality is a range such as 0..1 or 1..*, or Optional, Required or Prohibited', t.position);
+    throw malformed;
   }
 
   /** What a comparison is made against: a bare word (`type = ACC`) is the text it spells, not an attribute. */
-  private comparisonValue(): Node {
-    const t = this.peek();
-    if (t && t.kind === 'ident' && !this.startsPath(t) && this.peek(1)?.text !== '('
-      && !['true', 'false'].includes(t.text.toLowerCase())) {
-      this.at++;
-      this.literals.push(t.text);
-      return () => t.text;
+  private comparisonValue(cst: CstNode, textual: boolean): Node {
+    const bare = tokenOf(cst, 'bare');
+    if (bare) {
+      return this.literal(bare.image);
     }
-    return this.operand();
+    const operand = nodeOf(cst, 'operand');
+    const sole = textual ? soleToken(operand) : undefined;
+    return sole ? this.literal(this.text(sole)) : this.operand(operand);
   }
 
-  private operand(): Node {
-    const t = this.peek();
-    if (!t) {
-      throw new ParseError('Unexpected end of predicate', this.end);
+  private literal(text: string): Node {
+    this.literals.push(text);
+    return () => text;
+  }
+
+  private operand(cst: CstNode): Node {
+    const path = nodeOf(cst, 'pathOperand');
+    if (path) {
+      return this.pathOperand(path, false);
     }
-    if (this.startsPath(t)) {
-      return this.pathOperand(false);
+    const call = nodeOf(cst, 'functionCall');
+    if (call) {
+      return this.call(call);
     }
-    this.at++;
-    if (t.kind === 'string') {
-      this.literals.push(t.text);
-      return () => t.text;
+    const inner = nodeOf(cst, 'orExpr');
+    if (inner) {
+      return this.or(inner);
     }
-    if (t.kind === 'number') {
-      const value = Number(t.text);
+    const t = soleToken(cst);
+    if (t.tokenType === StringLit) {
+      return this.literal(this.text(t));
+    }
+    if (t.tokenType === NumberLit) {
+      const value = Number(t.image);
       return () => value;
     }
-    if (t.kind === 'punct' && t.text === '(') {
-      const inner = this.or();
-      this.expect(')');
-      return inner;
+    const word = t.image.toLowerCase();
+    if (word === 'true' || word === 'false') {
+      const value = word === 'true';
+      return () => value;
     }
-    if (t.kind === 'ident') {
-      const word = t.text.toLowerCase();
-      if (this.peek()?.text === '(') {
-        return this.call(t);
-      }
-      if (word === 'true' || word === 'false') {
-        const value = word === 'true';
-        return () => value;
-      }
-      const attribute = t.text;
-      return frame => frame.ctx.attr(attribute);
-    }
-    throw new ParseError('Unexpected ' + t.text, t.position);
+    const attribute = t.image;
+    return frame => frame.ctx.attr(attribute);
   }
 
-  /** Whether the token begins a path inside a predicate (`child::x`, `../x`, `.//x`, `*`, `name/x`). */
-  private startsPath(t: Token): boolean {
-    if (t.kind === 'punct') {
-      return ['.', '..', '*', '/', '//'].includes(t.text);
-    }
-    if (t.kind !== 'ident') {
-      return false;
-    }
-    const next = this.tokens[this.tokens.indexOf(t) + 1]?.text;
-    return next === '::' || next === '/' || next === '//';
-  }
-
-  private call(name: Token): Node {
-    this.expect('(');
-    const fn = name.text.toLowerCase();
+  private call(cst: CstNode): Node {
+    const name = tokenOf(cst, 'name');
+    const fn = name.image.toLowerCase();
+    const args = nodesOf(cst, 'arg');
     if (fn === 'count') {
-      const first = this.peek();
-      if (!first || !this.startsPath(first)) {
-        throw new ParseError('count() takes a path', this.position());
+      const path = args.length === 1 ? descend(args[0], 'pathOperand') : undefined;
+      if (!path) {
+        throw new ParseError('count() takes a path', args.length > 0 ? this.base + firstOffset(args[0]) : this.at(tokenOf(cst, 'RParen')));
       }
-      const counted = this.pathOperand(true);
-      this.expect(')');
-      return counted;
+      return this.pathOperand(path, true);
     }
-    const args: Node[] = [];
-    if (this.peek()?.text !== ')') {
-      do {
-        args.push(this.or());
-      } while (this.accept(','));
-    }
-    this.expect(')');
+    const nodes = args.map(arg => this.or(arg));
     switch (fn) {
       case 'position':
       case 'last':
-        if (args.length !== 0) {
-          throw new ParseError(name.text + '() takes no argument', name.position);
+        if (nodes.length !== 0) {
+          throw new ParseError(name.image + '() takes no argument', this.at(name));
         }
         this.state.positional = true;
         this.state.local = false;
         return this.numeric(fn === 'position' ? frame => frame.position : frame => frame.size);
       case 'text':
-        if (args.length !== 0) {
-          throw new ParseError('text() takes no argument', name.position);
+        if (nodes.length !== 0) {
+          throw new ParseError('text() takes no argument', this.at(name));
         }
         return frame => frame.ctx.attr(TEXT_ATTRIBUTE) ?? frame.ctx.names[0];
       case 'true':
       case 'false':
         return () => fn === 'true';
       case 'not':
-        if (args.length !== 1) {
-          throw new ParseError('not() takes one argument', name.position);
+        if (nodes.length !== 1) {
+          throw new ParseError('not() takes one argument', this.at(name));
         }
-        return (f, e) => !truthy(args[0](f, e));
+        return (f, e) => !truthy(nodes[0](f, e));
     }
     const test = TEXT_FUNCTIONS[fn];
     if (!test) {
-      throw new ParseError('Unknown function ' + name.text, name.position);
+      throw new ParseError('Unknown function ' + name.image, this.at(name));
     }
-    if (args.length !== 2) {
-      throw new ParseError(name.text + '() takes two arguments', name.position);
+    if (nodes.length !== 2) {
+      throw new ParseError(name.image + '() takes two arguments', this.at(name));
     }
     return (f, e) => {
-      const a = args[0](f, e);
-      const b = args[1](f, e);
+      const a = nodes[0](f, e);
+      const b = nodes[1](f, e);
       return a !== undefined && b !== undefined && test(fold(a, e.caseSensitive), fold(b, e.caseSensitive));
     };
   }
 
   /** `axis::name[...]/...` as a test that the path selects something (or, for `count()`, the number of nodes it selects). */
-  private pathOperand(counting: boolean): Node {
-    const first = this.peek();
-    if (first.text === '/' || first.text === '//') {
-      throw new ParseError('A path in a predicate starts from the node it judges; start it with ./ or ../', first.position);
+  private pathOperand(cst: CstNode, counting: boolean): Node {
+    const lead = tokenOf(cst, 'lead');
+    if (lead) {
+      throw new ParseError('A path in a predicate starts from the node it judges; start it with ./ or ../', this.at(lead));
     }
     this.state.local = false;
     const restrictedBefore = this.state.restricted;
     const steps: CompiledStep[] = [];
     let ancestor: {step: CompiledStep, orSelf: boolean} | undefined;
-    let sep: '/' | '//' = '/';
-    for (;;) {
-      const read = this.readPathStep(sep);
+    const separators = (cst.children['sep'] ?? []) as IToken[];
+    nodesOf(cst, 'pathStep').forEach((stepCst, i) => {
+      const read = this.readPathStep(i === 0 ? '/' : separators[i - 1].image as '/' | '//', stepCst);
       if (read.axis === 'ancestor' || read.axis === 'ancestor-or-self') {
         if (steps.length > 0 || ancestor || counting || this.state.depth > 0 || this.state.restricted) {
           throw new ParseError(read.axis + ':: can only start a path in a condition on the node itself', read.position);
@@ -775,14 +723,7 @@ class PredicateParser {
       if (read.axis === 'parent' || ancestor) {
         this.state.restricted = true;
       }
-      const t = this.peek();
-      if (t && t.kind === 'punct' && (t.text === '/' || t.text === '//')) {
-        this.at++;
-        sep = t.text;
-        continue;
-      }
-      break;
-    }
+    });
     this.state.restricted = restrictedBefore;
     if (ancestor) {
       return this.ancestorNode(ancestor, steps);
@@ -800,82 +741,59 @@ class PredicateParser {
     return node;
   }
 
-  /** One step of a path inside a predicate; the predicates nested in it are parsed here. */
-  private readPathStep(sep: '/' | '//'): {step: CompiledStep, axis: Axis, position: number} {
-    const t = this.peek();
+  /** One step of a path inside a predicate; the predicates nested in it are compiled here. */
+  private readPathStep(sep: '/' | '//', cst: CstNode): {step: CompiledStep, axis: Axis, position: number} {
+    const axisToken = tokenOf(cst, 'axis');
     let axis: Axis | undefined;
-    if (t.kind === 'ident' && this.peek(1)?.text === '::') {
-      axis = SEARCH_AXES.find(a => a === t.text.toLowerCase());
+    if (axisToken) {
+      axis = SEARCH_AXES.find(a => a === axisToken.image.toLowerCase());
       if (!axis) {
-        throw new ParseError('Unknown axis ' + t.text, t.position);
+        throw new ParseError('Unknown axis ' + axisToken.image, this.at(axisToken));
       }
-      this.at += 2;
     }
-    const nameToken = this.peek();
-    if (!nameToken) {
-      throw new ParseError('Unexpected end of predicate', this.end);
-    }
+    const nameToken = tokenOf(cst, 'name');
     let test: NameTest;
-    if (nameToken.kind === 'ident' || nameToken.kind === 'string') {
-      test = nameTest(nameToken.text);
-    } else if (nameToken.text === '*') {
-      test = nameTest('*');
-    } else if (nameToken.text === '.' || nameToken.text === '..') {
-      axis = nameToken.text === '.' ? 'self' : 'parent';
+    if (nameToken.tokenType === Ident || nameToken.tokenType === StringLit) {
+      test = nameTest(this.text(nameToken));
+    } else if (nameToken.tokenType === Star) {
       test = nameTest('*');
     } else {
-      throw new ParseError('Unexpected ' + nameToken.text, nameToken.position);
+      axis = nameToken.tokenType === Dot ? 'self' : 'parent';
+      test = nameTest('*');
     }
-    this.at++;
     const resolved = sep === '//' ? this.descendantAxis(axis, nameToken) : (axis ?? 'child');
     if (this.state.restricted && !DOWNWARD_AXES.includes(resolved)) {
-      throw new ParseError('The ' + resolved + ' axis cannot be used here', nameToken.position);
+      throw new ParseError('The ' + resolved + ' axis cannot be used here', this.at(nameToken));
     }
     const predicates: CompiledPredicate[] = [];
     const flags = stepFlags();
-    while (this.peek()?.kind === 'punct' && this.peek().text === '[') {
-      const close = this.matchingBracket();
-      const inner = this.tokens.slice(this.at + 1, close);
-      const closeToken = this.tokens[close];
-      this.at = close + 1;
+    for (const predicate of nodesOf(cst, 'predicate')) {
       const wasRestricted = this.state.restricted;
       this.state.depth++;
       this.state.restricted = wasRestricted || resolved === 'parent' || resolved === 'ancestor' || resolved === 'ancestor-or-self';
-      const compiled = new PredicateParser(inner, closeToken.position, this.state).parse();
+      const compiled = new PredicateCompiler(this.state, this.base).compile(nodeOf(predicate, 'orExpr'));
       this.state.restricted = wasRestricted;
       this.state.depth--;
       predicates.push(compiled.predicate);
       mergeFlags(flags, compiled.flags);
     }
     if (flags.positional && (resolved === 'descendant' || resolved === 'ancestor' || resolved === 'ancestor-or-self')) {
-      throw new ParseError('A position cannot be asked on the ' + resolved + ' axis', nameToken.position);
+      throw new ParseError('A position cannot be asked on the ' + resolved + ' axis', this.at(nameToken));
     }
     if (flags.ancestral) {
-      throw new ParseError('A condition on the ancestors cannot be nested in another condition', nameToken.position);
+      throw new ParseError('A condition on the ancestors cannot be nested in another condition', this.at(nameToken));
     }
-    return {step: step(resolved, false, [test], predicates, flags), axis: resolved, position: nameToken.position};
+    return {step: step(resolved, false, [test], predicates, flags), axis: resolved, position: this.at(nameToken)};
   }
 
-  private descendantAxis(axis: Axis | undefined, at: Token): Axis {
+  private descendantAxis(axis: Axis | undefined, at: IToken): Axis {
     if (axis === undefined || axis === 'child' || axis === 'descendant') {
       return 'descendant';
     }
     if (axis === 'descendant-or-self') {
       return axis;
     }
-    throw new ParseError('// must be followed by a name', at.position);
-  }
-
-  private matchingBracket(): number {
-    let depth = 0;
-    for (let i = this.at; i < this.tokens.length; i++) {
-      if (this.tokens[i].kind === 'punct' && this.tokens[i].text === '[') {
-        depth++;
-      } else if (this.tokens[i].kind === 'punct' && this.tokens[i].text === ']' && --depth === 0) {
-        return i;
-      }
-    }
-    throw new ParseError('Missing ]', this.end);
+    throw new ParseError('// must be followed by a name', this.at(at));
   }
 
   /** `ancestor::Name[...]/rest`: the test is judged at each ancestor as the search passes it, and read from a flag. */
@@ -895,20 +813,6 @@ class PredicateParser {
     this.numbers.add(node);
     return node;
   }
-
-  private accept(text: string): boolean {
-    if (this.peek()?.text === text) {
-      this.at++;
-      return true;
-    }
-    return false;
-  }
-
-  private expect(text: string) {
-    if (!this.accept(text)) {
-      throw new ParseError('Expected ' + text, this.position());
-    }
-  }
 }
 
 /** Whether a node itself satisfies an ancestor test (what each ancestor is asked as the search passes it). */
@@ -922,6 +826,11 @@ export function ancestorTestHolds(test: AncestorTest, ctx: NodeContext, env: Env
 const CARDINALITY_NAMES: Record<string, {min: number, max: number}> = {
   optional: {min: 0, max: 1}, required: {min: 1, max: 1}, prohibited: {min: 0, max: 0}
 };
+
+function namedCardinality(name: string): {min: number, max: number} | undefined {
+  const key = name.toLowerCase();
+  return Object.prototype.hasOwnProperty.call(CARDINALITY_NAMES, key) ? CARDINALITY_NAMES[key] : undefined;
+}
 
 const TEXT_FUNCTIONS: Record<string, (a: string, b: string) => boolean> = {
   'contains': (a, b) => a.indexOf(b) > -1,

@@ -1,11 +1,12 @@
 import {SEARCH_FUNCTIONS} from './search-expression';
+import {Continuation, PredicateTail, RANGE_ATTRIBUTES, predicateTail} from './search-grammar';
 
+/**
+ * The axes that are worth spelling out: `child::` is what no axis means, `self::` is `.`, `parent::` is `..` and `descendant::`
+ * is `//`, so those are offered in their short forms (see `upSuggestions`) and `/`, `//`.
+ */
 const AXIS_DETAILS: [string, string][] = [
-  ['child', 'the children (what / goes to)'],
-  ['descendant', 'the nodes below at any depth (what // goes to)'],
   ['descendant-or-self', 'the node itself and the nodes below'],
-  ['self', 'the node itself'],
-  ['parent', 'the parent (.. for short)'],
   ['ancestor', 'the nodes above, in a predicate: *[ancestor::Name]'],
   ['ancestor-or-self', 'the node itself and the nodes above, in a predicate'],
   ['following-sibling', 'the siblings after the node'],
@@ -29,6 +30,8 @@ export interface SearchSuggestion {
   insert: string;
   detail: string;
   kind: 'attribute' | 'function' | 'operator' | 'keyword' | 'value' | 'snippet';
+  /** How many characters before the end of `insert` the caret goes (inside the parentheses of `count()`); the end when absent. */
+  caretBack?: number;
 }
 
 export interface SearchSuggestions {
@@ -51,7 +54,31 @@ const COMPARISONS: { op: string, detail: string, flag: boolean }[] = [
 const FUNCTION_DETAILS: Record<string, string> = {
   'contains': 'contains(attribute, "text"): the value has the text in it',
   'starts-with': 'starts-with(attribute, "text"): the value begins with the text',
-  'ends-with': 'ends-with(attribute, "text"): the value ends with the text'
+  'ends-with': 'ends-with(attribute, "text"): the value ends with the text',
+  'text': 'the text the node shows in the tree, e.g. contains(text(), "id")',
+  'position': 'the place among the siblings the step selects (1 is first); [2] is [position() = 2]',
+  'last': 'how many siblings the step selects; [last()] is the last one',
+  'count': 'count(path): how many nodes the path selects, e.g. count(*) > 3'
+};
+
+/** What an argument of a function is: an attribute (or `text()`), a quoted text, or a path. */
+interface FunctionParameter {
+  kind: 'value' | 'text' | 'path';
+  detail: string;
+}
+
+const TEXT_FUNCTION_PARAMETERS: FunctionParameter[] = [
+  {kind: 'value', detail: 'the attribute (or text()) whose value is searched'},
+  {kind: 'text', detail: 'the text to look for in it'}
+];
+
+/** The arguments each function takes, in order; a function without any is completed with its parentheses. */
+const FUNCTION_PARAMETERS: Record<string, FunctionParameter[]> = {
+  ...Object.fromEntries(SEARCH_FUNCTIONS.map(f => [f, TEXT_FUNCTION_PARAMETERS])),
+  'text': [],
+  'position': [],
+  'last': [],
+  'count': [{kind: 'path', detail: 'the path whose nodes are counted: * for every child, or e.g. Code, ../Code, descendant-or-self::Code'}]
 };
 
 /** What the field offers while it is empty: examples of the expressions it understands. */
@@ -68,7 +95,7 @@ export function searchSyntaxHints(attributes: SearchAttribute[]): SearchSuggesti
     hints.push({label: example, insert: example, detail: 'text() is the text the node shows; combine conditions with and, or, not', kind: 'snippet'});
   }
   hints.push(
-    {label: '*[parent::*]', insert: '*[parent::*]', detail: 'by parent, ancestor::, child::, descendant::, following-sibling::, preceding-sibling::', kind: 'snippet'},
+    {label: '*[../Code]', insert: '*[../Code]', detail: 'a node whose parent has a child with Code in its name (so it and its siblings); also ancestor::, following-sibling::, preceding-sibling::', kind: 'snippet'},
     {label: '*[2]', insert: '*[2]', detail: 'the 2nd of the siblings; also position() and last()', kind: 'snippet'}
   );
   return hints;
@@ -92,47 +119,152 @@ export function suggestSearch(expression: string, caret: number, attributes: Sea
     return stepSuggestions(before, caret, attributes);
   }
 
-  const {tokens, word, wordStart, quote} = context;
+  const {prefix, word, wordStart, quote} = context;
+  const tail = predicateTail(prefix);
+  if (!tail) {
+    return NO_SUGGESTIONS;
+  }
+  const last = tail.tokens[tail.tokens.length - 1];
   if (quote) {
-    const values = valueSuggestions(attributeOf(tokens[tokens.length - 2]?.text), false);
+    const values = last?.type === 'Op' ? valueSuggestions(attributeOf(tail.tokens[tail.tokens.length - 2]?.text), false) : [];
     return rank(word, wordStart, caret, values);
   }
+  return rank(word, wordStart, caret, predicateSuggestions(tail, attributes, expression.substring(caret)));
+}
 
+/** What the grammar lets follow the predicate so far, as suggestions; what a name or a value stands for comes from the attributes. */
+function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[], after: string): SearchSuggestion[] {
+  const {tokens, next, complete} = tail;
   const last = tokens[tokens.length - 1];
-  let items: SearchSuggestion[];
-  if (last?.kind === 'op') {
-    const values = valueSuggestions(attributeOf(tokens[tokens.length - 2]?.text), true);
-    items = values.length > 0 ? values : attributeSuggestions(attributes);
-  } else if (last?.text === ':' && tokens[tokens.length - 2]?.text === ':') {
-    items = [{label: '*', insert: '*', detail: 'any node', kind: 'snippet'}];
-  } else if (last?.text === '/' || last?.text === '//') {
-    items = [{label: '*', insert: '*', detail: 'any node', kind: 'snippet'}, ...axisSuggestions(), ...upSuggestions()];
-  } else if (!last || isOperatorWord(last) || ['(', ',', '['].includes(last.text)) {
-    items = [
-      ...attributeSuggestions(attributes),
-      ...functionSuggestions(),
-      ...axisSuggestions(),
-      ...upSuggestions(),
-      {label: 'not', insert: 'not ', detail: 'negate the condition', kind: 'keyword'}
-    ];
-  } else if (last.kind === 'ident' && attributeOf(last.text)) {
-    items = [...operatorSuggestions(attributeOf(last.text)), ...joinSuggestions()];
-  } else {
-    items = joinSuggestions();
+  const beforeLast = tokens[tokens.length - 2];
+  const attributeOf = (name: string | undefined) => attributes.find(a => a.name.toLowerCase() === name?.toLowerCase());
+  const afterOp = last?.type === 'Op';
+  const inPath = ['Slash', 'SlashSlash', 'DoubleColon'].includes(last?.type);
+  const items: SearchSuggestion[] = [];
+
+  if (afterOp) {
+    const values = valueSuggestions(attributeOf(beforeLast?.text), true);
+    if (values.length > 0) {
+      return values;
+    }
   }
-  return rank(word, wordStart, caret, items);
+  // a comparison is made with a value, never with a path: after an operator only values and functions make sense
+  if (next.has('name') && !inPath && !afterOp) {
+    items.push(...attributeSuggestions(attributes));
+  }
+  if (next.has('call')) {
+    items.push(...functionSuggestions());
+  }
+  if (next.has('axis') && !afterOp) {
+    items.push(...axisSuggestions());
+  }
+  if (next.has('any') && !afterOp) {
+    items.push({label: '*', insert: '*', detail: 'any node', kind: 'snippet'});
+  }
+  if (last?.type === 'DotDot' && beforeLast?.type === 'NumberLit') {
+    return [{label: '*', insert: '*', detail: 'no upper limit, e.g. 1..*', kind: 'snippet'}];
+  }
+  if (next.has('parent') && !afterOp) {
+    items.push(last?.type === 'NumberLit' ?
+      {label: '..', insert: '..', detail: 'a range, e.g. 0..1 or 1..*', kind: 'snippet'} : upSuggestions()[0]);
+  }
+  if (next.has('self') && !afterOp) {
+    items.push(upSuggestions()[1]);
+  }
+  if (next.has('name') && !afterOp && !inPath) {
+    items.push({label: 'not', insert: 'not ', detail: 'negate the condition', kind: 'keyword'});
+  }
+  const known = last?.type === 'Ident' ? attributeOf(last.text) : undefined;
+  if (next.has('op') && (known || last?.type === 'RParen')) {
+    items.push(...operatorSuggestions(known));
+  }
+  if (!next.has('name')) {
+    for (const [kind, label, detail] of JOINS) {
+      if (next.has(kind)) {
+        items.push({label, insert: label + ' ', detail, kind: 'keyword'});
+      }
+    }
+  }
+  // a path goes on after a step (a name after / or ::, *, . or ..), not after an attribute, a value or a keyword
+  const afterStep = ['Star', 'Dot', 'DotDot', 'RBracket'].includes(last?.type) && beforeLast?.type !== 'DotDot'
+    || last?.type === 'Ident' && ['Slash', 'SlashSlash', 'DoubleColon'].includes(beforeLast?.type);
+  if (afterStep) {
+    if (next.has('slash')) {
+      items.push({label: '/', insert: '/', detail: 'go on to a child node', kind: 'operator'});
+    }
+    if (next.has('descendant')) {
+      items.push({label: '//', insert: '//', detail: 'go on to a node at any depth below', kind: 'operator'});
+    }
+    if (next.has('predicate')) {
+      items.push({label: '[', insert: '[', detail: 'one more condition on this node', kind: 'operator'});
+    }
+  }
+  if (next.has('comma')) {
+    items.push({label: ',', insert: ', ', detail: 'the next argument', kind: 'operator'});
+  }
+  // the `)` of `count()` is there already when the caret is between the parentheses
+  if (next.has('closeParen') && !after.trimStart().startsWith(')')) {
+    items.push({label: ')', insert: ')', detail: 'end of the arguments or of the group', kind: 'operator'});
+  }
+  if (complete && !next.has('name') || next.has('closeBracket')) {
+    items.push({label: ']', insert: ']', detail: 'end of the condition', kind: 'operator'});
+  }
+  const call = last?.type === 'LParen' || last?.type === 'Comma' ? enclosingCall(tokens) : undefined;
+  const parameter = call ? FUNCTION_PARAMETERS[call.name.toLowerCase()]?.[call.index] : undefined;
+  return parameter ? argumentSuggestions(parameter, items, tokens, call.index, attributes) : items;
 }
 
-interface Lexeme {
-  kind: 'ident' | 'string' | 'number' | 'op' | 'punct';
-  text: string;
+/** The function call whose argument the end of the tokens begins: its name and the place of the argument (from 0). */
+function enclosingCall(tokens: {type: string, text: string}[]): {name: string, index: number} | undefined {
+  let depth = 0;
+  let index = 0;
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const type = tokens[i].type;
+    if (type === 'RParen' || type === 'RBracket') {
+      depth++;
+    } else if (type === 'LBracket') {
+      if (depth-- === 0) {
+        return undefined;
+      }
+    } else if (type === 'LParen') {
+      if (depth-- === 0) {
+        return tokens[i - 1]?.type === 'Ident' ? {name: tokens[i - 1].text, index} : undefined;
+      }
+    } else if (type === 'Comma' && depth === 0) {
+      index++;
+    }
+  }
+  return undefined;
 }
+
+/** What may be written where a function's argument begins: only what the argument is (a path, an attribute, a text). */
+function argumentSuggestions(parameter: FunctionParameter, items: SearchSuggestion[], tokens: {type: string, text: string}[],
+                             index: number, attributes: SearchAttribute[]): SearchSuggestion[] {
+  switch (parameter.kind) {
+    case 'path':
+      return items.filter(i => i.label.endsWith('::') || ['*', '..', '.'].includes(i.label))
+        .map(i => i.label === '*' ? {...i, detail: parameter.detail} : i);
+    case 'value':
+      return items.filter(i => i.kind === 'attribute' || i.label === 'text()');
+    default: {
+      // the text a function looks for: the values of the attribute it searches, when it has a fixed set of them
+      const searched = attributes.find(a => a.name.toLowerCase() === tokens[tokens.length - 2]?.text.toLowerCase());
+      const values = (searched?.values ?? []).map(v => ({label: v, insert: `"${v}"`, detail: searched.name, kind: 'value' as const}));
+      return [{label: '"text"', insert: '""', detail: parameter.detail, kind: 'snippet', caretBack: 1}, ...values];
+    }
+  }
+}
+
+const JOINS: [Continuation, string, string][] = [
+  ['and', 'and', 'both conditions hold'],
+  ['or', 'or', 'either condition holds']
+];
 
 interface Context {
   /** Whether the caret is inside `[...]`. */
   predicate: boolean;
-  /** The complete lexemes of the predicate before the word being typed. */
-  tokens: Lexeme[];
+  /** What the predicate holds before the word being typed (before the quote, inside a quoted text). */
+  prefix: string;
   /** The word being typed (what a completion replaces). */
   word: string;
   wordStart: number;
@@ -140,10 +272,11 @@ interface Context {
   quote: boolean;
 }
 
-/** Reads the part of the expression before the caret: where in a predicate it ends and what has been written so far. */
+/** Reads the part of the expression before the caret: whether it ends in a predicate, and the word being typed. */
 function readContext(before: string): Context {
   let depth = 0;
   let quote = '';
+  let quoteStart = -1;
   let predicateStart = -1;
   for (let i = 0; i < before.length; i++) {
     const c = before[i];
@@ -153,6 +286,7 @@ function readContext(before: string): Context {
       }
     } else if (depth > 0 && (c === '"' || c === '\'')) {
       quote = c;
+      quoteStart = i;
     } else if (c === '[') {
       if (depth++ === 0) {
         predicateStart = i + 1;
@@ -162,60 +296,17 @@ function readContext(before: string): Context {
     }
   }
   if (depth === 0) {
-    return {predicate: false, tokens: [], word: '', wordStart: before.length, quote: false};
+    return {predicate: false, prefix: '', word: '', wordStart: before.length, quote: false};
   }
-
+  if (quote) {
+    return {
+      predicate: true, prefix: before.substring(predicateStart, quoteStart), word: before.substring(quoteStart + 1),
+      wordStart: quoteStart + 1, quote: true
+    };
+  }
   const body = before.substring(predicateStart);
-  const tokens: Lexeme[] = [];
-  let i = 0;
-  let word = '';
-  let wordStart = before.length;
-  let inQuote = false;
-  while (i < body.length) {
-    const c = body[i];
-    if (/\s/.test(c)) {
-      i++;
-    } else if (c === '"' || c === '\'') {
-      const end = body.indexOf(c, i + 1);
-      if (end < 0) {
-        inQuote = true;
-        word = body.substring(i + 1);
-        wordStart = predicateStart + i + 1;
-        i = body.length;
-      } else {
-        tokens.push({kind: 'string', text: body.substring(i + 1, end)});
-        i = end + 1;
-      }
-    } else if (/[0-9]/.test(c) || (c === '-' && /[0-9]/.test(body[i + 1] || ''))) {
-      const m = /^-?[0-9]+(\.[0-9]+)?/.exec(body.substring(i));
-      tokens.push({kind: 'number', text: m[0]});
-      i += m[0].length;
-    } else if (/[A-Za-z_]/.test(c)) {
-      const m = /^[A-Za-z_][A-Za-z0-9_-]*/.exec(body.substring(i));
-      i += m[0].length;
-      if (i >= body.length) {
-        // the word under the caret: a completion replaces it
-        word = m[0];
-        wordStart = predicateStart + i - m[0].length;
-      } else {
-        tokens.push({kind: 'ident', text: m[0]});
-      }
-    } else if (c === '!' || c === '<' || c === '>' || c === '=') {
-      const two = body.substr(i, 2);
-      const op = two === '!=' || two === '<=' || two === '>=' ? two : c;
-      tokens.push({kind: 'op', text: op});
-      i += op.length;
-    } else {
-      tokens.push({kind: 'punct', text: c});
-      i++;
-    }
-  }
-  return {predicate: true, tokens, word, wordStart, quote: inQuote};
-}
-
-function isOperatorWord(token: Lexeme | string): boolean {
-  const text = (typeof token === 'string' ? token : token.text).toLowerCase();
-  return text === 'and' || text === 'or' || text === 'not';
+  const word = /[A-Za-z0-9_-]*$/.exec(body)[0];
+  return {predicate: true, prefix: body.substring(0, body.length - word.length), word, wordStart: before.length - word.length, quote: false};
 }
 
 function stepSuggestions(before: string, caret: number, attributes: SearchAttribute[]): SearchSuggestions {
@@ -259,13 +350,11 @@ function attributeSuggestions(attributes: SearchAttribute[]): SearchSuggestion[]
 }
 
 function functionSuggestions(): SearchSuggestion[] {
-  return [
-    ...SEARCH_FUNCTIONS.map(f => ({label: f, insert: f + '(', detail: FUNCTION_DETAILS[f] ?? f, kind: 'function' as const})),
-    {label: 'text()', insert: 'text()', detail: 'the text the node shows in the tree, e.g. contains(text(), "id")', kind: 'function'},
-    {label: 'position()', insert: 'position()', detail: 'the place among the siblings the step selects (1 is first); [2] is [position() = 2]', kind: 'function'},
-    {label: 'last()', insert: 'last()', detail: 'how many siblings the step selects; [last()] is the last one', kind: 'function'},
-    {label: 'count(', insert: 'count(', detail: 'count(path): how many nodes the path selects, e.g. count(child::*) > 3', kind: 'function'}
-  ];
+  return Object.entries(FUNCTION_PARAMETERS).map(([name, parameters]) => ({
+    label: name + '()', insert: name + '()', detail: FUNCTION_DETAILS[name] ?? name, kind: 'function' as const,
+    // a function that takes arguments is completed with its parentheses and the caret goes between them
+    caretBack: parameters.length > 0 ? 1 : undefined
+  }));
 }
 
 function axisSuggestions(): SearchSuggestion[] {
@@ -275,24 +364,16 @@ function axisSuggestions(): SearchSuggestion[] {
 /** The short ways to go to the node itself and to its parent. */
 function upSuggestions(): SearchSuggestion[] {
   return [
-    {label: '..', insert: '..', detail: 'the parent, e.g. ../Code', kind: 'snippet'},
-    {label: '.', insert: '.', detail: 'the node itself, e.g. .//Code (a descendant)', kind: 'snippet'}
+    {label: '..', insert: '..', detail: 'the parent (parent::*), e.g. ../Code: a child of the parent with Code in its name', kind: 'snippet'},
+    {label: '.', insert: '.', detail: 'the node itself (self::*), e.g. .//Code (a descendant)', kind: 'snippet'}
   ];
 }
 
 function operatorSuggestions(attribute: SearchAttribute | undefined): SearchSuggestion[] {
-  const flagOnly = attribute?.kind === 'flag';
+  const equalityOnly = attribute?.kind === 'flag' || RANGE_ATTRIBUTES.includes(attribute?.name.toLowerCase());
   return COMPARISONS
-    .filter(c => c.flag || !flagOnly)
+    .filter(c => c.flag || !equalityOnly)
     .map(c => ({label: c.op, insert: c.op + ' ', detail: c.detail, kind: 'operator' as const}));
-}
-
-function joinSuggestions(): SearchSuggestion[] {
-  return [
-    {label: 'and', insert: 'and ', detail: 'both conditions hold', kind: 'keyword'},
-    {label: 'or', insert: 'or ', detail: 'either condition holds', kind: 'keyword'},
-    {label: ']', insert: ']', detail: 'end of the condition', kind: 'operator'}
-  ];
 }
 
 function valueSuggestions(attribute: SearchAttribute | undefined, quoted: boolean): SearchSuggestion[] {

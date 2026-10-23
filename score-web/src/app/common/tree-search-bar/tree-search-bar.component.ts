@@ -1,6 +1,7 @@
 import {DecimalPipe} from '@angular/common';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {ViewportRuler} from '@angular/cdk/scrolling';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Observable, Subscription} from 'rxjs';
 import {FormsModule} from '@angular/forms';
@@ -79,6 +80,12 @@ export class TreeSearchBarComponent<N = any> {
   }
 
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  /**
+   * The panel follows the bar when the window is resized with the panel open: the autocomplete resizes its overlay on a viewport
+   * change by what its `panelWidth` is then, so the width is brought up to date first (this subscription is older than the autocomplete's).
+   */
+  private readonly viewportChange = inject(ViewportRuler).change().pipe(takeUntilDestroyed()).subscribe(() => this.refreshPanelWidth());
   private readonly destroyRef = inject(DestroyRef);
   private _searcher: TreeSearcher<N>;
   private progressSubscription: Subscription | undefined;
@@ -115,6 +122,8 @@ export class TreeSearchBarComponent<N = any> {
   /** What the field suggests at the caret, each as the whole expression that choosing it leads to. */
   suggestions: { suggestion: SearchSuggestion, expression: string, caret: number }[] = [];
   private selectedAt = 0;
+  /** The width of the suggestion panel: the width of the search bar, to the end of its last button. */
+  panelWidth = 'auto';
 
   /** Works out the suggestions for the text before the caret; call it whenever the text or the caret moved. */
   updateSuggestions() {
@@ -124,13 +133,27 @@ export class TreeSearchBarComponent<N = any> {
       this.suggestions = [];
       return;
     }
+    this.refreshPanelWidth();
     const text = input.value;
     const {from, to, items} = suggestSearch(text, input.selectionStart ?? text.length, attributes);
     this.suggestions = items.map(suggestion => ({
       suggestion,
       expression: text.substring(0, from) + suggestion.insert + text.substring(to),
-      caret: from + suggestion.insert.length
+      caret: from + suggestion.insert.length - (suggestion.caretBack ?? 0)
     }));
+  }
+
+  refreshPanelWidth() {
+    this.panelWidth = this.fittingPanelWidth();
+    if (this.autocomplete?.autocomplete) {
+      this.autocomplete.autocomplete.panelWidth = this.panelWidth;
+    }
+  }
+
+  /** The panel is as wide as `score-tree-search-bar`, so that it ends where the bar's last button does, however small the screen is. */
+  private fittingPanelWidth(): string {
+    const width = this.host.nativeElement.getBoundingClientRect().width;
+    return width > 0 ? `${Math.floor(width)}px` : 'auto';
   }
 
   onSuggestionSelected(event: MatAutocompleteSelectedEvent) {

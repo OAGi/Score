@@ -1329,6 +1329,30 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
   height: 0;
 }
 
+/* The count of matches stays on one line; its "in N nodes" part goes first when the field is narrow. */
+.tree-search-input {
+  container-type: inline-size;
+}
+
+.tree-search-count {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@container (max-width: 380px) {
+  .tree-search-count-detail {
+    display: none;
+  }
+}
+
+/* The expression error takes its own line under the field, so that it pushes what follows (the breadcrumb) down. */
+.tree-search-error {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--mat-sys-error, #b3261e);
+}
+
 .tree-search-box .mat-mdc-icon-button:hover {
   --mat-icon-button-hover-state-layer-opacity: 0;
 }
@@ -1354,28 +1378,33 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
 /* the search box's suggestions are a dense list: half the height of a regular option */
 .tree-search-suggestions .mat-mdc-option {
   min-height: 24px;
+  padding-block: 3px;
   font-size: 12px;
   word-break: normal;
 }
 
 .tree-search-suggestions .mat-mdc-option .mdc-list-item__primary-text {
   display: flex;
+  align-items: baseline;
   min-width: 0;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .tree-search-suggestion-label {
+  flex: 0 0 auto;
   font-family: monospace;
   font-weight: 600;
   margin-right: 12px;
+  white-space: nowrap;
 }
 
+/* A detail that does not fit goes on to the next line: text that is cut off tells nothing. */
 .tree-search-suggestion-detail {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   font-size: 11px;
+  line-height: 1.3;
   opacity: 0.7;
 }
 

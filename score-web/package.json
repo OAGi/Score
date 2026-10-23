@@ -38,6 +38,7 @@
     "@stomp/stompjs": "^7.3.0",
     "angular-split": "^20.0.0",
     "bootstrap": "^5.3.8",
+    "chevrotain": "^13.2.0",
     "core-js": "^3.50.0",
     "crypto-js": "^4.1.1",
     "file-saver": "^2.0.5",

@@ -33,6 +33,38 @@ describe('parseSearchExpression', () => {
   });
 });
 
+describe('parseSearchExpression with an unfinished path in a predicate', () => {
+  it('reports an error instead of throwing when the path ends with a slash', () => {
+    for (const expr of ['*[a/]', '*[./]', '*[a//]', '*[x = a/]', 'A[b/]/C']) {
+      const parsed = parseSearchExpression(expr);
+      expect(parsed.error).withContext(expr).toBeDefined();
+      expect(parsed.steps).toEqual([]);
+    }
+  });
+});
+
+describe('bare words that start with a digit', () => {
+  it('are read as text, as a GUID is', () => {
+    const node = {name: 'Code', guid: '6f3ab1c2'};
+    expect(matches('*[guid = 6f3ab1c2]', node)).toBe(true);
+    expect(matches('*[guid = 6f3ab1c3]', node)).toBe(false);
+    expect(matches('*[guid != 6f3ab1c3]', node)).toBe(true);
+  });
+
+  it('are text after guid even when they are all digits', () => {
+    const node = {name: 'Code', guid: '00000000000000000000000000000001'};
+    expect(matches('*[guid = 1]', node)).toBe(false);
+    expect(matches('*[guid = 00000000000000000000000000000001]', node)).toBe(true);
+    expect(matches('*[guid = "00000000000000000000000000000001"]', node)).toBe(true);
+    expect(matches('*[guid != 1]', node)).toBe(true);
+  });
+
+  it('leave numbers and ranges alone', () => {
+    expect(matches('*[cardinality = 0..1]', {name: 'A', cardinality_min: 0, cardinality_max: 1})).toBe(true);
+    expect(matches('*[n >= 10]', {name: 'A', n: 12})).toBe(true);
+  });
+});
+
 describe('search predicates', () => {
   it('compare an attribute with a value', () => {
     expect(matches('Code[used = true]', {name: 'Code', used: true})).toBe(true);

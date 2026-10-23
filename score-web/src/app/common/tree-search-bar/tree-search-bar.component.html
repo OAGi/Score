@@ -10,7 +10,7 @@
           (blur)="onBlur()" (input)="updateSuggestions()" (focus)="updateSuggestions()" (click)="updateSuggestions()"
           (keyup.arrowleft)="updateSuggestions()" (keyup.arrowright)="updateSuggestions()"
           (keyup.enter)="onEnter(searcher.inputKeyword)">
-        <mat-autocomplete #suggest="matAutocomplete" class="tree-search-suggestions" [autoActiveFirstOption]="false" panelWidth="480px"
+        <mat-autocomplete #suggest="matAutocomplete" class="tree-search-suggestions" [autoActiveFirstOption]="false" [panelWidth]="panelWidth"
           (optionSelected)="onSuggestionSelected($event)">
           @for (s of suggestions; track s.suggestion.label) {
             <mat-option [value]="s.expression" [title]="s.suggestion.detail">
@@ -19,24 +19,17 @@
             </mat-option>
           }
         </mat-autocomplete>
-        @if (searcher.expressionError) {
-          <mat-hint align="start" style="color: var(--mat-sys-error, #b3261e)">{{ searcher.expressionError }}</mat-hint>
-        }
         @if (searcher.isSearching) {
-          <mat-hint matSuffix
-          align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + '+ ' + searcher.searchedUnit : '' }}</mat-hint>
+          <mat-hint matSuffix class="tree-search-count" align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}+ {{ searcher.searchedUnit }}</span>}</mat-hint>
         }
         @if (!searcher.isSearching && searcher.searchKeyword && searcher.resultCount > 0) {
-          <mat-hint matSuffix
-          align="end">{{searcher.searchIndex + 1}}/{{searcher.resultCount}}{{ searcher.fullSearched ? '' : '+' }}{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + (searcher.fullSearched ? '' : '+') + ' ' + searcher.searchedUnit : '' }}</mat-hint>
+          <mat-hint matSuffix class="tree-search-count" align="end">{{searcher.searchIndex + 1}}/{{searcher.resultCount}}{{ searcher.fullSearched ? '' : '+' }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}{{ searcher.fullSearched ? '' : '+' }} {{ searcher.searchedUnit }}</span>}</mat-hint>
         }
         @if (!searcher.isSearching && searcher.searchKeyword && !searcher.fullSearched && searcher.resultCount === 0) {
-          <mat-hint matSuffix
-          align="end">0 results{{ searcher.searchedUnit ? ' in ' + (searcher.searchedItemCount | number) + ' ' + searcher.searchedUnit : '' }}</mat-hint>
+          <mat-hint matSuffix class="tree-search-count" align="end">0 results@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }} {{ searcher.searchedUnit }}</span>}</mat-hint>
         }
         @if (!searcher.isSearching && searcher.searchKeyword && searcher.fullSearched && searcher.resultCount === 0) {
-          <mat-hint matSuffix
-          align="end">0 results</mat-hint>
+          <mat-hint matSuffix class="tree-search-count" align="end">0 results</mat-hint>
         }
       </mat-form-field>
     </div>
@@ -67,4 +60,7 @@
     </div>
     <ng-content select="[treeSearchSettings]"></ng-content>
   </div>
+  @if (searcher.expressionError) {
+    <div class="tree-search-error" role="alert">{{ searcher.expressionError }}</div>
+  }
 </div>

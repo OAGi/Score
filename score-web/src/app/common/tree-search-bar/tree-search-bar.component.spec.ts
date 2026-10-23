@@ -9,6 +9,8 @@ describe('TreeSearchBarComponent', () => {
       tree: {scrollToIndex: vi.fn()},
       scope: 'selected',
       selectMatch: (TreeSearchBarComponent.prototype as any).selectMatch,
+      fittingPanelWidth: (TreeSearchBarComponent.prototype as any).fittingPanelWidth,
+      refreshPanelWidth: (TreeSearchBarComponent.prototype as any).refreshPanelWidth,
       nodeSelect: {emit: vi.fn()},
       hideSuggestions: vi.fn(),
       ...overrides
@@ -41,6 +43,54 @@ describe('TreeSearchBarComponent', () => {
     TreeSearchBarComponent.prototype.onSearch.call(ctx, 'Release');
 
     expect(ctx.hideSuggestions).toHaveBeenCalled();
+  });
+
+  it('puts the caret between the parentheses of a function that takes arguments, and after one that does not', () => {
+    const attribute = {name: 'den', kind: 'text', description: 'den'};
+    const ctx = bar({
+      searcher: {searchAttributes: [attribute], isSearching: false},
+      searchInput: {nativeElement: {value: '*[', selectionStart: 2}},
+      host: {nativeElement: {getBoundingClientRect: () => ({width: 300})}},
+      suggestions: []
+    });
+
+    TreeSearchBarComponent.prototype.updateSuggestions.call(ctx);
+
+    const caretAfter = (label: string) => ctx.suggestions.find((s: any) => s.suggestion.label === label);
+    expect(caretAfter('count()')).toMatchObject({expression: '*[count()', caret: '*[count('.length});
+    expect(caretAfter('text()')).toMatchObject({expression: '*[text()', caret: '*[text()'.length});
+  });
+
+  it('makes the suggestion panel as wide as the search bar', () => {
+    const widthOf = (width: number) => {
+      const ctx = bar({
+        searcher: {searchAttributes: [{name: 'used', kind: 'flag', description: 'used'}], isSearching: false},
+        searchInput: {nativeElement: {value: '*[', selectionStart: 2}},
+        host: {nativeElement: {getBoundingClientRect: () => ({width})}},
+        suggestions: []
+      });
+      TreeSearchBarComponent.prototype.updateSuggestions.call(ctx);
+      return ctx.panelWidth;
+    };
+
+    expect(widthOf(300)).toBe('300px');
+    expect(widthOf(299.6)).toBe('299px');
+    expect(widthOf(480)).toBe('480px');
+    expect(widthOf(900)).toBe('900px');
+  });
+
+  it('gives the open autocomplete the width of the bar again when the window is resized', () => {
+    let width = 700;
+    const autocomplete = {autocomplete: {panelWidth: '480px'}};
+    const ctx = bar({host: {nativeElement: {getBoundingClientRect: () => ({width})}}, autocomplete});
+
+    TreeSearchBarComponent.prototype.refreshPanelWidth.call(ctx);
+    expect(autocomplete.autocomplete.panelWidth).toBe('700px');
+
+    width = 366;
+    TreeSearchBarComponent.prototype.refreshPanelWidth.call(ctx);
+    expect(autocomplete.autocomplete.panelWidth).toBe('366px');
+    expect(ctx.panelWidth).toBe('366px');
   });
 
   it('searches the whole tree when nothing is selected', () => {
