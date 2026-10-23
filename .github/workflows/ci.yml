@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, master]
+  push:
+    branches: [develop, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  score-http:
+    name: score-http (mvn test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      # The unit tests need no database; the ones that do are skipped.
+      - name: Run the tests
+        working-directory: score-http
+        run: ./mvnw --batch-mode --no-transfer-progress test
+
+  score-web:
+    name: score-web (build and vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: score-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: score-web/.nvmrc
+          cache: npm
+          cache-dependency-path: score-web/package-lock.json
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run the tests
+        run: npm test
+
+  npm-audit:
+    name: npm audit (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [score-web, connect-center-api/docs]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: score-web/.nvmrc
+      # Reads package-lock.json only, so nothing is installed. Fails on any advisory.
+      - name: Audit
+        working-directory: ${{ matrix.project }}
+        run: npm audit --package-lock-only
