@@ -173,7 +173,7 @@
       }
 
       <!-- ASCC & ASCCP -->
-      @if (isAsccpDetail()) {
+      @if (isAsccpDetail() && asAsccpDetail().ascc) {
         <score-cc-ascc-panel [detail]="asAsccpDetail().ascc" [state]="state" [access]="access"
           [editable]="selectedNode.level === 1 && isEditable()" [deprecatable]="isDeprecateAble()"
           [cardinalityMin]="ccCardinalityMin" [cardinalityMax]="ccCardinalityMax"
@@ -187,7 +187,7 @@
       }
 
       <!-- BCC & BCCP & BDT -->
-      @if (isBccpDetail()) {
+      @if (isBccpDetail() && asBccpDetail().bcc) {
         <score-cc-bcc-panel [detail]="asBccpDetail().bcc" [state]="state" [access]="access"
           [editable]="selectedNode.level === 1 && isEditable()" [deprecatable]="isDeprecateAble()"
           [entityTypeLocked]="hasRevisionAssociation() || !asBccpDetail().bdt.hasNoSc"

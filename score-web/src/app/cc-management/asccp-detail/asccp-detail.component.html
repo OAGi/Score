@@ -203,7 +203,7 @@
       }
 
       <!-- ASCC & ASCCP -->
-      @if (isAsccpDetail()) {
+      @if (isAsccpDetail() && asAsccpDetail().ascc) {
         <score-cc-ascc-panel [detail]="asAsccpDetail().ascc" [state]="state" [access]="access"
           (definitionCopy)="copyToDefinition($event)"></score-cc-ascc-panel>
       }
@@ -268,7 +268,7 @@
       </mat-menu>
 
       <!-- BCC & BCCP & BDT -->
-      @if (isBccpDetail()) {
+      @if (isBccpDetail() && asBccpDetail().bcc) {
         <score-cc-bcc-panel [detail]="asBccpDetail().bcc" [state]="state" [access]="access"
           (definitionCopy)="copyToDefinition($event)"></score-cc-bcc-panel>
       }

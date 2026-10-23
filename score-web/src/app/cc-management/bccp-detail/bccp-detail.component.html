@@ -190,7 +190,7 @@
     </ng-container>
     <ng-container treeDetailPane>
       <!-- BCC & BCCP & BDT -->
-      @if (isBccpDetail()) {
+      @if (isBccpDetail() && asBccpDetail().bcc) {
         <score-cc-bcc-panel [detail]="asBccpDetail().bcc" [state]="state" [access]="access" [canCopyDefinition]="selectedNode.level !== 0"
           (definitionCopy)="copyToDefinition($event)"></score-cc-bcc-panel>
       }
