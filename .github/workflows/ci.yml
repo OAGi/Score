@@ -26,10 +26,11 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      # The unit tests need no database; the ones that do are skipped.
+      # The unit tests need no database; the ones that do are skipped. ScoreHttpApplicationTests boots
+      # the whole application, which needs MariaDB and Redis, so it is left out of this job.
       - name: Run the tests
         working-directory: score-http
-        run: ./mvnw --batch-mode --no-transfer-progress test
+        run: ./mvnw --batch-mode --no-transfer-progress test -Dtest='!ScoreHttpApplicationTests'
 
   score-web:
     name: score-web (build and vitest)
