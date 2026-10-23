@@ -108,6 +108,9 @@ buildx_scan() {
     return 0
   fi
 
+  # buildx_build usually runs in a subshell, so the values it resolved are gone here.
+  buildx_resolve
+
   echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
   if [ "$buildx_push" = 1 ]; then
     buildx_old_ifs=$IFS
