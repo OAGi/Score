@@ -4,7 +4,8 @@ import org.oagi.score.gateway.http.change.ChangeFeed;
 import org.oagi.score.gateway.http.change.RecordChangeWatchdog;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -57,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RecordCacheFreshnessTest {
 
     private static final ScoreUser REQUESTER = new ScoreUser(null, "freshness", "freshness", null, false, null);
-    private static final ObjectMapper JSON = new ObjectMapper().findAndRegisterModules();
+    private static final ObjectMapper JSON = JsonMapper.builder().findAndAddModules().build();
 
     private static TestDataSource dataSource;
     private static DSLContext dsl;

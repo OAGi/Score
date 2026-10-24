@@ -51,7 +51,7 @@ class PasskeyProvidersTest {
 
     @Test
     void everyListedIconIsAnInertSvg() throws Exception {
-        var document = new com.fasterxml.jackson.databind.ObjectMapper()
+        var document = new tools.jackson.databind.ObjectMapper()
                 .readTree(new org.springframework.core.io.ClassPathResource("aaguid.json").getInputStream());
         var providers = document.path("providers");
         var icons = document.path("icons");
@@ -64,7 +64,7 @@ class PasskeyProvidersTest {
                 }
             }
         });
-        icons.fields().forEachRemaining(entry -> {
+        icons.properties().forEach(entry -> {
             String icon = entry.getValue().asText();
             org.junit.jupiter.api.Assertions.assertTrue(
                     icon.matches("^data:image/svg\\+xml;base64,[A-Za-z0-9+/=]+$"), "not a base64 SVG: " + entry.getKey());

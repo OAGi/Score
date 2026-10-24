@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.integration_management.github.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;

@@ -8,8 +8,8 @@ spring:
   aop:
     proxy-target-class: true
 
-  # Spring Boot 4 defaults to Jackson 3. Align the auto-configured mapper with Jackson 2
-  # defaults during the migration (#1750); paired with the spring-boot-jackson2 bridge.
+  # Spring Boot 4 defaults to Jackson 3. Keep the auto-configured mapper on Jackson 2 default behavior
+  # (property order, enum and date handling) so the REST wire contract is unchanged from Spring Boot 3.
   jackson:
     use-jackson2-defaults: true
 

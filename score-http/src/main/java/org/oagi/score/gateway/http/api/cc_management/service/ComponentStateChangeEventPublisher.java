@@ -1,9 +1,5 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
@@ -11,7 +7,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.event.ComponentStateChangeEvent;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
-import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.JsonJackson3Codec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.impl.DefaultTypeResolverBuilder;
 
 import java.math.BigInteger;
 import java.util.UUID;
@@ -67,7 +70,7 @@ public class ComponentStateChangeEventPublisher {
      * (instead of Redisson's default Kryo) keeps the queue payload schema-tolerant: a consumer can
      * decode events produced before a field existed (the field stays {@code null}) and events
      * carrying fields it does not know yet (ignored), so publisher and consumer can be upgraded
-     * independently. {@link JsonJacksonCodec}'s mapper provides most of what the event needs:
+     * independently. {@link JsonJackson3Codec}'s mapper provides most of what the event needs:
      * class-typed default typing (the interface-typed {@link ManifestId} field is restored to its
      * concrete record, e.g. {@code ["...AccManifestId",10]}), {@code FAIL_ON_UNKNOWN_PROPERTIES}
      * disabled, and {@code NON_NULL} inclusion (an absent comment is simply omitted).
@@ -81,11 +84,18 @@ public class ComponentStateChangeEventPublisher {
      * already excludes {@code XMLGregorianCalendar} — keeps both directions symmetric: the scalar
      * id value round-trips plainly while the polymorphic types keep their {@code @class} info.</p>
      */
-    public static final Codec COMPONENT_STATE_CHANGE_EVENT_CODEC = new JsonJacksonCodec() {
+    public static final Codec COMPONENT_STATE_CHANGE_EVENT_CODEC = new JsonJackson3Codec() {
         @Override
-        protected void initTypeInclusion(ObjectMapper mapObjectMapper) {
-            TypeResolverBuilder<?> typer = new ObjectMapper.DefaultTypeResolverBuilder(
-                    ObjectMapper.DefaultTyping.NON_FINAL, mapObjectMapper.getPolymorphicTypeValidator()) {
+        protected void initTypeInclusion(JsonMapper.Builder builder) {
+            // Jackson 3 turns this on by default; the queue payload must keep the enum constant name().
+            builder.disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING);
+
+            // The stock codec's validator: do not reuse the mapper's own, or the polymorphic ManifestId is rejected.
+            PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+                    .allowIfBaseType(Object.class)
+                    .allowIfSubType(Object.class)
+                    .build();
+            builder.setDefaultTyping(new DefaultTypeResolverBuilder(typeValidator, DefaultTyping.NON_FINAL, "@class") {
                 @Override
                 public boolean useForType(JavaType t) {
                     while (t.isArrayType()) {
@@ -101,10 +111,7 @@ public class ComponentStateChangeEventPublisher {
                     }
                     return !t.isFinal(); // includes Object.class
                 }
-            };
-            typer.init(JsonTypeInfo.Id.CLASS, null);
-            typer.inclusion(JsonTypeInfo.As.PROPERTY);
-            mapObjectMapper.setDefaultTyping(typer);
+            });
         }
     };
 

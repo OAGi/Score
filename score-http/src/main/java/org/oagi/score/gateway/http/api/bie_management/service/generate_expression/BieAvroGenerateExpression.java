@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.api.bie_management.model.BIE;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryRecord;
@@ -60,8 +62,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         root = null;
     }
@@ -219,7 +220,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         String avroMap = xbt.avroMap();
         try {
             return mapper.readValue(avroMap, LinkedHashMap.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

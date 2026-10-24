@@ -92,14 +92,6 @@
     </properties>
 
     <dependencies>
-        <!-- Jackson 2 stop-gap bridge (#1750): Spring Boot 4 defaults to Jackson 3 (tools.jackson).
-             This keeps a Jackson 2 (com.fasterxml.jackson) ObjectMapper auto-configured and on the
-             classpath for the code still on Jackson 2 (and Redisson's Jackson 2 codec). Paired with
-             spring.jackson.use-jackson2-defaults=true. Remove once source is fully on Jackson 3. -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-jackson2</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -178,7 +170,7 @@
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
         <dependency>

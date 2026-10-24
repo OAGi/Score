@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.graph.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 

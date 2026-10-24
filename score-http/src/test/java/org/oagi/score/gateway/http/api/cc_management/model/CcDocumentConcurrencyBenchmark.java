@@ -4,7 +4,8 @@ import org.oagi.score.gateway.http.cache.RecordCache;
 import org.oagi.score.gateway.http.cache.RedisRecordCache;
 import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
 class CcDocumentConcurrencyBenchmark {
 
     private static final ScoreUser REQUESTER = new ScoreUser(null, "benchmark", "benchmark", null, false, null);
-    private static final ObjectMapper JSON = new ObjectMapper().findAndRegisterModules();
+    private static final ObjectMapper JSON = JsonMapper.builder().findAndAddModules().build();
 
     @Test
     void manyRequestsAtOnce() throws Exception {

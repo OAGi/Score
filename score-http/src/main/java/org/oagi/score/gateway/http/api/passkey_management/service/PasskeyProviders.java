@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.passkey_management.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.webauthn4j.converter.AttestationObjectConverter;
 import com.webauthn4j.converter.util.ObjectConverter;
 import com.webauthn4j.data.attestation.AttestationObject;
@@ -53,10 +53,10 @@ final class PasskeyProviders {
     static Map<UUID, Provider> load(ClassPathResource resource) {
         Map<UUID, Provider> providers = new HashMap<>();
         try (InputStream in = resource.getInputStream()) {
-            JsonNode document = new ObjectMapper().readTree(in);
+            JsonNode document = JsonMapper.builder().build().readTree(in);
             JsonNode icons = document.path("icons");
             JsonNode entries = document.path("providers");
-            entries.fields().forEachRemaining(entry -> {
+            entries.properties().forEach(entry -> {
                 String name = entry.getValue().path("name").asText("");
                 String light = icons.path(entry.getValue().path("icon_light").asText("")).asText("");
                 String dark = icons.path(entry.getValue().path("icon_dark").asText("")).asText("");

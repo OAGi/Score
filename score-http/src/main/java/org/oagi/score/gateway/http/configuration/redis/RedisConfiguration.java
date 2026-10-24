@@ -1,7 +1,5 @@
 package org.oagi.score.gateway.http.configuration.redis;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import org.redisson.Redisson;
@@ -19,12 +17,19 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.PlaceholderResolutionException;
 import org.springframework.util.StringUtils;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.impl.DefaultTypeResolverBuilder;
 
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -149,12 +154,28 @@ public class RedisConfiguration {
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setEnableTransactionSupport(false);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY);
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+        redisTemplate.setValueSerializer(eventValueSerializer());
 
         return redisTemplate;
+    }
+
+    /**
+     * Events carry id records that serialize as a bare {@code BigInteger} scalar ({@code @JsonValue}) and
+     * deserialize through a delegating {@code @JsonCreator}. Default typing must therefore skip
+     * {@code BigInteger}, or the reader demands a type wrapper the writer never emits.
+     */
+    static GenericJacksonJsonRedisSerializer eventValueSerializer() {
+        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType(Object.class)
+                .build();
+        JsonMapper mapper = JsonMapper.builder()
+                .setDefaultTyping(new DefaultTypeResolverBuilder(typeValidator, DefaultTyping.NON_FINAL, "@class") {
+                    @Override
+                    public boolean useForType(JavaType t) {
+                        return t.getRawClass() != BigInteger.class && super.useForType(t);
+                    }
+                })
+                .build();
+        return new GenericJacksonJsonRedisSerializer(mapper);
     }
 }

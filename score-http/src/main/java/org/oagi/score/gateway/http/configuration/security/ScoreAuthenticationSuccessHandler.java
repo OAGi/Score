@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +12,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyAuthenticationToken;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -66,7 +66,7 @@ public class ScoreAuthenticationSuccessHandler
             resp.put("authentication", (authentication instanceof PasskeyAuthenticationToken) ? "passkey" : "basic");
             resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
 
-            ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+            ObjectMapper objectMapper = JsonMapper.builder().build();
             objectMapper.writeValue(response.getOutputStream(), resp);
         } else if (principal instanceof OAuth2User) {
             OAuth2User oAuth2User = (OAuth2User) principal;

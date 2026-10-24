@@ -1,8 +1,10 @@
 package org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
@@ -109,19 +111,17 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         OpenAPIExpressionFormat openAPIExpressionFormat = option.getOpenAPIExpressionFormat();
         switch (openAPIExpressionFormat) {
             case YAML:
-                expressionMapper = new ObjectMapper(new YAMLFactory());
+                expressionMapper = YAMLMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
                 break;
             case JSON:
-                expressionMapper = new ObjectMapper();
+                expressionMapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
                 break;
         }
-        expressionMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         root = null;
         schemas = new LinkedHashMap<>();
@@ -1459,7 +1459,7 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
         String openApi31Map = xbt.openApi31Map();
         try {
             return mapper.readValue(openApi31Map, LinkedHashMap.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -2090,7 +2090,7 @@ public class OpenAPI31GenerateExpression implements BieGenerateOpenApiExpression
         ensureRoot();
 
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        String extension = (expressionMapper.getFactory() instanceof YAMLFactory) ? "yml" : "json";
+        String extension = (expressionMapper instanceof YAMLMapper) ? "yml" : "json";
 
         tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
 
