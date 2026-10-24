@@ -1,5 +1,5 @@
 import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
-import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, DoCheck, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {forkJoin, Observable, of} from 'rxjs';
 import {finalize, map, switchMap} from 'rxjs/operators';
@@ -179,7 +179,7 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-uplift.component.css']
 })
-export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
+export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost {
   private bizCtxService = inject(BusinessContextService);
   private bieListService = inject(BieListService);
   private accountService = inject(AccountListService);
@@ -222,6 +222,12 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
   >();
   private sourceWrapperByRawNode = new Map<BieFlatNode, BieUpliftSourceFlatNode>();
   private targetWrapperByRawNode = new Map<BieFlatNode, BieUpliftTargetFlatNode>();
+  /**
+   * What a render asks again and again, for every row, is answered once per change detection: the wrapper indexes
+   * are brought up to date once, and `getMatchDisabledReason` is worked out once per node (see `ngDoCheck`).
+   */
+  private wrappersIndexed = false;
+  private matchReasonCache: Map<BieUpliftTargetFlatNode, string>;
 
   innerY: number = window.innerHeight;
 
@@ -597,6 +603,11 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
     }
   }
 
+  ngDoCheck() {
+    this.wrappersIndexed = false;
+    this.matchReasonCache?.clear();
+  }
+
   onResize(event) {
     this.innerY = window.innerHeight;
   }
@@ -697,7 +708,16 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
     return !!node && node.reusedTopLevelAsbiepId !== undefined && node.reusedTopLevelAsbiepId !== null;
   }
 
+  private indexLoadedWrappers() {
+    if (!this.wrappersIndexed) {
+      this.indexSourceWrappers(this.sourceDataSource?.data || []);
+      this.indexTargetWrappers(this.targetDataSource?.data || []);
+      this.wrappersIndexed = true;
+    }
+  }
+
   private isTargetNodeCoveredByReuse(node: BieUpliftTargetFlatNode): boolean {
+    this.indexLoadedWrappers();
     let parent = node.parent as BieFlatNode;
     while (parent) {
       const parentIdentity = parent.self || parent;
@@ -722,6 +742,16 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
   }
 
   getMatchDisabledReason(node: BieUpliftTargetFlatNode): string {
+    this.matchReasonCache ??= new Map();
+    let reason = this.matchReasonCache.get(node);
+    if (reason === undefined) {
+      reason = this.computeMatchDisabledReason(node);
+      this.matchReasonCache.set(node, reason);
+    }
+    return reason;
+  }
+
+  private computeMatchDisabledReason(node: BieUpliftTargetFlatNode): string {
     if (node.level > 0 && this.isTargetNodeCoveredByReuse(node)) {
       return 'Already mapped by the selected reuse BIE';
     }
@@ -947,8 +977,12 @@ export class BieUpliftComponent implements OnInit, BieUpliftTreeRowHost {
                                 targetCandidates?: BieFlatNode[]): boolean {
     const sourceParentCandidates = sourceCandidates || this.sourceDataSource?.data || [];
     const targetParentCandidates = targetCandidates || this.targetDataSource?.data || [];
-    this.indexSourceWrappers(sourceParentCandidates);
-    this.indexTargetWrappers(targetParentCandidates);
+    if (sourceCandidates || targetCandidates) {
+      this.indexSourceWrappers(sourceParentCandidates);
+      this.indexTargetWrappers(targetParentCandidates);
+    } else {
+      this.indexLoadedWrappers();
+    }
     let sourceParent = this.getStructuralParent(sourceNode, sourceParentCandidates,
       this.sourceWrapperByRawNode) as BieUpliftSourceFlatNode;
     let targetParent = this.getStructuralParent(targetNode, targetParentCandidates,
