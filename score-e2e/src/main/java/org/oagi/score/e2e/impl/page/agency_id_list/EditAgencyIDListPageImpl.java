@@ -99,7 +99,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//score-search-bar//input");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =

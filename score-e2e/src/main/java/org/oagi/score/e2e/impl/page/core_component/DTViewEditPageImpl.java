@@ -468,6 +468,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         searchInput.sendKeys(Keys.ENTER);
         // The tree search re-renders its input once the search ran, so the element held above can be detached.
         clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
@@ -492,7 +494,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
@@ -791,7 +793,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public String getInvalidStateIconText(WebElement node) {
-        WebElement element = node.findElement(By.xpath("//mat-icon[contains(text(), \"error\")]"));
+        WebElement element = node.findElement(By.xpath(".//mat-icon[contains(text(), \"error\")]"));
         return element.getAttribute("mattooltip").toString();
     }
 

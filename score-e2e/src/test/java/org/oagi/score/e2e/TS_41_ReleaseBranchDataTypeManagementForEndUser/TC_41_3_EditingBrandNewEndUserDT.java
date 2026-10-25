@@ -72,6 +72,8 @@ public class TC_41_3_EditingBrandNewEndUserDT extends BaseTest {
             assertNotNull(option);
             waitFor(ofMillis(1000L));
             escape(getDriver());
+            // The panel has to be closed for good before the next click, or that click only closes it again.
+            waitFor(ofMillis(1000L));
         }
 
         dtViewEditPage.showValueDomain();

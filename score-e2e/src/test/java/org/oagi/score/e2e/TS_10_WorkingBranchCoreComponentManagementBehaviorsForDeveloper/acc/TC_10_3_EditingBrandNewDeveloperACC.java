@@ -328,7 +328,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getObjectClassTerm() + " Extension. Details");
+        WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Extension/" + acc.getObjectClassTerm() + " Extension. Details");
         ACCViewEditPage.ACCPanel extensionACCPanel = accViewEditPage.getACCPanel(extensionNode);
         String extensionObjectClassTerm = getText(extensionACCPanel.getObjectClassTermField());
         assertEquals(acc.getObjectClassTerm() + " Extension", extensionObjectClassTerm);
