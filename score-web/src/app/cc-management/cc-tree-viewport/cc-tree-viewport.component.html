@@ -15,6 +15,12 @@
           [innerHTML]="node.name | highlight : searcher.keywordFor(node, node.name)">
     </span>
 
+    @if (isInvalidState(node)) {
+      <div class="ps-2 align-self-center">
+        <mat-icon matTooltip="Invalid state">error</mat-icon>
+      </div>
+    }
+
     @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {
       <span class="node-cardinality ps-2">
         {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}

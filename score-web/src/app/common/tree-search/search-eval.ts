@@ -64,6 +64,8 @@ export type CompiledPredicate = (frame: Frame, env: Env) => boolean;
 export interface NameTest {
   /** The name as written, camel-case split; empty for `*`. */
   token: string;
+  /** The name as written, for a node whose own name has camel case in it (`newDerivedDT_ Code. Type`). */
+  raw?: string;
   any: boolean;
 }
 
@@ -113,7 +115,8 @@ function holds(name: string, token: string, env: Env): boolean {
 }
 
 export function passesTests(names: readonly string[], tests: NameTest[], env: Env): boolean {
-  return tests.every(test => test.any || names.some(name => holds(name, test.token, env)));
+  return tests.every(test => test.any || names.some(name => holds(name, test.token, env)
+    || test.raw !== undefined && test.raw !== test.token && holds(name, test.raw, env)));
 }
 
 /** The nodes an axis leads to from a node, nearest first for the reversed axes. */

@@ -134,7 +134,7 @@
     </ng-container>
     <ng-container treeDetailTree>
       <score-cc-tree-viewport #tree [dataSource]="dataSource" [searcher]="searcher" [(cursorNode)]="cursorNode"
-                              [height]="treeDetail.treeHeight" [contextMenu]="contextMenu"
+                              [height]="treeDetail.treeHeight" [contextMenu]="contextMenu" [isInvalidState]="isInvalidState"
                               (nodeClick)="onClick($event)" (nodeKey)="onTreeKey($event)"
                               (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event">
       </score-cc-tree-viewport>

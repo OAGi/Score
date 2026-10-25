@@ -23,6 +23,8 @@ export class CcTreeViewportComponent {
   @Input() isDraggable: (node: CcFlatNode) => boolean = () => false;
   @Input() showDragHandle: (node: CcFlatNode) => boolean = () => false;
   @Input() canDrop: () => boolean = () => true;
+  /** Whether a node is flagged with the invalid state icon (a BDT whose base BDT is deleted). */
+  @Input() isInvalidState: (node: CcFlatNode) => boolean = () => false;
 
   @Output() cursorNodeChange = new EventEmitter<CcFlatNode>();
   @Output() nodeClick = new EventEmitter<CcFlatNode>();
