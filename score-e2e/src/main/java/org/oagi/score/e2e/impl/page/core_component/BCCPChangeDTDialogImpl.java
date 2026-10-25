@@ -64,7 +64,7 @@ public class BCCPChangeDTDialogImpl extends SearchBarPageImpl implements BCCPCha
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select DT to update BCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select DT to update BCCP".equals(getText(title));
         return true;
     }
 

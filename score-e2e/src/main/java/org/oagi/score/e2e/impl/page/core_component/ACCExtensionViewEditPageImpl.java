@@ -366,8 +366,8 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];

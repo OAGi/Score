@@ -70,7 +70,7 @@ public class ASCCPCreateDialogImpl extends SearchBarPageImpl implements ASCCPCre
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to create ASCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select ACC to create ASCCP".equals(getText(title));
         return true;
     }
 

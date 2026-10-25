@@ -441,7 +441,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed()) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -451,7 +451,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed();
         return node;
     }
 
@@ -466,8 +466,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];

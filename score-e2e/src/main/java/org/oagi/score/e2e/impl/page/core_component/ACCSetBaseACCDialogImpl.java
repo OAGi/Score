@@ -64,7 +64,7 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to set a base ACC".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select ACC to set a base ACC".equals(getText(title));
         return true;
     }
 

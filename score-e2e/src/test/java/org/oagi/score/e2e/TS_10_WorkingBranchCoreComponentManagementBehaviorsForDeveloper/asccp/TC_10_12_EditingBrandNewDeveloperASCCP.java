@@ -475,7 +475,10 @@ public class TC_10_12_EditingBrandNewDeveloperASCCP extends BaseTest {
 
         acc.setObjectClassTerm(randomPropertyTerm);
         getAPIFactory().getCoreComponentAPI().updateACC(acc);
-        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc.getDen());
+        // The ACC node is now named after the new object class term (acc.getDen() still holds the old name), and the
+        // tree shows the change once the page is loaded again.
+        getDriver().navigate().refresh();
+        WebElement accNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + randomPropertyTerm + ". Details");
         ASCCPViewEditPage.ACCPanel accPanel = asccpViewEditPage.getACCPanel(accNode);
         assertEquals("1", getText(accPanel.getRevisionField()));
 
