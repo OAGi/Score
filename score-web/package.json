@@ -73,7 +73,7 @@
     "eslint": "^9.39.5",
     "jsdom": "^29.0.2",
     "mkdirp": "^1.0.4",
-    "ts-node": "~8.10.2",
+    "ts-node": "~10.9.2",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.0",
     "vitest": "^4.1.12"
