@@ -41,7 +41,7 @@ jobs:
         working-directory: score-web
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: score-web/.nvmrc
           cache: npm
@@ -62,7 +62,7 @@ jobs:
         project: [score-web, connect-center-api/docs]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: score-web/.nvmrc
       # Reads package-lock.json only, so nothing is installed. Fails on any advisory.
