@@ -24,7 +24,7 @@
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <selenium.version>4.49.0</selenium.version>
-        <junit.version>5.14.2</junit.version>
+        <junit.version>6.1.3</junit.version>
         <junit.platform.version>1.14.2</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>
         <slf4j.version>2.0.18</slf4j.version>
