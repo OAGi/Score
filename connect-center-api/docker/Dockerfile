@@ -1,6 +1,6 @@
 # The docs build output (.next standalone JS, static assets) is architecture independent, so it
 # runs on the build host's own platform: under QEMU (amd64 on Apple Silicon) `next build` segfaults.
-FROM --platform=$BUILDPLATFORM node:20-bookworm-slim AS docs-builder
+FROM --platform=$BUILDPLATFORM node:26-bookworm-slim AS docs-builder
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -18,7 +18,7 @@ RUN npm run build \
 
 # Target-platform pieces of the docs server: the node binary and the native sharp binaries
 # (installed at the version in docs/package-lock.json).
-FROM node:20-bookworm-slim AS node-runtime
+FROM node:26-bookworm-slim AS node-runtime
 
 WORKDIR /sharp
 COPY docs/package-lock.json /tmp/docs-package-lock.json
