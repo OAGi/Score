@@ -36,7 +36,7 @@
         <lombok.version>1.18.48</lombok.version>
         <awaitility.version>4.3.0</awaitility.version>
         <snakeyaml.version>2.6</snakeyaml.version>
-        <mariadb-client.version>3.5.10</mariadb-client.version>
+        <mariadb-client.version>4.0.0</mariadb-client.version>
         <!-- Match the HikariCP the Spring Boot 4.1 BOM resolves in score-http (#1750): the Boot 4.1
              upgrade bumped it 6.3.3 → 7.0.2. HikariCP 7 requires Java 17+, satisfied by the Java 21
              bump above. Keeps the e2e connection-pool library identical to the backend. -->
