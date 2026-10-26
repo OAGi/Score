@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
@@ -32,6 +33,7 @@ import tools.jackson.databind.jsontype.impl.DefaultTypeResolverBuilder;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -88,11 +90,25 @@ public class RedisConfiguration {
         return Collections.emptyList();
     }
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        org.springframework.data.redis.connection.RedisConfiguration redisConfiguration;
+    /**
+     * The one place that decides which Redis to connect to (cluster, sentinel or standalone) and where.
+     * Lettuce ({@link #redisConnectionFactory()}) and Redisson ({@link #redissonConfig}) are both built from it,
+     * so a change of environment cannot reach one client and miss the other.
+     */
+    org.springframework.data.redis.connection.RedisConfiguration redisTopology() {
         List<String> redisClusterNodes = getRedisClusterNodes();
         if (!redisClusterNodes.isEmpty()) {
+            return new RedisClusterConfiguration(redisClusterNodes);
+        } else if (StringUtils.hasLength(redisSentinelMaster())) {
+            return new RedisSentinelConfiguration(redisSentinelMaster(), getRedisSentinelNodes());
+        }
+        return new RedisStandaloneConfiguration(redisHost(), Integer.parseInt(redisPort()));
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        org.springframework.data.redis.connection.RedisConfiguration topology = redisTopology();
+        if (topology instanceof RedisClusterConfiguration clusterConfiguration) {
             // Without these a failed node keeps being asked, and every command to it waits for the (one minute) time-out,
             // because the client learns of the new master only when told to look at the cluster again.
             ClusterClientOptions clusterClientOptions = ClusterClientOptions.builder()
@@ -106,45 +122,37 @@ public class RedisConfiguration {
                     .clientOptions(clusterClientOptions)
                     .commandTimeout(Duration.ofSeconds(5))
                     .build();
-            return new LettuceConnectionFactory(new RedisClusterConfiguration(redisClusterNodes), clientConfiguration);
-        } else if (StringUtils.hasLength(redisSentinelMaster())) {
-            Set<String> redisSentinelNodes = getRedisSentinelNodes();
-            redisConfiguration = new RedisSentinelConfiguration(redisSentinelMaster(), redisSentinelNodes);
-        } else {
-            redisConfiguration = new RedisStandaloneConfiguration(redisHost(), Integer.parseInt(redisPort()));
+            return new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
         }
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfiguration);
-        return connectionFactory;
+        return new LettuceConnectionFactory(topology);
     }
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
+        return Redisson.create(redissonConfig(redisTopology()));
+    }
+
+    static Config redissonConfig(org.springframework.data.redis.connection.RedisConfiguration topology) {
         Config config = new Config();
         config.setTransportMode(TransportMode.NIO);
-        List<String> redisClusterNodes = getRedisClusterNodes();
-        if (!redisClusterNodes.isEmpty()) {
+        if (topology instanceof RedisClusterConfiguration clusterConfiguration) {
             config.useClusterServers()
-                    .setNodeAddresses(redisClusterNodes.stream().map(e -> {
-                        if (e.startsWith("redis://") || e.startsWith("rediss://")) {
-                            return e;
-                        }
-                        return "redis://" + e;
-                    }).collect(Collectors.toList()));
-        } else if (StringUtils.hasLength(redisSentinelMaster())) {
-            Set<String> redisSentinelNodes = getRedisSentinelNodes();
+                    .setNodeAddresses(redissonAddresses(clusterConfiguration.getClusterNodes()));
+        } else if (topology instanceof RedisSentinelConfiguration sentinelConfiguration) {
             config.useSentinelServers()
-                    .setMasterName(redisSentinelMaster())
-                    .setSentinelAddresses(redisSentinelNodes.stream().map(e -> {
-                        if (e.startsWith("redis://") || e.startsWith("rediss://")) {
-                            return e;
-                        }
-                        return "redis://" + e;
-                    }).collect(Collectors.toList()));
-        } else {
+                    .setMasterName(sentinelConfiguration.getRequiredMaster().getName())
+                    .setSentinelAddresses(redissonAddresses(sentinelConfiguration.getSentinels()));
+        } else if (topology instanceof RedisStandaloneConfiguration standaloneConfiguration) {
             config.useSingleServer()
-                    .setAddress("redis://" + redisHost() + ":" + redisPort());
+                    .setAddress("redis://" + standaloneConfiguration.getHostName() + ":" + standaloneConfiguration.getPort());
+        } else {
+            throw new IllegalStateException("Unsupported Redis configuration: " + topology.getClass().getName());
         }
-        return Redisson.create(config);
+        return config;
+    }
+
+    private static List<String> redissonAddresses(Collection<RedisNode> nodes) {
+        return nodes.stream().map(e -> "redis://" + e.getHost() + ":" + e.getPort()).collect(Collectors.toList());
     }
 
     @Bean
