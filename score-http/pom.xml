@@ -85,7 +85,7 @@
         <plantuml.version>1.2026.8</plantuml.version>
         <springdoc.version>3.1.1</springdoc.version>
         <snakeyaml.version>2.7</snakeyaml.version>
-        <json-schema-validator.version>2.0.7</json-schema-validator.version>
+        <json-schema-validator.version>3.0.8</json-schema-validator.version>
         <saxon.version>10.9</saxon.version>
         <xsom.version>4.0.9</xsom.version>
         <spring-ai.version>2.0.1</spring-ai.version>
