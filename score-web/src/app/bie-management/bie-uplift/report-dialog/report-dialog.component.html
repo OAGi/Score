@@ -21,7 +21,7 @@
     </mat-card>
   }
 
-  <score-table-view [table]="columns" [load]="load" [ready]="!loading" [syncUrl]="false">
+  <score-table-view emptyMessage="No Report Item" [table]="columns" [load]="load" [ready]="!loading" [syncUrl]="false">
 
     <ng-container scoreColumnDef="ccType">
       <td score-cell *scoreCellDef="let row">
@@ -68,6 +68,10 @@
           <span class="d-block">{{ row.message }}</span>
         }
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 

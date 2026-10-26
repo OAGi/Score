@@ -6,7 +6,7 @@
     </button>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" [selection]="selection" singleSelect
+  <score-table-view emptyMessage="No Account" [table]="columns" [load]="load" [selection]="selection" singleSelect
     [selectOnRowClick]="false" [busy]="busy()" pageFromResponse>
 
     <ng-container scoreColumnDef="loginId">
@@ -44,6 +44,10 @@
       <td score-cell *scoreCellDef="let element">
         {{ (element.enabled) ? 'Enable' : 'Disable' }}
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

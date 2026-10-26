@@ -11,6 +11,7 @@ import {BUSINESS_CONTEXT_VALUE_TABLE} from '../domain/business-context-value.tab
 import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {v4 as uuid} from 'uuid';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -32,6 +33,18 @@ export class BusinessContextCreateComponent implements OnInit {
   disabled: boolean;
 
   businessContext: BusinessContext;
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: BusinessContextValue): CompactRecord => ({
+    title: value.contextSchemeValue,
+    titleLabel: 'Context Scheme Value',
+    subtitle: value.contextSchemeValueMeaning,
+    subtitleLabel: value.contextSchemeValueMeaning ? 'Meaning' : undefined,
+    meta: [
+      ...(value.contextCategoryName ? [{label: 'Context Category', value: value.contextCategoryName}] : []),
+      ...(value.contextSchemeName ? [{label: 'Context Scheme', value: value.contextSchemeName}] : [])
+    ]
+  }));
 
   readonly columns = createTableColumns(BUSINESS_CONTEXT_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextValue>>(ScoreTableViewComponent);

@@ -6,7 +6,7 @@
       (libraryChange)="onLibraryChange($event)"/>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [selection]="selection" singleSelect searchClearsSort advancedSearchOpen rowHover advancedSearchOffset="14.5rem">
 
     <score-branch-selector searchPrefix multiple [releases]="releases" [selected]="selectedReleases"
@@ -128,6 +128,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-bie-compact-row [element]="element" [link]="'/profile_bie/' + element.topLevelAsbiepId" external/>
     </ng-container>
   </score-table-view>
   <ng-container ngProjectAs="[listActionBar]">

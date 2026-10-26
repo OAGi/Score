@@ -1,5 +1,5 @@
 <score-dialog-page title="Select Base Verb to {{this.action}} Verb">
-  <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
+  <score-table-view emptyMessage="No Base Verb" #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
         searchClearsSort pageFromResponse rowHover >
 
@@ -55,6 +55,11 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-cc-compact-row [element]="element" [label]="element.den" [link]="'core_component/acc/' + element.manifestId" external/>
     </ng-container>
 
     <ng-container *scoreDetailDef="let element">

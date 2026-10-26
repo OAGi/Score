@@ -8,6 +8,8 @@ import {AccountListEntry} from '../domain/accounts';
 import {ACCOUNT_TABLE} from '../domain/account.table';
 import {PendingAccount} from '../domain/pending-list';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {AccountCompactSource, accountCompactRecord} from '../../account-management/domain/account-compact';
 
 /**
  * The accounts of the list, with the column settings of the account list: the dialog shows whether an account is connected to
@@ -39,6 +41,9 @@ export class AccountListDialogComponent {
   pending = inject<PendingAccount>(MAT_DIALOG_DATA);
 
   title = 'Link to existing account';
+
+  /** What the compact row shows of an account: made once for a row. */
+  readonly compactRecord = memoizeRow((account: AccountCompactSource): CompactRecord => accountCompactRecord(account, {status: false}));
 
   readonly columns = createTableColumns(ACCOUNT_LIST_DIALOG_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);

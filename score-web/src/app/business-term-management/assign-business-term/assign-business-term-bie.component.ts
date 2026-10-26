@@ -98,6 +98,18 @@ export class AssignBusinessTermBieComponent {
     return this.auth.getUserToken();
   }
 
+  /** A BIE that is not the user's, and is in a state that others may not open. */
+  canOpen(element: AsbieBbieListEntry): boolean {
+    return this.isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared');
+  }
+
+  accessRestriction(element: AsbieBbieListEntry): string | undefined {
+    if (this.canOpen(element)) {
+      return undefined;
+    }
+    return element.access === 'Prohibited' ? 'Only the owner can access BIE in this state.' : 'This profile BIE is in progress.';
+  }
+
   get isAdmin(): boolean {
     return this.auth.isAdmin();
   }

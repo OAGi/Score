@@ -11,6 +11,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 import {ModuleService} from '../../domain/module.service';
 import {ModuleSetListEntry} from '../../domain/module';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const MODULE_SET_TABLE = defineTable({
   storageKey: 'TableColumns-ModuleSetPage',
@@ -46,6 +47,15 @@ export class ModuleSetListComponent implements OnInit {
 
   title = 'Module Set';
   readonly libraryChoice = new LibraryChoice(this.auth);
+
+  /** What the compact row shows of a module set: made once for a row. */
+  readonly compactRecord = memoizeRow((moduleSet: ModuleSetListEntry): CompactRecord => ({
+    title: moduleSet.name,
+    link: '/module_management/module_set/' + moduleSet.moduleSetId,
+    subtitle: moduleSet.guid,
+    meta: moduleSet.description ? [{label: 'Description', value: moduleSet.description, priority: 2}] : [],
+    updated: moduleSet.lastUpdated ? {when: moduleSet.lastUpdated.when, by: moduleSet.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(MODULE_SET_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ModuleSetListEntry>>(ScoreTableViewComponent);

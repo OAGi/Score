@@ -30,3 +30,36 @@
 .highlight {
   background: #42A948;
 }
+
+/* The controls of a row in the compact layout: side by side while they fit. */
+.compact-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+
+.compact-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.compact-control mat-select {
+  min-width: 80px;
+}
+
+.compact-label {
+  font-size: 12px;
+  color: #767676;
+}
+
+.compact-label {
+  white-space: nowrap;
+}
+
+/* The checkbox is taller than the selects: its spare height is not given to the row, and it is centred with the rest. */
+.compact-control mat-checkbox {
+  margin: -6px 0;
+}

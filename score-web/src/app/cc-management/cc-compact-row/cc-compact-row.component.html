@@ -1,0 +1,56 @@
+<ng-template #stateBadges let-element>
+  <span class="cc-state {{ element.state }}"
+        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.state).background,
+        'color': webPageInfo.getComponentStateColorSet(element.state).font}">{{ element.state | separate }}</span>
+  @if (element.deprecated) {
+    <span class="cc-state Deprecated"
+          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+          'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+  }
+</ng-template>
+
+<div class="cc-compact">
+  <div class="cc-compact-side">
+    @if (type()) {
+      <mat-chip>{{ type() }}</mat-chip>
+    }
+    <ng-container *ngTemplateOutlet="stateBadges; context: {$implicit: element()}"/>
+  </div>
+  <div class="cc-compact-body">
+    <div class="cc-compact-grid">
+      <div class="cc-compact-title score-break-word">
+        @if (isNew()) {
+          <span class="new-component me-2">New</span>
+        }
+        @if (link()) {
+          <a [routerLink]="link()" [target]="external() ? '_blank' : undefined" [attr.rel]="external() ? 'noopener noreferrer' : null">{{ label() }}</a>
+        } @else {
+          {{ label() }}
+        }
+        @for (tag of element().tagList; track tag) {
+          <span class="tag ms-2" [style.background-color]="tag.backgroundColor" [style.color]="tag.textColor">{{ tag.name }}</span>
+        }
+      </div>
+      <div class="description score-break-word">{{ element().guid }}</div>
+      @if (showOwner()) {
+        <div class="cc-compact-meta">
+          <span class="cc-rev">Rev. {{ element().log?.revisionNum }}</span>
+          <span class="cc-owner-line">
+            <span class="cc-owner">Owner <b>{{ element().owner?.loginId }}</b></span>
+            <span class="cc-compact-extra"><ng-content/></span>
+          </span>
+          @if (element().module) {
+            <span class="cc-module"><span class="cc-label">Module</span>{{ element().module }}</span>
+          }
+          @if (element().definition?.content) {
+            <span class="cc-definition"><span class="cc-label">Definition</span>{{ element().definition?.content }}</span>
+          }
+        </div>
+      }
+      <div class="cc-compact-updated">
+        <span class="cc-updated-when">Updated {{ element().lastUpdated.when | date: 'yyyy-MM-dd HH:mm' }}</span>
+        <span class="cc-updated-by">by <b>{{ element().lastUpdated.who.loginId }}</b></span>
+      </div>
+    </div>
+  </div>
+</div>

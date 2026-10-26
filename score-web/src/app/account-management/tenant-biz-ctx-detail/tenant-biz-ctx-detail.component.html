@@ -12,7 +12,7 @@
     }
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" [ready]="ready()" [busy]="busy()" [extraParams]="extraParams()">
+  <score-table-view emptyMessage="No Business Context" [table]="columns" [load]="load" [ready]="ready()" [busy]="busy()" [extraParams]="extraParams()">
 
     <ng-container scoreColumnDef="name">
       <td score-cell *scoreCellDef="let element">
@@ -44,6 +44,16 @@
           </button>
         }
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)">
+        @if (!addBusinessCtxToTenant) {
+          <button actions mat-raised-button color="warn" (click)="removeTenantBusinessCtx(element.businessContextId)">Remove</button>
+        } @else {
+          <button actions mat-raised-button color="accent" (click)="addTenantBusinessCtx(element.businessContextId)">Add</button>
+        }
+      </score-record-compact-row>
     </ng-container>
   </score-table-view>
 </score-list-page>

@@ -1,5 +1,5 @@
 <score-list-page title="Pending Account">
-  <score-table-view [table]="columns" [load]="load">
+  <score-table-view emptyMessage="No Pending Account" [table]="columns" [load]="load">
 
     <ng-container scoreColumnDef="preferredUsername">
       <td score-cell *scoreCellDef="let element">
@@ -27,6 +27,10 @@
       <td score-cell *scoreCellDef="let element">
         <span class="score-line-clamp-2 score-break-word">{{ element.creationTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

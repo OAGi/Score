@@ -17,6 +17,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {forkJoin} from 'rxjs';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -40,6 +41,18 @@ export class BusinessContextDetailComponent implements OnInit {
   disabled: boolean;
   hashCode;
   businessContext: BusinessContextDetails;
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: BusinessContextValue): CompactRecord => ({
+    title: value.contextSchemeValue,
+    titleLabel: 'Context Scheme Value',
+    subtitle: value.contextSchemeValueMeaning,
+    subtitleLabel: value.contextSchemeValueMeaning ? 'Meaning' : undefined,
+    meta: [
+      ...(value.contextCategoryName ? [{label: 'Context Category', value: value.contextCategoryName}] : []),
+      ...(value.contextSchemeName ? [{label: 'Context Scheme', value: value.contextSchemeName}] : [])
+    ]
+  }));
 
   readonly columns = createTableColumns(BUSINESS_CONTEXT_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextValue>>(ScoreTableViewComponent);

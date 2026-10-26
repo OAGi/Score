@@ -20,6 +20,8 @@ import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../co
 import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {memoizeRow} from '../../common/record-compact-row';
+import {codeListCompactRecord} from '../domain/code-list-compact';
 
 const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
@@ -60,6 +62,9 @@ export class CodeListUpliftComponent {
   private readonly cookieType = 'CC';
 
   readonly libraryChoice = new LibraryChoice(this.auth);
+  /** What the compact row shows of a code list: made once for a row. */
+  readonly compactRecord = memoizeRow(codeListCompactRecord);
+
   readonly columns = createTableColumns(CODE_LIST_UPLIFT_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<CodeListListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CodeListListEntry>(false, []);

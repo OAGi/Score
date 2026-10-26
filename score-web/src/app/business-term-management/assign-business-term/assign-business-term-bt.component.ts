@@ -11,6 +11,8 @@ import {BUSINESS_TERM_TABLE} from '../domain/business-term.table';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {base64Decode} from '../../common/utility';
 import {createTableColumns, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {businessTermCompactRecord} from '../domain/business-term-compact';
 
 @Component({
   standalone: false,
@@ -28,6 +30,9 @@ export class AssignBusinessTermBtComponent {
 
   title = 'Assign Business Term';
   subtitle = 'Select Business Term';
+
+  /** What the compact row shows of a business term: made once for a row. */
+  readonly compactRecord = memoizeRow(businessTermCompactRecord);
 
   readonly columns = createTableColumns(BUSINESS_TERM_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessTermListEntry>>(ScoreTableViewComponent);

@@ -6,14 +6,11 @@
   </ng-container>
   <ng-container ngProjectAs="[listActions]">
     @if (isDeveloper && libraryChoice.library?.libraryId) {
-      <button
-        (click)="create()" class="ms-2" color="primary" mat-raised-button>
-        New Module Set
-      </button>
+      <score-responsive-button label="New Module Set" (pressed)="create()"/>
     }
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Module Set" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     rowHover [busy]="busy()" [hiddenColumns]="isDeveloper ? [] : ['more']">
 
     <ng-container scoreColumnDef="name">
@@ -51,6 +48,10 @@
           <mat-icon>more_vert</mat-icon>
         </button>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 

@@ -9,6 +9,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {CcListComponent} from './cc-list.component';
 import {CcListService} from './domain/cc-list.service';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {CcCompactRowComponent} from '../cc-compact-row/cc-compact-row.component';
 import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog.component';
 import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dialog.component';
 import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
@@ -42,6 +43,7 @@ const routes: Routes = [
     ColumnSelectorModule,
     FontAwesomeModule,
     TitleWithLibrarySelector,
+    CcCompactRowComponent,
     ...SCORE_TABLE
   ],
   declarations: [

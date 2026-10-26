@@ -4,6 +4,7 @@ import {finalize} from 'rxjs/operators';
 import {MatchInfo} from '../domain/bie-uplift';
 import {BieUpliftService} from '../domain/bie-uplift.service';
 import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -18,6 +19,20 @@ export class ReportDialogComponent implements OnInit {
   data = inject(MAT_DIALOG_DATA);
 
 
+
+  /** What the compact row shows of a line of the report: made once for a row. */
+  readonly compactRecord = memoizeRow((row: MatchInfo): CompactRecord => ({
+    badges: row.ccType ? [{text: row.ccType}] : [],
+    title: row.sourceDisplayPath,
+    subtitle: row.targetDisplayPath ? '\u2193 ' + row.targetDisplayPath : undefined,
+    meta: [
+      ...(row.match ? [{label: 'Match', value: '' + row.match}] : []),
+      ...(row.reuse ? [{label: 'Reuse', value: '' + row.reuse, priority: 1 as const}] : []),
+      ...(row.status ? [{label: 'Status', value: row.status}] : []),
+      ...(!row.valid && row.message ? [{label: 'Message', value: row.message, priority: 2 as const}] : []),
+      ...(row.context ? [{label: 'Context', value: row.context, priority: 3 as const}] : [])
+    ]
+  }));
 
   readonly columns = createTableColumns(defineTable({
     storageKey: 'TableColumns-BieUpliftReportPage',

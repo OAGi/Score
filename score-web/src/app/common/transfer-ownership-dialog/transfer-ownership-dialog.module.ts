@@ -8,6 +8,7 @@ import {SearchBarModule} from '../search-bar/search-bar.module';
 import {ScoreCommonModule} from '../score-common.module';
 import {ColumnSelectorModule} from '../column-selector/column-selector.module';
 import {SCORE_TABLE} from '../score-table';
+import {RecordCompactRowComponent} from '../record-compact-row';
 
 @NgModule({
     imports: [
@@ -19,6 +20,7 @@ import {SCORE_TABLE} from '../score-table';
         SearchBarModule,
         ScoreCommonModule,
         ColumnSelectorModule,
+        RecordCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

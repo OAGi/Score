@@ -7,6 +7,8 @@ import {BusinessContextListEntry} from '../../context-management/business-contex
 import {BUSINESS_CONTEXT_TABLE} from '../../context-management/business-context/domain/business-context.table';
 import {AuthService} from '../../authentication/auth.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {businessContextCompactRecord} from '../../context-management/business-context/domain/business-context-compact';
 
 const BIZ_CTX_TABLE = defineTable({
   ...BUSINESS_CONTEXT_TABLE,
@@ -38,6 +40,10 @@ export class BieCopyBizCtxComponent {
 
   title = 'Copy BIE';
   subtitle = 'Select Business Contexts';
+
+  /** What the compact row shows of a business context: made once for a row. */
+  readonly compactRecord = memoizeRow((context: BusinessContextListEntry): CompactRecord =>
+    businessContextCompactRecord(context, {tenant: this.isTenantEnabled}));
 
   readonly columns = createTableColumns(this.isTenantEnabled ? BIZ_CTX_WITH_TENANT_TABLE : BIZ_CTX_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextListEntry>>(ScoreTableViewComponent);

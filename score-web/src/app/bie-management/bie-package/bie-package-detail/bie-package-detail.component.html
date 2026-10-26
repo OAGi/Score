@@ -122,7 +122,7 @@
       </mat-toolbar>
     </mat-card-header>
     <mat-card-content class="mat-card-container mb-4">
-      <score-table-view [table]="columns" [load]="load" [ready]="ready()" multiSort
+      <score-table-view emptyMessage="No Profile BIE" [table]="columns" [load]="load" [ready]="ready()" multiSort
         [selection]="(biePackage.state === 'WIP' && biePackage.access === 'CanEdit') ? selection : undefined" [rowKey]="rowKey"
         [selectAll]="false" [selectOnRowClick]="false" [rowClass]="rowClass">
 
@@ -256,6 +256,10 @@
               <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
             </div>
           </td>
+        </ng-container>
+        <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+        <ng-container *scoreCompactDef="let element">
+          <score-bie-compact-row [element]="element" [link]="'/profile_bie/' + element.topLevelAsbiepId" external/>
         </ng-container>
       </score-table-view>
     </mat-card-content>

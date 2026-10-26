@@ -11,6 +11,8 @@ import {AuthService} from '../../authentication/auth.service';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {SCORE_TABLE} from '../../common/score-table';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {RecordCompactRowComponent} from '../../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -47,6 +49,8 @@ const routes: Routes = [
         ConfirmDialogModule,
         CommonModule,
         ScoreCommonModule,
+        RecordCompactRowComponent,
+        ResponsiveButtonComponent,
         ...SCORE_TABLE
     ],
   declarations: [

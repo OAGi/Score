@@ -1,13 +1,13 @@
 @if (hasSearch) {
   <score-search-bar [showAdvancedSearch]="initialAdvancedSearch" [placeholder]="def.search?.placeholder ?? 'Search'"
-    [advancedSearch]="hasAdvancedSearch" [disabled]="searchDisabled()"
+    [advancedSearch]="hasAdvancedSearch" [disabled]="searchDisabled()" [wideBranchSelector]="searchPrefixWide()"
     [model]="def.search ? $any(query.values[def.search.key]) : ''"
     (modelChange)="def.search && onSearchModelChange($event)"
     (searchTriggered)="onSearch()">
     <ng-container ngProjectAs="[branchSelector]">
       <ng-content select="[searchPrefix]"></ng-content>
     </ng-container>
-    <div advancedSearchContent [style.padding-left]="advancedSearchOffset()">
+    <div advancedSearchContent [class.prefix-wide]="searchPrefixWide()" [style.padding-left]="advancedSearchOffset()">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
@@ -142,11 +142,14 @@
     }
     <ng-template #toolbar>
       @if (columnSelector()) {
-        <score-column-selector [state]="table()"></score-column-selector>
+        <!-- The compact row is the screen's own: there are no columns to choose. -->
+        @if (!compact()) {
+          <score-column-selector [state]="table()"></score-column-selector>
+        }
         <ng-content select="[toolbar]"></ng-content>
       }
     </ng-template>
-    <div class="mat-elevation-z1 table-wrapper mt-3">
+    <div #tableWrapper class="mat-elevation-z1 table-wrapper mt-3">
       <!-- Before the table: the headers have to be there when the table draws its header row. -->
       @for (column of defaultHeaderColumns(); track column) {
         <ng-template [scoreDefaultHeader]="column">
@@ -171,7 +174,7 @@
 
       @if (multiSort()) {
         <table mat-table scoreTable matMultiSort (matSortChange)="onMultiSortChange()" [dataSource]="dataSource"
-          [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.row-hover]="rowHover()">
+          [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.compact]="compact()" [class.row-hover]="rowHover()">
           @if (selection()) {
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
@@ -189,6 +192,15 @@
                   (change)="$event ? toggle(row) : null"
                   [checked]="isSelected(row)">
                 </mat-checkbox>
+              </td>
+            </ng-container>
+          }
+
+          @if (compactDef(); as compactRow) {
+            <ng-container matColumnDef="compact">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row" class="compact-cell">
+                <ng-container *ngTemplateOutlet="compactRow.template; context: {$implicit: row}"></ng-container>
               </td>
             </ng-container>
           }
@@ -217,7 +229,7 @@
       } @else {
         <table mat-table scoreTable
           matSort [matSortActive]="query.sorts[0]?.active" [matSortDirection]="$any(query.sorts[0]?.direction)" [matSortStart]="sortStart()"
-          [dataSource]="dataSource" [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.row-hover]="rowHover()">
+          [dataSource]="dataSource" [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.compact]="compact()" [class.row-hover]="rowHover()">
           @if (selection()) {
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
@@ -235,6 +247,15 @@
                   (change)="$event ? toggle(row) : null"
                   [checked]="isSelected(row)">
                 </mat-checkbox>
+              </td>
+            </ng-container>
+          }
+
+          @if (compactDef(); as compactRow) {
+            <ng-container matColumnDef="compact">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row" class="compact-cell">
+                <ng-container *ngTemplateOutlet="compactRow.template; context: {$implicit: row}"></ng-container>
               </td>
             </ng-container>
           }
@@ -260,6 +281,12 @@
               (click)="onDetailClick(row)"></tr>
           }
         </table>
+      }
+
+      <!-- The header row is not drawn in the compact layout: without rows, nothing would say that there are none. It is not a row of the
+           table (the table does not take back a no-data row once it has drawn it, and code that counts the rows must not see one). -->
+      @if (compact() && !loading() && !busy() && dataSource.data.length === 0) {
+        <div class="no-data">{{ emptyMessage() }}</div>
       }
 
       <mat-paginator

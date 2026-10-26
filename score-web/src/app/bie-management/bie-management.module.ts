@@ -1,4 +1,6 @@
 import {SCORE_TABLE} from '../common/score-table';
+import {BieCompactRowComponent} from './bie-compact-row/bie-compact-row.component';
+import {CcCompactRowComponent} from '../cc-management/cc-compact-row/cc-compact-row.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatBadgeModule} from '@angular/material/badge';
@@ -52,6 +54,7 @@ import {ColumnSelectorModule} from '../common/column-selector/column-selector.mo
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 import {BieDiagramDialogComponent} from './bie-diagram-dialog/bie-diagram-dialog.component';
 import {BieStateDependencyDialogComponent} from './bie-state-dependency-dialog/bie-state-dependency-dialog.component';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
 
 const routes: Routes = [
   {
@@ -171,6 +174,9 @@ const routes: Routes = [
         SearchBarModule,
         ColumnSelectorModule,
         TitleWithLibrarySelector,
+        BieCompactRowComponent,
+        CcCompactRowComponent,
+        RecordCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

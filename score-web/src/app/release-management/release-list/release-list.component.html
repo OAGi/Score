@@ -6,13 +6,11 @@
   </ng-container>
   <ng-container ngProjectAs="[listActions]">
     @if (userToken.roles.includes('developer') && libraryChoice.library?.libraryId) {
-      <button mat-raised-button class="ms-2" color="primary" (click)="create()">
-        New Release
-      </button>
+      <score-responsive-button label="New Release" (pressed)="create()"/>
     }
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
+  <score-table-view emptyMessage="No Release" [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
     [selection]="selection" [rowKey]="rowKey" [rowSelectable]="rowSelectable" [busy]="busy()"
     unselectableTooltip="This release cannot be modified.">
 
@@ -70,6 +68,10 @@
           </button>
         }
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 

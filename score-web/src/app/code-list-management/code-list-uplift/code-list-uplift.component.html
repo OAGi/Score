@@ -5,7 +5,7 @@
       (libraryChange)="onLibraryChange($event)"/>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()" [busy]="busy()"
+  <score-table-view emptyMessage="No Code List" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()" [busy]="busy()"
     [selection]="selection" singleSelect searchClearsSort rowHover advancedSearchOffset="25.5rem">
 
     <div searchPrefix class="d-flex align-items-center" style="width: 22rem; padding: 0 0.5rem 0 1rem;">
@@ -157,6 +157,10 @@
           class="element-detail-content"></p>
         </mat-card-content>
       </mat-card>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)" external/>
     </ng-container>
   </score-table-view>
   <ng-container ngProjectAs="[listActionBar]">

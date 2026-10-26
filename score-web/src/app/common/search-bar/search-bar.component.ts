@@ -16,6 +16,8 @@ export class SearchBarComponent {
   @Input() placeholder = 'Search';
   @Input() disabled = false;  // Add disabled input
   @Input() advancedSearch = true;
+  /** The branch selector is wide (more than one, say): it goes to a line above the search box on a tablet too, not just on a phone. */
+  @Input() wideBranchSelector = false;
 
   @Input()
   set model(value: string) {

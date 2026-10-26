@@ -2,7 +2,7 @@
   <score-title-with-library-selector dialogTitle [title]="title"
       [libraries]="mappedLibraries"
       (libraryChange)="onLibraryChange($event)"/>
-  <score-table-view [table]="columns" [load]="load" [selection]="selection" singleSelect
+  <score-table-view emptyMessage="No Code List" [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" advancedSearchOffset="11.5rem">
 
     <div searchPrefix class="d-flex">
@@ -116,6 +116,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 

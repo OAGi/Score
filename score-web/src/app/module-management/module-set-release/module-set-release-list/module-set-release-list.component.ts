@@ -11,6 +11,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 import {ModuleService} from '../../domain/module.service';
 import {ModuleSetReleaseListEntry} from '../../domain/module';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const MODULE_SET_RELEASE_TABLE = defineTable({
   storageKey: 'TableColumns-ModuleSetReleasePage',
@@ -46,6 +47,15 @@ export class ModuleSetReleaseListComponent implements OnInit {
 
   title = 'Module Set Release';
   readonly libraryChoice = new LibraryChoice(this.auth);
+
+  /** What the compact row shows of a module set release: made once for a row. */
+  readonly compactRecord = memoizeRow((moduleSetRelease: ModuleSetReleaseListEntry): CompactRecord => ({
+    badges: moduleSetRelease.releaseNum ? [{text: moduleSetRelease.releaseNum}] : [],
+    title: moduleSetRelease.name,
+    link: '/module_management/module_set_release/' + moduleSetRelease.moduleSetReleaseId,
+    meta: [{label: 'Default', value: moduleSetRelease.isDefault ? 'Yes' : 'No'}],
+    updated: moduleSetRelease.lastUpdated ? {when: moduleSetRelease.lastUpdated.when, by: moduleSetRelease.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(MODULE_SET_RELEASE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ModuleSetReleaseListEntry>>(ScoreTableViewComponent);

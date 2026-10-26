@@ -1,12 +1,12 @@
 <score-base-page [loading]="loading" [showToolbar]="false">
   <div class="row p-3">
-    <div class="col-3">
+    <div class="col-auto">
       <button mat-raised-button color="primary" (click)="backToMessages()">
         <span class="pe-2">&larr;</span>
         <span>Back to messages</span>
       </button>
     </div>
-    <div class="col-9 d-flex place-content-flex-end" (click)="discard()">
+    <div class="col d-flex place-content-flex-end" (click)="discard()">
       <button mat-raised-button color="warn">
         Discard
       </button>

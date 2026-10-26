@@ -1,11 +1,9 @@
 <score-list-page title="Account">
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="primary" routerLink="create">
-      New Account
-    </button>
+    <score-responsive-button label="New Account" link="create"/>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" pageFromResponse>
+  <score-table-view emptyMessage="No Account" [table]="columns" [load]="load" pageFromResponse>
 
     <ng-container scoreColumnDef="loginId">
       <td score-cell *scoreCellDef="let element">
@@ -44,6 +42,10 @@
       <td score-cell *scoreCellDef="let element">
         {{ (element.enabled) ? 'Enable' : 'Disable' }}
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

@@ -24,6 +24,7 @@ import {CodeListService} from '../../../code-list-management/domain/code-list.se
 import {finalize} from 'rxjs/operators';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -63,6 +64,14 @@ export class ContextSchemeDetailComponent implements OnInit {
   hashCode;
   businessContext;
   disabled: boolean;
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: ContextSchemeValue): CompactRecord => ({
+    title: value.value,
+    titleLabel: 'Value',
+    subtitle: value.meaning,
+    subtitleLabel: value.meaning ? 'Meaning' : undefined
+  }));
 
   readonly columns = createTableColumns(CONTEXT_SCHEME_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ContextSchemeValue>>(ScoreTableViewComponent);

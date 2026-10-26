@@ -330,7 +330,7 @@
       }
     </mat-toolbar>
     <mat-card>
-      <score-table-view #tableView [table]="columns" [load]="load" [selection]="access === 'CanEdit' ? selection : undefined"
+      <score-table-view emptyMessage="No Agency ID List Value" #tableView [table]="columns" [load]="load" [selection]="access === 'CanEdit' ? selection : undefined"
         [rowKey]="rowKey" [rowSelectable]="rowSelectable" [allRows]="allRows"
         [syncUrl]="false" [selectOnRowClick]="false" rowHover pageFromResponse (rowClick)="openDialog($any($event))">
 
@@ -363,6 +363,10 @@
 
         <ng-container scoreColumnDef="definitionSource">
           <td score-cell *scoreCellDef="let element"> {{ element.definition.source }}</td>
+        </ng-container>
+        <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+        <ng-container *scoreCompactDef="let element">
+          <score-record-compact-row [record]="compactRecord(element)"/>
         </ng-container>
       </score-table-view>
     </mat-card>

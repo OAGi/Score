@@ -1,13 +1,9 @@
 <score-list-page title="Message">
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="warn" matTooltip="Discard"
-      [hidden]="selection.selected.length === 0"
-      (click)="discard()">
-      Discard
-    </button>
+    <score-responsive-button label="Discard" icon="delete" color="warn" [hidden]="selection.selected.length === 0" (pressed)="discard()"/>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey">
+  <score-table-view emptyMessage="No Message" [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey">
 
     <ng-container scoreColumnDef="subject">
       <td score-cell *scoreCellDef="let element">
@@ -22,6 +18,10 @@
         <div class="ellipsis">{{ element.created.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
         <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.created.who.loginId }}</b></div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

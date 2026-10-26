@@ -11,6 +11,8 @@ import {TenantListService} from '../domain/tenant-list.service';
 import {TenantList} from '../domain/tenants';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {AccountCompactSource, accountCompactRecord} from '../../account-management/domain/account-compact';
 
 const TENANT_USER_TABLE = defineTable({
   ...ACCOUNT_TABLE,
@@ -38,6 +40,9 @@ export class TenantUserDetailComponent implements OnInit {
   tenantInfo: TenantList;
   tenantId: number;
   addUserToTenant = false;
+
+  /** What the compact row shows of an account: made once for a row. */
+  readonly compactRecord = memoizeRow((account: AccountCompactSource): CompactRecord => accountCompactRecord(account, {status: true}));
 
   readonly columns = createTableColumns(TENANT_USER_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<AccountListEntry>>(ScoreTableViewComponent);

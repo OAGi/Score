@@ -5,7 +5,7 @@
       (libraryChange)="onLibraryChange($event)"/>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Code List" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [filterOptions]="filterOptions()" [selection]="selection" [rowKey]="rowKey" singleSelect [syncUrl]="false" [columnSelector]="false"
     rowHover advancedSearchOffset="14.5rem">
 
@@ -111,6 +111,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdateUser }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
   <ng-container ngProjectAs="[listActionBar]">

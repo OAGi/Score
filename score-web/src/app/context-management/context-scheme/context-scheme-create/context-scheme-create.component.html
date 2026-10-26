@@ -49,7 +49,7 @@
   </score-detail-card>
 
   <score-detail-card heading="Context Scheme Values">
-    <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows"
+    <score-table-view emptyMessage="No Context Scheme Value" #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows"
       [syncUrl]="false" [selectOnRowClick]="false" rowHover pageFromResponse (rowClick)="openDialog($event)">
 
       <ng-container scoreColumnDef="value">
@@ -58,6 +58,10 @@
 
       <ng-container scoreColumnDef="meaning">
         <td score-cell *scoreCellDef="let element"> {{ element.meaning }}</td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-record-compact-row [record]="compactRecord(element)"/>
       </ng-container>
     </score-table-view>
     <ng-container ngProjectAs="[cardActions]">

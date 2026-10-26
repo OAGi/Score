@@ -1,0 +1,198 @@
+:host {
+  display: block;
+}
+
+.cc-compact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+/* Type above state, in a column of their own. */
+.cc-compact-side {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 72px;
+}
+
+/* The container of the block: what decides how the grid inside is laid out. */
+.cc-compact-body {
+  flex: 1 1 0;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+/* DEN, GUID and the rest on the left; the update on the right, at the foot of the block (beside GUID and the rest). */
+.cc-compact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+}
+
+.cc-compact-grid > * {
+  grid-column: 1;
+}
+
+.cc-compact-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* GUID stays on one line, at any width (the layouts below see to it that there is room for it; when there is none, it is cut). */
+.cc-compact-grid > .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cc-compact-meta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 2px 14px;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 12px;
+  color: #545454;
+}
+
+/* One line: revision, owner (with what the screen puts beside it, which may wrap inside its own item), then the module and the
+   definition, which are cut short when the line is full, and left out when the block is narrower (see below). */
+.cc-compact-meta > * {
+  flex: 0 0 auto;
+}
+
+.cc-compact-meta > .cc-owner-line {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: 0 14px;
+  min-width: 0;
+}
+
+.cc-compact-meta > .cc-module,
+.cc-compact-meta > .cc-definition {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cc-compact-meta > .cc-module {
+  max-width: 45%;
+}
+
+.cc-compact-meta > .cc-definition {
+  flex: 1 1 0;
+}
+
+.cc-label {
+  margin-right: 6px;
+  color: #767676;
+}
+
+.cc-compact-grid > .cc-compact-updated {
+  display: flex;
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: end;
+  font-size: 12px;
+  color: #545454;
+  white-space: nowrap;
+}
+
+.cc-compact-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 14px;
+  /* The items are the screen's, which this stylesheet cannot reach: a value moves to the next line whole, not in pieces. */
+  white-space: nowrap;
+}
+
+.cc-compact-extra:empty {
+  display: none;
+}
+
+.tag {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
+}
+
+.new-component {
+  border: 2px dotted rgb(220, 20, 60);
+  font-size: 11px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
+}
+
+/* A login id that does not fit is shortened, not pushed out of the row. */
+.cc-owner,
+.cc-updated-by {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.cc-owner b,
+.cc-updated-by b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0.25em;
+}
+
+/* What goes, and when: the definition first, then the module. */
+@container (max-width: 719px) {
+  .cc-compact-meta > .cc-definition {
+    display: none;
+  }
+}
+
+@container (max-width: 559px) {
+  .cc-compact-meta > .cc-module {
+    display: none;
+  }
+}
+
+/* No room for the update beside GUID (which must not break): one line under the rest. */
+@container (max-width: 399px) {
+  .cc-compact-grid > .cc-compact-updated {
+    display: block;
+    grid-column: 1 / -1;
+    grid-row: auto;
+    align-self: start;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cc-compact-updated > span + span {
+    margin-left: 0.35em;
+  }
+}
+
+/* Not room even for that line: when and who, one above the other. */
+@container (max-width: 239px) {
+  .cc-compact-grid > .cc-compact-updated {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: visible;
+  }
+
+  .cc-compact-updated > span + span {
+    margin-left: 0;
+  }
+}

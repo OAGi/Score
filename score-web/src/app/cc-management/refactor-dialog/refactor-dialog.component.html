@@ -6,7 +6,7 @@
   }
 
   <section>
-    <score-table-view #baseView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" singleSelect
+    <score-table-view emptyMessage="No ACC" #baseView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" singleSelect
       [syncUrl]="false" rowHover>
 
       <ng-container scoreColumnDef="type">
@@ -74,6 +74,11 @@
         </td>
       </ng-container>
 
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-cc-compact-row [element]="element" [label]="element.den" [type]="element.type" [link]="getRouterLink(element)" external/>
+      </ng-container>
+
       <ng-container *scoreDetailDef="let element">
         <mat-card class="mb-2">
           @if (element.definition.source) {
@@ -100,7 +105,7 @@
 
   <section>
     <div class="dialog-section-title">Analysis result and required action.</div>
-    <score-table-view #issueView [table]="issueColumns" [load]="issueLoad" [syncUrl]="false">
+    <score-table-view emptyMessage="No Issue" #issueView [table]="issueColumns" [load]="issueLoad" [syncUrl]="false">
 
       <ng-container scoreColumnDef="type">
         <td score-cell *scoreCellDef="let element">
@@ -175,6 +180,18 @@
             <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdateUser }}</b></div>
           </div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-record-compact-row [record]="issueRecord(element)" external>
+          <ul class="m-0 ps-3">
+            @for (reason of element.reasons; track reason) {
+              <li class="text-danger">{{ reason }}</li>
+            } @empty {
+              <li class="text-primary">Ready to refactor.</li>
+            }
+          </ul>
+        </score-record-compact-row>
       </ng-container>
     </score-table-view>
   </section>

@@ -7,6 +7,7 @@ import {Log} from '../domain/log';
 import {LogService} from '../domain/log.service';
 import {LogCompareDialogComponent} from '../log-compare-dialog/log-compare-dialog.component';
 import {createTableColumns, defineTable} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const LOG_TABLE = defineTable({
   storageKey: 'TableColumns-LogPage',
@@ -33,6 +34,14 @@ export class LogListComponent {
   private service = inject(LogService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
+
+  /** What the compact row shows of a revision: made once for a row. The box to compare it stays beside it. */
+  readonly compactRecord = memoizeRow((log: Log): CompactRecord => ({
+    badges: [{text: this.logAction(log)}],
+    title: 'Revision ' + log.revisionNum,
+    subtitle: log.hash?.substring(0, 8),
+    updated: {when: log.timestamp, by: log.loginId, label: 'Created'}
+  }));
 
   readonly columns = createTableColumns(LOG_TABLE);
   /** The two revisions to compare. */

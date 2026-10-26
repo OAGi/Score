@@ -1,6 +1,6 @@
 <score-dialog-page title="Assign Business Term">
   <div class="bt-assign-form">
-    <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
+    <score-table-view emptyMessage="No Business Term" #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
       [syncUrl]="false" searchClearsSort rowHover [busy]="busy()">
 
       <ng-container scoreColumnDef="businessTerm">
@@ -43,6 +43,10 @@
             </div>
           </div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-record-compact-row [record]="compactRecord(element)" external/>
       </ng-container>
     </score-table-view>
 

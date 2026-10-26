@@ -1,3 +1,16 @@
 :host {
   display: contents;
 }
+
+/* A title that is longer than the toolbar is cut, with an ellipsis, and does not push the buttons of the page (the actions) out of it. */
+.title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep mat-toolbar > button {
+  flex-shrink: 0;
+}

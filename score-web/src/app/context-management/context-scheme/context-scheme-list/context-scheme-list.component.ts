@@ -6,6 +6,7 @@ import {ContextSchemeListEntry} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const CONTEXT_SCHEME_TABLE = defineTable({
   storageKey: 'TableColumns-ContextSchemePage',
@@ -35,6 +36,23 @@ export class ContextSchemeListComponent {
   private service = inject(ContextSchemeService);
   private confirmDialogService = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of a context scheme: made once for a row. */
+  readonly compactRecord = memoizeRow((scheme: ContextSchemeListEntry): CompactRecord => ({
+    title: scheme.schemeName,
+    link: '/context_management/context_scheme/' + scheme.contextSchemeId,
+    subtitle: scheme.guid,
+    meta: [
+      ...(scheme.contextCategory ? [{
+        label: 'Context Category', value: scheme.contextCategory.name,
+        link: '/context_management/context_category/' + scheme.contextCategory.contextCategoryId
+      }] : []),
+      ...(scheme.schemeId ? [{label: 'Scheme ID', value: scheme.schemeId, priority: 1 as const}] : []),
+      ...(scheme.schemeAgencyId ? [{label: 'Agency ID', value: scheme.schemeAgencyId, priority: 2 as const}] : []),
+      ...(scheme.schemeVersionId ? [{label: 'Version', value: scheme.schemeVersionId, priority: 3 as const}] : [])
+    ],
+    updated: scheme.lastUpdated ? {when: scheme.lastUpdated.when, by: scheme.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(CONTEXT_SCHEME_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ContextSchemeListEntry>>(ScoreTableViewComponent);

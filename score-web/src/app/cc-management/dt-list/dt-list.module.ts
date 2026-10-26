@@ -1,4 +1,5 @@
 import {SCORE_TABLE} from '../../common/score-table';
+import {CcCompactRowComponent} from '../cc-compact-row/cc-compact-row.component';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
@@ -39,6 +40,7 @@ const routes: Routes = [
     ColumnSelectorModule,
     FontAwesomeModule,
     TitleWithLibrarySelector,
+    CcCompactRowComponent,
     ...SCORE_TABLE
   ],
   declarations: [

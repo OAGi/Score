@@ -3,6 +3,8 @@ import {HttpParams} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
 import {LibraryService} from '../domain/library.service';
 import {createTableColumns, defineTable} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {LibraryListEntry} from '../domain/library';
 
 const LIBRARY_TABLE = defineTable({
   storageKey: 'TableColumns-LibraryPage',
@@ -36,6 +38,22 @@ const LIBRARY_TABLE = defineTable({
 export class LibraryListComponent {
   private auth = inject(AuthService);
   private service = inject(LibraryService);
+
+  /** What the compact row shows of a library: made once for a row. */
+  readonly compactRecord = memoizeRow((library: LibraryListEntry): CompactRecord => ({
+    badges: library.type ? [{text: library.type}] : [],
+    titleBadges: library.isDefault ? [{text: 'Default', kind: 'state', cssClass: 'default-indicator', background: '#fdd835', font: '#212121'}] : [],
+    title: library.name,
+    link: '/library/' + library.libraryId,
+    meta: [
+      ...(library.organization ? [{
+        label: 'Organization', value: library.organization, href: library.link || undefined, priority: 1 as const
+      }] : []),
+      ...(library.domain ? [{label: 'Domain', value: library.domain, priority: 2 as const}] : []),
+      ...(library.description ? [{label: 'Description', value: library.description, priority: 3 as const}] : [])
+    ],
+    updated: library.lastUpdated ? {when: library.lastUpdated.when, by: library.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(LIBRARY_TABLE);
   readonly load = (params: HttpParams) => this.service.getLibraryList(params);

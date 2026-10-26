@@ -5,7 +5,7 @@
     </button>
   </ng-container>
   <mat-card class="pt-3">
-    <score-table-view [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false">
+    <score-table-view emptyMessage="No BIE Reuse" [table]="columns" [load]="load" [busy]="loading" [syncUrl]="false">
 
       <ng-container scoreColumnDef="releaseNum">
         <td score-cell *scoreCellDef="let element">
@@ -125,6 +125,14 @@
         <td score-cell *scoreCellDef="let element">
           <div class="score-line-clamp-2 score-break-word">{{ element.reusedRemark }}</div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <div class="reuse-pair">
+          <score-record-compact-row [record]="reusingRecord(element)" external/>
+          <div class="reuse-arrow">reuses</div>
+          <score-record-compact-row [record]="reusedRecord(element)" external/>
+        </div>
       </ng-container>
     </score-table-view>
   </mat-card>

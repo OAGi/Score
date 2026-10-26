@@ -1,4 +1,5 @@
 import {SCORE_TABLE} from '../../common/score-table';
+import {CcCompactRowComponent} from '../cc-compact-row/cc-compact-row.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AccPanelComponent} from '../detail-panels/acc-panel.component';
 import {AsccPanelComponent} from '../detail-panels/ascc-panel.component';
@@ -69,6 +70,7 @@ const routes: Routes = [
         BccPanelComponent,
         BccpPanelComponent,
         DtScPanelComponent,
+        CcCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

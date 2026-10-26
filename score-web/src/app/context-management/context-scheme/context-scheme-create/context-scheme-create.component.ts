@@ -18,6 +18,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {ContextCategoryService} from '../../context-category/domain/context-category.service';
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -51,6 +52,14 @@ export class ContextSchemeCreateComponent implements OnInit {
   disabled: boolean;
 
   contextSchemeCreateRequest: ContextSchemeCreateRequest;
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: ContextSchemeValue): CompactRecord => ({
+    title: value.value,
+    titleLabel: 'Value',
+    subtitle: value.meaning,
+    subtitleLabel: value.meaning ? 'Meaning' : undefined
+  }));
 
   readonly columns = createTableColumns(CONTEXT_SCHEME_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ContextSchemeValue>>(ScoreTableViewComponent);

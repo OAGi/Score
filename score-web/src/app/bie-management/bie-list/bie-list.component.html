@@ -39,7 +39,7 @@
     </button>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [selection]="selection" [rowSelectable]="rowSelectable" [busy]="busy()" searchClearsSort rowHover advancedSearchOffset="14.5rem">
 
     <score-branch-selector searchPrefix multiple [releases]="releases" [selected]="selectedReleases"
@@ -200,6 +200,11 @@
           <mat-icon>more_vert</mat-icon>
         </button>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-bie-compact-row [element]="element" [link]="canOpen(element) ? '/profile_bie/' + element.topLevelAsbiepId : undefined"
+        [restriction]="accessRestriction(element)"/>
     </ng-container>
   </score-table-view>
 
