@@ -1,9 +1,9 @@
 package org.oagi.score.gateway.http.api.log_management.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -492,8 +492,8 @@ public class LogRepository {
                     .fetchOne();
             this.logId = logRecord.getLogId();
             try {
-                this.content = (ObjectNode) new ObjectMapper().readTree(logRecord.getSnapshot().toString());
-            } catch (JsonProcessingException e) {
+                this.content = (ObjectNode) JsonMapper.builder().build().readTree(logRecord.getSnapshot().toString());
+            } catch (JacksonException e) {
                 this.content = nodeFactory.objectNode();
             }
         }

@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.integration_management.github.handler;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

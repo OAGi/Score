@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.integration_management.github.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.integration_management.github.client.GitHubApiClient;
 import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.api.integration_management.github.model.ProjectFieldOptions;

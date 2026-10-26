@@ -70,7 +70,7 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select DT to create BCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select DT to create BCCP".equals(getText(title));
         return true;
     }
 

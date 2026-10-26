@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.BieStateDependenciesRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.DeprecateBIERequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBieStateRequest;

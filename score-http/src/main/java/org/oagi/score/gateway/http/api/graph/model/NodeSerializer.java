@@ -1,10 +1,9 @@
 package org.oagi.score.gateway.http.api.graph.model;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class NodeSerializer extends StdSerializer<Node> {
@@ -14,24 +13,24 @@ public class NodeSerializer extends StdSerializer<Node> {
     }
 
     @Override
-    public void serialize(Node node, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(Node node, JsonGenerator gen, SerializationContext provider) {
         gen.writeStartObject();
-        gen.writeStringField("type", node.getTypeAsString());
-        gen.writeNumberField("manifestId", node.getManifestId().value().longValue());
+        gen.writeStringProperty("type", node.getTypeAsString());
+        gen.writeNumberProperty("manifestId", node.getManifestId().value().longValue());
         if (node.getBasedManifestId() != null) {
-            gen.writeNumberField("basedManifestId", node.getBasedManifestId().value().longValue());
+            gen.writeNumberProperty("basedManifestId", node.getBasedManifestId().value().longValue());
         }
         if (node.getLinkedManifestId() != null) {
-            gen.writeNumberField("linkedManifestId", node.getLinkedManifestId().value().longValue());
+            gen.writeNumberProperty("linkedManifestId", node.getLinkedManifestId().value().longValue());
         }
         if (node.getPrevManifestId() != null) {
-            gen.writeNumberField("prevManifestId", node.getPrevManifestId().value().longValue());
+            gen.writeNumberProperty("prevManifestId", node.getPrevManifestId().value().longValue());
         }
         if (!node.getTagList().isEmpty()) {
-            gen.writeObjectField("tagList", node.getTagList());
+            gen.writePOJOProperty("tagList", node.getTagList());
         }
         for (Map.Entry<String, Object> entry : node.getProperties().entrySet()) {
-            gen.writeObjectField(entry.getKey(), entry.getValue());
+            gen.writePOJOProperty(entry.getKey(), entry.getValue());
         }
         gen.writeEndObject();
     }

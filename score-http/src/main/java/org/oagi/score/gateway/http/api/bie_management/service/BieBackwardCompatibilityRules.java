@@ -1,7 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BackwardCompatibility;
 
 import java.math.BigInteger;
@@ -26,7 +27,7 @@ public final class BieBackwardCompatibilityRules {
     private BieBackwardCompatibilityRules() {
     }
 
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    private static final ObjectMapper JSON_MAPPER = JsonMapper.builder().build();
 
     /**
      * XSD built-in types whose only constraining facet is whitespace (no pattern / enumeration): they accept ANY

@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.graph.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.tag_management.model.TagSummaryRecord;

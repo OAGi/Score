@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.controller.payload;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.Asbie;
 import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieId;

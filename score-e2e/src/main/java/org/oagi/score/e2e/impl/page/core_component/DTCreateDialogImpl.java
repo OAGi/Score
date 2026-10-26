@@ -30,7 +30,7 @@ public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDia
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select based DT".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select based DT".equals(getText(title));
         return true;
     }
 

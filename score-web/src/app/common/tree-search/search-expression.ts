@@ -119,7 +119,7 @@ function plainStep(text: string): CompiledStep {
 
 function nameTest(name: string): NameTest {
   const trimmed = name.trim().replace(/^(["'])(.*)\1$/, '$2');
-  return {token: splitCamelCase(trimmed), any: trimmed === '*' || trimmed === ''};
+  return {token: splitCamelCase(trimmed), raw: trimmed, any: trimmed === '*' || trimmed === ''};
 }
 
 function step(axis: Axis, anywhere: boolean, tests: NameTest[], predicates: CompiledPredicate[] = [], flags: Partial<CompiledStep> = {}): CompiledStep {

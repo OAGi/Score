@@ -8,10 +8,11 @@ spring:
   aop:
     proxy-target-class: true
 
-  # Spring Boot 4 defaults to Jackson 3. Align the auto-configured mapper with Jackson 2
-  # defaults during the migration (#1750); paired with the spring-boot-jackson2 bridge.
   jackson:
-    use-jackson2-defaults: true
+    deserialization:
+      # Jackson 3 rejects an explicit JSON null for a primitive (boolean/int) request field; Jackson 2 read it as
+      # false/0, and the frontend may still send null for an untouched flag. Keep the lenient behavior.
+      fail-on-null-for-primitives: false
 
   servlet:
     multipart:

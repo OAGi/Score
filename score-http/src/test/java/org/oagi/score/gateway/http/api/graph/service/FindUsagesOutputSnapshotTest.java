@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.graph.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.junit.jupiter.api.Test;

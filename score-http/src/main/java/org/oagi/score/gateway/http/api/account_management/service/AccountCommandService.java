@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.account_management.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
@@ -174,8 +174,8 @@ public class AccountCommandService {
 
         byte[] bytes;
         try {
-            bytes = new ObjectMapper().writeValueAsBytes(validationInfo);
-        } catch (JsonProcessingException e) {
+            bytes = JsonMapper.builder().build().writeValueAsBytes(validationInfo);
+        } catch (JacksonException e) {
             throw new IllegalStateException("Failed to write an email validation info.", e);
         }
 
@@ -210,8 +210,8 @@ public class AccountCommandService {
 
         EmailValidationInfo emailValidationInfo;
         try {
-            emailValidationInfo = new ObjectMapper().readValue(decryptedObj, EmailValidationInfo.class);
-        } catch (IOException e) {
+            emailValidationInfo = JsonMapper.builder().build().readValue(decryptedObj, EmailValidationInfo.class);
+        } catch (JacksonException e) {
             throw new IllegalStateException("Failed to read an email validation info.", e);
         }
 

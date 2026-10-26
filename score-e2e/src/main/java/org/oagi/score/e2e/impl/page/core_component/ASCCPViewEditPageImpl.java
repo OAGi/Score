@@ -379,7 +379,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed()) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -389,7 +389,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed();
         return node;
     }
 
@@ -400,7 +400,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     private WebElement goToNode(String path) {
@@ -414,8 +414,10 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         });
         searchInput.sendKeys(Keys.ENTER);
         waitFor(ofMillis(1000L));
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
@@ -440,7 +442,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 click(asccpNode);
                 waitFor(ofMillis(500L));
             }
-            return new ASCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
+            return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCCP\"]]");
         });
     }
 

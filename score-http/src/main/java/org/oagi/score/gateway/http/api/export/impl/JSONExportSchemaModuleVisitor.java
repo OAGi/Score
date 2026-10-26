@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.export.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
@@ -72,7 +74,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
     public JSONExportSchemaModuleVisitor(CcDocument ccDocument, SchemaNamingStrategy namingStrategy) {
         this.ccDocument = ccDocument;
         this.moduleCcDocument = (ccDocument instanceof ModuleCcDocument moduleCcDocument) ? moduleCcDocument : null;
-        this.mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        this.mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
         this.namingStrategy = namingStrategy;
     }
 
@@ -537,7 +539,7 @@ public class JSONExportSchemaModuleVisitor implements ExportSchemaModuleVisitor 
 
         try {
             return mapper.readValue(jsonSchemaDefinition, LinkedHashMap.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException("Failed to parse JSON schema definition.", e);
         }
     }

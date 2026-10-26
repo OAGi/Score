@@ -1,7 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.api.bie_management.model.BieListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
@@ -114,8 +115,7 @@ public class BiePackageQueryService {
     }
 
     public File writeBiePackageManifestResponseToTempFile(BiePackageManifestResponse response) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectMapper objectMapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         // Create temp file
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);

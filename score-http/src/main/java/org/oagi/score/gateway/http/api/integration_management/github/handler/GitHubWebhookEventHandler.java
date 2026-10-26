@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.integration_management.github.handler;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Handles one (or more) GitHub webhook event type(s) (issue #1533). Each implementation decides whether

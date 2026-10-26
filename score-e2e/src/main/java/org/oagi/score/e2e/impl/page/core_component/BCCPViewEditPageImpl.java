@@ -255,7 +255,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
@@ -267,7 +267,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed()) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -277,7 +277,7 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed();
         return node;
     }
 
@@ -388,12 +388,12 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             return new BCCPPanelContainer() {
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[2]");
+                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCCP\"]]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("(//div[contains(@class, \"tree-detail-panel\")])[3]");
+                    return new DTPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"DT\"]]");
                 }
             };
         });
@@ -409,8 +409,10 @@ public class BCCPViewEditPageImpl extends BasePageImpl implements BCCPViewEditPa
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];

@@ -91,6 +91,15 @@ describe('PathPattern', () => {
     expect(pattern.isMatch(pattern.step(0, 'Release'))).toBe(false);
   });
 
+  it('finds a node whose own name has camel case in it by that name', () => {
+    const pattern = new PathPattern('/newDerivedDT_ Code. Type/Code. List. Identifier', false, {exact: true});
+    const root = pattern.step(pattern.initialMask, 'newDerivedDT_ Code. Type');
+    expect(pattern.isMatch(pattern.step(root, 'Code. List. Identifier'))).toBe(true);
+    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Other. Type'), 'Code. List. Identifier'))).toBe(false);
+    const loose = new PathPattern('newDerivedDT_ Code. Type');
+    expect(loose.isMatch(loose.step(0, 'newDerivedDT_ Code. Type'))).toBe(true);
+  });
+
   it('reads an exact pattern as whole names', () => {
     const pattern = new PathPattern('/Root/Header', false, {exact: true});
     expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Root'), 'Header'))).toBe(true);

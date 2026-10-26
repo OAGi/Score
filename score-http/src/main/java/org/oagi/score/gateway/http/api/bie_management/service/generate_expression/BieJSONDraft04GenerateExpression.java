@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.common.collect.ImmutableMap;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
@@ -79,8 +81,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         root = null;
         reusedTopLevelAsbiepNameMap = null;
@@ -456,7 +457,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         String jbtDraft05Map = getXbtJsonSchemaMap(xbt);
         try {
             return mapper.readValue(jbtDraft05Map, LinkedHashMap.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -71,7 +72,7 @@ class CachedCcDocumentEquivalenceTest {
     private static TestDataSource dataSource;
     private static DSLContext dsl;
     private static final ScoreUser REQUESTER = new ScoreUser(null, "equivalence", "equivalence", null, false, null);
-    private static final ObjectMapper JSON = new ObjectMapper().findAndRegisterModules();
+    private static final ObjectMapper JSON = JsonMapper.builder().findAndAddModules().build();
 
     @BeforeAll
     static void connect() {

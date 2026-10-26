@@ -65,7 +65,7 @@ public class ASCCPChangeACCDialogImpl extends SearchBarPageImpl implements ASCCP
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to update ASCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select ACC to update ASCCP".equals(getText(title));
         return true;
     }
 
