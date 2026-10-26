@@ -22,7 +22,7 @@
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^3.0.1",
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^12.2.0",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
