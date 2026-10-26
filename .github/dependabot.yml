@@ -1,12 +1,15 @@
 version: 2
 
 # Version updates are grouped per ecosystem and directory (minor and patch together) so that
-# each week brings few pull requests. Security updates are raised on their own by Dependabot.
+# each week brings few pull requests. Major upgrades are ignored here and done by hand as migrations. Security updates are raised on their own by Dependabot.
 updates:
   - package-ecosystem: npm
     directory: /score-web
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -14,6 +17,9 @@ updates:
     directory: /connect-center-api/docs
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -21,6 +27,9 @@ updates:
     directory: /score-external-api
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -28,6 +37,9 @@ updates:
     directory: /score-http
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -35,6 +47,9 @@ updates:
     directory: /score-e2e
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -42,6 +57,9 @@ updates:
     directory: /connect-center-api
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch: {update-types: [minor, patch]}
 
@@ -49,33 +67,54 @@ updates:
     directory: /docs/user_guide
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /score-http/docker
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /score-web/docker
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /score-repo/docker
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /score-external-api/docker
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /connect-center-api/docker
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
     target-branch: develop
     schedule: {interval: weekly}
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
