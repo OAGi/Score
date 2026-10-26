@@ -42,7 +42,7 @@
              bump above. Keeps the e2e connection-pool library identical to the backend. -->
         <hikariCP.version>7.0.2</hikariCP.version>
         <jOOQ.version>3.20.20</jOOQ.version>
-        <json.version>20250517</json.version>
+        <json.version>20260814</json.version>
         <!-- Matches the score-http poi.version: e2e generates multi-worksheet .xlsx upload
              fixtures at runtime with the same library the production parser reads them with. -->
         <poi.version>5.5.1</poi.version>
