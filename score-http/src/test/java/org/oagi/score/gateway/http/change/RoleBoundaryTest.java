@@ -23,10 +23,10 @@ class RoleBoundaryTest {
     private static final Path SOURCES = Path.of("src/main/java/org/oagi/score/gateway/http");
     private static final Pattern IMPORT = Pattern.compile("^import\\s+(?:static\\s+)?([\\w.]+);", Pattern.MULTILINE);
 
-    /** The parts of the events that the cache may use: what is published, the reader it asks to catch up, and what a change names. */
+    /** The parts of the events that the cache may use: what is published, the reader it asks to catch up, the signal that tells the other instances, and what a change names. */
     private static final List<String> EVENT_CONTRACT = List.of(
             BASE + "change.ChangeLogEntry", BASE + "change.RecordsChangedEvent", BASE + "change.ChangeLogReadEvent",
-            BASE + "change.ChangeLogReader", BASE + "change.ChangeEvent", BASE + "change.RecordType", BASE + "change.RecordRef",
+            BASE + "change.ChangeLogReader", BASE + "change.ChangeSignal", BASE + "change.ChangeEvent", BASE + "change.RecordType", BASE + "change.RecordRef",
             BASE + "change.propagation.PropagationConsumer", BASE + "change.propagation.PropagationResult");
 
     @Test

@@ -369,6 +369,14 @@ class RecordCacheFreshnessTest {
                 "update dt set qualifier = nullif(left(qualifier, char_length(qualifier) - 1), '') where dt_id = ?", dtId);
     }
 
+    /** What transferring an ACC to another user does to the database: the owner of the ACC is the one thing that changes. */
+    @Test
+    void aTransferOfAnAccToAnotherUserIsSeenAtOnce() throws Exception {
+        long newOwnerId = dsl.fetchOne("select min(app_user_id) from app_user where app_user_id <> ?", ownerId).get(0, Long.class);
+        check("acc owner", true, manifestKeys("acc", "acc_id", accId), "update acc set owner_user_id = " + newOwnerId + " where acc_id = ?",
+                "update acc set owner_user_id = " + ownerId + " where acc_id = ?", accId);
+    }
+
     @Test
     void aChangeOfANamespaceOfAnXbtOrOfTheAllowedPrimitivesIsSeenAtOnce() throws Exception {
         check("namespace", true, Set.of("namespace:" + namespaceId), "update namespace set uri = concat(uri, 'x') where namespace_id = ?",

@@ -33,7 +33,8 @@ public class RecordChangeWatchdog implements ChangeLogReader {
     private static final Logger logger = LoggerFactory.getLogger(RecordChangeWatchdog.class);
 
     private static final int BATCH = 5000;
-    private static final long POLL_MILLIS = 500;
+    /** Only the safety net: a commit of any instance wakes the reader at once (see {@link ChangeSignal}), and so does a reader of records. */
+    private static final long POLL_MILLIS = 1000;
     /** How many of the latest rows are read again at start, in case their transactions were still open. */
     private static final long STARTUP_LOOK_BACK = 10_000;
     static final long GAP_LIFETIME_NANOS = Duration.ofHours(1).toNanos();
