@@ -36,8 +36,8 @@
           </div>
         </div>
       </a>
-      <mat-list-item class="nav-item {{ active === 'ApplicationSettings' ? 'active' : '' }}"
-        [routerLink]="isAdmin ? '/settings/application_settings' : null" [disabled]="!isAdmin">
+      <mat-list-item class="nav-item {{ applicationSettingsActive ? 'active' : '' }}"
+        [routerLink]="isAdmin ? '/settings/application_settings/features' : null" [disabled]="!isAdmin">
         <div class="d-flex">
           <mat-icon mat-list-icon>developer_mode</mat-icon>
           <div mat-line style="padding-left: 10px; align-content: center;">
@@ -48,6 +48,14 @@
           </div>
         </div>
       </mat-list-item>
+      @if (isAdmin) {
+        @for (item of applicationSettingsItems; track item.key) {
+          <a class="vertical-align sub-item" mat-list-item class="nav-item sub-item {{ active === 'ApplicationSettings:' + item.key ? 'active' : '' }}"
+            [routerLink]="'/settings/application_settings/' + item.key">
+            <span class="sub-label">{{ item.label }}</span>
+          </a>
+        }
+      }
     </mat-list>
   </div>
 </div>

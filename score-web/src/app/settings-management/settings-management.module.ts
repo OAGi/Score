@@ -57,9 +57,36 @@ const routes: Routes = [
   },
   {
     path: 'settings/application_settings',
+    pathMatch: 'full',
+    redirectTo: 'settings/application_settings/features'
+  },
+  {
+    path: 'settings/application_settings/features',
     component: SettingsApplicationSettingsComponent,
+    data: {section: 'features'},
     canActivate: [CanActivateAdmin],
-    title: 'Application Settings'
+    title: 'Application Features'
+  },
+  {
+    path: 'settings/application_settings/smtp',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'smtp'},
+    canActivate: [CanActivateAdmin],
+    title: 'SMTP Settings'
+  },
+  {
+    path: 'settings/application_settings/filename-expressions',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'filename-expressions'},
+    canActivate: [CanActivateAdmin],
+    title: 'Filename Expressions'
+  },
+  {
+    path: 'settings/application_settings/web-page',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'web-page'},
+    canActivate: [CanActivateAdmin],
+    title: 'Web Page Settings'
   }
 ];
 

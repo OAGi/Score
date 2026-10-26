@@ -1,4 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -12,6 +13,15 @@ import {ApplicationSettingsInfo} from './domain/application-settings';
 import {MailService} from '../../common/score-mail.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
+export type ApplicationSettingsSection = 'features' | 'smtp' | 'filename-expressions' | 'web-page';
+
+const APPLICATION_SETTINGS_SECTIONS: Record<ApplicationSettingsSection, string> = {
+  'features': 'Application Features',
+  'smtp': 'SMTP Settings',
+  'filename-expressions': 'Filename Expressions',
+  'web-page': 'Web Page Settings'
+};
+
 @Component({
   standalone: false,
   selector: 'score-settings-application-settings',
@@ -20,6 +30,7 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrls: ['./settings-application-settings.component.css']
 })
 export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
   private sanitizer = inject(DomSanitizer);
   private settingsService = inject(SettingsApplicationSettingsService);
@@ -32,7 +43,18 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
   applicationSettingsInfo: ApplicationSettingsInfo;
   webPageInfo: WebPageInfo;
 
-  title = 'Application settings';
+  /** Which of the application-settings pages is shown (see the routes). */
+  section: ApplicationSettingsSection = this.route.snapshot.data['section'] || 'features';
+
+  get sectionTitle(): string {
+    return APPLICATION_SETTINGS_SECTIONS[this.section];
+  }
+
+  /** The entry of the settings menu that belongs to the page. */
+  get menuItem(): string {
+    return 'ApplicationSettings:' + this.section;
+  }
+
   loading = false;
   bieSchemaSampleFilename = '';
   bieSchemaSampleDuplicateFilename = '';
