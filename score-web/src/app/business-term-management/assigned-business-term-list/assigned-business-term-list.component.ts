@@ -7,6 +7,7 @@ import {AsbieBbieListEntry, AssignedBusinessTermListEntry, BieToAssign} from '..
 import {BusinessTermService} from '../domain/business-term.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const BIE_TYPES = [{value: 'BBIE', label: 'BBIE'}, {value: 'ASBIE', label: 'ASBIE'}];
 
@@ -52,6 +53,24 @@ export class AssignedBusinessTermListComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of an assignment of a business term to a BIE: made once for a row. */
+  readonly compactRecord = memoizeRow((assigned: AssignedBusinessTermListEntry): CompactRecord => ({
+    badges: [
+      ...(assigned.bieType ? [{text: assigned.bieType}] : []),
+      ...(assigned.primaryIndicator ? [{text: 'Primary'}] : [])
+    ],
+    title: assigned.den,
+    link: '/business_term_management/assign_business_term/details/' + assigned.assignedBizTermId,
+    linkQueryParams: {type: assigned.bieType, id: assigned.assignedBizTermId},
+    subtitle: assigned.businessTerm,
+    meta: [
+      ...(assigned.typeCode ? [{label: 'Type Code', value: assigned.typeCode, priority: 1 as const}] : []),
+      ...(assigned.externalReferenceId ? [{label: 'Reference ID', value: assigned.externalReferenceId, priority: 2 as const}] : []),
+      ...(assigned.externalReferenceUri ? [{label: 'URI', value: assigned.externalReferenceUri, href: assigned.externalReferenceUri, priority: 3 as const}] : [])
+    ],
+    updated: assigned.lastUpdated ? {when: assigned.lastUpdated.when, by: assigned.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(ASSIGNED_BUSINESS_TERM_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<AssignedBusinessTermListEntry>>(ScoreTableViewComponent);

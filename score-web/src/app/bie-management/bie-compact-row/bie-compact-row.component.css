@@ -1,0 +1,174 @@
+:host {
+  display: block;
+}
+
+.bie-compact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+/* State above branch, in a column of their own. */
+.bie-compact-side {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 72px;
+}
+
+/* The container of the block: how much of the rest there is room for is a matter of its width. */
+.bie-compact-body {
+  flex: 1 1 0;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.bie-compact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+}
+
+.bie-compact-grid > * {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.bie-compact-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bie-compact-guid {
+  font-size: 11px;
+  color: #767676;
+}
+
+.bie-compact-meta {
+  font-size: 12px;
+  color: #545454;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0 14px;
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Everything on one line: what does not fit is cut by the width (see below), and the remark, the last, is shortened. */
+.bie-compact-meta > * {
+  flex: 0 0 auto;
+}
+
+.bie-compact-meta > .bie-remark {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bie-contexts a + a::before {
+  content: ', ';
+  color: #545454;
+}
+
+.bie-compact-label {
+  margin-right: 6px;
+  color: #767676;
+}
+
+b {
+  margin-left: 0.25em;
+}
+
+/* The update, at the foot of the block, beside GUID and the owner line. */
+.bie-compact-grid > .bie-compact-updated {
+  display: flex;
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: end;
+  font-size: 12px;
+  color: #545454;
+  white-space: nowrap;
+}
+
+/* What the screen puts inside the element (e.g. the controls of a row): under everything else, across the width. */
+.bie-compact-grid > .bie-compact-slot {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  margin-top: 6px;
+}
+
+.bie-compact-grid > .bie-compact-slot:empty {
+  display: none;
+}
+
+/* What goes, and when: the narrower the block, the less of it. They are on one line, beside the update: the thresholds are what each of
+   them needs, with those before it. */
+@container (max-width: 699px) {
+  .bie-remark {
+    display: none;
+  }
+}
+
+@container (max-width: 659px) {
+  .bie-biz-term {
+    display: none;
+  }
+}
+
+@container (max-width: 559px) {
+  .bie-contexts {
+    display: none;
+  }
+}
+
+@container (max-width: 459px) {
+  .bie-status {
+    display: none;
+  }
+}
+
+@container (max-width: 379px) {
+  .bie-version {
+    display: none;
+  }
+}
+
+/* No room for the update beside the rest: one line under it (the last to go, when there is not even room for that). */
+@container (max-width: 339px) {
+  .bie-compact-grid > .bie-compact-updated {
+    display: block;
+    grid-column: 1 / -1;
+    grid-row: auto;
+    align-self: start;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bie-compact-updated > span + span {
+    margin-left: 0.35em;
+  }
+}
+
+/* Not room even for that line: when and who, one above the other. */
+@container (max-width: 239px) {
+  .bie-compact-grid > .bie-compact-updated {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: visible;
+  }
+
+  .bie-compact-updated > span + span {
+    margin-left: 0;
+  }
+}

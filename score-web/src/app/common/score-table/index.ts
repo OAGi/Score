@@ -6,4 +6,5 @@ export * from './score-table-view.component';
 export * from './score-table-view.token';
 export * from './score-table';
 export * from './score-detail-def.directive';
+export * from './score-compact-def.directive';
 export * from './in-memory-load';

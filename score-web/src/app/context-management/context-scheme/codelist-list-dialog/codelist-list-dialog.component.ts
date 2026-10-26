@@ -14,6 +14,8 @@ import {ReleaseService} from '../../../release-management/domain/release.service
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryService} from '../../../library-management/domain/library.service';
+import {memoizeRow} from '../../../common/record-compact-row';
+import {codeListCompactRecord} from '../../../code-list-management/domain/code-list-compact';
 
 @Component({
   standalone: false,
@@ -36,6 +38,9 @@ export class CodelistListDialogComponent implements OnInit {
   releaseStateList = ['Published', 'Production'];
   /** Where the chosen branch is remembered. */
   private readonly cookieType = 'CC';
+
+  /** What the compact row shows of a code list: made once for a row. */
+  readonly compactRecord = memoizeRow(codeListCompactRecord);
 
   readonly columns = createTableColumns(CODE_LIST_TABLE);
   selection = new SelectionModel<CodeListListEntry>(true, []);

@@ -17,6 +17,8 @@ import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {SCORE_TABLE} from '../../common/score-table';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
+import {RecordCompactRowComponent} from '../../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -56,6 +58,8 @@ const routes: Routes = [
         FontAwesomeModule,
         SearchBarModule,
         ColumnSelectorModule,
+        RecordCompactRowComponent,
+        ResponsiveButtonComponent,
         ...SCORE_TABLE,
         TitleWithLibrarySelector
     ],

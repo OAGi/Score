@@ -29,3 +29,65 @@ table.row-hover tr.element-row:not(.expanded-row):hover {
 table.row-hover tr.element-row:not(.expanded-row):active {
   background: #efefef;
 }
+
+/* The compact row: the header row has nothing left to show, and the cell is the whole row. */
+table.compact tr.mat-mdc-header-row {
+  display: none;
+}
+
+table.compact td.compact-cell {
+  padding: 8px 16px 8px 0;
+}
+
+/* The checkbox and the fixed columns (a row menu) of the compact row keep little room: the row needs it. The cells of the screen are
+   reached with `::ng-deep`; Material's own padding of the first and the last cell is stronger than a plain rule. */
+table.compact td.mat-column-select {
+  padding: 0 4px 0 12px !important;
+}
+
+table.compact tr.element-row ::ng-deep td.mat-mdc-cell:not(.compact-cell):not(.mat-column-select) {
+  padding: 0 4px 0 0 !important;
+}
+
+table.compact tr.element-row ::ng-deep td.mat-mdc-cell:not(.compact-cell):not(.mat-column-select) .mat-mdc-icon-button {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+}
+
+/* The compact layout without rows (the other layouts have their header row). */
+.no-data {
+  padding: 16px;
+  color: #767676;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* A narrow screen: the paginator does not wrap (the label and the size, then the range and the buttons, on two lines): without the label of
+   the size, which the select says well enough, they fit on one. */
+@media (max-width: 560px) {
+  mat-paginator ::ng-deep .mat-mdc-paginator-page-size-label {
+    display: none;
+  }
+}
+
+/* The column selector (first in the markup, and the toolbar is reversed: at the right end) is apart from what the screen puts beside it by a
+   gap, which there is none of when the selector is not there (compact). A gap of the container, not a margin of the selector: the screen's
+   content is not of this component's styles, so that no rule here can tell whether there is something beside the selector. */
+.score-column-container {
+  gap: 0.5rem;
+}
+
+/* A narrow screen: the branch selector is a line above the search box (see the search bar), so that the filters need no offset to be
+   under the box, and take the whole width. */
+@media (max-width: 600px) {
+  [advancedSearchContent] {
+    padding-left: 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  [advancedSearchContent].prefix-wide {
+    padding-left: 0 !important;
+  }
+}

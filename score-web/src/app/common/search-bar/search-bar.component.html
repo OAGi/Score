@@ -1,6 +1,6 @@
-<mat-card class="search-box">
+<mat-card class="search-box" [class.wide-branch-selector]="wideBranchSelector">
   <div class="main-search">
-    <ng-content select="[branchSelector]"></ng-content>
+    <div class="branch-slot"><ng-content select="[branchSelector]"></ng-content></div>
     <button mat-icon-button type="submit" (click)="onSearch()">
       <mat-icon matPrefix>search</mat-icon>
     </button>

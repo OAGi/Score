@@ -8,6 +8,9 @@ import {BieReportService} from '../bie-report/domain/bie-report.service';
 import {BIE_REUSE_REPORT_TABLE} from '../bie-report/bie-report.table';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {reuseCompactRecord} from '../bie-report/domain/reuse-compact';
+import {base64Encode} from '../../common/utility';
 
 const REUSED_COLUMNS = ['reusedState', 'reusedDen', 'reusedOwner', 'reusedVersion', 'reusedStatus', 'reusedRemark'];
 
@@ -26,6 +29,14 @@ export class BieListDialogComponent implements OnInit {
   data = inject(MAT_DIALOG_DATA);
 
   faRecycle = faRecycle;
+
+  /** What the compact row shows of the BIE that reuses, and of the BIE that is reused: made once for a row. */
+  readonly reusingRecord = memoizeRow((report: ReuseReport) => reuseCompactRecord('reusing', report, this.isAccessibleLeft(report) ? {
+    path: '/profile_bie/' + report.reusingTopLevelAsbiepId, queryParams: {q: base64Encode(report.displayPath)}
+  } : undefined));
+  readonly reusedRecord = memoizeRow((report: ReuseReport) => reuseCompactRecord('reused', report, this.isAccessibleRight(report) ? {
+    path: '/profile_bie/' + report.reusedTopLevelAsbiepId
+  } : undefined));
 
   readonly columns = createTableColumns(BIE_REUSE_REPORT_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ReuseReport>>(ScoreTableViewComponent);

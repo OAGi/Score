@@ -14,6 +14,7 @@ import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {NamespaceListEntry} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const NAMESPACE_TABLE = defineTable({
   storageKey: 'TableColumns-NamespacePage',
@@ -59,6 +60,19 @@ export class NamespaceListComponent implements OnInit {
 
   title = 'Namespace';
   readonly libraryChoice = new LibraryChoice(this.auth);
+
+  /** What the compact row shows of a namespace: made once for a row. */
+  readonly compactRecord = memoizeRow((namespace: NamespaceListEntry): CompactRecord => ({
+    badges: namespace.standard ? [{text: 'Standard'}] : [],
+    title: namespace.uri,
+    link: '/namespace/' + namespace.namespaceId,
+    subtitle: namespace.prefix,
+    meta: [
+      {label: 'Owner', value: namespace.owner?.loginId, strong: true},
+      ...(namespace.description ? [{label: 'Description', value: namespace.description, priority: 2 as const}] : [])
+    ],
+    updated: namespace.lastUpdated ? {when: namespace.lastUpdated.when, by: namespace.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(NAMESPACE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<NamespaceListEntry>>(ScoreTableViewComponent);

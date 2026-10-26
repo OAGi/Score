@@ -48,6 +48,7 @@ import {initFilter} from '../utility';
 import {ScoreTableViewRef} from './score-table-view.token';
 import {ScoreColumnDefDirective, ScoreDefaultHeaderDirective, ScoreHeaderCellDirective} from './score-column-def.directive';
 import {ScoreTableDirective} from './score-table.directive';
+import {ScoreCompactDefDirective} from './score-compact-def.directive';
 import {ScoreDetailDefDirective} from './score-detail-def.directive';
 import {DateRange, QuerySort, queryFromUrl, queryToHttpParams, queryToUrl, TableFilterValue, TableQuery} from './table-query';
 import {TableColumnsState} from './table-columns-state';
@@ -120,6 +121,10 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   readonly pageSizeOptions = input([10, 25, 50]);
   /** The direction of the first click on a sortable header. */
   readonly sortStart = input<'asc' | 'desc'>('desc');
+  /** What the compact layout, which has no header row to show, says when there are no rows: what the table lists, e.g. 'No Account'. */
+  readonly emptyMessage = input('No data');
+  /** The width of the table (px) up to which a row is drawn by the screen's `scoreCompactDef` instead of by the columns. */
+  readonly compactBelow = input(1024);
   /** Highlights the row under the pointer. */
   readonly rowHover = input(false, {transform: booleanAttribute});
   /** The choices of the `select` filters that have no `options` in the definition, by the filter's key. */
@@ -157,6 +162,8 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   readonly pageFromResponse = input(false, {transform: booleanAttribute});
   /** Left space of the advanced search, as wide as what the screen puts before the search box (`[searchPrefix]`). */
   readonly advancedSearchOffset = input('3rem');
+  /** The branch selector in front of the search box is wide (more than one): it goes to a line above on a tablet too. */
+  readonly searchPrefixWide = input(false, {transform: booleanAttribute});
   /** `false` leaves out the column selector (and the `[toolbar]` content with it): the columns cannot be chosen. */
   readonly columnSelector = input(true, {transform: booleanAttribute});
   /** A search by text has no order of its own to keep: typing in the search box leaves the table unsorted (a single sort only). */
@@ -172,7 +179,14 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
 
   private readonly columnDefs = contentChildren(ScoreColumnDefDirective);
   /** The detail row of every row; the rows have none without it. */
-  protected readonly detailDef = contentChild(ScoreDetailDefDirective);
+  private readonly givenDetailDef = contentChild(ScoreDetailDefDirective);
+  /** The compact row is all there is to a row: nothing opens under it. */
+  protected readonly detailDef = computed(() => this.compact() ? undefined : this.givenDetailDef());
+  protected readonly compactDef = contentChild(ScoreCompactDefDirective);
+  private readonly tableWrapper = viewChild<ElementRef<HTMLElement>>('tableWrapper');
+  private readonly tableWidth = signal(0);
+  /** The table is too narrow for its columns, and the screen says how to draw a row then. */
+  protected readonly compact = computed(() => !!this.compactDef() && this.tableWidth() > 0 && this.tableWidth() <= this.compactBelow());
   /** The row whose detail row is open. */
   readonly expanded = signal<T | null>(null);
   private readonly paginator = viewChild.required(MatPaginator);
@@ -195,12 +209,19 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   /** The columns that the screen gave no header cell: they get the default one. */
   protected readonly defaultHeaderColumns = computed(() => this.columnDefs().filter(c => !c.headerCellDef()));
 
-  readonly displayedColumns = computed(() => [
-    ...(this.selection() ? ['select'] : []),
-    ...this.table().fixed('start').filter(id => !this.hiddenColumns().includes(id)),
-    ...this.table().displayed().filter(id => !this.hiddenColumns().includes(id)),
-    ...this.table().fixed('end').filter(id => !this.hiddenColumns().includes(id))
-  ]);
+  /** The columns that the compact row has taken over, which are not shown beside it. */
+  private readonly compactHidden = computed(() => this.compact() ? this.compactDef()?.hide() ?? [] : []);
+
+  /** The compact row takes the place of the selectable columns; the checkbox and the fixed columns (e.g. a row menu) stay. */
+  readonly displayedColumns = computed(() => {
+    const shown = (id: string) => !this.hiddenColumns().includes(id) && !this.compactHidden().includes(id);
+    return [
+      ...(this.selection() ? ['select'] : []),
+      ...this.table().fixed('start').filter(shown),
+      ...(this.compact() ? ['compact'] : this.table().displayed().filter(shown)),
+      ...this.table().fixed('end').filter(shown)
+    ];
+  });
 
   /** The choices of every `updater` filter, which the select search narrows. */
   readonly updaterFilters: Record<string, { ctrl: FormControl; options: ReplaySubject<string[]> }> = {};
@@ -230,6 +251,15 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
     });
     // The table is in an `@if`, so its sort is known only after the first render.
     afterNextRender(() => this.start());
+    // The width of the table decides between the columns and the compact row.
+    afterNextRender(() => {
+      const wrapper = this.tableWrapper()?.nativeElement;
+      if (wrapper && typeof ResizeObserver !== 'undefined') {
+        const observer = new ResizeObserver(() => this.tableWidth.set(wrapper.clientWidth));
+        observer.observe(wrapper);
+        this.destroyRef.onDestroy(() => observer.disconnect());
+      }
+    });
     // The screen decides again: search again.
     effect(() => {
       this.extraParams();

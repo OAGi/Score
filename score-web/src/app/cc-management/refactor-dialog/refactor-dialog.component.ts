@@ -10,6 +10,8 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {CC_WITH_TYPE_TABLE} from '../domain/cc-dialog.table';
 import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../common/score-table';
 import {IssuedCc} from './domain/refactor-dialog';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {SeparatePipe} from '../../common/utility';
 
 /** The ACCs to move to: the column settings of the core component list; there is no search and no order of its own. */
 const REFACTOR_ACC_TABLE = defineTable({
@@ -148,6 +150,23 @@ export class RefactorDialogComponent implements OnInit {
         });
     }
   }
+
+  /** What the compact row shows of an issue (a component that cannot be refactored yet): made once for a row. The reasons go under it. */
+  readonly issueRecord = memoizeRow((issue: IssuedCc): CompactRecord => ({
+    badges: [
+      {text: 'ACC'},
+      {text: new SeparatePipe().transform(issue.state), kind: 'state', cssClass: 'cc-state', state: issue.state},
+      ...(issue.deprecated ? [{text: 'Deprecated', kind: 'state' as const, cssClass: 'cc-state', state: 'Deprecated'}] : [])
+    ],
+    title: issue.den,
+    link: '/core_component/' + (issue.oagisComponentType === 'UserExtensionGroup' ? 'extension/' : 'acc/') + issue.manifestId,
+    subtitle: issue.guid,
+    meta: [
+      {label: 'Rev.', value: '' + issue.revision},
+      {label: 'Owner', value: issue.owner, strong: true}
+    ],
+    updated: issue.lastUpdateTimestamp ? {when: issue.lastUpdateTimestamp, by: issue.lastUpdateUser} : undefined
+  }));
 
   getRouterLink(ccList: CcListEntry) {
     if (ccList.oagisComponentType === 'UserExtensionGroup') {

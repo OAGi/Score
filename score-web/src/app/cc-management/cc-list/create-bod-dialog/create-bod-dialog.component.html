@@ -3,8 +3,8 @@
     <div class="col-6">
       <div class="dialog-section-title">Select Verb to {{this.action}} BOD</div>
       <div>
-        <score-table-view #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
-          [selection]="verbSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
+        <score-table-view emptyMessage="No Verb" #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
+          [selection]="verbSelection" [rowKey]="rowKey" [compactBelow]="520" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
           <ng-container scoreColumnDef="state">
             <td score-cell *scoreCellDef="let element">
@@ -49,6 +49,11 @@
             </td>
           </ng-container>
 
+          <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+          <ng-container *scoreCompactDef="let element">
+            <score-cc-compact-row [element]="element" [label]="element.den" [link]="'core_component/asccp/' + element.manifestId" [showOwner]="false" external/>
+          </ng-container>
+
           <ng-container *scoreDetailDef="let element">
             <mat-card class="mb-2">
               @if (element.definition.source) {
@@ -68,8 +73,8 @@
     <div class="col-6">
       <div class="dialog-section-title">Select Noun to {{this.action}} BOD</div>
       <div>
-        <score-table-view #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
-          [selection]="nounSelection" [rowKey]="rowKey" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
+        <score-table-view emptyMessage="No Noun" #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
+          [selection]="nounSelection" [rowKey]="rowKey" [compactBelow]="520" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
           <ng-container scoreColumnDef="state">
             <td score-cell *scoreCellDef="let element">
@@ -112,6 +117,11 @@
                 <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
               </div>
             </td>
+          </ng-container>
+
+          <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+          <ng-container *scoreCompactDef="let element">
+            <score-cc-compact-row [element]="element" [label]="element.den" [link]="'core_component/acc/' + element.manifestId" [showOwner]="false" external/>
           </ng-container>
 
           <ng-container *scoreDetailDef="let element">

@@ -7,6 +7,8 @@ import {BusinessContextService} from '../domain/business-context.service';
 import {BUSINESS_CONTEXT_TABLE} from '../domain/business-context.table';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
+import {businessContextCompactRecord} from '../domain/business-context-compact';
 
 @Component({
   standalone: false,
@@ -18,6 +20,10 @@ export class BusinessContextListComponent {
   private service = inject(BusinessContextService);
   private confirmDialogService = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of a business context: made once for a row. */
+  readonly compactRecord = memoizeRow((context: BusinessContextListEntry): CompactRecord =>
+    businessContextCompactRecord(context));
 
   readonly columns = createTableColumns(BUSINESS_CONTEXT_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextListEntry>>(ScoreTableViewComponent);

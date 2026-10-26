@@ -11,6 +11,7 @@ import {LogCompareDialogComponent} from './log-compare-dialog/log-compare-dialog
 import {LogListComponent} from './log-list/log-list.component';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {SCORE_TABLE} from '../common/score-table';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
 
 const routes: Routes = [
   {
@@ -39,6 +40,7 @@ const routes: Routes = [
         CommonModule,
         ScoreCommonModule,
         ColumnSelectorModule,
+        RecordCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

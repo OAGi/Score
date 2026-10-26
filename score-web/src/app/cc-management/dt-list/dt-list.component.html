@@ -65,7 +65,7 @@
     </button>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Data Type" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [filterOptions]="filterOptions()" [selection]="selection" [rowSelectable]="rowSelectable"
     [busy]="busy()" searchClearsSort pageFromResponse
     rowHover advancedSearchOffset="14.5rem">
@@ -163,6 +163,19 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-cc-compact-row [element]="element" [label]="element.den" [link]="getRouterLink(element)"
+        [isNew]="element.newComponent && element.libraryId === libraryChoice.library?.libraryId">
+        @if (element.defaultValueDomain) {
+          <span>Value Domain: {{ element.defaultValueDomain }}</span>
+        }
+        @if (element.sixDigitId) {
+          <span>Six Hexadecimal ID: {{ element.sixDigitId }}</span>
+        }
+      </score-cc-compact-row>
     </ng-container>
 
     <ng-container *scoreDetailDef="let element">

@@ -1,3 +1,4 @@
+import {BieCompactRowComponent} from '../bie-compact-row/bie-compact-row.component';
 import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
@@ -37,6 +38,7 @@ const routes: Routes = [
         SearchBarModule,
         ColumnSelectorModule,
         TitleWithLibrarySelector,
+        BieCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

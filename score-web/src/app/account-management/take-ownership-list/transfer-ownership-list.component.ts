@@ -7,6 +7,8 @@ import {AccountListService} from '../domain/account-list.service';
 import {ACCOUNT_TABLE} from '../domain/account.table';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {AccountCompactSource, accountCompactRecord} from '../../account-management/domain/account-compact';
 
 @Component({
   standalone: false,
@@ -18,6 +20,9 @@ export class TransferOwnershipListComponent {
   private service = inject(AccountListService);
   private confirmDialogService = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of an account: made once for a row. */
+  readonly compactRecord = memoizeRow((account: AccountCompactSource): CompactRecord => accountCompactRecord(account, {status: true}));
 
   readonly columns = createTableColumns(ACCOUNT_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);

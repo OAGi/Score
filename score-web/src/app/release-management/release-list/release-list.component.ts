@@ -15,6 +15,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseListEntry, WorkingRelease} from '../domain/release';
 import {ReleaseService} from '../domain/release.service';
 import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const RELEASE_STATES = ['Initialized', 'Draft', 'Published'];
 
@@ -58,6 +59,16 @@ export class ReleaseListComponent implements OnInit {
 
   title = 'Release';
   readonly libraryChoice = new LibraryChoice(this.auth);
+
+  /** What the compact row shows of a release: made once for a row. A release that is being processed is not a link. */
+  readonly compactRecord = memoizeRow((release: ReleaseListEntry): CompactRecord => ({
+    badges: [{text: release.state, kind: 'state', cssClass: 'release-state', colors: 'release', state: release.state}],
+    title: release.releaseNum,
+    link: release.state === 'Processing' ? undefined : '/release/' + release.releaseId,
+    subtitle: release.guid,
+    created: release.created ? {when: release.created.when, by: release.created.who?.loginId, label: 'Created'} : undefined,
+    updated: release.lastUpdated ? {when: release.lastUpdated.when, by: release.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(RELEASE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ReleaseListEntry>>(ScoreTableViewComponent);

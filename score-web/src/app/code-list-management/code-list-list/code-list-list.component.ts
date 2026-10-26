@@ -23,6 +23,8 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {CodeListListEntry} from '../domain/code-list';
 import {CODE_LIST_TABLE} from '../domain/code-list.table';
 import {CodeListService} from '../domain/code-list.service';
+import {memoizeRow} from '../../common/record-compact-row';
+import {codeListCompactRecord} from '../domain/code-list-compact';
 
 const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
 const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -69,6 +71,9 @@ export class CodeListListComponent {
   canSelect = ['WIP', 'Deleted'];
   readonly libraryChoice = new LibraryChoice(this.auth);
   readonly releaseChoice = new ReleaseChoice(this.auth);
+
+  /** What the compact row shows of a code list: made once for a row. */
+  readonly compactRecord = memoizeRow(codeListCompactRecord);
 
   readonly columns = createTableColumns(CODE_LIST_LIST_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<CodeListListEntry>>(ScoreTableViewComponent);

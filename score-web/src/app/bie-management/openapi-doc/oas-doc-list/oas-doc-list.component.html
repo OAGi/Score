@@ -1,15 +1,10 @@
 <score-list-page title="OpenAPI Document">
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="primary" routerLink="create">
-      New OpenAPI Document
-    </button>
-    <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-      [disabled]="selection.selected.length === 0">
-      Discard
-    </button>
+    <score-responsive-button label="New OpenAPI Document" link="create"/>
+    <score-responsive-button label="Discard" icon="delete" color="warn" [disabled]="selection.selected.length === 0" (pressed)="discard()"/>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" multiSort [selection]="selection" [rowKey]="rowKey">
+  <score-table-view emptyMessage="No OpenAPI Document" #tableView [table]="columns" [load]="load" multiSort [selection]="selection" [rowKey]="rowKey">
 
     <ng-container scoreColumnDef="title">
       <td score-cell *scoreCellDef="let element">
@@ -57,6 +52,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdatedBy.username }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

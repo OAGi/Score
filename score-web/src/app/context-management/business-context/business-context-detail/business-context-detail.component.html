@@ -7,7 +7,7 @@
   </score-detail-card>
 
   <score-detail-card heading="Business Context Values">
-    <score-table-view [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows"
+    <score-table-view emptyMessage="No Business Context Value" [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows"
       [syncUrl]="false" [selectOnRowClick]="false" rowHover pageFromResponse (rowClick)="openDialog($event)">
 
       <ng-container scoreColumnDef="contextCategoryName">
@@ -29,6 +29,10 @@
             {{ element.contextSchemeValueMeaning }}
           </div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-record-compact-row [record]="compactRecord(element)"/>
       </ng-container>
     </score-table-view>
     <ng-container ngProjectAs="[cardActions]">

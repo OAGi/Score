@@ -13,6 +13,8 @@ import {MarkdownModule} from 'ngx-markdown';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {SCORE_TABLE} from '../common/score-table';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -46,6 +48,8 @@ const routes: Routes = [
     MarkdownModule,
     SearchBarModule,
     ColumnSelectorModule,
+    RecordCompactRowComponent,
+    ResponsiveButtonComponent,
     ...SCORE_TABLE
   ],
   declarations: [

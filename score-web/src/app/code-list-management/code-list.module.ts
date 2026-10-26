@@ -18,6 +18,7 @@ import {ColumnSelectorModule} from '../common/column-selector/column-selector.mo
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 import {GithubIssueBoxComponent} from '../cc-management/github-issue-box/github-issue-box.component';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
 
 const routes: Routes = [
   {
@@ -70,6 +71,7 @@ const routes: Routes = [
         SearchBarModule,
         TitleWithLibrarySelector,
         GithubIssueBoxComponent,
+        RecordCompactRowComponent,
         ...SCORE_TABLE
     ],
   declarations: [

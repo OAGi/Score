@@ -1,11 +1,9 @@
 <score-list-page title="Tenant Roles">
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="primary" routerLink="create">
-      New Tenant
-    </button>
+    <score-responsive-button label="New Tenant" link="create"/>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load">
+  <score-table-view emptyMessage="No Tenant" [table]="columns" [load]="load">
 
     <ng-container scoreColumnDef="name">
       <td score-cell *scoreCellDef="let element">
@@ -31,6 +29,13 @@
           Manage Business Context
         </button>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)">
+          <button actions mat-raised-button color="primary" routerLink="/tenant/users/{{ element.tenantId }}">Manage Users</button>
+          <button actions mat-raised-button color="primary" routerLink="/tenant/bis-ctx/{{ element.tenantId }}">Manage Business Context</button>
+      </score-record-compact-row>
     </ng-container>
   </score-table-view>
 </score-list-page>

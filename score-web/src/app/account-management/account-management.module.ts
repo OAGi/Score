@@ -23,6 +23,8 @@ import {TransferOwnershipListComponent} from './take-ownership-list/transfer-own
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {ScoreCommonModule} from '../common/score-common.module';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 
 const routes: Routes = [
@@ -104,6 +106,8 @@ const routes: Routes = [
     SearchBarModule,
     ColumnSelectorModule,
     ScoreCommonModule,
+    RecordCompactRowComponent,
+    ResponsiveButtonComponent,
     ...SCORE_TABLE
   ],
   declarations: [

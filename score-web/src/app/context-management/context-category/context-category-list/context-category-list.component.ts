@@ -6,6 +6,7 @@ import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategoryListEntry} from '../domain/context-category';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const CONTEXT_CATEGORY_TABLE = defineTable({
   storageKey: 'TableColumns-ContextCategoryPage',
@@ -33,6 +34,15 @@ export class ContextCategoryListComponent {
   private service = inject(ContextCategoryService);
   private confirmDialogService = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of a context category: made once for a row. */
+  readonly compactRecord = memoizeRow((category: ContextCategoryListEntry): CompactRecord => ({
+    title: category.name,
+    link: '/context_management/context_category/' + category.contextCategoryId,
+    subtitle: category.guid,
+    meta: category.description ? [{label: 'Description', value: category.description, priority: 1}] : [],
+    updated: category.lastUpdated ? {when: category.lastUpdated.when, by: category.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(CONTEXT_CATEGORY_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<ContextCategoryListEntry>>(ScoreTableViewComponent);

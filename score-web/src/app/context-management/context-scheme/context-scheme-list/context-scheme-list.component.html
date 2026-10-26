@@ -1,15 +1,10 @@
 <score-list-page title="Context Scheme">
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="primary" routerLink="create">
-      New Context Scheme
-    </button>
-    <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-      [disabled]="selection.selected.length === 0">
-      Discard
-    </button>
+    <score-responsive-button label="New Context Scheme" link="create"/>
+    <score-responsive-button label="Discard" icon="delete" color="warn" [disabled]="selection.selected.length === 0" (pressed)="discard()"/>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load"
+  <score-table-view emptyMessage="No Context Scheme" [table]="columns" [load]="load"
     [selection]="selection" [rowKey]="rowKey" [rowSelectable]="rowSelectable"
     unselectableTooltip="It is currently in use by another component.">
 
@@ -71,6 +66,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

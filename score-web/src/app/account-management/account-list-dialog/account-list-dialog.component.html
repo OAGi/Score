@@ -1,5 +1,5 @@
 <score-dialog-page title="{{ title }}">
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
+  <score-table-view emptyMessage="No Account" #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
         [selection]="selection" singleSelect [selectOnRowClick]="false" [syncUrl]="false" [columnSelector]="false" pageFromResponse>
 
     <ng-container scoreColumnDef="loginId">
@@ -39,6 +39,10 @@
           <span>Yes</span>
         }
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 

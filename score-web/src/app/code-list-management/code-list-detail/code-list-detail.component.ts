@@ -40,6 +40,7 @@ import {AgencyIdListService} from '../../agency-id-list-management/domain/agency
 import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -89,6 +90,19 @@ export class CodeListDetailComponent implements OnInit {
   agencyIdList: AgencyIdListSummary;
   prevCodeList: CodeListDetails;
   hashCode;
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: CodeListValueDetails): CompactRecord => ({
+    badges: value.deprecated ? [{text: 'Deprecated', kind: 'state', cssClass: 'cl-state', state: 'Deprecated'}] : [],
+    title: value.value,
+    titleLabel: 'Value',
+    subtitle: value.meaning,
+    subtitleLabel: value.meaning ? 'Meaning' : undefined,
+    meta: [
+      ...(value.definition?.content ? [{label: 'Definition', value: value.definition.content, priority: 2 as const}] : []),
+      ...(value.definition?.source ? [{label: 'Source', value: value.definition.source, priority: 4 as const}] : [])
+    ]
+  }));
 
   readonly columns = createTableColumns(CODE_LIST_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<CodeListValueDetails>>(ScoreTableViewComponent);

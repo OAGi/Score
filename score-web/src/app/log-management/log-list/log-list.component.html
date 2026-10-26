@@ -7,7 +7,7 @@
     </button>
   </ng-container>
 
-  <score-table-view [table]="columns" [load]="load" pageFromResponse>
+  <score-table-view emptyMessage="No History" [table]="columns" [load]="load" pageFromResponse>
 
     <ng-container [scoreColumnDef]="columns.column('check')">
       <td score-cell *scoreCellDef="let element">
@@ -45,6 +45,10 @@
       <td score-cell *scoreCellDef="let element">
         {{ element.timestamp | dateAgo }}
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

@@ -6,6 +6,7 @@ import {MessageListEntry} from '../domain/messageDetails';
 import {MessageService} from '../domain/message.service';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const MESSAGE_TABLE = defineTable({
   storageKey: 'TableColumns-MessagePage',
@@ -33,6 +34,15 @@ export class MessageListComponent {
   private service = inject(MessageService);
   private confirmDialogService = inject(ConfirmDialogService);
   private snackBar = inject(MatSnackBar);
+
+  /** What the compact row shows of a message: made once for a row. */
+  readonly compactRecord = memoizeRow((message: MessageListEntry): CompactRecord => ({
+    title: message.subject,
+    titleStrong: !message.read,
+    titleMuted: message.read,
+    link: '/message/' + message.messageId,
+    updated: message.created ? {when: message.created.when, by: message.created.who?.loginId, label: 'Created'} : undefined
+  }));
 
   readonly columns = createTableColumns(MESSAGE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<MessageListEntry>>(ScoreTableViewComponent);

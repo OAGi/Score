@@ -21,6 +21,8 @@ import {ReleaseChoice} from '../../release-management/domain/release-choice';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {AgencyIdListListEntry} from '../domain/agency-id-list';
 import {AgencyIdListService} from '../domain/agency-id-list.service';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {SeparatePipe} from '../../common/utility';
 
 const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
 const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
@@ -79,6 +81,25 @@ export class AgencyIdListListComponent {
   canSelect = ['WIP', 'Deleted'];
   readonly libraryChoice = new LibraryChoice(this.auth);
   readonly releaseChoice = new ReleaseChoice(this.auth);
+
+  /** What the compact row shows of an agency ID list: made once for a row. */
+  readonly compactRecord = memoizeRow((entry: AgencyIdListListEntry): CompactRecord => ({
+    badges: [
+      {text: new SeparatePipe().transform(entry.state), kind: 'state', cssClass: 'cl-state', state: entry.state},
+      ...(entry.deprecated ? [{text: 'Deprecated', kind: 'state' as const, cssClass: 'cl-state', state: 'Deprecated'}] : [])
+    ],
+    isNew: entry.newComponent,
+    title: entry.name,
+    link: '/agency_id_list/' + entry.agencyIdListManifestId,
+    subtitle: entry.guid,
+    meta: [
+      {label: 'Rev.', value: '' + entry.log?.revisionNum},
+      {label: 'Owner', value: entry.owner?.loginId, strong: true},
+      ...(entry.versionId ? [{label: 'Version', value: entry.versionId, priority: 1 as const}] : []),
+      ...(entry.module ? [{label: 'Module', value: entry.module, priority: 4 as const}] : [])
+    ],
+    updated: entry.lastUpdated ? {when: entry.lastUpdated.when, by: entry.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(AGENCY_ID_LIST_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<AgencyIdListListEntry>>(ScoreTableViewComponent);

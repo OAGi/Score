@@ -1,0 +1,5 @@
+<button mat-raised-button class="responsive-text" [color]="color()" [disabled]="disabled()" [routerLink]="link()" (click)="pressed.emit()">{{ label() }}</button>
+<button mat-icon-button class="responsive-icon" [color]="color() === 'warn' ? 'warn' : undefined" [disabled]="disabled()" [matTooltip]="label()"
+        [attr.aria-label]="label()" [routerLink]="link()" (click)="pressed.emit()">
+  <mat-icon>{{ icon() }}</mat-icon>
+</button>

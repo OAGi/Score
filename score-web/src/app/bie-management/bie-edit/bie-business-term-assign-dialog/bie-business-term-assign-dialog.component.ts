@@ -10,6 +10,8 @@ import {BieToAssign, BusinessTermListEntry} from '../../../business-term-managem
 import {BUSINESS_TERM_TABLE} from '../../../business-term-management/domain/business-term.table';
 import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
+import {businessTermCompactRecord} from '../../../business-term-management/domain/business-term-compact';
 
 export interface BieBusinessTermAssignDialogData {
   // The BIE node the term is assigned to. bieType is 'ASBIE' or 'BBIE'; bieId is the asbieId/bbieId.
@@ -44,6 +46,9 @@ export class BieBusinessTermAssignDialogComponent {
   private snackBar = inject(MatSnackBar);
   dialogRef = inject(MatDialogRef<BieBusinessTermAssignDialogComponent>);
   data: BieBusinessTermAssignDialogData = inject(MAT_DIALOG_DATA);
+
+  /** What the compact row shows of a business term: made once for a row. */
+  readonly compactRecord = memoizeRow(businessTermCompactRecord);
 
   readonly columns = createTableColumns(BIE_BUSINESS_TERM_ASSIGN_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessTermListEntry>>(ScoreTableViewComponent);

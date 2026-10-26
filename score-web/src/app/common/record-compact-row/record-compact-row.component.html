@@ -1,0 +1,91 @@
+<ng-template #badgeTemplate let-badge>
+  @if (badge.kind === 'state') {
+    <span class="rc-state {{ badge.cssClass }} {{ badge.state ?? badge.text }}" [matTooltip]="badge.tooltip ?? ''"
+          [ngStyle]="{'background-color': colorSet(badge).background, 'color': colorSet(badge).font}">{{ badge.text }}</span>
+  } @else {
+    <mat-chip [matTooltip]="badge.tooltip ?? ''">{{ badge.text }}</mat-chip>
+  }
+</ng-template>
+
+<div class="rc" [class.rc-title-only]="titleOnly()">
+  @if (record().badges?.length) {
+    <div class="rc-side">
+      @for (badge of record().badges; track $index) {
+        <ng-container *ngTemplateOutlet="badgeTemplate; context: {$implicit: badge}"/>
+      }
+    </div>
+  }
+  <div #body class="rc-body">
+    <div class="rc-grid">
+      <div class="rc-title score-break-word" [class.rc-title-strong]="record().titleStrong" [class.rc-title-muted]="record().titleMuted"
+           [class.rc-title-middle]="titleAndUpdate()">
+        @if (record().isNew) {
+          <span class="rc-new me-2">New</span>
+        }
+        @if (record().titleLabel) {
+          <span class="rc-label rc-title-label">{{ record().titleLabel }}</span>
+        }
+        @if (record().link) {
+          <a [routerLink]="record().link" [queryParams]="record().linkQueryParams" [target]="external() ? '_blank' : undefined"
+             [attr.rel]="external() ? 'noopener noreferrer' : null">{{ record().title }}</a>
+        } @else {
+          <span [matTooltip]="record().restriction ?? ''">{{ record().title }}</span>
+        }
+        @if (record().titleTag) {
+          <span class="bie-display-name ms-2">{{ record().titleTag }}</span>
+        }
+        @for (badge of record().titleBadges; track $index) {
+          <span class="rc-title-badge">
+            <ng-container *ngTemplateOutlet="badgeTemplate; context: {$implicit: badge}"/>
+          </span>
+        }
+      </div>
+      @if (record().subtitle) {
+<div class="rc-subtitle">
+          @if (record().subtitleLabel) {
+            <span class="rc-label">{{ record().subtitleLabel }}</span>
+          }
+          {{ record().subtitle }}
+        </div>
+      }
+      @if (meta().length) {
+        <div class="rc-meta">
+          @for (item of meta(); track $index; let last = $last) {
+            <span class="rc-meta-item" [class.last]="last">
+              @if (item.label) {
+                <span class="rc-label">{{ item.label }}</span>
+              }
+              @if (item.link) {
+                <a [routerLink]="item.link" [target]="external() ? '_blank' : undefined">{{ item.value }}</a>
+              } @else if (item.href) {
+                <a [attr.href]="item.href" target="_blank" rel="noopener noreferrer">{{ item.value }}</a>
+              } @else if (item.strong) {
+                <b>{{ item.value }}</b>
+              } @else {
+                {{ item.value }}
+              }
+            </span>
+          }
+        </div>
+      }
+      <ng-template #stamp let-stamp let-fallback="fallback">
+        <span>{{ stamp.label ?? fallback }} {{ stamp.when | date: 'yyyy-MM-dd HH:mm' }}</span>
+        @if (stamp.by) {
+          <span>by <b>{{ stamp.by }}</b></span>
+        }
+      </ng-template>
+      @if (record().created; as created) {
+        <div class="rc-updated rc-created" [style.--rc-text-rows]="textRows()">
+          <ng-container *ngTemplateOutlet="stamp; context: {$implicit: created, fallback: 'Created'}"/>
+        </div>
+      }
+      @if (record().updated; as updated) {
+        <div class="rc-updated" [style.--rc-text-rows]="textRows()">
+          <ng-container *ngTemplateOutlet="stamp; context: {$implicit: updated, fallback: 'Updated'}"/>
+        </div>
+      }
+      <div class="rc-slot"><ng-content/></div>
+    </div>
+  </div>
+  <div class="rc-actions"><ng-content select="[actions]"/></div>
+</div>

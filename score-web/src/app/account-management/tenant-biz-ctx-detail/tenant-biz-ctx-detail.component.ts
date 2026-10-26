@@ -11,6 +11,7 @@ import {BusinessContextListEntry} from '../../context-management/business-contex
 import {BUSINESS_CONTEXT_TABLE} from '../../context-management/business-context/domain/business-context.table';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 const TENANT_BUSINESS_CONTEXT_TABLE = defineTable({
   ...BUSINESS_CONTEXT_TABLE,
@@ -36,6 +37,13 @@ export class TenantBusinessCtxDetailComponent implements OnInit {
   tenantInfo: TenantList;
   tenantId: number;
   addBusinessCtxToTenant = false;
+
+  /** What the compact row shows of a business context of the tenant: made once for a row. */
+  readonly compactRecord = memoizeRow((context: BusinessContextListEntry): CompactRecord => ({
+    title: context.name,
+    subtitle: context.guid,
+    updated: context.lastUpdated ? {when: context.lastUpdated.when, by: context.lastUpdated.who?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(TENANT_BUSINESS_CONTEXT_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessContextListEntry>>(ScoreTableViewComponent);

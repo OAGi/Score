@@ -1,5 +1,5 @@
 <score-dialog-page title="{{ title }}">
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No Confirm Message Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
         [selection]="selection" [rowKey]="rowKey" singleSelect searchDisabled [syncUrl]="false" advancedSearchOffset="11.5rem"
         rowHover>
 
@@ -125,6 +125,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-bie-compact-row [element]="element" [link]="'/profile_bie/' + element.topLevelAsbiepId" external/>
     </ng-container>
   </score-table-view>
 

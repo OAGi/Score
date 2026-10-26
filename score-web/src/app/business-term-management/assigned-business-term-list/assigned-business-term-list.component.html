@@ -7,10 +7,7 @@
       [disabled]="selection.selected.length !== 1">
       Search by Selected BIE
     </button>
-    <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-      [disabled]="selection.selected.length === 0">
-      Discard
-    </button>
+    <score-responsive-button label="Discard" icon="delete" color="warn" [disabled]="selection.selected.length === 0" (pressed)="discard()"/>
   </ng-container>
   <ng-container ngProjectAs="[listHeader]">
     @if (tableView.filterValue('bieId')) {
@@ -27,7 +24,7 @@
     }
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [ready]="ready()">
+  <score-table-view emptyMessage="No Business Term Assignment" #tableView [table]="columns" [load]="load" [selection]="selection" [ready]="ready()">
 
     <ng-container scoreColumnDef="bieDen">
       <td score-cell *scoreCellDef="let element"
@@ -83,6 +80,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

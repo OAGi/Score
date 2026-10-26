@@ -1,5 +1,5 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {TestBed} from '@angular/core/testing';
+import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {provideHttpClient} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {provideRouter} from '@angular/router';
@@ -132,6 +132,59 @@ class RowsHostComponent extends Base {
   clicked: string[] = [];
   selectOnRowClick = true;
   withDetail = true;
+}
+
+/** A screen that says how to draw a row when the table is narrow. */
+@Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [...SCORE_TABLE],
+  template: `
+    <score-table-view [table]="columns" [load]="load" [selection]="selection" [compactBelow]="600" [emptyMessage]="emptyMessage()">
+      ${cells}
+      <ng-container *scoreCompactDef="let row"><div class="card">Card of {{ row.name }}</div></ng-container>
+      <ng-container *scoreDetailDef="let row"><p class="detail">Detail of {{ row.name }}</p></ng-container>
+    </score-table-view>`
+})
+class CompactHostComponent extends Base {
+  selection = new SelectionModel<any>(true, []);
+  emptyMessage = signal('No data');
+}
+
+const COMPACT_FIXED_TABLE = defineTable({
+  storageKey: 'TableColumns-ViewSpecCompactFixedPage',
+  columns: [{id: 'name', label: 'Name', width: 0}],
+  fixed: [{id: 'more', position: 'end', width: 40}],
+});
+
+/** A compact row beside a fixed column. */
+@Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [...SCORE_TABLE],
+  template: `
+    <score-table-view [table]="columns" [load]="load" [selection]="selection" [compactBelow]="600">
+      <ng-container scoreColumnDef="name"><td score-cell *scoreCellDef="let row">{{ row.name }}</td></ng-container>
+      <ng-container [scoreColumnDef]="columns.column('more')"><td score-cell *scoreCellDef="let row"><button class="more">...</button></td></ng-container>
+      <ng-container *scoreCompactDef="let row"><div class="card">Card of {{ row.name }}</div></ng-container>
+    </score-table-view>`
+})
+class CompactFixedHostComponent extends Base {
+  override columns = new TableColumnsState(COMPACT_FIXED_TABLE, {username: 'view-spec'} as UserToken);
+  selection = new SelectionModel<any>(true, []);
+}
+
+/** A compact row that has the controls of the fixed column. */
+@Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [...SCORE_TABLE],
+  template: `
+    <score-table-view [table]="columns" [load]="load" [compactBelow]="600">
+      <ng-container scoreColumnDef="name"><td score-cell *scoreCellDef="let row">{{ row.name }}</td></ng-container>
+      <ng-container [scoreColumnDef]="columns.column('more')"><td score-cell *scoreCellDef="let row"><button class="more">...</button></td></ng-container>
+      <ng-container *scoreCompactDef="let row; hide: ['more']"><div class="card">Card of {{ row.name }} <button class="more-in-card">...</button></div></ng-container>
+    </score-table-view>`
+})
+class CompactHiddenFixedHostComponent extends Base {
+  override columns = new TableColumnsState(COMPACT_FIXED_TABLE, {username: 'view-spec'} as UserToken);
 }
 
 /** A cell with control flow in it: the query for the header cell of its column then runs again with every row. */
@@ -280,6 +333,110 @@ describe('ScoreTableViewComponent', () => {
       const fixture = TestBed.createComponent(PlainHostComponent);
       fixture.detectChanges();
       expect(fixture.nativeElement.querySelector('mat-multi-sort-table-settings')).toBeNull();
+    });
+  });
+
+  describe('compact row', () => {
+    let notify: () => void;
+    let width: number;
+
+    beforeEach(() => {
+      width = 1000;
+      vi.stubGlobal('ResizeObserver', class {
+        constructor(callback: () => void) {
+          notify = callback;
+        }
+        observe() {
+        }
+        disconnect() {
+        }
+      });
+      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(() => width);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    const resizeTo = (fixture: ComponentFixture<unknown>, px: number) => {
+      width = px;
+      notify();
+      fixture.detectChanges();
+    };
+
+    it('draws the columns while the table is wide, and the screen\'s row (beside the checkbox) when it is narrow', () => {
+      const fixture = TestBed.createComponent(CompactHostComponent);
+      fixture.detectChanges();
+      const el: HTMLElement = fixture.nativeElement;
+      resizeTo(fixture, 1000);
+      expect(el.querySelector('.card')).toBeNull();
+      expect(el.querySelector('score-column-selector')).toBeTruthy();
+      expect(el.querySelector('tr.detail-row')).toBeTruthy();
+      expect(Array.from(el.querySelectorAll('th')).map(t => t.textContent.trim())).toEqual(['', 'Name', 'Custom size']);
+
+      resizeTo(fixture, 600);
+      expect(el.querySelector('table.compact')).toBeTruthy();
+      // The row is the screen's: choosing columns would change nothing.
+      expect(el.querySelector('score-column-selector')).toBeNull();
+      // Nothing opens under the compact row, which already shows what there is.
+      expect(el.querySelector('tr.detail-row')).toBeNull();
+      expect(el.querySelector('table.has-detail')).toBeNull();
+      expect(el.querySelector('td.compact-cell .card').textContent).toBe('Card of a');
+      expect(Array.from(el.querySelector('tr.element-row').children).map(td => td.classList.contains('mat-column-select') || td.classList.contains('compact-cell')))
+        .toEqual([true, true]);
+
+      resizeTo(fixture, 601);
+      expect(el.querySelector('.card')).toBeNull();
+    });
+
+    it('says that there is no data when the compact layout has no rows, and only then (the columns have their headers)', () => {
+      const fixture = TestBed.createComponent(CompactHostComponent);
+      fixture.componentInstance.load = () => of({length: 0, list: []} as any);
+      fixture.detectChanges();
+      const el: HTMLElement = fixture.nativeElement;
+      const message = () => el.querySelector('.no-data') as HTMLElement;
+      resizeTo(fixture, 1000);
+      expect(message()).toBeNull();
+      resizeTo(fixture, 500);
+      expect(message().textContent.trim()).toBe('No data');
+      // What the screen says instead.
+      fixture.componentInstance.emptyMessage.set('No Thing');
+      fixture.detectChanges();
+      expect(message().textContent.trim()).toBe('No Thing');
+      // It is not a row of the table.
+      expect(el.querySelectorAll('tbody tr').length).toBe(0);
+      resizeTo(fixture, 1000);
+      expect(message()).toBeNull();
+    });
+
+    it('keeps the fixed columns (a row menu) beside the compact row', () => {
+      const fixture = TestBed.createComponent(CompactFixedHostComponent);
+      fixture.detectChanges();
+      resizeTo(fixture, 500);
+      const row = fixture.nativeElement.querySelector('tr.element-row') as HTMLElement;
+      expect(Array.from(row.children).map(td => td.className.match(/mat-column-(\w+)/)[1])).toEqual(['select', 'compact', 'more']);
+      expect(row.querySelector('.card')).toBeTruthy();
+      expect(row.querySelector('button.more')).toBeTruthy();
+    });
+
+    it('leaves out the fixed columns that the compact row has taken over', () => {
+      const fixture = TestBed.createComponent(CompactHiddenFixedHostComponent);
+      fixture.detectChanges();
+      resizeTo(fixture, 1000);
+      const columns = () => Array.from(fixture.nativeElement.querySelector('tr.element-row').children)
+        .map((td: Element) => td.className.match(/mat-column-(\w+)/)[1]);
+      expect(columns()).toEqual(['name', 'more']);
+      resizeTo(fixture, 500);
+      expect(columns()).toEqual(['compact']);
+    });
+
+    it('keeps the columns at any width without *scoreCompactDef', () => {
+      const fixture = TestBed.createComponent(PlainHostComponent);
+      fixture.detectChanges();
+      resizeTo(fixture, 100);
+      expect(fixture.nativeElement.querySelector('table.compact')).toBeNull();
+      expect(fixture.nativeElement.querySelectorAll('th').length).toBe(2);
     });
   });
 

@@ -1,5 +1,5 @@
 <score-list-page [title]="'BIE_CREATE.TITLE' | translate" [subtitle]="subtitle">
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams"
+  <score-table-view emptyMessage="No Business Context" #tableView [table]="columns" [load]="load" [extraParams]="extraParams"
     [selection]="selection" [rowKey]="rowKey" searchClearsSort rowHover>
 
     <ng-container scoreColumnDef="name">
@@ -29,6 +29,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)" external/>
     </ng-container>
   </score-table-view>
   <ng-container ngProjectAs="[listActionBar]">

@@ -38,6 +38,7 @@ import {Message} from '@stomp/stompjs';
 import {hashCode, initFilter} from '../../common/utility';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -75,6 +76,19 @@ export class AgencyIdListDetailComponent implements OnInit {
   filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
   valueFilterCtrl: FormControl = new FormControl();
   valueFilteredList: ReplaySubject<AgencyIdListValueDetails[]> = new ReplaySubject<AgencyIdListValueDetails[]>(1);
+
+  /** What the compact row shows of a value: made once for a row. Clicking it opens the value, as the row of the columns does. */
+  readonly compactRecord = memoizeRow((value: AgencyIdListValueDetails): CompactRecord => ({
+    badges: value.deprecated ? [{text: 'Deprecated', kind: 'state', cssClass: 'cl-state', state: 'Deprecated'}] : [],
+    title: value.value,
+    titleLabel: 'Value',
+    subtitle: value.name,
+    subtitleLabel: value.name ? 'Name' : undefined,
+    meta: [
+      ...(value.definition?.content ? [{label: 'Definition', value: value.definition.content, priority: 2 as const}] : []),
+      ...(value.definition?.source ? [{label: 'Source', value: value.definition.source, priority: 4 as const}] : [])
+    ]
+  }));
 
   readonly columns = createTableColumns(AGENCY_ID_LIST_VALUE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<AgencyIdListValueDetails>>(ScoreTableViewComponent);

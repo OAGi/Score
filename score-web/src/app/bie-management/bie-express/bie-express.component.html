@@ -5,7 +5,7 @@
       (libraryChange)="onLibraryChange($event)"/>
   </ng-container>
   <mat-card class="pt-3">
-    <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+    <score-table-view emptyMessage="No Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
       [selection]="selection" [rowKey]="rowKey" [busy]="busy()" searchClearsSort rowHover advancedSearchOffset="14.5rem">
 
       <div searchPrefix class="d-flex">
@@ -144,6 +144,10 @@
             <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
           </div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-bie-compact-row [element]="element" [link]="'/profile_bie/' + element.topLevelAsbiepId" external/>
       </ng-container>
     </score-table-view>
   </mat-card>

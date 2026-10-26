@@ -47,6 +47,7 @@ import {PageRequest} from '../../../basis/basis';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 import {ReleaseSummary} from '../../../release-management/domain/release';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
@@ -78,6 +79,16 @@ export class OasDocDetailComponent implements OnInit {
   hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
+
+  /** What the compact row shows of a BIE of the document: made once for a row. The controls of the endpoint go under it. */
+  readonly compactRecord = memoizeRow((bie: BieForOasDoc): CompactRecord => ({
+    badges: bie.releaseNum ? [{text: bie.releaseNum}] : [],
+    title: bie.den,
+    link: bie.topLevelAsbiepId ? '/profile_bie/' + bie.topLevelAsbiepId : undefined,
+    titleTag: bie.displayName || undefined,
+    subtitle: bie.guid,
+    meta: bie.remark ? [{label: 'Remark', value: bie.remark}] : []
+  }));
 
   readonly columns = createTableColumns(OAS_DOC_BIE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BieForOasDoc>>(ScoreTableViewComponent);

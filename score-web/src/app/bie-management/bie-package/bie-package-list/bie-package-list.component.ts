@@ -19,6 +19,7 @@ import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../..
 import {LibraryService} from '../../../library-management/domain/library.service';
 import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryChoice} from '../../../library-management/domain/library-choice';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const BIE_PACKAGE_TABLE = defineTable({
   storageKey: 'TableColumns-BiePackagePage',
@@ -74,6 +75,23 @@ export class BiePackageListComponent {
   title = 'BIE Package';
 
   readonly libraryChoice = new LibraryChoice(this.auth);
+  /** What the compact row shows of a BIE package: made once for a row. */
+  readonly compactRecord = memoizeRow((biePackage: BiePackageListEntry): CompactRecord => ({
+    badges: [
+      {text: biePackage.state, kind: 'state', cssClass: 'bie-state', state: biePackage.state},
+      ...(biePackage.releases?.length ? [{text: biePackage.releases.map(release => release.releaseNum).join(', ')}] : [])
+    ],
+    title: biePackage.name,
+    link: '/bie_package/' + biePackage.biePackageId,
+    meta: [
+      {label: 'Owner', value: biePackage.owner?.loginId, strong: true},
+      ...(biePackage.versionId ? [{label: 'Version ID', value: biePackage.versionId, priority: 1 as const}] : []),
+      ...(biePackage.versionName ? [{label: 'Version Name', value: biePackage.versionName, priority: 1 as const}] : []),
+      ...(biePackage.description ? [{label: 'Description', value: biePackage.description, priority: 3 as const}] : [])
+    ],
+    updated: biePackage.lastUpdated ? {when: biePackage.lastUpdated.when, by: biePackage.lastUpdated.who?.loginId} : undefined
+  }));
+
   readonly columns = createTableColumns(BIE_PACKAGE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BiePackageListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(true, []);

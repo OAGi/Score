@@ -18,6 +18,7 @@ import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../..
 import {LibrarySummary} from '../../../library-management/domain/library';
 import {LibraryChoice} from '../../../library-management/domain/library-choice';
 import {LibraryService} from '../../../library-management/domain/library.service';
+import {BieCompactRowElement} from '../../bie-compact-row/bie-compact-row.component';
 
 const OAS_DOC_ASSIGN_TABLE = defineTable({
   ...BIE_TABLE,
@@ -94,6 +95,33 @@ export class OasDocAssignDialogComponent implements OnInit {
     })
   );
   readonly rowKey = (row: BieForOasDoc) => row;
+
+  private readonly compactRows = new WeakMap<BieForOasDoc, BieCompactRowElement>();
+
+  /** What the compact row shows of a BIE of the list (which has its own shape): made once for a row, so that the row is not drawn again. */
+  compactRow(element: BieForOasDoc): BieCompactRowElement {
+    let row = this.compactRows.get(element);
+    if (!row) {
+      const owner: any = element.owner;
+      row = {
+        guid: element.guid,
+        den: element.den,
+        displayName: element.displayName,
+        state: element.state,
+        release: {releaseNum: element.releaseNum},
+        owner: {loginId: typeof owner === 'string' ? owner : owner?.loginId},
+        version: element.version,
+        status: element.status,
+        bizTerm: (element as any).bizTerm,
+        remark: element.remark,
+        businessContextList: element.businessContexts,
+        // The update is left out, as the column of it is (see `hiddenColumns` of the table).
+        lastUpdated: undefined
+      };
+      this.compactRows.set(element, row);
+    }
+    return row;
+  }
 
   constructor() {
     afterNextRender(() => this.start());

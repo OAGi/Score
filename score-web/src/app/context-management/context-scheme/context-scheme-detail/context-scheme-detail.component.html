@@ -52,7 +52,7 @@
   </score-detail-card>
 
   <score-detail-card heading="Context Scheme Values">
-    <score-table-view #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows" [rowSelectable]="rowSelectable" unselectableTooltip="It is currently in use by another component."
+    <score-table-view emptyMessage="No Context Scheme Value" #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" [allRows]="allRows" [rowSelectable]="rowSelectable" unselectableTooltip="It is currently in use by another component."
       [syncUrl]="false" [selectOnRowClick]="false" rowHover pageFromResponse (rowClick)="openDialog($event)">
 
       <ng-container scoreColumnDef="value">
@@ -63,6 +63,10 @@
         <td score-cell *scoreCellDef="let element">
           <div [innerHTML]="element.meaning | highlight : tableView.applied('search') : ['bg-warning']"></div>
         </td>
+      </ng-container>
+      <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+      <ng-container *scoreCompactDef="let element">
+        <score-record-compact-row [record]="compactRecord(element)"/>
       </ng-container>
     </score-table-view>
     <ng-container ngProjectAs="[cardActions]">

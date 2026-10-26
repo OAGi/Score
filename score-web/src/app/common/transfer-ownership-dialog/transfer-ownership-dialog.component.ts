@@ -7,6 +7,8 @@ import {AccountListEntry} from '../../account-management/domain/accounts';
 import {ACCOUNT_TABLE} from '../../account-management/domain/account.table';
 import {AuthService} from '../../authentication/auth.service';
 import {createTableColumns, defineTable} from '../score-table';
+import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+import {AccountCompactSource, accountCompactRecord} from '../../account-management/domain/account-compact';
 
 /** The account list, to choose who the ownership goes to: the role is given by the one who opens the dialog. */
 const TRANSFER_OWNERSHIP_TABLE = defineTable({
@@ -26,6 +28,9 @@ export class TransferOwnershipDialogComponent {
   private auth = inject(AuthService);
   private accountService = inject(AccountListService);
   data = inject(MAT_DIALOG_DATA);
+
+  /** What the compact row shows of an account: made once for a row. */
+  readonly compactRecord = memoizeRow((account: AccountCompactSource): CompactRecord => accountCompactRecord(account, {status: true}));
 
   readonly columns = createTableColumns(TRANSFER_OWNERSHIP_TABLE);
   selection = new SelectionModel<AccountListEntry>(false, []);

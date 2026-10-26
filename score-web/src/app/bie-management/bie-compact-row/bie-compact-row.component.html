@@ -1,0 +1,60 @@
+<div class="bie-compact">
+  <div class="bie-compact-side">
+    <span class="bie-state {{ element().state }}"
+          [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element().state).background,
+          'color': webPageInfo.getComponentStateColorSet(element().state).font}">{{ element().state }}</span>
+    @if (element().deprecated) {
+      <span class="bie-state Deprecated" [matTooltip]="deprecatedTooltip(element())"
+            [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
+            'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
+    }
+    <mat-chip [matTooltip]="element().release.releaseNum">{{ element().release.releaseNum }}</mat-chip>
+  </div>
+  <div class="bie-compact-body">
+    <div class="bie-compact-grid">
+      <div class="bie-compact-title score-break-word">
+        @if (link()) {
+          <a [routerLink]="link()" [target]="external() ? '_blank' : undefined" [attr.rel]="external() ? 'noopener noreferrer' : null">{{ element().den }}</a>
+        } @else {
+          <span [matTooltip]="restriction() ?? ''">{{ element().den }}</span>
+        }
+        @if (element().displayName) {
+          <span class="bie-display-name ms-2">{{ element().displayName }}</span>
+        }
+      </div>
+      <div class="bie-compact-guid score-break-word">{{ element().guid }}</div>
+      <div class="bie-compact-meta">
+        <span class="bie-owner">Owner <b>{{ element().owner.loginId }}</b></span>
+        @if (element().version) {
+          <span class="bie-version">Version <b>{{ element().version }}</b></span>
+        }
+        @if (element().status) {
+          <span class="bie-status">Status <b>{{ element().status }}</b></span>
+        }
+        @if (element().businessContextList?.length) {
+          <span class="bie-contexts">
+            <span class="bie-compact-label">Contexts</span>
+            @for (context of element().businessContextList; track context.businessContextId) {
+              <a [routerLink]="'/context_management/business_context/' + context.businessContextId" target="_blank" rel="noopener noreferrer">{{ context.name }}</a>
+            }
+          </span>
+        }
+        @if (element().bizTerm) {
+          <span class="bie-biz-term"><span class="bie-compact-label">Business Term</span>{{ element().bizTerm }}</span>
+        }
+        @if (element().remark) {
+          <span class="bie-remark"><span class="bie-compact-label">Remark</span>{{ element().remark }}</span>
+        }
+      </div>
+      <div class="bie-compact-slot"><ng-content/></div>
+      @if (element().lastUpdated; as updated) {
+        <div class="bie-compact-updated">
+          <span>Updated {{ updated.when | date: 'yyyy-MM-dd HH:mm' }}</span>
+          @if (updated.who) {
+            <span>by <b>{{ updated.who.loginId }}</b></span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

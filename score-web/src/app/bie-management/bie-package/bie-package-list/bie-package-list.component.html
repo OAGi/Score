@@ -5,16 +5,11 @@
       (libraryChange)="onLibraryChange($event)"/>
   </ng-container>
   <ng-container ngProjectAs="[listActions]">
-    <button mat-raised-button class="ms-2" color="primary" (click)="create()">
-      New BIE Package
-    </button>
-    <button mat-raised-button class="ms-2" color="warn" (click)="discard()"
-      [disabled]="selection.selected.length === 0">
-      Discard
-    </button>
+    <score-responsive-button label="New BIE Package" (pressed)="create()"/>
+    <score-responsive-button label="Discard" icon="delete" color="warn" [disabled]="selection.selected.length === 0" (pressed)="discard()"/>
   </ng-container>
 
-  <score-table-view #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
+  <score-table-view emptyMessage="No BIE Package" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
     [selection]="selection" [rowKey]="rowKey"
     [busy]="busy()" multiSort advancedSearchOffset="14.5rem">
 
@@ -87,6 +82,10 @@
           <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
+    </ng-container>
+    <!-- A narrow screen: the record as one block, not the columns squeezed. -->
+    <ng-container *scoreCompactDef="let element">
+      <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
 </score-list-page>

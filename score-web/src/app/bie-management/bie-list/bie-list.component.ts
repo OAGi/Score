@@ -149,6 +149,18 @@ export class BieListComponent {
   }
 
   /** The search part of a link to the list that shows the BIE (a `q=` of the current query, with what the link says). */
+  /** A BIE that is not the user's, and is in a state that others may not open. */
+  canOpen(element: BieListEntry): boolean {
+    return this.isAdmin || (element.access !== 'Prohibited' && element.access !== 'Unprepared');
+  }
+
+  accessRestriction(element: BieListEntry): string | undefined {
+    if (this.canOpen(element)) {
+      return undefined;
+    }
+    return element.access === 'Prohibited' ? 'Only the owner can access BIE in this state.' : 'This profile BIE is in progress.';
+  }
+
   linkQuery(extras: { [key: string]: any }): string {
     const q = queryToUrl(BIE_LIST_TABLE, this.view().query);
     let params = new HttpParams({fromString: base64Decode(q.substring('q='.length))});

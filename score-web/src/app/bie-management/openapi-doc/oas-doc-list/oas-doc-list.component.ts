@@ -7,6 +7,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 import {OasDoc, toMinorOpenApiVersion} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 const OPEN_API_DOCUMENT_TABLE = defineTable({
   storageKey: 'TableColumns-OpenAPIDocumentPage',
@@ -44,6 +45,20 @@ export class OasDocListComponent {
   private snackBar = inject(MatSnackBar);
 
   title = 'OpenAPI Document';
+
+  /** What the compact row shows of an OpenAPI document: made once for a row. */
+  readonly compactRecord = memoizeRow((doc: OasDoc): CompactRecord => ({
+    title: doc.title,
+    link: '/profile_bie/express/oas_doc/' + doc.oasDocId,
+    subtitle: doc.guid,
+    meta: [
+      ...(doc.openAPIVersion ? [{label: 'OpenAPI', value: doc.openAPIVersion}] : []),
+      ...(doc.version ? [{label: 'Version', value: doc.version, priority: 1 as const}] : []),
+      ...(doc.licenseName ? [{label: 'License', value: doc.licenseName, priority: 2 as const}] : []),
+      ...(doc.description ? [{label: 'Description', value: doc.description, priority: 3 as const}] : [])
+    ],
+    updated: doc.lastUpdateTimestamp ? {when: doc.lastUpdateTimestamp, by: doc.lastUpdatedBy?.loginId} : undefined
+  }));
 
   readonly columns = createTableColumns(OPEN_API_DOCUMENT_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<OasDoc>>(ScoreTableViewComponent);
