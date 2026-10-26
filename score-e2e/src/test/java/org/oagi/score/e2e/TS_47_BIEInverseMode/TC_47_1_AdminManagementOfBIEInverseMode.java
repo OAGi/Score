@@ -56,7 +56,7 @@ public class TC_47_1_AdminManagementOfBIEInverseMode extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         try {
             loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-            getDriver().get(getConfig().getBaseUrl().resolve("/settings/application_settings").toString());
+            getDriver().get(getConfig().getBaseUrl().resolve("/settings/application_settings/features").toString());
             assertFalse(getDriver().findElements(INVERSE_MODE_LABEL).stream().anyMatch(WebElement::isDisplayed),
                     "A non-admin must not see the BIE Inverse Mode application setting on the direct route.");
         } finally {
@@ -68,7 +68,7 @@ public class TC_47_1_AdminManagementOfBIEInverseMode extends BaseTest {
     @DisplayName("TC_47_1_TA_2: enable and disable confirmation can be cancelled or confirmed")
     public void admin_can_toggle_the_setting_and_cancel_without_changing_it() {
         loginPage().signIn("oagis", "oagis");
-        getDriver().get(getConfig().getBaseUrl().resolve("/settings/application_settings").toString());
+        getDriver().get(getConfig().getBaseUrl().resolve("/settings/application_settings/features").toString());
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfElementLocated(INVERSE_MODE_LABEL));
 
@@ -89,6 +89,27 @@ public class TC_47_1_AdminManagementOfBIEInverseMode extends BaseTest {
         clickWhenReady(wait, DISABLE_BUTTON);
         clickWhenReady(wait, DIALOG_DISABLE_BUTTON);
         wait.until(ignored -> !getAPIFactory().getApplicationSettingsAPI().isBIEInverseModeEnabled());
+    }
+
+    @Test
+    @DisplayName("TC_47_1_TA_3: Application settings is split into sub-menu pages and the bare URL opens the first one")
+    public void application_settings_is_split_into_sub_menu_pages() {
+        loginPage().signIn("oagis", "oagis");
+        getDriver().get(getConfig().getBaseUrl().resolve("/settings/application_settings").toString());
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(INVERSE_MODE_LABEL));
+        assertTrue(getDriver().getCurrentUrl().endsWith("/settings/application_settings/features"));
+
+        String[][] pages = {
+                {"SMTP Settings", "smtp"},
+                {"Filename Expressions", "filename-expressions"},
+                {"Web Page Settings", "web-page"}};
+        for (String[] page : pages) {
+            clickWhenReady(wait, By.xpath("//a[contains(@class,'sub-item')][normalize-space(.)='" + page[0] + "']"));
+            wait.until(ExpectedConditions.urlContains("/settings/application_settings/" + page[1]));
+            assertTrue(getDriver().findElements(INVERSE_MODE_LABEL).stream().noneMatch(WebElement::isDisplayed),
+                    page[0] + " must not show the Application Features settings.");
+        }
     }
 
     private void clickWhenReady(WebDriverWait wait, By locator) {

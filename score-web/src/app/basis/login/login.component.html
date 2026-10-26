@@ -9,6 +9,9 @@
   <div class="login-panel">
     @if ((oauth2AppInfos | async); as oAuth2AppInfos) {
       <div class="auth-form">
+        @if ((brand | async); as brandLogo) {
+          <div class="login-brand" [innerHTML]="brandLogo"></div>
+        }
         @if (!roles.includes('pending') && !roles.includes('reject')) {
         <form role="form" autocomplete="on" (submit)="onSubmit()">
           <h2 class="auth-form-title">Welcome</h2>

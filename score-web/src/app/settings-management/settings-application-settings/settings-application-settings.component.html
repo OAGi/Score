@@ -1,19 +1,17 @@
 <score-base-page [loading]="loading" [showToolbar]="false">
   <div class="settings-layout">
-    <score-settings-menu active="ApplicationSettings"></score-settings-menu>
+    <score-settings-menu [active]="menuItem"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
         <mat-card class="p-0">
           <mat-toolbar class="bg-white">
-            <span class="title">{{ title }}</span>
+            <span class="title">{{ sectionTitle }}</span>
             <span class="flex-11-auto"></span>
           </mat-toolbar>
           <mat-card class="mb-2">
             <mat-card-content class="mat-card-container">
+              @if (section === 'features') {
               <div>
-                <div class="subhead">
-                  <h4 class="subhead-heading">Application Features</h4>
-                </div>
                 <div class="row">
                   <div class="col-md-4 col-sm-12">
                     <mat-label>Multi-tenant mode</mat-label>
@@ -98,11 +96,9 @@
                   </div>
                 </div>
               </div>
-              @if (!!applicationSettingsInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">SMTP settings</h4>
-                  </div>
+              }
+              @if (section === 'smtp' && !!applicationSettingsInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-3">
@@ -167,11 +163,8 @@
                   </div>
                 </div>
               }
-              @if (!!applicationSettingsInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">Filename Expressions</h4>
-                  </div>
+              @if (section === 'filename-expressions' && !!applicationSettingsInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-12">
@@ -271,11 +264,8 @@
                   </div>
                 </div>
               }
-              @if (!!webPageInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">Web Page Settings</h4>
-                  </div>
+              @if (section === 'web-page' && !!webPageInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-8">
