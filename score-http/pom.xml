@@ -70,7 +70,7 @@
         <!-- lettuce/netty versions are managed by the Spring Boot 4 BOM (pins removed for #1750). -->
         <redisson.version>4.7.0</redisson.version>
         <lombok.version>1.18.48</lombok.version>
-        <mariadb-client.version>3.5.10</mariadb-client.version>
+        <mariadb-client.version>4.0.0</mariadb-client.version>
         <log4j.version>2.25.5</log4j.version>
         <jOOQ.version>3.21.9</jOOQ.version>
         <guava.version>33.7.2-jre</guava.version>
