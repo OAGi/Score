@@ -1,11 +1,20 @@
 .login-page {
+  /* oagi.org palette */
+  --login-navy: #051e38;
+  --login-blue: #0077b6;
+  --login-cyan: #00b4d8;
+  --login-divider: #d9ebf4;
+  --login-border: #dfe3e8;
+  --login-muted: #5b6877;
+  --login-ink: #1f2d3d;
+
   display: grid;
   grid-template-columns: minmax(320px, 5fr) 6fr;
   min-height: 100vh;
 }
 
 .login-hero {
-  background-color: #1f3a5f;
+  background-color: var(--login-navy);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -66,7 +75,20 @@
   width: 380px;
 }
 
+/* The logo is administrator-defined SVG of unknown colors, so it sits on the white panel (as in the navbar), not the navy hero. */
+.login-brand {
+  margin-bottom: 28px;
+}
+
+.login-brand ::ng-deep svg {
+  display: block;
+  height: 26px;
+  max-width: 100%;
+  width: auto;
+}
+
 .auth-form-title {
+  color: var(--login-blue);
   font-size: 34px;
   font-weight: 700;
   letter-spacing: -0.6px;
@@ -75,7 +97,7 @@
 }
 
 .auth-form-subtitle {
-  color: #5b6877;
+  color: var(--login-muted);
   font-size: 14px;
   margin: 0 0 20px;
 }
@@ -85,7 +107,7 @@
 }
 
 .statement-container {
-  color: #5b6877;
+  color: var(--login-muted);
   font-size: 13px;
   margin-top: 28px;
   max-width: 380px;
@@ -150,6 +172,7 @@ label {
 }
 
 .label-link {
+  color: var(--login-blue);
   float: right;
   font-size: 12px;
 }
@@ -214,36 +237,36 @@ label {
 }
 
 .auth-form .form-control {
-  border-color: #dfe3e8;
+  border-color: var(--login-border);
 }
 
 .auth-form .form-control:focus {
-  border-color: #1f3a5f;
-  box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.18);
+  border-color: var(--login-cyan);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-cyan) 25%, transparent);
 }
 
 .auth-form .btn-primary {
-  background-color: #1f3a5f;
-  border-color: #1f3a5f;
+  background-color: var(--login-navy);
+  border-color: var(--login-navy);
   font-weight: 600;
 }
 
 .auth-form .btn-primary:hover:not(:disabled),
 .auth-form .btn-primary:focus-visible {
-  background-color: #2a4a77;
-  border-color: #2a4a77;
+  background-color: var(--login-blue);
+  border-color: var(--login-blue);
 }
 
 .auth-form .btn-outline-secondary {
   background-color: #fff;
-  border-color: #dfe3e8;
-  color: #1f2d3d;
+  border-color: var(--login-border);
+  color: var(--login-ink);
 }
 
 .auth-form .btn-outline-secondary:hover {
   background-color: #f4f6f9;
   border-color: #c5ccd5;
-  color: #1f2d3d;
+  color: var(--login-ink);
 }
 
 .passkey-login-button {
@@ -266,7 +289,7 @@ label {
 }
 
 .auth-form .line-separator {
-  background-color: #dfe3e8;
+  background-color: var(--login-divider);
 }
 
 .oauth2-form-body {

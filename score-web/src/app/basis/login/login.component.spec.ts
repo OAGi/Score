@@ -33,7 +33,7 @@ describe('LoginComponent passkey sign-in', () => {
   let offer: { offerAfterPasswordSignIn: ReturnType<typeof vi.fn> };
 
   function setup(options: {
-    supported?: boolean; enabled?: boolean; oidc?: any[]; conditional?: boolean; hasPasskey?: boolean;
+    supported?: boolean; enabled?: boolean; oidc?: any[]; conditional?: boolean; hasPasskey?: boolean; brand?: string;
   } = {}) {
     router = {navigateByUrl: vi.fn().mockResolvedValue(true)};
     snackBar = {open: vi.fn()};
@@ -62,7 +62,7 @@ describe('LoginComponent passkey sign-in', () => {
       providers: [
         provideHttpClient(),
         {provide: AuthService, useValue: auth},
-        {provide: WebPageInfoService, useValue: {load: () => of(null)}},
+        {provide: WebPageInfoService, useValue: {load: () => of(options.brand ? {brand: options.brand} : null)}},
         {provide: PasskeyService, useValue: passkey},
         {provide: PasskeyOfferService, useValue: offer},
         {provide: Router, useValue: router},
@@ -121,6 +121,21 @@ describe('LoginComponent passkey sign-in', () => {
     it('lets the browser offer passkeys in the username field when enabled', () => {
       setup({enabled: true});
       expect(usernameInput().getAttribute('autocomplete')).toBe('username webauthn');
+    });
+  });
+
+  describe('brand logo', () => {
+    it('shows the administrator-defined SVG above the welcome title', () => {
+      setup({enabled: false, brand: '<svg class="custom-logo" width="160" height="26"></svg>'});
+      const logo = el().querySelector('.login-brand') as HTMLElement;
+      expect(logo.querySelector('svg.custom-logo')).not.toBeNull();
+      expect(logo.compareDocumentPosition(el().querySelector('.auth-form-title')) & Node.DOCUMENT_POSITION_FOLLOWING)
+        .toBeTruthy();
+    });
+
+    it('shows no logo block when no brand is set', () => {
+      setup({enabled: false});
+      expect(el().querySelector('.login-brand')).toBeNull();
     });
   });
 
