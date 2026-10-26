@@ -146,15 +146,13 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     public void deleteAppUserById(BigInteger appUserIdBigInteger) {
         ULong appUserId = ULong.valueOf(appUserIdBigInteger);
 
-        ReleaseRecord publishedRelease = dslContext.selectFrom(RELEASE)
-                .where(and(
-                        RELEASE.CREATED_BY.eq(appUserId),
-                        RELEASE.STATE.eq("Published")
-                ))
-                .orderBy(RELEASE.LAST_UPDATE_TIMESTAMP.desc())
-                .fetchAny();
-        if (publishedRelease != null) {
-            revertWorkingRelease(appUserId, publishedRelease);
+        // A user can leave several releases behind, and each one holds manifests of its own, so revert them all, the newest first.
+        List<ReleaseRecord> releases = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.CREATED_BY.eq(appUserId))
+                .orderBy(RELEASE.RELEASE_ID.desc())
+                .fetch();
+        for (ReleaseRecord release : releases) {
+            revertWorkingRelease(appUserId, release);
         }
 
         int attempts = 0;
@@ -1027,10 +1025,32 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         List<ULong> releaseIdList = dslContext.select(RELEASE.RELEASE_ID)
                 .from(RELEASE)
                 .where(RELEASE.CREATED_BY.eq(appUserId))
+                .orderBy(RELEASE.RELEASE_ID.desc())
                 .fetchInto(ULong.class);
-        if (releaseIdList != null && !releaseIdList.isEmpty()) {
+        for (ULong releaseId : releaseIdList) {
+            ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                    .where(RELEASE.RELEASE_ID.eq(releaseId))
+                    .fetchOne();
+            // The neighbours must not keep pointing at the deleted release. The Working release only points back
+            // to the last published one, and the published one does not point forward to it.
+            boolean nextIsWorking = release.getNextReleaseId() != null && "Working".equals(dslContext
+                    .select(RELEASE.RELEASE_NUM)
+                    .from(RELEASE)
+                    .where(RELEASE.RELEASE_ID.eq(release.getNextReleaseId()))
+                    .fetchOneInto(String.class));
+            dslContext.update(RELEASE)
+                    .set(RELEASE.NEXT_RELEASE_ID, nextIsWorking ? null : release.getNextReleaseId())
+                    .where(RELEASE.NEXT_RELEASE_ID.eq(releaseId))
+                    .execute();
+            dslContext.update(RELEASE)
+                    .set(RELEASE.PREV_RELEASE_ID, release.getPrevReleaseId())
+                    .where(RELEASE.PREV_RELEASE_ID.eq(releaseId))
+                    .execute();
+            dslContext.deleteFrom(RELEASE_DEP)
+                    .where(RELEASE_DEP.RELEASE_ID.eq(releaseId))
+                    .execute();
             dslContext.deleteFrom(RELEASE)
-                    .where(RELEASE.RELEASE_ID.in(releaseIdList))
+                    .where(RELEASE.RELEASE_ID.eq(releaseId))
                     .execute();
         }
     }

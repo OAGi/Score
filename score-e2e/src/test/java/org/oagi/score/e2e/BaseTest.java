@@ -3,6 +3,8 @@ package org.oagi.score.e2e;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
@@ -16,9 +18,33 @@ import org.openqa.selenium.WebDriver;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@ExtendWith(BaseTest.ScreenshotOnFailure.class)
+@ExtendWith({BaseTest.ScreenshotOnFailure.class, BaseTest.APIFactoryLifecycle.class})
 public class BaseTest {
+
+    /**
+     * Gives each test class its own APIFactory (a one-connection pool, so session settings such as FOREIGN_KEY_CHECKS
+     * stay on one connection) and closes it once the class is done. Classes run concurrently, so the factory cannot
+     * live in one shared field, and a pool that is never closed keeps its connection until the database refuses
+     * new ones, which also makes the clean-up of the test data fail.
+     */
+    static class APIFactoryLifecycle implements BeforeAllCallback, AfterAllCallback {
+        @Override
+        public void beforeAll(ExtensionContext context) {
+            BaseTest.config = Configuration.load();
+            apiFactories.put(context.getRequiredTestClass(), DSLContextAPIFactory.build(config));
+        }
+
+        @Override
+        public void afterAll(ExtensionContext context) throws Exception {
+            APIFactory apiFactory = apiFactories.remove(context.getRequiredTestClass());
+            if (apiFactory != null) {
+                apiFactory.close();
+            }
+        }
+    }
 
     /** Saves what the browser showed when a test failed, as target/screenshots/&lt;class&gt;.&lt;method&gt;.png. */
     static class ScreenshotOnFailure implements TestExecutionExceptionHandler {
@@ -41,7 +67,7 @@ public class BaseTest {
 
     private static Configuration config;
 
-    private static APIFactory apiFactory;
+    private static final Map<Class<?>, APIFactory> apiFactories = new ConcurrentHashMap<>();
     private WebDriver driver;
 
     private LoginPage loginPage;
@@ -54,9 +80,6 @@ public class BaseTest {
 
         // Set a default log level
         // System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG");
-
-        BaseTest.config = Configuration.load();
-        BaseTest.apiFactory = DSLContextAPIFactory.build(BaseTest.config);
     }
 
     @BeforeEach
@@ -75,7 +98,7 @@ public class BaseTest {
     }
 
     public APIFactory getAPIFactory() {
-        return apiFactory;
+        return apiFactories.get(getClass());
     }
 
     public LoginPage loginPage() {
