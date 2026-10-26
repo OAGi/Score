@@ -1,4 +1,4 @@
-FROM mariadb:11.8.9
+FROM mariadb:13.0.2
 
 LABEL maintainer="Hakju Oh <hakju.oh@nist.gov>"
 
