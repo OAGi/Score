@@ -31,6 +31,7 @@ import {BranchSelectorComponent} from './branch-selector/branch-selector.compone
 import {TreeSearchBarComponent} from './tree-search-bar/tree-search-bar.component';
 import {TreeBreadcrumbsComponent} from './tree-breadcrumbs/tree-breadcrumbs.component';
 import {TreeDetailComponent} from './tree-detail/tree-detail.component';
+import {TreeSettingsButtonComponent} from './tree-settings-button/tree-settings-button.component';
 import {TreeViewportComponent} from './tree-viewport/tree-viewport.component';
 
 @NgModule({
@@ -60,6 +61,7 @@ import {TreeViewportComponent} from './tree-viewport/tree-viewport.component';
     TreeSearchBarComponent,
     TreeBreadcrumbsComponent,
     TreeDetailComponent,
+    TreeSettingsButtonComponent,
     TreeViewportComponent,
     MatDialogModule,
     MatCardModule,
@@ -81,6 +83,7 @@ import {TreeViewportComponent} from './tree-viewport/tree-viewport.component';
     TreeSearchBarComponent,
     TreeBreadcrumbsComponent,
     TreeDetailComponent,
+    TreeSettingsButtonComponent,
     TreeViewportComponent,
     UnboundedPipe,
     HighlightSearch,

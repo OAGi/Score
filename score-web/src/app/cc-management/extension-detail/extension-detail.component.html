@@ -4,11 +4,7 @@
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
         <div class="actions ms-auto">
-          <button mat-icon-button mat-small-icon-button [id]="'cc-settings'"
-            [matMenuTriggerFor]="settingsContextMenu"
-            [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-            <mat-icon>settings</mat-icon>
-          </button>
+          <score-tree-settings-button [menu]="settingsContextMenu" buttonId="cc-settings"></score-tree-settings-button>
           @if (state === 'WIP' && access === 'CanEdit') {
             <button mat-raised-button color="primary" (click)="updateDetails()"
               [disabled]="updateDisabled">

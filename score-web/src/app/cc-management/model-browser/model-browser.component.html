@@ -4,16 +4,8 @@
                      [tree]="tree" (nodeSelect)="onClick($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
-        <div class="actions ms-auto d-flex align-items-center">
-          <div>
-            <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
-              [matMenuTriggerFor]="settingsContextMenu"
-              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-              <mat-icon>settings</mat-icon>
-            </button>
-          </div>
-          <div class="ms-3">
-          </div>
+        <div class="actions ms-auto">
+          <score-tree-settings-button [menu]="settingsContextMenu" buttonId="bie-settings"></score-tree-settings-button>
         </div>
         <mat-menu class="context-menu" #settingsContextMenu="matMenu">
           <button mat-menu-item [id]="'bie-settings-hide-cardinality'">

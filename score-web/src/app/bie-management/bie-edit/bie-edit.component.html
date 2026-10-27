@@ -126,56 +126,48 @@
                      [tree]="tree" (nodeSelect)="onClick($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
-        <div class="actions ms-auto d-flex align-items-center">
-          <div>
-            <button mat-icon-button mat-small-icon-button [id]="'bie-settings'"
-              [matMenuTriggerFor]="settingsContextMenu"
-              [matMenuTriggerData]="{'menuId': 'settingsContextMenu'}">
-              <mat-icon>settings</mat-icon>
+        <div class="actions ms-auto">
+          <score-tree-settings-button [menu]="settingsContextMenu" buttonId="bie-settings"></score-tree-settings-button>
+          <!-- Issue #1312: Update commits content edits, so it is owner-only — a non-owner (incl. an
+               admin) views a WIP BIE read-only and has nothing to commit. (Move to QA / Discard below
+               are state transitions, not content edits, so an admin keeps them; see Issue #1576.) -->
+          @if (state === 'WIP' && access === 'CanEdit') {
+            <button mat-raised-button color="primary" (click)="updateDetails()"
+              matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
+              [matBadgeHidden]="sizeOfChanges === 0"
+              [disabled]="updateDisabled">
+              Update
             </button>
-          </div>
-          <div class="ms-3">
-            <!-- Issue #1312: Update commits content edits, so it is owner-only — a non-owner (incl. an
-                 admin) views a WIP BIE read-only and has nothing to commit. (Move to QA / Discard below
-                 are state transitions, not content edits, so an admin keeps them; see Issue #1576.) -->
-            @if (state === 'WIP' && access === 'CanEdit') {
-              <button mat-raised-button color="primary" (click)="updateDetails()"
-                matBadgePosition="below after" matBadge="{{ sizeOfChanges }}"
-                [matBadgeHidden]="sizeOfChanges === 0"
-                [disabled]="updateDisabled">
-                Update
-              </button>
-            }
-            <!-- Issue #1576: an administrator retains state-transition governance over any user's WIP BIE
-                 (a last-resort mechanism to move/hand off stranded WIP content), even though content is
-                 read-only for a non-owner (Issue #1312). -->
-            @if (state === 'WIP' && (access === 'CanEdit' || isAdmin)) {
-              <button mat-raised-button color="accent" (click)="updateState('QA')"
-                [disabled]="isUpdating || isChanged || !isValid">
-                Move to QA
-              </button>
-            }
-            <!-- Issue #1576: an administrator retains Discard over any user's WIP BIE (last-resort cleanup),
-                 even though content is read-only for a non-owner (Issue #1312). -->
-            @if ((state === 'WIP' && access === 'CanEdit') || isAdmin) {
-              <button mat-raised-button color="warn" class="ms-2" (click)="discard()"
-                [disabled]="isUpdating || isChanged">
-                Discard
-              </button>
-            }
-            @if (state === 'QA' && (access === 'CanMove' || isAdmin)) {
-              <button mat-raised-button color="warn" (click)="updateState('WIP')"
-                [disabled]="isUpdating">
-                Back to WIP
-              </button>
-            }
-            @if (state === 'QA' && (access === 'CanMove' || isAdmin)) {
-              <button mat-raised-button color="accent" (click)="updateState('Production')"
-                [disabled]="isUpdating">
-                Move to Production
-              </button>
-            }
-          </div>
+          }
+          <!-- Issue #1576: an administrator retains state-transition governance over any user's WIP BIE
+               (a last-resort mechanism to move/hand off stranded WIP content), even though content is
+               read-only for a non-owner (Issue #1312). -->
+          @if (state === 'WIP' && (access === 'CanEdit' || isAdmin)) {
+            <button mat-raised-button color="accent" (click)="updateState('QA')"
+              [disabled]="isUpdating || isChanged || !isValid">
+              Move to QA
+            </button>
+          }
+          <!-- Issue #1576: an administrator retains Discard over any user's WIP BIE (last-resort cleanup),
+               even though content is read-only for a non-owner (Issue #1312). -->
+          @if ((state === 'WIP' && access === 'CanEdit') || isAdmin) {
+            <button mat-raised-button color="warn" (click)="discard()"
+              [disabled]="isUpdating || isChanged">
+              Discard
+            </button>
+          }
+          @if (state === 'QA' && (access === 'CanMove' || isAdmin)) {
+            <button mat-raised-button color="warn" (click)="updateState('WIP')"
+              [disabled]="isUpdating">
+              Back to WIP
+            </button>
+          }
+          @if (state === 'QA' && (access === 'CanMove' || isAdmin)) {
+            <button mat-raised-button color="accent" (click)="updateState('Production')"
+              [disabled]="isUpdating">
+              Move to Production
+            </button>
+          }
         </div>
         <mat-menu class="context-menu" #settingsContextMenu="matMenu">
           <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
