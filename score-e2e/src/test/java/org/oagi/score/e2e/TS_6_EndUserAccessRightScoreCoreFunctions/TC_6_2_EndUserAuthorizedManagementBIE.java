@@ -4251,6 +4251,108 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_validation_panel_on_the_extension_page")
+    public void end_user_is_asked_before_appending_a_property_that_the_local_extension_already_has() {
+        ASCCPObject asccp;
+        AppUserObject usera;
+        BCCPObject bccp;
+        {
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+            bccp = coreComponentAPI.getBCCPByDENAndReleaseNum(library, "Validation Indicator. Indicator", release.getReleaseNumber());
+
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+        }
+        BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+        TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI().
+                generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+        ACCExtensionViewEditPage accExtensionViewEditPage =
+                editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+        String extensionPath = "/" + asccp.getPropertyTerm() + " User Extension Group. Details";
+
+        // the first one breaks nothing: it is appended without asking
+        SelectAssociationDialog selectAssociationDialog = accExtensionViewEditPage.appendPropertyAtLast(extensionPath);
+        selectAssociationDialog.selectAssociation(bccp.getDen());
+        assertTrue(accExtensionViewEditPage.getNodeByPath(extensionPath + "/" + bccp.getPropertyTerm()).isDisplayed());
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+
+        // the second one would make the property term twice: the panel lists it and asks
+        selectAssociationDialog = accExtensionViewEditPage.appendPropertyAtLast(extensionPath);
+        selectAssociationDialog.selectAssociation(bccp.getDen());
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+        assertTrue(getDriver().findElements(By.xpath("//score-confirm-dialog")).isEmpty());
+
+        click(getValidationCancelButton(getDriver()));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+    }
+
+    @Test
+    @DisplayName("TC_6_2_TA_validate_on_the_extension_page")
+    public void end_user_can_validate_the_local_extension() {
+        ASCCPObject asccp;
+        AppUserObject usera;
+        ACCObject extensionAcc;
+        BCCPObject[] bccps = new BCCPObject[2];
+        {
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "Published");
+            coreComponentAPI.appendExtension(acc, developer, namespace, "Published");
+            asccp = coreComponentAPI.createRandomASCCP(acc, developer, namespace, "Published");
+            DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+            bccps[0] = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            bccps[1] = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "Published");
+            coreComponentAPI.updateBCCPPropertyTerm(bccps[1], bccps[0].getPropertyTerm());
+
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            TopLevelASBIEPObject topLevelAsbiep = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+
+            HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+            ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+            EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(topLevelAsbiep);
+            ACCExtensionViewEditPage accExtensionViewEditPage =
+                    editBIEPage.extendBIELocallyOnNode("/" + asccp.getPropertyTerm() + "/Extension");
+
+            // the local extension is there now; give it two properties of one property term, as the page does not allow
+            extensionAcc = coreComponentAPI.getACCByDENAndReleaseNum(library,
+                    asccp.getPropertyTerm() + " User Extension Group. Details", release.getReleaseNumber());
+            coreComponentAPI.appendBCC(extensionAcc, bccps[0], "WIP");
+            coreComponentAPI.appendBCC(extensionAcc, bccps[1], "WIP");
+            getDriver().navigate().refresh();
+
+            String extensionPath = "/" + asccp.getPropertyTerm() + " User Extension Group. Details";
+            accExtensionViewEditPage.validate(extensionPath);
+            List<String> messages = getValidationPanelMessages(getDriver());
+            assertTrue(messages.stream().anyMatch(message -> message.contains(bccps[0].getPropertyTerm())));
+            // nothing is being changed, so nothing is asked
+            assertFalse(isValidationDecisionDisplayed(getDriver()));
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

@@ -459,6 +459,47 @@ public abstract class PageHelper {
         return retry(() -> elementToBeClickable(driver, By.xpath(xpathExpr)));
     }
 
+    /**
+     * The Validation Results panel asks "Cancel or Proceed anyway" when a refactor, an append or a base ACC would
+     * break something. Its buttons are not in a score-confirm-dialog.
+     */
+    private static final By VALIDATION_PANEL_LOCATOR = By.xpath("//score-validation-panel//div[contains(@class, \"validation-panel\")]");
+
+    public static WebElement getValidationProceedButton(WebDriver driver) {
+        return retry(() -> elementToBeClickable(driver, By.id("validation-proceed")));
+    }
+
+    public static WebElement getValidationCancelButton(WebDriver driver) {
+        return retry(() -> elementToBeClickable(driver, By.id("validation-cancel")));
+    }
+
+    /** Waits for the panel to ask, and returns the messages of the problems it lists. */
+    public static List<String> getValidationPanelMessages(WebDriver driver) {
+        retry(() -> visibilityOfElementLocated(driver, VALIDATION_PANEL_LOCATOR));
+        List<String> messages = new ArrayList<>();
+        for (WebElement message : driver.findElements(By.xpath(
+                "//score-validation-panel//div[contains(@class, \"violation\")]//span[contains(@class, \"message\")]"))) {
+            messages.add(getText(message));
+        }
+        return messages;
+    }
+
+    /** The subjects (the ACCs the problems are about) the panel lists, in the order of the problems. */
+    public static List<String> getValidationPanelSubjects(WebDriver driver) {
+        retry(() -> visibilityOfElementLocated(driver, VALIDATION_PANEL_LOCATOR));
+        List<String> subjects = new ArrayList<>();
+        for (WebElement subject : driver.findElements(By.xpath(
+                "//score-validation-panel//div[contains(@class, \"violation\")]//div[contains(@class, \"subject\")]"))) {
+            subjects.add(getText(subject));
+        }
+        return subjects;
+    }
+
+    /** Whether the panel asks to proceed with a change; false once nothing is asked, within a short wait. */
+    public static boolean isValidationDecisionDisplayed(WebDriver driver) {
+        return !driver.findElements(By.id("validation-proceed")).isEmpty();
+    }
+
     public static void switchToNextTab(WebDriver driver) {
         List<String> tabs = new ArrayList<>(driver.getWindowHandles());
         driver.switchTo().window(tabs.get(1));

@@ -193,7 +193,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
@@ -771,7 +771,7 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation("Accrued Amount. Open_ Amount");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();

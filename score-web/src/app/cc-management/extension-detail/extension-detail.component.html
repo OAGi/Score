@@ -77,9 +77,7 @@
                           (dropped)="drop($event)"
                               (nodeClick)="onClick($event)" (nodeKey)="onTreeKey($event)"
                               (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event"
-                              [validationMarker]="validation.marker"
-                              [validationCount]="validation.badgeCount"
-                              [validationHasErrors]="validation.errorCount > 0" (validationShow)="validation.show(null)" (validationMarkerClick)="validation.show($event)">
+                              [decorators]="validation.decorators">
       </score-cc-tree-viewport>
 
       <mat-menu class="context-menu" #contextMenu="matMenu">

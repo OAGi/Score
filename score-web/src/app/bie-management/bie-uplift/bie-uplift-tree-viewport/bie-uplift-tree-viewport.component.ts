@@ -5,6 +5,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {ScoreCommonModule} from '../../../common/score-common.module';
+import {TreeNodeDecorationsComponent} from '../../../common/tree-viewport/tree-node-decorations.component';
+import {TreeNodeDecorator} from '../../../common/tree-viewport/tree-decorator';
 import {TreeViewportComponent} from '../../../common/tree-viewport/tree-viewport.component';
 import {BieFlatNode, BieFlatNodeDataSource, BieFlatNodeDataSourceSearcher} from '../../domain/bie-flat-tree';
 import {BieUpliftSourceFlatNode, BieUpliftTargetFlatNode} from '../domain/bie-uplift';
@@ -33,7 +35,7 @@ export interface BieUpliftTreeRowHost {
   templateUrl: './bie-uplift-tree-viewport.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bie-uplift-tree-viewport.component.css',
-  imports: [ScoreCommonModule, MatCheckboxModule, MatTooltipModule, FaIconComponent, TreeViewportComponent]
+  imports: [ScoreCommonModule, MatCheckboxModule, MatTooltipModule, FaIconComponent, TreeViewportComponent, TreeNodeDecorationsComponent]
 })
 export class BieUpliftTreeViewportComponent<N extends BieFlatNode = BieFlatNode> {
 
@@ -44,6 +46,8 @@ export class BieUpliftTreeViewportComponent<N extends BieFlatNode = BieFlatNode>
   @Input() selectedNode: N | undefined;
   @Input() height: number;
   @Input() contextMenu: MatMenuPanel;
+  /** What features show on the rows; the tree draws them after the status icons. */
+  @Input() decorators: TreeNodeDecorator<N>[] = [];
 
   @Output() nodeClick = new EventEmitter<N>();
   @Output() contextMenuOpen = new EventEmitter<N>();

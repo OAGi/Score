@@ -353,6 +353,14 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     @Override
+    public void validate(String path) {
+        retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(elementToBeClickable(getDriver(), By.id("cc-validate")));
+        });
+    }
+
+    @Override
     public boolean isDeleted(WebElement node) {
         try {
             WebElement elm = node.findElement(By.xpath(

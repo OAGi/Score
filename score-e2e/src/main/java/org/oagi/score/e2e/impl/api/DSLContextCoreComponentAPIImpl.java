@@ -1550,6 +1550,21 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
     }
 
     @Override
+    public void updateBCCPPropertyTerm(BCCPObject bccp, String propertyTerm) {
+        String den = propertyTerm + ". " + bccp.getRepresentationTerm();
+        dslContext.update(BCCP)
+                .set(BCCP.PROPERTY_TERM, propertyTerm)
+                .where(BCCP.BCCP_ID.eq(ULong.valueOf(bccp.getBccpId())))
+                .execute();
+        dslContext.update(BCCP_MANIFEST)
+                .set(BCCP_MANIFEST.DEN, den)
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(ULong.valueOf(bccp.getBccpManifestId())))
+                .execute();
+        bccp.setPropertyTerm(propertyTerm);
+        bccp.setDen(den);
+    }
+
+    @Override
     public void updateBasedDT(BCCPObject bccp, DTObject dataType) {
         dslContext.update(BCCP)
                 .set(BCCP.BDT_ID, ULong.valueOf(dataType.getDtId()))

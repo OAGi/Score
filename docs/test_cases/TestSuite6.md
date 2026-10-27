@@ -138,6 +138,11 @@ Current automation status: not automated yet.
 #### Test Assertion #6.2.15
 The end user can view the details of a BIE that is in WIP state and owned by another user (developer or end user) but cannot make any change (Issue #1312).
 
+#### Test Assertion #6.2.16
+On the page of a local extension (the user extension group ACC), appending a property that would add a duplicate property term shows the Validation Results panel, which lists the problem and asks Cancel or Proceed anyway. It works as it does for an ACC (assertion [#15.8.1.g](TestSuite15.md#test-assertion-1581g)): a property that breaks nothing is appended without asking, and Cancel appends nothing. The same panel is opened for the extension by Validate in the context menu of its root node.
+
+Current automation status: automated. Appending is covered by `end_user_is_asked_before_appending_a_property_that_the_local_extension_already_has`, and Validate on the extension page by `end_user_can_validate_the_local_extension` (the two properties of one property term are added through the API, since the page would not let the user append them).
+
 ### Test Step Pre-condition:
 
 1. The tests create end user and developer accounts, core components, BIEs, extensions, business contexts, and code lists as needed for each scenario.
@@ -158,6 +163,8 @@ The end user can view the details of a BIE that is in WIP state and owned by ano
 8. The test verifies that an end user cannot create a BIE from a selectable ASCCP whose ACC has a group component type, can reset a BIE node to its initial values after confirmation, can create BIEs from production end-user ASCCPs regardless of ownership, and still cannot create a BIE when such a production end-user ASCCP is backed by a group-type ACC. (Assertions [#9](#test-assertion-629), [#10](#test-assertion-6210), [#12](#test-assertion-6212), [#13](#test-assertion-6213))
 9. The test verifies BIE editability when the end-user ASCCP is in `Production`, and then checks the locking/flagging behavior after amendment, `QA`, `Deprecated`, and non-production base-ACC scenarios. Assertions `6.2.14.e` and `6.2.14.f` are documented but not automated yet. (Assertions [#14](#test-assertion-6214), [#14.a](#test-assertion-6214a), [#14.b](#test-assertion-6214b), [#14.c](#test-assertion-6214c), [#14.d](#test-assertion-6214d), [#14.e](#test-assertion-6214e), [#14.f](#test-assertion-6214f))
 10. The test opens another user's WIP BIE (owned by a developer, then by an end user) and verifies that its details can be viewed but every field is disabled, so no change can be made. (Assertion [#15](#test-assertion-6215))
+11. The test opens the local extension of a WIP end-user BIE, appends a property, and appends it again. The first append is not asked about; the second one shows the Validation Results panel with the duplicate property term, and Cancel closes it. (Assertion [#16](#test-assertion-6216))
+12. The test opens the local extension of a WIP end-user BIE whose extension has two properties of one property term, chooses Validate in the context menu of the root node, and verifies that the Validation Results panel lists the duplicate property term and asks nothing. (Assertion [#16](#test-assertion-6216))
 
 ## Test Case 6.3
 

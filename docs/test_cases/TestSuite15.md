@@ -285,6 +285,8 @@ The ACC shall not already contain an ASCCP or BCCP with the same property term w
 The resulting ASCC shall be in the WIP state.
 ##### Test Assertion #15.8.1.e
 If the ASCCP is not reusable, check that there is no ASCC already using it.
+##### Test Assertion #15.8.1.g
+When the append would add a duplicate property term, the Validation Results panel lists the problem and asks Cancel or Proceed anyway; it is not a confirmation dialog. Cancel appends nothing. Proceed anyway goes on with the change and the rules of saving still apply (assertion [#1.c](#test-assertion-1581c)). When the append breaks nothing, nothing is asked.
 
 #### Test Assertion #15.8.2
 The end user can click on any associations and insert an ASCCP before or after it. The rest of the behavior is the same as test assertion #1.

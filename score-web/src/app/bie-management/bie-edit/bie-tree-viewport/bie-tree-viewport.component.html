@@ -39,6 +39,7 @@
       @if (node.inherited) {
         <fa-icon [icon]="faSitemap" matTooltip="Inherited" class="node-status-icon ps-3 pointer"></fa-icon>
       }
+      <score-tree-decorations [node]="node" [decorators]="decorators"/>
     } @else {
       <div class="node-edit-container d-flex flex-column">
         <input matInput #editInput

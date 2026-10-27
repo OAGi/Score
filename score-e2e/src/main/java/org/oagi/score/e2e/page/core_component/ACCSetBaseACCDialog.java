@@ -211,4 +211,12 @@ public interface ACCSetBaseACCDialog extends Dialog, SearchBarPage {
      * @return ACCViewEditPage
      */
     ACCViewEditPage hitApplyButton(String accDen);
+
+    /**
+     * Select the ACC and hit the Apply button without waiting for the base ACC to be set. When setting it would break
+     * something, the Validation Results panel asks first and nothing is updated until the user answers.
+     *
+     * @param accDen ACC DEN
+     */
+    void selectAndApply(String accDen);
 }

@@ -1,8 +1,14 @@
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {StructureChangeReport, ValidationLocation, ValidationPathSegment, ValidationSession} from '../../validation/validation';
+import {
+  StructureChangeReport,
+  ValidationLocation,
+  ValidationPathSegment,
+  ValidationSession,
+  ValidationSeverity
+} from '../../validation/validation';
 import {ValidationService} from '../../validation/validation.service';
 import {NodeNavigator} from '../../validation/validation-navigator';
-import {ValidationMarker} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {TreeNodeDecoration, TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 import {CcFlatNode, CcFlatNodeDataSource} from './cc-flat-tree';
 import {findNodeByLocation} from './cc-node-navigator';
 
@@ -19,13 +25,29 @@ export interface CcTreeValidationHost {
   readonly element: HTMLElement;
 }
 
+/** The most serious problem a validation found with a node, and whether the page has changed since. */
+export interface ValidationMarker {
+  severity: ValidationSeverity;
+  stale: boolean;
+  messages: string[];
+}
+
+const SEVERITY_ICON: { [severity: string]: { icon: string; color: string } } = {
+  ERROR: {icon: 'error', color: '#d32f2f'},
+  WARNING: {icon: 'warning', color: '#f57c00'},
+  INFO: {icon: 'info', color: '#1976d2'}
+};
+
 /**
  * What a page with a tree of core components knows about its last validation, and what it does with it: asks for it,
  * marks the nodes the problems are about and takes the user to them. Nothing of it is saved anywhere.
  */
-export class CcTreeValidation extends ValidationSession implements NodeNavigator {
+export class CcTreeValidation extends ValidationSession implements NodeNavigator, TreeNodeDecorator<CcFlatNode> {
 
   panelHeight = 240;
+
+  /** What the tree of the page is given to show of this validation (see {@link decorationsFor}). */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [this];
 
   /**
    * A change of structure that waits for the user to say whether it is made, with what it would break in the report.
@@ -88,6 +110,28 @@ export class CcTreeValidation extends ValidationSession implements NodeNavigator
     const severity = this.severityAt(node.path);
     return severity ? {severity, stale: this.stale, messages: this.messagesAt(node.path)} : undefined;
   };
+
+  /**
+   * What the tree shows of the validation on the row of a node: on the root, a button that opens a closed panel (while
+   * there are problems and none of their nodes is on screen); on a node a problem is about, the icon of the most
+   * serious one, dimmed when the page has changed since. Clicking either opens the panel.
+   */
+  decorationsFor(node: CcFlatNode): TreeNodeDecoration[] {
+    const decorations: TreeNodeDecoration[] = [];
+    if (node.level === 0 && this.badgeCount > 0) {
+      const look = SEVERITY_ICON[this.errorCount > 0 ? 'ERROR' : 'WARNING'];
+      decorations.push({id: 'cc-validation-show', ...look, tooltip: 'Show validation results', onClick: () => this.show(null)});
+    }
+    const marker = this.marker(node);
+    if (marker) {
+      decorations.push({
+        cssClass: 'validation-marker', ...SEVERITY_ICON[marker.severity],
+        tooltip: marker.messages.join('\n') + (marker.stale ? '\n(may be outdated)' : ''), tooltipClass: 'validation-tooltip',
+        opacity: marker.stale ? 0.45 : 1, onClick: () => this.show(node)
+      });
+    }
+    return decorations;
+  }
 
   /**
    * What the root row of the tree says about a closed panel: the number of problems, but only while no node a

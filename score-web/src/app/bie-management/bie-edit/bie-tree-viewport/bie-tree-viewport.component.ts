@@ -7,6 +7,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {ScoreCommonModule} from '../../../common/score-common.module';
+import {TreeNodeDecorationsComponent} from '../../../common/tree-viewport/tree-node-decorations.component';
+import {TreeNodeDecorator} from '../../../common/tree-viewport/tree-decorator';
 import {TreeViewportComponent, TreeViewportNodeKey} from '../../../common/tree-viewport/tree-viewport.component';
 import {BieFlatNode, BieFlatNodeDataSource, BieFlatNodeDataSourceSearcher} from '../../domain/bie-flat-tree';
 
@@ -35,7 +37,7 @@ export interface BieTreeRowHost {
   templateUrl: './bie-tree-viewport.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ScoreCommonModule, FormsModule, MatCheckboxModule, MatInputModule, MatTooltipModule, FaIconComponent,
-    TreeViewportComponent]
+    TreeViewportComponent, TreeNodeDecorationsComponent]
 })
 export class BieTreeViewportComponent {
 
@@ -45,6 +47,8 @@ export class BieTreeViewportComponent {
   @Input() cursorNode: BieFlatNode | undefined;
   @Input() height: number;
   @Input() contextMenu: MatMenuPanel;
+  /** What features show on the rows; the tree draws them after the status icons. */
+  @Input() decorators: TreeNodeDecorator<BieFlatNode>[] = [];
 
   @Output() cursorNodeChange = new EventEmitter<BieFlatNode>();
   @Output() nodeClick = new EventEmitter<BieFlatNode>();

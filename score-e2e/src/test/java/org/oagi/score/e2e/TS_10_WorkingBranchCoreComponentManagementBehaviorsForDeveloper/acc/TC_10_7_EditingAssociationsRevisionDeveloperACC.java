@@ -167,7 +167,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
 
@@ -322,11 +322,11 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -1026,7 +1026,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();
 
@@ -2158,7 +2158,7 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         assert visibilityOfElementLocated(getDriver(),
                 By.xpath("//score-multi-actions-snack-bar//div[contains(@class, \"header\")]")).isDisplayed();

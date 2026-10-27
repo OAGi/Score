@@ -334,6 +334,14 @@ public class ACCExtensionViewEditPageImpl extends BasePageImpl implements ACCExt
     }
 
     @Override
+    public void validate(String path) {
+        retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(elementToBeClickable(getDriver(), By.id("cc-validate")));
+        });
+    }
+
+    @Override
     public WebElement getSearchInputTextField() {
         return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(30L), ofMillis(100L)),
                 SEARCH_INPUT_TEXT_FIELD_LOCATOR);

@@ -257,6 +257,17 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
 
     @Override
     public ACCViewEditPage hitApplyButton(String accDen) {
+        selectAndApply(accDen);
+        waitFor(ofMillis(500L));
+
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        return parent;
+    }
+
+    @Override
+    public void selectAndApply(String accDen) {
         setDEN(accDen);
         hitSearchButton();
 
@@ -278,11 +289,5 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
         });
 
         click(getApplyButton());
-        waitFor(ofMillis(500L));
-
-        invisibilityOfLoadingContainerElement(getDriver());
-
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-        return parent;
     }
 }

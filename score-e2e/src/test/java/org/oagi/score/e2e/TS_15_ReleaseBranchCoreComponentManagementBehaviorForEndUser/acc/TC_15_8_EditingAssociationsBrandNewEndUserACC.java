@@ -161,7 +161,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -176,6 +176,42 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         assertEquals("unbounded", getText(asccPanel.getCardinalityMaxField()));
         assertNotChecked(asccPanel.getDeprecatedCheckbox());
         assertDisabled(asccPanel.getDeprecatedCheckbox());
+    }
+
+    @Test
+    @DisplayName("TC_15_8_TA_1.g")
+    public void validation_panel_asks_before_appending_an_association_that_would_duplicate_a_property_term() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(
+                library, "Accrued Amount. Open_ Amount", branch);
+        getAPIFactory().getCoreComponentAPI().appendBCC(acc, bccp, "WIP");
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp.getDen());
+
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+
+        click(getValidationCancelButton(getDriver()));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+
+        // Cancel appends nothing
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertTrue(accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm()).isDisplayed());
+        String xpathExpr = "//div[contains(@class, \"mat-tree-node\")][contains(., \"" + bccp.getPropertyTerm() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(xpathExpr)).size());
     }
 
     @Test
@@ -309,11 +345,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -766,7 +802,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation("Accrued Amount. Open_ Amount");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -1402,11 +1438,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -1685,7 +1721,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));

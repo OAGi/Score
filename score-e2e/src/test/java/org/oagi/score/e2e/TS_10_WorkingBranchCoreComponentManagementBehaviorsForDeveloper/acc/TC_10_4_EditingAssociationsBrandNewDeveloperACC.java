@@ -161,7 +161,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -339,11 +339,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -793,7 +793,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendBCCPDialog.selectAssociation(bccp_to_append.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -1302,11 +1302,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -1411,11 +1411,11 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -1735,7 +1735,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -2980,7 +2980,7 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendAssociationDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendAssociationDialog.selectAssociation("Description. Description_ Text");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         MultiActionSnackBar multiActionSnackBar = getMultiActionSnackBar(getDriver());
         String snackBarMessage = getText(multiActionSnackBar.getMessageElement());
@@ -3152,6 +3152,293 @@ public class TC_10_4_EditingAssociationsBrandNewDeveloperACC extends BaseTest {
             String xpathExpr = "//score-based-acc-dialog//*[contains(text(),\"" + bccp_to_append.getPropertyTerm() + "\")]";
             assertEquals(0, getDriver().findElements(By.xpath(xpathExpr)).size());
         }
+    }
+
+    /**
+     * The Validation Results panel is what asks before a change that would break something is made. The number of
+     * the nodes whose name has the property term tells whether the change was made.
+     */
+    private int countNodesOf(String name) {
+        String xpathExpr = "//div[contains(@class, \"mat-tree-node\")][contains(., \"" + name + "\")]";
+        return getDriver().findElements(By.xpath(xpathExpr)).size();
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_27.a")
+    public void test_TA_10_4_27_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        coreComponentAPI.appendBCC(acc, bccp, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp.getDen());
+
+        // the panel lists the problem the append would make and asks; it is not a confirmation dialog
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+        assertTrue(getDriver().findElements(By.xpath("//score-confirm-dialog")).isEmpty());
+        assertTrue(isValidationDecisionDisplayed(getDriver()));
+
+        click(getValidationCancelButton(getDriver()));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+
+        // Cancel makes no change: the ACC still has the one association it had
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertTrue(accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm()).isDisplayed());
+        assertEquals(1, countNodesOf(bccp.getPropertyTerm()));
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_27.b")
+    public void test_TA_10_4_27_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp.getDen());
+
+        // nothing is broken by it, so nothing is asked and the association is appended as it always was
+        assertTrue(accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm()).isDisplayed());
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_27.c")
+    public void test_TA_10_4_27_c() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject accBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accDerived = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        coreComponentAPI.appendBCC(accDerived, bccp, "WIP");
+        coreComponentAPI.updateBasedACC(accDerived, accBase);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accBase.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + accBase.getDen());
+        appendBCCPDialog.selectAssociation(bccp.getDen());
+
+        // the base ACC itself is fine; the ACC that has it as its base ACC would have the term twice
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+        assertTrue(getValidationPanelSubjects(getDriver()).contains(accDerived.getDen()));
+
+        click(getValidationCancelButton(getDriver()));
+
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accBase.getAccManifestId());
+        accViewEditPage.getNodeByPath("/" + accBase.getDen());
+        assertEquals(0, countNodesOf(bccp.getPropertyTerm()));
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_28")
+    public void test_TA_10_4_28() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        coreComponentAPI.appendBCC(acc, bccp, "WIP");
+        coreComponentAPI.appendBCC(accForBase, bccp, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        ACCSetBaseACCDialog accSetBaseACCDialog = accViewEditPage.setBaseACC("/" + acc.getDen());
+        accSetBaseACCDialog.selectAndApply(accForBase.getDen());
+
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+
+        click(getValidationCancelButton(getDriver()));
+
+        // Cancel leaves the ACC without a base ACC
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.getNodeByPath("/" + acc.getDen());
+        assertEquals(0, countNodesOf(accForBase.getDen()));
+    }
+
+    /**
+     * Two BCCPs of the same property term: the analysis of the refactoring only blocks the same BCCP, so a move that
+     * leaves such a pair in one ACC gets past it and only the check can tell.
+     */
+    private BCCPObject[] createBccpsOfOnePropertyTerm(CoreComponentAPI coreComponentAPI, ReleaseObject release, DTObject dataType,
+                                                      AppUserObject developer, NamespaceObject namespace) {
+        BCCPObject first = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        BCCPObject second = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        coreComponentAPI.updateBCCPPropertyTerm(second, first.getPropertyTerm());
+        return new BCCPObject[]{first, second};
+    }
+
+    private void selectBaseACCAndRefactor(ACCViewEditPage accViewEditPage, String nodePath, String propertyTerm) {
+        SelectBaseACCToRefactorDialog selectBaseACCToRefactorDialog = accViewEditPage.refactorToBaseACC(nodePath, propertyTerm);
+        click(selectBaseACCToRefactorDialog.getTableRecordAtIndex(1).findElement(By.className("mat-column-" + "select")));
+        selectBaseACCToRefactorDialog.hitAnalyzeButton();
+        // the analysis lets it through: what it blocks is not what the check is about
+        click(selectBaseACCToRefactorDialog.getRefactorButton(true));
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_29.a")
+    public void test_TA_10_4_29_a() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accSibling = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject[] bccps = createBccpsOfOnePropertyTerm(coreComponentAPI, release, dataType, developer, namespace);
+        String propertyTerm = bccps[0].getPropertyTerm();
+        coreComponentAPI.appendBCC(acc, bccps[0], "WIP");
+        coreComponentAPI.appendBCC(accSibling, bccps[1], "WIP");
+        coreComponentAPI.updateBasedACC(acc, accForBase);
+        coreComponentAPI.updateBasedACC(accSibling, accForBase);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        String nodePath = "/" + acc.getDen() + "/" + propertyTerm;
+        selectBaseACCAndRefactor(accViewEditPage, nodePath, propertyTerm);
+
+        // the base ACC would have the term, and so would the other ACC that has it as its base ACC twice
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(propertyTerm)));
+        assertTrue(getValidationPanelSubjects(getDriver()).contains(accSibling.getDen()));
+
+        click(getValidationCancelButton(getDriver()));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+
+        // Cancel moves nothing: the BCCP is still under the ACC and not under its base ACC
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertTrue(accViewEditPage.getNodeByPath(nodePath).isDisplayed());
+        assertEquals(1, countNodesOf(propertyTerm));
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_29.b")
+    public void test_TA_10_4_29_b() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accSibling = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accForBase = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject[] bccps = createBccpsOfOnePropertyTerm(coreComponentAPI, release, dataType, developer, namespace);
+        String propertyTerm = bccps[0].getPropertyTerm();
+        coreComponentAPI.appendBCC(acc, bccps[0], "WIP");
+        coreComponentAPI.appendBCC(accSibling, bccps[1], "WIP");
+        coreComponentAPI.updateBasedACC(acc, accForBase);
+        coreComponentAPI.updateBasedACC(accSibling, accForBase);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        selectBaseACCAndRefactor(accViewEditPage, "/" + acc.getDen() + "/" + propertyTerm, propertyTerm);
+
+        getValidationPanelMessages(getDriver());
+        click(getValidationProceedButton(getDriver()));
+
+        // Proceed anyway makes the move
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        WebElement movedBCCPNode = accViewEditPage.getNodeByPath(
+                "/" + acc.getDen() + "/" + accForBase.getDen() + "/" + propertyTerm);
+        assertTrue(movedBCCPNode.isDisplayed());
+    }
+
+    @Test
+    @DisplayName("TC_10_4_TA_30")
+    public void test_TA_10_4_30() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "Working");
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject accWithProblem = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        ACCObject accWithoutProblem = coreComponentAPI.createRandomACC(developer, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject[] bccps = createBccpsOfOnePropertyTerm(coreComponentAPI, release, dataType, developer, namespace);
+        coreComponentAPI.appendBCC(accWithProblem, bccps[0], "WIP");
+        coreComponentAPI.appendBCC(accWithProblem, bccps[1], "WIP");
+        BCCPObject bccp = coreComponentAPI.createRandomBCCP(release, dataType, developer, namespace, "WIP");
+        coreComponentAPI.appendBCC(accWithoutProblem, bccp, "WIP");
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+
+        // Validate lists the problem; nothing is asked, since nothing is being changed
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accWithProblem.getAccManifestId());
+        accViewEditPage.validate("/" + accWithProblem.getDen());
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccps[0].getPropertyTerm())));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+        // and marks both nodes the problem is about in the tree, where the tree draws what the validation shows
+        assertEquals(2, getDriver().findElements(By.cssSelector(".tree-decoration.validation-marker")).size());
+
+        // a clean ACC only says so
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(accWithoutProblem.getAccManifestId());
+        accViewEditPage.validate("/" + accWithoutProblem.getDen());
+        assertEquals("No issues found", getSnackBarMessage(getDriver()));
+        assertTrue(getDriver().findElements(By.xpath("//score-validation-panel")).isEmpty());
     }
 
     private class RandomCoreComponentWithStateContainer {
