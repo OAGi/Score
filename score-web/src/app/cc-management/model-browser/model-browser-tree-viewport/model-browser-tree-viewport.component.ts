@@ -21,14 +21,12 @@ export interface ChoiceGuide {
   tooltip: string | null;
 }
 
-/** What the model browser rows (choice guides, order weight badge, drag mode) need from the screen. */
+/** What the model browser rows (choice guides, drag mode) need from the screen. */
 export interface ModelBrowserTreeRowHost {
   /** A node is being dragged. */
   dragging: boolean;
 
   choiceGuides(node: ModelBrowserNode): ChoiceGuide[];
-
-  currentWeightOf(node: ModelBrowserNode): number | undefined | null;
 }
 
 /** The node tree of the model browser: choice branch guides, name, cardinality and order weight per row. */

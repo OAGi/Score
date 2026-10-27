@@ -21,7 +21,6 @@
   </ng-template>
 
   <ng-template #content let-node>
-    @let orderWeight = host.currentWeightOf(node);
     <span class="node-label"
           [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
           [class.deprecated]="node.deprecated"
@@ -31,13 +30,5 @@
     </span>
 
     <score-tree-decorations [node]="node" [decorators]="decorators"/>
-
-    <!-- Issue #1638: a sibling with a custom order weight shows it as a small badge.
-         Follow-up: badge display is a per-user preference (dataSource.hideOrderWeights),
-         defaulting hidden for end-users and shown for developers. Managing weights
-         (drag handle / Order Weight / Reset) stays developer-only via canReorder. -->
-    @if (!dataSource.hideOrderWeights && orderWeight !== undefined && orderWeight !== null) {
-      <span class="order-weight-badge ms-4" matTooltip="Order weight">{{ orderWeight }}</span>
-    }
   </ng-template>
 </score-tree-viewport>

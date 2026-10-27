@@ -26,7 +26,6 @@ import {
   ModelBrowserNodeDataSourceSearcher
 } from './domain/model-browser-node';
 import {CdkDragDrop, CdkDragMove} from '@angular/cdk/drag-drop';
-import {loadBooleanProperty, saveBooleanProperty} from '../../common/utility';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {CcFlatNode} from '../domain/cc-flat-tree';
@@ -44,6 +43,7 @@ import {
   ModelBrowserTreeViewportComponent
 } from './model-browser-tree-viewport/model-browser-tree-viewport.component';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {OrderWeightDecorator} from './domain/order-weight-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 
 
@@ -96,23 +96,24 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
   private validTargetHashPaths = new Set<string>();
 
   preferencesInfo: PreferencesInfo;
-  HIDE_ORDER_WEIGHTS_PROPERTY_KEY = 'ModelBrowser-Settings-Hide-Order-Weights';
 
   /** Shows the cardinality of the nodes, unless the user hides it. */
   readonly cardinality = new CardinalityDecorator<ModelBrowserNode>(
     {userToken: () => this.auth.getUserToken(), key: 'ModelBrowser-Settings-Hide-Cardinality'});
 
+  /**
+   * Shows the custom order weight of the nodes. Order weights are developer-managed (Issue #1638), so it is hidden for
+   * end-users and shown for developers until the user chooses.
+   */
+  readonly orderWeight = new OrderWeightDecorator<ModelBrowserNode>(
+    node => this.currentWeightOf(node),
+    {
+      userToken: () => this.auth.getUserToken(), key: 'ModelBrowser-Settings-Hide-Order-Weights',
+      defaultHidden: () => !this.auth.isDeveloper()
+    });
+
   /** What the tree shows after the names of the nodes, in this order. */
-  readonly decorators: TreeNodeDecorator<ModelBrowserNode>[] = [this.cardinality];
-
-  get hideOrderWeights(): boolean {
-    return this.dataSource.hideOrderWeights;
-  }
-
-  set hideOrderWeights(hideOrderWeights: boolean) {
-    this.dataSource.hideOrderWeights = hideOrderWeights;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, hideOrderWeights);
-  }
+  readonly decorators: TreeNodeDecorator<ModelBrowserNode>[] = [this.cardinality, this.orderWeight];
 
   ngOnDestroy(): void {
     this.searcher?.dispose();
@@ -152,10 +153,7 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
       this.cardinality.restore();
-      // Issue #1638 follow-up: order weights are developer-managed, so the display defaults to hidden
-      // for end-users and shown for developers — still a per-user, persisted preference either way.
-      this.dataSource.hideOrderWeights = loadBooleanProperty(
-        this.auth.getUserToken(), this.HIDE_ORDER_WEIGHTS_PROPERTY_KEY, !this.auth.isDeveloper());
+      this.orderWeight.restore();
 
       this.onClick(this.dataSource.data[0]);
 

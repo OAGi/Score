@@ -1305,8 +1305,6 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
   readonly nodeExpanded$ = new Subject<T>();
   _listeners: ChangeListener<ModelBrowserNodeDataSource<T>>[] = [];
 
-  _hideOrderWeights = false;
-
   get data(): T[] {
     return this.dataChange.value;
   }
@@ -1340,19 +1338,6 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
     if (!!this.delegatedListeners) {
       this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
     }
-  }
-
-  get hideOrderWeights(): boolean {
-    return this._hideOrderWeights;
-  }
-
-  set hideOrderWeights(hideOrderWeights: boolean) {
-    if (this._hideOrderWeights === hideOrderWeights) {
-      return;
-    }
-
-    this._hideOrderWeights = hideOrderWeights;
-    this._listeners.forEach(e => e.onChange(this, 'hideOrderWeights', hideOrderWeights));
   }
 
   constructor(
