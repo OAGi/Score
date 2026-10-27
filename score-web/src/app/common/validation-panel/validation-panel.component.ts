@@ -28,10 +28,19 @@ export class ValidationPanelComponent {
   @Input() title = 'Validation Results';
   /** The height of the panel; the page owns it, so that it can leave the same room free below its content. */
   @Input() height = 240;
+  /**
+   * The panel is the question of a change that has not been made yet: it ends with the choice to make it all the same
+   * or not to make it. The page decides what either does.
+   */
+  @Input() decision = false;
+  /** What the page adds to the summary (how many ACCs were checked, ...). */
+  @Input() note = '';
 
   @Output() locationSelect = new EventEmitter<ValidationLocation>();
   @Output() closed = new EventEmitter<void>();
   @Output() heightChange = new EventEmitter<number>();
+  @Output() proceed = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
 
   readonly minHeight = 96;
 
@@ -93,11 +102,20 @@ export class ValidationPanelComponent {
     } else if (event.key === 'Enter' && this.activeIndex >= 0) {
       this.selectFirst(rows[this.activeIndex]);
     } else if (event.key === 'Escape') {
-      this.closed.emit();
+      this.dismiss();
     } else {
       return;
     }
     event.preventDefault();
+  }
+
+  /** Closing the panel of a question that is not answered is answering it: the change is not made. */
+  dismiss() {
+    if (this.decision) {
+      this.cancel.emit();
+    } else {
+      this.closed.emit();
+    }
   }
 
   startResize(event: MouseEvent) {

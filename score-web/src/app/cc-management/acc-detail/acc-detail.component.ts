@@ -908,28 +908,18 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
         return;
       }
 
+      // what the association would break is asked first; when it would break nothing it is appended as it always was
       this.isUpdating = true;
-      this.service.verifyAppendAssociation(
-        this.rootNode.manifestId,
-        association.manifestId, association.type).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = ((pos === -1) ? 'Append' : 'Insert') + ' association';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-            .subscribe(result => {
-              if (!result) {
-                this.isUpdating = false;
-                return;
-              }
-
-              this._doAppendAssociation(association, pos);
-            });
-        } else {
-          this._doAppendAssociation(association, pos);
-        }
+      this.validationService.appendCheck(this.rootNode.manifestId, association.type, association.manifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doAppendAssociation(association, pos))) {
+            this.isUpdating = false;
+          } else {
+            this._doAppendAssociation(association, pos);
+          }
+        },
+        // not being able to ask is no reason to take the appending away
+        error: () => this._doAppendAssociation(association, pos)
       });
     });
   }
@@ -1039,27 +1029,18 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
         return;
       }
 
+      // what the base ACC would break is asked first; when it would break nothing it is set as it always was
       this.isUpdating = true;
-      this.service.verifySetBasedAcc(
-        this.rootNode.manifestId, basedAccManifestId).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = 'Set Based ACC';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-            .subscribe(result => {
-              if (!result) {
-                this.isUpdating = false;
-                return;
-              }
-
-              this._doSetBasedAcc(basedAccManifestId);
-            });
-        } else {
-          this._doSetBasedAcc(basedAccManifestId);
-        }
+      this.validationService.baseCheck(this.rootNode.manifestId, basedAccManifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doSetBasedAcc(basedAccManifestId))) {
+            this.isUpdating = false;
+          } else {
+            this._doSetBasedAcc(basedAccManifestId);
+          }
+        },
+        // not being able to ask is no reason to take the setting away
+        error: () => this._doSetBasedAcc(basedAccManifestId)
       });
     });
   }
@@ -2017,7 +1998,19 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
         autoFocus: false
       });
 
-      dialogRef.afterClosed().subscribe(_ => {
+      dialogRef.afterClosed().subscribe(result => {
+        if (result?.check) {
+          // the move would break something: it is made only if the user says so, and until then it is not made
+          this.validation.askAboutChange(result.check, () => {
+            this.isUpdating = true;
+            result.refactor().subscribe({
+              next: () => this.reload('Refactored'),
+              error: () => this.isUpdating = false,
+              complete: () => this.isUpdating = false
+            });
+          });
+          return;
+        }
         this.reload('Refactored');
       });
     }

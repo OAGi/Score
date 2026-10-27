@@ -5,11 +5,14 @@
   <div class="panel-header">
     <span class="panel-title">{{ title }}</span>
     <span class="panel-summary">{{ summary }}</span>
+    @if (note) {
+      <span class="panel-summary">· {{ note }}</span>
+    }
     @if (session.stale) {
       <span class="panel-stale">Results may be outdated — validate again</span>
     }
     <span class="flex-spacer"></span>
-    <button class="panel-button" (click)="closed.emit()" matTooltip="Close" aria-label="Close">
+    <button class="panel-button" (click)="dismiss()" [matTooltip]="decision ? 'Cancel' : 'Close'" aria-label="Close">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -20,6 +23,9 @@
             {{ violation.severity === 'ERROR' ? 'error' : violation.severity === 'WARNING' ? 'warning' : 'info' }}
           </mat-icon>
           <div class="violation-content">
+            @if (violation.subject) {
+              <div class="subject">{{ violation.subject.label }}</div>
+            }
             <div class="violation-line">
               <span class="message">{{ violation.message }}</span>
             </div>
@@ -40,4 +46,11 @@
         <div class="empty">Nothing to show.</div>
       }
   </div>
+  @if (decision) {
+    <div class="panel-footer">
+      <span class="footer-text">Make the change all the same?</span>
+      <button mat-stroked-button id="validation-cancel" (click)="cancel.emit()">Cancel</button>
+      <button mat-flat-button color="warn" id="validation-proceed" (click)="proceed.emit()">Proceed anyway</button>
+    </div>
+  }
 </div>

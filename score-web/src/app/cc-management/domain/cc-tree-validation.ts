@@ -1,5 +1,5 @@
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ValidationLocation, ValidationSession} from '../../validation/validation';
+import {StructureChangeReport, ValidationLocation, ValidationPathSegment, ValidationSession} from '../../validation/validation';
 import {ValidationService} from '../../validation/validation.service';
 import {NodeNavigator} from '../../validation/validation-navigator';
 import {ValidationMarker} from '../cc-tree-viewport/cc-tree-viewport.component';
@@ -27,10 +27,56 @@ export class CcTreeValidation extends ValidationSession implements NodeNavigator
 
   panelHeight = 240;
 
+  /**
+   * A change of structure that waits for the user to say whether it is made, with what it would break in the report.
+   * It is only there while the panel asks.
+   */
+  decision: { proceed: () => void; note: string } | null = null;
+
   constructor(private host: CcTreeValidationHost,
               private service: ValidationService,
               private snackBar: MatSnackBar) {
     super();
+  }
+
+  /**
+   * Shows what a change that has not been made would break, and asks whether to make it. A change that would break
+   * nothing is not asked about: the answer is yes, and nothing is shown. Returns whether the user is asked.
+   */
+  askAboutChange(change: StructureChangeReport, proceed: () => void): boolean {
+    if (change.report.violations.length === 0) {
+      return false;
+    }
+    this.keepingDetailAtEnd(() => this.apply(change.report));
+    this.decision = {
+      proceed,
+      note: 'Checked ' + change.checkedCount + (change.checkedCount === 1 ? ' ACC' : ' ACCs')
+    };
+    return true;
+  }
+
+  proceedWithChange() {
+    const decision = this.decision;
+    this.clear();
+    decision?.proceed();
+  }
+
+  cancelChange() {
+    this.clear();
+  }
+
+  /** What closing the panel does: it takes the question back (the change is not made), or just closes the results. */
+  close() {
+    if (this.decision) {
+      this.cancelChange();
+    } else {
+      this.panelOpen = false;
+    }
+  }
+
+  override clear(): void {
+    super.clear();
+    this.decision = null;
   }
 
   /** The room the open panel takes at the bottom of the page: the tree and the detail end above it. */
@@ -101,9 +147,18 @@ export class CcTreeValidation extends ValidationSession implements NodeNavigator
   }
 
   navigateTo(location: ValidationLocation): boolean {
+    const root = location.path[0];
+    if (root && (root.type !== this.host.type || root.manifestId !== String(this.host.manifestId))) {
+      // a problem of another object (the ones a change would affect): it is shown where that object is
+      window.open(addressOf(root), '_blank');
+      return true;
+    }
     const dataSource = this.host.dataSource;
     const node = findNodeByLocation(dataSource, location);
     if (!node) {
+      if (this.decision) {
+        return false;
+      }
       this.markStale();
       this.snackBar.open('That node is no longer in the tree — re-validate', '', {duration: 4000});
       return false;
@@ -114,5 +169,19 @@ export class CcTreeValidation extends ValidationSession implements NodeNavigator
     this.host.onClick(node);
     this.host.scrollToNode(node, 100);
     return true;
+  }
+}
+
+/** Where the page of an object is. */
+function addressOf(segment: ValidationPathSegment): string {
+  switch (segment.type) {
+    case 'ASCCP':
+      return '/core_component/asccp/' + segment.manifestId;
+    case 'BCCP':
+      return '/core_component/bccp/' + segment.manifestId;
+    case 'DT':
+      return '/data_type/' + segment.manifestId;
+    default:
+      return '/core_component/acc/' + segment.manifestId;
   }
 }

@@ -10,6 +10,9 @@ import {WebPageInfoService} from '../../basis/basis.service';
 import {CC_WITH_TYPE_TABLE} from '../domain/cc-dialog.table';
 import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../common/score-table';
 import {IssuedCc} from './domain/refactor-dialog';
+import {ValidationService} from '../../validation/validation.service';
+import {Observable} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 import {SeparatePipe} from '../../common/utility';
 
@@ -49,6 +52,7 @@ export class RefactorDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   data = inject(MAT_DIALOG_DATA);
   private confirmDialogService = inject(ConfirmDialogService);
+  private validationService = inject(ValidationService);
 
 
   // ACC Table
@@ -74,6 +78,8 @@ export class RefactorDialogComponent implements OnInit {
   readonly rowKey = (row: CcListEntry) => row;
 
   loading = false;
+  /** What the move would break is being asked. */
+  checking = false;
   isValid = false;
 
   action: string;
@@ -120,35 +126,57 @@ export class RefactorDialogComponent implements OnInit {
       });
   }
 
+  /**
+   * Moves the association, after asking what the move would break: when it would break nothing the move goes on as it
+   * always did; otherwise the dialog closes and the page shows what it would break and asks whether to go on.
+   */
   doRefactor(): void {
-    if (!this.isValid) {
+    if (!this.isValid || this.checking) {
       return;
     }
     if (this.selection.selected.length === 0) {
       return;
     }
-    const destinationManifestId = this.selection.selected[0].manifestId;
-    if (this.selection.selected[0].deprecated) {
+    const destination = this.selection.selected[0];
+    const destinationManifestId = destination.manifestId;
+    const type = this.data.type;
+
+    this.checking = true;
+    this.validationService.refactorCheck(type, this.data.targetManifestId, destinationManifestId)
+      .pipe(finalize(() => this.checking = false))
+      .subscribe({
+        next: change => {
+          if (change.report.violations.length === 0) {
+            this.refactorAfterConfirmation(destination).subscribe(resp => this.dialogRef.close(resp));
+          } else {
+            this.dialogRef.close({check: change, refactor: () => this.refactorAfterConfirmation(destination)});
+          }
+        },
+        // not being able to ask is no reason to take the move away
+        error: () => this.refactorAfterConfirmation(destination).subscribe(resp => this.dialogRef.close(resp))
+      });
+  }
+
+  /** A component that is deprecated is moved only on the user's word; nothing is emitted when the word is no. */
+  private refactorAfterConfirmation(destination: CcListEntry): Observable<any> {
+    const move = () => this.service.refactor(this.data.type, this.data.targetManifestId, destination.manifestId);
+    if (!destination.deprecated) {
+      return move();
+    }
+    return new Observable<any>(subscriber => {
       const dialogConfig = this.confirmDialogService.newConfig();
       dialogConfig.data.header = 'Confirmation required';
       dialogConfig.data.content = ['The selected component is deprecated', 'Are you sure you want to proceed with it?'];
       dialogConfig.data.action = 'Proceed anyway';
 
-      this.confirmDialogService.open(dialogConfig).beforeClosed()
-        .subscribe(result => {
-          if (result) {
-            this.service.refactor(this.data.type, this.data.targetManifestId, destinationManifestId)
-              .subscribe(resp => {
-                this.dialogRef.close(resp);
-              });
-          }
-        });
-    } else {
-      this.service.refactor(this.data.type, this.data.targetManifestId, destinationManifestId)
-        .subscribe(resp => {
-          this.dialogRef.close(resp);
-        });
-    }
+      this.confirmDialogService.open(dialogConfig).beforeClosed().subscribe(result => {
+        if (result) {
+          move().subscribe(subscriber);
+        } else {
+          subscriber.complete();
+        }
+      });
+    });
   }
 
   /** What the compact row shows of an issue (a component that cannot be refactored yet): made once for a row. The reasons go under it. */

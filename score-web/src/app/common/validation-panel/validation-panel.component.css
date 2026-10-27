@@ -160,3 +160,23 @@
   padding: 12px;
   color: rgba(0, 0, 0, .54);
 }
+
+.subject {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #fafafa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.footer-text {
+  margin-right: auto;
+  color: rgba(0, 0, 0, .6);
+}

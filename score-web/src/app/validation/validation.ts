@@ -1,6 +1,6 @@
 export type ValidationSeverity = 'ERROR' | 'WARNING' | 'INFO';
 
-export type ValidationTrigger = 'ON_DEMAND' | 'STATE_TRANSITION' | 'RELEASE';
+export type ValidationTrigger = 'ON_DEMAND' | 'STATE_TRANSITION' | 'RELEASE' | 'STRUCTURE_CHANGE';
 
 /** One step of the address of a node: its kind (ACC, ASCC, ASCCP, BCC, BCCP, ...) and manifest id. */
 export interface ValidationPathSegment {
@@ -15,12 +15,20 @@ export interface ValidationLocation {
   role?: string;
 }
 
+/** The subject a violation is about when it is not the one the report is about (a report of what a change would affect). */
+export interface ViolationSubject {
+  type: string;
+  id: string;
+  label: string;
+}
+
 export interface Violation {
   ruleId: string;
   severity: ValidationSeverity;
   message: string;
   params: { [key: string]: string };
   locations: ValidationLocation[];
+  subject?: ViolationSubject | null;
 }
 
 export interface ValidationReport {
@@ -28,6 +36,12 @@ export interface ValidationReport {
   validatedAt: string;
   status: 'VALID' | 'HAS_WARNINGS' | 'HAS_ERRORS';
   violations: Violation[];
+}
+
+/** What a change of structure would break, and how many ACCs were checked to find out. */
+export interface StructureChangeReport {
+  report: ValidationReport;
+  checkedCount: number;
 }
 
 const SEVERITY_RANK: { [severity: string]: number } = {ERROR: 0, WARNING: 1, INFO: 2};

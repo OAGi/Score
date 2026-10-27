@@ -202,7 +202,7 @@
       <span class="ps-2">Cancel</span>
     </button>
     <button mat-raised-button color="primary"
-        [disabled]="!isValid"
+        [disabled]="!isValid || checking"
         (click)="doRefactor()">
       <mat-icon>build</mat-icon>
       <span class="ps-2">Refactor</span>

@@ -54,12 +54,21 @@ public class AccValidationInputLoader implements ValidationInputLoader<AccValida
             throw new IllegalArgumentException("The ACC manifest record with ID " + accManifestId + " could not be found.");
         }
         CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
-        return new Walk(ccDocument, accQuery, acc).run();
+        return new Walk(AccGraphSource.of(ccDocument), accQuery, acc).run();
+    }
+
+    /**
+     * Lays an ACC out from a source that is already there (the ACCs a change would affect share one), without the
+     * lookups that only the rules about a revision need: no previous revision, no count of what points at a property.
+     */
+    public static AccValidationInput layOut(AccGraphSource graph, AccSummaryRecord acc) {
+        return new Walk(graph, null, acc).run();
     }
 
     private static class Walk {
 
-        private final CcDocument ccDocument;
+        private final AccGraphSource ccDocument;
+        /** Null where the lookups of a revision are not wanted. */
         private final AccQueryRepository accQuery;
         private final AccSummaryRecord root;
         private final List<AccValidationInput.Property> properties = new ArrayList<>();
@@ -68,7 +77,7 @@ public class AccValidationInputLoader implements ValidationInputLoader<AccValida
         private final List<AccValidationInput.OwnBcc> ownBccs = new ArrayList<>();
         private final List<AccValidationInput.Base> bases = new ArrayList<>();
 
-        Walk(CcDocument ccDocument, AccQueryRepository accQuery, AccSummaryRecord root) {
+        Walk(AccGraphSource ccDocument, AccQueryRepository accQuery, AccSummaryRecord root) {
             this.ccDocument = ccDocument;
             this.accQuery = accQuery;
             this.root = root;
@@ -80,7 +89,7 @@ public class AccValidationInputLoader implements ValidationInputLoader<AccValida
             List<PathSegment> path = new ArrayList<>();
             path.add(segment("ACC", root.accManifestId()));
             walk(root, path, false, false, onTheWay);
-            AccSummaryRecord previous = root.prevAccManifestId() != null ? accQuery.getAccSummary(root.prevAccManifestId()) : null;
+            AccSummaryRecord previous = accQuery != null && root.prevAccManifestId() != null ? accQuery.getAccSummary(root.prevAccManifestId()) : null;
             NamespaceSummaryRecord namespace = root.namespaceId() != null ? ccDocument.getNamespace(root.namespaceId()) : null;
             return new AccValidationInput(root, previous, namespace, properties, baseCycles, ownAsccs, ownBccs, bases);
         }
@@ -122,8 +131,8 @@ public class AccValidationInputLoader implements ValidationInputLoader<AccValida
                 List<PathSegment> own = (asccp == null)
                         ? append(path, segment("ASCC", ascc.asccManifestId()))
                         : append(path, segment("ASCC", ascc.asccManifestId()), segment("ASCCP", asccp.asccpManifestId()));
-                AsccSummaryRecord previous = ascc.prevAsccManifestId() != null ? accQuery.getAsccSummary(ascc.prevAsccManifestId()) : null;
-                int references = (asccp != null && !asccp.reusable())
+                AsccSummaryRecord previous = accQuery != null && ascc.prevAsccManifestId() != null ? accQuery.getAsccSummary(ascc.prevAsccManifestId()) : null;
+                int references = (accQuery != null && asccp != null && !asccp.reusable())
                         ? (int) accQuery.getAsccSummaryList(asccp.asccpManifestId()).stream()
                         .filter(e -> e.state() != CcState.Deleted).count() : 1;
                 ownAsccs.add(new AccValidationInput.OwnAscc(ascc, asccp, roleOf, previous, references, own));
@@ -132,7 +141,7 @@ public class AccValidationInputLoader implements ValidationInputLoader<AccValida
                 List<PathSegment> own = (bccp == null)
                         ? append(path, segment("BCC", bcc.bccManifestId()))
                         : append(path, segment("BCC", bcc.bccManifestId()), segment("BCCP", bccp.bccpManifestId()));
-                BccSummaryRecord previous = bcc.prevBccManifestId() != null ? accQuery.getBccSummary(bcc.prevBccManifestId()) : null;
+                BccSummaryRecord previous = accQuery != null && bcc.prevBccManifestId() != null ? accQuery.getBccSummary(bcc.prevBccManifestId()) : null;
                 boolean hasSupplementaryComponents = bcc.entityType() == EntityType.Attribute && bccp != null
                         && ccDocument.getDtScList(bccp.dtManifestId()).stream()
                         .anyMatch(sc -> sc.cardinality() != null && sc.cardinality().max() != null && sc.cardinality().max() > 0);

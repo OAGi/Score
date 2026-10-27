@@ -19,6 +19,7 @@ import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.comp
 import {AngularSplitModule} from 'angular-split';
 import {ExtensionDetailComponent} from './extension-detail.component';
 import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
+import {ValidationPanelComponent} from '../../common/validation-panel/validation-panel.component';
 import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
 
 const routes: Routes = [
@@ -50,6 +51,7 @@ const routes: Routes = [
     DragDropModule,
     AngularSplitModule,
     GithubIssueBoxComponent,
+    ValidationPanelComponent,
     DtPanelComponent,
     AccPanelComponent,
     AsccPanelComponent,

@@ -399,8 +399,10 @@
   </score-tree-detail>
   @if (validation.hasReport && validation.panelOpen) {
     <score-validation-panel [session]="validation" title="Validation Results" (locationSelect)="validation.navigateTo($event)"
-                              (closed)="validation.panelOpen = false"
-                              [height]="validation.panelHeight" (heightChange)="validation.resizePanel($event)">
+                              (closed)="validation.close()"
+                              [height]="validation.panelHeight" (heightChange)="validation.resizePanel($event)"
+                              [decision]="!!validation.decision" [note]="validation.decision?.note ?? ''"
+                              (proceed)="validation.proceedWithChange()" (cancel)="validation.cancelChange()">
     </score-validation-panel>
   }
 </score-sidenav-page>

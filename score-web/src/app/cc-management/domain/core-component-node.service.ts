@@ -357,21 +357,6 @@ export class CcNodeService {
     return new HttpParams().set('data', data);
   }
 
-  verifyAppendAssociation(accManifestId: number,
-                          manifestId: number, type: string): Observable<VerifyAppendAssociationResponse> {
-
-    let params = new HttpParams();
-    if (type === 'ASCCP') {
-      params = params.set('asccpManifestId', manifestId);
-    } else if (type === 'BCCP') {
-      params = params.set('bccpManifestId', manifestId);
-    }
-
-    return this.http.get<VerifyAppendAssociationResponse>('/api/core-components/acc/' + accManifestId + '/verify', {
-      params
-    });
-  }
-
   appendAscc(accManifestId: number, asccpManifestId: number,
              pos: number, attribute: boolean): Observable<any> {
 
@@ -385,12 +370,6 @@ export class CcNodeService {
 
     return this.http.post('/api/core-components/acc/' + accManifestId + '/bcc/' + bccpManifestId, {}, {
       params: new HttpParams().set('pos', '' + pos).set('attribute', attribute)
-    });
-  }
-
-  verifySetBasedAcc(accManifestId: number, basedAccManifestId: number): Observable<VerifyAppendAssociationResponse> {
-    return this.http.get<VerifyAppendAssociationResponse>('/api/core-components/acc/' + accManifestId + '/verify', {
-      params: new HttpParams().set('basedAccManifestId', basedAccManifestId)
     });
   }
 

@@ -15,9 +15,9 @@ public interface ValidationRule<I> {
 
     Severity severity();
 
-    /** The triggers the rule applies to; by default all of them. */
+    /** The triggers the rule applies to; by default the ones that are about the state of the subject itself. */
     default Set<ValidationTrigger> triggers() {
-        return Set.of(ValidationTrigger.values());
+        return Set.of(ValidationTrigger.ON_DEMAND, ValidationTrigger.STATE_TRANSITION, ValidationTrigger.RELEASE);
     }
 
     Stream<Violation> evaluate(I input);

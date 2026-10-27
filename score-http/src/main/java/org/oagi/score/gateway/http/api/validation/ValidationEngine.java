@@ -54,7 +54,17 @@ public class ValidationEngine {
     private <I> ValidationReport run(SubjectValidator<I> validator, ScoreUser requester,
                                      ValidationSubject subject, ValidationTrigger trigger) {
         I input = validator.loader().load(requester, subject);
+        List<Violation> violations = evaluate(validator, subject, input, trigger).stream().sorted(ORDER).collect(Collectors.toList());
+        return new ValidationReport(subject, new Date(), statusOf(violations), violations);
+    }
 
+    /**
+     * Runs the rules that apply to the trigger on an input that is already there, for a caller that makes the input
+     * itself (the ones of the subjects a change would affect, read once for all of them). A rule that fails is reported
+     * and does not stop the others.
+     */
+    public <I> List<Violation> evaluate(SubjectValidator<I> validator, ValidationSubject subject, I input,
+                                        ValidationTrigger trigger) {
         List<Violation> violations = new ArrayList<>();
         for (ValidationRule<I> rule : validator.rules()) {
             if (!rule.triggers().contains(trigger)) {
@@ -69,12 +79,10 @@ public class ValidationEngine {
                         Map.of("ruleId", rule.id()), List.of()));
             }
         }
-
-        violations = violations.stream().sorted(ORDER).collect(Collectors.toList());
-        return new ValidationReport(subject, new Date(), statusOf(violations), violations);
+        return violations;
     }
 
-    private static final Comparator<Violation> ORDER = Comparator
+    static final Comparator<Violation> ORDER = Comparator
             .comparing(Violation::severity)
             .thenComparing(Violation::ruleId)
             .thenComparing(v -> v.locations().isEmpty() ? "" : v.locations().get(0).label());

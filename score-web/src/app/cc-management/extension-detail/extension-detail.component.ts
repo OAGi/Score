@@ -1,5 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
@@ -19,6 +19,8 @@ import {
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
 import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {ValidationService} from '../../validation/validation.service';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
 import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {findPreviousAssociation} from '../domain/association-revision';
@@ -89,7 +91,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./extension-detail.component.css']
 })
-export class ExtensionDetailComponent implements OnInit {
+export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -107,6 +109,8 @@ export class ExtensionDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private stompService = inject(RxStompService);
   private clipboard = inject(Clipboard);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
 
 
   protected readonly trim = trim;
@@ -149,6 +153,9 @@ export class ExtensionDetailComponent implements OnInit {
     return this.sidenavPage.sidenav;
   }
   @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
+
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
 
   preferencesInfo: PreferencesInfo;
   HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
@@ -303,6 +310,14 @@ export class ExtensionDetailComponent implements OnInit {
     this.treeViewport.scrollToNode(curNode, 500);
   }
 
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
+  }
+
+  get element(): HTMLElement {
+    return this.host.nativeElement;
+  }
+
   receiveCommentEvent(evt) {
     const comment = new Comment();
     comment.commentId = evt.properties.commentId;
@@ -379,6 +394,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.service.getAccDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([rootNode, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
@@ -753,27 +769,18 @@ export class ExtensionDetailComponent implements OnInit {
         return;
       }
 
-      this.service.verifyAppendAssociation(
-          this.rootNode.manifestId,
-          association.manifestId, association.type).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = ((pos === -1) ? 'Append' : 'Insert') + ' association';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-              .subscribe(result => {
-                if (!result) {
-                  this.isUpdating = false;
-                  return;
-                }
-
-                this._doAppendAssociation(association, pos);
-              });
-        } else {
-          this._doAppendAssociation(association, pos);
-        }
+      // what the association would break is asked first; when it would break nothing it is appended as it always was
+      this.isUpdating = true;
+      this.validationService.appendCheck(this.rootNode.manifestId, association.type, association.manifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doAppendAssociation(association, pos))) {
+            this.isUpdating = false;
+          } else {
+            this._doAppendAssociation(association, pos);
+          }
+        },
+        // not being able to ask is no reason to take the appending away
+        error: () => this._doAppendAssociation(association, pos)
       });
     });
   }

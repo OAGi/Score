@@ -68,6 +68,15 @@ class AccFixture {
         when(document.getBccp(org.mockito.ArgumentMatchers.any())).thenAnswer(i -> bccps.get(i.<BccpManifestId>getArgument(0)));
         when(document.getAssociations(org.mockito.ArgumentMatchers.any())).thenAnswer(i ->
                 associations.getOrDefault(i.<AccSummaryRecord>getArgument(0).accManifestId(), List.of()));
+        when(document.getAccListByBasedAccManifestId(org.mockito.ArgumentMatchers.any())).thenAnswer(i ->
+                accs.values().stream().filter(a -> i.<AccManifestId>getArgument(0).equals(a.basedAccManifestId())).toList());
+        when(document.getAsccpListByRoleOfAccManifestId(org.mockito.ArgumentMatchers.any())).thenAnswer(i ->
+                asccps.values().stream().filter(a -> i.<AccManifestId>getArgument(0).equals(a.roleOfAccManifestId())).toList());
+        when(document.getAccListByToAsccpManifestId(org.mockito.ArgumentMatchers.any())).thenAnswer(i ->
+                associations.entrySet().stream()
+                        .filter(e -> e.getValue().stream().anyMatch(x -> x instanceof AsccSummaryRecord a
+                                && a.toAsccpManifestId().equals(i.<AsccpManifestId>getArgument(0))))
+                        .map(e -> accs.get(e.getKey())).toList());
         return document;
     }
 }

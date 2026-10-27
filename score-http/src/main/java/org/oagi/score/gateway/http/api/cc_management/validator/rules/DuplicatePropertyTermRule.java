@@ -4,12 +4,14 @@ import org.oagi.score.gateway.http.api.cc_management.validator.AccValidationInpu
 import org.oagi.score.gateway.http.api.cc_management.validator.AccValidationInput.Property;
 import org.oagi.score.gateway.http.api.validation.Location;
 import org.oagi.score.gateway.http.api.validation.ValidationRule;
+import org.oagi.score.gateway.http.api.validation.ValidationTrigger;
 import org.oagi.score.gateway.http.api.validation.Severity;
 import org.oagi.score.gateway.http.api.validation.Violation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -60,6 +62,12 @@ abstract class DuplicatePropertyTermRule implements ValidationRule<AccValidation
     @Override
     public Severity severity() {
         return Severity.ERROR;
+    }
+
+    /** A change that moves properties around is what makes duplicates, so these rules are the ones it asks for. */
+    @Override
+    public Set<ValidationTrigger> triggers() {
+        return Set.of(ValidationTrigger.values());
     }
 
     @Override
