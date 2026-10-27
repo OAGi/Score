@@ -76,7 +76,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private static final String ID_ATTRIBUTE_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Document document;
+    private static final Format OUTPUT_FORMAT = Format.getPrettyFormat().setIndent("\t");
+
+    // The schema is written while it is generated: only the elements in progress are kept in memory.
+    private StreamingSchemaWriter body;
     private Element schemaNode;
     private Element rootElementNode;
 
@@ -109,7 +112,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         this.topLevelNamespacePrefixes.clear();
         this.declarations.clear();
         this.typeNames = new TypeNames();
-        this.document = new Document();
+        this.body = null;
         this.schemaNode = null;
         this.schemaTargetNamespace = null;
     }
@@ -165,7 +168,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         schemaNode.setAttribute("targetNamespace", targetNamespace.getURI());
         schemaNode.setAttribute("elementFormDefault", "qualified");
         schemaNode.setAttribute("attributeFormDefault", "unqualified");
-        document.addContent(schemaNode);
+        try {
+            this.body = new StreamingSchemaWriter(schemaNode, OUTPUT_FORMAT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         this.schemaTargetNamespace = targetNamespace;
         return schemaNode;
     }
@@ -199,7 +206,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         tempFile = new File(tempFile.getParentFile(), filename + ".xsd");
 
-        output(this.document, tempFile);
+        if (body != null) {
+            body.assemble(tempFile);
+        } else {
+            output(new Document(), tempFile);
+        }
 
         logger.info("XML Schema is generated: " + tempFile);
 
@@ -215,17 +226,19 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                                     throw new UncheckedIOException(e);
                                 }
                             })
-                    .register(new CommonComponents.GeneratedFile(tempFile, document, schemaNode,
+                    .register(new CommonComponents.GeneratedFile(tempFile, body, schemaNode,
                             schemaNode.getAttributeValue("targetNamespace"),
                             (schemaTargetNamespace != null) ? schemaTargetNamespace.getPrefix() : "",
                             new LinkedHashSet<>(includedSchemaLocations), new ArrayList<>(declarations.values())));
+        } else if (body != null) {
+            body.dispose();
         }
 
         return tempFile;
     }
 
     private static void output(Document document, File file) throws IOException {
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
+        XMLOutputter outputter = new XMLOutputter(OUTPUT_FORMAT);
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             outputter.output(document, outputStream);
             outputStream.flush();
@@ -252,7 +265,15 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         try {
             logger.debug("Generating Top Level ABIE w/ given ASBIEP Id: " + asbiep.asbiepId());
 
+            if (isProcessed(asbiep)) {
+                // The top-level element is written already: it cannot take another content.
+                logger.warn("The top-level ASBIEP is generated already: " + asbiep.asbiepId());
+                return;
+            }
             rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAsbiep);
+            // Issue #1615 & #1617
+            // The annotation is complete before the content, which is written as soon as it is finished.
+            attachBiePackageAttributes(rootElementNode, topLevelAsbiep, this.option.getBiePackage());
 
             AbieSummaryRecord abie = generationContext.queryTargetABIE(asbiep);
             Element rootSeqNode;
@@ -263,16 +284,17 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         asccp, topLevelAsbiep.topLevelAsbiepId());
                 rootElementNode.setAttribute("type",
                         resolveTypeQName(targetNamespace, topLevelAsbiep.topLevelAsbiepId(), topLevelTypeName));
+                body.emit(rootElementNode);
                 rootSeqNode = generateGlobalABIEType(abie, topLevelTypeName);
+                generateBIEs(abie, rootSeqNode);
+                finishABIE(rootSeqNode);
             } else {
+                body.enter(rootElementNode);
                 rootSeqNode = generateABIE(abie, rootElementNode);
+                generateBIEs(abie, rootSeqNode);
+                finishABIE(rootSeqNode);
+                body.exit(rootElementNode);
             }
-            generateBIEs(abie, rootSeqNode);
-            if (rootSeqNode.getChildren().isEmpty()) {
-                rootSeqNode.detach();
-            }
-            // Issue #1615 & #1617
-            attachBiePackageAttributes(rootElementNode, topLevelAsbiep, this.option.getBiePackage());
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
@@ -781,7 +803,24 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             complexType.addContent(element);
         }
 
+        body.enter(complexType);
+        body.enter(element);
         return element;
+    }
+
+    /**
+     * Finishes the compositor that {@link #generateABIE} or {@link #generateGlobalABIEType} returned, and its
+     * complex type. A compositor with no content is left out.
+     */
+    private void finishABIE(Element compositorNode) {
+        Element complexType = compositorNode.getParentElement();
+        body.flushChildren();
+        if (!body.isStarted(compositorNode) && compositorNode.getChildren().isEmpty()) {
+            body.discard(compositorNode);
+        } else {
+            body.exit(compositorNode);
+        }
+        body.exit(complexType);
     }
 
     private Element generateGlobalABIEType(AbieSummaryRecord abie, String typeName) {
@@ -805,12 +844,16 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             element = newElement("sequence");
             complexType.addContent(element);
         }
+        body.enter(complexType);
+        body.enter(element);
         return element;
     }
 
     public void generateBIEs(AbieSummaryRecord abie, Element parent) {
         List<BIE> childBIEs = generationContext.queryChildBIEs(abie);
         for (BIE bie : childBIEs) {
+            // The children of the previous BIE are finished.
+            body.flushChildren();
             if (bie instanceof BbieSummaryRecord) {
                 BbieSummaryRecord bbie = (BbieSummaryRecord) bie;
                 DtSummaryRecord bdt = generationContext.queryAssocBDT(bbie);
@@ -829,15 +872,15 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     }
                     Element asbiepNode = generateASBIEP(asbiep, node);
                     AbieSummaryRecord childAbie = generationContext.queryTargetABIE(asbiep);
+                    body.enter(asbiepNode);
                     Element compositorNode = generateABIE(childAbie, asbiepNode);
 
                     generationContext.referenceCounter().increase(asbiep)
                             .ifNotCircularReference(asbiep, () -> generateBIEs(childAbie, compositorNode))
                             .decrease(asbiep);
 
-                    if (compositorNode.getChildren().isEmpty()) {
-                        compositorNode.detach();
-                    }
+                    finishABIE(compositorNode);
+                    body.exit(asbiepNode);
                 }
             }
         }
@@ -1851,9 +1894,9 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
 
         /**
-         * A generated schema file, whose document is kept to be changed once the request is generated.
+         * A generated schema file, whose content is kept to be written again once the request is generated.
          */
-        record GeneratedFile(File file, Document document, Element schemaNode, String namespaceUri, String prefix,
+        record GeneratedFile(File file, StreamingSchemaWriter body, Element schemaNode, String namespaceUri, String prefix,
                              Set<String> includedFilenames, Collection<Declaration> declarations) {
         }
 
@@ -1883,6 +1926,14 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
          * returns the common files, which are none when there is no such component.
          */
         synchronized List<File> asFiles() throws IOException {
+            try {
+                return moveToCommonFiles();
+            } finally {
+                generatedFiles.forEach(generatedFile -> generatedFile.body().dispose());
+            }
+        }
+
+        private List<File> moveToCommonFiles() throws IOException {
             // the components to move, with the prefix of the namespace of the first file that declares each
             Map<CommonKey, Map<String, Declaration>> moved = new LinkedHashMap<>();
             Map<CommonKey, String> prefixes = new LinkedHashMap<>();
@@ -1936,7 +1987,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 }
             }
             for (GeneratedFile changedFile : changedFiles) {
-                output(changedFile.document(), changedFile.file());
+                changedFile.body().assemble(changedFile.file());
             }
 
             List<File> commonFiles = new ArrayList<>();

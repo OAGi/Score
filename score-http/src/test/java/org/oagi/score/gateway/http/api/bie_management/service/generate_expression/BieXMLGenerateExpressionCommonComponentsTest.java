@@ -1,10 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression.CommonComponents;
@@ -16,7 +14,6 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,12 +32,6 @@ class BieXMLGenerateExpressionCommonComponentsTest {
         restriction.setAttribute("base", base);
         simpleType.addContent(restriction);
         return simpleType;
-    }
-
-    private static void write(Document document, File file) throws IOException {
-        try (var out = new FileOutputStream(file)) {
-            new XMLOutputter(Format.getPrettyFormat()).output(document, out);
-        }
     }
 
     /** A generated file of the namespace {@code urn:example}, as the generator leaves it: the types are declared in it. */
@@ -71,10 +62,10 @@ class BieXMLGenerateExpressionCommonComponentsTest {
         for (Element element : elements) {
             schema.addContent(element);
         }
-        Document document = new Document(schema);
+        StreamingSchemaWriter body = new StreamingSchemaWriter(schema, Format.getPrettyFormat());
         File file = dir.resolve(name).toFile();
-        write(document, file);
-        return new GeneratedFile(file, document, schema, namespaceUri, prefix, new LinkedHashSet<>(includes), declarations);
+        body.assemble(file);
+        return new GeneratedFile(file, body, schema, namespaceUri, prefix, new LinkedHashSet<>(includes), declarations);
     }
 
     private static void assertValid(Path dir, String name) {
