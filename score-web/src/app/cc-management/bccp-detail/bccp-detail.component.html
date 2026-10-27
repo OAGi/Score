@@ -1,5 +1,5 @@
 <score-sidenav-page [commentControl]="commentControl" [currentUser]="currentUser" [progress]="isUpdating" [showToolbar]="false">
-  <score-tree-detail #treeDetail [ready]="!!searcher && !!dataSource" [searcher]="searcher" [selectedNode]="selectedNode"
+  <score-tree-detail #treeDetail [ready]="!!searcher && !!dataSource" [heightOffset]="180 + validation.openPanelHeight" [searcher]="searcher" [selectedNode]="selectedNode"
                      [tree]="tree" (nodeSelect)="onClick($event)">
     <ng-container treeDetailActions>
       @if (searcher && dataSource) {
@@ -131,7 +131,10 @@
       <score-cc-tree-viewport #tree [dataSource]="dataSource" [searcher]="searcher" [(cursorNode)]="cursorNode"
                               [height]="treeDetail.treeHeight" [contextMenu]="contextMenu"
                               (nodeClick)="onClick($event)" (nodeKey)="onTreeKey($event)"
-                              (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event">
+                              (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event"
+                              [validationMarker]="validation.marker"
+                              [validationCount]="validation.badgeCount"
+                              [validationHasErrors]="validation.errorCount > 0" (validationShow)="validation.show(null)" (validationMarkerClick)="validation.show($event)">
       </score-cc-tree-viewport>
 
       <mat-menu class="context-menu" #contextMenu="matMenu">
@@ -145,6 +148,12 @@
         <button mat-menu-item (click)="dataSource.expandDescendants(contextMenuItem, 3)">
           <span class="context-menu-item">Expand 3</span>
         </button>
+        @if (!!contextMenuItem && contextMenuItem.level === 0) {
+          <mat-divider></mat-divider>
+          <button mat-menu-item [id]="'cc-validate'" (click)="validation.validate()" [disabled]="validation.running">
+            <span class="context-menu-item">Validate</span>
+          </button>
+        }
         @if (!!contextMenuItem && contextMenuItem.level === 0 && isEditable()) {
           <mat-divider></mat-divider>
         }
@@ -222,4 +231,10 @@
       }
     </ng-container>
   </score-tree-detail>
+  @if (validation.hasReport && validation.panelOpen) {
+    <score-validation-panel [session]="validation" title="Validation Results" (locationSelect)="validation.navigateTo($event)"
+                              (closed)="validation.panelOpen = false"
+                              [height]="validation.panelHeight" (heightChange)="validation.resizePanel($event)">
+    </score-validation-panel>
+  }
 </score-sidenav-page>

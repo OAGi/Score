@@ -1,0 +1,43 @@
+<div class="validation-panel" [class.stale]="session.stale"
+     [style.height.px]="height" tabindex="0" (keydown)="onKey($event)" role="region"
+     aria-label="Validation results">
+  <div class="resize-handle" (mousedown)="startResize($event)" title="Drag to resize"></div>
+  <div class="panel-header">
+    <span class="panel-title">{{ title }}</span>
+    <span class="panel-summary">{{ summary }}</span>
+    @if (session.stale) {
+      <span class="panel-stale">Results may be outdated — validate again</span>
+    }
+    <span class="flex-spacer"></span>
+    <button class="panel-button" (click)="closed.emit()" matTooltip="Close" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="panel-body">
+      @for (violation of violations; track violation; let i = $index) {
+        <div class="violation" [class.active]="i === activeIndex || isFocused(violation)" (click)="activeIndex = i; selectFirst(violation)">
+          <mat-icon class="severity" [class]="violation.severity.toLowerCase()">
+            {{ violation.severity === 'ERROR' ? 'error' : violation.severity === 'WARNING' ? 'warning' : 'info' }}
+          </mat-icon>
+          <div class="violation-content">
+            <div class="violation-line">
+              <span class="message">{{ violation.message }}</span>
+            </div>
+            @if (violation.locations.length > 0) {
+              <div class="locations">
+                @for (location of violation.locations; track $index) {
+                  @if ($index > 0) {
+                    <span class="role">{{ location.role || 'and' }}</span>
+                  }
+                  <a class="location-link" [class.visited]="isVisited(violation, location)" href="javascript:void(0)"
+                     (click)="select(violation, location, $event)">{{ location.label }}</a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty">Nothing to show.</div>
+      }
+  </div>
+</div>

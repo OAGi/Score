@@ -1,5 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
@@ -86,6 +86,8 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {ValidationService} from '../../validation/validation.service';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
 
 @Component({
   standalone: false,
@@ -94,7 +96,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./acc-detail.component.css']
 })
-export class AccDetailComponent implements OnInit {
+export class AccDetailComponent implements OnInit, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -112,6 +114,8 @@ export class AccDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private stompService = inject(RxStompService);
   private clipboard = inject(Clipboard);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -159,6 +163,10 @@ export class AccDetailComponent implements OnInit {
   initialExpandDepth = 10;
 
   contextMenuItem: CcFlatNode;
+
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
+
   @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
   get sidenav(): MatSidenav {
@@ -403,6 +411,7 @@ export class AccDetailComponent implements OnInit {
       this.service.getAccDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([rootNode, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
@@ -1186,6 +1195,14 @@ export class AccDetailComponent implements OnInit {
         throw err;
       },
     });
+  }
+
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
+  }
+
+  get element(): HTMLElement {
+    return this.host.nativeElement;
   }
 
   updateState(state: string) {

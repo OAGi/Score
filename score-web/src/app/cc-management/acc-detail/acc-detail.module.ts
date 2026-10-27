@@ -29,6 +29,7 @@ import {TagService} from '../../tag-management/domain/tag.service';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {GithubIssueBoxComponent} from '../github-issue-box/github-issue-box.component';
+import {ValidationPanelComponent} from '../../common/validation-panel/validation-panel.component';
 
 const routes: Routes = [
   {
@@ -55,6 +56,7 @@ const routes: Routes = [
         TranslatePipe,
         ScoreCommonModule,
         CcTreeViewportComponent,
+        ValidationPanelComponent,
         SearchOptionsDialogModule,
         FindUsagesDialogModule,
         DragDropModule,

@@ -21,6 +21,26 @@
       </div>
     }
 
+    @if (node.level === 0 && validationCount > 0) {
+      <button type="button" class="ps-2 align-self-center d-inline-flex align-items-center" id="cc-validation-show"
+              style="border: 0; background: transparent; cursor: pointer; font-size: 12px; height: 20px; line-height: 20px; padding-top: 0; padding-bottom: 0;"
+              [matTooltip]="'Show validation results'" (click)="validationShow.emit(); $event.stopPropagation()">
+        <mat-icon style="width: 18px; height: 18px; font-size: 18px; line-height: 18px;" [style.color]="validationHasErrors ? '#d32f2f' : '#f57c00'">{{ validationHasErrors ? 'error' : 'warning' }}</mat-icon>
+      </button>
+    }
+
+    @if (validationMarker(node); as marker) {
+      <div class="ps-2 d-inline-flex align-items-center align-self-center validation-marker" [style.opacity]="marker.stale ? 0.45 : 1"
+           style="cursor: pointer;" (click)="validationMarkerClick.emit(node); $event.stopPropagation()">
+        <mat-icon style="width: 18px; height: 18px; font-size: 18px; line-height: 18px;"
+                  [style.color]="marker.severity === 'ERROR' ? '#d32f2f' : marker.severity === 'WARNING' ? '#f57c00' : '#1976d2'"
+                  [matTooltip]="marker.messages.join('\n') + (marker.stale ? '\n(may be outdated)' : '')"
+                  matTooltipClass="validation-tooltip">
+          {{ marker.severity === 'ERROR' ? 'error' : marker.severity === 'WARNING' ? 'warning' : 'info' }}
+        </mat-icon>
+      </div>
+    }
+
     @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {
       <span class="node-cardinality ps-2">
         {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}

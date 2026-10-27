@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
@@ -23,6 +23,8 @@ import {
   DtScFlatNode
 } from '../domain/cc-flat-tree';
 import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
+import {ValidationService} from '../../validation/validation.service';
 import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
@@ -83,7 +85,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bdt-detail.component.css']
 })
-export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
+export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
@@ -91,6 +93,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
   private namespaceService = inject(NamespaceService);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
@@ -142,6 +146,17 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
   restrictionDataSource = new MatTableDataSource<any>();
 
   contextMenuItem: CcFlatNode;
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
+
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
+  }
+
+  get element(): HTMLElement {
+    return this.host.nativeElement;
+  }
+
   @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
   get sidenav(): MatSidenav {
@@ -409,6 +424,7 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware {
       this.service.getDtDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([dtDetails, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);

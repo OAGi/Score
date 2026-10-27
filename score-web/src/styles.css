@@ -1435,3 +1435,7 @@ div.mat-form-field-wrapper div.mat-form-field-flex div.mat-form-field-infix {
 .mat-mdc-select-disabled {
   color: inherit !important;
 }
+
+.validation-tooltip .mdc-tooltip__surface {
+  white-space: pre-line;
+}
