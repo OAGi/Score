@@ -2,7 +2,7 @@ import {locationAddress, ValidationReport, ValidationSession, Violation} from '.
 
 function violation(severity: Violation['severity'], ...addresses: string[]): Violation {
   return {
-    ruleId: 'ACC-ASSOC-02', severity, message: 'Duplicate', params: {},
+    ruleId: 'DUP-001', severity, message: 'Duplicate', params: {},
     locations: addresses.map(address => ({
       label: address,
       path: address.split('>').map(part => ({type: part.split('-')[0], manifestId: part.split('-')[1]}))

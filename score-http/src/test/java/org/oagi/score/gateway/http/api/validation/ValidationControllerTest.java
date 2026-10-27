@@ -82,7 +82,7 @@ class ValidationControllerTest {
 
     @Test
     void a_report_with_problems_is_still_an_answer_and_has_what_the_panel_shows() throws Exception {
-        Violation violation = new Violation("ACC-ASSOC-02", Severity.WARNING,
+        Violation violation = new Violation("DUP-001", Severity.WARNING,
                 "The property term \"Amount\" is used by more than one association of this ACC.",
                 Map.of("propertyTerm", "Amount"),
                 List.of(new Location("Amount (Root. Details)", List.of(new PathSegment("ACC", "12"), new PathSegment("BCC", "10")), "first occurrence")));

@@ -22,51 +22,51 @@ public class AccAssociationRules {
 
     @Bean
     ValidationRule<AccValidationInput> accOnlyOneExtension() {
-        return new FunctionRule<>("ACC-ASSOC-01", "ASSOCIATION", Severity.ERROR, input -> {
+        return new FunctionRule<>("ASC-001", "ASSOCIATION", Severity.ERROR, input -> {
             List<AccValidationInput.OwnAscc> extensions = input.ownAsccs().stream()
                     .filter(a -> a.asccp() != null && a.asccp().type() == AsccpType.Extension).toList();
             return extensions.size() < 2 ? Stream.<Violation>empty()
-                    : extensions.stream().map(a -> on("ACC-ASSOC-01", Severity.ERROR,
+                    : extensions.stream().map(a -> on("ASC-001", Severity.ERROR,
                     "The ACC has more than one extension.", a.asccp().den(), a.path()));
         });
     }
 
     @Bean
     ValidationRule<AccValidationInput> accChoiceHasMembers() {
-        return new FunctionRule<>("ACC-ASSOC-03", "ASSOCIATION", Severity.WARNING, input ->
+        return new FunctionRule<>("ASC-002", "ASSOCIATION", Severity.WARNING, input ->
                 input.root().componentType() == OagisComponentType.Choice
                         && input.ownAsccs().size() + input.ownBccs().size() < 2
-                        ? onAcc(input, "ACC-ASSOC-03", Severity.WARNING, "A choice should have at least two members.")
+                        ? onAcc(input, "ASC-002", Severity.WARNING, "A choice should have at least two members.")
                         : Stream.empty());
     }
 
     @Bean
     ValidationRule<AccValidationInput> accCardinalityMinIsNotNegative() {
-        return cardinality("ACC-CARD-01", "The minimum cardinality is less than 0.",
+        return cardinality("CRD-001", "The minimum cardinality is less than 0.",
                 (c, attribute) -> c.min() != null && c.min() < 0);
     }
 
     @Bean
     ValidationRule<AccValidationInput> accCardinalityMaxIsNotBelowMinusOne() {
-        return cardinality("ACC-CARD-02", "The maximum cardinality is less than 0 and is not -1 (unbounded).",
+        return cardinality("CRD-002", "The maximum cardinality is less than 0 and is not -1 (unbounded).",
                 (c, attribute) -> c.max() != null && c.max() < -1);
     }
 
     @Bean
     ValidationRule<AccValidationInput> accCardinalityMinIsNotAboveMax() {
-        return cardinality("ACC-CARD-03", "The minimum cardinality is greater than the maximum cardinality.",
+        return cardinality("CRD-003", "The minimum cardinality is greater than the maximum cardinality.",
                 (c, attribute) -> c.min() != null && c.max() != null && c.max() >= 0 && c.min() > c.max());
     }
 
     @Bean
     ValidationRule<AccValidationInput> accAttributeMinIsAtMostOne() {
-        return cardinality("ACC-CARD-04", "The minimum cardinality of an attribute is greater than 1.",
+        return cardinality("CRD-004", "The minimum cardinality of an attribute is greater than 1.",
                 (c, attribute) -> attribute && c.min() != null && c.min() > 1);
     }
 
     @Bean
     ValidationRule<AccValidationInput> accAttributeMaxIsZeroOrOne() {
-        return cardinality("ACC-CARD-05", "The maximum cardinality of an attribute is not 0 or 1.",
+        return cardinality("CRD-005", "The maximum cardinality of an attribute is not 0 or 1.",
                 (c, attribute) -> attribute && c.max() != null && (c.max() < 0 || c.max() > 1));
     }
 
@@ -88,40 +88,40 @@ public class AccAssociationRules {
     @Bean
     ValidationRule<AccValidationInput> accAssociationTargetIsNotDeprecated() {
         String message = "The association points at a deprecated property.";
-        return new FunctionRule<>("ACC-ASSOC-04", "ASSOCIATION", Severity.WARNING, input -> Stream.concat(
+        return new FunctionRule<>("REF-001", "ASSOCIATION", Severity.WARNING, input -> Stream.concat(
                 input.ownAsccs().stream()
                         .filter(a -> !a.ascc().deprecated() && a.asccp() != null && a.asccp().deprecated())
-                        .map(a -> on("ACC-ASSOC-04", Severity.WARNING, message, a.asccp().den(), a.path())),
+                        .map(a -> on("REF-001", Severity.WARNING, message, a.asccp().den(), a.path())),
                 input.ownBccs().stream()
                         .filter(b -> !b.bcc().deprecated() && b.bccp() != null && b.bccp().deprecated())
-                        .map(b -> on("ACC-ASSOC-04", Severity.WARNING, message, b.bccp().den(), b.path()))));
+                        .map(b -> on("REF-001", Severity.WARNING, message, b.bccp().den(), b.path()))));
     }
 
     @Bean
     ValidationRule<AccValidationInput> accAssociationDefinitionIsGiven() {
         String message = "The association has no definition.";
-        return new FunctionRule<>("ACC-ASSOC-05", "ASSOCIATION", Severity.WARNING, input -> Stream.concat(
+        return new FunctionRule<>("ATR-008", "ASSOCIATION", Severity.WARNING, input -> Stream.concat(
                 input.ownAsccs().stream().filter(a -> blank(a.ascc().definition()))
-                        .map(a -> on("ACC-ASSOC-05", Severity.WARNING, message, label(a.asccp(), a.ascc().den()), a.path())),
+                        .map(a -> on("ATR-008", Severity.WARNING, message, label(a.asccp(), a.ascc().den()), a.path())),
                 input.ownBccs().stream().filter(b -> blank(b.bcc().definition()))
-                        .map(b -> on("ACC-ASSOC-05", Severity.WARNING, message, label(b.bccp(), b.bcc().den()), b.path()))));
+                        .map(b -> on("ATR-008", Severity.WARNING, message, label(b.bccp(), b.bcc().den()), b.path()))));
     }
 
     @Bean
     ValidationRule<AccValidationInput> accMinimumDoesNotRiseInRevision() {
-        return revision("ACC-CARD-06", "The minimum cardinality is greater than in the previous revision.",
+        return revision("CRD-006", "The minimum cardinality is greater than in the previous revision.",
                 (c, p) -> c.min() != null && p.min() != null && c.min() > p.min());
     }
 
     @Bean
     ValidationRule<AccValidationInput> accUnboundedMaximumIsKeptInRevision() {
-        return revision("ACC-CARD-07", "The maximum cardinality was unbounded in the previous revision and is not any more.",
+        return revision("CRD-007", "The maximum cardinality was unbounded in the previous revision and is not any more.",
                 (c, p) -> c.max() != null && p.max() != null && p.max() == -1 && c.max() != -1);
     }
 
     @Bean
     ValidationRule<AccValidationInput> accMaximumDoesNotFallInRevision() {
-        return revision("ACC-CARD-08", "The maximum cardinality is less than in the previous revision.",
+        return revision("CRD-008", "The maximum cardinality is less than in the previous revision.",
                 (c, p) -> c.max() != null && p.max() != null && p.max() != -1 && c.max() != -1 && c.max() < p.max());
     }
 

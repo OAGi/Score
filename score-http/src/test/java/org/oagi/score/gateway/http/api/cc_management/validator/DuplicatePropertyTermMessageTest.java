@@ -69,7 +69,7 @@ class DuplicatePropertyTermMessageTest {
 
         Violation violation = validate(root, ValidationTrigger.ON_DEMAND).get(0);
 
-        assertEquals("ACC-ASSOC-02", violation.ruleId());
+        assertEquals("DUP-001", violation.ruleId());
         assertEquals(Severity.ERROR, violation.severity());
         assertEquals("The property term \"Amount\" is used by more than one association of this ACC.", violation.message());
         assertEquals("Amount", violation.params().get("propertyTerm"));
@@ -84,7 +84,7 @@ class DuplicatePropertyTermMessageTest {
 
         Violation violation = validate(root, ValidationTrigger.ON_DEMAND).get(0);
 
-        assertEquals("ACC-BASE-01", violation.ruleId());
+        assertEquals("DUP-002", violation.ruleId());
         assertEquals("The property term \"Name\" is used by this ACC and also by one of its base ACCs.", violation.message());
     }
 
@@ -99,7 +99,7 @@ class DuplicatePropertyTermMessageTest {
 
         Violation violation = validate(root, ValidationTrigger.ON_DEMAND).get(0);
 
-        assertEquals("ACC-GRP-01", violation.ruleId());
+        assertEquals("DUP-003", violation.ruleId());
         assertEquals("The property term \"Name\" is brought in through a group, and this ACC or its base ACC already has it.",
                 violation.message());
     }

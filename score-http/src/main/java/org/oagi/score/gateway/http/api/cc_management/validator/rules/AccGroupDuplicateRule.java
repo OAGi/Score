@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class AccGroupDuplicateRule extends DuplicatePropertyTermRule {
 
     public AccGroupDuplicateRule() {
-        super(Origin.GROUP, "ACC-GRP-01", "is brought in through a group, and this ACC or its base ACC already has it");
+        super(Origin.GROUP, "DUP-003", "is brought in through a group, and this ACC or its base ACC already has it");
     }
 }

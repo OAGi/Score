@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 /** The rules of a BCCP that an ASCCP does not have: what is about its fixed value. */
 public final class BccpAttributeRules {
 
-    private static final String PREFIX = "BCCP";
-
     private BccpAttributeRules() {
     }
 
@@ -21,7 +19,7 @@ public final class BccpAttributeRules {
     }
 
     private static ValidationRule<BccpValidationInput> fixedValueIsKept() {
-        String id = PropertyAttributeRules.id(PREFIX, PropertyAttributeRules.LAST + 1);
+        String id = "ATR-010";
         return new FunctionRule<>(id, PropertyAttributeRules.CATEGORY, Severity.ERROR, input -> {
             if (input.previous() == null || input.previous().valueConstraint() == null
                     || !input.previous().valueConstraint().hasFixedValue()) {
@@ -35,7 +33,7 @@ public final class BccpAttributeRules {
     }
 
     private static ValidationRule<BccpValidationInput> fixedValueExcludesNillable() {
-        String id = PropertyAttributeRules.id(PREFIX, PropertyAttributeRules.LAST + 2);
+        String id = "ATR-011";
         return new FunctionRule<>(id, PropertyAttributeRules.CATEGORY, Severity.ERROR, input ->
                 input.root().nillable() && input.root().valueConstraint() != null && input.root().valueConstraint().hasFixedValue()
                         ? Stream.of(PropertyAttributeRules.onRoot(id, Severity.ERROR, "A property with a fixed value must not be nillable.", input))

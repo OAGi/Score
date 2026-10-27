@@ -106,18 +106,18 @@ class AccStateRulesTest {
     @Test
     void the_name_and_the_namespace_are_required() {
         AccSummaryRecord acc = acc(1, " ", OagisComponentType.Semantics, false, false, new NamespaceIdHolder(null), 1);
-        assertEquals(List.of("ACC-ATTR-01", "ACC-ATTR-02"), ids(acc));
+        assertEquals(List.of("ATR-001", "ATR-002"), ids(acc));
     }
 
     @Test
     void the_component_type_decides_whether_an_acc_can_be_abstract() {
-        assertEquals(List.of("ACC-ATTR-03"), ids(acc(1, "G", OagisComponentType.SemanticGroup, true, false,
+        assertEquals(List.of("ATR-012"), ids(acc(1, "G", OagisComponentType.SemanticGroup, true, false,
                 new NamespaceIdHolder(NAMESPACE), 1)));
     }
 
     @Test
     void a_first_revision_is_not_deprecated() {
-        assertEquals(List.of("ACC-ATTR-09"), ids(acc(1, "R", OagisComponentType.Semantics, false, true,
+        assertEquals(List.of("ATR-004"), ids(acc(1, "R", OagisComponentType.Semantics, false, true,
                 new NamespaceIdHolder(NAMESPACE), 1)));
         assertTrue(ids(acc(1, "R", OagisComponentType.Semantics, false, true, new NamespaceIdHolder(NAMESPACE), 2)).isEmpty());
     }
@@ -127,7 +127,7 @@ class AccStateRulesTest {
         bcc(10, EntityType.Attribute, 0, 1);
         bcc(11, EntityType.Element, 0, 1);
         ascc(12, AsccpType.Default, 0, 1);
-        assertEquals(List.of("ACC-ATTR-04", "ACC-ATTR-04"), ids(valid(OagisComponentType.AttributeGroup)));
+        assertEquals(List.of("ATR-013", "ATR-013"), ids(valid(OagisComponentType.AttributeGroup)));
     }
 
     @Test
@@ -138,8 +138,8 @@ class AccStateRulesTest {
         bcc(13, EntityType.Attribute, 2, 1);
         bcc(14, EntityType.Attribute, 0, -1);
         ascc(15, AsccpType.Default, 2, 1);
-        assertEquals(List.of("ACC-CARD-01", "ACC-CARD-02", "ACC-CARD-03", "ACC-CARD-03", "ACC-CARD-03", "ACC-CARD-04",
-                "ACC-CARD-05"), ids(valid(OagisComponentType.Semantics)));
+        assertEquals(List.of("CRD-001", "CRD-002", "CRD-003", "CRD-003", "CRD-003", "CRD-004",
+                "CRD-005"), ids(valid(OagisComponentType.Semantics)));
     }
 
     @Test
@@ -154,13 +154,13 @@ class AccStateRulesTest {
         ascc(10, AsccpType.Extension, 0, -1);
         assertTrue(ids(valid(OagisComponentType.Semantics)).isEmpty());
         ascc(11, AsccpType.Extension, 0, 1);
-        assertEquals(List.of("ACC-ASSOC-01", "ACC-ASSOC-01"), ids(valid(OagisComponentType.Semantics)));
+        assertEquals(List.of("ASC-001", "ASC-001"), ids(valid(OagisComponentType.Semantics)));
     }
 
     @Test
     void a_choice_has_two_members() {
         bcc(10, EntityType.Element, 0, 1);
-        assertEquals(List.of("ACC-ASSOC-03"), ids(valid(OagisComponentType.Choice)));
+        assertEquals(List.of("ASC-002"), ids(valid(OagisComponentType.Choice)));
         bcc(11, EntityType.Element, 0, 1);
         assertTrue(ids(valid(OagisComponentType.Choice)).isEmpty());
     }
@@ -172,7 +172,7 @@ class AccStateRulesTest {
         AccValidationInput input = new AccValidationInput(valid(OagisComponentType.Semantics), List.of(), List.of(), asccs, bccs, bases);
         List<Violation> found = rules.stream().flatMap(r -> r.evaluate(input)).toList();
         assertEquals(1, found.size());
-        assertEquals("ACC-BASE-02", found.get(0).ruleId());
+        assertEquals("BAS-001", found.get(0).ruleId());
         assertEquals(Severity.WARNING, found.get(0).severity());
     }
 }

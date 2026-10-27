@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 /** The rules about what an ASCCP points at: the ACC it is the role of. */
 public final class AsccpReferenceRules {
 
-    private static final String PREFIX = "ASCCP";
-
     private AsccpReferenceRules() {
     }
 
@@ -21,7 +19,7 @@ public final class AsccpReferenceRules {
     }
 
     private static ValidationRule<AsccpValidationInput> roleOfAccIsNotDeprecated() {
-        String id = PREFIX + "-RI-01";
+        String id = "REF-001";
         return new FunctionRule<>(id, "REFERENCE-INTEGRITY", Severity.WARNING, input ->
                 input.roleOf() != null && input.roleOf().deprecated() && !input.root().deprecated()
                         ? Stream.of(PropertyAttributeRules.onChild(id, Severity.WARNING, "The ACC of the ASCCP is deprecated.", input,

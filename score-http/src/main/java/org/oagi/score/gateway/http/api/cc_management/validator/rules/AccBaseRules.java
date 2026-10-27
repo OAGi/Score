@@ -17,11 +17,11 @@ public class AccBaseRules {
 
     @Bean
     ValidationRule<AccValidationInput> accBaseIsNotDeprecated() {
-        return new FunctionRule<>("ACC-BASE-02", "BASED-ACC", Severity.WARNING, input -> {
+        return new FunctionRule<>("BAS-001", "BASED-ACC", Severity.WARNING, input -> {
             AccSummaryRecord acc = input.root();
             return acc.deprecated() ? Stream.empty() : input.bases().stream().findFirst()
                     .filter(b -> b.acc().deprecated())
-                    .map(b -> on("ACC-BASE-02", Severity.WARNING,
+                    .map(b -> on("BAS-001", Severity.WARNING,
                             "The base ACC \"" + b.acc().den() + "\" is deprecated.", b.acc().den(), b.path()))
                     .stream();
         });

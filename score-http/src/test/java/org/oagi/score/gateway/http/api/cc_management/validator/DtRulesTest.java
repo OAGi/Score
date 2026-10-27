@@ -82,29 +82,29 @@ class DtRulesTest {
     }
 
     @Test
-    void the_ids_have_no_gaps_inside_a_category() {
-        assertEquals(List.of("DT-ATTR-01", "DT-ATTR-02", "DT-ATTR-03", "DT-ATTR-04", "DT-ATTR-05", "DT-ATTR-06", "DT-ATTR-07",
-                "DT-VD-01", "DT-VD-02", "DT-VD-03", "DT-VD-04", "DT-SC-01", "DT-SC-02", "DT-SC-03"),
+    void the_ids_are_those_of_the_problems() {
+        assertEquals(List.of("ATR-002", "ATR-003", "ATR-004", "ATR-005", "ATR-006", "ATR-007", "ATR-008",
+                "DOM-001", "DOM-002", "DOM-003", "DOM-004", "DUP-004", "CRD-009", "ATR-008"),
                 RULES.stream().map(ValidationRule::id).toList());
     }
 
     @Test
     void the_namespace_is_required_and_standard_for_a_developer() {
-        assertEquals(List.of("DT-ATTR-01"), ids(input(dt("Text", null, DEFINITION, false, 1, null), null, null, List.of(TOKEN), List.of())));
+        assertEquals(List.of("ATR-002"), ids(input(dt("Text", null, DEFINITION, false, 1, null), null, null, List.of(TOKEN), List.of())));
         DtSummaryRecord developers = dt("Text", NAMESPACE, DEFINITION, false, 1, DEVELOPER);
-        assertEquals(List.of("DT-ATTR-02"), ids(input(developers, null, new NamespaceSummaryRecord(NAMESPACE, "u", "p", false), List.of(TOKEN), List.of())));
+        assertEquals(List.of("ATR-003"), ids(input(developers, null, new NamespaceSummaryRecord(NAMESPACE, "u", "p", false), List.of(TOKEN), List.of())));
         assertTrue(ids(input(developers, null, STANDARD, List.of(TOKEN), List.of())).isEmpty());
     }
 
     @Test
     void a_first_revision_is_not_deprecated_and_a_revision_keeps_what_it_has() {
-        assertEquals(List.of("DT-ATTR-03"), ids(input(dt("Text", NAMESPACE, DEFINITION, true, 1, null), null, STANDARD, List.of(TOKEN), List.of())));
+        assertEquals(List.of("ATR-004"), ids(input(dt("Text", NAMESPACE, DEFINITION, true, 1, null), null, STANDARD, List.of(TOKEN), List.of())));
         DtSummaryRecord previous = dt();
         DtSummaryRecord changed = dt("Date", new NamespaceId(BigInteger.TEN), DEFINITION, false, 2, null);
-        assertEquals(List.of("DT-ATTR-04", "DT-ATTR-05"), ids(input(changed, previous, null, List.of(TOKEN), List.of())));
+        assertEquals(List.of("ATR-005", "ATR-006"), ids(input(changed, previous, null, List.of(TOKEN), List.of())));
         DtSummaryRecord wasDeprecated = dt("Text", NAMESPACE, DEFINITION, true, 1, null);
         DtValidationInput undone = input(dt("Text", NAMESPACE, DEFINITION, false, 2, null), wasDeprecated, STANDARD, List.of(TOKEN), List.of());
-        assertEquals(List.of("DT-ATTR-06"), ids(undone));
+        assertEquals(List.of("ATR-007"), ids(undone));
         assertTrue(RULES.stream().flatMap(r -> r.evaluate(undone)).allMatch(v -> v.severity() == Severity.WARNING));
     }
 
@@ -112,20 +112,20 @@ class DtRulesTest {
     void a_missing_definition_is_a_warning_on_the_dt_and_on_each_sc() {
         DtValidationInput input = input(dt("Text", NAMESPACE, new Definition(" ", null), false, 1, null), null, STANDARD, List.of(TOKEN),
                 List.of(sc(2, "List", "Name", 0, 1, null, List.of(TOKEN))));
-        assertEquals(List.of("DT-ATTR-07", "DT-SC-03"), ids(input));
+        assertEquals(List.of("ATR-008", "ATR-008"), ids(input));
     }
 
     @Test
     void a_data_type_has_value_domains_and_one_of_them_is_the_default() {
-        assertEquals(List.of("DT-VD-01"), ids(input(dt(), null, STANDARD, List.of(), List.of())));
-        assertEquals(List.of("DT-VD-02"), ids(input(dt(), null, STANDARD, List.of(STRING, INTEGER), List.of())));
+        assertEquals(List.of("DOM-001"), ids(input(dt(), null, STANDARD, List.of(), List.of())));
+        assertEquals(List.of("DOM-002"), ids(input(dt(), null, STANDARD, List.of(STRING, INTEGER), List.of())));
         ValueDomain secondDefault = new ValueDomain("Integer", new XbtManifestId(BigInteger.TEN), null, null, true);
-        assertEquals(List.of("DT-VD-02"), ids(input(dt(), null, STANDARD, List.of(TOKEN, secondDefault), List.of())));
+        assertEquals(List.of("DOM-002"), ids(input(dt(), null, STANDARD, List.of(TOKEN, secondDefault), List.of())));
     }
 
     @Test
     void the_same_value_domain_is_not_twice_in_a_holder() {
-        assertEquals(List.of("DT-VD-03"), ids(input(dt(), null, STANDARD, List.of(TOKEN, new ValueDomain("Token", TOKEN.xbtManifestId(), null, null, false)), List.of())));
+        assertEquals(List.of("DOM-003"), ids(input(dt(), null, STANDARD, List.of(TOKEN, new ValueDomain("Token", TOKEN.xbtManifestId(), null, null, false)), List.of())));
     }
 
     @Test
@@ -136,8 +136,8 @@ class DtRulesTest {
         ValueDomain defaultNormalized = new ValueDomain("NormalizedString", new XbtManifestId(BigInteger.valueOf(3)), null, null, true);
         assertTrue(ids(input(dt(), null, STANDARD, List.of(defaultNormalized, CODE_LIST), List.of())).isEmpty());
         ValueDomain defaultInteger = new ValueDomain("Integer", new XbtManifestId(BigInteger.TEN), null, null, true);
-        assertEquals(List.of("DT-VD-04"), ids(input(dt(), null, STANDARD, List.of(defaultInteger, CODE_LIST), List.of())));
-        assertEquals(List.of("DT-VD-04"), ids(input(dt(), null, STANDARD, List.of(CODE_LIST), List.of())).stream().filter(i -> i.equals("DT-VD-04")).toList());
+        assertEquals(List.of("DOM-004"), ids(input(dt(), null, STANDARD, List.of(defaultInteger, CODE_LIST), List.of())));
+        assertEquals(List.of("DOM-004"), ids(input(dt(), null, STANDARD, List.of(CODE_LIST), List.of())).stream().filter(i -> i.equals("DOM-004")).toList());
     }
 
     @Test
@@ -146,7 +146,7 @@ class DtRulesTest {
         DtValidationInput input = input(dt(), null, STANDARD, List.of(TOKEN), List.of(none));
         List<Violation> found = RULES.stream().flatMap(r -> r.evaluate(input)).toList();
         assertEquals(1, found.size());
-        assertEquals("DT-VD-01", found.get(0).ruleId());
+        assertEquals("DOM-001", found.get(0).ruleId());
         assertEquals(List.of("DT", "DT_SC"), found.get(0).locations().get(0).path().stream().map(PathSegment::type).toList());
     }
 
@@ -155,7 +155,7 @@ class DtRulesTest {
         DtValidationInput same = input(dt(), null, STANDARD, List.of(TOKEN), List.of(sc(2, "List", "Name"), sc(3, "List", "Name")));
         List<Violation> found = RULES.stream().flatMap(r -> r.evaluate(same)).toList();
         assertEquals(1, found.size());
-        assertEquals("DT-SC-01", found.get(0).ruleId());
+        assertEquals("DUP-004", found.get(0).ruleId());
         assertEquals(Severity.WARNING, found.get(0).severity());
         assertEquals(2, found.get(0).locations().size());
         assertTrue(ids(input(dt(), null, STANDARD, List.of(TOKEN), List.of(sc(2, "List", "Name"), sc(3, "List", "Identifier")))).isEmpty());
@@ -163,7 +163,7 @@ class DtRulesTest {
 
     @Test
     void the_cardinality_of_an_sc_is_valid() {
-        assertEquals(List.of("DT-SC-02", "DT-SC-02", "DT-SC-02"), ids(input(dt(), null, STANDARD, List.of(TOKEN), List.of(
+        assertEquals(List.of("CRD-009", "CRD-009", "CRD-009"), ids(input(dt(), null, STANDARD, List.of(TOKEN), List.of(
                 sc(2, "A", "Name", -1, 1, DEFINITION, List.of(TOKEN)),
                 sc(3, "B", "Name", 0, -2, DEFINITION, List.of(TOKEN)),
                 sc(4, "C", "Name", 3, 2, DEFINITION, List.of(TOKEN))))));

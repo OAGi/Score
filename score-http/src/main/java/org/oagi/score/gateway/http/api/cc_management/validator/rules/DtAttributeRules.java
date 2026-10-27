@@ -19,7 +19,6 @@ import static org.oagi.score.gateway.http.api.cc_management.validator.rules.AccR
 /** The rules about what a DT is by itself, and what a revision of it keeps. */
 public final class DtAttributeRules {
 
-    private static final String PREFIX = "DT-ATTR-";
     private static final String CATEGORY = "ATTRIBUTE";
 
     private DtAttributeRules() {
@@ -27,33 +26,31 @@ public final class DtAttributeRules {
 
     public static List<ValidationRule<DtValidationInput>> all() {
         return List.of(
-                own(1, Severity.ERROR, "The namespace is required.",
+                own("ATR-002", Severity.ERROR, "The namespace is required.",
                         input -> input.root().namespaceId() == null),
-                own(2, Severity.ERROR, "A data type of a developer must have a standard namespace.",
+                own("ATR-003", Severity.ERROR, "A data type of a developer must have a standard namespace.",
                         input -> input.root().owner() != null && input.root().owner().isDeveloper()
                                 && input.namespace() != null && !input.namespace().standard()),
-                own(3, Severity.ERROR, "A data type of the first revision must not be deprecated.",
+                own("ATR-004", Severity.ERROR, "A data type of the first revision must not be deprecated.",
                         input -> input.root().revisionNum() <= 1 && input.root().deprecated()),
-                revision(4, Severity.ERROR, "The namespace of a revision must not differ from the previous revision.",
+                revision("ATR-005", Severity.ERROR, "The namespace of a revision must not differ from the previous revision.",
                         (dt, previous) -> !Objects.equals(dt.namespaceId(), previous.namespaceId())),
-                revision(5, Severity.ERROR, "The data type term of a revision must not differ from the previous revision.",
+                revision("ATR-006", Severity.ERROR, "The data type term of a revision must not differ from the previous revision.",
                         (dt, previous) -> !Objects.equals(dt.dataTypeTerm(), previous.dataTypeTerm())),
-                revision(6, Severity.WARNING, "The data type was deprecated in the previous revision and is not any more.",
+                revision("ATR-007", Severity.WARNING, "The data type was deprecated in the previous revision and is not any more.",
                         (dt, previous) -> previous.deprecated() && !dt.deprecated()),
-                own(7, Severity.WARNING, "The data type has no definition.",
+                own("ATR-008", Severity.WARNING, "The data type has no definition.",
                         input -> blank(input.root().definition())));
     }
 
-    private static ValidationRule<DtValidationInput> own(int number, Severity severity, String message,
+    private static ValidationRule<DtValidationInput> own(String id, Severity severity, String message,
                                                          Predicate<DtValidationInput> wrong) {
-        String id = PREFIX + String.format("%02d", number);
         return new FunctionRule<>(id, CATEGORY, severity,
                 input -> wrong.test(input) ? Stream.of(onRoot(id, severity, message, input)) : Stream.empty());
     }
 
-    private static ValidationRule<DtValidationInput> revision(int number, Severity severity, String message,
+    private static ValidationRule<DtValidationInput> revision(String id, Severity severity, String message,
                                                               BiPredicate<DtSummaryRecord, DtSummaryRecord> wrong) {
-        String id = PREFIX + String.format("%02d", number);
         return new FunctionRule<>(id, CATEGORY, severity, input -> input.previous() != null
                 && wrong.test(input.root(), input.previous()) ? Stream.of(onRoot(id, severity, message, input)) : Stream.empty());
     }

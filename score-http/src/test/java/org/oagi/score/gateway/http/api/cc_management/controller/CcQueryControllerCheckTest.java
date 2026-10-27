@@ -49,7 +49,7 @@ class CcQueryControllerCheckTest {
     }
 
     private static StructureChangeReport broken() {
-        Violation violation = new Violation("ACC-BASE-01", Severity.ERROR,
+        Violation violation = new Violation("DUP-002", Severity.ERROR,
                 "The property term \"Amount\" is used by this ACC and also by one of its base ACCs.",
                 Map.of("propertyTerm", "Amount"),
                 List.of(new Location("Amount (Other. Details)", List.of(new PathSegment("ACC", "3"), new PathSegment("BCC", "11")), "first occurrence"),
@@ -96,7 +96,7 @@ class CcQueryControllerCheckTest {
         mvc.perform(get("/core-components/acc/2/base/check").param("basedAccManifestId", "1"))
                 .andExpect(jsonPath("$.report.status").value("HAS_ERRORS"))
                 .andExpect(jsonPath("$.report.violations.length()").value(1))
-                .andExpect(jsonPath("$.report.violations[0].ruleId").value("ACC-BASE-01"))
+                .andExpect(jsonPath("$.report.violations[0].ruleId").value("DUP-002"))
                 .andExpect(jsonPath("$.report.violations[0].severity").value("ERROR"))
                 .andExpect(jsonPath("$.report.violations[0].message").value(
                         "The property term \"Amount\" is used by this ACC and also by one of its base ACCs."))

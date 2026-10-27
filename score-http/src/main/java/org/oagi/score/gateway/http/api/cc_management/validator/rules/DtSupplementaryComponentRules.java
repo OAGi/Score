@@ -19,7 +19,6 @@ import static org.oagi.score.gateway.http.api.cc_management.validator.rules.AccR
 /** The rules about the supplementary components (SCs) of a DT. */
 public final class DtSupplementaryComponentRules {
 
-    private static final String PREFIX = "DT-SC-";
     private static final String CATEGORY = "SUPPLEMENTARY-COMPONENT";
 
     private DtSupplementaryComponentRules() {
@@ -31,7 +30,7 @@ public final class DtSupplementaryComponentRules {
 
     /** Two SCs of one DT with the same property term and the same representation term: they have the same name. */
     private static ValidationRule<DtValidationInput> uniqueTerms() {
-        String id = PREFIX + "01";
+        String id = "DUP-004";
         return new FunctionRule<>(id, CATEGORY, Severity.WARNING, input -> {
             Map<List<String>, List<SupplementaryComponent>> byTerms = new LinkedHashMap<>();
             for (SupplementaryComponent e : input.supplementaryComponents()) {
@@ -52,7 +51,7 @@ public final class DtSupplementaryComponentRules {
     }
 
     private static ValidationRule<DtValidationInput> cardinality() {
-        String id = PREFIX + "02";
+        String id = "CRD-009";
         return new FunctionRule<>(id, CATEGORY, Severity.ERROR, input -> input.supplementaryComponents().stream()
                 .filter(e -> wrong(e.sc().cardinality()))
                 .map(e -> on(id, Severity.ERROR, "The cardinality of the supplementary component is not valid.",
@@ -66,7 +65,7 @@ public final class DtSupplementaryComponentRules {
     }
 
     private static ValidationRule<DtValidationInput> definitionIsGiven() {
-        String id = PREFIX + "03";
+        String id = "ATR-008";
         return new FunctionRule<>(id, CATEGORY, Severity.WARNING, input -> input.supplementaryComponents().stream()
                 .filter(e -> blank(e.sc().definition()))
                 .map(e -> on(id, Severity.WARNING, "The supplementary component has no definition.", e.sc().den(), e.path())));

@@ -79,7 +79,7 @@ class AccValidationTest {
         assertEquals(ReportStatus.HAS_ERRORS, report.status());
         assertEquals(1, report.violations().size());
         Violation violation = report.violations().get(0);
-        assertEquals("ACC-ASSOC-02", violation.ruleId());
+        assertEquals("DUP-001", violation.ruleId());
         assertEquals(List.of("ACC-1>BCC-10>BCCP-100", "ACC-1>ASCC-11>ASCCP-101"),
                 violation.locations().stream().map(AccValidationTest::pathOf).toList());
         assertEquals(List.of("first occurrence", "conflicts with"),
@@ -95,7 +95,7 @@ class AccValidationTest {
 
         Violation violation = validate(root, ValidationTrigger.ON_DEMAND).violations().get(0);
 
-        assertEquals("ACC-BASE-01", violation.ruleId());
+        assertEquals("DUP-002", violation.ruleId());
         assertEquals(List.of("ACC-1>BCC-10>BCCP-100", "ACC-1>ACC-2>BCC-20>BCCP-200"),
                 violation.locations().stream().map(AccValidationTest::pathOf).toList());
     }
@@ -111,7 +111,7 @@ class AccValidationTest {
 
         Violation violation = validate(root, ValidationTrigger.ON_DEMAND).violations().get(0);
 
-        assertEquals("ACC-GRP-01", violation.ruleId());
+        assertEquals("DUP-003", violation.ruleId());
         assertEquals(List.of("ACC-1>ASCC-10>ASCCP-100>ACC-3>BCC-30>BCCP-300", "ACC-1>ACC-2>BCC-20>BCCP-200"),
                 violation.locations().stream().map(AccValidationTest::pathOf).toList());
     }
@@ -148,7 +148,7 @@ class AccValidationTest {
         ValidationReport report = validate(root, ValidationTrigger.ON_DEMAND);
 
         assertEquals(1, report.violations().size());
-        assertEquals("ACC-BASE-03", report.violations().get(0).ruleId());
+        assertEquals("BAS-002", report.violations().get(0).ruleId());
         assertEquals("ACC-1>ACC-2>ACC-1", pathOf(report.violations().get(0).locations().get(0)));
     }
 

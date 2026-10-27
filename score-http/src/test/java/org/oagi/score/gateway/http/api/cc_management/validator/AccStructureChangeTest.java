@@ -69,7 +69,7 @@ class AccStructureChangeTest {
 
         assertEquals(List.of("Other. Details: Amount"), labels(result));
         Violation violation = result.report().violations().get(0);
-        assertEquals("ACC-BASE-01", violation.ruleId());
+        assertEquals("DUP-002", violation.ruleId());
         assertEquals(Severity.ERROR, violation.severity());
         assertEquals("3", violation.subject().id());
         assertEquals(3, result.checkedCount(), "the base ACC, the source and the other ACC; not the unrelated one");
@@ -146,7 +146,7 @@ class AccStructureChangeTest {
                 AccStructureChange.refactor(document, moved, group.accManifestId(), List.of(moved)));
 
         assertEquals(List.of("Container. Details: Amount"), labels(result));
-        assertEquals("ACC-GRP-01", result.report().violations().get(0).ruleId());
+        assertEquals("DUP-003", result.report().violations().get(0).ruleId());
         assertEquals(Set.of(id(1), id(2), id(3)), AccStructureChange.affectedBy(document, Set.of(id(1))));
     }
 
@@ -183,7 +183,7 @@ class AccStructureChangeTest {
                 AccStructureChange.append(document, acc.accManifestId(), document.getBccp(bccpId(100))));
 
         assertEquals(List.of("Acc. Details: Amount"), labels(result));
-        assertEquals("ACC-ASSOC-02", result.report().violations().get(0).ruleId());
+        assertEquals("DUP-001", result.report().violations().get(0).ruleId());
     }
 
     @Test

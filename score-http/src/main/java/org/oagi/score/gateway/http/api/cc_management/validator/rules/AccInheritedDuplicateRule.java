@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class AccInheritedDuplicateRule extends DuplicatePropertyTermRule {
 
     public AccInheritedDuplicateRule() {
-        super(Origin.BASE, "ACC-BASE-01", "is used by this ACC and also by one of its base ACCs");
+        super(Origin.BASE, "DUP-002", "is used by this ACC and also by one of its base ACCs");
     }
 }

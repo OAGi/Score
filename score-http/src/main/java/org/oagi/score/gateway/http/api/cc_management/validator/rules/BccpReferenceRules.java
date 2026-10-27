@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 /** The rules about what a BCCP points at: its data type. */
 public final class BccpReferenceRules {
 
-    private static final String PREFIX = "BCCP";
-
     private BccpReferenceRules() {
     }
 
@@ -21,7 +19,7 @@ public final class BccpReferenceRules {
     }
 
     private static ValidationRule<BccpValidationInput> bdtIsNotDeprecated() {
-        String id = PREFIX + "-RI-01";
+        String id = "REF-001";
         return new FunctionRule<>(id, "REFERENCE-INTEGRITY", Severity.WARNING, input ->
                 input.bdt() != null && input.bdt().deprecated() && !input.root().deprecated()
                         ? Stream.of(PropertyAttributeRules.onChild(id, Severity.WARNING, "The data type of the BCCP is deprecated.", input,

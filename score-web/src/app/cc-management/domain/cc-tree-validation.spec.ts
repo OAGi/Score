@@ -3,7 +3,7 @@ import {StructureChangeReport, ValidationReport, Violation} from '../../validati
 
 function violation(accId: string): Violation {
   return {
-    ruleId: 'ACC-BASE-01', severity: 'ERROR', message: 'Duplicate', params: {propertyTerm: 'Amount'},
+    ruleId: 'DUP-002', severity: 'ERROR', message: 'Duplicate', params: {propertyTerm: 'Amount'},
     locations: [{label: 'Amount', path: [{type: 'ACC', manifestId: accId}, {type: 'BCC', manifestId: '7'}]}],
     subject: {type: 'ACC', id: accId, label: 'ACC ' + accId}
   };

@@ -16,15 +16,15 @@ public class AccReferenceRules {
 
     @Bean
     ValidationRule<AccValidationInput> accNonReusableAsccpIsReferencedOnce() {
-        return new FunctionRule<>("ACC-RI-01", "REFERENCE-INTEGRITY", Severity.ERROR, input -> input.ownAsccs().stream()
+        return new FunctionRule<>("REF-002", "REFERENCE-INTEGRITY", Severity.ERROR, input -> input.ownAsccs().stream()
                 .filter(a -> a.asccp() != null && !a.asccp().reusable() && a.references() > 1)
-                .map(a -> on("ACC-RI-01", Severity.ERROR,
+                .map(a -> on("REF-002", Severity.ERROR,
                         "The ASCCP is not reusable but " + a.references() + " ASCCs point at it.", a.asccp().den(), a.path())));
     }
 
     @Bean
     ValidationRule<AccValidationInput> accDeveloperAccUsesDeveloperProperties() {
-        return new FunctionRule<>("ACC-RI-02", "REFERENCE-INTEGRITY", Severity.ERROR, input -> {
+        return new FunctionRule<>("REF-003", "REFERENCE-INTEGRITY", Severity.ERROR, input -> {
             var owner = input.root().owner();
             if (owner == null || !owner.isDeveloper()) {
                 return Stream.empty();
@@ -33,10 +33,10 @@ public class AccReferenceRules {
             return Stream.concat(
                     input.ownAsccs().stream()
                             .filter(a -> a.asccp() != null && endUser(a.asccp().owner()))
-                            .map(a -> on("ACC-RI-02", Severity.ERROR, message, a.asccp().den(), a.path())),
+                            .map(a -> on("REF-003", Severity.ERROR, message, a.asccp().den(), a.path())),
                     input.ownBccs().stream()
                             .filter(b -> b.bccp() != null && endUser(b.bccp().owner()))
-                            .map(b -> on("ACC-RI-02", Severity.ERROR, message, b.bccp().den(), b.path())));
+                            .map(b -> on("REF-003", Severity.ERROR, message, b.bccp().den(), b.path())));
         });
     }
 

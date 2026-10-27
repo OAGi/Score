@@ -23,7 +23,6 @@ import static org.oagi.score.gateway.http.api.cc_management.validator.rules.AccR
  */
 public final class DtValueDomainRules {
 
-    private static final String PREFIX = "DT-VD-";
     private static final String CATEGORY = "VALUE-DOMAIN";
 
     /** The primitives that a code list or an agency ID list can be a value domain on: the ones that are like a string. */
@@ -70,7 +69,7 @@ public final class DtValueDomainRules {
 
     private static ValidationRule<DtValidationInput> perHolder(int number, Severity severity,
                                                                BiFunction<ValueDomainHolder, String, Stream<Violation>> check) {
-        String id = PREFIX + String.format("%02d", number);
+        String id = "DOM-" + String.format("%03d", number);
         return new FunctionRule<>(id, CATEGORY, severity,
                 input -> input.holders().stream().flatMap(holder -> check.apply(holder, id)));
     }

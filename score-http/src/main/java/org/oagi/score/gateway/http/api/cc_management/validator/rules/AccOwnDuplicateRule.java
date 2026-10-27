@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class AccOwnDuplicateRule extends DuplicatePropertyTermRule {
 
     public AccOwnDuplicateRule() {
-        super(Origin.OWN, "ACC-ASSOC-02", "is used by more than one association of this ACC");
+        super(Origin.OWN, "DUP-001", "is used by more than one association of this ACC");
     }
 }

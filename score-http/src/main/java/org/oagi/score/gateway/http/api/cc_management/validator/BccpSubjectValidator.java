@@ -16,7 +16,7 @@ public class BccpSubjectValidator implements SubjectValidator<BccpValidationInpu
     private BccpValidationInputLoader loader;
 
     private final List<ValidationRule<BccpValidationInput>> rules = Stream.of(
-            PropertyAttributeRules.<BccpValidationInput>of("BCCP"),
+            PropertyAttributeRules.<BccpValidationInput>of(),
             BccpAttributeRules.all(),
             BccpReferenceRules.all())
             .flatMap(List::stream).toList();

@@ -93,29 +93,29 @@ class AsccpAndBccpRulesTest {
     }
 
     @Test
-    void the_ids_are_those_of_the_kind_of_subject_and_have_no_gaps() {
+    void the_ids_name_the_problem_and_not_the_kind_of_subject() {
         List<String> asccpIds = asccpRules().stream().map(ValidationRule::id).toList();
-        assertEquals(List.of("ASCCP-ATTR-01", "ASCCP-ATTR-02", "ASCCP-ATTR-03", "ASCCP-ATTR-04", "ASCCP-ATTR-05", "ASCCP-ATTR-06",
-                "ASCCP-ATTR-07", "ASCCP-ATTR-08", "ASCCP-ATTR-09", "ASCCP-RI-01"), asccpIds);
+        assertEquals(List.of("ATR-001", "ATR-002", "ATR-003", "ATR-004", "ATR-005", "ATR-006",
+                "ATR-007", "ATR-009", "ATR-008", "REF-001"), asccpIds);
         List<String> bccpIds = bccpRules().stream().map(ValidationRule::id).toList();
-        assertEquals(List.of("BCCP-ATTR-01", "BCCP-ATTR-02", "BCCP-ATTR-03", "BCCP-ATTR-04", "BCCP-ATTR-05", "BCCP-ATTR-06",
-                "BCCP-ATTR-07", "BCCP-ATTR-08", "BCCP-ATTR-09", "BCCP-ATTR-10", "BCCP-ATTR-11", "BCCP-RI-01"), bccpIds);
+        assertEquals(List.of("ATR-001", "ATR-002", "ATR-003", "ATR-004", "ATR-005", "ATR-006",
+                "ATR-007", "ATR-009", "ATR-008", "ATR-010", "ATR-011", "REF-001"), bccpIds);
     }
 
     @Test
     void the_property_term_and_the_namespace_are_required() {
-        assertEquals(List.of("ASCCP-ATTR-01", "ASCCP-ATTR-02"),
+        assertEquals(List.of("ATR-001", "ATR-002"),
                 ids(new AsccpValidationInput(asccp(" ", null, DEFINITION, false, false, 1, null), null, null, acc(false))));
-        assertEquals(List.of("BCCP-ATTR-01", "BCCP-ATTR-02"),
+        assertEquals(List.of("ATR-001", "ATR-002"),
                 ids(new BccpValidationInput(bccp(null, null, DEFINITION, false, false, null, 1, null), null, null, dt(false))));
     }
 
     @Test
     void a_missing_definition_is_a_warning() {
         AsccpValidationInput asccp = new AsccpValidationInput(asccp("P", NAMESPACE, new Definition(" ", null), false, false, 1, null), null, STANDARD, acc(false));
-        assertEquals(List.of("ASCCP-ATTR-09"), ids(asccp));
+        assertEquals(List.of("ATR-008"), ids(asccp));
         assertTrue(asccpRules().stream().flatMap(r -> r.evaluate(asccp)).allMatch(v -> v.severity() == Severity.WARNING));
-        assertEquals(List.of("BCCP-ATTR-09"),
+        assertEquals(List.of("ATR-008"),
                 ids(new BccpValidationInput(bccp("T", NAMESPACE, null, false, false, null, 1, null), null, STANDARD, dt(false))));
     }
 
@@ -123,18 +123,18 @@ class AsccpAndBccpRulesTest {
     void a_property_of_a_developer_has_a_standard_namespace() {
         AsccpSummaryRecord developers = asccp("P", NAMESPACE, DEFINITION, false, false, 1, DEVELOPER);
         NamespaceSummaryRecord endUsers = new NamespaceSummaryRecord(NAMESPACE, "u", "p", false);
-        assertEquals(List.of("ASCCP-ATTR-03"), ids(new AsccpValidationInput(developers, null, endUsers, acc(false))));
+        assertEquals(List.of("ATR-003"), ids(new AsccpValidationInput(developers, null, endUsers, acc(false))));
         assertTrue(ids(new AsccpValidationInput(developers, null, STANDARD, acc(false))).isEmpty());
-        assertEquals(List.of("BCCP-ATTR-03"),
+        assertEquals(List.of("ATR-003"),
                 ids(new BccpValidationInput(bccp("T", NAMESPACE, DEFINITION, false, false, null, 1, DEVELOPER), null, endUsers, dt(false))));
     }
 
     @Test
     void a_first_revision_is_not_deprecated() {
-        assertEquals(List.of("ASCCP-ATTR-04"),
+        assertEquals(List.of("ATR-004"),
                 ids(new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, true, false, 1, null), null, STANDARD, acc(true))));
         assertTrue(ids(new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, true, false, 2, null), null, STANDARD, acc(true))).isEmpty());
-        assertEquals(List.of("BCCP-ATTR-04"),
+        assertEquals(List.of("ATR-004"),
                 ids(new BccpValidationInput(bccp("T", NAMESPACE, DEFINITION, true, false, null, 1, null), null, STANDARD, dt(true))));
     }
 
@@ -142,19 +142,19 @@ class AsccpAndBccpRulesTest {
     void a_revision_keeps_the_namespace_and_the_property_term() {
         AsccpSummaryRecord previous = asccp();
         AsccpSummaryRecord changed = asccp("Q", new NamespaceId(BigInteger.TEN), DEFINITION, false, false, 2, null);
-        assertEquals(List.of("ASCCP-ATTR-05", "ASCCP-ATTR-06"), ids(new AsccpValidationInput(changed, previous, null, acc(false))));
+        assertEquals(List.of("ATR-005", "ATR-006"), ids(new AsccpValidationInput(changed, previous, null, acc(false))));
         assertTrue(ids(new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, false, false, 2, null), previous, STANDARD, acc(false))).isEmpty());
 
         BccpSummaryRecord bccpPrevious = bccp();
         BccpSummaryRecord bccpChanged = bccp("Q", new NamespaceId(BigInteger.TEN), DEFINITION, false, false, null, 2, null);
-        assertEquals(List.of("BCCP-ATTR-05", "BCCP-ATTR-06"), ids(new BccpValidationInput(bccpChanged, bccpPrevious, null, dt(false))));
+        assertEquals(List.of("ATR-005", "ATR-006"), ids(new BccpValidationInput(bccpChanged, bccpPrevious, null, dt(false))));
     }
 
     @Test
     void deprecation_and_nillable_going_back_are_warnings() {
         AsccpSummaryRecord previous = asccp("P", NAMESPACE, DEFINITION, true, true, 1, null);
         AsccpValidationInput input = new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, false, false, 2, null), previous, STANDARD, acc(false));
-        assertEquals(List.of("ASCCP-ATTR-07", "ASCCP-ATTR-08"), ids(input));
+        assertEquals(List.of("ATR-007", "ATR-009"), ids(input));
         assertTrue(asccpRules().stream().flatMap(r -> r.evaluate(input)).allMatch(v -> v.severity() == Severity.WARNING));
         // false to true is allowed
         assertTrue(ids(new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, true, true, 2, null), asccp(), STANDARD, acc(true))).isEmpty());
@@ -162,7 +162,7 @@ class AsccpAndBccpRulesTest {
 
     @Test
     void the_acc_of_an_asccp_that_is_deprecated_is_a_warning_unless_the_asccp_is_deprecated_too() {
-        assertEquals(List.of("ASCCP-RI-01"), ids(new AsccpValidationInput(asccp(), null, STANDARD, acc(true))));
+        assertEquals(List.of("REF-001"), ids(new AsccpValidationInput(asccp(), null, STANDARD, acc(true))));
         assertTrue(ids(new AsccpValidationInput(asccp("P", NAMESPACE, DEFINITION, true, false, 2, null), null, STANDARD, acc(true))).isEmpty());
         assertTrue(ids(new AsccpValidationInput(asccp(), null, STANDARD, null)).isEmpty());
     }
@@ -171,16 +171,16 @@ class AsccpAndBccpRulesTest {
     void a_fixed_value_is_kept_and_excludes_nillable() {
         BccpSummaryRecord fixed = bccp("T", NAMESPACE, DEFINITION, false, false, new ValueConstraint(null, "x"), 1, null);
         BccpSummaryRecord otherFixed = bccp("T", NAMESPACE, DEFINITION, false, false, new ValueConstraint(null, "y"), 2, null);
-        assertEquals(List.of("BCCP-ATTR-10"), ids(new BccpValidationInput(otherFixed, fixed, STANDARD, dt(false))));
+        assertEquals(List.of("ATR-010"), ids(new BccpValidationInput(otherFixed, fixed, STANDARD, dt(false))));
         assertTrue(ids(new BccpValidationInput(fixed, fixed, STANDARD, dt(false))).isEmpty());
 
         BccpSummaryRecord nillableFixed = bccp("T", NAMESPACE, DEFINITION, false, true, new ValueConstraint(null, "x"), 1, null);
-        assertEquals(List.of("BCCP-ATTR-11"), ids(new BccpValidationInput(nillableFixed, null, STANDARD, dt(false))));
+        assertEquals(List.of("ATR-011"), ids(new BccpValidationInput(nillableFixed, null, STANDARD, dt(false))));
     }
 
     @Test
     void the_bdt_of_a_bccp_that_is_deprecated_is_a_warning_unless_the_bccp_is_deprecated_too() {
-        assertEquals(List.of("BCCP-RI-01"), ids(new BccpValidationInput(bccp(), null, STANDARD, dt(true))));
+        assertEquals(List.of("REF-001"), ids(new BccpValidationInput(bccp(), null, STANDARD, dt(true))));
         assertTrue(ids(new BccpValidationInput(bccp("T", NAMESPACE, DEFINITION, true, false, null, 2, null), null, STANDARD, dt(true))).isEmpty());
     }
 

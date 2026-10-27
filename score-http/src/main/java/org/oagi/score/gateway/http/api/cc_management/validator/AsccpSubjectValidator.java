@@ -16,7 +16,7 @@ public class AsccpSubjectValidator implements SubjectValidator<AsccpValidationIn
     private AsccpValidationInputLoader loader;
 
     private final List<ValidationRule<AsccpValidationInput>> rules = Stream.of(
-            PropertyAttributeRules.<AsccpValidationInput>of("ASCCP"),
+            PropertyAttributeRules.<AsccpValidationInput>of(),
             AsccpReferenceRules.all())
             .flatMap(List::stream).toList();
 

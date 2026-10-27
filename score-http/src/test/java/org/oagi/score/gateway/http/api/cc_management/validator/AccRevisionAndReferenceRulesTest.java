@@ -118,14 +118,14 @@ class AccRevisionAndReferenceRulesTest {
         assertTrue(ids(input(acc(), previous, null, List.of(), List.of())).isEmpty());
 
         AccSummaryRecord other = acc("Other", OagisComponentType.Base, false, new NamespaceId(BigInteger.TEN), DEFINITION, null);
-        assertEquals(List.of("ACC-ATTR-05", "ACC-ATTR-07", "ACC-ATTR-08"), ids(input(other, previous, null, List.of(), List.of())));
+        assertEquals(List.of("ATR-005", "ATR-006", "ATR-014"), ids(input(other, previous, null, List.of(), List.of())));
     }
 
     @Test
     void semantics_does_not_become_abstract_in_a_revision() {
         AccSummaryRecord previous = acc();
         AccSummaryRecord abstractNow = acc("Root", OagisComponentType.Semantics, true, NAMESPACE, DEFINITION, null);
-        assertEquals(List.of("ACC-ATTR-06"), ids(input(abstractNow, previous, null, List.of(), List.of())));
+        assertEquals(List.of("ATR-015"), ids(input(abstractNow, previous, null, List.of(), List.of())));
         assertTrue(ids(input(previous, abstractNow, null, List.of(), List.of())).isEmpty());
     }
 
@@ -135,25 +135,25 @@ class AccRevisionAndReferenceRulesTest {
         AccValidationInput input = input(noDefinition, null, null,
                 List.of(new AccValidationInput.OwnAscc(ascc(0, 1, false, null), asccp(true, false, null), null, PATH)),
                 List.of(new AccValidationInput.OwnBcc(bcc(EntityType.Element, 0, 1, false, null, new Definition("", null)), bccp(false, null), PATH)));
-        assertEquals(List.of("ACC-ASSOC-05", "ACC-ASSOC-05", "ACC-ATTR-11"), ids(input));
+        assertEquals(List.of("ATR-008", "ATR-008", "ATR-008"), ids(input));
         assertTrue(RULES.stream().flatMap(r -> r.evaluate(input)).allMatch(v -> v.severity() == Severity.WARNING));
     }
 
     @Test
     void only_an_association_of_the_previous_revision_is_deprecated() {
         BccSummaryRecord deprecated = bcc(EntityType.Element, 0, 1, true, null, DEFINITION);
-        assertEquals(List.of("ACC-ATTR-10"), ids(withBcc(deprecated, null, bccp(false, null), false)));
+        assertEquals(List.of("ATR-016"), ids(withBcc(deprecated, null, bccp(false, null), false)));
         assertTrue(ids(withBcc(deprecated, deprecated, bccp(false, null), false)).isEmpty());
-        assertEquals(List.of("ACC-ATTR-10"), ids(withAscc(ascc(0, 1, true, DEFINITION), null, asccp(true, false, null), 1)));
+        assertEquals(List.of("ATR-016"), ids(withAscc(ascc(0, 1, true, DEFINITION), null, asccp(true, false, null), 1)));
     }
 
     @Test
     void an_element_has_no_default_value_and_an_attribute_has_no_supplementary_component() {
-        assertEquals(List.of("ACC-ATTR-12"), ids(withBcc(
+        assertEquals(List.of("ATR-017"), ids(withBcc(
                 bcc(EntityType.Element, 0, 1, false, new ValueConstraint("x", null), DEFINITION), null, bccp(false, null), false)));
         assertTrue(ids(withBcc(
                 bcc(EntityType.Attribute, 0, 1, false, new ValueConstraint("x", null), DEFINITION), null, bccp(false, null), false)).isEmpty());
-        assertEquals(List.of("ACC-ATTR-13"), ids(withBcc(
+        assertEquals(List.of("ATR-018"), ids(withBcc(
                 bcc(EntityType.Attribute, 0, 1, false, null, DEFINITION), null, bccp(false, null), true)));
     }
 
@@ -161,16 +161,16 @@ class AccRevisionAndReferenceRulesTest {
     void an_acc_of_a_developer_has_a_standard_namespace() {
         AccSummaryRecord developers = acc("Root", OagisComponentType.Semantics, false, NAMESPACE, DEFINITION, DEVELOPER);
         NamespaceSummaryRecord endUsers = new NamespaceSummaryRecord(NAMESPACE, "u", "p", false);
-        assertEquals(List.of("ACC-ATTR-14"), ids(input(developers, null, endUsers, List.of(), List.of())));
+        assertEquals(List.of("ATR-003"), ids(input(developers, null, endUsers, List.of(), List.of())));
         assertTrue(ids(input(developers, null, new NamespaceSummaryRecord(NAMESPACE, "u", "p", true), List.of(), List.of())).isEmpty());
         assertTrue(ids(input(acc(), null, endUsers, List.of(), List.of())).isEmpty());
     }
 
     @Test
     void a_deprecated_property_is_a_warning_unless_the_association_is_deprecated_too() {
-        assertEquals(List.of("ACC-ASSOC-04"), ids(withBcc(
+        assertEquals(List.of("REF-001"), ids(withBcc(
                 bcc(EntityType.Element, 0, 1, false, null, DEFINITION), null, bccp(true, null), false)));
-        assertEquals(List.of("ACC-ASSOC-04"), ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(true, true, null), 1)));
+        assertEquals(List.of("REF-001"), ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(true, true, null), 1)));
         assertTrue(ids(withBcc(bcc(EntityType.Element, 0, 1, true, null, DEFINITION), bcc(EntityType.Element, 0, 1, true, null, DEFINITION),
                 bccp(true, null), false)).isEmpty());
     }
@@ -178,19 +178,19 @@ class AccRevisionAndReferenceRulesTest {
     @Test
     void cardinality_only_relaxes_from_one_revision_to_the_next() {
         BccSummaryRecord previous = bcc(EntityType.Element, 1, 3, false, null, DEFINITION);
-        assertEquals(List.of("ACC-CARD-06"), ids(withBcc(bcc(EntityType.Element, 2, 3, false, null, DEFINITION), previous, bccp(false, null), false)));
-        assertEquals(List.of("ACC-CARD-08"), ids(withBcc(bcc(EntityType.Element, 1, 2, false, null, DEFINITION), previous, bccp(false, null), false)));
+        assertEquals(List.of("CRD-006"), ids(withBcc(bcc(EntityType.Element, 2, 3, false, null, DEFINITION), previous, bccp(false, null), false)));
+        assertEquals(List.of("CRD-008"), ids(withBcc(bcc(EntityType.Element, 1, 2, false, null, DEFINITION), previous, bccp(false, null), false)));
         assertTrue(ids(withBcc(bcc(EntityType.Element, 0, -1, false, null, DEFINITION), previous, bccp(false, null), false)).isEmpty());
 
         AsccSummaryRecord unbounded = ascc(0, -1, false, DEFINITION);
-        assertEquals(List.of("ACC-CARD-07"), ids(withAscc(ascc(0, 5, false, DEFINITION), unbounded, asccp(true, false, null), 1)));
+        assertEquals(List.of("CRD-007"), ids(withAscc(ascc(0, 5, false, DEFINITION), unbounded, asccp(true, false, null), 1)));
         assertTrue(ids(withAscc(ascc(0, -1, false, DEFINITION), unbounded, asccp(true, false, null), 1)).isEmpty());
     }
 
     @Test
     void a_property_that_is_not_reusable_is_pointed_at_once() {
         assertTrue(ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(false, false, null), 1)).isEmpty());
-        assertEquals(List.of("ACC-RI-01"), ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(false, false, null), 2)));
+        assertEquals(List.of("REF-002"), ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(false, false, null), 2)));
         assertTrue(ids(withAscc(ascc(0, 1, false, DEFINITION), null, asccp(true, false, null), 5)).isEmpty());
     }
 
@@ -200,7 +200,7 @@ class AccRevisionAndReferenceRulesTest {
         AccValidationInput input = input(developers, null, null,
                 List.of(new AccValidationInput.OwnAscc(ascc(0, 1, false, DEFINITION), asccp(true, false, END_USER), null, null, 1, PATH)),
                 List.of(new AccValidationInput.OwnBcc(bcc(EntityType.Element, 0, 1, false, null, DEFINITION), bccp(false, END_USER), null, false, PATH)));
-        assertEquals(List.of("ACC-RI-02", "ACC-RI-02"), ids(input));
+        assertEquals(List.of("REF-003", "REF-003"), ids(input));
         assertTrue(ids(input(acc(), null, null, input.ownAsccs(), input.ownBccs())).isEmpty());
     }
 }

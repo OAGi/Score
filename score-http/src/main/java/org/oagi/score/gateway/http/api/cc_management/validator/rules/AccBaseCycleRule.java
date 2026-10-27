@@ -17,7 +17,7 @@ public class AccBaseCycleRule implements ValidationRule<AccValidationInput> {
 
     @Override
     public String id() {
-        return "ACC-BASE-03";
+        return "BAS-002";
     }
 
     @Override
