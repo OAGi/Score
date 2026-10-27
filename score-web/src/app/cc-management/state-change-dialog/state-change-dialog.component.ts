@@ -8,7 +8,6 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MarkdownComponent} from 'ngx-markdown';
-import {DialogPageComponent} from '../../common/dialog-page/dialog-page.component';
 import {GithubIntegrationService, GithubStatus, LinkedIssue, ProjectField, ProjectFieldOption, IssueRepoAccess} from '../domain/github-integration.service';
 import {LogService} from '../../log-management/domain/log.service';
 import {candidatePost, cancelPost, revertPost} from './github-status-post-renderer';
@@ -88,8 +87,9 @@ const OCTICON_PATHS: { [name: string]: string } = {
   standalone: true,
   selector: 'score-state-change-dialog',
   imports: [CommonModule, FormsModule, MatDialogModule,
-    MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent, DialogPageComponent],
+    MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent],
   providers: [LogService],
+  host: {'[class.has-issues]': '!issuesLoading && anyTargetHasIssues()'},
   templateUrl: './state-change-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./state-change-dialog.component.css'],

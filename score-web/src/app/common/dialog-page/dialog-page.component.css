@@ -34,6 +34,8 @@
 .dialog-close {
   flex: none;
   outline: none;
+  /* The icon sits inside the button's own padding; pull the button out so that the X ends where the text below ends. */
+  margin-right: -10px;
 }
 
 .dialog-body {
@@ -64,6 +66,11 @@
   gap: 8px;
   box-sizing: border-box;
   padding: 0 var(--score-dialog-padding) var(--score-dialog-padding);
+}
+
+.dialog-actions ::ng-deep button {
+  /* As the buttons of a page's action bar (the global `.actions button` rule, which this bar is not under). */
+  height: 36px;
 }
 
 .dialog-actions:empty {

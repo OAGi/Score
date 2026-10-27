@@ -873,7 +873,8 @@ mat-checkbox.hide-unused > .mat-checkbox-layout {
 
 score-confirm-dialog > div {
   min-width: 500px !important;
-  padding: 8px 16px;
+  /* The title, content and actions bring their own 24px side padding. */
+  padding: 8px 0;
 }
 
 .mat-mdc-card-actions button {

@@ -1,12 +1,22 @@
-/* Wide enough for comfortable Markdown editing of the pre-filled GitHub post.
-   ONE fixed width (the call sites pass no width in the MatDialog config, so this rule is the
-   single authority): the dialog must not change size when the Write/Preview tabs are toggled
-   or while typing. The max-width only guards small screens. */
+/* Without linked GitHub issues the dialog is the plain confirm dialog (same width as the generic one). With them it is
+   wide enough for comfortable Markdown editing of the pre-filled GitHub post: ONE fixed width (the call sites pass no
+   width in the MatDialog config, so this rule is the single authority), so that the dialog does not change size when
+   the Write/Preview tabs are toggled or while typing. The max-width only guards small screens. */
 :host > div {
   box-sizing: border-box;
-  width: 760px;
+  min-width: 500px;
   max-width: calc(100vw - 32px);
+  /* The plain dialog has only the 24px side padding of the Material title, content and actions. */
+  padding: 8px 0;
+}
+
+:host(.has-issues) > div {
+  width: 760px;
   padding: 8px 16px;
+}
+
+:host(.has-issues) .content {
+  width: 100%;
 }
 
 /* Header/content/actions mirror the generic confirm dialog so the swap is visually seamless. */
@@ -25,6 +35,16 @@
   width: 100%;
 }
 
+.close {
+  position: relative;
+  margin-left: auto;
+  left: 12px;
+}
+
+.close button {
+  outline: none;
+}
+
 .content {
   display: inline-block;
   box-sizing: border-box;
@@ -40,11 +60,20 @@
   color: rgba(0, 0, 0, 0.7);
   overflow-x: hidden;
   overflow-y: auto;
-  width: 100%;
 }
 
 .content p {
   margin-bottom: 0;
+}
+
+.actions {
+  bottom: 0;
+  left: 0;
+  overflow: visible;
+  width: 100%;
+  opacity: 1;
+  direction: rtl;
+  padding: 8px 24px;
 }
 
 .btn {
