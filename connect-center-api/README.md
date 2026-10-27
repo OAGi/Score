@@ -57,13 +57,13 @@ A ready-to-run image is published on Docker Hub. It bundles the API and the docu
 started together:
 
 ```bash
-docker pull oagi1docker/connect-center-api:0.1
+docker pull oagi1docker/connect-center-api:0.1.1
 
 docker run -d --name connect-center-api \
   -p 5555:5555 -p 3001:3001 \
   -e DB_HOST=<db-host> -e DB_PORT=3306 \
   -e DB_USER=<user> -e DB_PASSWORD=<password> -e DB_NAME=<schema> \
-  oagi1docker/connect-center-api:0.1
+  oagi1docker/connect-center-api:0.1.1
 ```
 
 | Service | URL |

@@ -21,7 +21,7 @@ services:
   # ... your existing connectCenter services (db, backend, frontend, redis) ...
 
   connect-center-api:
-    image: oagi1docker/connect-center-api:0.1
+    image: oagi1docker/connect-center-api:0.1.1
     depends_on:
       - db
     ports:
