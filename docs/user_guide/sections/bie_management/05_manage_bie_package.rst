@@ -231,10 +231,89 @@ BIEs and components were added, removed, changed, or deprecated).
 
 When the `0.3 (draft)` *Manifest Version* is selected, the manifest also includes the
 *Revision Reason* captured on the "Edit BIE Package" page and, for each BIE, a *backward
-compatibility* indicator that reports whether the BIE remains backward compatible with its
-counterpart in the prior package version. The indicator is reported separately for the
-`XML Schema` expression and the `JSON Schema` expression; a value of `true` means the BIE
-is backward compatible for that expression. A BIE that is new in this package version, or
-whose package has no prior version, has no prior counterpart to compare against. The
-default `0.2` manifest omits both the *Revision Reason* and the backward compatibility
-indicator.
+compatibility* indicator. The default `0.2` manifest omits both the *Revision Reason* and
+the backward compatibility indicator.
+
+Backward compatibility indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The indicator reports whether the BIE remains backward compatible with its counterpart in
+the prior package version, that is, whether every instance document that was valid against
+the prior version of the BIE is still valid against the new one. It is decided from the
+schema alone; whether an actual system integration keeps working is not judged.
+
+- It is reported separately for the `XML Schema` expression (``xmlSchema``) and the
+  `JSON Schema` expression (``jsonSchema``). ``true`` means the BIE is backward compatible
+  for that expression, and ``false`` means a previously valid instance can be rejected.
+- The counterpart of a BIE in the prior package version is the same BIE if it is in both
+  packages, otherwise the BIE it was made from by a Copy or an Uplift, and otherwise a BIE
+  that is based on the same ASCCP and is not the counterpart of another BIE. All of the
+  content of the BIE (including the BIEs it reuses) is compared.
+  A single breaking change makes the indicator ``false`` for the expression it breaks.
+- A BIE that is new in this package version has no counterpart to compare with and is
+  reported as ``false`` for both expressions. A BIE that has not changed is ``true`` for both.
+
+The following changes make the indicator ``false``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Change
+     - XML Schema
+     - JSON Schema
+     - Note
+   * - A required element or supplementary component is added
+     - false
+     - false
+     -
+   * - Any element or supplementary component is removed
+     - false
+     - false
+     - Removing an optional one breaks as well, since the schema no longer allows it
+   * - The cardinality is made more restrictive (the minimum raised or the maximum lowered)
+     - false
+     - false
+     -
+   * - The maximum cardinality is loosened across the one/many boundary (for example 1 to 2)
+     - true
+     - false
+     - JSON Schema renders a single value and an array differently
+   * - Nillable is turned off
+     - false
+     - false
+     - For an attribute or a supplementary component, only ``jsonSchema`` is ``false``
+   * - A fixed value is added or changed
+     - false
+     - false
+     -
+   * - A length or pattern restriction is added or tightened
+     - false
+     - false
+     -
+   * - The primitive type of the value domain is narrowed or changed to an unrelated type
+     - depends
+     - depends
+     - Each expression is judged by its own type rules. In XML Schema, narrowing a type
+       within its own family (for example string to token) breaks, while changing from an
+       unrelated type to a text type (string, normalizedString or token) is compatible
+   * - A code list or an agency ID list loses a value, is switched to one that does not
+       contain all of its values, or is newly applied to a primitive type
+     - false
+     - false
+     - Removing the list again (back to a primitive type) is compatible
+   * - An element and an attribute are switched
+     - false
+     - true
+     - JSON Schema does not distinguish them
+   * - A BIE gets its first used supplementary component, and it is optional
+     - true
+     - false
+     - JSON Schema renders the value as an object. If the component is required, both are
+       ``false``
+
+These changes do not affect the indicator: adding an optional element, loosening a minimum
+cardinality, widening a type or a restriction (including adding a value to a code list),
+and changing the remark, definition, example, or deprecated flag.
+
+Only the two per-expression indicators are written to the manifest.
