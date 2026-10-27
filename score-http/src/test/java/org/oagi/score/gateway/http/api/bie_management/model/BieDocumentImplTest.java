@@ -298,7 +298,7 @@ class BieDocumentImplTest {
 
         BieDocumentImpl document = new BieDocumentImpl(bieSet);
         document.setTopLevelAsbiep(new TopLevelAsbiepSummaryRecord(
-                null, null, topLevelId, null, rootAsbiepId, null, null, null, null, null,
+                null, null, topLevelId, null, null, rootAsbiepId, null, null, null, null, null,
                 null, null, false, false, null, null, null));
         document.with(ccDocument);
         return new Fixture(document, reusedAbie, bbie);

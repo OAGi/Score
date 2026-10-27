@@ -13,6 +13,8 @@ public record TopLevelAsbiepSummaryRecord(
 
         TopLevelAsbiepId topLevelAsbiepId,
         TopLevelAsbiepId basedTopLevelAsbiepId,
+        /** The BIE this one was made from by a Copy or an Uplift, if the link is still there. */
+        TopLevelAsbiepId sourceTopLevelAsbiepId,
         AsbiepId asbiepId,
         Guid guid,
 

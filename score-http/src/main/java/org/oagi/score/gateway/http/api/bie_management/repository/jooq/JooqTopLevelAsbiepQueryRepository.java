@@ -133,6 +133,7 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
             return dslContext().select(concat(fields(
                             TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                             TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID,
+                            TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID,
                             TOP_LEVEL_ASBIEP.ASBIEP_ID,
                             ASBIEP.GUID,
 
@@ -169,6 +170,9 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
                 TopLevelAsbiepId basedTopLevelAsbiepId =
                         (record.get(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID) != null) ?
                                 new TopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID).toBigInteger()) : null;
+                TopLevelAsbiepId sourceTopLevelAsbiepId =
+                        (record.get(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID) != null) ?
+                                new TopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.SOURCE_TOP_LEVEL_ASBIEP_ID).toBigInteger()) : null;
                 AsbiepId asbiepId = (record.get(ASBIEP.ASBIEP_ID) != null) ?
                         new AsbiepId(record.get(ASBIEP.ASBIEP_ID).toBigInteger()) : null;
                 LibrarySummaryRecord library = fetchLibrarySummary(record);
@@ -177,6 +181,7 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
                 return new TopLevelAsbiepSummaryRecord(library, release,
                         topLevelAsbiepId,
                         basedTopLevelAsbiepId,
+                        sourceTopLevelAsbiepId,
                         asbiepId,
                         new Guid(record.get(ASBIEP.GUID)),
 

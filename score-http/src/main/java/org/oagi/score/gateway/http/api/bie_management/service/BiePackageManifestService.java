@@ -128,6 +128,11 @@ public class BiePackageManifestService {
                         .stream().map(e -> topLevelAsbiepQueryRepository.getTopLevelAsbiepSummary(e))
                         .collect(Collectors.toList()) : Collections.emptyList();
 
+        Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> prevById = new HashMap<>();
+        prevTopLevelAsbiepList.forEach(e -> prevById.putIfAbsent(e.topLevelAsbiepId(), e));
+        Map<TopLevelAsbiepId, TopLevelAsbiepId> priorOf = matchPriorBies(requester, topLevelAsbiepQueryRepository,
+                currentTopLevelAsbiepList, prevTopLevelAsbiepList);
+
         for (TopLevelAsbiepSummaryRecord currentTopLevelAsbiep : currentTopLevelAsbiepList) {
 
             releaseMapByLibraryId.putIfAbsent(currentTopLevelAsbiep.library().libraryId(), new ArrayList<>());
@@ -137,7 +142,8 @@ public class BiePackageManifestService {
             }
 
             BiePackageManifestEntry biePackageManifestEntry = null;
-            for (TopLevelAsbiepSummaryRecord prevTopLevelAsbiep : prevTopLevelAsbiepList) {
+            TopLevelAsbiepSummaryRecord prevTopLevelAsbiep = prevById.get(priorOf.get(currentTopLevelAsbiep.topLevelAsbiepId()));
+            if (prevTopLevelAsbiep != null) {
                 BieTrackContext context = diff(requester, currentTopLevelAsbiep, prevTopLevelAsbiep, pathDelimiter);
                 if (context != null) {
                     biePackageManifestEntry = new BiePackageManifestEntry(
@@ -157,7 +163,6 @@ public class BiePackageManifestService {
                             context.changed,
                             context.deprecated
                     );
-                    break;
                 }
             }
 
@@ -196,24 +201,9 @@ public class BiePackageManifestService {
             biePackageManifestEntryList.add(biePackageManifestEntry);
         }
 
+        Set<TopLevelAsbiepId> replaced = new HashSet<>(priorOf.values());
         for (TopLevelAsbiepSummaryRecord prevTopLevelAsbiep : prevTopLevelAsbiepList) {
-            boolean matched = false;
-            for (TopLevelAsbiepSummaryRecord currentTopLevelAsbiep : currentTopLevelAsbiepList) {
-                BieDocument current = bieReadService.getBieDocument(requester, currentTopLevelAsbiep.topLevelAsbiepId());
-                BieDocument previous = bieReadService.getBieDocument(requester, prevTopLevelAsbiep.topLevelAsbiepId());
-
-                Asbiep currentAsbiep = current.getRootAsbiep();
-                Asbiep prevAsbiep = previous.getRootAsbiep();
-
-                AsccpSummaryRecord currentAsccp = current.getCcDocument().getAsccp(currentAsbiep.getBasedAsccpManifestId());
-                AsccpSummaryRecord prevAsccp = previous.getCcDocument().getAsccp(prevAsbiep.getBasedAsccpManifestId());
-
-                if (currentAsccp.guid().equals(prevAsccp.guid())) {
-                    matched = true;
-                    break;
-                }
-            }
-            if (!matched) {
+            if (!replaced.contains(prevTopLevelAsbiep.topLevelAsbiepId())) {
                 removedBiesFromPriorPackageVersion.add(newBieManifestSummary(prevTopLevelAsbiep));
             }
         }
@@ -388,6 +378,34 @@ public class BiePackageManifestService {
         public void setPathDelimiter(String delimiter) {
             this.delimiter = delimiter;
         }
+    }
+
+    /**
+     * Pairs each BIE of the package with the BIE of the prior package version that it replaces (see
+     * {@link PriorBieMatcher}). A BIE that is not in the result is new in the package.
+     */
+    private Map<TopLevelAsbiepId, TopLevelAsbiepId> matchPriorBies(ScoreUser requester,
+                                                                   TopLevelAsbiepQueryRepository topLevelAsbiepQueryRepository,
+                                                                   List<TopLevelAsbiepSummaryRecord> current,
+                                                                   List<TopLevelAsbiepSummaryRecord> prior) {
+        if (prior.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return PriorBieMatcher.match(
+                current.stream().map(e -> candidateOf(requester, e)).collect(Collectors.toList()),
+                prior.stream().map(e -> candidateOf(requester, e)).collect(Collectors.toList()),
+                id -> {
+                    TopLevelAsbiepSummaryRecord source = safeGet(() -> topLevelAsbiepQueryRepository.getTopLevelAsbiepSummary(id));
+                    return (source != null) ? source.sourceTopLevelAsbiepId() : null;
+                });
+    }
+
+    private PriorBieMatcher.Candidate candidateOf(ScoreUser requester, TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        Guid rootAsccpGuid = safeGet(() -> {
+            BieDocument document = bieReadService.getBieDocument(requester, topLevelAsbiep.topLevelAsbiepId());
+            return document.getCcDocument().getAsccp(document.getRootAsbiep().getBasedAsccpManifestId()).guid();
+        });
+        return new PriorBieMatcher.Candidate(topLevelAsbiep.topLevelAsbiepId(), topLevelAsbiep.sourceTopLevelAsbiepId(), rootAsccpGuid);
     }
 
     public BieTrackContext diff(ScoreUser requester,

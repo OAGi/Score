@@ -57,7 +57,7 @@ class BusinessContextViewOnlyGuardTest {
     private static TopLevelAsbiepSummaryRecord bie(UserId ownerId, BieState state) {
         UserSummaryRecord owner = new UserSummaryRecord(ownerId, "login", "name", List.of(ScoreRole.DEVELOPER));
         return new TopLevelAsbiepSummaryRecord(
-                null, null, BIE, null, null, null,
+                null, null, BIE, null, null, null, null,
                 "den", "propertyTerm", "displayName", "1.0", "status",
                 state, false, false, owner, null, null);
     }
