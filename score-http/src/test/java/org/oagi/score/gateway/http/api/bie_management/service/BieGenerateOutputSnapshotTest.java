@@ -99,6 +99,9 @@ class BieGenerateOutputSnapshotTest {
             for (long bie : bies) {
                 var owner = dsl.fetchOne("select u.app_user_id, u.login_id, u.is_developer from top_level_asbiep t"
                         + " join app_user u on u.app_user_id = t.owner_user_id where t.top_level_asbiep_id = " + bie);
+                if (owner == null) {
+                    continue; // the owner is not in the database (for example in a partial dump)
+                }
                 ScoreUser ownerUser = new ScoreUser(new UserId(owner.get(0, ULong.class).toBigInteger()), owner.get(1, String.class),
                         owner.get(1, String.class), null, false,
                         owner.get(2, Integer.class) == 1 ? List.of(ScoreRole.DEVELOPER) : List.of(ScoreRole.END_USER));
@@ -107,7 +110,9 @@ class BieGenerateOutputSnapshotTest {
                 }
             }
         } finally {
-            dsl.execute(restore.toString());
+            if (!restore.isEmpty()) {
+                dsl.execute(restore.toString());
+            }
         }
 
         if (capture) {

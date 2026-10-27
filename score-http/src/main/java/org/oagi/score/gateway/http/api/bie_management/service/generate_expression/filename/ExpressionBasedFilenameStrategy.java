@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameTokenUtils.normalizeTokenWithoutSpaces;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameTokenUtils.sanitizeFileName;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 import static org.oagi.score.gateway.http.common.util.StringUtils.trim;
@@ -137,6 +138,17 @@ public class ExpressionBasedFilenameStrategy implements BieSchemaFilenameStrateg
             }
             throw e;
         }
+    }
+
+    @Override
+    public String buildCommonFilename(String commonName) {
+        if (biePackage == null) {
+            return commonName;
+        }
+        // Whitespace is removed from the package name and version ID, as the filename expression does.
+        String packagePrefix = normalizeTokenWithoutSpaces(biePackage.name())
+                + (hasLength(biePackage.versionId()) ? "-" + normalizeTokenWithoutSpaces(biePackage.versionId()) : "");
+        return hasLength(packagePrefix) ? packagePrefix + "_" + commonName : commonName;
     }
 
     private FilenameExpressionParser.ParsedExpression parseFilenameExpressionOrDefault(String expression) {

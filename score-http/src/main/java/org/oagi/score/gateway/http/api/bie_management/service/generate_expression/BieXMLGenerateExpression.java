@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.bie_management.service.generate_expressi
 
 import jakarta.annotation.Nullable;
 import org.jdom2.*;
+import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -57,6 +58,9 @@ import org.springframework.util.StringUtils;
 import java.io.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.hasAnyValuesInFacets;
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.toName;
@@ -85,6 +89,12 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private final Set<String> importedSchemaLocations = new LinkedHashSet<>();
     // Stable namespace prefix per referenced top-level ASBIEP to avoid prefix drift in one document.
     private final Map<TopLevelAsbiepId, String> topLevelNamespacePrefixes = new HashMap<>();
+    // The target namespace of the current document; its prefix qualifies the references to its own global types.
+    private Namespace schemaTargetNamespace;
+    // The global components that this document declares, to be moved into common files if its files share them.
+    private final Map<String, CommonComponents.Declaration> declarations = new LinkedHashMap<>();
+    // The names of the global types of this document, for the generation without a request-wide registry.
+    private TypeNames typeNames = new TypeNames();
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -97,8 +107,47 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         this.includedSchemaLocations.clear();
         this.importedSchemaLocations.clear();
         this.topLevelNamespacePrefixes.clear();
+        this.declarations.clear();
+        this.typeNames = new TypeNames();
         this.document = new Document();
         this.schemaNode = null;
+        this.schemaTargetNamespace = null;
+    }
+
+    /**
+     * Qualifies the name of a global type declared in this document's target namespace.
+     * A target namespace with an empty prefix is the default namespace, so the name stays unqualified.
+     */
+    private String qualified(String localName) {
+        if (schemaTargetNamespace == null || !hasLength(schemaTargetNamespace.getPrefix())
+                || !hasLength(localName) || localName.indexOf(':') >= 0) {
+            return localName;
+        }
+        return schemaTargetNamespace.getPrefix() + ":" + localName;
+    }
+
+    /**
+     * The type name of an XBT: only an XBT with a schema definition is declared in the schema,
+     * the others are XML Schema built-in types.
+     */
+    private String xbtTypeRef(XbtSummaryRecord xbt) {
+        return hasLength(xbt.schemaDefinition()) ? qualified(xbt.builtInType()) : xbt.builtInType();
+    }
+
+    /**
+     * Adds the global component to this document, once, and records it to move it into a common file
+     * if the other files joined to this document declare it too.
+     */
+    private Element declareGlobalComponent(CommonComponents.Kind kind, String key, Supplier<Element> factory) {
+        Element processed = processedElements.get(key);
+        if (processed != null) {
+            return processed;
+        }
+        Element created = factory.get();
+        schemaNode.addContent(created);
+        processedElements.put(key, created);
+        declarations.put(key, new CommonComponents.Declaration(kind, key, created));
+        return created;
     }
 
     private Namespace getNamespace(GenerationContext generationContext, NamespaceId namespaceId) {
@@ -117,6 +166,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         schemaNode.setAttribute("elementFormDefault", "qualified");
         schemaNode.setAttribute("attributeFormDefault", "unqualified");
         document.addContent(schemaNode);
+        this.schemaTargetNamespace = targetNamespace;
         return schemaNode;
     }
 
@@ -149,15 +199,37 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         tempFile = new File(tempFile.getParentFile(), filename + ".xsd");
 
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-            outputter.output(this.document, outputStream);
-            outputStream.flush();
-        }
+        output(this.document, tempFile);
 
         logger.info("XML Schema is generated: " + tempFile);
 
+        SharedComponentRegistry sharedComponentRegistry =
+                (generationContext != null) ? generationContext.getSharedComponentRegistry() : null;
+        if (sharedComponentRegistry != null && schemaNode != null) {
+            sharedComponentRegistry.sharedComponents(CommonComponents.class,
+                            () -> new CommonComponents(sharedComponentRegistry::sharedFilename),
+                            commonComponents -> {
+                                try {
+                                    return commonComponents.asFiles();
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
+                            })
+                    .register(new CommonComponents.GeneratedFile(tempFile, document, schemaNode,
+                            schemaNode.getAttributeValue("targetNamespace"),
+                            (schemaTargetNamespace != null) ? schemaTargetNamespace.getPrefix() : "",
+                            new LinkedHashSet<>(includedSchemaLocations), new ArrayList<>(declarations.values())));
+        }
+
         return tempFile;
+    }
+
+    private static void output(Document document, File file) throws IOException {
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            outputter.output(document, outputStream);
+            outputStream.flush();
+        }
     }
 
     private void generateTopLevelAsbiep(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
@@ -215,60 +287,37 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private String key(CodeListSummaryRecord codeList) {
-        // Values belong to a manifest, so revisions of the same component must
-        // not reuse a type generated from another manifest's value set.
-        return "CodeList" + ID_ATTRIBUTE_PREFIX + codeList.codeListManifestId();
+        // The same code list has a manifest in each release, but the type is named after the code list, not after
+        // the manifest. So the type is identified by its name and its values: the code lists of two manifests that
+        // make the same type are one declaration, and a code list of the same name with other values is not.
+        AgencyIdListValueSummaryRecord agencyIdListValue =
+                generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
+        List<String> values = generationContext.getCodeListValues(codeList).stream()
+                .map(CodeListValueSummaryRecord::value).toList();
+        return "CodeList" + ID_ATTRIBUTE_PREFIX + baseCodeListTypeName(codeList, agencyIdListValue)
+                + ID_ATTRIBUTE_PREFIX + values.hashCode();
     }
 
     private String key(AgencyIdListSummaryRecord agencyIdList) {
-        return "AgencyIdList" + ID_ATTRIBUTE_PREFIX + agencyIdList.agencyIdListManifestId();
+        AgencyIdListValueSummaryRecord agencyIdListValue =
+                generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
+        List<String> values = generationContext
+                .findAgencyIdListValueByAgencyIdListManifestId(agencyIdList.agencyIdListManifestId()).stream()
+                .map(AgencyIdListValueSummaryRecord::value).toList();
+        return "AgencyIdList" + ID_ATTRIBUTE_PREFIX + baseAgencyListTypeName(agencyIdList, agencyIdListValue)
+                + ID_ATTRIBUTE_PREFIX + values.hashCode();
     }
 
     private boolean isProcessed(BIE bie) {
         return processedElements.containsKey(key(bie));
     }
 
-    private boolean isProcessed(XbtSummaryRecord xbt) {
-        return processedElements.containsKey(key(xbt));
-    }
-
-    private boolean isProcessed(CodeListSummaryRecord codeList) {
-        return processedElements.containsKey(key(codeList));
-    }
-
-    private boolean isProcessed(AgencyIdListSummaryRecord agencyIdList) {
-        return processedElements.containsKey(key(agencyIdList));
-    }
-
     private Element getProcessedElement(BIE bie) {
         return processedElements.get(key(bie));
     }
 
-    private Element getProcessedElement(CodeListSummaryRecord codeList) {
-        return processedElements.get(key(codeList));
-    }
-
-    private Element getProcessedElement(AgencyIdListSummaryRecord agencyIdList) {
-        return processedElements.get(key(agencyIdList));
-    }
-
     private Element setProcessedElement(BIE bie, Element element) {
         processedElements.put(key(bie), element);
-        return element;
-    }
-
-    private Element setProcessedElement(XbtSummaryRecord xbt, Element element) {
-        processedElements.put(key(xbt), element);
-        return element;
-    }
-
-    private Element setProcessedElement(CodeListSummaryRecord codeList, Element element) {
-        processedElements.put(key(codeList), element);
-        return element;
-    }
-
-    private Element setProcessedElement(AgencyIdListSummaryRecord agencyIdList, Element element) {
-        processedElements.put(key(agencyIdList), element);
         return element;
     }
 
@@ -910,6 +959,10 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         if (schemaNode == null) {
             return;
         }
+        insertDirective(schemaNode, directive);
+    }
+
+    private static void insertDirective(Element schemaNode, Element directive) {
         int insertionIndex = 0;
         for (Content content : schemaNode.getContent()) {
             if (!(content instanceof Element)) {
@@ -936,8 +989,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
         String targetNamespace = (schemaNode != null) ? schemaNode.getAttributeValue("targetNamespace") : null;
         if (Objects.equals(targetNamespace, refNamespace.getURI())) {
-            // For same-target-namespace type references, keep it unqualified.
-            return localName;
+            // A same-target-namespace type is qualified only when the namespace has a prefix.
+            return qualified(localName);
         }
         String prefix = ensureNamespaceDeclaration(refNamespace, topLevelAsbiepId);
         return hasLength(prefix) ? prefix + ":" + localName : localName;
@@ -1035,7 +1088,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
         String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
-        extNode.setAttribute("base", codeListTypeName);
+        extNode.setAttribute("base", qualified(codeListTypeName));
         eNode.addContent(complexType);
         return eNode;
     }
@@ -1045,7 +1098,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findDtAwdPriByDtManifestIdAndDefaultIsTrue(bdt.dtManifestId());
         XbtSummaryRecord xbt = Helper.getXbt(generationContext, dtAwdPri);
         addXbtSimpleType(xbt);
-        return xbt.builtInType();
+        return xbtTypeRef(xbt);
     }
 
     public String setBDTBase(BbieSummaryRecord bbie, DtSummaryRecord bdt) {
@@ -1056,7 +1109,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         } else {
             addXbtSimpleType(xbt);
         }
-        return (typeName != null) ? typeName : xbt.builtInType();
+        return (typeName != null) ? typeName : xbtTypeRef(xbt);
     }
 
     public Element setBBIE_Attr_Type(DtSummaryRecord bdt, Element gNode) {
@@ -1064,7 +1117,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 generationContext.findDtAwdPriByDtManifestIdAndDefaultIsTrue(bdt.dtManifestId());
         XbtSummaryRecord xbt = Helper.getXbt(generationContext, dtAwdPri);
         if (xbt.builtInType() != null) {
-            gNode.setAttribute("type", xbt.builtInType());
+            gNode.setAttribute("type", xbtTypeRef(xbt));
         }
         addXbtSimpleType(xbt);
         return gNode;
@@ -1080,7 +1133,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             addXbtSimpleType(xbt);
         }
 
-        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.builtInType());
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbtTypeRef(xbt));
 
         return gNode;
     }
@@ -1229,7 +1282,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             addXbtSimpleType(xbt);
         }
 
-        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.builtInType());
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbtTypeRef(xbt));
 
         return gNode;
     }
@@ -1274,7 +1327,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         schemaNode.addContent(xbtNode);
 
-        return name;
+        return qualified(name);
     }
 
     public void addXbtSimpleType(XbtSummaryRecord xbt) {
@@ -1289,10 +1342,17 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         if (rootElementNode == null) {
             return;
         }
-        if (isProcessed(xbt)) {
-            return;
+
+        // The XBT it is derived from must be declared as well, because its schema content refers to it.
+        XbtSummaryRecord baseXbt = (xbt.subTypeOfXbtId() != null) ? generationContext.getXbt(xbt.subTypeOfXbtId()) : null;
+        if (baseXbt != null) {
+            addXbtSimpleType(baseXbt);
         }
 
+        declareGlobalComponent(CommonComponents.Kind.DATA_TYPE, key(xbt), () -> newXbtSimpleType(xbt, baseXbt));
+    }
+
+    private Element newXbtSimpleType(XbtSummaryRecord xbt, XbtSummaryRecord baseXbt) {
         String name = xbt.builtInType();
 
         Element xbtNode = newElement("simpleType");
@@ -1314,13 +1374,37 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             for (Content child : content.removeContent()) {
                 xbtNode.addContent(child);
             }
-
-            schemaNode.addContent(xbtNode);
         } catch (JDOMException | IOException e) {
             throw new IllegalStateException("Error occurs while the schema content loads for " + name, e);
         }
 
-        setProcessedElement(xbt, xbtNode);
+        if (baseXbt != null && hasLength(baseXbt.schemaDefinition())) {
+            qualifyBaseXbtReferences(xbtNode, baseXbt.builtInType());
+        }
+        return xbtNode;
+    }
+
+    /**
+     * The schema content refers to the XBT it is derived from by its bare name, which has to be qualified
+     * in a document with a prefixed target namespace.
+     */
+    private void qualifyBaseXbtReferences(Element xbtNode, String baseTypeName) {
+        List<Element> nodes = new ArrayList<>();
+        nodes.add(xbtNode);
+        xbtNode.getDescendants(Filters.element()).forEach(nodes::add);
+        for (Element node : nodes) {
+            for (String attributeName : List.of("base", "itemType", "memberTypes")) {
+                String value = node.getAttributeValue(attributeName);
+                if (value == null) {
+                    continue;
+                }
+                StringJoiner joiner = new StringJoiner(" ");
+                for (String token : value.trim().split("\\s+")) {
+                    joiner.add(token.equals(baseTypeName) ? qualified(token) : token);
+                }
+                node.setAttribute(attributeName, joiner.toString());
+            }
+        }
     }
 
     public Element generateBBIE(BbieSummaryRecord bbie, DtSummaryRecord bdt, Element parent) {
@@ -1350,7 +1434,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
-                        eNode.setAttribute("type", agencyListTypeName);
+                        eNode.setAttribute("type", qualified(agencyListTypeName));
                     }
                 } else {
                     if (bbie.primitiveRestriction().xbtManifestId() == null) {
@@ -1377,7 +1461,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                 if (bbieScList.isEmpty()) {
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-                    eNode.setAttribute("type", getCodeListTypeName(codeList, agencyIdListValue));
+                    eNode.setAttribute("type", qualified(getCodeListTypeName(codeList, agencyIdListValue)));
                 } else {
                     eNode = generateBDT(bbie, eNode, codeList);
                     eNode = generateSCs(bbie, eNode, bbieScList);
@@ -1401,7 +1485,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
-                        eNode.setAttribute("type", agencyListTypeName);
+                        eNode.setAttribute("type", qualified(agencyListTypeName));
                     }
                 } else {
                     if (bbie.primitiveRestriction().xbtManifestId() == null) {
@@ -1432,7 +1516,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
                     String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                     if (StringUtils.hasLength(codeListTypeName)) {
-                        eNode.setAttribute("type", codeListTypeName);
+                        eNode.setAttribute("type", qualified(codeListTypeName));
                     }
                     return eNode;
                 } else {
@@ -1442,7 +1526,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
                         String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                         if (StringUtils.hasLength(codeListTypeName)) {
-                            eNode.setAttribute("type", codeListTypeName);
+                            eNode.setAttribute("type", qualified(codeListTypeName));
                         }
                     }
                 }
@@ -1473,7 +1557,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         } else {
             XbtSummaryRecord xbt = generationContext.getXbt(dtAwdPri.xbtManifestId());
             addXbtSimpleType(xbt);
-            return xbt.builtInType();
+            return xbtTypeRef(xbt);
         }
     }
 
@@ -1485,7 +1569,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         } else {
             XbtSummaryRecord xbt = generationContext.getXbt(dtScAwdPri.xbtManifestId());
             addXbtSimpleType(xbt);
-            return xbt.builtInType();
+            return xbtTypeRef(xbt);
         }
     }
 
@@ -1497,11 +1581,12 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         return generateCodeList(codeList, setCodeListRestrictionAttr(bbieSc));
     }
 
-    private Element generateCodeList(CodeListSummaryRecord codeList, String codeListRestrictionAttr) {
-        if (isProcessed(codeList)) {
-            return getProcessedElement(codeList);
-        }
+    Element generateCodeList(CodeListSummaryRecord codeList, String codeListRestrictionAttr) {
+        return declareGlobalComponent(CommonComponents.Kind.CODE_LIST, key(codeList),
+                () -> newCodeListSimpleType(codeList, codeListRestrictionAttr));
+    }
 
+    private Element newCodeListSimpleType(CodeListSummaryRecord codeList, String codeListRestrictionAttr) {
         Element stNode = newElement("simpleType");
 
         AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
@@ -1519,9 +1604,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             enumeration.setAttribute("value", codeListValue.value());
             rtNode.addContent(enumeration);
         }
-
-        schemaNode.addContent(stNode);
-        setProcessedElement(codeList, stNode);
 
         return stNode;
     }
@@ -1587,7 +1669,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                         addXbtSimpleType(xbt);
                     }
 
-                    gNode.setAttribute("type", (typeName != null) ? typeName : xbt.builtInType());
+                    gNode.setAttribute("type", (typeName != null) ? typeName : xbtTypeRef(xbt));
                 }
             }
         }
@@ -1604,7 +1686,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             addXbtSimpleType(xbt);
         }
 
-        gNode.setAttribute("type", (typeName != null) ? typeName : xbt.builtInType());
+        gNode.setAttribute("type", (typeName != null) ? typeName : xbtTypeRef(xbt));
 
         return gNode;
 
@@ -1657,7 +1739,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
                     generateAgencyList(agencyIdList, agencyListTypeName);
                     if (StringUtils.hasLength(agencyListTypeName)) {
-                        aNode.setAttribute("type", agencyListTypeName);
+                        aNode.setAttribute("type", qualified(agencyListTypeName));
                     }
                 }
             } else {
@@ -1670,7 +1752,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
                 String codeListTypeName = getCodeListTypeName(codeList, agencyIdListValue);
                 if (StringUtils.hasLength(codeListTypeName)) {
-                    aNode.setAttribute("type", codeListTypeName);
+                    aNode.setAttribute("type", qualified(codeListTypeName));
                 }
             }
 
@@ -1680,10 +1762,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     public Element generateAgencyList(AgencyIdListSummaryRecord agencyIdList, String agencyListTypeName) {
-        if (isProcessed(agencyIdList)) {
-            return getProcessedElement(agencyIdList);
-        }
+        return declareGlobalComponent(CommonComponents.Kind.AGENCY_ID_LIST, key(agencyIdList),
+                () -> newAgencyListSimpleType(agencyIdList, agencyListTypeName));
+    }
 
+    private Element newAgencyListSimpleType(AgencyIdListSummaryRecord agencyIdList, String agencyListTypeName) {
         Element stNode = newElement("simpleType");
 
         stNode.setAttribute("name", agencyListTypeName);
@@ -1726,9 +1809,209 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             }
         }
 
-        schemaNode.addContent(stNode);
-        setProcessedElement(agencyIdList, stNode);
         return stNode;
+    }
+
+    /**
+     * Moves the global components that several files of a generation request declare into common files.
+     * <p>
+     * Files joined by {@code xsd:include} must not declare the same global {@code simpleType} (an XBT with a schema
+     * definition, a code list, an agency ID list), but each file is generated on its own and declares what it uses.
+     * So the files are generated as usual and recorded here, and once all of them are generated the components that
+     * a file declares together with a file it is joined to are moved into one common file of their kind, which each
+     * file that declared one of them includes. A request with no such component leaves its files as they are, so
+     * they are the same as the files generated one by one.
+     * <p>
+     * A common file has the target namespace of the files that include it, as an {@code xsd:include} requires, so
+     * there is one for each kind and namespace. Like the other schema files of a namespace with a prefix, its filename
+     * ends with {@code _<prefix>}.
+     */
+    static class CommonComponents {
+
+        enum Kind {
+            DATA_TYPE("CommonDataType"),
+            CODE_LIST("CommonCodeList"),
+            AGENCY_ID_LIST("CommonAgencyIdList");
+
+            private final String baseName;
+
+            Kind(String baseName) {
+                this.baseName = baseName;
+            }
+
+            String baseName() {
+                return baseName;
+            }
+        }
+
+        /**
+         * A global component that a file declares.
+         */
+        record Declaration(Kind kind, String key, Element element) {
+        }
+
+        /**
+         * A generated schema file, whose document is kept to be changed once the request is generated.
+         */
+        record GeneratedFile(File file, Document document, Element schemaNode, String namespaceUri, String prefix,
+                             Set<String> includedFilenames, Collection<Declaration> declarations) {
+        }
+
+        /**
+         * The components of a kind that the files of a namespace share.
+         */
+        private record CommonKey(String namespaceUri, Kind kind) {
+        }
+
+        private final BiFunction<String, String, String> filenameResolver;
+        private final List<GeneratedFile> generatedFiles = new ArrayList<>();
+
+        /**
+         * @param filenameResolver gives the base filename (without file extension) of a common file from the identity
+         *                         of the file and its name, such as {@code CommonCodeList_adapt}
+         */
+        CommonComponents(BiFunction<String, String, String> filenameResolver) {
+            this.filenameResolver = filenameResolver;
+        }
+
+        synchronized void register(GeneratedFile generatedFile) {
+            generatedFiles.add(generatedFile);
+        }
+
+        /**
+         * Moves the components that files joined to each other declare together into common files, and
+         * returns the common files, which are none when there is no such component.
+         */
+        synchronized List<File> asFiles() throws IOException {
+            // the components to move, with the prefix of the namespace of the first file that declares each
+            Map<CommonKey, Map<String, Declaration>> moved = new LinkedHashMap<>();
+            Map<CommonKey, String> prefixes = new LinkedHashMap<>();
+            for (Set<GeneratedFile> group : new LinkedHashSet<>(joinedGroups().values())) {
+                Map<String, Integer> declaredCount = new LinkedHashMap<>();
+                Map<String, Declaration> declarationByKey = new LinkedHashMap<>();
+                Map<String, GeneratedFile> firstOwner = new LinkedHashMap<>();
+                for (GeneratedFile generatedFile : group) {
+                    for (Declaration declaration : generatedFile.declarations()) {
+                        declaredCount.merge(declaration.key(), 1, Integer::sum);
+                        declarationByKey.putIfAbsent(declaration.key(), declaration);
+                        firstOwner.putIfAbsent(declaration.key(), generatedFile);
+                    }
+                }
+                declaredCount.forEach((key, count) -> {
+                    if (count > 1) {
+                        Declaration declaration = declarationByKey.get(key);
+                        GeneratedFile owner = firstOwner.get(key);
+                        CommonKey commonKey = new CommonKey(owner.namespaceUri(), declaration.kind());
+                        moved.computeIfAbsent(commonKey, k -> new LinkedHashMap<>()).putIfAbsent(key, declaration);
+                        prefixes.putIfAbsent(commonKey, owner.prefix());
+                    }
+                });
+            }
+            if (moved.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Map<CommonKey, String> filenames = new LinkedHashMap<>();
+            moved.keySet().forEach(commonKey -> {
+                String prefix = prefixes.get(commonKey);
+                String name = commonKey.kind().baseName() + (hasLength(prefix) ? "_" + prefix : "");
+                filenames.put(commonKey, filenameResolver.apply(commonKey.namespaceUri() + "|" + commonKey.kind(), name) + ".xsd");
+            });
+
+            // A file that declares a moved component takes it from the common file, even when it is not joined
+            // to the files that declared it twice, so that the common file does not repeat what the file declares.
+            Set<GeneratedFile> changedFiles = new LinkedHashSet<>();
+            for (GeneratedFile generatedFile : generatedFiles) {
+                for (Declaration declaration : generatedFile.declarations()) {
+                    CommonKey commonKey = new CommonKey(generatedFile.namespaceUri(), declaration.kind());
+                    Map<String, Declaration> movedOfKind = moved.get(commonKey);
+                    if (movedOfKind == null || !movedOfKind.containsKey(declaration.key())) {
+                        continue;
+                    }
+                    declaration.element().detach();
+                    if (generatedFile.includedFilenames().add(filenames.get(commonKey))) {
+                        insertDirective(generatedFile.schemaNode(), include(filenames.get(commonKey)));
+                    }
+                    changedFiles.add(generatedFile);
+                }
+            }
+            for (GeneratedFile changedFile : changedFiles) {
+                output(changedFile.document(), changedFile.file());
+            }
+
+            List<File> commonFiles = new ArrayList<>();
+            File directory = File.createTempFile(ScoreGuidUtils.randomGuid(), null).getParentFile();
+            for (Map.Entry<CommonKey, Map<String, Declaration>> entry : moved.entrySet()) {
+                CommonKey commonKey = entry.getKey();
+                String prefix = prefixes.get(commonKey);
+
+                Element schema = new Element("schema", XSD_NAMESPACE);
+                schema.addNamespaceDeclaration(XSD_NAMESPACE);
+                schema.addNamespaceDeclaration(Namespace.getNamespace(prefix, commonKey.namespaceUri()));
+                schema.setAttribute("targetNamespace", commonKey.namespaceUri());
+                schema.setAttribute("elementFormDefault", "qualified");
+                schema.setAttribute("attributeFormDefault", "unqualified");
+                CommonKey dataTypeKey = new CommonKey(commonKey.namespaceUri(), Kind.DATA_TYPE);
+                if (commonKey.kind() == Kind.CODE_LIST && filenames.containsKey(dataTypeKey)
+                        && refersToCustomType(entry.getValue().values())) {
+                    // the base of a code list is an XBT that is declared in the common data type file
+                    schema.addContent(include(filenames.get(dataTypeKey)));
+                }
+                entry.getValue().values().forEach(declaration -> schema.addContent(declaration.element().clone()));
+
+                File commonFile = new File(directory, filenames.get(commonKey));
+                output(new Document(schema), commonFile);
+                commonFiles.add(commonFile);
+            }
+            return commonFiles;
+        }
+
+        private static Element include(String schemaLocation) {
+            Element include = new Element("include", XSD_NAMESPACE);
+            include.setAttribute("schemaLocation", schemaLocation);
+            return include;
+        }
+
+        /**
+         * The files by their names, each with the files joined to it by {@code xsd:include}, directly or not.
+         * Only the files of the same group can declare a component twice into one schema.
+         */
+        private Map<String, Set<GeneratedFile>> joinedGroups() {
+            Map<String, Set<GeneratedFile>> groups = new LinkedHashMap<>();
+            for (GeneratedFile generatedFile : generatedFiles) {
+                Set<GeneratedFile> group = new LinkedHashSet<>(Set.of(generatedFile));
+                groups.put(generatedFile.file().getName(), group);
+            }
+            for (GeneratedFile generatedFile : generatedFiles) {
+                for (String includedFilename : generatedFile.includedFilenames()) {
+                    Set<GeneratedFile> included = groups.get(includedFilename);
+                    Set<GeneratedFile> own = groups.get(generatedFile.file().getName());
+                    if (included == null || included == own) {
+                        continue;
+                    }
+                    own.addAll(included);
+                    for (GeneratedFile member : own) {
+                        groups.put(member.file().getName(), own);
+                    }
+                }
+            }
+            return groups;
+        }
+
+        private static boolean refersToCustomType(Collection<Declaration> declarations) {
+            for (Declaration declaration : declarations) {
+                List<Element> nodes = new ArrayList<>();
+                nodes.add(declaration.element());
+                declaration.element().getDescendants(Filters.element()).forEach(nodes::add);
+                for (Element node : nodes) {
+                    String base = node.getAttributeValue("base");
+                    if (base != null && !base.startsWith(XSD_NAMESPACE.getPrefix() + ":")) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     private interface BIEMetaData {
@@ -2471,15 +2754,59 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         }
     }
 
+    /**
+     * The name of the type of a code list, which is made from the code list and not from its manifest. So the code list
+     * of each release makes the same name, and when a code list of another content makes it too (the same name
+     * with other values) it gets a number to differ from the first.
+     */
     public String getCodeListTypeName(CodeListSummaryRecord codeList,
-                                             AgencyIdListValueSummaryRecord agencyIdListValue) {
+                                      AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return uniqueTypeName(baseCodeListTypeName(codeList, agencyIdListValue), key(codeList));
+    }
+
+    public String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                        AgencyIdListValueSummaryRecord agencyIdListValue) {
+        return uniqueTypeName(baseAgencyListTypeName(agencyIdList, agencyIdListValue), key(agencyIdList));
+    }
+
+    private String baseCodeListTypeName(CodeListSummaryRecord codeList,
+                                        AgencyIdListValueSummaryRecord agencyIdListValue) {
         return Helper.getCodeListTypeName(codeList, agencyIdListValue,
                 (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
     }
 
-    public String getAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
-                                               AgencyIdListValueSummaryRecord agencyIdListValue) {
+    private String baseAgencyListTypeName(AgencyIdListSummaryRecord agencyIdList,
+                                          AgencyIdListValueSummaryRecord agencyIdListValue) {
         return Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue,
                 (name) -> name.contains(" ") ? Utility.toCamelCase(name) : name);
+    }
+
+    /**
+     * Two global types of a namespace can not have the same name, so the first content that makes a name keeps it,
+     * and another content that makes it gets the name with a number. The names are kept for all the files of a
+     * generation request, if it has any, so that the files joined to each other do not make the same name either.
+     */
+    private String uniqueTypeName(String baseName, String key) {
+        SharedComponentRegistry registry = (generationContext != null) ? generationContext.getSharedComponentRegistry() : null;
+        TypeNames names = (registry != null)
+                ? registry.sharedComponents(TypeNames.class, TypeNames::new, shared -> Collections.emptyList())
+                : typeNames;
+        String namespaceUri = (schemaNode != null) ? schemaNode.getAttributeValue("targetNamespace") : null;
+        return names.unique((namespaceUri != null) ? namespaceUri : "", baseName, key);
+    }
+
+    static class TypeNames {
+
+        private final Map<String, List<String>> keysByName = new HashMap<>();
+
+        synchronized String unique(String namespaceUri, String baseName, String key) {
+            List<String> keys = keysByName.computeIfAbsent(namespaceUri + "|" + baseName, k -> new ArrayList<>());
+            int index = keys.indexOf(key);
+            if (index < 0) {
+                keys.add(key);
+                index = keys.size() - 1;
+            }
+            return (index == 0) ? baseName : baseName + "_" + (index + 1);
+        }
     }
 }

@@ -334,6 +334,20 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     /**
+     * What the files of the generation run share, or {@code null} when they share nothing.
+     * The host sets it, and an expression keeps in it what every file would repeat.
+     */
+    private SharedComponentRegistry sharedComponentRegistry;
+
+    public void setSharedComponentRegistry(SharedComponentRegistry sharedComponentRegistry) {
+        this.sharedComponentRegistry = sharedComponentRegistry;
+    }
+
+    public SharedComponentRegistry getSharedComponentRegistry() {
+        return sharedComponentRegistry;
+    }
+
+    /**
      * Registers runtime reference metadata for a generated top-level ASBIEP schema.
      *
      * @param schemaReferenceInfo reference metadata to cache; ignored when null or missing key ID

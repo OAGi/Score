@@ -103,15 +103,16 @@ public class BiePackageQueryService {
         option.setFilenames(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
-        Map<TopLevelAsbiepId, File> result =
+        BieGenerateService.EachSchemaResult generated =
                 bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, File> result = generated.files();
         Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId = result.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getName()));
         BiePackageManifestResponse biePackageManifestResponse =
                 biePackageManifestService.getBiePackageManifest(
                         requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId, manifestVersion);
 
-        return makeGenerateBiePackageResponse(biePackage, result, biePackageManifestResponse);
+        return makeGenerateBiePackageResponse(biePackage, generated, biePackageManifestResponse);
     }
 
     public File writeBiePackageManifestResponseToTempFile(BiePackageManifestResponse response) throws IOException {
@@ -132,10 +133,10 @@ public class BiePackageQueryService {
     }
 
     private BieGenerateExpressionResult makeGenerateBiePackageResponse(
-            BiePackageSummaryRecord biePackage, Map<TopLevelAsbiepId, File> result, BiePackageManifestResponse biePackageManifestResponse) throws IOException {
+            BiePackageSummaryRecord biePackage, BieGenerateService.EachSchemaResult generated, BiePackageManifestResponse biePackageManifestResponse) throws IOException {
 
         File manifestFile = writeBiePackageManifestResponseToTempFile(biePackageManifestResponse);
-        List<File> files = new ArrayList<>(result.values());
+        List<File> files = generated.allFiles();
         files.add(manifestFile);
 
         String filename = String.join("-", Arrays.asList(
