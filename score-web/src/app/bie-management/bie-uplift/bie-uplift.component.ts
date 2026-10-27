@@ -108,12 +108,12 @@ export class BieUpliftSourceFlatNodeDatabase<T extends BieFlatNode> extends BieF
     return wrapper;
   }
 
-  override hasUsedOrInheritedDescendant(node: T): boolean {
+  protected override filterableChildren(node: T): BieFlatNode[] {
     // The uplift visitor decides which source branches to retain while it
     // walks the tree. Avoid recursively probing the same CC graph from every
     // rendered node; that duplicates the traversal and can be quadratic for
     // reused or cyclic structures.
-    return false;
+    return [];
   }
 }
 

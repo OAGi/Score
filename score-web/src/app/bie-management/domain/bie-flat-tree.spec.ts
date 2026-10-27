@@ -510,7 +510,9 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
   }
 
   function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean}) {
-    const graph = db.searchGraph(root, options);
+    // the tree answers for its own filters: the search does not pass its state in
+    db.filters.setActive('hideUnused', !!options?.hideUnused);
+    const graph = db.searchGraph(root);
     const pattern = new PathPattern(expr, false, mode);
     const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
     const attributes = [(a: string) => ({name: root.name, displayName: root.displayName || root.name, used: !!root.used})[a]];

@@ -1,4 +1,5 @@
 import {BieUpliftComponent, BieUpliftSourceFlatNodeDatabase, BieUpliftTargetFlatNodeDatabase} from './bie-uplift.component';
+import {TreeFilterSet} from '../../common/tree-viewport/tree-filter';
 import {BieUpliftMap, BieUpliftSourceFlatNode, BieUpliftTargetFlatNode, MatchInfo} from './domain/bie-uplift';
 import {AsbiepFlatNode, BbiepFlatNode, BieFlatNode, BieFlatNodeDataSource, BieFlatNodeDatabase} from '../domain/bie-flat-tree';
 import {BieEditAbieNode, UsedBie} from '../bie-edit/domain/bie-edit-node';
@@ -1562,7 +1563,8 @@ describe('BieUpliftComponent', () => {
     wrappedSourceBbieSc.target = {} as BieUpliftTargetFlatNode;
 
     const database = {
-      children: () => [wrappedSourceBbieSc]
+      children: () => [wrappedSourceBbieSc],
+      filters: new TreeFilterSet<BieFlatNode>({childrenOf: () => []})
     };
     const dataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(
       database as unknown as BieFlatNodeDataSource<BieUpliftSourceFlatNode>['database'], null as any, null as any);

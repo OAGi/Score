@@ -16,6 +16,8 @@ import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
 import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchLimits, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
+import {TreeFilterChange, TreeFilterSet} from '../../common/tree-viewport/tree-filter';
+import {BieHideUnusedFilter, HIDE_UNUSED_FILTER} from './bie-tree-filters';
 import {FlatNode, getKey} from '../../common/flat-tree';
 import {BieDetailUpdateResponse, BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
@@ -366,23 +368,13 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
     });
   }
 
-  getChildren(options?: any | undefined): BieFlatNode[] {
-    if (!!options && options.hideUnused) {
-      return this._children.filter(e => this.hasVisibleChild(e));
-    }
-    return this._children;
-  }
-
-  private hasVisibleChild(child: BieFlatNode): boolean {
-    return !!child && (!!child.used || !!child.inherited ||
-      !!this.dataSource?.hasUsedOrInheritedDescendant(child) ||
-      !!this.dataSource?.searcher?.isSearchResult(child));
+  getChildren(options?: {filtered?: boolean}): BieFlatNode[] {
+    const filters = options?.filtered ? this.dataSource?.filters : undefined;
+    return filters ? filters.visibleChildren(this._children) : this._children;
   }
 
   get children(): BieFlatNode[] {
-    return this.getChildren({
-      hideUnused: !!this.dataSource && this.dataSource.hideUnused
-    });
+    return this.getChildren({filtered: true});
   }
 
   set children(children: BieFlatNode[]) {
@@ -401,8 +393,9 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
       this.dataSource.database.loadChildren(this);
     }
     if (this._children.length > 0) {
-      if (this.dataSource && this.dataSource.hideUnused) {
-        return this._children.some(e => this.hasVisibleChild(e));
+      const filters = this.dataSource?.filters;
+      if (filters?.active) {
+        return this._children.some(e => filters.visible(e));
       }
       return true;
     }
@@ -1003,20 +996,15 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return this._node.isChoice;
   }
 
-  getChildren(options?: any | undefined): FlatNode[] {
+  getChildren(options?: {filtered?: boolean}): FlatNode[] {
     const children = this._hasChildrenOverride ? this._childrenOverride :
       (this._node.getChildren ? this._node.getChildren() : this._node.children || []);
-    if (options?.hideUnused) {
-      const dataSource = (this._node as BieFlatNodeImpl).dataSource;
-      return children.filter(child => (child as BieFlatNode).used || (child as BieFlatNode).inherited ||
-        !!dataSource?.hasUsedOrInheritedDescendant?.(child as BieFlatNode) ||
-        !!dataSource?.searcher?.isSearchResult?.(child as BieFlatNode));
-    }
-    return children;
+    const filters = options?.filtered ? (this._node as BieFlatNodeImpl).dataSource?.filters : undefined;
+    return filters ? filters.visibleChildren(children as BieFlatNode[]) : children;
   }
 
   get children(): FlatNode[] {
-    return this.getChildren({hideUnused: !!(this._node as BieFlatNodeImpl).dataSource?.hideUnused});
+    return this.getChildren({filtered: true});
   }
 
   set children(children: FlatNode[]) {
@@ -2546,8 +2534,17 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   dataSource: BieFlatNodeDataSource<T>;
 
+  readonly hideUnusedFilter = new BieHideUnusedFilter();
+  /** What the tree may hide ("Hide unused"); the data source and the nodes ask it for the rows they list. */
+  readonly filters = new TreeFilterSet<BieFlatNode>({
+    childrenOf: node => this.filterableChildren(node as T),
+    identityOf: node => this.unwrapNode(node),
+    exempt: node => !!this.dataSource?.searcher?.isSearchResult(node as T)
+  });
+
   constructor(ccGraph: CcGraph, abieNode: BieEditAbieNode, topLevelAsbiepId: number,
               usedBieList: UsedBie[], refBieList: RefBie[], viewOrderMap?: Map<string, number>) {
+    this.filters.add(this.hideUnusedFilter);
     this._ccGraph = ccGraph;
     this._abieNode = abieNode;
     this._topLevelAsbiepId = topLevelAsbiepId;
@@ -2682,15 +2679,17 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
    * (used, inherited or reusing), which are few. The result is built anew for every search, as that data can change
    * at any time.
    *
-   * With `hideUnused` the tree is only what the BIE uses (and what leads to it), so every place of it is a clone with
-   * just those children: the DAG is then the tree the user sees, which is small.
+   * While a filter is on (see `filters`) the tree is only what the filters let stay, so every place of it is a clone
+   * with just those children: the DAG is then the tree the user sees, which is small. The search does not tell the tree
+   * what to show; the tree answers for the filters it has.
    *
    * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
    */
-  searchGraph(root: T, options?: {hideUnused?: boolean}): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
-    const hideUnused = !!options?.hideUnused;
-    const shownChildren = (node: T): T[] => this.children(node)
-      .filter(child => !hideUnused || child.used || child.inherited || this.hasUsedOrInheritedDescendant(child));
+  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+    const filtered = this.filters.active;
+    // A search result stays visible in the tree whatever the filters say, but the graph is what the search is made
+    // from, so the filters alone decide here.
+    const shownChildren = (node: T): T[] => this.children(node).filter(child => this.filters.passes(child));
     const builder = new SearchDagBuilder();
     const clones = new WeakMap<object, number>();
     const representatives: T[] = [];
@@ -2723,12 +2722,12 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     const definedPlaces = this.placesWithBieDefinition(root);
     const carriesBieData = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return hideUnused || !!(raw.used || raw.inherited || raw.reused) || definedPlaces.has(raw);
+      return filtered || !!(raw.used || raw.inherited || raw.reused) || definedPlaces.has(raw);
     };
 
     const isSpecial = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return hideUnused || carriesBieData(node) || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
+      return filtered || carriesBieData(node) || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
     };
 
     const place = (node: T): {record: number, clone: boolean} => {
@@ -2826,23 +2825,21 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     return places;
   }
 
-  hasUsedOrInheritedDescendant(node: T, visited: Set<unknown> = new Set()): boolean {
-    const rawNode = node ? this.unwrapNode(node) : node;
-    if (!rawNode || visited.has(rawNode)) {
-      return false;
-    }
-    visited.add(rawNode);
-    if (rawNode.used || rawNode.inherited) {
-      return true;
-    }
+  /** Whether the node is used or inherited, or has such a node below it, whether "Hide unused" is on or not. */
+  hasUsedOrInheritedDescendant(node: T): boolean {
+    return this.filters.satisfies(this.hideUnusedFilter, node);
+  }
 
-    // Filtering must not materialize unused CC branches. Persisted usage is
-    // resolved when a node is loaded; presentation groups are loaded with their
-    // parent. Inspect existing descendants to retain their visible ancestors.
-    // Use object identity because separate reuse occurrences can share a path,
-    // and read live flags so edits cannot leave cached visibility behind.
-    const children = rawNode.getChildren ? rawNode.getChildren() : rawNode.children;
-    return children.some(child => this.hasUsedOrInheritedDescendant(child as T, visited));
+  /**
+   * The children the filters look at below a node to keep the way to what they accept.
+   *
+   * Filtering must not materialize unused CC branches. Persisted usage is resolved when a node is loaded;
+   * presentation groups are loaded with their parent. So only the existing descendants are inspected. The flags
+   * are read live, so edits cannot leave cached visibility behind.
+   */
+  protected filterableChildren(node: T): BieFlatNode[] {
+    const rawNode = this.unwrapNode(node);
+    return (rawNode.getChildren ? rawNode.getChildren() : rawNode.children) as BieFlatNode[];
   }
 
   private isCycleNode(node: BieFlatNode): boolean {
@@ -3387,7 +3384,6 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
   readonly nodeExpanded$ = new Subject<T>();
   _listeners: ChangeListener<BieFlatNodeDataSource<T>>[] = [];
 
-  _hideUnused = false;
   searcher: BieFlatNodeDataSourceSearcher<T>;
 
   get data(): T[] {
@@ -3511,21 +3507,25 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     }
   }
 
+  get filters(): TreeFilterSet<BieFlatNode> {
+    return this._database.filters;
+  }
+
   get hideUnused(): boolean {
-    return this._hideUnused;
+    return this.filters.isActive(HIDE_UNUSED_FILTER);
   }
 
   set hideUnused(hideUnused: boolean) {
-    if (this._hideUnused === hideUnused) {
-      return;
-    }
+    this.filters.setActive(HIDE_UNUSED_FILTER, hideUnused);
+  }
 
-    this._hideUnused = hideUnused;
+  /** Rebuilds the rows after a filter was switched on or off. */
+  private onFilterChange({filter, active}: TreeFilterChange<BieFlatNode>) {
     this.data.forEach(e => {
       e.expandable = undefined;
     });
-    if (hideUnused) {
-      this.data = this.data.filter(e => e.used || e.inherited || this.database.hasUsedOrInheritedDescendant(e));
+    if (active) {
+      this.data = this.data.filter(e => this.filters.passes(e));
     } else {
       const expandedData = this.data.filter(e => this.isExpanded(e));
       this.collapse(this.data[0] as T);
@@ -3536,7 +3536,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
       }
     }
 
-    this._listeners.forEach(e => e.onChange(this, 'hideUnused', hideUnused));
+    this._listeners.forEach(e => e.onChange(this, filter.id, active));
   }
 
   constructor(
@@ -3546,14 +3546,11 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     private delegatedListeners?: ChangeListener<T>[]
   ) {
     _database.dataSource = this;
+    _database.filters.changes$.subscribe(change => this.onFilterChange(change));
   }
 
   get database(): BieFlatNodeDatabase<T> {
     return this._database;
-  }
-
-  hasUsedOrInheritedDescendant(node: BieFlatNode): boolean {
-    return this._database.hasUsedOrInheritedDescendant(node as T);
   }
 
   isExpanded(node: T): boolean {
@@ -3691,12 +3688,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
       return false;
     }
 
-    let children = this._database.children(node);
-    if (this.hideUnused) {
-      children = children.filter(e => e.used || e.inherited ||
-        this._database.hasUsedOrInheritedDescendant(e) ||
-        (this.searcher && this.searcher.isSearchResult(e)));
-    }
+    const children = this.filters.visibleChildren(this._database.children(node));
     // Prefer object identity so repeated occurrences with identical names remain
     // independent. The query path is only a compatibility fallback when a
     // wrapper instance has been recreated, and is rejected when ambiguous.
@@ -4032,15 +4024,14 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   }
 
   /**
-   * The BIE tree as the searcher sees it: its DAG (what the tree shows, so with unused nodes hidden only what the BIE
-   * uses), and the attributes a search expression may ask about (`name`, `displayName`, `type`, `used`, `inherited`,
-   * `reused`). Hiding unused nodes changes what the DAG holds, not how it is searched.
+   * The BIE tree as the searcher sees it: its DAG (what the tree shows, so only what its filters let stay), and the attributes a search expression may ask about (`name`, `displayName`, `type`, `used`, `inherited`,
+   * `reused`). A filter changes what the DAG holds, not how it is searched.
    */
   protected override graphAdapter(): TreeGraphAdapter<T> {
     let graph: ReturnType<BieFlatNodeDatabase<T>['searchGraph']>;
     return {
       dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0], {hideUnused: this.dataSource.hideUnused});
+        graph = this.database.searchGraph(this.dataSource.data[0]);
         return graph?.dag;
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
@@ -4062,7 +4053,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   }
 
   onChange(entity: BieFlatNodeDataSource<T>, propertyName: string, val: any) {
-    if (propertyName === 'hideUnused') {
+    if (propertyName === HIDE_UNUSED_FILTER) {
       this.resetSearch();
     }
   }

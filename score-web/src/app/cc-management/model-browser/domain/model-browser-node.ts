@@ -257,7 +257,6 @@ export abstract class ModelBrowserNodeImpl implements ModelBrowserNode {
       this.dataSource.database.loadChildren(this);
     }
     this._expandable = this._children.length !== 0;
-    // for 'hideUnused'
     this._expandable = this.dataSource.database.children(this).length > 0;
     return this._expandable;
   }
@@ -1306,7 +1305,6 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
   readonly nodeExpanded$ = new Subject<T>();
   _listeners: ChangeListener<ModelBrowserNodeDataSource<T>>[] = [];
 
-  _hideUnused = false;
   _hideOrderWeights = false;
 
   get data(): T[] {
