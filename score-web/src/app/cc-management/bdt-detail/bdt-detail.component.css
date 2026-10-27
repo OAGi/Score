@@ -2,10 +2,6 @@
   margin-left: 30px;
 }
 
-.mat-tree-node .inhibited {
-  opacity: 0.7;
-}
-
 .checklist-leaf-node {
   padding-right: 8px;
 }

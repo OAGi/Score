@@ -97,11 +97,11 @@ describe('Hide prohibited: which node is prohibited', () => {
     const {root} = dtTree();
     const byName = (sc: SupplementaryComponent) => (root.getChildren() as CcFlatNode[]).find(e => e.name === nameOf(sc));
 
-    expect(byName(ALPHA).inhibited).toBe(false);
-    expect(byName(BETA_PROHIBITED).inhibited).toBe(true);
-    expect(byName(GAMMA).inhibited).toBe(false);
-    expect(byName(DELTA_PROHIBITED).inhibited).toBe(true);
-    expect(byName(EPSILON).inhibited).toBe(false);
+    expect(byName(ALPHA).prohibited).toBe(false);
+    expect(byName(BETA_PROHIBITED).prohibited).toBe(true);
+    expect(byName(GAMMA).prohibited).toBe(false);
+    expect(byName(DELTA_PROHIBITED).prohibited).toBe(true);
+    expect(byName(EPSILON).prohibited).toBe(false);
   });
 
   it('is read from the component of the graph, not from a cardinality edited on the node', () => {
@@ -111,7 +111,7 @@ describe('Hide prohibited: which node is prohibited', () => {
     alpha.cardinalityMax = 0;
 
     expect(alpha.cardinalityMax).toBe(0);
-    expect(alpha.inhibited).toBe(false);
+    expect(alpha.prohibited).toBe(false);
   });
 
   it('is never a node of another kind', () => {
@@ -121,10 +121,10 @@ describe('Hide prohibited: which node is prohibited', () => {
 
     expect(root).toBeInstanceOf(AccFlatNode);
     expect(bccp).toBeInstanceOf(BccpFlatNode);
-    expect(root.inhibited).toBe(false);
-    expect(bccp.inhibited).toBe(false);
+    expect(root.prohibited).toBe(false);
+    expect(bccp.prohibited).toBe(false);
     expect(dtTree().root).toBeInstanceOf(DtFlatNode);
-    expect(dtTree().root.inhibited).toBe(false);
+    expect(dtTree().root.prohibited).toBe(false);
   });
 });
 
@@ -143,8 +143,8 @@ describe('Hide prohibited: the children of a node', () => {
 
     expect(names(root.children)).toEqual([ALPHA, GAMMA, EPSILON].map(nameOf));
     expect(names(root.getChildren() as CcFlatNode[])).toEqual(ALL.map(nameOf));
-    expect(names(root.getChildren({hideProhibited: true}) as CcFlatNode[])).toEqual([ALPHA, GAMMA, EPSILON].map(nameOf));
-    expect(names(root.getChildren({hideProhibited: false}) as CcFlatNode[])).toEqual(ALL.map(nameOf));
+    expect(names(root.getChildren({filtered: true}) as CcFlatNode[])).toEqual([ALPHA, GAMMA, EPSILON].map(nameOf));
+    expect(names(root.getChildren({filtered: false}) as CcFlatNode[])).toEqual(ALL.map(nameOf));
   });
 
   it('never has a prohibited supplementary component below a core component, whether it is hidden or not', () => {

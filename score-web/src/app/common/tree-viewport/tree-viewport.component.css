@@ -33,6 +33,10 @@ score-tree-viewport .mat-tree-node .node-cardinality {
   margin-left: 18px;
 }
 
+score-tree-viewport .mat-tree-node .prohibited {
+  opacity: 0.7;
+}
+
 score-tree-viewport .mat-tree-node .deprecated {
   text-decoration: line-through;
   background-color: #ececec;

@@ -8,6 +8,7 @@
     <span class="node-label"
           [class]="[node.typeClass.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
           [class.search-index]="searcher.isCurrentSearchIndex(node)"
+          [class.prohibited]="node.prohibited"
           [class.deprecated]="node.deprecated"
           [class.text-danger]="node.state === 'Deleted'"
           [class.text-line-through]="node.state === 'Deleted'"

@@ -2,6 +2,8 @@ import {associationKey, cardinalityKey, componentSearchAttributes, definitionAtt
 import {AttrValue} from '../../common/tree-search/search-expression';
 import {COMPONENT_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
+import {TreeFilterChange, TreeFilterSet} from '../../common/tree-viewport/tree-filter';
+import {CcHideProhibitedFilter, HIDE_PROHIBITED_FILTER} from './cc-tree-filters';
 import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
 import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
@@ -47,7 +49,8 @@ export interface CcFlatNode extends FlatNode {
   path: string;
   hashPath: string;
 
-  inhibited: boolean;
+  /** Whether the node cannot occur (cardinality 0..0); only a DT's supplementary component can be. */
+  prohibited: boolean;
 
   typeClass: string;
 
@@ -110,7 +113,7 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
     return (!!this.detail) ? this.detail.hashCode : 0;
   }
 
-  get inhibited() {
+  get prohibited() {
     return false;
   }
 
@@ -184,16 +187,12 @@ export abstract class CcFlatNodeImpl implements CcFlatNode {
   }
 
   getChildren(options?: any | undefined): CcFlatNode[] {
-    if (!!options && options.hideProhibited) {
-      return this._children.filter(e => !e.inhibited);
-    }
-    return this._children;
+    const filters = options?.filtered ? this.dataSource?.filters : undefined;
+    return filters ? filters.visibleChildren(this._children) : this._children;
   }
 
   get children(): CcFlatNode[] {
-    return this.getChildren({
-      hideProhibited: !!this.dataSource && this.dataSource.hideProhibited
-    });
+    return this.getChildren({filtered: true});
   }
 
   set children(children: CcFlatNode[]) {
@@ -743,7 +742,7 @@ export class DtScFlatNode extends CcFlatNodeImpl {
     return this.manifestId;
   }
 
-  get inhibited(): boolean {
+  get prohibited(): boolean {
     return this.dtScNode.cardinalityMin === 0 && this.dtScNode.cardinalityMax === 0;
   }
 
@@ -801,6 +800,8 @@ export class DtScFlatNode extends CcFlatNodeImpl {
 export class CcFlatNodeDatabase<T extends CcFlatNode> {
 
   dataSource: CcFlatNodeDataSource<T>;
+  readonly hideProhibitedFilter = new CcHideProhibitedFilter();
+  readonly filters = new TreeFilterSet<CcFlatNode>({childrenOf: node => node.getChildren() as CcFlatNode[]});
   _ccGraph: CcGraph;
   private _type: string;
   private _manifestId: number;
@@ -809,6 +810,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     this._ccGraph = ccGraph;
     this._type = type;
     this._manifestId = manifestId;
+    this.filters.add(this.hideProhibitedFilter);
   }
 
   get key(): string {
@@ -992,8 +994,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
   searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
     const builder = new SearchDagBuilder();
     const clones = new WeakMap<object, number>();
-    const hideProhibited = !!this.dataSource && this.dataSource.hideProhibited;
-    const shown = (nodes: T[]): T[] => hideProhibited ? nodes.filter(e => !e.inhibited) : nodes;
+    const shown = (nodes: T[]): T[] => this.filters.visibleChildren(nodes);
     const representatives: T[] = [];
     let cloneCount = 0;
 
@@ -1121,8 +1122,6 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
   listeners: ChangeListener<DataSource<T>>[] = [];
   dataChange = new BehaviorSubject<T[]>([]);
 
-  _hideProhibited = false;
-
   addListener(listener: ChangeListener<CcFlatNodeDataSource<T>>) {
     if (!!listener && this.listeners.indexOf(listener) === -1) {
       this.listeners.push(listener);
@@ -1171,22 +1170,26 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
     }
   }
 
+  get filters(): TreeFilterSet<CcFlatNode> {
+    return this._database.filters;
+  }
+
   get hideProhibited(): boolean {
-    return this._hideProhibited;
+    return this.filters.isActive(HIDE_PROHIBITED_FILTER);
   }
 
   set hideProhibited(hideProhibited: boolean) {
-    if (this._hideProhibited === hideProhibited) {
-      return;
-    }
+    this.filters.setActive(HIDE_PROHIBITED_FILTER, hideProhibited);
+  }
 
-    this._hideProhibited = hideProhibited;
-    if (hideProhibited) {
-      this.data = this.data.filter(e => !e.inhibited);
+  /** Rebuilds the rows after a filter was switched on or off. */
+  private onFilterChange({filter, active}: TreeFilterChange<CcFlatNode>) {
+    this.data.forEach(e => {
+      (e as CcFlatNode).expandable = undefined;
+    });
+    if (active) {
+      this.data = this.data.filter(e => this.filters.passes(e));
     } else {
-      this.data.forEach(e => {
-        (e as CcFlatNode).expandable = undefined;
-      });
       const expandedData = this.data.filter(e => this.isExpanded(e));
       this.collapse(this.data[0] as T);
       this.data = [this.data[0], ];
@@ -1196,7 +1199,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
       }
     }
 
-    this.listeners.forEach(e => e.onChange(this, 'hideProhibited', hideProhibited));
+    this.listeners.forEach(e => e.onChange(this, filter.id, active));
   }
 
   insertNodes(nodes: T[], siblingIndex: number) {
@@ -1264,6 +1267,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
     private delegatedListeners?: ChangeListener<T>[]
   ) {
     _database.dataSource = this;
+    _database.filters.changes$.subscribe(change => this.onFilterChange(change));
   }
 
   connect(collectionViewer: CollectionViewer): Observable<readonly T[]> {
@@ -1383,10 +1387,7 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
       return false;
     }
 
-    let children = this._database.children(node);
-    if (this.hideProhibited) {
-      children = children.filter(e => !e.inhibited);
-    }
+    const children = this.filters.visibleChildren(this._database.children(node));
     const index = this.data.map(e => e.hashPath).indexOf(node.hashPath);
     if (!children || index < 0) {
       // If no children, or cannot find the node, no op
@@ -1454,7 +1455,7 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
   }
 
   onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
-    if (propertyName === 'hideProhibited') {
+    if (propertyName === HIDE_PROHIBITED_FILTER) {
       this.resetSearch();
     }
   }
