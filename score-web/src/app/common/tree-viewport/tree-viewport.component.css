@@ -22,21 +22,15 @@ score-tree-viewport .mat-tree-node div {
   height: 20px;
 }
 
-score-tree-viewport .mat-tree-node > .node-label,
-score-tree-viewport .mat-tree-node > .node-cardinality {
+/* What follows a name (decorations, tags) brings its own gap; the cardinality has the same one in every tree. */
+score-tree-viewport .mat-tree-node > .node-label {
   cursor: pointer;
   padding-right: 2px !important;
-  margin-right: 10px;
 }
 
-/* BIE-style rows (BIE edit, model browser, uplift) have no gap after the label and cardinality. */
-score-tree-viewport .mat-tree-node > .node-label.node-tight {
-  margin-right: 0;
-}
-
-score-tree-viewport .mat-tree-node > .node-cardinality.node-tight {
-  padding-right: 0 !important;
-  margin-right: 0;
+score-tree-viewport .mat-tree-node .node-cardinality {
+  cursor: pointer;
+  margin-left: 18px;
 }
 
 score-tree-viewport .mat-tree-node .deprecated {
@@ -100,9 +94,14 @@ score-tree-viewport .mat-tree-node > .tree-row-actions {
   padding-left: 8px;
 }
 
-score-tree-viewport .mat-tree-node > .node-cardinality,
-score-tree-viewport .mat-tree-node > .node-status-icon {
+score-tree-viewport .mat-tree-node .node-cardinality,
+score-tree-viewport .mat-tree-node .node-status-icon {
   flex: 0 0 auto;
+}
+
+/* A status icon that asks the user to do something (for example, to select the BIE a node must reuse). */
+score-tree-viewport .mat-tree-node .node-status-icon.warn {
+  color: #ff5722;
 }
 
 score-tree-viewport .tag-list {

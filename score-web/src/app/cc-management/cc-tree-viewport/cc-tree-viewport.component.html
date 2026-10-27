@@ -16,20 +16,14 @@
     </span>
 
     @if (isInvalidState(node)) {
-      <div class="ps-2 align-self-center">
+      <div class="ps-3 align-self-center">
         <mat-icon matTooltip="Invalid state">error</mat-icon>
       </div>
     }
 
     <score-tree-decorations [node]="node" [decorators]="decorators"/>
 
-    @if (!dataSource.hideCardinality && node.cardinalityMin !== undefined && node.cardinalityMax !== undefined) {
-      <span class="node-cardinality ps-2">
-        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-      </span>
-    }
-
-    <div class="tag-list ps-2">
+    <div class="tag-list ps-3">
       @for (tag of node.tagList; track tag) {
         <span class="tag ms-2" [style.background-color]="tag.backgroundColor"
               [style.color]="tag.textColor">{{ tag.name }}</span>

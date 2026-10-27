@@ -2,8 +2,6 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChi
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatMenuPanel} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {FaIconComponent} from '@fortawesome/angular-fontawesome';
-import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {ScoreCommonModule} from '../../../common/score-common.module';
 import {TreeNodeDecorationsComponent} from '../../../common/tree-viewport/tree-node-decorations.component';
 import {TreeNodeDecorator} from '../../../common/tree-viewport/tree-decorator';
@@ -23,7 +21,6 @@ export interface BieUpliftTreeRowHost {
 
   checkMatch(event: any, node: BieUpliftTargetFlatNode): void;
 
-  matchReused(node: BieUpliftTargetFlatNode): void;
 }
 
 /**
@@ -34,8 +31,7 @@ export interface BieUpliftTreeRowHost {
   selector: 'score-bie-uplift-tree-viewport',
   templateUrl: './bie-uplift-tree-viewport.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: './bie-uplift-tree-viewport.component.css',
-  imports: [ScoreCommonModule, MatCheckboxModule, MatTooltipModule, FaIconComponent, TreeViewportComponent, TreeNodeDecorationsComponent]
+  imports: [ScoreCommonModule, MatCheckboxModule, MatTooltipModule, TreeViewportComponent, TreeNodeDecorationsComponent]
 })
 export class BieUpliftTreeViewportComponent<N extends BieFlatNode = BieFlatNode> {
 
@@ -53,9 +49,6 @@ export class BieUpliftTreeViewportComponent<N extends BieFlatNode = BieFlatNode>
   @Output() contextMenuOpen = new EventEmitter<N>();
 
   @ViewChild(TreeViewportComponent, {static: true}) tree: TreeViewportComponent<N>;
-
-  faRecycle = faRecycle;
-  faCircleExclamation = faCircleExclamation;
 
   /** Only a node that has children has a context menu. */
   readonly menuOf = (node: N) => this.dataSource.isExpandable(node) ? this.contextMenu : null;

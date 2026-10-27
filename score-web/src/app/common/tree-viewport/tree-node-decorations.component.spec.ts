@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {faRecycle} from '@fortawesome/free-solid-svg-icons';
 import {TreeNodeDecoration, TreeNodeDecorator} from './tree-decorator';
 import {TreeNodeDecorationsComponent} from './tree-node-decorations.component';
 
@@ -123,6 +124,79 @@ describe('TreeNodeDecorationsComponent', () => {
       decorations()[0].click();
 
       expect(host.rowClicks).toBe(1);
+    });
+  });
+
+  describe('a text', () => {
+    it('is drawn as it is, with the classes the feature gives', () => {
+      render([decorator(() => [{text: '0..3', cssClass: 'node-cardinality ps-2'}])]);
+
+      const text = decorations()[0];
+      expect(text.tagName).toBe('SPAN');
+      expect(text.textContent?.trim()).toBe('0..3');
+      expect(text.classList).toContain('node-cardinality');
+      expect(text.querySelector('mat-icon')).toBeNull();
+    });
+
+    it('is drawn when it is an empty string', () => {
+      render([decorator(() => [{text: ''}])]);
+
+      expect(decorations().length).toBe(1);
+    });
+  });
+
+  describe('a Font Awesome icon', () => {
+    it('is drawn with the classes and the tooltip of the feature, and is not a Material icon', () => {
+      render([decorator(() => [{faIcon: faRecycle, tooltip: 'Reused', cssClass: 'node-status-icon ps-3 pointer'}])]);
+
+      const icon = decorations()[0];
+      expect(icon.tagName).toBe('FA-ICON');
+      expect(icon.classList).toContain('node-status-icon');
+      expect(icon.querySelector('svg')).not.toBeNull();
+      expect(icon.querySelector('mat-icon')).toBeNull();
+    });
+
+    it('runs what the click does, with the click', () => {
+      const clicks: MouseEvent[] = [];
+      render([decorator(() => [{faIcon: faRecycle, onClick: event => clicks.push(event)}])]);
+
+      decorations()[0].click();
+
+      expect(clicks.length).toBe(1);
+      expect(clicks[0].type).toBe('click');
+    });
+
+    it('is only shown without a click: a click on it is a click on the row', () => {
+      render([decorator(() => [{faIcon: faRecycle}])]);
+
+      decorations()[0].click();
+
+      expect(host.rowClicks).toBe(1);
+    });
+  });
+
+  describe('the order', () => {
+    it('is the order of the decorators, whatever they show', () => {
+      render([
+        decorator(() => [{text: 'first'}]),
+        decorator(() => [{faIcon: faRecycle, cssClass: 'second'}]),
+        decorator(() => [{icon: 'bolt', cssClass: 'third'}, {text: 'fourth'}])
+      ]);
+
+      const shown = decorations().map(e => e.textContent?.trim() || e.className);
+      expect(shown[0]).toBe('first');
+      expect(shown[1]).toContain('second');
+      expect(shown[2]).toContain('bolt');
+      expect(shown[3]).toBe('fourth');
+    });
+
+    it('changes with the decorators, not with the feature', () => {
+      const a = decorator(() => [{text: 'a'}]);
+      const b = decorator(() => [{text: 'b'}]);
+
+      render([b, a]);
+
+      expect(decorations().map(e => e.textContent?.trim())).toEqual(['b', 'a']);
     });
   });
 });

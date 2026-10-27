@@ -43,6 +43,8 @@ import {
   ModelBrowserTreeRowHost,
   ModelBrowserTreeViewportComponent
 } from './model-browser-tree-viewport/model-browser-tree-viewport.component';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 
 
 @Component({
@@ -94,17 +96,14 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
   private validTargetHashPaths = new Set<string>();
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'ModelBrowser-Settings-Hide-Cardinality';
   HIDE_ORDER_WEIGHTS_PROPERTY_KEY = 'ModelBrowser-Settings-Hide-Order-Weights';
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<ModelBrowserNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'ModelBrowser-Settings-Hide-Cardinality'});
 
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows after the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<ModelBrowserNode>[] = [this.cardinality];
 
   get hideOrderWeights(): boolean {
     return this.dataSource.hideOrderWeights;
@@ -152,7 +151,7 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
       this.searcher?.dispose();
       this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
       // Issue #1638 follow-up: order weights are developer-managed, so the display defaults to hidden
       // for end-users and shown for developers — still a per-user, persisted preference either way.
       this.dataSource.hideOrderWeights = loadBooleanProperty(

@@ -48,7 +48,7 @@ import {SearchOptionsService} from '../search-options-dialog/domain/search-optio
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
+import {initFilter, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
@@ -59,6 +59,8 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 
 @Component({
   standalone: false,
@@ -136,16 +138,12 @@ export class BccpDetailComponent implements OnInit, CcTreeValidationHost {
   @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<CcFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'CC-Settings-Hide-Cardinality'});
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows besides the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
 
   private redirectToCcList() {
     this.isUpdating = false;
@@ -225,7 +223,7 @@ export class BccpDetailComponent implements OnInit, CcTreeValidationHost {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       this.workingRelease = bccpDetails.release.workingRelease;
 
@@ -392,7 +390,7 @@ export class BccpDetailComponent implements OnInit, CcTreeValidationHost {
       }
 
       // Recover the state of 'Hide Cardinality' property.
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});

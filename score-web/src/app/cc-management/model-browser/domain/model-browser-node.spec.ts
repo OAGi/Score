@@ -255,7 +255,7 @@ describe('ModelBrowserNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', 
 describe('ModelBrowserNodeDataSource.hideOrderWeights (#1638 follow-up — order-weight badge visibility)', () => {
   // The order-weight badge display is a per-user preference gated on this flag (default hidden for
   // end-users, shown for developers). The flag lives on the data source so the template reacts to it,
-  // and change listeners are notified (same wiring as hideCardinality).
+  // and change listeners are notified.
   function newDs(): ModelBrowserNodeDataSource<any> {
     return new ModelBrowserNodeDataSource<any>(newDb(), null as any);
   }

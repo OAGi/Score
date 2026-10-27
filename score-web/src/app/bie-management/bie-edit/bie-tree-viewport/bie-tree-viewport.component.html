@@ -19,7 +19,7 @@
 
   <ng-template #content let-node>
     @if (host.renamingNode !== node) {
-      <span class="node-label node-tight"
+      <span class="node-label"
             [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
             [class.deprecated]="node.deprecated"
             [matTooltip]="node.deprecated ? 'Deprecated' : ''"
@@ -27,18 +27,6 @@
             [innerHTML]="(node.displayName ? node.displayName : node.name) | highlight : searcher.keywordFor(node, (node.displayName ? node.displayName : node.name))"
             (dblclick)="host.startChangingDisplayName(node)">
       </span>
-      @if (!dataSource.hideCardinality) {
-        <span class="node-cardinality node-tight ps-4">
-          {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-        </span>
-      }
-      @if (node.reused) {
-        <fa-icon [icon]="faRecycle" matTooltip="Reused" class="node-status-icon ps-3 pointer"
-                 (click)="host.openNewEditBieTab(node, $event)"></fa-icon>
-      }
-      @if (node.inherited) {
-        <fa-icon [icon]="faSitemap" matTooltip="Inherited" class="node-status-icon ps-3 pointer"></fa-icon>
-      }
       <score-tree-decorations [node]="node" [decorators]="decorators"/>
     } @else {
       <div class="node-edit-container d-flex flex-column">

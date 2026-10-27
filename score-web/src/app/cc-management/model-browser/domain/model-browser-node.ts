@@ -1307,7 +1307,6 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
   _listeners: ChangeListener<ModelBrowserNodeDataSource<T>>[] = [];
 
   _hideUnused = false;
-  _hideCardinality = false;
   _hideOrderWeights = false;
 
   get data(): T[] {
@@ -1343,19 +1342,6 @@ export class ModelBrowserNodeDataSource<T extends ModelBrowserNode> implements D
     if (!!this.delegatedListeners) {
       this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
     }
-  }
-
-  get hideCardinality(): boolean {
-    return this._hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    if (this._hideCardinality === hideCardinality) {
-      return;
-    }
-
-    this._hideCardinality = hideCardinality;
-    this._listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
   }
 
   get hideOrderWeights(): boolean {

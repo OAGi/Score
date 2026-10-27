@@ -60,7 +60,7 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
+import {initFilter, trim, UnboundedPipe} from '../../common/utility';
 import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
@@ -88,6 +88,8 @@ import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {ValidationService} from '../../validation/validation.service';
 import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 
 @Component({
   standalone: false,
@@ -175,16 +177,12 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
   @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<CcFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'CC-Settings-Hide-Cardinality'});
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows besides the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
 
   private redirectToCcList() {
     this.isUpdating = false;
@@ -270,7 +268,7 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       this.workingRelease = accDetails.release.workingRelease;
 
@@ -454,7 +452,7 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       this.originalName = undefined;
 
       // Recover the state of 'Hide Cardinality' property.
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});

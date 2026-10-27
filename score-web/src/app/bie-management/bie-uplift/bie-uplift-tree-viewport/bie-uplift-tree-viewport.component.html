@@ -19,7 +19,7 @@
   </ng-template>
 
   <ng-template #content let-node>
-    <span class="node-label node-tight"
+    <span class="node-label"
           [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
                     searcher.isSearchResult(node) ? 'inside' : 'outside']"
           [class.deprecated]="node.deprecated"
@@ -27,28 +27,6 @@
           [class.search-index]="searcher.isCurrentSearchIndex(node)"
           [innerHTML]="(side === 'source' && node.displayName ? node.displayName : node.name) | highlight : searcher.keywordFor(node, (side === 'source' && node.displayName ? node.displayName : node.name))">
     </span>
-
-    @if (!dataSource.hideCardinality) {
-      <span class="node-cardinality node-tight ps-4">
-        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-      </span>
-    }
-
-    @if (side === 'source') {
-      @if (node.reused) {
-        <fa-icon [icon]="faRecycle" matTooltip="Reused" class="node-status-icon ps-3 pointer"></fa-icon>
-      }
-    } @else {
-      @if (node.source && node.source.reused &&
-      (node.reusedTopLevelAsbiepId === undefined || node.reusedTopLevelAsbiepId === null)) {
-        <fa-icon [icon]="faCircleExclamation" matTooltip="Select BIE" class="node-status-icon ps-3 pointer warn"
-                 (click)="host.matchReused(node)"></fa-icon>
-      }
-      @if (node.reusedTopLevelAsbiepId !== undefined && node.reusedTopLevelAsbiepId !== null) {
-        <fa-icon [icon]="faRecycle" matTooltip="Reused" class="node-status-icon ps-3 pointer"
-                 (click)="host.matchReused(node)"></fa-icon>
-      }
-    }
 
     <score-tree-decorations [node]="node" [decorators]="decorators"/>
   </ng-template>

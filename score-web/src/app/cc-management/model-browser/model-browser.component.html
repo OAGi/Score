@@ -17,7 +17,7 @@
         </div>
         <mat-menu class="context-menu" #settingsContextMenu="matMenu">
           <button mat-menu-item [id]="'bie-settings-hide-cardinality'">
-            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="cardinality.hidden">
               <span>Hide cardinality</span>
             </mat-checkbox>
           </button>
@@ -30,7 +30,7 @@
       }
     </ng-container>
     <ng-container treeDetailTree>
-      <score-model-browser-tree-viewport #tree [dataSource]="dataSource" [searcher]="searcher" [host]="this"
+      <score-model-browser-tree-viewport #tree [dataSource]="dataSource" [decorators]="decorators" [searcher]="searcher" [host]="this"
                                          [(cursorNode)]="cursorNode" [height]="treeDetail.treeHeight"
                                          [contextMenu]="contextMenu" [leafContextMenu]="contextMenuForLeaf"
                                          [isDraggable]="canReorderNode" [canDrop]="canDrop" [dropInvalid]="dropInvalid"

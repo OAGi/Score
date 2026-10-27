@@ -9,6 +9,8 @@ import {
   ModelBrowserNodeDataSource,
   ModelBrowserNodeDataSourceSearcher
 } from '../domain/model-browser-node';
+import {TreeNodeDecorationsComponent} from '../../../common/tree-viewport/tree-node-decorations.component';
+import {TreeNodeDecorator} from '../../../common/tree-viewport/tree-decorator';
 
 export interface ChoiceGuide {
   offset: number;
@@ -36,7 +38,7 @@ export interface ModelBrowserTreeRowHost {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './model-browser-tree-viewport.component.css',
   encapsulation: ViewEncapsulation.None,
-  imports: [ScoreCommonModule, MatTooltipModule, TreeViewportComponent]
+  imports: [ScoreCommonModule, MatTooltipModule, TreeViewportComponent, TreeNodeDecorationsComponent]
 })
 export class ModelBrowserTreeViewportComponent {
 
@@ -51,6 +53,8 @@ export class ModelBrowserTreeViewportComponent {
   @Input() isDraggable: (node: ModelBrowserNode) => boolean = () => false;
   @Input() canDrop: () => boolean = () => true;
   @Input() dropInvalid = false;
+  /** What features show on the rows; the tree draws them after the names. */
+  @Input() decorators: TreeNodeDecorator<ModelBrowserNode>[] = [];
 
   @Output() cursorNodeChange = new EventEmitter<ModelBrowserNode>();
   @Output() nodeClick = new EventEmitter<ModelBrowserNode>();

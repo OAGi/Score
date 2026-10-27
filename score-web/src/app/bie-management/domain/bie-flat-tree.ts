@@ -3388,7 +3388,6 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
   _listeners: ChangeListener<BieFlatNodeDataSource<T>>[] = [];
 
   _hideUnused = false;
-  _hideCardinality = false;
   searcher: BieFlatNodeDataSourceSearcher<T>;
 
   get data(): T[] {
@@ -3510,19 +3509,6 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
     if (!!this.delegatedListeners) {
       this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
     }
-  }
-
-  get hideCardinality(): boolean {
-    return this._hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    if (this._hideCardinality === hideCardinality) {
-      return;
-    }
-
-    this._hideCardinality = hideCardinality;
-    this._listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
   }
 
   get hideUnused(): boolean {

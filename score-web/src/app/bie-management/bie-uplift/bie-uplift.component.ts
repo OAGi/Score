@@ -35,6 +35,9 @@ import {saveBooleanProperty} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {Title} from '@angular/platform-browser';
 import {formatAppTitle} from '../../common/app-title.strategy';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {BieUpliftSourceStatusDecorator, BieUpliftTargetStatusDecorator} from '../domain/bie-tree-decorators';
 
 function loadAndWrapUpliftChildren<T extends BieFlatNode>(
   node: T,
@@ -212,6 +215,14 @@ export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost
   targetDataSource: BieFlatNodeDataSource<BieUpliftTargetFlatNode>;
   sourceSearcher: BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>;
   targetSearcher: BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>;
+
+  /** What each of the two trees shows after the names of the nodes, in this order. */
+  readonly sourceCardinality = new CardinalityDecorator<BieUpliftSourceFlatNode>();
+  readonly targetCardinality = new CardinalityDecorator<BieUpliftTargetFlatNode>();
+  readonly sourceDecorators: TreeNodeDecorator<BieUpliftSourceFlatNode>[] =
+    [this.sourceCardinality, new BieUpliftSourceStatusDecorator()];
+  readonly targetDecorators: TreeNodeDecorator<BieUpliftTargetFlatNode>[] =
+    [this.targetCardinality, new BieUpliftTargetStatusDecorator(node => this.matchReused(node))];
 
   sourceSelectedNode: BieUpliftSourceFlatNode;
   targetSelectedNode: BieUpliftTargetFlatNode;

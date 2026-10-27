@@ -1,22 +1,33 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {TreeNodeDecoration, TreeNodeDecorator} from './tree-decorator';
 
 /**
- * Draws what the decorators of a tree show on the row of a node. A tree puts it in the row where the decorations
- * belong (the row template of each kind of tree), and gives it the node and the decorators.
+ * Draws what the decorators of a tree show on the row of a node, in the order of the decorators. A tree puts it in the
+ * row where the decorations belong (the row template of each kind of tree), and gives it the node and the decorators.
  */
 @Component({
   selector: 'score-tree-decorations',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIconModule, MatTooltipModule],
+  imports: [MatIconModule, MatTooltipModule, FaIconComponent],
+  // The element takes no place of its own, so what it draws lies in the row as if the row had drawn it.
+  styles: [':host { display: contents; }'],
   template: `
     @for (decoration of decorations(); track $index) {
-      @if (decoration.onClick) {
+      @if (decoration.text !== undefined) {
+        <span class="tree-decoration {{ decoration.cssClass }}" [attr.id]="decoration.id"
+              [style.opacity]="decoration.opacity ?? 1" [style.color]="decoration.color"
+              [matTooltip]="decoration.tooltip ?? ''">{{ decoration.text }}</span>
+      } @else if (decoration.faIcon) {
+        <fa-icon [icon]="decoration.faIcon" class="tree-decoration {{ decoration.cssClass }}" [attr.id]="decoration.id"
+                 [style.opacity]="decoration.opacity ?? 1" [style.color]="decoration.color"
+                 [matTooltip]="decoration.tooltip ?? ''" (click)="decoration.onClick?.($event)"/>
+      } @else if (decoration.onClick) {
         <button type="button" class="tree-decoration ps-2 d-inline-flex align-items-center align-self-center {{ decoration.cssClass }}"
                 [attr.id]="decoration.id" style="border: 0; background: transparent; cursor: pointer; padding-top: 0; padding-bottom: 0;"
-                [style.opacity]="decoration.opacity ?? 1" (click)="decoration.onClick(); $event.stopPropagation()">
+                [style.opacity]="decoration.opacity ?? 1" (click)="decoration.onClick($event); $event.stopPropagation()">
           <mat-icon style="width: 18px; height: 18px; font-size: 18px; line-height: 18px;" [style.color]="decoration.color"
                     [matTooltip]="decoration.tooltip ?? ''" [matTooltipClass]="decoration.tooltipClass ?? ''">{{ decoration.icon }}</mat-icon>
         </button>

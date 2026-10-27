@@ -47,7 +47,7 @@
                 <mat-menu class="context-menu" #sourceSettingsContextMenu="matMenu">
                   <button mat-menu-item>
                     <mat-checkbox class="d-inline-flex pe-2"
-                      [(ngModel)]="sourceDataSource.hideCardinality">
+                      [(ngModel)]="sourceCardinality.hidden">
                       <span>Hide cardinality</span>
                     </mat-checkbox>
                   </button>
@@ -62,7 +62,7 @@
           <!-- Source BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <score-bie-uplift-tree-viewport #sourceTree side="source" [dataSource]="sourceDataSource" [searcher]="sourceSearcher" [host]="this"
+              <score-bie-uplift-tree-viewport #sourceTree side="source" [dataSource]="sourceDataSource" [searcher]="sourceSearcher" [host]="this" [decorators]="sourceDecorators"
                 [selectedNode]="sourceSelectedNode" [height]="innerHeight" [contextMenu]="contextMenu"
                 (nodeClick)="onSourceClick($event)" (contextMenuOpen)="contextMenuItem = $event"></score-bie-uplift-tree-viewport>
             </mat-card-content>
@@ -90,7 +90,7 @@
                 <mat-menu class="context-menu" #targetSettingsContextMenu="matMenu">
                   <button mat-menu-item>
                     <mat-checkbox class="d-inline-flex pe-2"
-                      [(ngModel)]="targetDataSource.hideCardinality">
+                      [(ngModel)]="targetCardinality.hidden">
                       <span>Hide cardinality</span>
                     </mat-checkbox>
                   </button>
@@ -105,7 +105,7 @@
           <!-- Target BIE -->
           <mat-card class="bie-node-tree-panel overflow-auto">
             <mat-card-content class="mat-card-container">
-              <score-bie-uplift-tree-viewport #targetTree side="target" [dataSource]="targetDataSource" [searcher]="targetSearcher" [host]="this"
+              <score-bie-uplift-tree-viewport #targetTree side="target" [dataSource]="targetDataSource" [searcher]="targetSearcher" [host]="this" [decorators]="targetDecorators"
                 [selectedNode]="targetSelectedNode" [height]="innerHeight" [contextMenu]="contextMenu"
                 (nodeClick)="onTargetClick($event)" (contextMenuOpen)="contextMenuItem = $event"></score-bie-uplift-tree-viewport>
             </mat-card-content>

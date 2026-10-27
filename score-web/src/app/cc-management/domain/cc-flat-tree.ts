@@ -1121,7 +1121,6 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
   listeners: ChangeListener<DataSource<T>>[] = [];
   dataChange = new BehaviorSubject<T[]>([]);
 
-  _hideCardinality = false;
   _hideProhibited = false;
 
   addListener(listener: ChangeListener<CcFlatNodeDataSource<T>>) {
@@ -1170,19 +1169,6 @@ export class CcFlatNodeDataSource<T extends CcFlatNode> implements DataSource<T>
     if (!!this.delegatedListeners) {
       this.delegatedListeners.forEach(e => e.onChange(entity, propertyName, val));
     }
-  }
-
-  get hideCardinality(): boolean {
-    return this._hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    if (this._hideCardinality === hideCardinality) {
-      return;
-    }
-
-    this._hideCardinality = hideCardinality;
-    this.listeners.forEach(e => e.onChange(this, 'hideCardinality', hideCardinality));
   }
 
   get hideProhibited(): boolean {

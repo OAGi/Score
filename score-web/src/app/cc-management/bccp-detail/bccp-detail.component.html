@@ -120,7 +120,7 @@
         }
         <mat-menu class="context-menu" #settingsContextMenu="matMenu">
           <button mat-menu-item [id]="'cc-settings-hide-cardinality'">
-            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="hideCardinality">
+            <mat-checkbox class="d-inline-flex pe-2" [(ngModel)]="cardinality.hidden">
               <span>Hide cardinality</span>
             </mat-checkbox>
           </button>
@@ -132,7 +132,7 @@
                               [height]="treeDetail.treeHeight" [contextMenu]="contextMenu"
                               (nodeClick)="onClick($event)" (nodeKey)="onTreeKey($event)"
                               (copyLink)="copyLink($event)" (contextMenuOpen)="contextMenuItem = $event"
-                              [decorators]="validation.decorators">
+                              [decorators]="decorators">
       </score-cc-tree-viewport>
 
       <mat-menu class="context-menu" #contextMenu="matMenu">

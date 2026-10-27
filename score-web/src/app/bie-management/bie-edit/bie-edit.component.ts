@@ -95,6 +95,9 @@ import {
   OasDocConfirmMessageDialogComponent,
   OasDocConfirmMessageDialogResult
 } from '../openapi-doc/oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {BieStatusDecorator} from '../domain/bie-tree-decorators';
 
 
 @Component({
@@ -261,17 +264,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
   @ViewChildren('businessTermChipGrid', {read: ElementRef}) businessTermChipGridElements: QueryList<ElementRef<HTMLElement>>;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'BIE-Settings-Hide-Cardinality';
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<BieFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'BIE-Settings-Hide-Cardinality'});
 
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows after the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<BieFlatNode>[] = [this.cardinality,
+    new BieStatusDecorator((node, event) => this.openNewEditBieTab(node, event))];
 
   get hideUnused(): boolean {
     return this.dataSource.hideUnused;
@@ -345,7 +346,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
         this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
-        this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+        this.cardinality.restore();
         this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
         // Issue #1254
@@ -991,7 +992,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
         }
 
         // Recover the state of 'Hide Cardinality' and 'Hide Unused' properties.
-        this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+        this.cardinality.restore();
         this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
         this.loading = false;

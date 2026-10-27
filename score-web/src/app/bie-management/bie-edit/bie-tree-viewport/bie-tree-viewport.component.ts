@@ -4,8 +4,6 @@ import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
 import {MatInputModule} from '@angular/material/input';
 import {MatMenuPanel} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {FaIconComponent} from '@fortawesome/angular-fontawesome';
-import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {ScoreCommonModule} from '../../../common/score-common.module';
 import {TreeNodeDecorationsComponent} from '../../../common/tree-viewport/tree-node-decorations.component';
 import {TreeNodeDecorator} from '../../../common/tree-viewport/tree-decorator';
@@ -28,15 +26,14 @@ export interface BieTreeRowHost {
 
   stopChangingDisplayName(revert?: boolean): void;
 
-  openNewEditBieTab(node: BieFlatNode, event?: MouseEvent): void;
 }
 
-/** The node tree of the BIE edit screen: Used checkbox, display name (editable in place), cardinality and status icons. */
+/** The node tree of the BIE edit screen: Used checkbox, display name (editable in place), and what the decorators show. */
 @Component({
   selector: 'score-bie-tree-viewport',
   templateUrl: './bie-tree-viewport.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ScoreCommonModule, FormsModule, MatCheckboxModule, MatInputModule, MatTooltipModule, FaIconComponent,
+  imports: [ScoreCommonModule, FormsModule, MatCheckboxModule, MatInputModule, MatTooltipModule,
     TreeViewportComponent, TreeNodeDecorationsComponent]
 })
 export class BieTreeViewportComponent {
@@ -57,9 +54,6 @@ export class BieTreeViewportComponent {
   @Output() contextMenuOpen = new EventEmitter<BieFlatNode>();
 
   @ViewChild(TreeViewportComponent, {static: true}) tree: TreeViewportComponent<BieFlatNode>;
-
-  faRecycle = faRecycle;
-  faSitemap = faSitemap;
 
   readonly isActionsHidden = (node: BieFlatNode) => this.host?.renamingNode === node;
 

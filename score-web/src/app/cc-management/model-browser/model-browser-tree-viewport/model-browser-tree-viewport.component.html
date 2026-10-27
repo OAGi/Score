@@ -22,7 +22,7 @@
 
   <ng-template #content let-node>
     @let orderWeight = host.currentWeightOf(node);
-    <span class="node-label node-tight"
+    <span class="node-label"
           [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
           [class.deprecated]="node.deprecated"
           [matTooltip]="node.deprecated ? 'Deprecated' : ''"
@@ -30,11 +30,7 @@
           [innerHTML]="node.name | highlight : searcher.keywordFor(node, node.name)">
     </span>
 
-    @if (!dataSource.hideCardinality) {
-      <span class="node-cardinality node-tight ps-4">
-        {{ node.cardinalityMin + '..' + ((node.cardinalityMax === -1) ? '&infin;' : node.cardinalityMax) }}
-      </span>
-    }
+    <score-tree-decorations [node]="node" [decorators]="decorators"/>
 
     <!-- Issue #1638: a sibling with a custom order weight shows it as a small badge.
          Follow-up: badge display is a per-user preference (dataSource.hideOrderWeights),
