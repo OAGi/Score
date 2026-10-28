@@ -4,7 +4,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
-import com.google.common.collect.ImmutableMap;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BIE;
@@ -59,13 +58,18 @@ import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**
- * Generates JSON Schema Draft-04 expressions for selected top-level BIEs.
+ * Generates JSON Schema expressions for selected top-level BIEs; the {@link BieJsonSchemaDialect} decides
+ * how each kind of BIE node is expressed in the JSON Schema version being generated.
+ * <p>
+ * Where the dialect supports it, this generator supports two reuse modes:
+ * 1) Inline reusable definitions under the definitions keyword (such as {@code #/$defs})
+ * 2) External-file references when split-reference mode is enabled
  */
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, InitializingBean {
+public class BieJSONGenerateExpression implements BieGenerateExpression, InitializingBean {
 
-    private static final String ID_KEYWORD = "$id";
+    private final BieJsonSchemaDialect dialect;
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ObjectMapper mapper;
 
@@ -73,6 +77,10 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
     private Map<TopLevelAsbiepId, String> reusedTopLevelAsbiepNameMap;
     private GenerateExpressionOption option;
     private ScoreUser requester;
+
+    public BieJSONGenerateExpression(BieJsonSchemaDialect dialect) {
+        this.dialect = dialect;
+    }
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -147,7 +155,10 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             Map<String, Object> definitions;
             if (root == null) {
                 root = new LinkedHashMap();
-                root.put("$schema", getJsonSchemaUri());
+                root.put("$schema", dialect.schemaUri());
+                if (dialect.idKeyword() != null) {
+                    root.put(dialect.idKeyword(), "");
+                }
                 root.put("type", "object");
 
                 root.put("required", new ArrayList());
@@ -156,11 +167,11 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
                 Map<String, Object> properties = new LinkedHashMap();
                 root.put("properties", properties);
                 definitions = new LinkedHashMap();
-                root.put("definitions", definitions);
+                root.put(dialect.definitionsKeyword(), definitions);
 
                 reusedTopLevelAsbiepNameMap = new LinkedHashMap<>();
             } else {
-                definitions = (Map<String, Object>) root.get("definitions");
+                definitions = (Map<String, Object>) root.get(dialect.definitionsKeyword());
             }
 
             /*
@@ -272,14 +283,14 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
                 properties.remove("required");
             }
 
-            properties = oneOf(allOf(properties), isNillable);
+            properties = dialect.asbie(properties, asbie, isNillable);
         }
 
         if (isArray) {
             Map<String, Object> items = new LinkedHashMap();
             items.putAll(properties);
             if (reused) {
-                items = oneOf(allOf(items), isNillable);
+                items = dialect.asbieReusedItems(items, asbie, isNillable);
             }
 
             properties = new LinkedHashMap();
@@ -325,7 +336,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         }
 
         Map<String, Object> refProperties = new HashMap<>();
-        refProperties.put("$ref", "#/definitions/" + nameForList);
+        refProperties.put("$ref", dialect.definitionRef(nameForList));
         return refProperties;
     }
 
@@ -394,7 +405,21 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             properties.put("items", items);
         }
 
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
+        properties = dialect.asbiep(properties, asbiep);
+
+        Map<String, Object> parentProperties = (Map<String, Object>) parent.get("properties");
+        if (dialect.supportsSeparateSchemaFiles() && isReferencedSchemaFile(topLevelAsbiep)) {
+            // Mirror XML "global named type" style for referenced schema files.
+            // The root property points to a named $defs type, and external refs can target it.
+            String topLevelTypeName = resolveTopLevelExternalTypeName(topLevelAsbiep, asccp, definitions);
+            definitions.putIfAbsent(topLevelTypeName, properties);
+            Map<String, Object> refProperty = new LinkedHashMap<>();
+            refProperty.put("$ref", dialect.definitionRef(topLevelTypeName));
+            parentProperties.put(name, refProperty);
+            return;
+        }
+
+        parentProperties.put(name, properties);
     }
 
     private void attachBiePackageAttributes(Map<String, Object> properties, Map<String, Object> definitions,
@@ -440,24 +465,16 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         String ref = fillDefinitions(definitions, xbt);
 
         Map<String, Object> attrProps = new LinkedHashMap<>();
-        attrProps.put("allOf", Arrays.asList(Map.of("$ref", ref)));
-        attrProps.put("enum", Arrays.asList(hasLength(value) ? value : ""));
+        attrProps.put("$ref", ref);
+        dialect.fixedValue(attrProps, hasLength(value) ? value : "");
 
         properties.put(name, attrProps);
 
         return true;
     }
 
-    protected String getJsonSchemaUri() {
-        return "http://json-schema.org/draft-04/schema#";
-    }
-
-    protected String getXbtJsonSchemaMap(XbtSummaryRecord xbt) {
-        return xbt.jbtDraft05Map();
-    }
-
-    protected Map<String, Object> toProperties(XbtSummaryRecord xbt) {
-        String jbtDraft05Map = getXbtJsonSchemaMap(xbt);
+    private Map<String, Object> toProperties(XbtSummaryRecord xbt) {
+        String jbtDraft05Map = dialect.xbtJsonSchemaMap(xbt);
         try {
             return mapper.readValue(jbtDraft05Map, LinkedHashMap.class);
         } catch (JacksonException e) {
@@ -499,7 +516,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             definitions.put(componentName, content);
         }
 
-        return "#/definitions/" + componentName;
+        return dialect.definitionRef(componentName);
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -513,7 +530,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             definitions.put(builtInType, content);
         }
 
-        return "#/definitions/" + builtInType;
+        return dialect.definitionRef(builtInType);
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -566,7 +583,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             definitions.put(codeListName, properties);
         }
 
-        return "#/definitions/" + codeListName;
+        return dialect.definitionRef(codeListName);
     }
 
     private String fillDefinitions(Map<String, Object> definitions,
@@ -588,7 +605,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             definitions.put(agencyListTypeName, properties);
         }
 
-        return "#/definitions/" + agencyListTypeName;
+        return dialect.definitionRef(agencyListTypeName);
     }
 
     private void fillProperties(Map<String, Object> parent,
@@ -616,8 +633,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
                 oneOf.add(item);
             }
 
-            parent.clear();
-            parent.put("oneOf", oneOf);
+            dialect.abieChoice(parent, oneOf, abie);
         } else {
             for (BIE bie : children) {
                 fillProperties(parent, definitions, bie, generationContext);
@@ -696,28 +712,16 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             parentRequired.add(name);
         }
 
-        // Issue #596
-        if (bbie.valueConstraint() != null) {
-            if (StringUtils.hasLength(bbie.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbie.valueConstraint().fixedValue()));
-            } else if (StringUtils.hasLength(bbie.valueConstraint().defaultValue())) {
-                properties.put("default", bbie.valueConstraint().defaultValue());
-            }
-        }
-
-        // Issue #692
-        String exampleText = bbie.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("examples", Arrays.asList(exampleText));
-        }
+        // Issue #596, Issue #692
+        dialect.bbieKeywords(properties, bbie, bbie.example());
 
         // Issue #564
         String ref = getReference(definitions, bbie, bdt, generationContext);
+        dialect.adaptToReference(properties, ref, definitions);
         List<BbieScSummaryRecord> bbieScList = generationContext.queryBBIESCs(bbie)
                 .stream().filter(e -> e.cardinality().max() != 0).collect(Collectors.toList());
         if (bbieScList.isEmpty()) {
-            properties.put("$ref", ref);
-            properties = oneOf(allOf(properties), isNillable);
+            properties = dialect.bbie(properties, ref, bbie, isNillable);
         } else {
             properties.put("type", "object");
             properties.put("required", new ArrayList());
@@ -726,7 +730,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
 
             Map<String, Object> contentProperties = new LinkedHashMap();
             contentProperties.put("$ref", ref);
-            for (String key : Arrays.asList("enum", "default", "examples")) {
+            for (String key : dialect.scContentCopyKeys()) {
                 if (properties.containsKey(key)) {
                     contentProperties.put(key, properties.remove(key));
                 }
@@ -734,7 +738,7 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
 
             ((List<String>) properties.get("required")).add("content");
             ((Map<String, Object>) properties.get("properties"))
-                    .put("content", oneOf(allOf(contentProperties), isNillable));
+                    .put("content", dialect.bbieContent(contentProperties, bbie, isNillable));
 
             for (BbieScSummaryRecord bbieSc : bbieScList) {
                 fillProperties(properties, definitions, bbieSc, generationContext);
@@ -761,71 +765,52 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Map<String, Object> allOf(Map<String, Object> properties) {
-        if (properties.containsKey("$ref") && properties.size() > 1) {
-            Map<String, Object> prop = new LinkedHashMap();
-            Map<String, Object> refMap = ImmutableMap.<String, Object>builder()
-                    .put("$ref", properties.remove("$ref"))
-                    .build();
-            prop.put("allOf", (properties.isEmpty()) ? Arrays.asList(refMap) : Arrays.asList(refMap, properties));
-
-            return prop;
-        }
-
-        return properties;
-    }
-
-    private Map<String, Object> oneOf(Map<String, Object> properties,
-                                      boolean isNillable) {
-        if (isNillable) {
-            Map<String, Object> prop = new LinkedHashMap();
-            prop.put("oneOf", Arrays.asList(
-                    ImmutableMap.builder()
-                            .put("type", "null")
-                            .build(),
-                    properties
-            ));
-
-            return prop;
-        }
-
-        return properties;
-    }
-
     /**
-     * Resolves a local definition reference for a reused ABIE schema.
+     * Resolves a reference for a reused ABIE schema.
+     * <p>
+     * Depending on split-reference mode, this points either to a local definition
+     * or to an external file with a JSON Pointer into that file.
      */
     private String getReference(Map<String, Object> definitions,
                                 AsbiepSummaryRecord asbiep,
                                 GenerationContext generationContext) {
         String refNameOfTopLevelAsbiep = resolveReusedSchemaName(definitions, asbiep);
-        if (!definitions.containsKey(refNameOfTopLevelAsbiep)) {
-            TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
-            Map<String, Object> properties = new LinkedHashMap<>();
-            properties.put("required", new ArrayList());
-            fillProperties(properties, definitions, refTopLevelAsbiep, false, generationContext);
-            suppressRootProperty(properties, false);
-            definitions.put(refNameOfTopLevelAsbiep, properties);
+        TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
+        if (!(dialect.supportsSeparateSchemaFiles() && option.isSeparateFileReferencesForReusedSchemas())) {
+            if (!definitions.containsKey(refNameOfTopLevelAsbiep)) {
+                Map<String, Object> properties = new LinkedHashMap<>();
+                properties.put("required", new ArrayList());
+                fillProperties(properties, definitions, refTopLevelAsbiep, false, generationContext);
+                suppressRootProperty(properties, false);
+                definitions.put(refNameOfTopLevelAsbiep, properties);
+            }
+            return dialect.definitionRef(refNameOfTopLevelAsbiep);
+        } else {
+            String refFileName = resolveExternalRefFileName(refTopLevelAsbiep);
+            if (!StringUtils.hasLength(refFileName)) {
+                refFileName = defaultExternalRefFileName(refNameOfTopLevelAsbiep);
+            }
+            String refTypeName = resolveTopLevelExternalTypeName(
+                    refTopLevelAsbiep,
+                    generationContext.queryBasedASCCP(asbiep),
+                    null);
+            return refFileName + ".json" + dialect.definitionRef(escapeJsonPointerToken(refTypeName));
         }
-        return "#/definitions/" + refNameOfTopLevelAsbiep;
     }
 
-    private void appendOptionalTopLevelAsbiep(
-            List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps,
-            TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
-            boolean enabled,
-            TopLevelAsbiepId optionalTopLevelAsbiepId,
-            ReleaseId expectedReleaseId,
-            String label) {
-        if (!enabled || optionalTopLevelAsbiepId == null) {
-            return;
+    private String resolveExternalRefFileName(TopLevelAsbiepSummaryRecord refTopLevelAsbiep) {
+        Map<TopLevelAsbiepId, String> filenames = option.getFilenames();
+        if (filenames == null || filenames.isEmpty()) {
+            return null;
         }
-        TopLevelAsbiepSummaryRecord optionalTopLevelAsbiep =
-                topLevelAsbiepQuery.getTopLevelAsbiepSummary(optionalTopLevelAsbiepId);
-        if (!expectedReleaseId.equals(optionalTopLevelAsbiep.release().releaseId())) {
-            throw new IllegalArgumentException(label + " release does not match.");
+
+        String filename = filenames.get(refTopLevelAsbiep.topLevelAsbiepId());
+        if (!StringUtils.hasLength(filename)) {
+            return null;
         }
-        mergedTopLevelAsbieps.add(optionalTopLevelAsbiep);
+        // Keep the filename bound to the reused schema's owner top-level ASBIEP.
+        // This guarantees that $ref targets the exact file generated for that reused schema.
+        return filename;
     }
 
     private String resolveReusedSchemaName(Map<String, Object> definitions,
@@ -850,6 +835,68 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
     private String resolveReusedSchemaBaseName(AsbiepSummaryRecord asbiep) {
         AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
         return convertIdentifierToId(camelCase(asccp.propertyTerm()));
+    }
+
+    private String resolveTopLevelExternalTypeName(TopLevelAsbiepSummaryRecord topLevelAsbiep,
+                                                   AsccpSummaryRecord asccp,
+                                                   Map<String, Object> definitions) {
+        String baseName = convertIdentifierToId(camelCase(asccp.propertyTerm()));
+        String topLevelAsbiepIdValue = (topLevelAsbiep != null && topLevelAsbiep.topLevelAsbiepId() != null)
+                ? topLevelAsbiep.topLevelAsbiepId().value().toString()
+                : "0";
+        String candidate = baseName + "_" + topLevelAsbiepIdValue + "Type";
+        if (definitions == null) {
+            return candidate;
+        }
+        if (!definitions.containsKey(candidate)) {
+            return candidate;
+        }
+        int suffix = 1;
+        String uniqueCandidate = candidate + "_" + suffix;
+        while (definitions.containsKey(uniqueCandidate)) {
+            suffix++;
+            uniqueCandidate = candidate + "_" + suffix;
+        }
+        return uniqueCandidate;
+    }
+
+    private boolean isReferencedSchemaFile(TopLevelAsbiepSummaryRecord topLevelAsbiep) {
+        if (topLevelAsbiep == null || topLevelAsbiep.topLevelAsbiepId() == null || generationContext == null) {
+            return false;
+        }
+        return generationContext.getSchemaReferenceInfo(topLevelAsbiep.topLevelAsbiepId()).isReferencedSchemaFile();
+    }
+
+    private String escapeJsonPointerToken(String token) {
+        if (token == null) {
+            return "";
+        }
+        return token.replace("~", "~0").replace("/", "~1");
+    }
+
+    private String defaultExternalRefFileName(String reusedSchemaName) {
+        if (!StringUtils.hasLength(reusedSchemaName)) {
+            return "Schema";
+        }
+        return Character.toUpperCase(reusedSchemaName.charAt(0)) + reusedSchemaName.substring(1);
+    }
+
+    private void appendOptionalTopLevelAsbiep(
+            List<TopLevelAsbiepSummaryRecord> mergedTopLevelAsbieps,
+            TopLevelAsbiepQueryRepository topLevelAsbiepQuery,
+            boolean enabled,
+            TopLevelAsbiepId optionalTopLevelAsbiepId,
+            ReleaseId expectedReleaseId,
+            String label) {
+        if (!enabled || optionalTopLevelAsbiepId == null) {
+            return;
+        }
+        TopLevelAsbiepSummaryRecord optionalTopLevelAsbiep =
+                topLevelAsbiepQuery.getTopLevelAsbiepSummary(optionalTopLevelAsbiepId);
+        if (!expectedReleaseId.equals(optionalTopLevelAsbiep.release().releaseId())) {
+            throw new IllegalArgumentException(label + " release does not match.");
+        }
+        mergedTopLevelAsbieps.add(optionalTopLevelAsbiep);
     }
 
     private String getReference(Map<String, Object> definitions, BbieSummaryRecord bbie, DtSummaryRecord bdt,
@@ -913,20 +960,8 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             ((List<String>) parent.get("required")).add(name);
         }
 
-        // Issue #596
-        if (bbieSc.valueConstraint() != null) {
-            if (StringUtils.hasLength(bbieSc.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbieSc.valueConstraint().fixedValue()));
-            } else if (StringUtils.hasLength(bbieSc.valueConstraint().defaultValue())) {
-                properties.put("default", bbieSc.valueConstraint().defaultValue());
-            }
-        }
-
-        // Issue #692
-        String exampleText = bbieSc.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("examples", Arrays.asList(exampleText));
-        }
+        // Issue #596, Issue #692
+        dialect.bbieScKeywords(properties, bbieSc, bbieSc.example());
 
         CodeListSummaryRecord codeList = generationContext.getCodeList(bbieSc);
         String ref;
@@ -954,8 +989,8 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
             }
         }
 
-        properties.put("$ref", ref);
-        properties = allOf(properties);
+        dialect.adaptToReference(properties, ref, definitions);
+        properties = dialect.bbieSc(properties, ref, bbieSc);
 
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
@@ -966,12 +1001,16 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
         }
 
         // The "required" property for the root element of schema should has only one child.
-        if (((List<String>) root.get("required")).size() > 1) {
+        List<String> required = (List<String>) root.get("required");
+        if (required != null && required.size() > 1) {
             root.remove("required");
         }
 
-        //
         Map<String, Object> properties = (Map<String, Object>) root.get("properties");
+        if (properties == null || properties.isEmpty()) {
+            return;
+        }
+
         for (String key : properties.keySet()) {
             Map<String, Object> copied = new LinkedHashMap();
             copied.putAll(((Map<String, Object>) properties.get(key)));
@@ -982,6 +1021,9 @@ public class BieJSONDraft04GenerateExpression implements BieGenerateExpression, 
     @Override
     public File asFile(String filename) throws IOException {
         ensureRoot();
+        if (dialect.idKeyword() != null) {
+            root.put(dialect.idKeyword(), filename + ".json");
+        }
 
         File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         tempFile = new File(tempFile.getParentFile(), filename + ".json");

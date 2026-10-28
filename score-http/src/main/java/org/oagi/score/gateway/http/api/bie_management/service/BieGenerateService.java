@@ -10,8 +10,9 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSON202012GenerateExpression;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSONDraft04GenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSONGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.Json202012Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.JsonDraft04Dialect;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.odf.BieODFSpreadsheetGenerationExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
@@ -837,11 +838,11 @@ public class BieGenerateService {
                     case "DRAFT04":
                     case "DRAFT-05":
                     case "DRAFT05":
-                        generateExpression = applicationContext.getBean(BieJSONDraft04GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, JsonDraft04Dialect.INSTANCE);
                         break;
                     case "2020-12":
                     case "202012":
-                        generateExpression = applicationContext.getBean(BieJSON202012GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, Json202012Dialect.INSTANCE);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown JSON expression version: " + expressionVersion);
