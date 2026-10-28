@@ -280,6 +280,10 @@ public class AccountCommandService {
             throw new IllegalArgumentException();
         }
 
+        if (targetAccountDetails.admin() && !requester.isAdministrator()) {
+            throw new AccessControlException(requester);
+        }
+
         boolean prevEnabled = targetAccountDetails.enabled();
         if (prevEnabled != enabled) {
             var command = repositoryFactory.accountCommandRepository(requester, passwordEncoder);
