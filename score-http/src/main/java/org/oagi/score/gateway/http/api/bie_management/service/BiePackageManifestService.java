@@ -179,6 +179,9 @@ public class BiePackageManifestService {
                     }
                 }
             } else {
+                if (prevPackage != null) { // no BIE of the prior package version to compare with
+                    newBiesFromPriorPackageVersion.add(newBieManifestSummary(currentTopLevelAsbiep));
+                }
                 biePackageManifestEntry = new BiePackageManifestEntry(
                         newBieManifestDetail(currentTopLevelAsbiep,
                                 resolveRemark(asbiepQueryRepository, currentTopLevelAsbiep),
