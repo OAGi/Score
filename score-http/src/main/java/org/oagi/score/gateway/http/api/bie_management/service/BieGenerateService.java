@@ -842,13 +842,13 @@ public class BieGenerateService {
             case "OPENAPI3":
                 String openApiVersion = option.getExpressionVersion();
                 if (!StringUtils.hasLength(openApiVersion) || isOpenApi31Version(openApiVersion)) {
-                    generateExpression = applicationContext.getBean(BieOpenAPI31GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi31Dialect.INSTANCE);
                 } else {
-                    generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 }
                 break;
             case "OPENAPI30":
-                generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 break;
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);

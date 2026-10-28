@@ -5,6 +5,9 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummar
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApiDialect;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
@@ -12,8 +15,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpre
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OasOperationCollisionValidator;
-import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI30GenerateExpression;
-import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI31GenerateExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -330,10 +332,9 @@ public class OpenAPIGenerateService {
         // declares a 3.1.x version; otherwise keep the OpenAPI 3.0 generator.
         String openAPIVersion = (option != null && option.getOasDoc() != null)
                 ? option.getOasDoc().getOpenAPIVersion() : null;
-        if (isOpenApi31Version(openAPIVersion)) {
-            return applicationContext.getBean(OpenAPI31GenerateExpression.class, generationContext, option);
-        }
-        return applicationContext.getBean(OpenAPI30GenerateExpression.class, generationContext, option);
+        BieOpenApiDialect dialect = isOpenApi31Version(openAPIVersion)
+                ? BieOpenApi31Dialect.INSTANCE : BieOpenApi30Dialect.INSTANCE;
+        return applicationContext.getBean(OpenAPIGenerateExpression.class, generationContext, option, dialect);
     }
 
     // Issue #1347: the distinct ConfirmMessage BIEs referenced by CONFIRM_MESSAGE operations, in

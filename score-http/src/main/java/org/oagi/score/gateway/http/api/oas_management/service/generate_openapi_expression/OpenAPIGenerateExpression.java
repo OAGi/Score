@@ -1,38 +1,21 @@
 package org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression;
 
-import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
-import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
-import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BIE;
-import org.oagi.score.gateway.http.api.bie_management.model.Facet;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 
 import java.math.BigInteger;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieSummaryRecord;
-import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
-import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryRecord;
-import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApiDialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApiSchemaBuilder;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
-import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
-import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
-import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
-import org.oagi.score.gateway.http.api.code_list_management.model.CodeListValueSummaryRecord;
 import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthFlow;
 import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthScope;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
@@ -43,8 +26,6 @@ import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpre
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.model.Operation;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRecord;
-import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
-import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,43 +36,44 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.oagi.score.gateway.http.api.oas_management.model.Operation.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 
+/**
+ * Generates an OpenAPI Document. What differs between the OpenAPI versions (the version, how a schema is expressed,
+ * whether a DELETE operation can have a request body) is decided by the {@link BieOpenApiDialect}.
+ */
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
+public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
-    // Issue #1760: the OpenAPI Document stores only the minor family (3.0). The generated document pins
-    // the canonical patch release for that family (errata-only), so users never pick a patch version.
-    private static final String OPEN_API_VERSION = "3.0.4";
     static final String VERSION_PATH_PARAMETER = "{version}";
     private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^{}]+)}");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final BieOpenApiDialect dialect;
     private GenerationContext generationContext;
     private OpenAPIGenerateExpressionOption option;
 
     private Map<Operation, GeneratorForOperation> generatorForOperationMap = new HashMap<>();
-    private ObjectMapper mapper;
+    private BieOpenApiSchemaBuilder schemaBuilder;
     private ObjectMapper expressionMapper;
 
     private Map<String, Object> root;
     private Map<String, Object> schemas = new LinkedHashMap<>();
     private Map<TopLevelAsbiepId, String> reusedTopLevelAsbiepNameMap;
 
-    public OpenAPI30GenerateExpression(GenerationContext generationContext, OpenAPIGenerateExpressionOption option) {
+    public OpenAPIGenerateExpression(GenerationContext generationContext, OpenAPIGenerateExpressionOption option,
+                                     BieOpenApiDialect dialect) {
+        this.dialect = dialect;
         this.generationContext = generationContext;
         this.option = option;
 
@@ -104,8 +86,6 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
-
         OpenAPIExpressionFormat openAPIExpressionFormat = option.getOpenAPIExpressionFormat();
         switch (openAPIExpressionFormat) {
             case YAML:
@@ -118,7 +98,9 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
 
         root = null;
         schemas = new LinkedHashMap<>();
-        reusedTopLevelAsbiepNameMap = null;
+        reusedTopLevelAsbiepNameMap = new LinkedHashMap<>();
+        schemaBuilder = new BieOpenApiSchemaBuilder(generationContext, dialect, new OasDocumentSchemaPolicy(),
+                option.isBieDefinition(), option.getScheme(), option.getHost(), schemas, reusedTopLevelAsbiepNameMap);
     }
 
     @Override
@@ -144,9 +126,10 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
     @Override
     public void generateErrorResponses() {
         // Issue #1347: merge the defaulted 4xx/5xx error responses into every generated operation.
+        // 415/422 go onto DELETE only if it can carry a request body (3.1+ — #1610).
         List<ErrorResponseSchemas.OperationErrorSpec> specs = ErrorResponseSchemas.buildSpecs(
                 option.getTemplates(), this::getResolvedResourceName, this::resolveConfirmSchemaName);
-        ErrorResponseSchemas.injectErrorResponses(root, schemas, specs, false);
+        ErrorResponseSchemas.injectErrorResponses(root, schemas, specs, dialect.allowsDeleteRequestBody());
     }
 
     // Issue #1347: the components.schemas name of a ConfirmMessage BIE materialized via generate(TLA).
@@ -175,7 +158,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
     // Issue #1729: configurable Security Schemes (components.securitySchemes). An empty/absent list keeps
     // the legacy default OAuth2 scheme (per-operation Read/Write scopes). A non-empty list emits the
     // configured schemes and only the selected root/operation Security Requirement Objects.
-    // Backend targets OpenAPI 3.0.3 (apiKey | http | oauth2 | openIdConnect).
+    // Backend targets OpenAPI 3.0.3 and 3.1.x (apiKey | http | oauth2 | openIdConnect).
     private List<OasSecurityScheme> securitySchemes() {
         if (option == null || option.getOasDoc() == null || option.getOasDoc().getSecuritySchemes() == null) {
             return Collections.emptyList();
@@ -298,7 +281,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
 
     // Builds the OAuth Flows Object for an oauth2 scheme from its CONFIGURED flows (insertion order).
     // It emits exactly what the user configured — there is NO fabricated fallback, so an oauth2 scheme
-    // with no flows yields an empty flows object. Per OpenAPI 3.0.3 each OAuth Flow Object's scopes key
+    // with no flows yields an empty flows object. Per OpenAPI 3.x each OAuth Flow Object's scopes key
     // is REQUIRED (may be empty), so a scopes map is always emitted per flow. The deviceAuthorization
     // flow (and its deviceAuthorizationUrl) is an OpenAPI 3.2+ feature, skipped for older documents.
     private Map<String, Object> buildOAuthFlows(OasSecurityScheme scheme) {
@@ -350,7 +333,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         }
         // Resolve declared schemes by their emitted components.securitySchemes key so a Security
         // Requirement Object only references declared schemes and uses the correct scope-array shape:
-        // oauth2/openIdConnect carry the scope names; all other types MUST be an empty array (3.0.3).
+        // oauth2/openIdConnect carry the scope names; all other types MUST be an empty array (3.x).
         Map<String, OasSecurityScheme> declaredSchemes = new LinkedHashMap<>();
         for (OasSecurityScheme scheme : securitySchemes()) {
             if (scheme != null && StringUtils.hasLength(scheme.getType())) {
@@ -539,7 +522,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
 
             fillPropertiesForTemplate(itemRefSchemaName, asbiep, false, isSuppressRoot);
         } else {
-            getReference(asbiep, schemaName, isSuppressRoot);
+            schemaBuilder.reference(asbiep, schemaName, isSuppressRoot);
         }
     }
 
@@ -943,52 +926,21 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
                             OpenAPITemplateForVerbOption template,
                             Map<String, Object> path,
                             AsbiepSummaryRecord asbiep) {
-            // Issue #1610: OpenAPI 3.0.3 forbids a request body on DELETE (the specification states it
-            // "SHALL be ignored"). A "Request" message body therefore drops the body (a banner in the editor
-            // prompts switching to OpenAPI 3.1.1 to keep it; see OpenAPI31GenerateExpression) and emits a
-            // status-only 202 (Accepted) success -- consistent with the 3.1 generator and anticipating #1347
-            // (RFC 9457 error responses), whose proposed Verb x Array matrix makes the DELETE success a 202.
-            // A "Response" message body still emits a 200 response carrying the BIE (a response body is
-            // allowed in 3.0.3), exactly like the other verbs.
-            if (path != null && path.size() > 0) {
-                // Issue #1610/#1347: a subsequent template for the SAME DELETE operation (e.g. the Response
-                // sibling of a Request). The first template scaffolds the operation; this one must still
-                // contribute its success response, otherwise a DELETE carrying both a Request and a Response
-                // would keep only the first template's response -- the Response body's 200 was being lost when
-                // the Request template happened to be processed first. A "Response" body's 200 (carrying the
-                // BIE) wins over a "Request" body's status-only 202, matching the 3.1 generator.
-                boolean isArray = template.isArrayForJsonExpression();
-                String schemaName = template.getSchemaName();
-                boolean isSuppressRoot = template.isSuppressRootProperty();
-                ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getMessageBodyType().equals("Response")) {
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + schemaName)
-                                                            .build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build());
-                    // The response references the BIE schema, so generate it.
-                    fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
-                } else if (!path.containsKey("responses")) {
-                    // Request: 3.0.3 drops the DELETE body; emit a status-only 202 only when a Response
-                    // sibling has not already set the success response (do not clobber its 200).
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("202", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .build())
-                            .build());
-                }
-            } else {
-                boolean isArray = template.isArrayForJsonExpression();
-                String schemaName = template.getSchemaName();
-                boolean isSuppressRoot = template.isSuppressRootProperty();
+            // Issue #1610: OpenAPI 3.1 permits a request body on DELETE, 3.0.3 forbids it (the specification states
+            // it "SHALL be ignored"). A "Request" message body therefore emits the requestBody in 3.1 and drops it in
+            // 3.0 (a banner in the editor prompts switching to OpenAPI 3.1 to keep it); either way its success
+            // response is a status-only 202 (Accepted) -- a DELETE does not echo the request back. This anticipates
+            // #1347 (RFC 9457 error responses), whose proposed Verb x Array matrix makes the DELETE success a 202.
+            // A "Response" message body emits a 200 response carrying the BIE, exactly like the other verbs.
+            // Finer control (e.g. a DELETE request body together with a custom success body) is deferred and
+            // tracked on #1610.
+            boolean requestBodyAllowed = dialect.allowsDeleteRequestBody();
+            boolean isArray = template.isArrayForJsonExpression();
+            String schemaName = template.getSchemaName();
+            boolean isSuppressRoot = template.isSuppressRootProperty();
+            boolean scaffolded = path != null && path.size() > 0;
+
+            if (!scaffolded) {
                 String bieName = getBieName(topLevelAsbiep);
 
                 path.put("summary", "");
@@ -999,31 +951,54 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                ensurePathParameters(path, getOperation(), isArray, template);
-                if (template.getMessageBodyType().equals("Response")) {
-                    path.put("responses", ImmutableMap.<String, Object>builder()
-                            .put("200", ImmutableMap.<String, Object>builder()
-                                    .put("description", "")
-                                    .put("content", ImmutableMap.<String, Object>builder()
-                                            .put("application/json", ImmutableMap.<String, Object>builder()
-                                                    .put("schema", ImmutableMap.<String, Object>builder()
-                                                            .put("$ref", "#/components/schemas/" + schemaName)
-                                                            .build())
+            }
+            ensurePathParameters(path, getOperation(), isArray, template);
+            if (scaffolded && requestBodyAllowed
+                    && StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
+                path.put("tags", Arrays.asList(template.getTagName()));
+            }
+
+            boolean isResponse = template.getMessageBodyType().equals("Response");
+            if (!isResponse) {
+                if (requestBodyAllowed) {
+                    path.put("requestBody", ImmutableMap.<String, Object>builder()
+                            .put("description", "")
+                            .put("content", ImmutableMap.<String, Object>builder()
+                                    .put("application/json", ImmutableMap.<String, Object>builder()
+                                            .put("schema", ImmutableMap.<String, Object>builder()
+                                                    .put("$ref", "#/components/schemas/" + schemaName)
                                                     .build())
                                             .build())
                                     .build())
                             .build());
-                    // The response references the BIE schema, so generate it.
-                    fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
-                } else {
-                    // Request: the body is dropped (3.0.3 forbids it); emit a status-only 202. Nothing
-                    // references the BIE schema here, so none is generated (avoids an orphan component).
+                }
+                // A subsequent template for the SAME DELETE operation (the Response sibling of a Request) must
+                // not lose its 200, so a status-only 202 is emitted only when no success response is there yet.
+                if (!path.containsKey("responses")) {
                     path.put("responses", ImmutableMap.<String, Object>builder()
                             .put("202", ImmutableMap.<String, Object>builder()
                                     .put("description", "")
                                     .build())
                             .build());
                 }
+            } else {
+                path.put("responses", ImmutableMap.<String, Object>builder()
+                        .put("200", ImmutableMap.<String, Object>builder()
+                                .put("description", "")
+                                .put("content", ImmutableMap.<String, Object>builder()
+                                        .put("application/json", ImmutableMap.<String, Object>builder()
+                                                .put("schema", ImmutableMap.<String, Object>builder()
+                                                        .put("$ref", "#/components/schemas/" + schemaName)
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build());
+            }
+
+            // The response references the BIE schema; a request body does too, where it is kept.
+            if (isResponse || requestBodyAllowed) {
+                fillPropertiesForTemplate(schemaName, asbiep, isArray, isSuppressRoot);
             }
         }
     }
@@ -1032,7 +1007,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
         generationContext.referenceCounter().increase(asbiep);
         try {
-            getReference(asbiep);
+            schemaBuilder.reference(asbiep);
         } finally {
             generationContext.referenceCounter().decrease(asbiep);
         }
@@ -1055,7 +1030,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
 
             if (root == null) {
                 root = new LinkedHashMap<>();
-                root.put("openapi", OPEN_API_VERSION);
+                root.put("openapi", dialect.openApiVersion());
                 ImmutableMap.Builder infoBuilder = ImmutableMap.<String, Object>builder()
                         .put("title", option.getOasDoc().getTitle());
                 if (StringUtils.hasLength(option.getOasDoc().getDescription())) {
@@ -1234,799 +1209,6 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         }
     }
 
-    private Map<String, Object> makeProperties(AbieSummaryRecord typeAbie, TopLevelAsbiepSummaryRecord topLevelAsbiep) {
-        AsbiepSummaryRecord asbiep = generationContext.findASBIEP(topLevelAsbiep.asbiepId(), topLevelAsbiep);
-        AsccpSummaryRecord asccp = generationContext.getAsccp(asbiep.basedAsccpManifestId());
-        Map<String, Object> properties = new LinkedHashMap();
-        // Issue #1148
-        properties.put("x-oagis-bie-guid", asbiep.getGuid());
-        properties.put("x-oagis-bie-date-time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(typeAbie.lastUpdated().when()));
-        properties.put("x-oagis-bie-version", StringUtils.hasLength(topLevelAsbiep.version()) ? topLevelAsbiep.version() : "");
-        // Issue #1603
-        properties.put("x-oagis-bie-den", asccp.propertyTerm());
-        // Issue #1574
-        ReleaseDetailsRecord release = generationContext.findRelease(topLevelAsbiep.release().releaseId());
-        properties.put("x-oagis-bie-uri", option.getScheme() + "://" + option.getHost() + "/profile_bie/" + topLevelAsbiep.topLevelAsbiepId().toString());
-        properties.put("x-oagis-release", release.releaseNum());
-        properties.put("x-oagis-release-date", new SimpleDateFormat("yyyy-MM-dd").format(release.lastUpdated().when()));
-        properties.put("required", new ArrayList());
-        properties.put("additionalProperties", false);
-
-        return properties;
-    }
-
-    private void suppressRootProperty(Map<String, Object> parent) {
-        Map<String, Object> properties = (Map<String, Object>) parent.get("properties");
-        // Get the first element from 'properties' property and move all children of the element to the parent.
-        Set<String> keys = properties.keySet();
-        if (keys.isEmpty()) {
-            return;
-        }
-        Map<String, Object> rootProperties = (Map<String, Object>) properties.get(keys.iterator().next());
-        parent.put("type", "object");
-        Arrays.asList("required", "additionalProperties", "properties").stream().forEach(e -> parent.remove(e));
-
-        for (Map.Entry<String, Object> entry : rootProperties.entrySet()) {
-            parent.put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                AsbieSummaryRecord asbie,
-                                GenerationContext generationContext) {
-
-        Map<String, Object> properties = new LinkedHashMap();
-        if (!parent.containsKey("properties")) {
-            parent.put("properties", new LinkedHashMap<String, Object>());
-        }
-
-        AsbiepSummaryRecord asbiep = generationContext.queryAssocToASBIEP(asbie);
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = convertIdentifierToId(camelCase(asccp.propertyTerm()));
-
-        int minVal = asbie.cardinality().min();
-        int maxVal = asbie.cardinality().max();
-        // Issue #562
-        boolean isArray = (maxVal < 0 || maxVal > 1);
-        boolean isNillable = (asbie.nillable() != null) ? asbie.nillable() : false;
-
-        boolean reused = !asbie.ownerTopLevelAsbiepId().equals(asbiep.ownerTopLevelAsbiepId());
-        if (minVal > 0) {
-            List<String> parentRequired = (List<String>) parent.get("required");
-            if (parentRequired == null) {
-                throw new IllegalStateException();
-            }
-            parentRequired.add(name);
-        }
-
-        if (reused) {
-            SchemaReference ref = getReference(asbiep);
-            properties.put("$ref", ref.getPath());
-        } else {
-            AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
-            AsccSummaryRecord ascc = generationContext.queryBasedASCC(asbie);
-
-            if (option.isBieDefinition()) {
-                String definition = asbie.definition();
-                if (StringUtils.hasLength(definition)) {
-                    properties.put("description", definition);
-                }
-            }
-
-            properties.put("type", "object");
-            properties.put("required", new ArrayList());
-            properties.put("additionalProperties", false);
-            properties.put("properties", new LinkedHashMap<String, Object>());
-
-            fillProperties(properties, schemas, typeAbie, generationContext);
-
-            if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
-                properties.remove("required");
-            }
-
-            properties = oneOf(allOf(properties), isNillable);
-        }
-
-        // Issue #1298
-        if (asbie.deprecated() != null && asbie.deprecated()) {
-            properties.put("deprecated", true);
-        }
-
-        if (isArray) {
-            Map<String, Object> items = new LinkedHashMap();
-            items.putAll(properties);
-
-            properties = new LinkedHashMap();
-
-            String description = (String) items.remove("description");
-            if (StringUtils.hasLength(description)) {
-                properties.put("description", description);
-            }
-            properties.put("type", "array");
-            if (minVal > 0) {
-                properties.put("minItems", minVal);
-            }
-            if (maxVal > 0) {
-                properties.put("maxItems", maxVal);
-            }
-            properties.put("items", items);
-
-            // Issue #1483
-            // make a global property for an array
-            if (reused) {
-                properties = makeGlobalPropertyIfArray(schemas, resolveReusedSchemaName(asbiep), properties);
-            }
-        }
-
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
-    }
-
-    private Map<String, Object> makeGlobalPropertyIfArray(Map<String, Object> schemas, String name,
-                                                          Map<String, Object> properties) {
-        if (properties == null || !"array".equals(properties.get("type"))) {
-            return properties;
-        }
-
-        Set<String> keySet = properties.keySet();
-        boolean customized = keySet.contains("minItems") || keySet.contains("maxItems");
-        if (customized) {
-            return properties;
-        }
-
-        String nameForList = name + "List";
-        if (!schemas.containsKey(nameForList)) {
-            schemas.put(nameForList, properties);
-        }
-
-        Map<String, Object> refProperties = new HashMap<>();
-        refProperties.put("$ref", "#/components/schemas/" + nameForList);
-        return refProperties;
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                AsbiepSummaryRecord asbiep, AbieSummaryRecord abie,
-                                GenerationContext generationContext) {
-
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        String name = convertIdentifierToId(camelCase(asccp.propertyTerm()));
-
-        List<String> parentRequired = (List<String>) parent.get("required");
-        parentRequired.add(name);
-
-        Map<String, Object> properties = new LinkedHashMap();
-        if (!parent.containsKey("properties")) {
-            parent.put("properties", new LinkedHashMap<String, Object>());
-        }
-
-        if (option.isBieDefinition()) {
-            String definition = asbiep.definition();
-            if (!StringUtils.hasLength(definition)) {
-                definition = abie.definition();
-            }
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
-        }
-
-        properties.put("type", "object");
-        properties.put("required", new ArrayList());
-        properties.put("additionalProperties", false);
-
-        fillProperties(properties, schemas, abie, generationContext);
-
-        if (properties.containsKey("required") && ((List) properties.get("required")).isEmpty()) {
-            properties.remove("required");
-        }
-
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
-    }
-
-    // Package-private for unit tests (issue #1610): asserts the 3.0 built-in body is read from openApi30Map().
-    Map<String, Object> toProperties(XbtSummaryRecord xbt) {
-        String openapi30Map = xbt.openApi30Map();
-        try {
-            return mapper.readValue(openapi30Map, LinkedHashMap.class);
-        } catch (JacksonException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String fillSchemas(Map<String, Object> schemas,
-                               XbtSummaryRecord xbt, Guid guid, Facet facet) {
-        if (guid == null) {
-            guid = new Guid(ScoreGuidUtils.randomGuid());
-        }
-
-        String name = "type_" + guid;
-
-        Map<String, Object> content = toProperties(xbt);
-        if (facet.minLength() != null) {
-            content.put("minLength", facet.minLength().longValue());
-        }
-        if (facet.maxLength() != null) {
-            content.put("maxLength", facet.maxLength().longValue());
-        }
-        if (StringUtils.hasLength(facet.pattern())) {
-            // Override 'pattern' and 'format' properties
-            content.remove("pattern");
-            content.remove("format");
-            content.put("pattern", facet.pattern());
-        }
-
-        schemas.put(name, content);
-
-        return "#/components/schemas/" + name;
-    }
-
-    private String fillSchemas(Map<String, Object> schemas,
-                               XbtSummaryRecord xbt) {
-        String builtInType = xbt.builtInType();
-        if (builtInType.startsWith("xsd:")) {
-            builtInType = builtInType.substring(4);
-        }
-        if (!schemas.containsKey(builtInType)) {
-            Map<String, Object> content = toProperties(xbt);
-            schemas.put(builtInType, content);
-        }
-
-        return "#/components/schemas/" + builtInType;
-    }
-
-    private String fillSchemas(Map<String, Object> schemas,
-                               BbieSummaryRecord bbie, CodeListSummaryRecord codeList) {
-        DtAwdPriSummaryRecord dtAwdPri =
-                generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
-
-        Map<String, Object> properties;
-        if (dtAwdPri.codeListManifestId() != null) {
-            properties = new LinkedHashMap();
-            properties.put("type", "string");
-        } else {
-            XbtSummaryRecord xbt = generationContext.getXbt(dtAwdPri.xbtManifestId());
-            properties = toProperties(xbt);
-        }
-
-        return fillSchemas(properties, schemas, codeList);
-    }
-
-    private String fillSchemas(Map<String, Object> schemas,
-                               BbieScSummaryRecord bbieSc, CodeListSummaryRecord codeList) {
-        DtScAwdPriSummaryRecord dtScAwdPri =
-                generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
-
-        Map<String, Object> properties;
-        if (dtScAwdPri.codeListManifestId() != null) {
-            properties = new LinkedHashMap();
-            properties.put("type", "string");
-        } else {
-            XbtSummaryRecord xbt = generationContext.getXbt(dtScAwdPri.xbtManifestId());
-            properties = toProperties(xbt);
-        }
-
-        return fillSchemas(properties, schemas, codeList);
-    }
-
-    private String fillSchemas(Map<String, Object> properties,
-                               Map<String, Object> schemas,
-                               CodeListSummaryRecord codeList) {
-
-        AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
-        String codeListName = Helper.getCodeListTypeName(codeList, agencyIdListValue);
-        /*
-         * Issue #589
-         */
-        codeListName = Stream.of(codeListName.split("_"))
-                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
-
-        if (!schemas.containsKey(codeListName)) {
-            List<CodeListValueSummaryRecord> codeListValues = generationContext.getCodeListValues(codeList);
-            List<String> enumerations = codeListValues.stream().map(e -> e.value()).collect(Collectors.toList());
-            if (!enumerations.isEmpty()) {
-                properties.put("enum", enumerations);
-            }
-
-            schemas.put(codeListName, properties);
-        }
-
-        return "#/components/schemas/" + codeListName;
-    }
-
-    private String fillSchemas(Map<String, Object> schemas,
-                               AgencyIdListSummaryRecord agencyIdList) {
-        AgencyIdListValueSummaryRecord agencyIdListValue =
-                generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
-        String agencyListTypeName = Helper.getAgencyListTypeName(agencyIdList, agencyIdListValue);
-        /*
-         * Issue #589
-         */
-        agencyListTypeName = Stream.of(agencyListTypeName.split("_"))
-                .map(e -> convertIdentifierToId(camelCase(e))).collect(Collectors.joining("_"));
-        if (!schemas.containsKey(agencyListTypeName)) {
-            Map<String, Object> properties = new LinkedHashMap();
-            properties.put("type", "string");
-
-            List<AgencyIdListValueSummaryRecord> agencyIdListValues =
-                    generationContext.findAgencyIdListValueByAgencyIdListManifestId(agencyIdList.agencyIdListManifestId());
-            List<String> enumerations = agencyIdListValues.stream().map(e -> e.value()).collect(Collectors.toList());
-            if (!enumerations.isEmpty()) {
-                properties.put("enum", enumerations);
-            }
-
-            schemas.put(agencyListTypeName, properties);
-        }
-
-        return "#/components/schemas/" + agencyListTypeName;
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                AbieSummaryRecord abie,
-                                GenerationContext generationContext) {
-
-        List<BIE> children = generationContext.queryChildBIEs(abie);
-        AccSummaryRecord acc = generationContext.getAcc(abie.basedAccManifestId());
-        if (OagisComponentType.Choice == acc.componentType()) {
-            List<Object> oneOf = new ArrayList();
-
-            for (BIE bie : children) {
-                Map<String, Object> item = new LinkedHashMap();
-                item.put("type", "object");
-                item.put("required", new ArrayList());
-                item.put("additionalProperties", false);
-                item.put("properties", new LinkedHashMap<String, Object>());
-
-                fillProperties(item, schemas, bie, generationContext);
-
-                if (item.containsKey("required") && ((List) item.get("required")).isEmpty()) {
-                    item.remove("required");
-                }
-                oneOf.add(item);
-            }
-
-            parent.clear();
-            parent.put("oneOf", oneOf);
-        } else {
-            for (BIE bie : children) {
-                fillProperties(parent, schemas, bie, generationContext);
-            }
-        }
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                BIE bie,
-                                GenerationContext generationContext) {
-        if (bie instanceof BbieSummaryRecord) {
-            BbieSummaryRecord bbie = (BbieSummaryRecord) bie;
-            fillProperties(parent, schemas, bbie, generationContext);
-        } else {
-            AsbieSummaryRecord asbie = (AsbieSummaryRecord) bie;
-            if (Helper.isAnyProperty(asbie, generationContext)) {
-                parent.put("additionalProperties", true);
-            } else {
-                AsbiepSummaryRecord asbiep = generationContext.queryAssocToASBIEP(asbie);
-
-                generationContext.referenceCounter().increase(asbiep)
-                        .ifNotCircularReference(asbiep,
-                                () -> fillProperties(parent, schemas, asbie, generationContext))
-                        .decrease(asbiep);
-            }
-        }
-    }
-
-    private Object readJsonValue(String textContent) {
-        try {
-            return mapper.readValue(textContent, Object.class);
-        } catch (Exception e) {
-            logger.warn("Can't read JSON value from given text: " + textContent, e);
-        }
-        return null;
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                BbieSummaryRecord bbie,
-                                GenerationContext generationContext) {
-        BccSummaryRecord bcc = generationContext.queryBasedBCC(bbie);
-        BccpSummaryRecord bccp = generationContext.queryToBCCP(bcc);
-        DtSummaryRecord bdt = generationContext.queryBDT(bccp);
-
-        int minVal = bbie.cardinality().min();
-        int maxVal = bbie.cardinality().max();
-        // Issue #562
-        boolean isArray = (maxVal < 0 || maxVal > 1);
-        boolean isNillable = (bbie.nillable() != null) ? bbie.nillable() : false;
-
-        String name = convertIdentifierToId(camelCase(bccp.propertyTerm()));
-
-        Map<String, Object> properties = new LinkedHashMap();
-        if (!parent.containsKey("properties")) {
-            parent.put("properties", new LinkedHashMap<String, Object>());
-        }
-
-        if (option.isBieDefinition()) {
-            String definition = bbie.definition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
-        }
-
-        if (minVal > 0) {
-            List<String> parentRequired = (List<String>) parent.get("required");
-            if (parentRequired == null) {
-                throw new IllegalStateException();
-            }
-            parentRequired.add(name);
-        }
-
-        // Issue #700
-        if (bbie.valueConstraint() != null) {
-            if (StringUtils.hasLength(bbie.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbie.valueConstraint().fixedValue()));
-            } else if (StringUtils.hasLength(bbie.valueConstraint().defaultValue())) {
-                properties.put("default", bbie.valueConstraint().defaultValue());
-            }
-        }
-
-        // Issue #692
-        XbtSummaryRecord xbt = getXbt(bbie, bdt);
-        String exampleText = bbie.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("example", exampleText);
-        } else { // Issue #1405
-            properties.put("example", emptyExample(xbt));
-        }
-
-        // Issue #564
-        String ref = getReference(schemas, bbie, bdt, generationContext);
-        List<BbieScSummaryRecord> bbieScList = generationContext.queryBBIESCs(bbie)
-                .stream().filter(e -> e.cardinality().max() != 0).collect(Collectors.toList());
-        if (bbieScList.isEmpty()) {
-            if (ref == null) {
-                Map<String, Object> content = applyFacet(toProperties(xbt), bbie.facet());
-                properties.putAll(content);
-            } else {
-                properties.put("$ref", ref);
-            }
-            properties = oneOf(allOf(properties), isNillable);
-        } else {
-            properties.put("type", "object");
-            properties.put("required", new ArrayList());
-            properties.put("additionalProperties", false);
-            properties.put("properties", new LinkedHashMap<String, Object>());
-
-            Map<String, Object> contentProperties = new LinkedHashMap();
-            if (ref == null) {
-                Map<String, Object> content = applyFacet(toProperties(xbt), bbie.facet());
-                contentProperties.putAll(content);
-            } else {
-                contentProperties.put("$ref", ref);
-            }
-            for (String key : Arrays.asList("description", "enum", "default", "example")) {
-                if (properties.containsKey(key)) {
-                    contentProperties.put(key, properties.remove(key));
-                }
-            }
-
-            ((List<String>) properties.get("required")).add("content");
-            ((Map<String, Object>) properties.get("properties"))
-                    .put("content", oneOf(allOf(contentProperties), isNillable));
-
-            for (BbieScSummaryRecord bbieSc : bbieScList) {
-                fillProperties(properties, schemas, bbieSc, generationContext);
-            }
-        }
-
-        // Issue #1298
-        if (bbie.deprecated() != null && bbie.deprecated()) {
-            properties.put("deprecated", true);
-        }
-
-        if (isArray) {
-            String description = (String) properties.remove("description");
-            Map<String, Object> items = new LinkedHashMap(properties);
-            properties = new LinkedHashMap();
-            if (StringUtils.hasLength(description)) {
-                properties.put("description", description);
-            }
-            properties.put("type", "array");
-
-            Boolean deprecated = (Boolean) items.remove("deprecated");
-            if (deprecated != null) {
-                properties.put("deprecated", deprecated);
-            }
-
-            if (minVal > 0) {
-                properties.put("minItems", minVal);
-            }
-            if (maxVal > 0) {
-                properties.put("maxItems", maxVal);
-            }
-            properties.put("items", items);
-        }
-
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
-    }
-
-    // Package-private for unit tests (issue #1610).
-    Object emptyExample(XbtSummaryRecord xbt) {
-        Map<String, Object> properties = toProperties(xbt);
-        Object type = properties.getOrDefault("type", "string");
-        if ("boolean".equals(type)) {
-            return false; // false for boolean (example: false)
-        } else if ("integer".equals(type) || "number".equals(type)) {
-            return null; // null value if integer or numeric (example: null)
-        } else {
-            return ""; // string or date, then empty string (example: "")
-        }
-    }
-
-    private Map<String, Object> allOf(Map<String, Object> properties) {
-        if (properties.containsKey("$ref") && properties.size() > 1) {
-            Map<String, Object> prop = new LinkedHashMap();
-            Map<String, Object> refMap = ImmutableMap.<String, Object>builder()
-                    .put("$ref", properties.remove("$ref"))
-                    .build();
-            prop.put("allOf", (properties.isEmpty()) ? Arrays.asList(refMap) : Arrays.asList(refMap, properties));
-
-            return prop;
-        }
-
-        return properties;
-    }
-
-    private Map<String, Object> oneOf(Map<String, Object> properties,
-                                      boolean isNillable) {
-        if (isNillable) {
-            Map<String, Object> prop = new LinkedHashMap();
-            prop.put("oneOf", Arrays.asList(
-                    ImmutableMap.builder()
-                            .put("nullable", true)
-                            .build(),
-                    properties
-            ));
-
-            return prop;
-        }
-
-        return properties;
-    }
-
-    private XbtSummaryRecord getXbt(BbieSummaryRecord bbie, DtSummaryRecord bdt) {
-        if (bbie.primitiveRestriction().xbtManifestId() == null) {
-            DtAwdPriSummaryRecord dtAwdPri =
-                    generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
-            return Helper.getXbt(generationContext, dtAwdPri);
-        } else {
-            return generationContext.getXbt(bbie.primitiveRestriction().xbtManifestId());
-        }
-    }
-
-    private Map<String, Object> applyFacet(Map<String, Object> content, Facet facet) {
-        if (facet != null) {
-            String type = (String) content.get("type");
-            boolean isTypeString = "string".equals(type);
-
-            if (isTypeString && facet.minLength() != null) {
-                content.put("minLength", facet.minLength().longValue());
-            }
-            if (isTypeString && facet.maxLength() != null) {
-                content.put("maxLength", facet.maxLength().longValue());
-            }
-            if (isTypeString && StringUtils.hasLength(facet.pattern())) {
-                // Override 'pattern' and 'format' properties
-                content.remove("pattern");
-                content.remove("format");
-                content.put("pattern", facet.pattern());
-            }
-        }
-        return content;
-    }
-
-    private class SchemaReference {
-
-        private String schemaName;
-        private String path;
-        private Map<String, Object> properties;
-
-        public SchemaReference(String schemaName, String path, Map<String, Object> properties) {
-            this.schemaName = schemaName;
-            this.path = path;
-            this.properties = properties;
-        }
-
-        public String getSchemaName() {
-            return schemaName;
-        }
-
-        public void setSchemaName(String schemaName) {
-            this.schemaName = schemaName;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-    }
-
-    private SchemaReference getReference(AsbiepSummaryRecord asbiep) {
-        return getReference(asbiep, null, true);
-    }
-
-    private SchemaReference getReference(AsbiepSummaryRecord asbiep,
-                                         String schemaName,
-                                         boolean suppressRootProperty) {
-        if (schemaName == null) {
-            schemaName = resolveReusedSchemaName(asbiep);
-        }
-
-        TopLevelAsbiepSummaryRecord refTopLevelAsbiep = generationContext.findTopLevelAsbiep(asbiep.ownerTopLevelAsbiepId());
-        Map<String, Object> properties;
-        if (!schemas.containsKey(schemaName)) {
-            AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
-            properties = makeProperties(typeAbie, refTopLevelAsbiep);
-            fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
-            if (suppressRootProperty) {
-                suppressRootProperty(properties);
-            }
-            schemas.put(schemaName, properties);
-        } else {
-            properties = (Map<String, Object>) schemas.get(schemaName);
-            // If it's duplicated
-            if (!asbiep.getGuid().equals(properties.get("x-oagis-bie-guid"))) {
-                schemaName = schemaName + refTopLevelAsbiep.topLevelAsbiepId();
-                AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
-                properties = makeProperties(typeAbie, refTopLevelAsbiep);
-                fillProperties(properties, schemas, asbiep, typeAbie, generationContext);
-                if (suppressRootProperty) {
-                    suppressRootProperty(properties);
-                }
-                schemas.put(schemaName, properties);
-            }
-        }
-
-        String path = "#/components/schemas/" + schemaName;
-        return new SchemaReference(schemaName, path, properties);
-    }
-
-    private String resolveReusedSchemaName(AsbiepSummaryRecord asbiep) {
-        if (reusedTopLevelAsbiepNameMap == null) {
-            reusedTopLevelAsbiepNameMap = new LinkedHashMap<>();
-        }
-
-        TopLevelAsbiepId ownerTopLevelAsbiepId = asbiep.ownerTopLevelAsbiepId();
-        String existing = reusedTopLevelAsbiepNameMap.get(ownerTopLevelAsbiepId);
-        if (StringUtils.hasLength(existing)) {
-            return existing;
-        }
-
-        AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
-        String baseName = convertIdentifierToId(camelCase(asccp.propertyTerm()));
-
-        String candidate = baseName;
-        int suffix = 1;
-        while (schemas.containsKey(candidate)) {
-            candidate = baseName + suffix++;
-        }
-
-        reusedTopLevelAsbiepNameMap.put(ownerTopLevelAsbiepId, candidate);
-        return candidate;
-    }
-
-    private String getReference(Map<String, Object> schemas, BbieSummaryRecord bbie, DtSummaryRecord bdt,
-                                GenerationContext generationContext) {
-        CodeListSummaryRecord codeList = Helper.getCodeList(generationContext, bbie, bdt);
-        String ref;
-        if (codeList != null) {
-            ref = fillSchemas(schemas, bbie, codeList);
-        } else {
-            AgencyIdListSummaryRecord agencyIdList = generationContext.getAgencyIdList(bbie);
-            if (agencyIdList != null) {
-                ref = fillSchemas(schemas, agencyIdList);
-            } else {
-                // Issue #1633
-                // Primitive types shouldn't be expressed in the 'schema' content.
-                return null;
-            }
-        }
-
-        return ref;
-    }
-
-    private XbtSummaryRecord getXbt(BbieScSummaryRecord bbieSc, DtScSummaryRecord dtSc) {
-        if (bbieSc.primitiveRestriction().xbtManifestId() == null) {
-            DtScAwdPriSummaryRecord dtScAwdPri =
-                    generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
-            return generationContext.getXbt(dtScAwdPri.xbtManifestId());
-        } else {
-            return generationContext.getXbt(bbieSc.primitiveRestriction().xbtManifestId());
-        }
-    }
-
-    private void fillProperties(Map<String, Object> parent,
-                                Map<String, Object> schemas,
-                                BbieScSummaryRecord bbieSc,
-                                GenerationContext generationContext) {
-        int minVal = bbieSc.cardinality().min();
-        int maxVal = bbieSc.cardinality().max();
-        if (maxVal == 0) {
-            return;
-        }
-
-        DtScSummaryRecord dtSc = generationContext.getDtSc(bbieSc.basedDtScManifestId());
-        String name = convertIdentifierToId(toName(dtSc.propertyTerm(), dtSc.representationTerm(), rt -> {
-            if ("Text".equals(rt)) {
-                return "";
-            }
-            return rt;
-        }, true));
-        Map<String, Object> properties = new LinkedHashMap();
-
-        if (option.isBieDefinition()) {
-            String definition = bbieSc.definition();
-            if (StringUtils.hasLength(definition)) {
-                properties.put("description", definition);
-            }
-        }
-
-        if (minVal > 0) {
-            ((List<String>) parent.get("required")).add(name);
-        }
-
-        // Issue #596
-        if (bbieSc.valueConstraint() != null) {
-            if (StringUtils.hasLength(bbieSc.valueConstraint().fixedValue())) {
-                properties.put("enum", Arrays.asList(bbieSc.valueConstraint().fixedValue()));
-            } else if (StringUtils.hasLength(bbieSc.valueConstraint().defaultValue())) {
-                properties.put("default", bbieSc.valueConstraint().defaultValue());
-            }
-        }
-
-        // Issue #692
-        XbtSummaryRecord xbt = getXbt(bbieSc, dtSc);
-        String exampleText = bbieSc.example();
-        if (StringUtils.hasLength(exampleText)) {
-            properties.put("example", exampleText);
-        } else { // Issue #1405
-            properties.put("example", emptyExample(xbt));
-        }
-
-        CodeListSummaryRecord codeList = generationContext.getCodeList(bbieSc);
-        String ref;
-        if (codeList != null) {
-            ref = fillSchemas(schemas, bbieSc, codeList);
-        } else {
-            AgencyIdListSummaryRecord agencyIdList = generationContext.getAgencyIdList(bbieSc);
-            if (agencyIdList != null) {
-                ref = fillSchemas(schemas, agencyIdList);
-            } else {
-                // Issue #1633
-                // Primitive types shouldn't be expressed in the 'schema' content.
-                ref = null;
-            }
-        }
-
-        if (ref == null) {
-            Map<String, Object> content = applyFacet(toProperties(xbt), bbieSc.facet());
-            properties.putAll(content);
-        } else {
-            properties.put("$ref", ref);
-        }
-        properties = allOf(properties);
-
-        // Issue #1298
-        if (bbieSc.deprecated() != null && bbieSc.deprecated()) {
-            properties.put("deprecated", true);
-        }
-
-        ((Map<String, Object>) parent.get("properties")).put(name, properties);
-    }
-
     private void ensureRoot() {
         if (root == null) {
             throw new IllegalStateException();
@@ -2043,7 +1225,7 @@ public class OpenAPI30GenerateExpression implements BieGenerateOpenApiExpression
         tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
 
         expressionMapper.writeValue(tempFile, root);
-        logger.info("Open API " + OPEN_API_VERSION + " Schema is generated: " + tempFile);
+        logger.info("Open API " + dialect.openApiVersion() + " Schema is generated: " + tempFile);
 
         return tempFile;
     }

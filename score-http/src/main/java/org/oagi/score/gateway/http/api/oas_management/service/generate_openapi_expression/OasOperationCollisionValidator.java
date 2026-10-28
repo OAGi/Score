@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * BIE (issue #1732) and request and response BIEs commonly differ — and the merged path item simply takes
  * one; that is not a collision. A genuine collision is two distinct operations fighting over the same body
  * slot (two request bodies, or two responses, on one endpoint). The resolved path mirrors the generator's own
- * {@link OpenAPI30GenerateExpression#resolveResourceName(String, String)} (the {@code {version}}
+ * {@link OpenAPIGenerateExpression#resolveResourceName(String, String)} (the {@code {version}}
  * substitution), so two paths that differ only by the version placeholder are caught too.
  */
 public final class OasOperationCollisionValidator {
@@ -73,7 +73,7 @@ public final class OasOperationCollisionValidator {
             if (template.getVerbOption() == null || template.getOasOperationId() == null) {
                 continue;
             }
-            String pathKey = OpenAPI30GenerateExpression.resolveResourceName(template.getResourceName(), documentVersion);
+            String pathKey = OpenAPIGenerateExpression.resolveResourceName(template.getResourceName(), documentVersion);
             String verbKey = template.getVerbOption().name().toLowerCase();
             groups.computeIfAbsent(pathKey + " " + verbKey, k -> new GroupAccumulator(pathKey, verbKey))
                     .add(template);
