@@ -17,6 +17,7 @@
 	- [Test Case 5.4 - Retired in 2.0-OAGi developer authorized access to code list management functions.](/docs/test_cases/TestSuite5.md#test-case-54)
 	- [Test Case 5.5 - OAGi developer authorized management of BIE](/docs/test_cases/TestSuite5.md#test-case-55)
 	- [Test Case 5.6 - OAGi developer authorized access to BIE Expression generation](/docs/test_cases/TestSuite5.md#test-case-56)
+	- [Test Case 5.7 - OAGi developer generates a BIE Schema whose filename follows the configured filename expression](/docs/test_cases/TestSuite5.md#test-case-57)
 - [Test Suite 6 - End user access right to connectCenter core functions](/docs/test_cases/TestSuite6.md)
 	- [Test Case 6.1 - End user's authorized management of context schemes](/docs/test_cases/TestSuite6.md#test-case-61)
 	- [Test Case 6.2 - End user authorized management of BIE](/docs/test_cases/TestSuite6.md#test-case-62)
