@@ -1,4 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -16,6 +16,8 @@ import org.oagi.score.gateway.http.api.bie_management.model.asbie.AsbieSummaryRe
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;

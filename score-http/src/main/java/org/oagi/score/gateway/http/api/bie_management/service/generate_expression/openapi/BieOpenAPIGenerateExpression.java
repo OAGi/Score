@@ -1,4 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
@@ -12,6 +12,8 @@ import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummary
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.TopLevelAsbiepQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextSummaryRecord;

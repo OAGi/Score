@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression;
 
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApiSchemaPolicy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApiSchemaPolicy;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 
 import java.util.Map;

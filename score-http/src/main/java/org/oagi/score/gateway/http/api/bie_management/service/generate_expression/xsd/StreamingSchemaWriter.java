@@ -1,4 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;

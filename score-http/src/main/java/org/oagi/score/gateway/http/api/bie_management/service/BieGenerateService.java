@@ -6,9 +6,17 @@ import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenera
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.avro.BieAvroGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSON202012GenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSONDraft04GenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.odf.BieODFSpreadsheetGenerationExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;

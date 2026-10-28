@@ -1,4 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd;
 
 import jakarta.annotation.Nullable;
 import org.jdom2.*;
@@ -20,6 +20,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScSummar
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.SharedComponentRegistry;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.cc_management.model.CoreComponent;
 import org.oagi.score.gateway.http.api.cc_management.model.Definition;

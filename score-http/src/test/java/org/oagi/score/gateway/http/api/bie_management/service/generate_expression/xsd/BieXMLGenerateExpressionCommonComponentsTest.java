@@ -1,14 +1,14 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression.CommonComponents;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression.CommonComponents.Declaration;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression.CommonComponents.GeneratedFile;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression.CommonComponents.Kind;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression.CommonComponents;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression.CommonComponents.Declaration;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression.CommonComponents.GeneratedFile;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression.CommonComponents.Kind;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;

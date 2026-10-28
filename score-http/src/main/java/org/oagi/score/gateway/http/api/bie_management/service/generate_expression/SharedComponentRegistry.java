@@ -38,7 +38,7 @@ public class SharedComponentRegistry {
      * The base filename (without file extension) of a shared file. A file, known by its identity, gets the same
      * filename each time; the name is what the filename is made from, and two files can have the same name.
      */
-    synchronized String sharedFilename(String identity, String name) {
+    public synchronized String sharedFilename(String identity, String name) {
         return sharedFilenames.computeIfAbsent(identity, k -> sharedFilenameResolver.apply(name));
     }
 
@@ -49,7 +49,7 @@ public class SharedComponentRegistry {
      *                {@link UncheckedIOException} on failure
      */
     @SuppressWarnings("unchecked")
-    synchronized <T> T sharedComponents(Object key, Supplier<T> factory, Function<T, List<File>> asFiles) {
+    public synchronized <T> T sharedComponents(Object key, Supplier<T> factory, Function<T, List<File>> asFiles) {
         return (T) entries.computeIfAbsent(key, k -> {
             T components = factory.get();
             return new Entry(components, () -> asFiles.apply(components));

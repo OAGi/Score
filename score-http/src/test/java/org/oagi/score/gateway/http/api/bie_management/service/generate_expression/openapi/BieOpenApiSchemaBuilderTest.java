@@ -1,4 +1,4 @@
-package org.oagi.score.gateway.http.api.bie_management.service.generate_expression;
+package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi;
 
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;

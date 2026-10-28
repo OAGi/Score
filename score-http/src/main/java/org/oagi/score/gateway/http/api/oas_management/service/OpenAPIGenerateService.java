@@ -5,9 +5,9 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummar
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApi30Dialect;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApi31Dialect;
-import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieOpenApiDialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApiDialect;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
