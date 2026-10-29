@@ -401,17 +401,41 @@ public class CodeListCommandService {
                 CcType.CODE_LIST, codeListManifestId, prevCodeListDetails.state(), WIP, requester.userId());
     }
 
+    private void assertCancellable(ScoreUser requester, CodeListDetailsRecord codeListDetails) {
+        if (CcState.WIP != codeListDetails.state()) {
+            throw new IllegalArgumentException("The Code List '" + codeListDetails.name() + "' cannot be cancelled " +
+                    "because it is in the '" + codeListDetails.state() + "' state. "
+                    + "Only Code Lists in the 'WIP' state can be cancelled.");
+        }
+
+        if (requester.isDeveloper()) {
+            if (!codeListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
+            }
+        } else {
+            if (codeListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
+            }
+        }
+
+        if (requester.isDeveloper() != codeListDetails.owner().isDeveloper()) {
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
+        }
+    }
+
     public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId, String comment, String projectFieldOptionOverride) {
 
         CodeListDetailsRecord codeListDetails =
                 query(requester).getCodeListDetails(codeListManifestId);
 
         if (codeListDetails == null) {
-            throw new IllegalArgumentException("Not found a target Agency Id List");
+            throw new IllegalArgumentException("Not found a target Code List");
         }
         if (codeListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
+
+        assertCancellable(requester, codeListDetails);
 
         CcState prevState = codeListDetails.state();
 

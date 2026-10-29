@@ -267,6 +267,28 @@ public class AgencyIdListCommandService {
                 CcState.WIP, requester.userId());
     }
 
+    private void assertCancellable(ScoreUser requester, AgencyIdListDetailsRecord agencyIdListDetails) {
+        if (CcState.WIP != agencyIdListDetails.state()) {
+            throw new IllegalArgumentException("The Agency ID List '" + agencyIdListDetails.name() + "' cannot be cancelled " +
+                    "because it is in the '" + agencyIdListDetails.state() + "' state. "
+                    + "Only Agency ID Lists in the 'WIP' state can be cancelled.");
+        }
+
+        if (requester.isDeveloper()) {
+            if (!agencyIdListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
+            }
+        } else {
+            if (agencyIdListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
+            }
+        }
+
+        if (requester.isDeveloper() != agencyIdListDetails.owner().isDeveloper()) {
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
+        }
+    }
+
     public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, String comment, String projectFieldOptionOverride) {
 
         AgencyIdListDetailsRecord agencyIdListDetails =
@@ -278,6 +300,8 @@ public class AgencyIdListCommandService {
         if (agencyIdListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
+
+        assertCancellable(requester, agencyIdListDetails);
 
         CcState prevState = agencyIdListDetails.state();
 
