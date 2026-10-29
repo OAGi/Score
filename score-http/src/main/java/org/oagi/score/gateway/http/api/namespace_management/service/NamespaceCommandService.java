@@ -132,9 +132,16 @@ public class NamespaceCommandService {
         // Fetch namespace details and validate requester permissions
         NamespaceDetailsRecord namespaceDetails =
                 query(requester).getNamespaceDetails(namespaceId, requester.userId());
+        if (namespaceDetails == null) {
+            throw new EmptyResultDataAccessException(1);
+        }
 
         if (!requester.hasRole(ADMINISTRATOR) && !Objects.equals(namespaceDetails.owner().userId(), requester.userId())) {
             throw new AccessDeniedException("Only the namespace owner can transfer ownership.");
+        }
+
+        if (targetUser == null) {
+            throw new IllegalArgumentException("'targetUser' must not be null.");
         }
 
         // Ensure namespace transfer is allowed based on type and target user role
