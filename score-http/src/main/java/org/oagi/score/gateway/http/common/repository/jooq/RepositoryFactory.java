@@ -8,8 +8,6 @@ import org.oagi.score.gateway.http.cache.RecordCache;
 import org.oagi.score.gateway.http.change.repository.JooqRecordChangeLogRepository;
 import org.oagi.score.gateway.http.change.repository.RecordChangeLogRepository;
 
-import org.oagi.score.gateway.http.api.account_management.repository.PendingQueryRepository;
-import org.oagi.score.gateway.http.api.account_management.repository.jooq.JooqPendingQueryRepository;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountCommandRepository;
 import org.oagi.score.gateway.http.api.passkey_management.repository.PasskeyCommandRepository;
@@ -335,10 +333,6 @@ public class RepositoryFactory {
 
     public LibraryQueryRepository libraryQueryRepository(ScoreUser requester) {
         return new JooqLibraryQueryRepository(dslContext, requester, this);
-    }
-
-    public PendingQueryRepository pendingQueryRepository(ScoreUser requester) {
-        return new JooqPendingQueryRepository(dslContext, requester, this);
     }
 
     public MessageCommandRepository messageCommandRepository(ScoreUser requester) {

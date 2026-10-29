@@ -107,7 +107,7 @@ public class SystemAccountQueryController implements InitializingBean {
             OAuth2User oAuth2User = (OAuth2User) principal;
             String sub = oAuth2User.getAttribute("sub");
             OAuth2UserRecord oAuth2UserRecord = accountQueryService.getOAuth2User(requester, sub);
-            AppOauth2User appOauth2User = pendingListService.getPendingBySub(sub);
+            AppOauth2User appOauth2User = pendingListService.getPendingBySub(requester, sub);
 
             if (oAuth2UserRecord != null && oAuth2UserRecord.userId() != null) {
                 accountDetails = accountQueryService.getAccountDetails(requester, oAuth2UserRecord.userId());
