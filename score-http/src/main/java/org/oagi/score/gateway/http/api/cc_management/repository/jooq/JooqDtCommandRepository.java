@@ -437,7 +437,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         }
         if (sixDigitId != null && compare(dt.sixDigitId(), sixDigitId) != 0) {
             if (hasLength(sixDigitId)) {
-                if (query.hasDuplicateSixDigitId(dtManifestId)) {
+                if (query.hasDuplicateSixDigitId(dtManifestId, sixDigitId)) {
                     throw new IllegalArgumentException("Six Digit Id '" + sixDigitId + "' already exist.");
                 }
                 moreStep = ((moreStep != null) ? moreStep : firstStep)

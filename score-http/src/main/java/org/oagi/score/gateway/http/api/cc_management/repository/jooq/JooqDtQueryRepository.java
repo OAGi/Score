@@ -1405,7 +1405,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     }
 
     @Override
-    public boolean hasDuplicateSixDigitId(DtManifestId dtManifestId) {
+    public boolean hasDuplicateSixDigitId(DtManifestId dtManifestId, String sixDigitId) {
         DtSummaryRecord dt = getDtSummary(dtManifestId);
         return dslContext().selectCount()
                 .from(DT_MANIFEST)
@@ -1413,7 +1413,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                 .where(and(
                         DT_MANIFEST.RELEASE_ID.eq(valueOf(dt.release().releaseId())),
                         DT.GUID.notEqual(dt.guid().value()),
-                        DT.SIX_DIGIT_ID.eq(dt.sixDigitId())
+                        DT.SIX_DIGIT_ID.eq(sixDigitId)
                 ))
                 .fetchOptionalInto(Integer.class).orElse(0) > 0;
     }
