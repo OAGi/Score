@@ -22,14 +22,20 @@ public class ScoreCorsConfigurationSource implements CorsConfigurationSource {
         this.allowedOrigins = allowedOrigins == null ? List.of() : List.copyOf(allowedOrigins);
     }
 
-    @Override
-    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+    /** The configured origins plus the origin the request was addressed to (the {@code Host} header, http or https). */
+    public List<String> allowedOrigins(HttpServletRequest request) {
         List<String> origins = new ArrayList<>(allowedOrigins);
         String host = request.getHeader("Host");
         if (host != null && !host.isBlank()) {
             origins.add("http://" + host);
             origins.add("https://" + host);
         }
+        return origins;
+    }
+
+    @Override
+    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+        List<String> origins = allowedOrigins(request);
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.applyPermitDefaultValues();

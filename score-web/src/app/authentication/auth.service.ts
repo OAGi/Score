@@ -239,7 +239,7 @@ export class AuthService implements OnInit, CanActivate {
     this.logoutInProgress = true;
     localStorage.removeItem(this.USER_INFO_KEY);
 
-    this.http.get('/api/' + environment.logoutPath)
+    this.http.post('/api/' + environment.logoutPath, null)
       .subscribe(resp => {
         this.redirectToLogin(url);
       }, err => {

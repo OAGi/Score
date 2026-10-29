@@ -48,11 +48,13 @@ import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyConfig
 import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationFilter;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.util.StringUtils;
-import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,7 +135,7 @@ public class SecurityConfiguration {
     private List<String> corsAllowedOrigins;
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public ScoreCorsConfigurationSource corsConfigurationSource() {
         return new ScoreCorsConfigurationSource(corsAllowedOrigins);
     }
 
@@ -260,7 +262,8 @@ public class SecurityConfiguration {
                 })
                 .logout(logoutConfigurer -> {
                     logoutConfigurer
-                            .logoutUrl("/logout")
+                            // With CSRF off, logoutUrl() alone accepts every HTTP method, so a link or <img> could log out.
+                            .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/logout"))
                             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                             .invalidateHttpSession(true)
                             .clearAuthentication(true);
@@ -274,6 +277,8 @@ public class SecurityConfiguration {
                 .csrf(csrfConfigurer -> {
                     csrfConfigurer.disable();
                 })
+                // CSRF tokens are not used (the web app sends none); state-changing requests are checked by Origin.
+                .addFilterBefore(new SameOriginRequestFilter(corsConfigurationSource()), CorsFilter.class)
                 .rememberMe(rememberMeConfigurer -> {
                     rememberMeConfigurer.rememberMeServices(rememberMeServices());
                 })
