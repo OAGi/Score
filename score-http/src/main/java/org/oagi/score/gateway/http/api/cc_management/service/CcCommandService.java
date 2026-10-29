@@ -1736,7 +1736,7 @@ public class CcCommandService {
         if (!repositoryFactory.accQueryRepository(requester)
                 .getBccSummaryList(bccpManifestId)
                 .isEmpty()) {
-            new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccp.den() + "'.");
+            throw new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccp.den() + "'.");
         }
 
         return repositoryFactory.bccpCommandRepository(requester).delete(bccpManifestId);
