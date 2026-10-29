@@ -384,15 +384,21 @@ export class BiePackageDetailComponent implements OnInit {
       (biePackage.description === undefined || biePackage.description === '');
   }
 
+  get updateDisabled(): boolean {
+    return !this.isChanged() || this.isDisabled(this.biePackage);
+  }
+
   update() {
-    if (this.hashCode !== hashCode(this.biePackage)) {
-      this.biePackageService.update(this.biePackage).subscribe(_ => {
-        this.init(this.biePackage);
-        this.snackBar.open('Updated', '', {
-          duration: 3000,
-        });
-      });
+    if (this.updateDisabled) {
+      return;
     }
+
+    this.biePackageService.update(this.biePackage).subscribe(_ => {
+      this.init(this.biePackage);
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+    });
   }
 
   updateState(state: string) {

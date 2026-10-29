@@ -81,6 +81,19 @@ public class BiePackageCommandService {
         } else {
             ensureBiePackageIsUpdatable(requester, request.biePackageId(), true);
 
+            if (!hasLength(request.name())) {
+                throw new IllegalArgumentException("The BIE package name cannot be empty.");
+            }
+            if (!hasLength(request.versionId())) {
+                throw new IllegalArgumentException("The BIE package version ID cannot be empty.");
+            }
+            if (!hasLength(request.versionName())) {
+                throw new IllegalArgumentException("The BIE package version name cannot be empty.");
+            }
+            if (!hasLength(request.description())) {
+                throw new IllegalArgumentException("The BIE package description cannot be empty.");
+            }
+
             try {
                 return command(requester).update(
                         request.biePackageId(),

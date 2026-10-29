@@ -2,7 +2,7 @@
   <ng-container ngProjectAs="[detailToolbar]">
     @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
       <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-        [disabled]="!isChanged() || isDisabled(biePackage)">
+        [disabled]="updateDisabled">
         Update
       </button>
     }
