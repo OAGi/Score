@@ -5,19 +5,29 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
+import net.sourceforge.plantuml.version.Version;
 import org.oagi.score.gateway.http.api.plantuml.data.GeneratePlantUmlDiagramRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class PlantUmlService {
+
+    // PlantUML reads the profile from the environment variable or, for this version, from a system property
+    // with the same upper-case name ("plantuml.security.profile" is not honoured).
+    private static final String SECURITY_PROFILE = "PLANTUML_SECURITY_PROFILE";
+
+    static {
+        // The diagram text is caller-controlled. PlantUML's default LEGACY profile lets "!include <path>" and
+        // "!includeurl <url>" read server files and make server-side requests, so default to SANDBOX before
+        // PlantUML initialises. An operator can still choose another profile explicitly.
+        if (System.getProperty(SECURITY_PROFILE) == null && System.getenv(SECURITY_PROFILE) == null) {
+            System.setProperty(SECURITY_PROFILE, "SANDBOX");
+        }
+    }
 
     public String getEncodedText(String text) throws IOException {
         Transcoder transcoder = TranscoderUtil.getDefaultTranscoder();
@@ -33,32 +43,19 @@ public class PlantUmlService {
             reader = new SourceStringReader(request.getText());
         }
 
-        reader.outputImage(outputStream, new FileFormatOption(FileFormat.valueOf(request.getFormat().toUpperCase())));
+        reader.outputImage(outputStream, new FileFormatOption(toFileFormat(request.getFormat())));
+    }
+
+    public FileFormat toFileFormat(String format) {
+        try {
+            return FileFormat.valueOf(format.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Unsupported format: " + format);
+        }
     }
 
     public String getVersion() {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        String result;
-        try {
-            try (OutputStream outputStream = new BufferedOutputStream(byteArrayOutputStream)) {
-                generatePlantUmlDiagram(new GeneratePlantUmlDiagramRequest()
-                        .withText("@startuml\nversion\n@enduml")
-                        .withFormat("txt"), outputStream);
-                outputStream.flush();
-            }
-
-            result = byteArrayOutputStream.toString().trim();
-        } catch (IOException e) {
-            return null;
-        }
-
-        String regex = "PlantUML version (\\d+(\\.\\d+){1,3})";
-        Matcher matcher = Pattern.compile(regex).matcher(result);
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            return null;
-        }
+        return Version.versionString();
     }
 
 }
