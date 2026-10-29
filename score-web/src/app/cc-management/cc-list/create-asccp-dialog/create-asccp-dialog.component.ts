@@ -17,6 +17,9 @@ const CREATE_ASCCP_TABLE = defineTable({
   filters: [F.states, F.definition, F.module, F.deprecated, F.tags, F.owner, F.updater, F.updatedDate],
 });
 
+/** States a role-of ACC may have to be usable in a new ASCCP; excludes Deleted (#26). */
+const USABLE_ROLE_OF_ACC_STATES = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published'];
+
 @Component({
   standalone: false,
   selector: 'score-create-asccp-dialog',
@@ -48,7 +51,8 @@ export class CreateAsccpDialogComponent implements OnInit {
       libraryId: '' + this.data.libraryId,
       releaseId: '' + (this.data.releaseId || 0),
       types: 'acc',
-      componentTypes: [Semantics, SemanticGroup].map(e => e.value).join(',')
+      componentTypes: [Semantics, SemanticGroup].map(e => e.value).join(','),
+      states: USABLE_ROLE_OF_ACC_STATES.join(',')
     };
     if (this.data.excludes?.length > 0) {
       params['excludes'] = this.data.excludes.join(',');

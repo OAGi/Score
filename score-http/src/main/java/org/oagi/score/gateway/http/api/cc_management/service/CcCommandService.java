@@ -337,6 +337,9 @@ public class CcCommandService {
         if (roleOfAcc.isAbstract()) {
             throw new IllegalArgumentException("An abstract ACC cannot be used to create a new ASCCP.");
         }
+        if (roleOfAcc.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted ACC cannot be used to create a new ASCCP.");
+        }
 
         var command = repositoryFactory.asccpCommandRepository(requester);
 
