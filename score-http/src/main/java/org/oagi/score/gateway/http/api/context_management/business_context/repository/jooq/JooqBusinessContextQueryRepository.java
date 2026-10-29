@@ -265,8 +265,7 @@ public class JooqBusinessContextQueryRepository extends JooqBaseRepository imple
                     ), creatorFields(), updaterFields()))
                     .from(BIZ_CTX)
                     .join(creatorTable()).on(BIZ_CTX.CREATED_BY.eq(creatorTablePk()))
-                    .join(updaterTable()).on(BIZ_CTX.LAST_UPDATED_BY.eq(updaterTablePk()))
-                    .leftJoin(TENANT_BUSINESS_CTX).on(BIZ_CTX.BIZ_CTX_ID.eq(TENANT_BUSINESS_CTX.BIZ_CTX_ID));
+                    .join(updaterTable()).on(BIZ_CTX.LAST_UPDATED_BY.eq(updaterTablePk()));
         }
 
         List<Condition> conditions(BusinessContextListFilterCriteria filterCriteria) {
@@ -373,7 +372,8 @@ public class JooqBusinessContextQueryRepository extends JooqBaseRepository imple
         // for tenant management
         if (tenantEnabled) {
             if (tenantId != null && !notConnectedToTenant) {
-                conditions.add(TENANT_BUSINESS_CTX.TENANT_ID.eq(valueOf(tenantId)));
+                conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
+                        .from(TENANT_BUSINESS_CTX).where(TENANT_BUSINESS_CTX.TENANT_ID.eq(valueOf(tenantId)))));
             }
 
             if (tenantId != null && notConnectedToTenant) {
