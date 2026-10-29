@@ -122,11 +122,16 @@ public class CodeListCommandService {
                     );
                     existingValues.remove(valueId);
                 } else {
+                    // A newly added value cannot be deprecated (same rule as the UI).
+                    if (Boolean.TRUE.equals(value.deprecated())) {
+                        throw new IllegalArgumentException("A newly added value cannot be deprecated.");
+                    }
                     command.createValue(codeListManifestId,
                             codeListDetails.codeListId(),
                             codeListDetails.release().releaseId(),
                             value.value(), value.meaning(),
-                            value.definition());
+                            value.definition(),
+                            Boolean.TRUE.equals(value.deprecated()));
                 }
             });
 

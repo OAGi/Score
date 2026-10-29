@@ -10,6 +10,8 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListDetail
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.controller.payload.UpdateCodeListRequest;
+import org.oagi.score.gateway.http.api.code_list_management.controller.payload.UpdateCodeListValueRequest;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListCommandRepository;
 import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
@@ -71,6 +73,25 @@ class CodeListCommandServiceNamespaceTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
         verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_newly_added_deprecated_value() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        when(command.update(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(true);
+        when(query.getCodeListValueDetailsList(manifestId)).thenReturn(List.of());
+        UpdateCodeListValueRequest newValue = new UpdateCodeListValueRequest(
+                null, "C", "Meaning C", null, true, false, false);
+        UpdateCodeListRequest request = new UpdateCodeListRequest(manifestId,
+                "Custom code list", "1", "custom-list", null,
+                null, null, new NamespaceId(BigInteger.ONE), false, false, List.of(newValue));
+
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        verify(command, never()).createValue(any(), any(), any(), any(), any(), any(), anyBoolean());
     }
 
     @Test

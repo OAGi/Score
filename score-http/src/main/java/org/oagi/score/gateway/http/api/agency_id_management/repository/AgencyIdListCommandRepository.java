@@ -37,7 +37,9 @@ public interface AgencyIdListCommandRepository {
             AgencyIdListId agencyIdListId,
             ReleaseId releaseId,
             String value, String name,
-            Definition definition);
+            Definition definition,
+            boolean deprecated,
+            boolean isDeveloperDefault, boolean isUserDefault);
 
     boolean updateValue(
             AgencyIdListValueManifestId valueId,

@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.agency_id_management.service;
 
 import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.CreateAgencyIdListRequest;
 import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.UpdateAgencyIdListRequest;
-import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.UpdateAgencyIdListValueRequest;
 import org.oagi.score.gateway.http.api.agency_id_management.model.*;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListCommandRepository;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
@@ -107,33 +106,42 @@ public class AgencyIdListCommandService {
 
             // Issue #1647
             // Only one 'developer default' and one 'user default' are allowed.
-            UpdateAgencyIdListValueRequest developerDefaultValueRequest =
-                    request.valueList().stream()
-                            .filter(e -> e.developerDefault() != null && e.developerDefault())
-                            .findAny().orElse(null);
-            UpdateAgencyIdListValueRequest userDefaultValueRequest =
-                    request.valueList().stream()
-                            .filter(e -> e.userDefault() != null && e.userDefault())
-                            .findAny().orElse(null);
+            long developerDefaultCount = request.valueList().stream()
+                    .filter(e -> Boolean.TRUE.equals(e.developerDefault())).count();
+            if (developerDefaultCount > 1) {
+                throw new IllegalArgumentException("Only one value can be flagged as 'developer default'.");
+            }
+            long userDefaultCount = request.valueList().stream()
+                    .filter(e -> Boolean.TRUE.equals(e.userDefault())).count();
+            if (userDefaultCount > 1) {
+                throw new IllegalArgumentException("Only one value can be flagged as 'user default'.");
+            }
 
             // Process updates and additions of agency ID list values
             request.valueList().forEach(value -> {
                 AgencyIdListValueManifestId valueId = value.agencyIdListValueManifestId();
+                boolean developerDefault = Boolean.TRUE.equals(value.developerDefault());
+                boolean userDefault = Boolean.TRUE.equals(value.userDefault());
                 if (existingValues.containsKey(valueId)) {
                     command.updateValue(valueId,
                             value.value(), value.name(),
                             value.definition(),
                             value.deprecated(),
-                            (developerDefaultValueRequest != null && developerDefaultValueRequest.agencyIdListValueManifestId().equals(value.agencyIdListValueManifestId())) ? value.developerDefault() : null,
-                            (userDefaultValueRequest != null && userDefaultValueRequest.agencyIdListValueManifestId().equals(value.agencyIdListValueManifestId())) ? value.userDefault() : null
+                            developerDefault, userDefault
                     );
                     existingValues.remove(valueId);
                 } else {
+                    // A newly added value cannot be deprecated (same rule as the UI).
+                    if (Boolean.TRUE.equals(value.deprecated())) {
+                        throw new IllegalArgumentException("A newly added value cannot be deprecated.");
+                    }
                     command.createValue(agencyIdListManifestId,
                             agencyIdListDetails.agencyIdListId(),
                             agencyIdListDetails.release().releaseId(),
                             value.value(), value.name(),
-                            value.definition());
+                            value.definition(),
+                            Boolean.TRUE.equals(value.deprecated()),
+                            developerDefault, userDefault);
                 }
             });
 

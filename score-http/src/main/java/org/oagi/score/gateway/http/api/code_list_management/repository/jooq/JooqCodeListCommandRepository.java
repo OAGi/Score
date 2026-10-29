@@ -490,7 +490,8 @@ public class JooqCodeListCommandRepository
             CodeListId codeListId,
             ReleaseId releaseId,
             String value, String meaning,
-            Definition definition) {
+            Definition definition,
+            boolean deprecated) {
 
         LocalDateTime timestamp = LocalDateTime.now();
 
@@ -508,7 +509,7 @@ public class JooqCodeListCommandRepository
         codeListValueRecord.setLastUpdatedBy(valueOf(requester().userId()));
         codeListValueRecord.setCreationTimestamp(timestamp);
         codeListValueRecord.setLastUpdateTimestamp(timestamp);
-        codeListValueRecord.setIsDeprecated((byte) 0);
+        codeListValueRecord.setIsDeprecated((byte) (deprecated ? 1 : 0));
 
         CodeListValueId codeListValueId = new CodeListValueId(
                 dslContext().insertInto(CODE_LIST_VALUE)
