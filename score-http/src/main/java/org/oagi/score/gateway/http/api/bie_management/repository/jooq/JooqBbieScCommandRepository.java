@@ -254,13 +254,8 @@ public class JooqBbieScCommandRepository extends JooqBaseRepository implements B
                 bbieScRecord.setDisplayName(emptyToNull(bbieSc.getDisplayName()));
             }
 
-            if (StringUtils.hasLength(bbieSc.getDefaultValue())) {
-                bbieScRecord.setDefaultValue(bbieSc.getDefaultValue());
-                bbieScRecord.setFixedValue(null);
-            } else if (StringUtils.hasLength(bbieSc.getFixedValue())) {
-                bbieScRecord.setDefaultValue(null);
-                bbieScRecord.setFixedValue(bbieSc.getFixedValue());
-            }
+            BieValueConstraintUpdates.apply(bbieSc.getDefaultValue(), bbieSc.getFixedValue(),
+                    bbieScRecord::setDefaultValue, bbieScRecord::setFixedValue);
 
             if (!bbieSc.isEmptyPrimitive()) {
                 if (bbieSc.getXbtManifestId() != null) {

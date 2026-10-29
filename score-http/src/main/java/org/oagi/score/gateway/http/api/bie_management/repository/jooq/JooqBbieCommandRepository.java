@@ -268,13 +268,8 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
                 bbieRecord.setRemark(emptyToNull(bbie.getRemark()));
             }
 
-            if (StringUtils.hasLength(bbie.getDefaultValue())) {
-                bbieRecord.setDefaultValue(bbie.getDefaultValue());
-                bbieRecord.setFixedValue(null);
-            } else if (StringUtils.hasLength(bbie.getFixedValue())) {
-                bbieRecord.setDefaultValue(null);
-                bbieRecord.setFixedValue(bbie.getFixedValue());
-            }
+            BieValueConstraintUpdates.apply(bbie.getDefaultValue(), bbie.getFixedValue(),
+                    bbieRecord::setDefaultValue, bbieRecord::setFixedValue);
 
             if (!bbie.isEmptyPrimitive()) {
                 if (bbie.getXbtManifestId() != null) {
