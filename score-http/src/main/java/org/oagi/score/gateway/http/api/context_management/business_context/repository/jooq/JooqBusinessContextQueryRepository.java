@@ -382,8 +382,8 @@ public class JooqBusinessContextQueryRepository extends JooqBaseRepository imple
             }
         }
 
-        // for editing bie
-        if (tenantEnabled && bieEditing) {
+        // for editing bie; an Admin is offered the business contexts of every tenant
+        if (tenantEnabled && bieEditing && !requester().isAdministrator()) {
             conditions.add(BIZ_CTX.BIZ_CTX_ID.in(
                     dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
                             .from(TENANT_BUSINESS_CTX)
