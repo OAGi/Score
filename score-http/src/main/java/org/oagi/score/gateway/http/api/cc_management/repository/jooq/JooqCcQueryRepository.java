@@ -198,27 +198,29 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                 boolean forCount, List<SortField<?>> branchOrderBy, int branchLimit) {
 
             List<SelectConditionStep<? extends org.jooq.Record>> branches = new ArrayList<>();
+            // Component types exist only for ACCs, so no other kind of component can match a Component Type filter.
+            boolean componentTypeFiltered = isNotEmpty(filterCriteria.componentTypes());
             if (filterCriteria.types().isAcc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new AccListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            if (filterCriteria.types().isAscc() && filterCriteria.asccpManifestIds().isEmpty()) {
+            if (!componentTypeFiltered && filterCriteria.types().isAscc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new AsccListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            if (filterCriteria.types().isBcc() && filterCriteria.asccpManifestIds().isEmpty()) {
+            if (!componentTypeFiltered && filterCriteria.types().isBcc() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new BccListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            if (filterCriteria.types().isAsccp()) {
+            if (!componentTypeFiltered && filterCriteria.types().isAsccp()) {
                 var queryBuilder = new AsccpListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            if (filterCriteria.types().isBccp() && filterCriteria.asccpManifestIds().isEmpty()) {
+            if (!componentTypeFiltered && filterCriteria.types().isBccp() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new BccpListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
-            if (filterCriteria.types().isDt() && filterCriteria.asccpManifestIds().isEmpty()) {
+            if (!componentTypeFiltered && filterCriteria.types().isDt() && filterCriteria.asccpManifestIds().isEmpty()) {
                 var queryBuilder = new DtListQueryBuilder(filterCriteria);
                 branches.add(queryBuilder.select(forCount).where(queryBuilder.conditions(includedReleaseSummarySet)));
             }
