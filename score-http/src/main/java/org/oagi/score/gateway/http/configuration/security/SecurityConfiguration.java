@@ -38,6 +38,8 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.jwt.JwtTypeValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.ObjectPostProcessor;
@@ -177,13 +179,19 @@ public class SecurityConfiguration {
     )
             throws Exception {
         if (!applicationConfigurationService.isTenantEnabled(sessionService.getScoreSystemUser()) && StringUtils.hasText(jwkSetUri)) {
-            JOSEObjectTypeVerifier typeVerifier = StringUtils.hasLength(allowedTypes) ?
+            List<String> tokenTypes = StringUtils.hasLength(allowedTypes) ?
+                    Arrays.stream(allowedTypes.split(",")).map(String::trim).toList() :
+                    List.of();
+            JOSEObjectTypeVerifier typeVerifier = tokenTypes.isEmpty() ?
+                    DefaultJOSEObjectTypeVerifier.JWT :
                     new DefaultJOSEObjectTypeVerifier<>(
-                            Arrays.stream(allowedTypes.split(","))
-                                    .map(e -> new JOSEObjectType(e.trim()))
-                                    .collect(Collectors.toSet())
-                    ) :
-                    DefaultJOSEObjectTypeVerifier.JWT;
+                            tokenTypes.stream().map(JOSEObjectType::new).collect(Collectors.toSet()));
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                    .jwtProcessorCustomizer(processor -> processor.setJWSTypeVerifier(typeVerifier)).build();
+            if (!tokenTypes.isEmpty()) {
+                // The default validators only accept the type JWT, which would reject the configured types again.
+                jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(new JwtTypeValidator(tokenTypes)));
+            }
 
             http
                     .securityMatchers((matchers) -> matchers
@@ -199,11 +207,7 @@ public class SecurityConfiguration {
                     .cors(cors -> cors.disable())
                     .csrf(csrf -> csrf.disable())
                     .oauth2ResourceServer(oauth2 ->
-                            oauth2.jwt(jwt -> jwt.decoder(
-                                    NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
-                                            .jwtProcessorCustomizer(processor ->
-                                                    processor.setJWSTypeVerifier(typeVerifier)).build()
-                            )));
+                            oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
         } else {
             http
                     .securityMatchers((matchers) -> matchers
