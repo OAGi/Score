@@ -27,7 +27,7 @@ import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'account',
     component: AccountListComponent,
@@ -67,31 +67,31 @@ const routes: Routes = [
   {
     path: 'tenant',
     component: TenantListComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant'
   },
   {
     path: 'tenant/create',
     component: TenantCreateComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Create Tenant'
   },
   {
     path: 'tenant/:id',
     component: UpdateTenantComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant'
   },
   {
     path: 'tenant/bis-ctx/:id',
     component: TenantBusinessCtxDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant Business Context'
   },
   {
     path: 'tenant/users/:id',
     component: TenantUserDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant Users'
   },
 ];
