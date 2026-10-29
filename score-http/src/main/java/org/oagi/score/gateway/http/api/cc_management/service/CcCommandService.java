@@ -1675,7 +1675,7 @@ public class CcCommandService {
             throw new IllegalArgumentException("Please purge related-ASCCPs first before purging the ACC '" + acc.den() + "'.");
         }
 
-        if (!query.getInheritedAccSummaryList(acc.basedAccManifestId()).isEmpty()) {
+        if (!query.getInheritedAccSummaryList(accManifestId).isEmpty()) {
             throw new IllegalArgumentException("Please purge derivations first before purging the ACC '" + acc.den() + "'.");
         }
 
