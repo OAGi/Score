@@ -686,23 +686,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .setNull(DT_SC.DEFINITION_SOURCE);
         }
         if (valueConstraint != null) {
-            if (valueConstraint.hasFixedValue()) {
-                if (valueConstraint.hasFixedValue() &&
-                        (dtSc.valueConstraint() == null || compare(dtSc.valueConstraint().fixedValue(), valueConstraint.fixedValue()) != 0)) {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .set(DT_SC.FIXED_VALUE, valueConstraint.fixedValue())
-                            .setNull(DT_SC.DEFAULT_VALUE);
-                } else if (valueConstraint.hasDefaultValue() &&
-                        (dtSc.valueConstraint() == null || compare(dtSc.valueConstraint().defaultValue(), valueConstraint.defaultValue()) != 0)) {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .set(DT_SC.DEFAULT_VALUE, valueConstraint.defaultValue())
-                            .setNull(DT_SC.FIXED_VALUE);
-                } else {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .setNull(DT_SC.DEFAULT_VALUE)
-                            .setNull(DT_SC.FIXED_VALUE);
-                }
-            }
+            moreStep = ValueConstraintUpdates.apply(firstStep, moreStep, dtSc.valueConstraint(), valueConstraint,
+                    DT_SC.FIXED_VALUE, DT_SC.DEFAULT_VALUE);
         } else {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .setNull(DT_SC.DEFAULT_VALUE)
