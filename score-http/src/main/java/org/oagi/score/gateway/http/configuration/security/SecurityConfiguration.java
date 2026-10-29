@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -53,9 +52,7 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.util.StringUtils;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -132,21 +129,12 @@ public class SecurityConfiguration {
         return new HttpSessionCsrfTokenRepository();
     }
 
+    @Value("${score.cors.allowed-origins:}")
+    private List<String> corsAllowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.applyPermitDefaultValues();
-        corsConfiguration.setAllowedMethods(
-                Arrays.asList(
-                        HttpMethod.GET.name(), HttpMethod.HEAD.name(),
-                        HttpMethod.POST.name(), HttpMethod.PUT.name(),
-                        HttpMethod.PATCH.name(), HttpMethod.DELETE.name())
-        );
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("*"));
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
+        return new ScoreCorsConfigurationSource(corsAllowedOrigins);
     }
 
     @Bean
