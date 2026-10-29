@@ -16,11 +16,11 @@ const LOG_TABLE = defineTable({
     {id: 'revisionNum', label: 'Revision', width: 100, sortable: true},
     {id: 'revisionAction', label: 'Action', width: 0, sortable: true},
     {id: 'loginId', label: 'Actor', width: 140, sortable: true},
-    {id: 'timestamp', label: 'Created At', header: 'Created at', width: 160, sortable: true},
+    {id: 'creationTimestamp', label: 'Created At', header: 'Created at', width: 160, sortable: true},
   ],
   fixed: [{id: 'check', position: 'start', header: 'Compare'}],
   sortParam: 'sortActive',
-  defaultSort: {active: 'lastUpdateTimestamp', direction: 'desc'},
+  defaultSort: {active: 'creationTimestamp', direction: 'desc'},
 });
 
 @Component({
