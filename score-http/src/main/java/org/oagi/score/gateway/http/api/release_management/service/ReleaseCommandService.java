@@ -102,9 +102,14 @@ public class ReleaseCommandService implements InitializingBean {
      * @param requester The user requesting the release creation.
      * @param request   The details of the release to be created.
      * @return The ID of the newly created release.
-     * @throws IllegalArgumentException if a release with the same release number already exists.
+     * @throws IllegalArgumentException if the requester is not a developer or a release with the
+     *                                  same release number already exists.
      */
     public ReleaseId create(ScoreUser requester, CreateReleaseRequest request) {
+        if (!requester.hasRole(DEVELOPER)) {
+            throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can create a release.");
+        }
+
         var query = repositoryFactory.releaseQueryRepository(requester);
         if (query.hasDuplicateReleaseNumber(request.libraryId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
@@ -124,7 +129,9 @@ public class ReleaseCommandService implements InitializingBean {
      *
      * @param requester The user requesting the update.
      * @param request   The details of the release update.
-     * @throws IllegalArgumentException if the release does not exist or if the release number is duplicated.
+     * @throws IllegalArgumentException if the requester is not a developer, the release does not exist,
+     *                                  the release is in the 'Published' or 'Processing' state, the update
+     *                                  attempts to rename the 'Working' release, or the release number is duplicated.
      */
     @Transactional
     public void update(ScoreUser requester, UpdateReleaseRequest request) {
@@ -132,11 +139,21 @@ public class ReleaseCommandService implements InitializingBean {
         if (request.releaseId() == null) {
             throw new IllegalArgumentException("'releaseId' is required.");
         }
+        if (!requester.hasRole(DEVELOPER)) {
+            throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can update a release.");
+        }
 
         var query = repositoryFactory.releaseQueryRepository(requester);
 
-        if (!query.exists(request.releaseId())) {
+        ReleaseSummaryRecord releaseSummary = query.getReleaseSummary(request.releaseId());
+        if (releaseSummary == null) {
             throw new IllegalArgumentException("'" + request.releaseId() + "' does not exist.");
+        }
+        if (releaseSummary.state() == Published || releaseSummary.state() == Processing) {
+            throw new IllegalArgumentException("The release in '" + releaseSummary.state() + "' state cannot be updated.");
+        }
+        if (releaseSummary.isWorkingRelease() && !releaseSummary.releaseNum().equals(request.releaseNum())) {
+            throw new IllegalArgumentException("'" + releaseSummary.releaseNum() + "' release number cannot be changed.");
         }
         if (query.hasDuplicateReleaseNumberExcludingCurrent(request.releaseId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
