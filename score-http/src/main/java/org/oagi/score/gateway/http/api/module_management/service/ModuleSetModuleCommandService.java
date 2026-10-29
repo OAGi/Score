@@ -148,10 +148,16 @@ public class ModuleSetModuleCommandService {
         ModuleSummaryRecord targetModule = query.getModule(request.targetModuleId());
         ModuleSummaryRecord parentModule = query.getModule(request.parentModuleId());
 
-        if (query.hasDuplicateName(request.parentModuleId(), targetModule.name())) {
-            copyOverWriteModule(requester, targetModule, parentModule, request.copySubModules());
+        copyModule(requester, targetModule, parentModule, request.copySubModules());
+    }
+
+    private void copyModule(
+            ScoreUser requester, ModuleSummaryRecord targetModule, ModuleSummaryRecord parentModule, boolean copySubModules) {
+
+        if (query(requester).hasDuplicateName(parentModule.moduleId(), targetModule.name())) {
+            copyOverWriteModule(requester, targetModule, parentModule, copySubModules);
         } else {
-            copyInsertModule(requester, targetModule, parentModule, request.copySubModules());
+            copyInsertModule(requester, targetModule, parentModule, copySubModules);
         }
     }
 
@@ -177,22 +183,20 @@ public class ModuleSetModuleCommandService {
                         targetModule.namespaceId(), targetModule.versionNum(), ModuleType.DIRECTORY);
                 if (copySubModules) {
                     query.getChildren(targetModule.moduleId()).stream().forEach(child -> {
-                        copyInsertModule(requester, child, duplicated, copySubModules);
+                        copyModule(requester, child, duplicated, copySubModules);
                     });
                 }
             }
         } else {
             if (targetModule.type() == ModuleType.FILE) {
-                command.delete(duplicated.moduleId());
-                if (copySubModules) {
-                    copyInsertModule(requester, targetModule, parentModule, copySubModules);
-                }
+                discard(requester, duplicated);
+                copyInsertModule(requester, targetModule, parentModule, copySubModules);
             } else {
                 command.updateVersionNumAndNamespaceId(duplicated.moduleId(),
                         targetModule.namespaceId(), targetModule.versionNum());
                 if (copySubModules) {
                     query.getChildren(targetModule.moduleId()).stream().forEach(child -> {
-                        copyInsertModule(requester, child, duplicated, copySubModules);
+                        copyModule(requester, child, duplicated, copySubModules);
                     });
                 }
             }
