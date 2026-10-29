@@ -964,8 +964,8 @@ public class CcCommandService {
         var command = repositoryFactory.bccpCommandRepository(requester);
         boolean updated = command.update(request.bccpManifestId(),
                 request.propertyTerm(),
-                request.deprecated(),
                 request.nillable(),
+                request.deprecated(),
                 request.namespaceId(),
                 hasLength(request.fixedValue()) ?
                         new ValueConstraint(null, request.fixedValue()) :
