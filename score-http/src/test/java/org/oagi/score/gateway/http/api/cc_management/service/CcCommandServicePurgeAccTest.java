@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
@@ -46,6 +47,7 @@ class CcCommandServicePurgeAccTest {
 
         AccSummaryRecord acc = mock(AccSummaryRecord.class);
         when(acc.state()).thenReturn(CcState.Deleted);
+        when(acc.owner()).thenReturn(mock(UserSummaryRecord.class));
         when(acc.den()).thenReturn("Acc. Details");
         when(acc.basedAccManifestId()).thenReturn(BASE_ACC_MANIFEST_ID);
         when(accQuery.getAccSummary(ACC_MANIFEST_ID)).thenReturn(acc);

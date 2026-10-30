@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.service;
 
 import org.oagi.score.gateway.http.common.util.DenUtils;
 import jakarta.annotation.Nullable;
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccCreateRequest;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccUpdateRequest;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.ascc.AsccCreateRequest;
@@ -1382,7 +1383,9 @@ public class CcCommandService {
         }
 
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, acc.owner(), "restore");
+        } else {
             if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
@@ -1489,7 +1492,9 @@ public class CcCommandService {
         }
 
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, asccp.owner(), "restore");
+        } else {
             if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
@@ -1594,7 +1599,9 @@ public class CcCommandService {
         }
 
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, bccp.owner(), "restore");
+        } else {
             if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
@@ -1650,7 +1657,9 @@ public class CcCommandService {
         }
 
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, dt.owner(), "restore");
+        } else {
             if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
@@ -1729,6 +1738,20 @@ public class CcCommandService {
         }
     }
 
+    /**
+     * A Deleted core component can be restored or purged only by a user in the same role as its owner, as a
+     * Code List and an Agency ID List can.
+     */
+    private void assertSameRoleAsOwner(ScoreUser requester, UserSummaryRecord owner, String action) {
+        if (owner.isDeveloper() != requester.isDeveloper()) {
+            if (owner.isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can " + action + " this component.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can " + action + " this component.");
+            }
+        }
+    }
+
     public boolean purge(ScoreUser requester, AccManifestId accManifestId) {
 
         if (requester == null) {
@@ -1741,6 +1764,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.accQueryRepository(requester);
         AccSummaryRecord acc = query.getAccSummary(accManifestId);
+        assertSameRoleAsOwner(requester, acc.owner(), "purge");
         if (acc.componentType() == UserExtensionGroup) {
             var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
             AsccpSummaryRecord groupAsccp = asccpQuery.getAsccpSummaryList(accManifestId).stream().findFirst().orElse(null);
@@ -1788,6 +1812,9 @@ public class CcCommandService {
         var query = repositoryFactory.asccpQueryRepository(requester);
         AsccpSummaryRecord asccp = query.getAsccpSummary(asccpManifestId);
 
+        if (!skipStateCheck) {
+            assertSameRoleAsOwner(requester, asccp.owner(), "purge");
+        }
         if (!skipStateCheck && CcState.Deleted != asccp.state()) {
             throw new IllegalArgumentException("The ASCCP '" + asccp.den() + "' cannot be purged " +
                     "because it is in the '" + asccp.state() + "' state. "
@@ -1815,6 +1842,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.bccpQueryRepository(requester);
         BccpSummaryRecord bccp = query.getBccpSummary(bccpManifestId);
+        assertSameRoleAsOwner(requester, bccp.owner(), "purge");
 
         if (CcState.Deleted != bccp.state()) {
             throw new IllegalArgumentException("The BCCP '" + bccp.den() + "' cannot be purged " +
@@ -1843,6 +1871,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.dtQueryRepository(requester);
         DtSummaryRecord dt = query.getDtSummary(dtManifestId);
+        assertSameRoleAsOwner(requester, dt.owner(), "purge");
 
         if (CcState.Deleted != dt.state()) {
             throw new IllegalArgumentException("The DT '" + dt.den() + "' cannot be purged " +

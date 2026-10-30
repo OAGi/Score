@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
@@ -40,6 +41,7 @@ class CcCommandServicePurgeBccpTest {
         AccQueryRepository accQuery = mock(AccQueryRepository.class);
         BccpSummaryRecord bccp = mock(BccpSummaryRecord.class);
         when(bccp.state()).thenReturn(CcState.Deleted);
+        when(bccp.owner()).thenReturn(mock(UserSummaryRecord.class));
         when(bccp.den()).thenReturn("Prop. Type");
         when(bccpQuery.getBccpSummary(BCCP_MANIFEST_ID)).thenReturn(bccp);
         when(accQuery.getBccSummaryList(BCCP_MANIFEST_ID)).thenReturn(List.of(mock(BccSummaryRecord.class)));
