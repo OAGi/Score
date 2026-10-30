@@ -1,4 +1,4 @@
-import {afterNextRender, ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -7,7 +7,7 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, DT_DIALOG_TABLE, ccStateOptions} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, DT_DIALOG_TABLE, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 import {CcListComponent} from '../../cc-list/cc-list.component';
 import {forkJoin} from 'rxjs';
 import {TagService} from '../../../tag-management/domain/tag.service';
@@ -32,8 +32,9 @@ export class CreateBdtDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
-  /** QA and Production are for a published release, and the Working branch has none. */
-  private readonly states = ccStateOptions(!!this.data.workingRelease);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CcListEntry>(false, []);
@@ -42,7 +43,7 @@ export class CreateBdtDialogComponent implements OnInit {
   readonly extraParams = signal<Record<string, string>>({});
   readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states});
 
-  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
+  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable));
   private tagService = inject(TagService);
   private namespaceService = inject(NamespaceService);
   readonly columns = createTableColumns(CREATE_BDT_TABLE);

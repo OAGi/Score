@@ -8,7 +8,7 @@ import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {CcListComponent} from '../cc-list.component';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, ccStateOptions} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 
 const BOD_COLUMNS = [
   {id: 'state', label: 'State', width: 104, sortable: true},
@@ -51,8 +51,9 @@ export class CreateBodDialogComponent {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
-  /** QA and Production are for a published release, and the Working branch has none. */
-  private readonly states = ccStateOptions(!!this.data.workingRelease);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
   readonly verbColumns = createTableColumns(VERB_TABLE);
   readonly nounColumns = createTableColumns(NOUN_TABLE);
@@ -68,8 +69,8 @@ export class CreateBodDialogComponent {
   extraParams: Record<string, string> = {};
   readonly filterOptions = {states: this.states};
 
-  readonly verbLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Verb'));
-  readonly nounLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Noun'));
+  readonly verbLoad = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable).set('tags', 'Verb'));
+  readonly nounLoad = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable).set('tags', 'Noun'));
   readonly rowKey = (row: CcListEntry) => row;
 
   constructor() {
@@ -79,7 +80,9 @@ export class CreateBodDialogComponent {
       releaseId: '' + (this.data.releaseId || 0),
       types: 'asccp'
     };
-    afterNextRender(() => this.ready.set(true));
+    afterNextRender(() => {
+      this.ready.set(true);
+    });
   }
 
   onNoClick(): void {

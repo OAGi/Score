@@ -34,7 +34,7 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
-import {ccStateOptions} from '../domain/cc-dialog.table';
+import {ccStateList, ccStateOptions} from '../domain/cc-dialog.table';
 
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
 const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
@@ -190,7 +190,7 @@ export class DtListComponent {
   /** The library, the branch and the types go to the query. Returns whether the parameters for the endpoint changed. */
   private applyChoices(): boolean {
     this.view().setFilter('releaseId', '' + (this.releaseChoice.release?.releaseId || 0));
-    const states = ccStateOptions(!!this.releaseChoice.release?.workingRelease);
+    const states = ccStateOptions(ccStateList(!!this.releaseChoice.release?.workingRelease));
     this.filterOptions.update(options => ({...options, states}));
 
     const params: Record<string, string> = {libraryId: '' + this.libraryChoice.library?.libraryId};

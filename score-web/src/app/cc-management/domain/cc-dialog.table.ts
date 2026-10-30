@@ -1,32 +1,42 @@
+import {HttpParams} from '@angular/common/http';
 import {defineTable} from '../../common/score-table';
 import {OagisComponentTypes} from './core-component-node';
 
-/** The Working branch is where developers work; ReleaseDraft is left out, as nothing new is done to a component then. */
-const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'Published', 'Deleted'];
-/** A published release is where end users work, and QA and Production are theirs alone. */
+/** The Working branch is where developers work: WIP, Draft, Candidate, then Published, with ReleaseDraft just before a release. */
+const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
+/** A published release is where end users work: WIP, QA, Production, and Published. */
 const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
 
-/** The states that a core component or a data type may have; only the branch tells, as a role works on one branch. */
+/** Every state that a core component or a data type may have, for the lists that browse them; only the branch tells. */
 export function ccStateList(workingRelease: boolean): string[] {
   return workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
 }
 
-/** The State filter's options for the branch. */
-export function ccStateOptions(workingRelease: boolean): { value: string, label: string }[] {
-  return ccStateList(workingRelease).map(e => ({value: e, label: separate(e)}));
+/**
+ * The states that a component may be picked in, by a dialog that builds a new component on it.
+ * A deleted one is gone, and a release draft is about to be released (it becomes a Candidate or Published),
+ * so nothing is to depend on it.
+ */
+export function pickableCcStates(workingRelease: boolean): string[] {
+  return ccStateList(workingRelease).filter(e => e !== 'Deleted' && e !== 'ReleaseDraft');
 }
 
-/** The states a new component may be built on, to begin with: all but Deleted. */
-export function usableCcStates(workingRelease: boolean): string[] {
-  return ccStateList(workingRelease).filter(e => e !== 'Deleted');
+/** With no state chosen, a dialog asks for the states that a component may be picked in, as if all of them were chosen. */
+export function withPickableStates(params: HttpParams, pickable: string[]): HttpParams {
+  return params.has('states') ? params : params.set('states', pickable.join(','));
+}
+
+/** The State filter's options for the states a screen gives. */
+export function ccStateOptions(states: string[]): { value: string, label: string }[] {
+  return states.map(e => ({value: e, label: separate(e)}));
 }
 
 export const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
 
 /** The filters that the dialogs choosing a core component share; a dialog takes the ones that it had, in its order. */
 export const CC_DIALOG_FILTERS = {
-  states: {type: 'select', key: 'states', label: 'State', options: RELEASE_STATE_LIST.map(e => ({value: e, label: separate(e)}))},
+  states: {type: 'select', key: 'states', label: 'State'},
   definition: {type: 'text', key: 'definition', label: 'Definition'},
   module: {type: 'text', key: 'module', label: 'CORE_COMPONENT_LIST.MODULE'},
   deprecated: {type: 'select', key: 'deprecated', label: 'Deprecated', options: TRUE_FALSE, onlyWhenOne: true},

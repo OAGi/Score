@@ -1,4 +1,4 @@
-import {afterNextRender, ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -10,7 +10,7 @@ import {CcListComponent} from '../cc-list.component';
 import {TagService} from '../../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions, usableCcStates} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 
 const CREATE_ASCCP_TABLE = defineTable({
   ...CC_WITHOUT_TYPE_TABLE,
@@ -31,8 +31,9 @@ export class CreateAsccpDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
-  /** QA and Production are for a published release, and the Working branch has none. */
-  private readonly states = ccStateOptions(!!this.data.workingRelease);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   readonly columns = createTableColumns(CREATE_ASCCP_TABLE);
@@ -43,12 +44,7 @@ export class CreateAsccpDialogComponent implements OnInit {
   readonly extraParams = signal<Record<string, string>>({});
   readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states, tags: []});
 
-  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
-
-  constructor() {
-    // A new ASCCP may take a role-of ACC in any state but Deleted; the user can narrow them down.
-    afterNextRender(() => this.view().setFilter('states', usableCcStates(!!this.data.workingRelease)));
-  }
+  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable));
 
   ngOnInit() {
     this.action = this.data.action;

@@ -7,7 +7,7 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 import {ExtensionDetailComponent} from '../../extension-detail/extension-detail.component';
 import {Base, Semantics} from '../../domain/core-component-node';
 
@@ -29,8 +29,9 @@ export class BasedAccDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
-  /** QA and Production are for a published release, and the Working branch has none. */
-  private readonly states = ccStateOptions(!!this.data.workingRelease);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CcListEntry>(false, []);
@@ -39,7 +40,7 @@ export class BasedAccDialogComponent implements OnInit {
   readonly extraParams = signal<Record<string, string>>({});
   readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states});
 
-  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
+  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable));
   readonly columns = createTableColumns(BASED_ACC_TABLE);
   action: string;
 
