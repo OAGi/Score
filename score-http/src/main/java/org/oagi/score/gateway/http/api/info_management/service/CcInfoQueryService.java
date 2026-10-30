@@ -88,7 +88,9 @@ public class CcInfoQueryService {
                         .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
 
         Map<CcState, Integer> numberOfMyCcExtByStates =
-                summaryCcExtList.stream().collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
+                summaryCcExtList.stream()
+                        .filter(e -> e.getOwnerUserId().equals(requester.userId()))
+                        .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
 
 //        Map<CcState, Integer> numberOfMyBieByStates =
 //                summaryCcExtList.stream()
