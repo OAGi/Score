@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.repository.AccCommandRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.AccQueryRepository;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -22,6 +23,8 @@ import java.math.BigInteger;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -71,6 +74,26 @@ class CcCommandServiceAppendAccGuardTest {
         assertThrows(IllegalArgumentException.class,
                 () -> service.createBcc(requester, BccCreateRequest.builder(ACC_ID, BCCP_ID).build()));
         assertNothingAppended();
+    }
+
+    @Test
+    void anEndUserCanCreateTheFirstUserExtensionOfAProductionAccOfADeveloper() {
+        accOwnedBy(CcState.Production, 2);
+        AccManifestId ueAcc = new AccManifestId(BigInteger.valueOf(30));
+        AsccpManifestId ueAsccp = new AsccpManifestId(BigInteger.valueOf(31));
+        when(requester.isDeveloper()).thenReturn(false);
+        CcCommandService spy = spy(service);
+        doReturn(ueAcc).when(spy).createAcc(any(), any());
+        doReturn(ueAsccp).when(spy).createAsccp(any(), any());
+        doReturn(null).when(spy).createAscc(any(), any(), any(), any(), anyBoolean());
+        AccSummaryRecord eAcc = mock(AccSummaryRecord.class);
+        when(eAcc.accManifestId()).thenReturn(ACC_ID);
+        when(eAcc.objectClassTerm()).thenReturn("All Extension");
+
+        spy.appendUserExtension(requester, eAcc, null, new ReleaseId(BigInteger.ONE));
+
+        verify(spy).createAscc(eq(requester), argThat(r -> ACC_ID.equals(r.accManifestId())),
+                any(), any(), eq(false));
     }
 
     @Test
