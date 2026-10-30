@@ -175,13 +175,21 @@ public class JooqAsbiepCommandRepository extends JooqBaseRepository implements A
         return asbiep;
     }
 
-    private void applyAsbiepSupportDocListChanges(
+    void applyAsbiepSupportDocListChanges(
             AsbiepId asbiepId, List<org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSupportDocRecord> supportDocList) {
 
         List<AsbiepSupportDocId> existingSupportDocIdList = dslContext().select(ASBIEP_SUPPORT_DOC.ASBIEP_SUPPORT_DOC_ID)
                 .from(ASBIEP_SUPPORT_DOC)
                 .where(ASBIEP_SUPPORT_DOC.ASBIEP_ID.eq(valueOf(asbiepId)))
                 .fetchStreamInto(BigInteger.class).map(e -> new AsbiepSupportDocId(e)).collect(Collectors.toList());
+
+        // A support document is updated only through the ASBIEP that owns it.
+        for (org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSupportDocRecord supportDoc : supportDocList) {
+            if (supportDoc.asbiepSupportDocId() != null && !existingSupportDocIdList.contains(supportDoc.asbiepSupportDocId())) {
+                throw new IllegalArgumentException("The support document '" + supportDoc.asbiepSupportDocId() +
+                        "' does not belong to the ASBIEP '" + asbiepId + "'.");
+            }
+        }
 
         Set<AsbiepSupportDocId> currentIds = supportDocList.stream()
                 .map(org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSupportDocRecord::asbiepSupportDocId)
