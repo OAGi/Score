@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.Production;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.WIP;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -64,9 +65,9 @@ public class BiePackageCommandService {
 
         return command(requester).create(
                 request.libraryId(),
-                hasLength(request.name()) ? request.name() : "New BIE Package",
-                hasLength(request.versionId()) ? request.versionId() : "v1.0",
-                hasLength(request.versionName()) ? request.versionName() : newVersionName(),
+                hasText(request.name()) ? request.name().trim() : "New BIE Package",
+                hasText(request.versionId()) ? request.versionId().trim() : "v1.0",
+                hasText(request.versionName()) ? request.versionName().trim() : newVersionName(),
                 request.description());
     }
 
@@ -81,22 +82,22 @@ public class BiePackageCommandService {
         } else {
             ensureBiePackageIsUpdatable(requester, request.biePackageId(), true);
 
-            if (!hasLength(request.name())) {
+            if (!hasText(request.name())) {
                 throw new IllegalArgumentException("The BIE package name cannot be empty.");
             }
-            if (!hasLength(request.versionId())) {
+            if (!hasText(request.versionId())) {
                 throw new IllegalArgumentException("The BIE package version ID cannot be empty.");
             }
-            if (!hasLength(request.versionName())) {
+            if (!hasText(request.versionName())) {
                 throw new IllegalArgumentException("The BIE package version name cannot be empty.");
             }
 
             try {
                 return command(requester).update(
                         request.biePackageId(),
-                        request.name(),
-                        request.versionId(),
-                        request.versionName(),
+                        request.name().trim(),
+                        request.versionId().trim(),
+                        request.versionName().trim(),
                         request.description(),
                         request.revisionReason());
             } catch (DuplicateKeyException e) {

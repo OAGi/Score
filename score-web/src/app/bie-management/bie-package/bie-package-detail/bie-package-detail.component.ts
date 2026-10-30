@@ -378,9 +378,9 @@ export class BiePackageDetailComponent implements OnInit {
 
   isDisabled(biePackage: BiePackageDetails) {
     return (this.disabled) ||
-      (biePackage.name === undefined || biePackage.name === '') ||
-      (biePackage.versionId === undefined || biePackage.versionId === '') ||
-      (biePackage.versionName === undefined || biePackage.versionName === '');
+      !biePackage.name?.trim() ||
+      !biePackage.versionId?.trim() ||
+      !biePackage.versionName?.trim();
   }
 
   get updateDisabled(): boolean {

@@ -89,6 +89,26 @@ class BiePackageCommandServiceTest {
     }
 
     @Test
+    void update_rejects_a_whitespace_only_name_versionId_or_versionName() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update(requester, aRequest("   ", "v1.0", "v1", "desc")));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update(requester, aRequest("Name", " 	", "v1", "desc")));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update(requester, aRequest("Name", "v1.0", "   ", "desc")));
+        verify(command, never()).update(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void update_saves_the_trimmed_name_versionId_and_versionName() {
+        when(command.update(any(), any(), any(), any(), any(), any())).thenReturn(true);
+
+        service.update(requester, aRequest("  Name ", " v1.0", "v1 ", "desc"));
+
+        verify(command).update(PACKAGE_ID, "Name", "v1.0", "v1", "desc", null);
+    }
+
+    @Test
     void update_persists_when_the_description_is_empty_or_null() {
         when(command.update(any(), any(), any(), any(), any(), any())).thenReturn(true);
 
