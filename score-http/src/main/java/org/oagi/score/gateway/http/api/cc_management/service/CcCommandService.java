@@ -1359,6 +1359,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, accManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1382,11 +1391,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
         if (restore) {
             assertSameRoleAsOwner(requester, acc.owner(), "restore");
         } else {
-            if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+            if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1468,6 +1481,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, asccpManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1491,11 +1513,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
         if (restore) {
             assertSameRoleAsOwner(requester, asccp.owner(), "restore");
         } else {
-            if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+            if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1575,6 +1601,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, bccpManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1598,11 +1633,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
         if (restore) {
             assertSameRoleAsOwner(requester, bccp.owner(), "restore");
         } else {
-            if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+            if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1633,6 +1672,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, dtManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1656,11 +1704,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
         if (restore) {
             assertSameRoleAsOwner(requester, dt.owner(), "restore");
         } else {
-            if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+            if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1735,6 +1787,23 @@ public class CcCommandService {
                     failures.entrySet().stream()
                             .map(e -> e.getKey() + " (" + e.getValue() + ")")
                             .collect(Collectors.joining("; ")));
+        }
+    }
+
+    /**
+     * The moves an endpoint may ask for. ReleaseDraft is reached, left and turned into Published by the release
+     * process only, and Draft and Candidate belong to developers as QA and Production belong to end-users.
+     */
+    private void assertEndpointMove(ScoreUser requester, CcState prevState, CcState nextState) {
+        if (prevState.isImplicitMove(nextState)) {
+            throw new IllegalArgumentException("The core component in '" + prevState + "' state can move to '" +
+                    nextState + "' state only by the release process.");
+        }
+        if ((nextState == CcState.Draft || nextState == CcState.Candidate) && !requester.isDeveloper()) {
+            throw new IllegalArgumentException("Only developers can move the core component to '" + nextState + "' state.");
+        }
+        if ((nextState == CcState.QA || nextState == CcState.Production) && requester.isDeveloper()) {
+            throw new IllegalArgumentException("Only end-users can move the core component to '" + nextState + "' state.");
         }
     }
 

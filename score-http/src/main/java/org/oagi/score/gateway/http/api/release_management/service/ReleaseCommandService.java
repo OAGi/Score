@@ -304,13 +304,13 @@ public class ReleaseCommandService implements InitializingBean {
             if (toCcState == ReleaseDraft) {
                 ReleaseValidationRequest validationRequest = request.getValidationRequest();
                 for (AccManifestId accManifestId : validationRequest.getAssignedAccComponentManifestIds()) {
-                    ccCommandService.updateState(requester, accManifestId, toCcState);
+                    ccCommandService.updateState(requester, accManifestId, toCcState, null, null, true);
                 }
                 for (AsccpManifestId asccpManifestId : validationRequest.getAssignedAsccpComponentManifestIds()) {
-                    ccCommandService.updateState(requester, asccpManifestId, toCcState);
+                    ccCommandService.updateState(requester, asccpManifestId, toCcState, null, null, true);
                 }
                 for (BccpManifestId bccpManifestId : validationRequest.getAssignedBccpComponentManifestIds()) {
-                    ccCommandService.updateState(requester, bccpManifestId, toCcState);
+                    ccCommandService.updateState(requester, bccpManifestId, toCcState, null, null, true);
                 }
                 for (CodeListManifestId codeListManifestId : validationRequest.getAssignedCodeListComponentManifestIds()) {
                     codeListCommandService.updateState(requester, codeListManifestId, toCcState);
@@ -319,7 +319,7 @@ public class ReleaseCommandService implements InitializingBean {
                     agencyIdListCommandService.updateState(requester, agencyIdListManifestId, toCcState);
                 }
                 for (DtManifestId dtManifestId : validationRequest.getAssignedDtComponentManifestIds()) {
-                    ccCommandService.updateState(requester, dtManifestId, toCcState);
+                    ccCommandService.updateState(requester, dtManifestId, toCcState, null, null, true);
                 }
             } else if (toCcState == Candidate) {
                 updateCCStates(requester, release, fromCcState, toCcState, timestamp);
@@ -393,17 +393,17 @@ public class ReleaseCommandService implements InitializingBean {
                                 CcState fromCcState, CcState toCcState, LocalDateTime timestamp) {
         var accQuery = repositoryFactory.accQueryRepository(requester);
         for (var acc : accQuery.getAccSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, acc.accManifestId(), toCcState);
+            ccCommandService.updateState(requester, acc.accManifestId(), toCcState, null, null, true);
         }
 
         var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
         for (var asccp : asccpQuery.getAsccpSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, asccp.asccpManifestId(), toCcState);
+            ccCommandService.updateState(requester, asccp.asccpManifestId(), toCcState, null, null, true);
         }
 
         var bccpQuery = repositoryFactory.bccpQueryRepository(requester);
         for (var bccp : bccpQuery.getBccpSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, bccp.bccpManifestId(), toCcState);
+            ccCommandService.updateState(requester, bccp.bccpManifestId(), toCcState, null, null, true);
         }
 
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
@@ -418,7 +418,7 @@ public class ReleaseCommandService implements InitializingBean {
 
         var dtQuery = repositoryFactory.dtQueryRepository(requester);
         for (var dt : dtQuery.getDtSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, dt.dtManifestId(), toCcState);
+            ccCommandService.updateState(requester, dt.dtManifestId(), toCcState, null, null, true);
         }
     }
 
