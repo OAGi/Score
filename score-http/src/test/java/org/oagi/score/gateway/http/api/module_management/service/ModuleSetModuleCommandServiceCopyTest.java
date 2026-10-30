@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.module_management.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.module_management.controller.payload.CopyModuleSetModuleRequest;
 import org.oagi.score.gateway.http.api.module_management.model.ModuleId;
 import org.oagi.score.gateway.http.api.module_management.model.ModuleSetId;
@@ -10,6 +11,7 @@ import org.oagi.score.gateway.http.api.module_management.model.ModuleType;
 import org.oagi.score.gateway.http.api.module_management.repository.ModuleCommandRepository;
 import org.oagi.score.gateway.http.api.module_management.repository.ModuleQueryRepository;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
+import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.mockito.InOrder;
@@ -37,7 +39,8 @@ class ModuleSetModuleCommandServiceCopyTest {
     private static final ModuleId EXISTING_ID = new ModuleId(BigInteger.valueOf(11));
     private static final ModuleId SOURCE_ID = new ModuleId(BigInteger.valueOf(20));
 
-    private final ScoreUser requester = mock(ScoreUser.class);
+    private final ScoreUser requester =
+            new ScoreUser(new UserId(BigInteger.ONE), "developer", "Developer", null, false, List.of(ScoreRole.DEVELOPER));
     private ModuleSetModuleCommandService service;
     private ModuleQueryRepository query;
     private ModuleCommandRepository command;

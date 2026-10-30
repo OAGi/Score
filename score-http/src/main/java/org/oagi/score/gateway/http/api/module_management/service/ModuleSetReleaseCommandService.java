@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
+
 @Service
 @Transactional
 public class ModuleSetReleaseCommandService {
@@ -35,6 +37,8 @@ public class ModuleSetReleaseCommandService {
     }
 
     public ModuleSetReleaseId create(ScoreUser requester, CreateModuleSetReleaseRequest request) {
+
+        requireDeveloper(requester);
 
         var command = command(requester);
 
@@ -61,6 +65,8 @@ public class ModuleSetReleaseCommandService {
 
     public boolean update(ScoreUser requester, UpdateModuleSetReleaseRequest request) {
 
+        requireDeveloper(requester);
+
         var query = query(requester);
         var command = command(requester);
 
@@ -84,10 +90,14 @@ public class ModuleSetReleaseCommandService {
 
     public boolean discard(ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId) {
 
+        requireDeveloper(requester);
+
         return command(requester).delete(moduleSetReleaseId);
     }
 
     public void assignCc(ScoreUser requester, AssignCCToModuleRequest assignCCToModuleRequest) {
+
+        requireDeveloper(requester);
 
         var command = moduleManifestCommand(requester);
 
@@ -126,6 +136,8 @@ public class ModuleSetReleaseCommandService {
     }
 
     public void unassignCc(ScoreUser requester, AssignCCToModuleRequest assignCCToModuleRequest) {
+
+        requireDeveloper(requester);
 
         var command = moduleManifestCommand(requester);
 

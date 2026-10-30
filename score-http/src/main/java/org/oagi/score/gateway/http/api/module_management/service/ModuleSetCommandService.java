@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
+
 @Service
 @Transactional
 public class ModuleSetCommandService {
@@ -53,6 +55,8 @@ public class ModuleSetCommandService {
     private ModuleSetReleaseCommandService moduleSetReleaseCommandService;
 
     public ModuleSetId create(ScoreUser requester, CreateModuleSetRequest request) {
+
+        requireDeveloper(requester);
 
         var command = command(requester);
 
@@ -89,11 +93,15 @@ public class ModuleSetCommandService {
 
     public boolean update(ScoreUser requester, UpdateModuleSetRequest request) {
 
+        requireDeveloper(requester);
+
         return command(requester).update(
                 request.moduleSetId(), request.name(), request.description());
     }
 
     public boolean discard(ScoreUser requester, ModuleSetId moduleSetId) {
+
+        requireDeveloper(requester);
 
         return command(requester).delete(moduleSetId);
     }

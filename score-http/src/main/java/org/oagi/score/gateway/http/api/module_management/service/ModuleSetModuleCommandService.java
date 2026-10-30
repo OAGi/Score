@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import static org.oagi.score.gateway.http.api.module_management.model.ModuleType.DIRECTORY;
 import static org.oagi.score.gateway.http.api.module_management.model.ModuleType.FILE;
+import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
 import static org.springframework.util.StringUtils.hasLength;
 
 @Service
@@ -42,6 +43,8 @@ public class ModuleSetModuleCommandService {
     }
 
     public ModuleId create(ScoreUser requester, CreateModuleSetModuleRequest request) {
+
+        requireDeveloper(requester);
 
         var query = query(requester);
 
@@ -68,6 +71,8 @@ public class ModuleSetModuleCommandService {
     }
 
     public boolean update(ScoreUser requester, UpdateModuleSetModuleRequest request) {
+
+        requireDeveloper(requester);
 
         var query = query(requester);
 
@@ -118,6 +123,8 @@ public class ModuleSetModuleCommandService {
 
     public boolean discard(ScoreUser requester, ModuleId moduleId, ModuleSetId moduleSetId) {
 
+        requireDeveloper(requester);
+
         ModuleSummaryRecord module = query(requester).getModule(moduleId);
         if (module == null) {
             throw new IllegalArgumentException("Cannot found a module record [moduleId=" + moduleId + "]");
@@ -142,6 +149,8 @@ public class ModuleSetModuleCommandService {
     }
 
     public void copyModule(ScoreUser requester, CopyModuleSetModuleRequest request) {
+
+        requireDeveloper(requester);
 
         var query = query(requester);
 
