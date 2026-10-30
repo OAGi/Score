@@ -208,6 +208,12 @@ public class JooqCodeListCommandRepository
                     .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, valueOf(agencyIdListValueDetails.agencyIdListValueManifestId()))
                     .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
                     .execute();
+        } else {
+            // The request is the full desired state, so no Agency ID List Value clears it.
+            dslContext().update(CODE_LIST_MANIFEST)
+                    .setNull(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
+                    .execute();
         }
 
         var step = dslContext().update(CODE_LIST);

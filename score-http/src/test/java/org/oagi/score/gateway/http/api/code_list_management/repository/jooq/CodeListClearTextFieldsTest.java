@@ -90,6 +90,15 @@ class CodeListClearTextFieldsTest {
     }
 
     @Test
+    void noAgencyIdListValueClearsTheColumnOfTheManifest() {
+        repository.update(MANIFEST, "name", null, null, null, null, null, null, null, null);
+
+        int i = indexOfUpdateOf("code_list_manifest");
+        assertTrue(sql.get(i).contains("`agency_id_list_value_manifest_id` = ?"), sql.get(i));
+        assertEquals(1, bindings.get(i).stream().filter(b -> b == null).count(), bindings.get(i).toString());
+    }
+
+    @Test
     void blankValueDefinitionAndSourceAreWrittenAsNull() {
         repository.updateValue(VALUE_MANIFEST, "v", "m", new Definition(null, ""), null);
 
