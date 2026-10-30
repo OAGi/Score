@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.common.util;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +14,12 @@ public class Zip {
     private static final Logger logger = LoggerFactory.getLogger(Zip.class);
     private static final int BUFFER = 2048;
 
+    /**
+     * Zips the files into {@code filename}.zip, which is a file of its own in a temporary directory of its own,
+     * so another export with the same name cannot replace it. The {@code targetFiles} are left as they are.
+     */
     public static File compression(Collection<File> targetFiles, String filename) throws IOException {
-        File file = File.createTempFile("oagis-", null);
+        File file = TempFiles.newFile(filename + ".zip");
         FileOutputStream dest = new FileOutputStream(file);
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {
             // out.setMethod(ZipOutputStream.DEFLATED);
@@ -38,11 +41,6 @@ public class Zip {
             }
         }
 
-        File renamedFile = new File(FileUtils.getTempDirectory(), filename + ".zip");
-        if (file.renameTo(renamedFile)) {
-            FileUtils.deleteQuietly(file);
-            file = renamedFile;
-        }
         return file;
     }
 
@@ -53,7 +51,7 @@ public class Zip {
         if (baseDirectory.getAbsolutePath().startsWith("/var/folders")) {
             baseDirectory = new File("/private/" + baseDirectory.getAbsolutePath());
         }
-        File file = File.createTempFile("oagis-", null);
+        File file = TempFiles.newFile("oagis.zip");
         URI currentPath = baseDirectory.toURI();
         FileOutputStream dest = new FileOutputStream(file);
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {

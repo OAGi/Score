@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
@@ -156,7 +157,9 @@ public class BieGenerateService {
                 }
 
                 try {
-                    return Zip.compression(files, ScoreGuidUtils.randomGuid());
+                    File zip = Zip.compression(files, ScoreGuidUtils.randomGuid());
+                    files.forEach(TempFiles::deleteQuietly);
+                    return zip;
                 } catch (IOException e) {
                     throw new BieGenerateFailureException("Compression failure.", e);
                 }
@@ -254,7 +257,9 @@ public class BieGenerateService {
         files.addAll(commonFiles);
 
         try {
-            return Zip.compression(files, filename);
+            File zip = Zip.compression(files, filename);
+            files.forEach(TempFiles::deleteQuietly);
+            return zip;
         } catch (IOException e) {
             throw new BieGenerateFailureException("Compression failure.", e);
         }

@@ -20,9 +20,10 @@ import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
-import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -176,7 +177,7 @@ public class ModuleSetReleaseQueryController {
     }
 
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}/export")
-    public ResponseEntity<DeleteOnCloseFileSystemResource> exportModuleSetRelease(
+    public ResponseEntity<InputStreamResource> exportModuleSetRelease(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("moduleSetReleaseId") ModuleSetReleaseId moduleSetReleaseId,
             @RequestParam(value = "expressionOption", required = false) String expressionOption,
@@ -193,7 +194,7 @@ public class ModuleSetReleaseQueryController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
                 .contentType(contentType)
                 .contentLength(response.file().length())
-                .body(new DeleteOnCloseFileSystemResource(response.file()));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.file())));
     }
 
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}/assignable")

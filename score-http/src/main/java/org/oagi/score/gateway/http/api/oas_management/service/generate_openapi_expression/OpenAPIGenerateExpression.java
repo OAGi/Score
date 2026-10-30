@@ -26,7 +26,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpre
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.model.Operation;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRecord;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1219,10 +1219,9 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
     public File asFile(String filename) throws IOException {
         ensureRoot();
 
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         String extension = (expressionMapper instanceof YAMLMapper) ? "yml" : "json";
 
-        tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
+        File tempFile = TempFiles.newFile(filename + "." + extension);
 
         expressionMapper.writeValue(tempFile, root);
         logger.info("Open API " + dialect.openApiVersion() + " Schema is generated: " + tempFile);

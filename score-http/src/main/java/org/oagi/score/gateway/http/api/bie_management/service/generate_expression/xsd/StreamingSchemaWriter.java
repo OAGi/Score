@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -143,7 +144,7 @@ final class StreamingSchemaWriter {
         // the body is written as the content of the schema element
         this.fstack.push();
         this.nstack.push(schemaNode);
-        this.spillFile = File.createTempFile("bie-schema-", ".spill");
+        this.spillFile = TempFiles.newFile("bie-schema.spill");
         this.spillBytes = new CountingOutputStream(new FileOutputStream(spillFile));
         this.spill = new BufferedWriter(new OutputStreamWriter(spillBytes, StandardCharsets.UTF_8), 1 << 16);
     }
@@ -439,7 +440,7 @@ final class StreamingSchemaWriter {
         } catch (IOException ignored) {
             // the file is deleted anyway
         }
-        spillFile.delete();
+        TempFiles.deleteQuietly(spillFile);
     }
 
     private static final class CountingOutputStream extends FilterOutputStream {

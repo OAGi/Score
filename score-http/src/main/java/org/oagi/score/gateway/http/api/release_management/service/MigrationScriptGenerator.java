@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.apache.commons.io.FileUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -52,12 +53,10 @@ public class MigrationScriptGenerator {
     }
 
     public File generate(ScoreUser user, ReleaseSummaryRecord release) throws IOException {
-        File baseDirectory = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
-        FileUtils.forceMkdir(baseDirectory);
-
-        File scriptFile = generateScriptFile(baseDirectory, user, release);
-        File infoFile = generateInfoFile(scriptFile, user, release);
+        File baseDirectory = TempFiles.newDirectory();
         try {
+            File scriptFile = generateScriptFile(baseDirectory, user, release);
+            File infoFile = generateInfoFile(scriptFile, user, release);
             return Zip.compression(Arrays.asList(scriptFile, infoFile), UUID.randomUUID().toString());
         } finally {
             FileUtils.deleteDirectory(baseDirectory);

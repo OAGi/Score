@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -60,7 +60,7 @@ public class BieGenerateController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bieGenerateExpressionResult.filename() + "\"")
                 .contentType(MediaType.parseMediaType(bieGenerateExpressionResult.contentType()))
                 .contentLength(bieGenerateExpressionResult.file().length())
-                .body(new InputStreamResource(new FileInputStream(bieGenerateExpressionResult.file())));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(bieGenerateExpressionResult.file())));
     }
 
     private Map<String, Object> convertValue(String data) {

@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.odf;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import com.github.jferard.fastods.*;
 import com.github.jferard.fastods.odselement.MetaElement;
 import org.apache.poi.ooxml.POIXMLProperties;
@@ -31,7 +32,6 @@ import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecor
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,19 +240,19 @@ public class BieODFSpreadsheetGenerationExpression implements BieGenerateExpress
         }
         generateColumnNames(rowRecords, 1);
 
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
+        File tempFile = null;
 
         switch (this.option.getOdfExpressionFormat()) {
             case "XLSX":
-                tempFile = new File(tempFile.getParentFile(), filename + ".xlsx");
+                tempFile = TempFiles.newFile(filename + ".xlsx");
                 writeAsXlsx(tempFile, rowRecords);
                 break;
             case "FODS":
-                tempFile = new File(tempFile.getParentFile(), filename + ".fods");
+                tempFile = TempFiles.newFile(filename + ".fods");
                 writeAsFods(tempFile, rowRecords);
                 break;
             case "ODS":
-                tempFile = new File(tempFile.getParentFile(), filename + ".ods");
+                tempFile = TempFiles.newFile(filename + ".ods");
                 writeAsOds(tempFile, rowRecords);
                 break;
             default:

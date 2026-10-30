@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import jakarta.annotation.Nullable;
 import org.jdom2.*;
 import org.jdom2.filter.Filters;
@@ -207,8 +208,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
     @Override
     public File asFile(String filename) throws IOException {
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        tempFile = new File(tempFile.getParentFile(), filename + ".xsd");
+        File tempFile = TempFiles.newFile(filename + ".xsd");
 
         if (body != null) {
             body.assemble(tempFile);
@@ -1995,7 +1995,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             }
 
             List<File> commonFiles = new ArrayList<>();
-            File directory = File.createTempFile(ScoreGuidUtils.randomGuid(), null).getParentFile();
             for (Map.Entry<CommonKey, Map<String, Declaration>> entry : moved.entrySet()) {
                 CommonKey commonKey = entry.getKey();
                 String prefix = prefixes.get(commonKey);
@@ -2014,7 +2013,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 }
                 entry.getValue().values().forEach(declaration -> schema.addContent(declaration.element().clone()));
 
-                File commonFile = new File(directory, filenames.get(commonKey));
+                File commonFile = TempFiles.newFile(filenames.get(commonKey));
                 output(new Document(schema), commonFile);
                 commonFiles.add(commonFile);
             }

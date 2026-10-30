@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
@@ -37,7 +38,6 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1025,8 +1025,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
             root.put(dialect.idKeyword(), filename + ".json");
         }
 
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        tempFile = new File(tempFile.getParentFile(), filename + ".json");
+        File tempFile = TempFiles.newFile(filename + ".json");
 
         mapper.writeValue(tempFile, root);
         logger.info("JSON Schema is generated: " + tempFile);

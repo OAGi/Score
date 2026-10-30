@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
@@ -22,7 +23,6 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRe
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -542,10 +542,9 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     public File asFile(String filename) throws IOException {
         ensureRoot();
 
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
         String extension = (expressionMapper instanceof YAMLMapper) ? "yml" : "json";
 
-        tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
+        File tempFile = TempFiles.newFile(filename + "." + extension);
 
         expressionMapper.writeValue(tempFile, root);
         logger.info("Open API " + dialect.openApiVersion() + " Schema is generated: " + tempFile);

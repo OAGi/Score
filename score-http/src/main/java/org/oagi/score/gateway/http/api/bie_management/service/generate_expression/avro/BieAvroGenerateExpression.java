@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.avro;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
@@ -27,7 +28,6 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryReco
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceSummaryRecord;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.oagi.score.gateway.http.common.util.Utility;
 import org.slf4j.Logger;
@@ -309,8 +309,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
     public File asFile(String filename) throws IOException {
         ensureRoot();
 
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        tempFile = new File(tempFile.getParentFile(), filename + ".avsc");
+        File tempFile = TempFiles.newFile(filename + ".avsc");
 
         mapper.writeValue(tempFile, root.toProperties());
         logger.info("Avro Schema is generated: " + tempFile);

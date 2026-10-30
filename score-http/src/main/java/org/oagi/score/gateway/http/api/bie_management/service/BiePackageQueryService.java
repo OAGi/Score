@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
@@ -16,7 +17,6 @@ import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.Zip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -119,9 +119,7 @@ public class BiePackageQueryService {
         ObjectMapper objectMapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         // Create temp file
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        tempFile = new File(tempFile.getParentFile(), "manifest.json");
-        tempFile.deleteOnExit();
+        File tempFile = TempFiles.newFile("manifest.json");
 
         // Write JSON to file using BufferedOutputStream for efficiency
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
@@ -150,6 +148,7 @@ public class BiePackageQueryService {
                 .collect(Collectors.toList()));
 
         File file = Zip.compression(files, filename);
+        files.forEach(TempFiles::deleteQuietly);
 
         String contentType = "application/zip";
         return new BieGenerateExpressionResult(file.getName(), contentType, file);
