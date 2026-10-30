@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
 import {FormControl, Validators} from '@angular/forms';
+import {httpUrlValidator} from '../oas-doc-url.validator';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -32,12 +33,10 @@ export class OasDocCreateComponent implements OnInit {
   subtitle = 'OpenAPI Document Metadata';
   oasDoc: OasDoc;
   disabled: boolean;
-  urlReg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
-  emailReg = '[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}';
-  contactUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
-  contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
-  licenseUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
-  termServiceUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  contactUrl = new FormControl('', [httpUrlValidator]);
+  contactEmail = new FormControl('', [Validators.email]);
+  licenseUrl = new FormControl('', [httpUrlValidator]);
+  termServiceUrl = new FormControl('', [httpUrlValidator]);
 
   ngOnInit(): void {
     this.disabled = false;
