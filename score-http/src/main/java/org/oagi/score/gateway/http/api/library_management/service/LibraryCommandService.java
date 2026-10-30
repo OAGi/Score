@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -66,15 +67,20 @@ public class LibraryCommandService {
             throw new IllegalArgumentException("Only administrators can create the library.");
         }
 
-        if (query(requester).hasDuplicateName(request.name())) {
-            throw new IllegalArgumentException("The library name '" + request.name() + "' already exists.");
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Library name cannot be empty.");
+        }
+        String name = request.name().trim();
+
+        if (query(requester).hasDuplicateName(name)) {
+            throw new IllegalArgumentException("The library name '" + name + "' already exists.");
         }
         if (!hasLength(request.namespaceUri())) {
             throw new IllegalArgumentException("'namespaceUri' is required.");
         }
 
         LibraryId libraryId = command(requester).create(
-                request.type(), request.name(), request.organization(), request.description(),
+                request.type(), name, request.organization(), request.description(),
                 request.link(), request.domain(), null);
 
         NamespaceId namespaceId = repositoryFactory.namespaceCommandRepository(requester).create(
@@ -109,13 +115,17 @@ public class LibraryCommandService {
         if (!query.exists(request.libraryId())) {
             throw new IllegalArgumentException("'" + request.libraryId() + "' does not exist.");
         }
-        if (query.hasDuplicateNameExcludingCurrent(request.libraryId(), request.name())) {
-            throw new IllegalArgumentException("The library name '" + request.name() + "' already exists.");
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Library name cannot be empty.");
+        }
+        String name = request.name().trim();
+        if (query.hasDuplicateNameExcludingCurrent(request.libraryId(), name)) {
+            throw new IllegalArgumentException("The library name '" + name + "' already exists.");
         }
 
         return command(requester).update(
                 request.libraryId(),
-                request.type(), request.name(), request.organization(), request.description(),
+                request.type(), name, request.organization(), request.description(),
                 request.link(), request.domain(), request.state(), request.isDefault());
     }
 

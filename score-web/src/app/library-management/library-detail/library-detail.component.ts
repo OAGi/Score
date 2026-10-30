@@ -108,7 +108,7 @@ export class LibraryDetailComponent {
   }
 
   isDisabled() {
-    return (!this.library.name) ||
+    return (!this.library.name?.trim()) ||
         (!this.uriForm.valid) ||
         (!this.library.organization) ||
         (!this.library.domain);
