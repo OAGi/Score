@@ -121,8 +121,8 @@ export class AgencyIdListValueDetails {
   definition: Definition = new Definition();
 
   deprecated: boolean;
-  isDeveloperDefault: boolean;
-  isUserDefault: boolean;
+  developerDefault: boolean;
+  userDefault: boolean;
   used: boolean;
 
   owner: ScoreUser;
@@ -262,4 +262,17 @@ export class AgencyIdListValue {
 
 export class AgencyIdListCreateResponse {
   agencyIdListManifestId: number;
+}
+
+/**
+ * The server returns the default flags of a value as `isDeveloperDefault` and `isUserDefault` but takes them as
+ * `developerDefault` and `userDefault`; the web uses the latter ones everywhere.
+ */
+export function withDefaultFlags(value: any): AgencyIdListValueDetails {
+  const {isDeveloperDefault, isUserDefault, ...rest} = value;
+  return {
+    ...rest,
+    developerDefault: isDeveloperDefault ?? rest.developerDefault ?? false,
+    userDefault: isUserDefault ?? rest.userDefault ?? false
+  };
 }

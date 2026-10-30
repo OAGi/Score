@@ -6,7 +6,8 @@ import {
   AgencyIdListDetails,
   AgencyIdListListEntry,
   AgencyIdListSummary,
-  AgencyIdListValueSummary
+  AgencyIdListValueSummary,
+  withDefaultFlags
 } from './agency-id-list';
 import {PageResponse} from '../../basis/basis';
 import {Comment} from '../../cc-management/domain/core-component-node';
@@ -40,6 +41,7 @@ export class AgencyIdListService {
     return this.http.get<AgencyIdListDetails>('/api/agency-id-lists/' + manifestId).pipe(
         map((elm: AgencyIdListDetails) => ({
           ...elm,
+          valueList: (elm.valueList || []).map(withDefaultFlags),
           agencyIdListValue: elm.agencyIdListValue || new AgencyIdListValueSummary(),
           namespace: elm.namespace || new NamespaceSummary(),
           created: {
@@ -58,6 +60,7 @@ export class AgencyIdListService {
     return this.http.get<AgencyIdListDetails>('/api/agency-id-lists/' + manifestId + '/prev').pipe(
         map((elm: AgencyIdListDetails) => ({
           ...elm,
+          valueList: (elm.valueList || []).map(withDefaultFlags),
           agencyIdListValue: elm.agencyIdListValue || new AgencyIdListValueSummary(),
           namespace: elm.namespace || new NamespaceSummary(),
           created: {

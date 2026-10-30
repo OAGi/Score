@@ -284,11 +284,11 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       }
 
       const data = this.values;
-      if (result.isDeveloperDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.isDeveloperDefault = false);
+      if (result.developerDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
       }
-      if (result.isUserDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.isUserDefault = false);
+      if (result.userDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
       }
 
       if (isAddAction) {
