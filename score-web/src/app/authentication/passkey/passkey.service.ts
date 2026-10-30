@@ -195,10 +195,15 @@ export class PasskeyService {
   }
 
   private asCancelledIfDismissed(error: any): Error {
+    // AbortError is only raised by our own cancelPending() (a newer request replaced this one, or the page is
+    // being left), which is expected and not worth a console message.
+    if (error?.name === 'AbortError') {
+      return new PasskeyCancelledError();
+    }
     // The browser reports "dismissed", "refused by the authenticator or password manager", and "timed out" all as
     // NotAllowedError, so keep the reason where a developer can find it.
     console.warn('The browser did not complete the passkey request:', error?.name, error?.message);
-    if (error && (error.name === 'NotAllowedError' || error.name === 'AbortError')) {
+    if (error?.name === 'NotAllowedError') {
       return new PasskeyCancelledError();
     }
     return error;
