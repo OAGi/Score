@@ -161,7 +161,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="den score-break-word">
-                        <a routerLink="/core_component/{{ element.type.endsWith('DT') ? 'dt' : element.type.toLowerCase() }}/{{ element.manifestId }}"
+                        <a routerLink="{{ element.type.endsWith('DT') ? '/data_type' : '/core_component/' + element.type.toLowerCase() }}/{{ element.manifestId }}"
                           matTooltip="{{ element.den }}">
                           <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                         </a>

@@ -430,6 +430,9 @@ export class ReleaseAssignComponent implements OnInit {
   }
 
   hrefLink(item: AssignableNode): string[] {
+    if (item.type === 'DT') {
+      return ['/data_type', String(item.manifestId)];
+    }
     const arr = [];
     if (item.type === 'CODE_LIST' || item.type === 'AGENCY_ID_LIST') {
       arr.push('');
