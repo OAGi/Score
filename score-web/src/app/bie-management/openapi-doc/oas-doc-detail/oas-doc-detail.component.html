@@ -357,7 +357,7 @@
 
         <ng-container scoreColumnDef="remark">
           <td score-cell *scoreCellDef="let element">
-            <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+            <div class="score-line-clamp-2 score-break-word">{{ element.remark }}</div>
           </td>
         </ng-container>
 

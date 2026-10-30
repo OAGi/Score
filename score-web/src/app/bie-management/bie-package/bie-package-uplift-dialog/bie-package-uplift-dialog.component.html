@@ -289,28 +289,28 @@
             <ng-container matColumnDef="version">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="version"> Version</th>
               <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version">{{ element.version }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="status"> Status</th>
               <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status">{{ element.status }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="bizTerm">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="bizTerm"> Business Term</th>
               <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+                <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="remark">
               <th mat-header-cell *matHeaderCellDef mat-multi-sort-header="remark"> Remark</th>
               <td mat-cell *matCellDef="let element">
-                <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+                <div class="score-line-clamp-2 score-break-word">{{ element.remark }}</div>
               </td>
             </ng-container>
 
