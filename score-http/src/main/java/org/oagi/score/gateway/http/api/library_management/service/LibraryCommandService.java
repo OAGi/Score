@@ -471,6 +471,11 @@ public class LibraryCommandService {
         moduleSetQuery.getModuleSetSummaryList(libraryId).forEach(
                 moduleSet -> moduleSetCommand.delete(moduleSet.moduleSetId()));
 
+        // The namespaces reference the library, and the working release that referenced them is gone by now.
+        var namespaceCommand = repositoryFactory.namespaceCommandRepository(requester);
+        repositoryFactory.namespaceQueryRepository(requester).getNamespaceSummaryList(libraryId).forEach(
+                namespace -> namespaceCommand.delete(namespace.namespaceId()));
+
         return command(requester).delete(libraryId);
     }
 
