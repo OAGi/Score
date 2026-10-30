@@ -166,4 +166,11 @@ public interface APIFactory extends AutoCloseable {
      */
     BieViewOrderAPI getBieViewOrderAPI();
 
+    /**
+     * Return the tenant API.
+     *
+     * @return the tenant API.
+     */
+    TenantAPI getTenantAPI();
+
 }

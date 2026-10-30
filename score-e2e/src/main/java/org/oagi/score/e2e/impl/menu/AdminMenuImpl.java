@@ -4,9 +4,11 @@ import org.oagi.score.e2e.impl.page.BasePageImpl;
 import org.oagi.score.e2e.impl.page.DelegateBasePageImpl;
 import org.oagi.score.e2e.impl.page.admin.AccountPageImpl;
 import org.oagi.score.e2e.impl.page.admin.PendingSSOPageImpl;
+import org.oagi.score.e2e.impl.page.admin.TenantPageImpl;
 import org.oagi.score.e2e.menu.AdminMenu;
 import org.oagi.score.e2e.page.admin.AccountPage;
 import org.oagi.score.e2e.page.admin.PendingSSOPage;
+import org.oagi.score.e2e.page.admin.TenantPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -27,6 +29,9 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
 
     private final By PENDING_SSO_SUB_MENU_LOCATOR =
             By.xpath("//button[contains(., \"Pending SSO\")]");
+
+    private final By TENANT_SUB_MENU_LOCATOR =
+            By.xpath("//button[contains(@class, \"mat-mdc-menu-item\") and normalize-space(.) = \"Tenant\"]");
 
     public AdminMenuImpl(BasePageImpl delegate) {
         super(delegate);
@@ -88,4 +93,34 @@ public class AdminMenuImpl extends DelegateBasePageImpl implements AdminMenu {
         assert pendingSSOPage.isOpened();
         return pendingSSOPage;
     }
+
+    @Override
+    public boolean hasTenantSubMenu() {
+        if (!isExpanded()) {
+            expandAdminMenu();
+        }
+        return !getDriver().findElements(TENANT_SUB_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public WebElement getTenantSubMenu() {
+        if (!isExpanded()) {
+            expandAdminMenu();
+        }
+        return elementToBeClickable(getDriver(), TENANT_SUB_MENU_LOCATOR);
+    }
+
+    @Override
+    public TenantPage openTenantSubMenu() {
+        TenantPage tenantPage = new TenantPageImpl(this);
+        try {
+            retry(() -> click(getDriver(), getTenantSubMenu()));
+        } catch (WebDriverException e) {
+            logger.warn("Failed to click the 'Tenant' menu.", e);
+            tenantPage.openPage();
+        }
+        assert tenantPage.isOpened();
+        return tenantPage;
+    }
+
 }

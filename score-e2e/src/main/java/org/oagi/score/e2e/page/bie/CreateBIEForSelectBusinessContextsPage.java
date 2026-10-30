@@ -98,6 +98,13 @@ public interface CreateBIEForSelectBusinessContextsPage extends Page, SearchBarP
     WebElement getTableRecordByValue(String value);
 
     /**
+     * Wait until the table has loaded and return the names of the business contexts that it lists, in the order listed.
+     *
+     * @return the names of the listed business contexts
+     */
+    List<String> getListedBusinessContextNames();
+
+    /**
      * Return the UI element of the column of the given table record with the column name.
      *
      * @param tableRecord the table record

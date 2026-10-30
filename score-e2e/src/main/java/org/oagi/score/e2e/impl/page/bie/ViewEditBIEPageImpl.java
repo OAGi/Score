@@ -18,6 +18,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.List;
+
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
@@ -197,6 +199,29 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public List<String> getListedDENs() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        List<String> dens = readListedDENs();
+        for (int i = 0; i < 5; i++) {
+            waitFor(ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
+            List<String> again = readListedDENs();
+            if (again.equals(dens)) {
+                return dens;
+            }
+            dens = again;
+        }
+        return dens;
+    }
+
+    private List<String> readListedDENs() {
+        return retry(() -> getDriver().findElements(By.xpath(
+                        "//tbody/tr/td[contains(@class, \"mat-column-den\")]//div[contains(@class, \"den\")]//span[1]")).stream()
+                .map(e -> e.getText().trim())
+                .collect(java.util.stream.Collectors.toList()));
     }
 
     @Override

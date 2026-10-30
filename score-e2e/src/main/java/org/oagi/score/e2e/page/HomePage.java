@@ -121,6 +121,13 @@ public interface HomePage extends Page {
     boolean hasBrowseStandardMenu();
 
     /**
+     * Return {@code true} if the 'Admin' menu is visible, otherwise {@code false}.
+     *
+     * @return {@code true} if the 'Admin' menu is visible, otherwise {@code false}
+     */
+    boolean hasAdminMenu();
+
+    /**
      * Return {@code true} if the 'Context' menu is visible, otherwise {@code false}.
      *
      * @return {@code true} if the 'Context' menu is visible, otherwise {@code false}
