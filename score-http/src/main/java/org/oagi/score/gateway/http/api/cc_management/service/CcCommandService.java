@@ -215,6 +215,9 @@ public class CcCommandService {
         if (toAsccp == null) {
             throw new IllegalArgumentException("Target ASCCP does not exist.");
         }
+        if (toAsccp.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted ASCCP cannot be appended.");
+        }
         assertReferencedReleaseAllowed(
                 requester,
                 fromAcc.release(),
@@ -286,6 +289,9 @@ public class CcCommandService {
         BccpSummaryRecord toBccp = bccpQuery.getBccpSummary(request.bccpManifestId());
         if (toBccp == null) {
             throw new IllegalArgumentException("Target BCCP does not exist.");
+        }
+        if (toBccp.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted BCCP cannot be appended.");
         }
         assertReferencedReleaseAllowed(
                 requester,

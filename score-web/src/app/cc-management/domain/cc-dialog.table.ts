@@ -1,7 +1,7 @@
 import {defineTable} from '../../common/score-table';
 import {OagisComponentTypes} from './core-component-node';
 
-const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
+export const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
 
 export const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];

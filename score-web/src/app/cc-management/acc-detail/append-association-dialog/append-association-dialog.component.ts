@@ -7,9 +7,11 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE, RELEASE_STATE_LIST} from '../../domain/cc-dialog.table';
 
 
+// A deleted property cannot be appended, so it is not offered to begin with.
+const APPENDABLE_STATES = RELEASE_STATE_LIST.filter(state => state !== 'Deleted');
 
 const APPEND_ASSOCIATION_TABLE = defineTable({
   ...CC_WITH_TYPE_TABLE,
@@ -52,6 +54,7 @@ export class AppendAssociationDialogComponent implements OnInit {
     afterNextRender(() => {
       // Every type that can be appended, to begin with.
       this.view().setFilter('types', this.typeList.map(e => e.toLowerCase()));
+      this.view().setFilter('states', APPENDABLE_STATES);
       this.ready.set(true);
     });
   }
