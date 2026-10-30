@@ -23,7 +23,7 @@ public interface AccountQueryRepository {
 
     OAuth2UserRecord getOAuth2User(OAuth2UserId oAuth2UserId, String sub);
 
-    OAuth2UserRecord getOAuth2User(String sub);
+    OAuth2UserRecord getOAuth2User(String providerName, String sub);
 
     OAuth2UserRecord getOAuth2User(UserId userId);
 
@@ -31,6 +31,6 @@ public interface AccountQueryRepository {
 
     AppOauth2User getPending(OAuth2UserId appOauth2UserId);
 
-    AppOauth2User getPendingBySub(String sub);
+    AppOauth2User getPendingBySub(String providerName, String sub);
 
 }

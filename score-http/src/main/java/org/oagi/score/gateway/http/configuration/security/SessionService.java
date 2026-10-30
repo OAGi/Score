@@ -7,7 +7,10 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.session.Session;
 import org.springframework.session.data.redis.RedisIndexedSessionRepository;
@@ -70,7 +73,11 @@ public class SessionService {
         }
         if (user instanceof OAuth2User) {
             String sub = ((OAuth2User) user).getAttribute("sub");
-            return query().getScoreUserByOidcSub(sub);
+            // The same sub of another identity provider is another person, so the provider of the request is used.
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String providerName = (authentication instanceof OAuth2AuthenticationToken token && token.getPrincipal() == user) ?
+                    token.getAuthorizedClientRegistrationId() : null;
+            return query().getScoreUserByOidcSub(providerName, sub);
         } else {
             return query().getScoreUserByUsername(user.getName());
         }

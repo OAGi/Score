@@ -12,7 +12,11 @@ public interface ScoreUserQueryRepository {
 
     ScoreUser getScoreUserByUsername(String username);
 
-    ScoreUser getScoreUserByOidcSub(String oidcSub);
+    /**
+     * The user linked to the SSO account {@code oidcSub} of the identity provider {@code providerName}; {@code sub} is
+     * unique only within one provider. A {@code null} provider name matches the account of any provider.
+     */
+    ScoreUser getScoreUserByOidcSub(String providerName, String oidcSub);
 
     List<ScoreUser> getScoreUsers();
 

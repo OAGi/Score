@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
@@ -429,14 +430,16 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
     }
 
     @Override
-    public OAuth2UserRecord getOAuth2User(String sub) {
+    public OAuth2UserRecord getOAuth2User(String providerName, String sub) {
         if (!hasLength(sub)) {
             return null;
         }
 
         var queryBuilder = new GetOAuth2UserQueryBuilder();
         return queryBuilder.select()
-                .where(APP_OAUTH2_USER.SUB.eq(sub))
+                .where(and(
+                        APP_OAUTH2_USER.SUB.eq(sub),
+                        (providerName != null) ? OAUTH2_APP.PROVIDER_NAME.eq(providerName) : noCondition()))
                 .fetchOne(queryBuilder.mapper());
     }
 
@@ -513,14 +516,16 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
     }
 
     @Override
-    public AppOauth2User getPendingBySub(String sub) {
+    public AppOauth2User getPendingBySub(String providerName, String sub) {
         if (!hasLength(sub)) {
             return null;
         }
 
         var queryBuilder = new GetPendingListQueryBuilder();
         return queryBuilder.select()
-                .where(APP_OAUTH2_USER.SUB.eq(sub))
+                .where(and(
+                        APP_OAUTH2_USER.SUB.eq(sub),
+                        (providerName != null) ? OAUTH2_APP.PROVIDER_NAME.eq(providerName) : noCondition()))
                 .fetchOne(queryBuilder.mapper());
     }
 

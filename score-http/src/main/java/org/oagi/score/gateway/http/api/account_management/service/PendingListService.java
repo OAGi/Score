@@ -55,8 +55,8 @@ public class PendingListService {
         return repositoryFactory.accountQueryRepository(requester).getPending(appOauth2UserId);
     }
 
-    public AppOauth2User getPendingBySub(ScoreUser requester, String sub) {
-        return repositoryFactory.accountQueryRepository(requester).getPendingBySub(sub);
+    public AppOauth2User getPendingBySub(ScoreUser requester, String providerName, String sub) {
+        return repositoryFactory.accountQueryRepository(requester).getPendingBySub(providerName, sub);
     }
 
     @Transactional
