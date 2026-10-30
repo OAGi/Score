@@ -36,52 +36,35 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
     }
 
     @Override
-    public BusinessTermUpsertResult upsertByExternalReferenceUri(
+    public BusinessTermUpsertResult upsertByBusinessTermAndUri(
             String businessTerm, String externalReferenceId, String externalReferenceUri,
             String definition, String comment) {
 
-        // external_ref_uri has no unique constraint, so more than one row may share this URI. Resolve the
-        // lowest matching id in ONE query: a null result means no row exists (INSERT); otherwise that id
-        // is the exact row the upsert UPDATEs — so an upsert never silently mutates a whole group of
-        // duplicate-URI rows, the returned id matches the row written, and the existence probe and the
-        // target lookup are a single round-trip instead of two.
+        // business_term has no unique constraint, so more than one row may share this (name + URI) pair.
+        // Resolve the lowest matching id in ONE query: a null result means no row exists (INSERT);
+        // otherwise that id is the exact row the upsert UPDATEs — so an upsert never silently mutates a
+        // whole group of duplicate rows, the returned id matches the row written, and the existence probe
+        // and the target lookup are a single round-trip instead of two. A row sharing only the URI is a
+        // different term and is deliberately not matched.
         ULong targetId = dslContext().select(BUSINESS_TERM.BUSINESS_TERM_ID)
                 .from(BUSINESS_TERM)
-                .where(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
+                .where(BUSINESS_TERM.BUSINESS_TERM_.eq(businessTerm))
+                .and(BUSINESS_TERM.EXTERNAL_REF_URI.eq(externalReferenceUri))
                 .orderBy(BUSINESS_TERM.BUSINESS_TERM_ID.asc())
                 .limit(1)
                 .fetchOne(BUSINESS_TERM.BUSINESS_TERM_ID);
 
         if (targetId == null) {
-            BusinessTermRecord record = new BusinessTermRecord();
-
-            record.setGuid(randomGuid());
-            record.setBusinessTerm(businessTerm);
-            record.setExternalRefId(externalReferenceId);
-            record.setExternalRefUri(externalReferenceUri);
-            record.setDefinition(definition);
-            record.setComment(comment);
-            record.setCreatedBy(valueOf(requester().userId()));
-            record.setLastUpdatedBy(valueOf(requester().userId()));
-            LocalDateTime timestamp = LocalDateTime.now();
-            record.setCreationTimestamp(timestamp);
-            record.setLastUpdateTimestamp(timestamp);
-
-            BusinessTermId businessTermId = new BusinessTermId(
-                    dslContext().insertInto(BUSINESS_TERM)
-                            .set(record)
-                            .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
-                            .fetchOne().getBusinessTermId().toBigInteger());
-            return new BusinessTermUpsertResult(businessTermId, true);
+            return new BusinessTermUpsertResult(
+                    insert(businessTerm, externalReferenceId, externalReferenceUri, definition, comment), true);
         }
 
         // #1754 - blank-clobber guard: on the upsert UPDATE branch, overwrite the OPTIONAL
         // external_ref_id / definition / comment only when the incoming value is non-blank, so a
         // re-import whose source file lacks one of those columns does not wipe the existing
-        // catalog term's value. The required business_term is always written. To CLEAR a field a
-        // user edits the term on the Edit screen (which routes through update(), not this upsert).
+        // catalog term's value. The (name + URI) key is never rewritten here. To CLEAR a field or
+        // rename a term a user edits it on the Edit screen (which routes through update(), not this upsert).
         var update = dslContext().update(BUSINESS_TERM)
-                .set(BUSINESS_TERM.BUSINESS_TERM_, businessTerm)
                 .set(BUSINESS_TERM.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
                 .set(BUSINESS_TERM.LAST_UPDATED_BY, valueOf(requester().userId()));
         if (hasLength(externalReferenceId)) {
@@ -97,6 +80,32 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 .execute();
 
         return new BusinessTermUpsertResult(new BusinessTermId(targetId.toBigInteger()), false);
+    }
+
+    @Override
+    public BusinessTermId insert(
+            String businessTerm, String externalReferenceId, String externalReferenceUri,
+            String definition, String comment) {
+
+        BusinessTermRecord record = new BusinessTermRecord();
+
+        record.setGuid(randomGuid());
+        record.setBusinessTerm(businessTerm);
+        record.setExternalRefId(externalReferenceId);
+        record.setExternalRefUri(externalReferenceUri);
+        record.setDefinition(definition);
+        record.setComment(comment);
+        record.setCreatedBy(valueOf(requester().userId()));
+        record.setLastUpdatedBy(valueOf(requester().userId()));
+        LocalDateTime timestamp = LocalDateTime.now();
+        record.setCreationTimestamp(timestamp);
+        record.setLastUpdateTimestamp(timestamp);
+
+        return new BusinessTermId(
+                dslContext().insertInto(BUSINESS_TERM)
+                        .set(record)
+                        .returning(BUSINESS_TERM.BUSINESS_TERM_ID)
+                        .fetchOne().getBusinessTermId().toBigInteger());
     }
 
     @Override

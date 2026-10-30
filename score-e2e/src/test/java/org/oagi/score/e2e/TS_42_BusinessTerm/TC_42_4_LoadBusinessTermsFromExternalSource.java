@@ -269,15 +269,16 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_5")
-    public void upload_updates_existing_business_term_when_external_reference_uri_already_exists() throws IOException {
+    public void upload_updates_existing_business_term_when_name_and_external_reference_uri_already_exist() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        // Seed an existing business term, then upload a row with the SAME external reference URI but
-        // different values; the upsert-by-URI import must UPDATE the existing record, not add one.
+        // Seed an existing business term, then upload a row with the SAME (name + external reference URI)
+        // pair but different optional values; the import must UPDATE the existing record, not add one.
         BusinessTermObject originalBusinessTerm =
                 getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser, "bt");
         BusinessTermObject updatedBusinessTerm = BusinessTermObject.createRandomBusinessTerm(endUser, "bt");
+        updatedBusinessTerm.setBusinessTerm(originalBusinessTerm.getBusinessTerm());
         updatedBusinessTerm.setExternalReferenceUri(originalBusinessTerm.getExternalReferenceUri());
 
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
@@ -325,11 +326,52 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             assertEquals(updatedBusinessTerm.getDefinition(), editBusinessTermPage.getDefinitionFieldText());
             assertEquals(updatedBusinessTerm.getComment(), editBusinessTermPage.getCommentFieldText());
 
-            // the original business-term name no longer resolves (the record was overwritten)
+        } finally {
+            csvFileForUpload.delete();
+        }
+    }
+
+    @Test
+    @DisplayName("TC_42_4_15")
+    public void upload_creates_a_distinct_business_term_when_only_the_external_reference_uri_is_shared() throws IOException {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        // A business term is identified by its (name + URI) pair. A row with the SAME URI but a DIFFERENT
+        // name is a distinct term: it is created and the existing term keeps its name.
+        BusinessTermObject original = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser, "bt");
+        String otherName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+        UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
+
+        File targetFolder = new File(System.getProperty("user.home"), "Downloads");
+        File csvFileForUpload = new File(targetFolder, "businessTermSharedUri_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
+        if (csvFileForUpload.exists()) {
+            csvFileForUpload.delete();
+        }
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(csvFileForUpload.toPath());
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                         .withHeader("businessTerm", "externalReferenceUri", "externalReferenceId", "definition", "comment"))) {
+                csvPrinter.printRecord(otherName, original.getExternalReferenceUri(), "1", "definition", "comment");
+                csvPrinter.flush();
+            }
+
+            uploadBusinessTermsPage.uploadFile(csvFileForUpload.getAbsolutePath());
+            uploadBusinessTermsPage.proceedToPreview();
+            uploadBusinessTermsPage.hitImportButton();
+            assertTrue(uploadBusinessTermsPage.getResultSummaryText().contains("1 created"));
+
+            // Both terms now exist under the shared URI, and the original keeps its name.
             viewEditBusinessTermPage.openPage();
-            viewEditBusinessTermPage.setTerm(originalBusinessTerm.getBusinessTerm());
+            viewEditBusinessTermPage.showAdvancedSearchPanel();
+            viewEditBusinessTermPage.setExternalReferenceURI(original.getExternalReferenceUri());
             viewEditBusinessTermPage.hitSearchButton();
-            assertEquals(0, viewEditBusinessTermPage.getTotalNumberOfItems());
+            assertEquals(2, viewEditBusinessTermPage.getTotalNumberOfItems());
+            BusinessTermObject reloaded = getAPIFactory().getBusinessTermAPI().getBusinessTermByName(original.getBusinessTerm());
+            assertEquals(original.getExternalReferenceUri(), reloaded.getExternalReferenceUri());
         } finally {
             csvFileForUpload.delete();
         }
@@ -525,7 +567,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
 
     @Test
     @DisplayName("TC_42_4_11")
-    public void intra_batch_duplicate_external_reference_uri_is_flagged_and_not_imported() throws IOException {
+    public void intra_batch_duplicate_business_term_and_external_reference_uri_is_flagged_and_not_imported() throws IOException {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
@@ -533,12 +575,12 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
-        // Two rows share the SAME External Reference URI within one import. The first is valid; the
-        // second (later) row repeating that URI must be flagged as a duplicate and left unselected so
-        // two rows in one file cannot silently overwrite the same record.
+        // Two rows share the SAME (name + External Reference URI) pair within one import. The first is
+        // valid; the second (later) row repeating that pair must be flagged as a duplicate and left
+        // unselected so two rows in one file cannot silently overwrite the same record.
         String sharedUri = "http://test." + RandomStringUtils.secure().nextAlphabetic(5) + ".com";
         String firstName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
-        String secondName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+        String secondName = firstName;
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         File csvFileForUpload = new File(targetFolder, "businessTermIntraDup_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
@@ -562,7 +604,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             assertTrue(uploadBusinessTermsPage.getReadyChipText().contains("1"));
             uploadBusinessTermsPage.hitImportButton();
 
-            // Only one record exists for the shared URI (the first row); the duplicate never imported.
+            // Only one record exists for the shared pair (the first row); the duplicate never imported.
             viewEditBusinessTermPage.openPage();
             viewEditBusinessTermPage.showAdvancedSearchPanel();
             viewEditBusinessTermPage.setExternalReferenceURI(sharedUri);
@@ -701,9 +743,9 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
         UploadBusinessTermsPage uploadBusinessTermsPage = viewEditBusinessTermPage.hitUploadBusinessTermsButton();
 
         // Re-import a row carrying the SAME External Reference URI but a header set that OMITS the
-        // definition, comment, and externalReferenceId columns entirely. The upsert-by-URI update must
-        // NOT blank those existing values (blank-clobber guard). Only the business term name changes.
-        String updatedName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
+        // definition, comment, and externalReferenceId columns entirely. The upsert-by-(name + URI) update
+        // must NOT blank those existing values (blank-clobber guard).
+        String updatedName = existing.getBusinessTerm();
 
         File targetFolder = new File(System.getProperty("user.home"), "Downloads");
         File csvFileForUpload = new File(targetFolder, "businessTermReimport_" + RandomStringUtils.secure().nextAlphabetic(5, 10) + ".csv");
@@ -723,7 +765,7 @@ public class TC_42_4_LoadBusinessTermsFromExternalSource extends BaseTest {
             uploadBusinessTermsPage.hitImportButton();
             assertTrue(uploadBusinessTermsPage.getResultSummaryText().contains("1 updated"));
 
-            // Verify via the DB API: the omitted columns keep their original values; only the name changed.
+            // Verify via the DB API: the omitted columns keep their original values.
             BusinessTermObject reloaded = getAPIFactory().getBusinessTermAPI().getBusinessTermByName(updatedName);
             assertEquals(existing.getExternalReferenceUri(), reloaded.getExternalReferenceUri());
             assertEquals(existing.getDefinition(), reloaded.getDefinition());

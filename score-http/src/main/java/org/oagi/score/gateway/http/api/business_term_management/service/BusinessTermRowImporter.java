@@ -32,7 +32,7 @@ public class BusinessTermRowImporter {
      * Validates and upserts one row. The access gate ({@code assertBusinessTermEnabled}) is applied
      * once by the caller before the loop, so it is deliberately not repeated per row here.
      *
-     * @return {@link Outcome#UPDATED} when an existing row with the same external reference URI was
+     * @return {@link Outcome#UPDATED} when an existing row with the same business term and external reference URI was
      * overwritten, otherwise {@link Outcome#CREATED}.
      * @throws IllegalArgumentException when the row fails validation (caught per row by the caller).
      */
@@ -41,10 +41,10 @@ public class BusinessTermRowImporter {
         BusinessTermInputValidator.validate(
                 row.businessTerm(), row.externalReferenceId(), row.externalReferenceUri());
 
-        // The repository upsert already probes the external reference URI to decide insert-vs-update, so
+        // The repository upsert already probes the (business term + external reference URI) pair to decide insert-vs-update, so
         // it reports the created/updated outcome directly — no separate existence query per row is needed.
         var command = repositoryFactory.businessTermCommandRepository(requester);
-        BusinessTermUpsertResult result = command.upsertByExternalReferenceUri(
+        BusinessTermUpsertResult result = command.upsertByBusinessTermAndUri(
                 row.businessTerm(),
                 row.externalReferenceId(),
                 row.externalReferenceUri(),

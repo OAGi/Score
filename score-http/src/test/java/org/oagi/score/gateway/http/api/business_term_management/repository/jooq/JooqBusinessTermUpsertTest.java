@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.BUSINESS_TERM;
 
 /**
- * SQL-level coverage of {@link JooqBusinessTermCommandRepository#upsertByExternalReferenceUri} through a
+ * SQL-level coverage of {@link JooqBusinessTermCommandRepository#upsertByBusinessTermAndUri} through a
  * jOOQ {@link MockDataProvider} (the service tests mock the repository, so they never exercise this
  * SQL). Asserts the created/updated classification the batch importer relies on, and that the existence
  * probe + target-id lookup are collapsed into a SINGLE {@code SELECT} (no separate {@code selectCount}).
@@ -90,7 +90,7 @@ class JooqBusinessTermUpsertTest {
         RecordingProvider provider = new RecordingProvider(/* rowExists */ false);
 
         BusinessTermUpsertResult result = repo(provider)
-                .upsertByExternalReferenceUri("Ship To", "id-1", "http://ref/1", "def", "comment");
+                .upsertByBusinessTermAndUri("Ship To", "id-1", "http://ref/1", "def", "comment");
 
         assertTrue(result.created(), "no existing row -> created");
         assertEquals(BigInteger.valueOf(NEW_ID), result.businessTermId().value());
@@ -104,14 +104,33 @@ class JooqBusinessTermUpsertTest {
         RecordingProvider provider = new RecordingProvider(/* rowExists */ true);
 
         BusinessTermUpsertResult result = repo(provider)
-                .upsertByExternalReferenceUri("Ship To", "id-1", "http://ref/1", "def", "comment");
+                .upsertByBusinessTermAndUri("Ship To", "id-1", "http://ref/1", "def", "comment");
 
         assertFalse(result.created(), "existing row -> updated");
         assertEquals(BigInteger.valueOf(EXISTING_ID), result.businessTermId().value(),
                 "the upsert updates (and returns) the resolved lowest-id row");
         assertEquals(1, countSelects(provider.sql),
                 "existence + target-id must be a single SELECT (no separate selectCount)");
+        // The upsert key is the (name + URI) pair: a row sharing only the URI must not be matched.
+        String probe = provider.sql.stream().filter(q -> q.startsWith("select")).findFirst().orElseThrow();
+        String where = probe.substring(probe.indexOf("where"));
+        assertTrue(where.contains("`business_term`.`business_term` = ?")
+                        && where.contains("`business_term`.`external_ref_uri` = ?"),
+                "probe must match on both the business term and the external reference URI: " + where);
         assertFalse(provider.sql.stream().anyMatch(s -> s.startsWith("insert")), "must not INSERT on update");
         assertTrue(provider.sql.stream().anyMatch(s -> s.startsWith("update")), "must UPDATE the existing row");
+    }
+
+    @Test
+    void insert_alwaysInsertsWithoutProbingTheUri() {
+        // Issue #10: the interactive create must never look up (and so never update) a row by URI.
+        RecordingProvider provider = new RecordingProvider(/* rowExists */ true);
+
+        var id = repo(provider).insert("Client", "id-1", "http://ref/1", "def", "comment");
+
+        assertEquals(BigInteger.valueOf(NEW_ID), id.value());
+        assertEquals(0, countSelects(provider.sql), "insert must not SELECT by URI");
+        assertTrue(provider.sql.stream().anyMatch(s -> s.startsWith("insert")), "must INSERT a new row");
+        assertFalse(provider.sql.stream().anyMatch(s -> s.startsWith("update")), "must never UPDATE");
     }
 }
