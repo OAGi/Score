@@ -483,35 +483,9 @@ public class CcCommandController {
             @RequestBody
             CcUpdateStateRequest request) {
 
-        ScoreUser requester = sessionService.asScoreUser(user);
-        request.accManifestIdList().forEach(accManifestId -> {
-            try {
-                ccCommandService.purge(requester, accManifestId);
-            } catch (Exception ignored) {
-                logger.error("Error occurred while purging ACC " + accManifestId, ignored);
-            }
-        });
-        request.asccpManifestIdList().forEach(asccpManifestId -> {
-            try {
-                ccCommandService.purge(requester, asccpManifestId);
-            } catch (Exception ignored) {
-                logger.error("Error occurred while purging ASCCP " + asccpManifestId, ignored);
-            }
-        });
-        request.bccpManifestIdList().forEach(bccpManifestId -> {
-            try {
-                ccCommandService.purge(requester, bccpManifestId);
-            } catch (Exception ignored) {
-                logger.error("Error occurred while purging BCCP " + bccpManifestId, ignored);
-            }
-        });
-        request.dtManifestIdList().forEach(dtManifestId -> {
-            try {
-                ccCommandService.purge(requester, dtManifestId);
-            } catch (Exception ignored) {
-                logger.error("Error occurred while purging DT " + dtManifestId, ignored);
-            }
-        });
+        ccCommandService.purge(sessionService.asScoreUser(user),
+                request.accManifestIdList(), request.asccpManifestIdList(),
+                request.bccpManifestIdList(), request.dtManifestIdList());
     }
 
     @PatchMapping(value = "/restore")

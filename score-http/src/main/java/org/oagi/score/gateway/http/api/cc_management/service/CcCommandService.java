@@ -1646,6 +1646,63 @@ public class CcCommandService {
         return updated;
     }
 
+    /**
+     * Purges the given components together. Components that reference one another (an ASCCP and the ACC
+     * it is the role of, an ACC and the BCCP of its BCCs) can only be purged in a dependency order that
+     * is not known up front, so the ones that cannot be purged yet are retried as long as a round purges
+     * something. What remains is reported, with the reason of each, instead of being skipped silently.
+     *
+     * @throws IllegalArgumentException if a component could not be purged; the request is one transaction, so
+     *                                  nothing is purged then.
+     */
+    public void purge(ScoreUser requester,
+                      Collection<AccManifestId> accManifestIdList,
+                      Collection<AsccpManifestId> asccpManifestIdList,
+                      Collection<BccpManifestId> bccpManifestIdList,
+                      Collection<DtManifestId> dtManifestIdList) {
+
+        record Purge(String label, Runnable action) {
+        }
+
+        List<Purge> pending = new ArrayList<>();
+        if (asccpManifestIdList != null) {
+            asccpManifestIdList.forEach(id -> pending.add(new Purge("ASCCP " + id, () -> purge(requester, id))));
+        }
+        if (accManifestIdList != null) {
+            accManifestIdList.forEach(id -> pending.add(new Purge("ACC " + id, () -> purge(requester, id))));
+        }
+        if (bccpManifestIdList != null) {
+            bccpManifestIdList.forEach(id -> pending.add(new Purge("BCCP " + id, () -> purge(requester, id))));
+        }
+        if (dtManifestIdList != null) {
+            dtManifestIdList.forEach(id -> pending.add(new Purge("DT " + id, () -> purge(requester, id))));
+        }
+
+        Map<String, String> failures = new LinkedHashMap<>();
+        boolean purged = true;
+        while (purged && !pending.isEmpty()) {
+            purged = false;
+            failures.clear();
+            for (Iterator<Purge> iterator = pending.iterator(); iterator.hasNext(); ) {
+                Purge purge = iterator.next();
+                try {
+                    purge.action().run();
+                    iterator.remove();
+                    purged = true;
+                } catch (RuntimeException e) {
+                    failures.put(purge.label(), e.getMessage());
+                }
+            }
+        }
+
+        if (!pending.isEmpty()) {
+            throw new IllegalArgumentException("Could not purge " + failures.size() + " component(s): " +
+                    failures.entrySet().stream()
+                            .map(e -> e.getKey() + " (" + e.getValue() + ")")
+                            .collect(Collectors.joining("; ")));
+        }
+    }
+
     public boolean purge(ScoreUser requester, AccManifestId accManifestId) {
 
         if (requester == null) {
