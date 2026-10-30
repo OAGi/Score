@@ -330,7 +330,14 @@ public class AgencyIdListCommandService {
                 query(requester).getAgencyIdListSummary(agencyIdListManifestId);
 
         if (!CcState.Deleted.equals(agencyIdListSummary.state())) {
-            throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
+            throw new IllegalArgumentException("Only the Agency ID List in 'Deleted' state can be deleted.");
+        }
+        if (agencyIdListSummary.owner().isDeveloper() != requester.isDeveloper()) {
+            if (agencyIdListSummary.owner().isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can purge this Agency ID List.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can purge this Agency ID List.");
+            }
         }
 
         boolean result = command(requester).delete(agencyIdListManifestId);
