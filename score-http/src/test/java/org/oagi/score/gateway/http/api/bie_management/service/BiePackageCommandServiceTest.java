@@ -137,6 +137,40 @@ class BiePackageCommandServiceTest {
         return new UpdateBiePackageRequest(PACKAGE_ID, null, null, null, null, null, state);
     }
 
+    private void packageInState(BieState state) {
+        BiePackageDetailsRecord wip = aWipBiePackageOwnedByRequester();
+        when(query.getBiePackageDetails(PACKAGE_ID)).thenReturn(new BiePackageDetailsRecord(
+                PACKAGE_ID, null, null, "Name", "v1.0", "v1", "desc",
+                null, null, state, null, null, null, wip.owner(), null, null));
+    }
+
+    @Test
+    void the_state_follows_only_the_moves_the_page_offers() {
+        when(command.updateState(any(), any())).thenReturn(true);
+
+        packageInState(BieState.WIP);
+        service.update(requester, aStateRequest(BieState.QA));
+        packageInState(BieState.QA);
+        service.update(requester, aStateRequest(BieState.WIP));
+        service.update(requester, aStateRequest(BieState.Production));
+
+        verify(command).updateState(PACKAGE_ID, BieState.QA);
+        verify(command).updateState(PACKAGE_ID, BieState.WIP);
+        verify(command).updateState(PACKAGE_ID, BieState.Production);
+    }
+
+    @Test
+    void a_production_package_cannot_leave_production_and_wip_cannot_skip_qa() {
+        packageInState(BieState.Production);
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, aStateRequest(BieState.WIP)));
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, aStateRequest(BieState.QA)));
+
+        packageInState(BieState.WIP);
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, aStateRequest(BieState.Production)));
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, aStateRequest(BieState.WIP)));
+        verify(command, never()).updateState(any(), any());
+    }
+
     @Test
     void a_non_owner_who_is_not_an_administrator_cannot_update_or_change_the_state() {
         ScoreUser other = anotherUser(ScoreRole.DEVELOPER);

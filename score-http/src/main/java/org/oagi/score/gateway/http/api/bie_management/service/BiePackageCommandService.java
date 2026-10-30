@@ -75,7 +75,12 @@ public class BiePackageCommandService {
 
         UserId requesterId = requester.userId();
         if (request.state() != null) {
-            ensureBiePackageIsUpdatable(requester, request.biePackageId(), false);
+            BiePackageDetailsRecord biePackage =
+                    ensureBiePackageIsUpdatable(requester, request.biePackageId(), false);
+            if (!canMove(biePackage.state(), request.state())) {
+                throw new IllegalArgumentException("The BIE package in '" + biePackage.state() +
+                        "' state cannot move to '" + request.state() + "' state.");
+            }
 
             return command(requester).updateState(
                     request.biePackageId(), request.state());
@@ -104,6 +109,17 @@ public class BiePackageCommandService {
                 throw new IllegalArgumentException("A BIE package with the same name, version ID, and version name already exists.", e);
             }
         }
+    }
+
+    /** The moves the BIE Package page offers: WIP to QA, QA to WIP and QA to Production. */
+    private boolean canMove(BieState from, BieState to) {
+        if (from == WIP) {
+            return to == BieState.QA;
+        }
+        if (from == BieState.QA) {
+            return to == WIP || to == BieState.Production;
+        }
+        return false;
     }
 
     private BiePackageDetailsRecord ensureBiePackageIsUpdatable(
