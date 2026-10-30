@@ -227,7 +227,7 @@ public class SecurityConfiguration {
                     // permitAll here so they still pass through the filter chain (#1750).
                     List<String> permitAllPaths = new ArrayList<>(
                             Arrays.asList("/favicon.ico", "/resources/**", "/error",
-                                    "/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**",
+                                    "/health", "/info/**", "/oauth2/**", "/ai/**",
                                     // Passkey sign-in is available before authentication. When score.passkey.* is
                                     // not set, PasskeyFeatureFilter answers 404 for these paths.
                                     "/webauthn/authenticate/options", "/login/webauthn"));

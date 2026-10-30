@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.validation;
 
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
@@ -37,7 +38,7 @@ class ValidationControllerTest {
     void setUp() {
         engine = mock(ValidationEngine.class);
         SessionService sessionService = mock(SessionService.class);
-        when(sessionService.asScoreUser(any())).thenReturn(requester);
+        when(sessionService.asScoreUser((AuthenticatedPrincipal) any())).thenReturn(requester);
         ValidationController controller = new ValidationController();
         ReflectionTestUtils.setField(controller, "validationEngine", engine);
         ReflectionTestUtils.setField(controller, "sessionService", sessionService);

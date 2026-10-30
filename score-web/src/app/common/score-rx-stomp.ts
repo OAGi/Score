@@ -118,6 +118,5 @@ export class RxStompService extends RxStomp {
 export function rxStompServiceFactory(http: HttpClient) {
   const rxStomp = new RxStompService(http);
   rxStomp.configure(scoreRxStompConfig);
-  rxStomp.activate();
   return rxStomp;
 }

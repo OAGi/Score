@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.comment_management.controller;
 
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
@@ -36,7 +37,7 @@ class CommentCommandControllerTest {
     void setUp() {
         service = mock(CommentCommandService.class);
         SessionService sessionService = mock(SessionService.class);
-        when(sessionService.asScoreUser(any())).thenReturn(requester);
+        when(sessionService.asScoreUser((AuthenticatedPrincipal) any())).thenReturn(requester);
         CommentCommandController controller = new CommentCommandController();
         ReflectionTestUtils.setField(controller, "commentCommandService", service);
         ReflectionTestUtils.setField(controller, "sessionService", sessionService);

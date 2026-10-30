@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.controller;
 
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
@@ -68,7 +69,7 @@ class CcQueryControllerCheckTest {
     void setUp() {
         service = mock(AccStructureChangeValidationService.class);
         SessionService sessionService = mock(SessionService.class);
-        when(sessionService.asScoreUser(any())).thenReturn(requester);
+        when(sessionService.asScoreUser((AuthenticatedPrincipal) any())).thenReturn(requester);
         CcQueryController controller = new CcQueryController();
         ReflectionTestUtils.setField(controller, "structureChangeValidationService", service);
         ReflectionTestUtils.setField(controller, "sessionService", sessionService);
