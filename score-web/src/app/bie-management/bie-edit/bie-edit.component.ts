@@ -1292,8 +1292,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
           return;
         } else {
           const asbiepNode = node as AsbiepFlatNode;
-          this.isUpdating = true;
           this.updateDetails(node.parents, () => {
+            this.isUpdating = true;
             this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
               .pipe(finalize(() => {
                 this.isUpdating = false;
@@ -1529,7 +1529,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
             return;
           }
 
-          this.isUpdating = true;
+          // updateDetails() skips saving while isUpdating is set, so the confirmation's flag is cleared first.
+          this.isUpdating = false;
 
           if (!abieNode.used) {
             this.toggleTreeUsed(abieNode);
@@ -1549,8 +1550,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     if (!this.canRemoveBaseBIE(node)) {
       return;
     }
-
-    this.isUpdating = true;
 
     const abieNode = (node as AbieFlatNode);
     if (!abieNode.used) {
