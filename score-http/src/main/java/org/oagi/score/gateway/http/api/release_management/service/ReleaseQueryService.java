@@ -23,6 +23,7 @@ import org.oagi.score.gateway.http.api.release_management.model.*;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.criteria.ReleaseListFilterCriteria;
 import org.oagi.score.gateway.http.common.model.ExportStandaloneSchemaResponse;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -158,13 +159,22 @@ public class ReleaseQueryService {
         return false;
     }
 
+    private ReleaseSummaryRecord requireReleaseSummary(ScoreUser requester, ReleaseId releaseId) {
+        ReleaseSummaryRecord release = query(requester).getReleaseSummary(releaseId);
+        if (release == null) {
+            throw new NotFoundException("The release '" + releaseId + "' does not exist.");
+        }
+        return release;
+    }
+
     public AssignComponents getAssignComponents(ScoreUser requester, ReleaseId releaseId) {
+        requireReleaseSummary(requester, releaseId);
         return query(requester).getAssignComponents(releaseId);
     }
 
     public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser requester, ReleaseId releaseId,
                                                                    boolean includeBieViewOrder) throws IOException {
-        ReleaseSummaryRecord release = query(requester).getReleaseSummary(releaseId);
+        ReleaseSummaryRecord release = requireReleaseSummary(requester, releaseId);
 
         MigrationScriptGenerator generator = new MigrationScriptGenerator(dslContext, resourceLoader,
                 BigInteger.valueOf(100000000L), includeBieViewOrder);

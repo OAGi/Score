@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseDetailsRe
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -12,8 +13,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ReleaseQueryServiceTest {
@@ -56,6 +60,25 @@ class ReleaseQueryServiceTest {
         ReleaseQueryService service = service(repository);
 
         assertThat(service.isLaterRelease(mock(ScoreUser.class), source, id(2))).isFalse();
+    }
+
+    @Test
+    void anUnknownReleaseIsNotFoundWhereItsAssignableComponentsAreAskedFor() {
+        ReleaseQueryRepository repository = mock(ReleaseQueryRepository.class);
+        when(repository.getReleaseSummary(id(99999))).thenReturn(null);
+
+        assertThatThrownBy(() -> service(repository).getAssignComponents(mock(ScoreUser.class), id(99999)))
+                .isInstanceOf(NotFoundException.class);
+        verify(repository, never()).getAssignComponents(any());
+    }
+
+    @Test
+    void anUnknownReleaseIsNotFoundWhereItsMigrationScriptIsGenerated() {
+        ReleaseQueryRepository repository = mock(ReleaseQueryRepository.class);
+        when(repository.getReleaseSummary(id(99999))).thenReturn(null);
+
+        assertThatThrownBy(() -> service(repository).generateMigrationScript(mock(ScoreUser.class), id(99999), false))
+                .isInstanceOf(NotFoundException.class);
     }
 
     private ReleaseQueryService service(ReleaseQueryRepository repository) {
