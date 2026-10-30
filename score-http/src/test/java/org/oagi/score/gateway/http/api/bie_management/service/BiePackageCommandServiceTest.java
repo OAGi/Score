@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 /**
  * pressing Ctrl/Cmd+S on the BIE Package detail page bypassed the Update button's guard
  * and saved the package with empty required fields. {@code update()} only checked ownership/WIP state,
- * not that name/versionId/versionName/description are non-empty, so the empty values were persisted.
+ * not that name/versionId/versionName are non-empty, so the empty values were persisted.
  */
 class BiePackageCommandServiceTest {
 
@@ -87,10 +87,14 @@ class BiePackageCommandServiceTest {
     }
 
     @Test
-    void update_rejects_an_empty_description() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.update(requester, aRequest("Name", "v1.0", "v1", "")));
-        verify(command, never()).update(any(), any(), any(), any(), any(), any());
+    void update_persists_when_the_description_is_empty_or_null() {
+        when(command.update(any(), any(), any(), any(), any(), any())).thenReturn(true);
+
+        service.update(requester, aRequest("Name", "v1.0", "v1", ""));
+        service.update(requester, aRequest("Name", "v1.0", "v1", null));
+
+        verify(command).update(PACKAGE_ID, "Name", "v1.0", "v1", "", null);
+        verify(command).update(PACKAGE_ID, "Name", "v1.0", "v1", null, null);
     }
 
     @Test

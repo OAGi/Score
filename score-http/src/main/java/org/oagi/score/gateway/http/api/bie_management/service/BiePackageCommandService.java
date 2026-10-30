@@ -90,9 +90,6 @@ public class BiePackageCommandService {
             if (!hasLength(request.versionName())) {
                 throw new IllegalArgumentException("The BIE package version name cannot be empty.");
             }
-            if (!hasLength(request.description())) {
-                throw new IllegalArgumentException("The BIE package description cannot be empty.");
-            }
 
             try {
                 return command(requester).update(

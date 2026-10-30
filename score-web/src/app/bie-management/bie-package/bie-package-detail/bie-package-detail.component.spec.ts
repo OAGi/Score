@@ -44,7 +44,7 @@ describe('BiePackageDetailComponent.update guards empty required fields (#20)', 
     expect(ctx.snackBar.open).not.toHaveBeenCalled();
   });
 
-  it('does NOT save when Version ID, Version Name, or Description is emptied', () => {
+  it('does NOT save when Version ID or Version Name is emptied', () => {
     const base = {name: 'Name', versionId: '', versionName: 'v1', description: 'desc'};
     const original = {name: 'Name', versionId: 'v1.0', versionName: 'v1', description: 'desc'};
     const ctx = updateCtx(base, original);
@@ -57,6 +57,16 @@ describe('BiePackageDetailComponent.update guards empty required fields (#20)', 
     const ctx = updateCtx(changed, {name: 'Name', versionId: 'v1.0', versionName: 'v1', description: 'desc'});
     ctx.update();
     expect(ctx.biePackageService.update).toHaveBeenCalledWith(changed);
+  });
+
+  it('saves when the Description is empty or null', () => {
+    const original = {name: 'Name', versionId: 'v1.0', versionName: 'v1', description: 'desc'};
+    for (const description of ['', null]) {
+      const changed = {name: 'Name', versionId: 'v1.0', versionName: 'v1', description};
+      const ctx = updateCtx(changed, original);
+      ctx.update();
+      expect(ctx.biePackageService.update).toHaveBeenCalledWith(changed);
+    }
   });
 
   it('does NOT save when nothing changed, even if required fields happen to be empty', () => {

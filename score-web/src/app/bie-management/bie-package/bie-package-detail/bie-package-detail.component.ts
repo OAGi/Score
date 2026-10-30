@@ -380,8 +380,7 @@ export class BiePackageDetailComponent implements OnInit {
     return (this.disabled) ||
       (biePackage.name === undefined || biePackage.name === '') ||
       (biePackage.versionId === undefined || biePackage.versionId === '') ||
-      (biePackage.versionName === undefined || biePackage.versionName === '') ||
-      (biePackage.description === undefined || biePackage.description === '');
+      (biePackage.versionName === undefined || biePackage.versionName === '');
   }
 
   get updateDisabled(): boolean {
