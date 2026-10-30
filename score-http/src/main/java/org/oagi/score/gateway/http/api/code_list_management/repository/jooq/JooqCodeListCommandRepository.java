@@ -88,6 +88,9 @@ public class JooqCodeListCommandRepository
 
             codeList.setVersionId(basedCodeListDetails.versionId());
             codeList.setBasedCodeListId(valueOf(basedCodeListDetails.codeListId()));
+            basedCodeListManifestRecord = dslContext().selectFrom(CODE_LIST_MANIFEST)
+                    .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(basedCodeListManifestId)))
+                    .fetchOne();
             if (requester().isDeveloper()) {
                 codeList.setExtensibleIndicator((byte) (basedCodeListDetails.extensible() ? 1 : 0));
             } else {
