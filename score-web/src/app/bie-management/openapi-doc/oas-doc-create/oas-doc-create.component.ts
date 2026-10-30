@@ -61,7 +61,9 @@ export class OasDocCreateComponent implements OnInit {
   openDialogOasDocCreate() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
-    dialogConfig.data.content = ['Another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'];
+    dialogConfig.data.content = ['Another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists!'];
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {
+    });
   }
 
   doCreate() {
@@ -74,25 +76,7 @@ export class OasDocCreateComponent implements OnInit {
   }
 
   create() {
-    this.checkUniqueness(this.oasDoc, (_) => {
-      this.checkOasDocTitle(this.oasDoc, (dummy) => {
-        this.doCreate();
-      });
-    });
-  }
-
-  createWithoutCheck() {
-    this.doCreate();
-  }
-
-  checkOasDocTitle(oasDoc: OasDoc, callbackFn?) {
-    this.openAPIService.checkUniqueness(oasDoc).subscribe(resp => {
-      if (!resp) {
-        this.openDialogOasDocCreate();
-        return;
-      }
-      return callbackFn && callbackFn();
-    });
+    this.checkUniqueness(this.oasDoc, () => this.doCreate());
   }
 
   checkUniqueness(oasDoc: OasDoc, callbackFn?) {

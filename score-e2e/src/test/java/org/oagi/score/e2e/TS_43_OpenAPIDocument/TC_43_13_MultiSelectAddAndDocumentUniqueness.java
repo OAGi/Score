@@ -33,7 +33,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
-import static org.oagi.score.e2e.impl.PageHelper.getMultiActionSnackBar;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 import static org.oagi.score.e2e.impl.PageHelper.sendKeys;
 import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
@@ -50,16 +49,13 @@ import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
  *       add every selected BIE; the two distinct BIEs land on two distinct endpoints (their resource paths
  *       are derived from their different Business Contexts).</li>
  *   <li><b>Document uniqueness.</b> An OpenAPI document is unique on
- *       {@code (Title, OpenAPI Version, Document Version, License Name)}. Creating a duplicate is now
- *       rejected by the server (the request reaches the backend and the error is surfaced), and editing one
- *       document's metadata to duplicate another is blocked before any save.</li>
+ *       {@code (Title, OpenAPI Version, Document Version)}; the License Name is not part of the key. Creating a
+ *       duplicate and editing one document's metadata to duplicate another are both blocked before any save
+ *       (the same check backs Create and Update).</li>
  * </ul>
  */
 @Execution(ExecutionMode.CONCURRENT)
 public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
-
-    private static final String DUPLICATE_DOC_BACKEND_MESSAGE =
-            "An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.";
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -113,7 +109,7 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        // An existing document fixes the unique tuple (Title, OpenAPI Version, Document Version, License Name).
+        // An existing document fixes the unique tuple (Title, OpenAPI Version, Document Version).
         OpenAPIDocumentObject existing =
                 getAPIFactory().getOpenAPIDocumentAPI().createRandomOpenAPIDocument(endUser);
 
@@ -122,17 +118,18 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         CreateOpenAPIDocumentPage createPage = openAPIDocumentPage.openCreateOpenAPIDocumentPage();
 
-        // Enter the SAME four-tuple as the existing document and hit Create.
+        // Enter the SAME three-tuple as the existing document, with a DIFFERENT License Name (not part of the key).
         createPage.setOpenAPIVersion(existing.getOpenApiVersion());
         createPage.setTitle(existing.getTitle());
         createPage.setDocumentVersion(existing.getVersion());
-        createPage.setLicenseName(existing.getLicenseName());
+        createPage.setLicenseName(existing.getLicenseName() + " other");
         click(createPage.getCreateButton(true));
 
-        // The duplicate is rejected by the server and the error is surfaced; no second document is created.
-        assertEquals(DUPLICATE_DOC_BACKEND_MESSAGE,
-                getText(getMultiActionSnackBar(getDriver()).getMessageElement()),
-                "Creating a document with the same (Title, OpenAPI Version, Document Version, License Name) is rejected");
+        // The duplicate create is blocked before any save (an "Invalid parameters" dialog explains the clash).
+        WebElement dialog = visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container"));
+        assertTrue(getText(dialog).contains("already exists"),
+                "Creating a document with the same (Title, OpenAPI Version, Document Version) must be blocked, not saved (was: "
+                        + getText(dialog) + ")");
     }
 
     @Test
@@ -152,11 +149,11 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         EditOpenAPIDocumentPage editPage = openAPIDocumentPage.openEditOpenAPIDocumentPage(target);
 
-        // Edit the target's metadata so its four-tuple equals the existing document's, then Update.
+        // Edit the target's metadata so its three-tuple equals the existing document's (License Name differs), then Update.
         editPage.setOpenAPIVersion(existing.getOpenApiVersion());
         editPage.setTitle(existing.getTitle());
         editPage.setDocumentVersion(existing.getVersion());
-        editPage.setLicenseName(existing.getLicenseName());
+        editPage.setLicenseName(existing.getLicenseName() + " other");
         editPage.clickUpdateButton();
 
         // The duplicate update is blocked before any save (an "Invalid parameters" dialog explains the clash).

@@ -504,3 +504,39 @@ describe('OasDocDetailComponent.generate guards unsaved changes (#1610)', () => 
     expect(ctx.loading).toBe(true);
   });
 });
+
+describe('OasDocDetailComponent.update duplicate check (same check as Create)', () => {
+  function ctx(unique: boolean): any {
+    const c: any = {
+      oasDoc: {oasDocId: 7, title: 'dup title', openAPIVersion: '3.1', version: '1.0', licenseName: 'MIT'},
+      openAPIService: {checkUniqueness: vi.fn(() => of(unique))},
+      doUpdate: vi.fn(),
+      openDialogOasDocUpdate: vi.fn(),
+    };
+    c.checkUniqueness = OasDocDetailComponent.prototype.checkUniqueness;
+    return c;
+  }
+
+  it('opens the duplicate dialog and does not update when the check fails', () => {
+    const c = ctx(false);
+    OasDocDetailComponent.prototype.update.call(c);
+    expect(c.openAPIService.checkUniqueness).toHaveBeenCalledWith(c.oasDoc);
+    expect(c.openDialogOasDocUpdate).toHaveBeenCalledTimes(1);
+    expect(c.doUpdate).not.toHaveBeenCalled();
+  });
+
+  it('updates when the check passes', () => {
+    const c = ctx(true);
+    OasDocDetailComponent.prototype.update.call(c);
+    expect(c.doUpdate).toHaveBeenCalledTimes(1);
+    expect(c.openDialogOasDocUpdate).not.toHaveBeenCalled();
+  });
+
+  it('opens a dialog that does not mention the License Name', () => {
+    const dialogConfig: any = {data: {}};
+    const open = vi.fn(() => ({afterClosed: () => of(undefined)}));
+    const c: any = {confirmDialogService: {newConfig: () => dialogConfig, open}};
+    OasDocDetailComponent.prototype.openDialogOasDocUpdate.call(c);
+    expect(dialogConfig.data.content[0]).not.toMatch(/license/i);
+  });
+});

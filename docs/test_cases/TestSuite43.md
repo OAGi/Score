@@ -739,7 +739,7 @@ The conversion is symmetric: flipping an existing `POST` operation row's `Messag
 
 **Multi-select Add and OpenAPI Document Uniqueness**
 
-Pre-condition: An end-user account that can access the BIE menu exists. On the Edit OpenAPI Document page, the `Add BIE For OpenAPI Document` dialog lets the user check more than one candidate BIE — each with its own inline `Verb`, `Message Body`, and `Array Indicator` — and click `Add` once to add them all. Selecting several BIEs must add EVERY selected BIE, including two BIEs that merely share a property term: two profiles of one ASCCP under two different Business Contexts carry the same DEN but resolve to two different resource paths (the backend derives the path from the Business Context), so both can be added even when each is configured with the same `(Verb, Message Body)` such as `GET` + `Response`. (Previously the dialog de-duplicated the batch on `(property term, Verb, Message Body)` alone and aborted the whole `Add` on the first such collision, so selecting two same-property-term BIEs silently added nothing.) Separately, an OpenAPI Document is unique on the tuple `(Title, OpenAPI Version, Document Version, License Name)`. Creating a document whose tuple duplicates an existing document is rejected by the server, and editing one document's metadata so its tuple duplicates another document's is blocked before any save.
+Pre-condition: An end-user account that can access the BIE menu exists. On the Edit OpenAPI Document page, the `Add BIE For OpenAPI Document` dialog lets the user check more than one candidate BIE — each with its own inline `Verb`, `Message Body`, and `Array Indicator` — and click `Add` once to add them all. Selecting several BIEs must add EVERY selected BIE, including two BIEs that merely share a property term: two profiles of one ASCCP under two different Business Contexts carry the same DEN but resolve to two different resource paths (the backend derives the path from the Business Context), so both can be added even when each is configured with the same `(Verb, Message Body)` such as `GET` + `Response`. (Previously the dialog de-duplicated the batch on `(property term, Verb, Message Body)` alone and aborted the whole `Add` on the first such collision, so selecting two same-property-term BIEs silently added nothing.) Separately, an OpenAPI Document is unique on the tuple `(Title, OpenAPI Version, Document Version)`. Creating a document whose tuple duplicates an existing document is rejected by the server, and editing one document's metadata so its tuple duplicates another document's is blocked before any save.
 
 ### Test Assertion:
 
@@ -747,24 +747,24 @@ Pre-condition: An end-user account that can access the BIE menu exists. On the E
 In the `Add BIE For OpenAPI Document` dialog, checking two BIEs that share one DEN / property term (two Business-Context profiles of a single ASCCP), configuring BOTH as `GET` + `Response`, and clicking `Add` once adds both BIEs: the Endpoint Details table then carries two rows for the shared DEN (one per Business Context). The multi-select `Add` does not silently abort on the shared property term.
 
 #### Test Assertion #43.13.2
-Creating an OpenAPI Document whose `(Title, OpenAPI Version, Document Version, License Name)` equals an existing document's is rejected by the server: clicking `Create` surfaces the error `An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.` and no second document is created.
+Creating an OpenAPI Document whose `(Title, OpenAPI Version, Document Version)` equals an existing document's is blocked before any save: clicking `Create` opens an `Invalid parameters` dialog stating that another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists, and no second document is created. The License Name is not part of the key.
 
 #### Test Assertion #43.13.3
-Editing an existing document's metadata so its `(Title, OpenAPI Version, Document Version, License Name)` equals another document's and clicking `Update` is blocked before any save: an `Invalid parameters` dialog states that another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists, and the document is left unchanged.
+Editing an existing document's metadata so its `(Title, OpenAPI Version, Document Version)` equals another document's and clicking `Update` is blocked before any save: an `Invalid parameters` dialog states that another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists, and the document is left unchanged.
 
 ### Test Step Pre-condition:
 1. An end-user account that can access the BIE menu is available in connectCenter.
 2. For the multi-select case: a single ASCCP profiled into two top-level BIEs, each under a different Business Context, so the two BIEs carry the same DEN; and an OpenAPI Document the end user can open into the Edit OpenAPI Document page.
-3. For the uniqueness cases: two distinct OpenAPI Documents whose `(Title, OpenAPI Version, Document Version, License Name)` tuples are known (each with a non-empty License Name).
+3. For the uniqueness cases: two distinct OpenAPI Documents whose `(Title, OpenAPI Version, Document Version)` tuples are known (the License Name is not part of the key).
 
 ### Test Step:
 1. Sign in to connectCenter as the end user and open the OpenAPI Document into the Edit OpenAPI Document page.
 2. Open the `Add BIE For OpenAPI Document` dialog, search by the shared DEN, check BOTH candidate rows, set each row's `Verb` to `GET` and `Message Body` to `Response`, and click `Add`.
 3. Verify that both BIEs were added — the Endpoint Details table shows two rows for the shared DEN. (Assertion [#1](#test-assertion-43131))
-4. Open the `Create OpenAPI Document` page, enter the same `OpenAPI Version`, `Title`, `Document Version`, and `License Name` as an existing document, and click `Create`.
-5. Verify that the create is rejected with `An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.` and that no second document is created. (Assertion [#2](#test-assertion-43132))
-6. Open a different existing document into the Edit OpenAPI Document page, change its `Title`, `Document Version`, and `License Name` to equal another document's (keeping the same `OpenAPI Version`), and click `Update`.
-7. Verify that the update is blocked before any save with an `Invalid parameters` dialog stating that another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists, and that the document is unchanged. (Assertion [#3](#test-assertion-43133))
+4. Open the `Create OpenAPI Document` page, enter the same `OpenAPI Version`, `Title`, and `Document Version` as an existing document (the `License Name` may differ), and click `Create`.
+5. Verify that the create is blocked before any save with an `Invalid parameters` dialog stating that another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists, and that no second document is created. (Assertion [#2](#test-assertion-43132))
+6. Open a different existing document into the Edit OpenAPI Document page, change its `Title` and `Document Version` to equal another document's (keeping the same `OpenAPI Version`), and click `Update`.
+7. Verify that the update is blocked before any save with an `Invalid parameters` dialog stating that another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists, and that the document is unchanged. (Assertion [#3](#test-assertion-43133))
 
 ## Test Case 43.14
 

@@ -902,7 +902,7 @@ export class OasDocDetailComponent implements OnInit {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
     dialogConfig.data.content = [
-      'Another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'
+      'Another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists!'
     ];
 
     this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {
