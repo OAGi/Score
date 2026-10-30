@@ -121,6 +121,37 @@ class ReleaseCommandServiceTest {
         verify(command).update(releaseId, null, "1.1", null, null);
     }
 
+    @Test
+    void rejectsCreateWithABlankReleaseNumber() {
+        ScoreUser requester = user(ScoreRole.DEVELOPER);
+        ReleaseCommandRepository command = mock(ReleaseCommandRepository.class);
+        ReleaseCommandService service = service(mock(ReleaseQueryRepository.class), command);
+
+        CreateReleaseRequest request = new CreateReleaseRequest(null, null, "   ", null, null);
+
+        assertThatThrownBy(() -> service.create(requester, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("releaseNum");
+        verify(command, never()).create(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void rejectsUpdateWithABlankReleaseNumber() {
+        ScoreUser requester = user(ScoreRole.DEVELOPER);
+        ReleaseId releaseId = id(1);
+        ReleaseCommandRepository command = mock(ReleaseCommandRepository.class);
+        ReleaseQueryRepository query = mock(ReleaseQueryRepository.class);
+        when(query.getReleaseSummary(releaseId)).thenReturn(summary(releaseId, "1.0", ReleaseState.Draft));
+        ReleaseCommandService service = service(query, command);
+
+        UpdateReleaseRequest request = new UpdateReleaseRequest(releaseId, null, " ", null, null);
+
+        assertThatThrownBy(() -> service.update(requester, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("releaseNum");
+        verify(command, never()).update(any(), any(), any(), any(), any());
+    }
+
     private ReleaseCommandService service(ReleaseQueryRepository query, ReleaseCommandRepository command) {
         RepositoryFactory repositories = mock(RepositoryFactory.class);
         when(repositories.releaseQueryRepository(any())).thenReturn(query);

@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -112,6 +113,10 @@ public class ReleaseCommandService implements InitializingBean {
             throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can create a release.");
         }
 
+        if (!StringUtils.hasText(request.releaseNum())) {
+            throw new IllegalArgumentException("'releaseNum' must not be blank.");
+        }
+
         var query = repositoryFactory.releaseQueryRepository(requester);
         if (query.hasDuplicateReleaseNumber(request.libraryId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
@@ -151,6 +156,9 @@ public class ReleaseCommandService implements InitializingBean {
         }
         if (!requester.hasRole(DEVELOPER)) {
             throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can update a release.");
+        }
+        if (!StringUtils.hasText(request.releaseNum())) {
+            throw new IllegalArgumentException("'releaseNum' must not be blank.");
         }
 
         var query = repositoryFactory.releaseQueryRepository(requester);

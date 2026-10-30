@@ -140,7 +140,7 @@ export class ReleaseCreateComponent implements OnInit {
   }
 
   isDisabled() {
-    if (this.releaseDetail.releaseNum === undefined || this.releaseDetail.releaseNum === '') {
+    if (!this.releaseDetail.releaseNum?.trim()) {
       return true;
     }
     if (this.selectedNamespace === undefined || this.selectedNamespace === null) {
