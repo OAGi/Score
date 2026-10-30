@@ -466,6 +466,13 @@ public class CodeListCommandService {
         if (!Deleted.equals(codeListSummary.state())) {
             throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
         }
+        if (codeListSummary.owner().isDeveloper() != requester.isDeveloper()) {
+            if (codeListSummary.owner().isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can purge this Code List.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can purge this Code List.");
+            }
+        }
 
         boolean result = command(requester).delete(codeListManifestId);
         if (result) {
