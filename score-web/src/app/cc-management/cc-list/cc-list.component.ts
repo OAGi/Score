@@ -41,11 +41,9 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {ccStateOptions} from '../domain/cc-dialog.table';
 
-const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
-const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
-const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
 
 const CC_TABLE = defineTable({
   storageKey: 'TableColumns-CoreComponentPage',
@@ -122,8 +120,6 @@ export class CcListComponent {
   faFlask = faFlask;
   title = this.isBrowseStandardMode ? 'Standard' : 'Core Component';
 
-  workingStateList = WORKING_STATE_LIST;
-  releaseStateList = RELEASE_STATE_LIST;
   workingRelease = WorkingRelease;
   // Issue #1700: Browser mode limits type filters to the browseable property components.
   private readonly browserModeTypes = ['ASCCP', 'BCCP'];
@@ -285,8 +281,8 @@ export class CcListComponent {
   /** The library and the branch go to the query. Returns whether the query for the endpoint changed. */
   private applyChoices(): boolean {
     this.view().setFilter('releaseId', '' + (this.releaseChoice.release?.releaseId || 0));
-    const states = this.releaseChoice.release?.workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
-    this.filterOptions.update(options => ({...options, states: states.map(e => ({value: e, label: separate(e)}))}));
+    const states = ccStateOptions(!!this.releaseChoice.release?.workingRelease);
+    this.filterOptions.update(options => ({...options, states}));
     return this.updateParams();
   }
 
@@ -643,7 +639,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',
@@ -682,7 +678,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',
@@ -722,6 +718,7 @@ export class CcListComponent {
       data: {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
+        workingRelease: true,
         action: 'create',
       },
       width: '100%',
@@ -763,7 +760,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',

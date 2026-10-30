@@ -7,7 +7,7 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, DT_WITHOUT_TYPE_TABLE} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, DT_WITHOUT_TYPE_TABLE, ccStateOptions} from '../../domain/cc-dialog.table';
 import {CcListComponent} from '../cc-list.component';
 import {TagService} from '../../../tag-management/domain/tag.service';
 
@@ -29,13 +29,15 @@ export class CreateBccpDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** QA and Production are for a published release, and the Working branch has none. */
+  private readonly states = ccStateOptions(!!this.data.workingRelease);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CcListEntry>(false, []);
 
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
-  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states});
 
   readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
   private tagService = inject(TagService);
@@ -56,7 +58,7 @@ export class CreateBccpDialogComponent implements OnInit {
     this.extraParams.set(params);
 
     this.tagService.getTags().subscribe(tags => {
-      this.filterOptions.set({tags: tags.map(e => ({value: e.name, label: e.name}))});
+      this.filterOptions.set({states: this.states, tags: tags.map(e => ({value: e.name, label: e.name}))});
       // Only the commonly used ones, to begin with.
       this.view().setFilter('commonlyUsed', ['true']);
       this.ready.set(true);

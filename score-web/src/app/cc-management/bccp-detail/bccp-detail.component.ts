@@ -618,6 +618,7 @@ export class BccpDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         action: 'update',
         state: node.state,
         // @ts-ignore

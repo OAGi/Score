@@ -8,7 +8,7 @@ import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {CcListComponent} from '../cc-list.component';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, ccStateOptions} from '../../domain/cc-dialog.table';
 
 const BOD_COLUMNS = [
   {id: 'state', label: 'State', width: 104, sortable: true},
@@ -51,6 +51,8 @@ export class CreateBodDialogComponent {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** QA and Production are for a published release, and the Working branch has none. */
+  private readonly states = ccStateOptions(!!this.data.workingRelease);
 
   readonly verbColumns = createTableColumns(VERB_TABLE);
   readonly nounColumns = createTableColumns(NOUN_TABLE);
@@ -64,6 +66,7 @@ export class CreateBodDialogComponent {
 
   /** The ASCCPs of the library and the release; the tag says whether they are verbs or nouns. */
   extraParams: Record<string, string> = {};
+  readonly filterOptions = {states: this.states};
 
   readonly verbLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Verb'));
   readonly nounLoad = (params: HttpParams) => this.ccListService.getCcListPage(params.set('tags', 'Noun'));

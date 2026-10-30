@@ -7,11 +7,9 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE, RELEASE_STATE_LIST} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE, ccStateOptions, usableCcStates} from '../../domain/cc-dialog.table';
 
 
-// A deleted property cannot be appended, so it is not offered to begin with.
-const APPENDABLE_STATES = RELEASE_STATE_LIST.filter(state => state !== 'Deleted');
 
 const APPEND_ASSOCIATION_TABLE = defineTable({
   ...CC_WITH_TYPE_TABLE,
@@ -31,13 +29,15 @@ export class AppendAssociationDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** QA and Production are for a published release, and the Working branch has none. */
+  private readonly states = ccStateOptions(!!this.data.workingRelease);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CcListEntry>(false, []);
 
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
-  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states});
 
   readonly load = (params: HttpParams) => this.ccListService.getCcListPage(
     // Without a type chosen, every type that can be appended is asked for.
@@ -54,7 +54,8 @@ export class AppendAssociationDialogComponent implements OnInit {
     afterNextRender(() => {
       // Every type that can be appended, to begin with.
       this.view().setFilter('types', this.typeList.map(e => e.toLowerCase()));
-      this.view().setFilter('states', APPENDABLE_STATES);
+      // A deleted property cannot be appended, so it is not offered to begin with.
+      this.view().setFilter('states', usableCcStates(!!this.data.workingRelease));
       this.ready.set(true);
     });
   }
@@ -68,7 +69,7 @@ export class AppendAssociationDialogComponent implements OnInit {
       params['excludes'] = this.data.excludes.join(',');
     }
     this.extraParams.set(params);
-    this.filterOptions.set({types: this.typeList.map(e => ({value: e.toLowerCase(), label: e}))});
+    this.filterOptions.set({states: this.states, types: this.typeList.map(e => ({value: e.toLowerCase(), label: e}))});
   }
 
   onNoClick(): void {

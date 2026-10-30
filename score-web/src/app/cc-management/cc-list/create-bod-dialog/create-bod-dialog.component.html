@@ -3,7 +3,7 @@
     <div class="col-6">
       <div class="dialog-section-title">Select Verb to {{this.action}} BOD</div>
       <div>
-        <score-table-view emptyMessage="No Verb" #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [ready]="ready()"
+        <score-table-view emptyMessage="No Verb" #verbView [table]="verbColumns" [load]="verbLoad" [extraParams]="extraParams" [filterOptions]="filterOptions" [ready]="ready()"
           [selection]="verbSelection" [rowKey]="rowKey" [compactBelow]="520" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
           <ng-container scoreColumnDef="state">
@@ -73,7 +73,7 @@
     <div class="col-6">
       <div class="dialog-section-title">Select Noun to {{this.action}} BOD</div>
       <div>
-        <score-table-view emptyMessage="No Noun" #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [ready]="ready()"
+        <score-table-view emptyMessage="No Noun" #nounView [table]="nounColumns" [load]="nounLoad" [extraParams]="extraParams" [filterOptions]="filterOptions" [ready]="ready()"
           [selection]="nounSelection" [rowKey]="rowKey" [compactBelow]="520" [syncUrl]="false" searchClearsSort pageFromResponse rowHover>
 
           <ng-container scoreColumnDef="state">

@@ -34,12 +34,10 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {ccStateOptions} from '../domain/cc-dialog.table';
 
 import {CreateBdtDialogComponent} from './create-bdt-dialog/create-bdt-dialog.component';
-const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
-const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
-const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
 
 const DT_TABLE = defineTable({
   storageKey: 'TableColumns-DataTypePage',
@@ -100,8 +98,6 @@ export class DtListComponent {
 
   title = 'Data Type';
 
-  workingStateList = WORKING_STATE_LIST;
-  releaseStateList = RELEASE_STATE_LIST;
   workingRelease = WorkingRelease;
 
   readonly libraryChoice = new LibraryChoice(this.auth);
@@ -194,8 +190,8 @@ export class DtListComponent {
   /** The library, the branch and the types go to the query. Returns whether the parameters for the endpoint changed. */
   private applyChoices(): boolean {
     this.view().setFilter('releaseId', '' + (this.releaseChoice.release?.releaseId || 0));
-    const states = this.releaseChoice.release?.workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
-    this.filterOptions.update(options => ({...options, states: states.map(e => ({value: e, label: separate(e)}))}));
+    const states = ccStateOptions(!!this.releaseChoice.release?.workingRelease);
+    this.filterOptions.update(options => ({...options, states}));
 
     const params: Record<string, string> = {libraryId: '' + this.libraryChoice.library?.libraryId};
     const types = this.filterTypes.filter(e => e.selected).map(e => e.name);
@@ -501,7 +497,7 @@ export class DtListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',

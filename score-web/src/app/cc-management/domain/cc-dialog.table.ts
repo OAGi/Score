@@ -1,8 +1,26 @@
 import {defineTable} from '../../common/score-table';
 import {OagisComponentTypes} from './core-component-node';
 
-export const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
+/** The Working branch is where developers work; ReleaseDraft is left out, as nothing new is done to a component then. */
+const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'Published', 'Deleted'];
+/** A published release is where end users work, and QA and Production are theirs alone. */
+const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
+
+/** The states that a core component or a data type may have; only the branch tells, as a role works on one branch. */
+export function ccStateList(workingRelease: boolean): string[] {
+  return workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
+}
+
+/** The State filter's options for the branch. */
+export function ccStateOptions(workingRelease: boolean): { value: string, label: string }[] {
+  return ccStateList(workingRelease).map(e => ({value: e, label: separate(e)}));
+}
+
+/** The states a new component may be built on, to begin with: all but Deleted. */
+export function usableCcStates(workingRelease: boolean): string[] {
+  return ccStateList(workingRelease).filter(e => e !== 'Deleted');
+}
 
 export const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
 

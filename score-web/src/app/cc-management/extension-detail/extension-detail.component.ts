@@ -750,6 +750,7 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
         state: this.rootNode.state,

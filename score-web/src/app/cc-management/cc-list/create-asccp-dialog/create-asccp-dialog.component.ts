@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {afterNextRender, ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -9,16 +9,13 @@ import {SemanticGroup, Semantics} from '../../domain/core-component-node';
 import {CcListComponent} from '../cc-list.component';
 import {TagService} from '../../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {createTableColumns, defineTable} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE} from '../../domain/cc-dialog.table';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions, usableCcStates} from '../../domain/cc-dialog.table';
 
 const CREATE_ASCCP_TABLE = defineTable({
   ...CC_WITHOUT_TYPE_TABLE,
   filters: [F.states, F.definition, F.module, F.deprecated, F.tags, F.owner, F.updater, F.updatedDate],
 });
-
-/** States a role-of ACC may have to be usable in a new ASCCP; excludes Deleted (#26). */
-const USABLE_ROLE_OF_ACC_STATES = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published'];
 
 @Component({
   standalone: false,
@@ -34,16 +31,24 @@ export class CreateAsccpDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** QA and Production are for a published release, and the Working branch has none. */
+  private readonly states = ccStateOptions(!!this.data.workingRelease);
 
+  readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   readonly columns = createTableColumns(CREATE_ASCCP_TABLE);
   selection = new SelectionModel<CcListEntry>(false, []);
   action: string;
 
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
-  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({tags: []});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states, tags: []});
 
   readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
+
+  constructor() {
+    // A new ASCCP may take a role-of ACC in any state but Deleted; the user can narrow them down.
+    afterNextRender(() => this.view().setFilter('states', usableCcStates(!!this.data.workingRelease)));
+  }
 
   ngOnInit() {
     this.action = this.data.action;
@@ -51,8 +56,7 @@ export class CreateAsccpDialogComponent implements OnInit {
       libraryId: '' + this.data.libraryId,
       releaseId: '' + (this.data.releaseId || 0),
       types: 'acc',
-      componentTypes: [Semantics, SemanticGroup].map(e => e.value).join(','),
-      states: USABLE_ROLE_OF_ACC_STATES.join(',')
+      componentTypes: [Semantics, SemanticGroup].map(e => e.value).join(',')
     };
     if (this.data.excludes?.length > 0) {
       params['excludes'] = this.data.excludes.join(',');
@@ -60,7 +64,7 @@ export class CreateAsccpDialogComponent implements OnInit {
     this.extraParams.set(params);
 
     this.tagService.getTags().subscribe(tags => {
-      this.filterOptions.set({tags: tags.map(e => ({value: e.name, label: e.name}))});
+      this.filterOptions.set({states: this.states, tags: tags.map(e => ({value: e.name, label: e.name}))});
       this.ready.set(true);
     });
   }
