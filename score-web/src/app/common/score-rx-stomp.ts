@@ -9,6 +9,10 @@ interface GatewayHealthResponse {
   ready?: boolean;
 }
 
+const HEALTH_PING_INTERVAL_MS = 500;
+const STABLE_CONNECTION_MS = 10000;
+const MAX_RECONNECT_DELAY_MS = 30000;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -17,16 +21,20 @@ export class RxStompService extends RxStomp {
   private connectionStateSubscription?: Subscription;
   private shouldReconnect = false;
   private reconnecting = false;
+  private connectedAt = 0;
+  private consecutiveFailures = 0;
 
   public constructor (private http: HttpClient) {
     super();
     this.connectionStateSubscription = this.connectionState$.subscribe(state => {
       if (state === RxStompState.OPEN) {
+        this.connectedAt = Date.now();
         this.stopHealthPingLoop();
         return;
       }
 
       if (state === RxStompState.CLOSED && this.shouldReconnect) {
+        this.noteConnectionLost();
         this.reconnect();
       }
     });
@@ -41,6 +49,21 @@ export class RxStompService extends RxStomp {
     this.shouldReconnect = false;
     this.stopHealthPingLoop();
     return super.deactivate(options);
+  }
+
+  /**
+   * A connection that did not stay open for STABLE_CONNECTION_MS counts as a failure, which backs the next reconnect
+   * off so that a gateway that is healthy but refuses the WebSocket is not hit in a tight loop.
+   */
+  private noteConnectionLost(): void {
+    const stable = this.connectedAt > 0 && Date.now() - this.connectedAt >= STABLE_CONNECTION_MS;
+    this.consecutiveFailures = stable ? 0 : this.consecutiveFailures + 1;
+    this.connectedAt = 0;
+  }
+
+  private reconnectDelay(): number {
+    return this.consecutiveFailures <= 1 ? 0 :
+      Math.min(MAX_RECONNECT_DELAY_MS, 1000 * 2 ** (this.consecutiveFailures - 2));
   }
 
   /**
@@ -65,7 +88,7 @@ export class RxStompService extends RxStomp {
       return;
     }
 
-    this.healthPingSubscription = timer(0, 500).pipe(
+    this.healthPingSubscription = timer(this.reconnectDelay(), HEALTH_PING_INTERVAL_MS).pipe(
       switchMap(() => this.checkGatewayHealth()),
       filter(Boolean),
       take(1)

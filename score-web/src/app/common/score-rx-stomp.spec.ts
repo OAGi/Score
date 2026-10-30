@@ -61,4 +61,20 @@ describe('RxStompService reconnect', () => {
 
     expect(activate).not.toHaveBeenCalled();
   });
+
+  it('backs off when the connection keeps closing right after it opens', async () => {
+    await vi.advanceTimersByTimeAsync(0);
+    for (let i = 0; i < 4; i++) {
+      changeState(RxStompState.OPEN);
+      changeState(RxStompState.CLOSED);
+      await vi.advanceTimersByTimeAsync(0);
+    }
+    activate.mockClear();
+
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(activate).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(activate).toHaveBeenCalledTimes(1);
+  });
 });

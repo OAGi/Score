@@ -18,3 +18,8 @@ logging:
     org.springframework.messaging: DEBUG
     org.jooq: DEBUG
     org.oagi.score: DEBUG
+
+score:
+  # `ng serve` (4200) opens the STOMP WebSocket on the backend (9000) directly, which is a cross-origin request.
+  cors:
+    allowed-origins: ${SCORE_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}
