@@ -2,6 +2,10 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceDetailsRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
+import org.oagi.score.gateway.http.api.namespace_management.repository.NamespaceQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.controller.payload.CreateReleaseRequest;
 import org.oagi.score.gateway.http.api.release_management.controller.payload.UpdateReleaseRequest;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -36,6 +40,33 @@ class ReleaseCommandServiceTest {
 
         assertThatThrownBy(() -> service.create(requester, request))
                 .isInstanceOf(IllegalArgumentException.class);
+        verify(command, never()).create(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void rejectsCreateWithANamespaceOfAnotherLibrary() {
+        ScoreUser requester = user(ScoreRole.DEVELOPER);
+        LibraryId libraryA = new LibraryId(BigInteger.ONE);
+        LibraryId libraryB = new LibraryId(BigInteger.TWO);
+        NamespaceId namespaceId = new NamespaceId(BigInteger.TEN);
+        ReleaseCommandRepository command = mock(ReleaseCommandRepository.class);
+        ReleaseQueryRepository query = mock(ReleaseQueryRepository.class);
+        NamespaceQueryRepository namespaceQuery = mock(NamespaceQueryRepository.class);
+        NamespaceDetailsRecord namespace = mock(NamespaceDetailsRecord.class);
+        when(namespace.libraryId()).thenReturn(libraryA);
+        when(namespaceQuery.getNamespaceDetails(any(), any())).thenReturn(namespace);
+        RepositoryFactory repositories = mock(RepositoryFactory.class);
+        when(repositories.releaseQueryRepository(any())).thenReturn(query);
+        when(repositories.releaseCommandRepository(any())).thenReturn(command);
+        when(repositories.namespaceQueryRepository(any())).thenReturn(namespaceQuery);
+        ReleaseCommandService service = new ReleaseCommandService();
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositories);
+
+        CreateReleaseRequest request = new CreateReleaseRequest(libraryB, namespaceId, "2.0", null, null);
+
+        assertThatThrownBy(() -> service.create(requester, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("namespace");
         verify(command, never()).create(any(), any(), any(), any(), any());
     }
 

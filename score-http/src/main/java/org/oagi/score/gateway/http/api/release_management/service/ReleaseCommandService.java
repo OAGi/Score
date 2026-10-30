@@ -1,5 +1,7 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
+import java.util.Objects;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceDetailsRecord;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdListCommandService;
@@ -113,6 +115,14 @@ public class ReleaseCommandService implements InitializingBean {
         var query = repositoryFactory.releaseQueryRepository(requester);
         if (query.hasDuplicateReleaseNumber(request.libraryId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
+        }
+
+        if (request.namespaceId() != null) {
+            NamespaceDetailsRecord namespace = repositoryFactory.namespaceQueryRepository(requester)
+                    .getNamespaceDetails(request.namespaceId(), requester.userId());
+            if (namespace == null || !Objects.equals(namespace.libraryId(), request.libraryId())) {
+                throw new IllegalArgumentException("The namespace does not belong to the library of the release.");
+            }
         }
 
         var command = repositoryFactory.releaseCommandRepository(requester);
