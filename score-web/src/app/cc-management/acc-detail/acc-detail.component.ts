@@ -91,6 +91,7 @@ import {ValidationService} from '../../validation/validation.service';
 import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
@@ -1721,7 +1722,10 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {
