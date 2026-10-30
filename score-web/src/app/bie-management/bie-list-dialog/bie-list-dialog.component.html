@@ -116,6 +116,12 @@
         <div class="score-line-clamp-2 score-break-word">{{ element.reusedStatus }}</div>
       </td>
     </ng-container>
+
+    <ng-container scoreColumnDef="reusedRemark">
+      <td score-cell *scoreCellDef="let element">
+        <div>{{ element.reusedRemark }}</div>
+      </td>
+    </ng-container>
     <!-- A narrow screen: the record as one block, not the columns squeezed. -->
     <ng-container *scoreCompactDef="let element">
       <div class="reuse-pair">
