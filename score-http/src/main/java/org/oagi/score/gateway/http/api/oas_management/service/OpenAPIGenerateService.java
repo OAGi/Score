@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import tools.jackson.core.JacksonException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,9 +111,10 @@ public class OpenAPIGenerateService {
         long millis = System.currentTimeMillis();
         String filename;
         if (StringUtils.hasLength(option.getOasDoc().getVersion())) {
-            filename = option.getOasDoc().getTitle() + "-" + option.getOasDoc().getVersion() + "-" + millis;
+            filename = toFileNamePart(option.getOasDoc().getTitle()) + "-"
+                    + toFileNamePart(option.getOasDoc().getVersion()) + "-" + millis;
         } else {
-            filename = option.getOasDoc().getTitle() + "-" + millis;
+            filename = toFileNamePart(option.getOasDoc().getTitle()) + "-" + millis;
         }
 
         // Issue #1730: a document may contain only bodyless (BIE-less) operations, so there may be no BIEs.
@@ -142,10 +145,19 @@ public class OpenAPIGenerateService {
         File schemaExpressionFile;
         try {
             schemaExpressionFile = generateExpression.asFile(filename);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             throw new BieGenerateFailureException("I/O operation failure.", e);
         }
         return schemaExpressionFile;
+    }
+
+    /**
+     * The title and the version of an OpenAPI Document may hold characters that a file name cannot (and a path
+     * separator would leave the temp directory), so anything but letters, digits, space, '-', '_' and '.' becomes '_'.
+     */
+    static String toFileNamePart(String text) {
+        String name = (text == null) ? "" : text.replaceAll("[^\\p{L}\\p{N} _.-]", "_").strip();
+        return name.isEmpty() || name.chars().allMatch(c -> c == '.') ? "openapi" : name;
     }
 
     private void defineSchemaName(BieGenerateOpenApiExpression generateExpression,
