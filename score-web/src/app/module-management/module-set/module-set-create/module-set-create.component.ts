@@ -65,7 +65,7 @@ export class ModuleSetCreateComponent implements OnInit {
       }
     }
 
-    return this.moduleSet.name && this.moduleSet.name.length > 0;
+    return !!this.moduleSet.name && this.moduleSet.name.trim().length > 0;
   }
 
   ngOnInit(): void {

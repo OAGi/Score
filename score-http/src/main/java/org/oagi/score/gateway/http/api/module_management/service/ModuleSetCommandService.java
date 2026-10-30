@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -58,10 +59,14 @@ public class ModuleSetCommandService {
 
         requireDeveloper(requester);
 
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Module set name cannot be empty.");
+        }
+
         var command = command(requester);
 
         ModuleSetId moduleSetId = command.create(
-                request.libraryId(), request.name(), request.description());
+                request.libraryId(), request.name().trim(), request.description());
 
         NamespaceSummaryRecord namespace =
                 namespaceQuery(requester).getAnyStandardNamespaceSummary(request.libraryId());
@@ -95,8 +100,12 @@ public class ModuleSetCommandService {
 
         requireDeveloper(requester);
 
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Module set name cannot be empty.");
+        }
+
         return command(requester).update(
-                request.moduleSetId(), request.name(), request.description());
+                request.moduleSetId(), request.name().trim(), request.description());
     }
 
     public boolean discard(ScoreUser requester, ModuleSetId moduleSetId) {
