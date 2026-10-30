@@ -1270,7 +1270,9 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
         }
         conditions.add(and(
                 CODE_LIST.LIST_ID.eq(listId),
-                CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId)),
+                (agencyIdListValueManifestId != null)
+                        ? CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId))
+                        : CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.isNull(),
                 CODE_LIST.VERSION_ID.eq(versionId)
         ));
 

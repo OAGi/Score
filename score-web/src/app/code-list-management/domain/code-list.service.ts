@@ -192,8 +192,10 @@ export class CodeListService {
     let params = new HttpParams()
       .set('releaseId', '' + codeList.release.releaseId)
       .set('listId', codeList.listId)
-      .set('agencyIdListValueManifestId', (!!codeList.agencyIdListValue) ? ('' + codeList.agencyIdListValue.agencyIdListValueManifestId) : '')
       .set('versionId', codeList.versionId);
+    if (codeList.agencyIdListValue?.agencyIdListValueManifestId) {
+      params = params.set('agencyIdListValueManifestId', '' + codeList.agencyIdListValue.agencyIdListValueManifestId);
+    }
     if (codeList.codeListManifestId) {
       params = params.set('codeListManifestId', '' + codeList.codeListManifestId);
     }

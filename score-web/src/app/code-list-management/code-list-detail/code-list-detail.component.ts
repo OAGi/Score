@@ -473,6 +473,8 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
       } else {
         this.doUpdate();
       }
+    }, _ => {
+      this.isUpdating = false;
     });
   }
 
