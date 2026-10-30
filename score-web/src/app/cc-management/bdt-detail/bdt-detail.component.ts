@@ -467,9 +467,8 @@ export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, 
         }
       }
 
-      // Recover the state of 'Hide Cardinality' and 'Hide Prohibited' property.
+      // Recover the state of 'Hide Cardinality'; 'Hide Prohibited' was carried over above.
       this.cardinality.restore();
-      this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, false);
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
