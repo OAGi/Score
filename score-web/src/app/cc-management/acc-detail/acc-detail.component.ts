@@ -2000,7 +2000,11 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        if (result?.check) {
+        if (!result) {
+          // cancelled: nothing was moved, and the unsaved edits stay
+          return;
+        }
+        if (result.check) {
           // the move would break something: it is made only if the user says so, and until then it is not made
           this.validation.askAboutChange(result.check, () => {
             this.isUpdating = true;
