@@ -247,11 +247,11 @@ public class JooqModuleSetReleaseQueryRepository extends JooqBaseRepository impl
             }
             if (filterCriteria.lastUpdatedTimestampRange() != null) {
                 if (filterCriteria.lastUpdatedTimestampRange().after() != null) {
-                    conditions.add(MODULE_SET.LAST_UPDATE_TIMESTAMP.greaterOrEqual(
+                    conditions.add(MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP.greaterOrEqual(
                             new Timestamp(filterCriteria.lastUpdatedTimestampRange().after().getTime()).toLocalDateTime()));
                 }
                 if (filterCriteria.lastUpdatedTimestampRange().before() != null) {
-                    conditions.add(MODULE_SET.LAST_UPDATE_TIMESTAMP.lessThan(
+                    conditions.add(MODULE_SET_RELEASE.LAST_UPDATE_TIMESTAMP.lessThan(
                             new Timestamp(filterCriteria.lastUpdatedTimestampRange().before().getTime()).toLocalDateTime()));
                 }
             }
