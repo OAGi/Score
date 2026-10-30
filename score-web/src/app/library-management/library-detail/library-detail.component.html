@@ -20,7 +20,7 @@
 
     <mat-form-field>
       <mat-label>Link</mat-label>
-      <input matInput required
+      <input matInput
         [formControl]="uriForm"
         [value]="uriForm.value">
       @if (uriForm.hasError('pattern')) {
