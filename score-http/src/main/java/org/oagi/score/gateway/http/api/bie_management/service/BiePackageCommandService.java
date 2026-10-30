@@ -117,7 +117,8 @@ public class BiePackageCommandService {
             throw new DataAccessForbiddenException("Not allowed to update the BIE package in '" + biePackage.state() + "' state.");
         }
 
-        if (!biePackage.owner().userId().equals(requester.userId())) {
+        // An administrator can update a BIE package they do not own, as for a BIE (Issue #1576).
+        if (!requester.isAdministrator() && !biePackage.owner().userId().equals(requester.userId())) {
             throw new DataAccessForbiddenException("Only allowed to update the BIE package by the owner.");
         }
 

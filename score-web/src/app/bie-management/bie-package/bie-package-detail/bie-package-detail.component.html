@@ -1,24 +1,24 @@
 <score-detail-page [title]="title" [showActions]="false">
   <ng-container ngProjectAs="[detailToolbar]">
-    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+    @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
       <button mat-raised-button class="ms-2" color="primary" (click)="update()"
         [disabled]="updateDisabled">
         Update
       </button>
     }
-    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+    @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
       <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
         [disabled]="loading || isChanged()">
         Move to QA
       </button>
     }
-    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+    @if (biePackage.state === 'QA' && biePackage.access === 'CanMove') {
       <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
         [disabled]="loading">
         Back to WIP
       </button>
     }
-    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+    @if (biePackage.state === 'QA' && biePackage.access === 'CanMove') {
       <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
         [disabled]="loading">
         Move to Production

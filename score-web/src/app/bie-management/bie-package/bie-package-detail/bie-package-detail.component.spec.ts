@@ -1,3 +1,5 @@
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
 import {vi} from 'vitest';
 import {of} from 'rxjs';
 import {BiePackageDetailComponent} from './bie-package-detail.component';
@@ -74,5 +76,24 @@ describe('BiePackageDetailComponent.update guards empty required fields (#20)', 
     const ctx = updateCtx(unchanged);
     ctx.update();
     expect(ctx.biePackageService.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('BiePackageDetailComponent toolbar', () => {
+  const html = readFileSync(
+    join(process.cwd(), 'src/app/bie-management/bie-package/bie-package-detail/bie-package-detail.component.html'), 'utf8');
+  const condition = (action: string): string => {
+    const button = html.indexOf(action);
+    return html.slice(html.lastIndexOf('@if', button), button);
+  };
+
+  it('shows Update and the state buttons by the access privilege only (the server grants an administrator CanEdit/CanMove)', () => {
+    for (const action of ['(click)="update()"', "updateState('QA')", "updateState('WIP')", "updateState('Production')"]) {
+      expect(condition(action)).not.toContain('isAdmin');
+    }
+  });
+
+  it('keeps Discard available to an administrator, which the server accepts', () => {
+    expect(condition('(click)="discard()"')).toContain('isAdmin');
   });
 });
