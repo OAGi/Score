@@ -58,7 +58,9 @@ class CcCommandServiceAppendDeletedPropertyTest {
         when(repositoryFactory.asccpQueryRepository(any())).thenReturn(asccpQuery);
         when(repositoryFactory.bccpQueryRepository(any())).thenReturn(bccpQuery);
 
+        when(requester.isAdministrator()).thenReturn(true);
         AccSummaryRecord acc = mock(AccSummaryRecord.class);
+        when(acc.state()).thenReturn(CcState.WIP);
         when(accQuery.getAccSummary(ACC_ID)).thenReturn(acc);
         asccp = mock(AsccpSummaryRecord.class);
         bccp = mock(BccpSummaryRecord.class);

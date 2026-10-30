@@ -182,8 +182,31 @@ public class CcCommandService {
         repositoryFactory.accCommandRepository(requester).updateLogId(accManifestId, logId);
     }
 
+    /**
+     * The endpoint-facing append may only change a WIP ACC owned by the requester (or by anyone, for an
+     * administrator), like every other update of an ACC. The overloads taking a log action are used by the
+     * internal flows, such as user extensions, that legitimately append to an ACC of another user.
+     */
+    private void assertAccAppendable(ScoreUser requester, AccManifestId accManifestId) {
+        AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
+        if (acc == null) {
+            throw new IllegalArgumentException("Source ACC does not exist.");
+        }
+        if (CcState.WIP != acc.state()) {
+            throw new IllegalArgumentException("The ACC '" + acc.den() + "' cannot be updated " +
+                    "because it is in the '" + acc.state() + "' state. "
+                    + "Only ACCs in the 'WIP' state can be updated.");
+        }
+        if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId())) {
+            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        }
+    }
+
     public AsccManifestId createAscc(
             ScoreUser requester, AsccCreateRequest request) {
+        if (requester != null && request != null) {
+            assertAccAppendable(requester, request.accManifestId());
+        }
         return createAscc(requester, request, LogAction.Modified, LogUtils.generateHash(), false);
     }
 
@@ -259,6 +282,9 @@ public class CcCommandService {
 
     public BccManifestId createBcc(
             ScoreUser requester, BccCreateRequest request) {
+        if (requester != null && request != null) {
+            assertAccAppendable(requester, request.accManifestId());
+        }
         return createBcc(requester, request, LogAction.Modified, LogUtils.generateHash(), false);
     }
 
