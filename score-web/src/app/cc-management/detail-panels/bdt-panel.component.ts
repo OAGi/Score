@@ -70,7 +70,7 @@ export class BdtPanelComponent {
   }
 
   randSixDigitId(): string {
-    return (Math.random() + 1).toString(36).substring(2, 8).toUpperCase();
+    return Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, '0').toUpperCase();
   }
 
   copyToDefinition(text: string) {
