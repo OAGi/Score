@@ -699,12 +699,6 @@ public class JooqCodeListCommandRepository
                         .execute();
             });
 
-            sourceCodeList.valueList().forEach(e -> {
-                if (duplicateValues.indexOf(e.value().toLowerCase()) > -1) {
-                    duplicateValues.remove(duplicateValues.indexOf(e.value().toLowerCase()));
-                }
-            });
-
         } else {
             targetCodeList = copyCodeList(sourceCodeList);
             targetCodeList.setCodeListId(
