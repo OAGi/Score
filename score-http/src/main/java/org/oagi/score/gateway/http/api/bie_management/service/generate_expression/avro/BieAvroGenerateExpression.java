@@ -113,19 +113,7 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         AsccpSummaryRecord asccp = generationContext.queryBasedASCCP(asbiep);
         String name = Utility.first(asccp.den(), true);
         NamespaceSummaryRecord namespaceSummary = generationContext.findNamespace(asccp.namespaceId());
-        String namespace = null;
-        if (namespaceSummary != null) {
-            URI uri;
-            try {
-                uri = new URI(namespaceSummary.uri());
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException("Invalid URI in the namespace: " + namespaceSummary.uri(), e);
-            }
-
-            List<String> tokensInHostname = Arrays.asList(uri.getHost().replace("www.", "").split("[\\.]"));
-            Collections.reverse(tokensInHostname);
-            namespace = String.join(".", tokensInHostname);
-        }
+        String namespace = (namespaceSummary != null) ? avroNamespace(namespaceSummary.uri()) : null;
 
         root = new AvroObject();
         root.setNamespace(namespace);
@@ -134,6 +122,55 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         root.setDocumentation(asbiep.definition());
 
         fillProperties(root, abie, generationContext);
+    }
+
+    /**
+     * The Avro namespace of a namespace URI: the host name reversed for a hierarchical URI such as
+     * {@code https://www.example.com/ns}, and the parts of the URI separated by {@code :} or {@code /} for one without a host such as a URN,
+     * each part made a valid Avro name. A dot inside such a part, as in a version {@code 7.1}, does not split it.
+     * Returns {@code null} when nothing usable remains.
+     */
+    static String avroNamespace(String namespaceUri) {
+        URI uri;
+        try {
+            uri = new URI(namespaceUri);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Invalid URI in the namespace: " + namespaceUri, e);
+        }
+
+        String host = uri.getHost();
+        if (host != null) {
+            if (host.startsWith("www.")) {
+                host = host.substring("www.".length());
+            }
+            List<String> tokensInHostname = avroNames(host.split("[\\.]"));
+            Collections.reverse(tokensInHostname);
+            return tokensInHostname.isEmpty() ? null : String.join(".", tokensInHostname);
+        }
+
+        // A URI without a host, e.g. urn:cidx:names:specification:ces:schema:all:7.1.
+        String schemeSpecificPart = uri.getSchemeSpecificPart();
+        if (schemeSpecificPart == null) {
+            return null;
+        }
+        List<String> names = avroNames(schemeSpecificPart.split("[:/]"));
+        return names.isEmpty() ? null : String.join(".", names);
+    }
+
+    /**
+     * Turns the tokens into Avro names, which start with {@code [A-Za-z_]} and contain only {@code [A-Za-z0-9_]},
+     * skipping the empty ones.
+     */
+    private static List<String> avroNames(String[] tokens) {
+        List<String> names = new ArrayList<>();
+        for (String token : tokens) {
+            String name = token.replaceAll("[^A-Za-z0-9_]", "_");
+            if (name.isEmpty()) {
+                continue;
+            }
+            names.add(Character.isDigit(name.charAt(0)) ? "_" + name : name);
+        }
+        return names;
     }
 
     private void fillProperties(AvroObject parent,
