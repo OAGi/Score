@@ -2757,10 +2757,12 @@ public class CcCommandService {
                 new Definition("A system created component containing user extension to the " + eAcc.objectClassTerm() + ".", null),
                 null));
 
+        // The base ACC is a published component of another user, so this internal append bypasses the
+        // WIP/owner guard of the endpoint-facing overload.
         createAscc(requester, AsccCreateRequest.builder(eAcc.accManifestId(), ueAsccpManifestId)
                 .cardinalityMin(1)
                 .cardinalityMax(1)
-                .build());
+                .build(), LogAction.Modified, LogUtils.generateHash(), false);
 
         return ueAccManifestId;
     }
