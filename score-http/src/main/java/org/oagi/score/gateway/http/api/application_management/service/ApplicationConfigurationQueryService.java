@@ -112,8 +112,8 @@ public class ApplicationConfigurationQueryService {
      * @return resolved boolean value
      */
     public boolean getBooleanProperty(ScoreUser requester, String key, boolean defaultValue) {
-        Boolean value = Boolean.valueOf(getProperty(requester, key));
-        return (value != null) ? value : defaultValue;
+        String value = getProperty(requester, key);
+        return (value == null || value.isBlank()) ? defaultValue : Boolean.parseBoolean(value.trim());
     }
 
     /**
@@ -136,8 +136,8 @@ public class ApplicationConfigurationQueryService {
      * @return resolved integer value
      */
     public int getIntProperty(ScoreUser requester, String key, int defaultValue) {
-        Integer value = Integer.valueOf(getProperty(requester, key));
-        return (value != null) ? value : defaultValue;
+        String value = getProperty(requester, key);
+        return (value == null || value.isBlank()) ? defaultValue : Integer.parseInt(value.trim());
     }
 
     /**
