@@ -396,6 +396,7 @@ export class DtListComponent {
           break;
       }
       call.subscribe(_ => {
+        this.busy.set(false);
         this.snackBar.open(notiMsg, '', {
           duration: 3000
         });
