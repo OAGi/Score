@@ -104,3 +104,11 @@ tr.element-row:not(.expanded-row):active {
   float: right;
   margin-right: 3px;
 }
+
+.copy-blocked {
+  color: #9e9e9e;
+}
+
+.copy-blocked-hint {
+  color: #d32f2f;
+}

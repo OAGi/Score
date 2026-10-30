@@ -157,7 +157,24 @@ public class ModuleSetModuleCommandService {
         ModuleSummaryRecord targetModule = query.getModule(request.targetModuleId());
         ModuleSummaryRecord parentModule = query.getModule(request.parentModuleId());
 
+        // Copying a directory into itself or into one of its sub-directories would copy the copies again and again.
+        for (ModuleSummaryRecord ancestor = parentModule; ancestor != null;
+             ancestor = (ancestor.parentModuleId() != null) ? query.getModule(ancestor.parentModuleId()) : null) {
+            if (ancestor.moduleId().equals(request.targetModuleId())) {
+                throw new IllegalArgumentException(copyIntoItselfMessage(targetModule, parentModule));
+            }
+        }
+
         copyModule(requester, targetModule, parentModule, request.copySubModules());
+    }
+
+    private static String copyIntoItselfMessage(ModuleSummaryRecord targetModule, ModuleSummaryRecord parentModule) {
+        String parentName = (parentModule.name() == null || parentModule.name().isEmpty()) ? "the root directory" : "'" + parentModule.name() + "'";
+        String reason = targetModule.moduleId().equals(parentModule.moduleId())
+                ? "it cannot be copied into itself"
+                : "the destination " + parentName + " is inside it";
+        return "Cannot copy '" + targetModule.name() + "' into " + parentName + ": " + reason
+                + ". Choose a destination outside of the module being copied.";
     }
 
     private void copyModule(
