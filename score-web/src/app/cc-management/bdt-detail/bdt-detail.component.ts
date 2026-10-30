@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
@@ -58,7 +58,7 @@ import {
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
@@ -87,7 +87,7 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bdt-detail.component.css']
 })
-export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValidationHost {
+export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
@@ -193,6 +193,13 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
     this.router.navigateByUrl('/data_type');
   }
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -236,7 +243,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
       setAppTitleIfPresent(this.titleService, dtDetails.den, 'Data Type');
 
       // subscribe an event
-      this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
