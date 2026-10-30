@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import java.math.BigInteger;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,5 +73,32 @@ class WebSocketAuthorizationInterceptorTest {
                 () -> interceptor.preSend(message(StompCommand.SUBSCRIBE, "/topic/message/someone", true), null));
         assertThrows(MessagingException.class,
                 () -> interceptor.preSend(message(StompCommand.SUBSCRIBE, "/topic/message/tester2", true), null));
+    }
+
+    @Test
+    void aSignedInClientCannotSubscribeToAPatternDestination() {
+        for (String destination : List.of("/topic/**", "/topic/*/*", "/topic/m*/**", "/topic/message/*",
+                "/topic/message/{name}", "/topic/message/tester?")) {
+            assertThrows(MessagingException.class,
+                    () -> interceptor.preSend(message(StompCommand.SUBSCRIBE, destination, true), null), destination);
+        }
+    }
+
+    @Test
+    void aLoginIdWithPatternCharactersGetsAnEncodedTopicOfItsOwn() {
+        assertEquals("/topic/message/ben.craker", WebSocketAuthorizationInterceptor.messageTopicOf("ben.craker"));
+        assertEquals("/topic/message/a%2Ab%3Fc%7Bd%25e", WebSocketAuthorizationInterceptor.messageTopicOf("a*b?c{d%e"));
+
+        SessionService sessionService = mock(SessionService.class);
+        when(sessionService.asScoreUser(any(Authentication.class))).thenReturn(
+                new ScoreUser(new UserId(BigInteger.TWO), "a*b", "Star", null, false, List.of(ScoreRole.END_USER)));
+        var starInterceptor = new WebSocketAuthorizationInterceptor(sessionService);
+
+        Message<?> own = message(StompCommand.SUBSCRIBE, "/topic/message/a%2Ab", true);
+        assertSame(own, starInterceptor.preSend(own, null));
+        assertThrows(MessagingException.class,
+                () -> starInterceptor.preSend(message(StompCommand.SUBSCRIBE, "/topic/message/a*b", true), null));
+        assertThrows(MessagingException.class,
+                () -> starInterceptor.preSend(message(StompCommand.SUBSCRIBE, "/topic/message/axb", true), null));
     }
 }
