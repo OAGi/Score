@@ -221,17 +221,14 @@ public class JooqCodeListCommandRepository
         if (hasLength(listId)) {
             more = ((more != null) ? more : step).set(CODE_LIST.LIST_ID, listId);
         }
+        // The request is the full desired state of these text columns, so a blank value clears the column.
         if (definition != null) {
-            if (hasLength(definition.content())) {
-                more = ((more != null) ? more : step).set(CODE_LIST.DEFINITION, definition.content());
-            }
-            if (hasLength(definition.source())) {
-                more = ((more != null) ? more : step).set(CODE_LIST.DEFINITION_SOURCE, definition.source());
-            }
+            more = ((more != null) ? more : step).set(CODE_LIST.DEFINITION,
+                    hasLength(definition.content()) ? definition.content() : null);
+            more = ((more != null) ? more : step).set(CODE_LIST.DEFINITION_SOURCE,
+                    hasLength(definition.source()) ? definition.source() : null);
         }
-        if (hasLength(remark)) {
-            more = ((more != null) ? more : step).set(CODE_LIST.REMARK, remark);
-        }
+        more = ((more != null) ? more : step).set(CODE_LIST.REMARK, hasLength(remark) ? remark : null);
         if (namespaceId != null) {
             more = ((more != null) ? more : step).set(CODE_LIST.NAMESPACE_ID, valueOf(namespaceId));
         }
@@ -553,12 +550,10 @@ public class JooqCodeListCommandRepository
             more = ((more != null) ? more : step).set(CODE_LIST_VALUE.MEANING, meaning);
         }
         if (definition != null) {
-            if (hasLength(definition.content())) {
-                more = ((more != null) ? more : step).set(CODE_LIST_VALUE.DEFINITION, definition.content());
-            }
-            if (hasLength(definition.source())) {
-                more = ((more != null) ? more : step).set(CODE_LIST_VALUE.DEFINITION_SOURCE, definition.source());
-            }
+            more = ((more != null) ? more : step).set(CODE_LIST_VALUE.DEFINITION,
+                    hasLength(definition.content()) ? definition.content() : null);
+            more = ((more != null) ? more : step).set(CODE_LIST_VALUE.DEFINITION_SOURCE,
+                    hasLength(definition.source()) ? definition.source() : null);
         }
         if (deprecated != null) {
             more = ((more != null) ? more : step).set(CODE_LIST_VALUE.IS_DEPRECATED, (byte) (deprecated ? 1 : 0));
