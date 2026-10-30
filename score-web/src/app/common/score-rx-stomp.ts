@@ -16,6 +16,7 @@ export class RxStompService extends RxStomp {
   private healthPingSubscription?: Subscription;
   private connectionStateSubscription?: Subscription;
   private shouldReconnect = false;
+  private reconnecting = false;
 
   public constructor (private http: HttpClient) {
     super();
@@ -25,8 +26,8 @@ export class RxStompService extends RxStomp {
         return;
       }
 
-      if (state === RxStompState.CLOSED && this.shouldReconnect && !this.active) {
-        this.startHealthPingLoop();
+      if (state === RxStompState.CLOSED && this.shouldReconnect) {
+        this.reconnect();
       }
     });
   }
@@ -40,6 +41,23 @@ export class RxStompService extends RxStomp {
     this.shouldReconnect = false;
     this.stopHealthPingLoop();
     return super.deactivate(options);
+  }
+
+  /**
+   * The client stays ACTIVE when its WebSocket closes unexpectedly (it only schedules a reconnect with a delay, and the
+   * delay is 0), so it is deactivated first for the health ping loop to be able to activate it again.
+   */
+  private reconnect(): void {
+    if (this.reconnecting || this.healthPingSubscription) {
+      return;
+    }
+    this.reconnecting = true;
+    super.deactivate().finally(() => {
+      this.reconnecting = false;
+      if (this.shouldReconnect) {
+        this.startHealthPingLoop();
+      }
+    });
   }
 
   private startHealthPingLoop(): void {
