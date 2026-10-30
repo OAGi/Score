@@ -32,6 +32,7 @@ public class CommentCommandController {
         if (!StringUtils.hasLength(reference)) {
             throw new IllegalArgumentException("'reference' parameter must not be empty.");
         }
+        requireText(request.text());
 
         commentCommandService.postComments(
                 sessionService.asScoreUser(user), reference, request.text(), request.prevCommentId());
@@ -43,6 +44,7 @@ public class CommentCommandController {
             @PathVariable("commentId") CommentId commentId,
             @RequestBody UpdateCommentRequest request) {
 
+        requireText(request.text());
         commentCommandService.updateComments(sessionService.asScoreUser(user), commentId, request.text());
     }
 
@@ -52,6 +54,12 @@ public class CommentCommandController {
             @PathVariable("commentId") CommentId commentId) {
 
         commentCommandService.deleteComment(sessionService.asScoreUser(user), commentId);
+    }
+
+    private static void requireText(String text) {
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException("The comment must not be empty.");
+        }
     }
 
 }

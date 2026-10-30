@@ -31,7 +31,8 @@ function commentControl(): CommentDrawerControl {
     } as any],
     commentMessage: '', replyCommentId: null, replyMessage: '', replyOpened: false,
     closeCommentSlide: () => {}, deleteComment: () => {}, openEditComment: () => {}, editComment: () => {},
-    cancelEditComment: () => {}, openReply: () => {}, closeReply: () => {}, addComment: () => {}
+    cancelEditComment: () => {}, openReply: () => {}, closeReply: () => {}, addComment: () => {},
+    hasText: (text?: string | null) => !!text?.trim()
   };
 }
 
