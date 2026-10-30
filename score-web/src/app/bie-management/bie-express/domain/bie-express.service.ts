@@ -14,7 +14,7 @@ export class BieExpressService {
       .set('topLevelAsbiepIds', topLevelAsbiepIds.join(','));
     Object.getOwnPropertyNames(option).forEach(key => {
       const value = option[key];
-      if (value) {
+      if (value !== undefined && value !== null && value !== '') {
         if (key === 'filenames') {
           for (const topLevelAsbiepId of Object.keys(value)) {
             params = params.set('filenames[' + topLevelAsbiepId + ']', value[topLevelAsbiepId]);
