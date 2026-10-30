@@ -52,6 +52,7 @@ import {
   Comment,
   Embedded,
   EntityType,
+  Element as ElementEntityType,
   EntityTypes,
   Extension,
   OAGIS10BODs,
@@ -1260,7 +1261,7 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
     } else {
       this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
-    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+    if (nodeDetail.bcc.entityType === ElementEntityType.value) {
       // Issue #1406
       if (!!nodeDetail.bcc.defaultValue || !!nodeDetail.bcc.fixedValue) {
         const dialogConfig = this.confirmDialogService.newConfig();
