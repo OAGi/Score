@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
 import java.util.Objects;
+import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceDetailsRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdListCommandService;
@@ -122,13 +124,7 @@ public class ReleaseCommandService implements InitializingBean {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
         }
 
-        if (request.namespaceId() != null) {
-            NamespaceDetailsRecord namespace = repositoryFactory.namespaceQueryRepository(requester)
-                    .getNamespaceDetails(request.namespaceId(), requester.userId());
-            if (namespace == null || !Objects.equals(namespace.libraryId(), request.libraryId())) {
-                throw new IllegalArgumentException("The namespace does not belong to the library of the release.");
-            }
-        }
+        requireNamespaceOfLibrary(requester, request.namespaceId(), request.libraryId());
 
         var command = repositoryFactory.releaseCommandRepository(requester);
         return command.create(
@@ -177,6 +173,8 @@ public class ReleaseCommandService implements InitializingBean {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
         }
 
+        requireNamespaceOfLibrary(requester, request.namespaceId(), releaseSummary.libraryId());
+
         var command = repositoryFactory.releaseCommandRepository(requester);
         command.update(
                 request.releaseId(),
@@ -184,6 +182,17 @@ public class ReleaseCommandService implements InitializingBean {
                 request.releaseNum(),
                 request.releaseNote(),
                 request.releaseLicense());
+    }
+
+    private void requireNamespaceOfLibrary(ScoreUser requester, NamespaceId namespaceId, LibraryId libraryId) {
+        if (namespaceId == null) {
+            return;
+        }
+        NamespaceDetailsRecord namespace = repositoryFactory.namespaceQueryRepository(requester)
+                .getNamespaceDetails(namespaceId, requester.userId());
+        if (namespace == null || !Objects.equals(namespace.libraryId(), libraryId)) {
+            throw new IllegalArgumentException("The namespace does not belong to the library of the release.");
+        }
     }
 
     /**

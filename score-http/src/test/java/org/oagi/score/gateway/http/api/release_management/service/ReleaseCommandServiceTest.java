@@ -122,6 +122,36 @@ class ReleaseCommandServiceTest {
     }
 
     @Test
+    void rejectsUpdateWithANamespaceOfAnotherLibrary() {
+        ScoreUser requester = user(ScoreRole.DEVELOPER);
+        ReleaseId releaseId = id(1);
+        LibraryId libraryA = new LibraryId(BigInteger.ONE);
+        LibraryId libraryB = new LibraryId(BigInteger.TWO);
+        NamespaceId namespaceId = new NamespaceId(BigInteger.TEN);
+        ReleaseCommandRepository command = mock(ReleaseCommandRepository.class);
+        ReleaseQueryRepository query = mock(ReleaseQueryRepository.class);
+        when(query.getReleaseSummary(releaseId)).thenReturn(
+                new ReleaseSummaryRecord(releaseId, libraryA, "1.0", ReleaseState.Draft));
+        NamespaceQueryRepository namespaceQuery = mock(NamespaceQueryRepository.class);
+        NamespaceDetailsRecord namespace = mock(NamespaceDetailsRecord.class);
+        when(namespace.libraryId()).thenReturn(libraryB);
+        when(namespaceQuery.getNamespaceDetails(any(), any())).thenReturn(namespace);
+        RepositoryFactory repositories = mock(RepositoryFactory.class);
+        when(repositories.releaseQueryRepository(any())).thenReturn(query);
+        when(repositories.releaseCommandRepository(any())).thenReturn(command);
+        when(repositories.namespaceQueryRepository(any())).thenReturn(namespaceQuery);
+        ReleaseCommandService service = new ReleaseCommandService();
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositories);
+
+        UpdateReleaseRequest request = new UpdateReleaseRequest(releaseId, namespaceId, "1.1", null, null);
+
+        assertThatThrownBy(() -> service.update(requester, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("namespace");
+        verify(command, never()).update(any(), any(), any(), any(), any());
+    }
+
+    @Test
     void rejectsCreateWithABlankReleaseNumber() {
         ScoreUser requester = user(ScoreRole.DEVELOPER);
         ReleaseCommandRepository command = mock(ReleaseCommandRepository.class);
