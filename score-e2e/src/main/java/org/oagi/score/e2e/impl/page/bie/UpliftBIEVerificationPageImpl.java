@@ -291,13 +291,13 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
         try {
             click(nodeInTargetBIE.findElement(By.xpath(
                     "./ancestor-or-self::div[contains(@class, \"mat-tree-node\")][1]" +
-                            "//fa-icon[@mattooltip=\"Select BIE\" or @mattooltip=\"Reused\"]")));
+                            "//fa-icon[.//*[@data-icon=\"circle-exclamation\" or @data-icon=\"recycle\"]]")));
         } catch (TimeoutException | NoSuchElementException e) {
             click(nodeInTargetBIE);
             new Actions(getDriver()).sendKeys("O").perform();
             click(nodeInTargetBIE.findElement(By.xpath(
                     "./ancestor-or-self::div[contains(@class, \"mat-tree-node\")][1]" +
-                            "//fa-icon[@mattooltip=\"Select BIE\" or @mattooltip=\"Reused\"]")));
+                            "//fa-icon[.//*[@data-icon=\"circle-exclamation\" or @data-icon=\"recycle\"]]")));
         }
         waitFor(ofMillis(1000L));
 
@@ -309,7 +309,7 @@ public class UpliftBIEVerificationPageImpl extends BasePageImpl implements Uplif
     @Override
     public WebElement getReusedIconOfNodeInTargetBIE(String nodeName) {
         WebElement targetNode = visibilityOfElementLocated(getDriver(), nodeLocator(2, nodeName));
-        return targetNode.findElement(By.xpath(".//fa-icon[@mattooltip=\"Select BIE\"]"));
+        return targetNode.findElement(By.xpath(".//fa-icon[.//*[@data-icon=\"circle-exclamation\"]]"));
     }
 
     @Override

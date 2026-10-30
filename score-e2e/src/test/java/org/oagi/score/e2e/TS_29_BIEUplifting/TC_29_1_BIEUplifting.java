@@ -985,9 +985,9 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         viewEditBIEPage.openPage();
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedReusedScenarioTopLevelASBIEP);
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package");
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"From UOM Package\"]/following-sibling::score-tree-decorations//fa-icon")).size());
         editBIEPage.getNodeByPath("/UOM Code Conversion Rate/From UOM Package/Unit Packaging");
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"Unit Packaging\"]/following-sibling::score-tree-decorations//fa-icon")).size());
         homePage.logout();
     }
 
@@ -1072,7 +1072,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(upliftedParentTopLevelASBIEP);
         editBIEPage.getNodeByPath("/From UOM Package/Unit Packaging");
         assertEquals(0, getDriver().findElements(By.xpath(
-                "//span[.=\"Unit Packaging\"]//ancestor::div[1]/fa-icon")).size());
+                "//span[.=\"Unit Packaging\"]/following-sibling::score-tree-decorations//fa-icon")).size());
         homePage.logout();
     }
 
@@ -1336,7 +1336,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement mappedManufacturingParty = editBIEPage.getNodeByPath(
                 "/BOM/BOM Option/BOM Item Data/Manufacturing Party");
         assertTrue(mappedManufacturingParty.findElements(By.xpath(
-                ".//fa-icon[@mattooltip=\"Reused\"]")).isEmpty());
+                ".//fa-icon[.//*[@data-icon=\"recycle\"]]")).isEmpty());
 
         BigInteger upliftedId = editBIEPage.getTopLevelASBIEP().getTopLevelAsbiepId();
         assertEquals(Collections.singletonList(targetChild.getTopLevelAsbiepId()),
@@ -1660,7 +1660,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     private void assertBOMReuseReference(
             EditBIEPage editBIEPage, String path, boolean expected, String expectedVersion) {
         WebElement node = editBIEPage.getNodeByPath(path);
-        boolean hasReuseIcon = !node.findElements(By.xpath(".//fa-icon[@mattooltip=\"Reused\"]")).isEmpty();
+        boolean hasReuseIcon = !node.findElements(By.xpath(".//fa-icon[.//*[@data-icon=\"recycle\"]]")).isEmpty();
         assertEquals(expected, hasReuseIcon, path);
         if (expected) {
             String mainWindowHandle = getDriver().getWindowHandle();
@@ -1677,7 +1677,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
     private void assertInlinedBOMItemDataParty(EditBIEPage editBIEPage, String bomItemDataPath) {
         WebElement partyNode = editBIEPage.getNodeByPath(bomItemDataPath + "/Party");
         assertTrue(partyNode.findElements(By.xpath(
-                ".//fa-icon[@mattooltip=\"Reused\"]")).isEmpty(), bomItemDataPath);
+                ".//fa-icon[.//*[@data-icon=\"recycle\"]]")).isEmpty(), bomItemDataPath);
     }
 
     private void setBIEToProduction(TopLevelASBIEPObject bie) {

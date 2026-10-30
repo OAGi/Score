@@ -247,7 +247,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
@@ -313,7 +313,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp_reuse.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         WebElement reusedASCCPNode = editBIEPage.getNodeByPath("/" + asccp_owner_usera.getPropertyTerm() + "/" + asccp_reuse.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
@@ -375,7 +375,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
@@ -427,12 +427,12 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE_lv2);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
@@ -479,7 +479,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
@@ -534,7 +534,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         homePage.logout();
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -618,7 +618,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -685,7 +685,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -756,7 +756,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -827,7 +827,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -902,7 +902,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setDEN(asccp_for_usera.getDen());
@@ -979,7 +979,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         homePage.logout();
         homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
@@ -1069,7 +1069,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
@@ -1163,7 +1163,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         homePage.openPage();
         bieMenu = homePage.getBIEMenu();
@@ -1236,13 +1236,13 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 2);
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.openPage();
         selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 1);
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
@@ -1250,7 +1250,7 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
 
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
@@ -1328,15 +1328,23 @@ public class TC_24_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(useraBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.retainReusedBIEOnNode("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.openPage();
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("retained useraBIE remark", getText(asbiePanel.getRemarkField()));
+
+        // The retained node is an ordinary node of the reusing BIE: editing it and saving keeps what was retained.
+        asbiePanel.setRemark("edited after retain");
+        editBIEPage.hitUpdateButton();
+        editBIEPage.openPage();
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_usera.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertEquals("edited after retain", getText(asbiePanel.getRemarkField()));
     }
 }
