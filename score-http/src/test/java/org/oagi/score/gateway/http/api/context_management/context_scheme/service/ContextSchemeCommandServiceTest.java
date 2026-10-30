@@ -71,6 +71,28 @@ class ContextSchemeCommandServiceTest {
                 "desc", "OAGi", "1.0", values);
     }
 
+    // ----- blank name (#213) -----
+
+    @Test
+    void create_rejects_a_blank_name() {
+        for (String name : new String[]{null, "", "   "}) {
+            var request = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", name,
+                    "desc", "OAGi", "1.0", List.of());
+            assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_blank_name() {
+        for (String name : new String[]{null, "", "   "}) {
+            var request = new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", name,
+                    "desc", "OAGi", "1.0", List.of());
+            assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        }
+        verifyNoInteractions(command);
+    }
+
     // ----- create: server-side uniqueness (B7) -----
 
     @Test

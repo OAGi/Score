@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.springframework.util.StringUtils.hasText;
+
 /**
  * Service class for managing context schemes.
  * This service includes methods for creating, updating, and discarding context schemes.
@@ -49,6 +51,10 @@ public class ContextSchemeCommandService {
      * @return The ID of the created context scheme.
      */
     public ContextSchemeId create(ScoreUser requester, CreateContextSchemeRequest request) {
+        if (!hasText(request.schemeName())) {
+            throw new IllegalArgumentException("Context scheme name cannot be empty.");
+        }
+
         // Server-side uniqueness enforcement (do not rely on the client-side pre-check alone).
         var query = query(requester);
         if (query.hasDuplicate(request.schemeId(), request.schemeAgencyId(), request.schemeVersionId())) {
@@ -84,6 +90,10 @@ public class ContextSchemeCommandService {
      * @param request   The request containing the updated context scheme details.
      */
     public void update(ScoreUser requester, UpdateContextSchemeRequest request) {
+        if (!hasText(request.schemeName())) {
+            throw new IllegalArgumentException("Context scheme name cannot be empty.");
+        }
+
         var query = query(requester);
 
         // Server-side uniqueness enforcement, excluding the scheme being edited (Issue #1744 class).

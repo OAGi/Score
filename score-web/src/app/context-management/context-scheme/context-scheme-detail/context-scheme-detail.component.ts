@@ -183,7 +183,7 @@ export class ContextSchemeDetailComponent implements OnInit {
   isDisabled(contextScheme: ContextSchemeUpdateRequest) {
     return (this.disabled) || (this.isUpdating) ||
       (contextScheme.contextCategoryId === undefined || contextScheme.contextCategoryId <= 0) ||
-      (contextScheme.schemeName === undefined || contextScheme.schemeName === '') ||
+      (contextScheme.schemeName === undefined || contextScheme.schemeName.trim() === '') ||
       (contextScheme.schemeId === undefined || contextScheme.schemeId === '') ||
       (contextScheme.schemeAgencyId === undefined || contextScheme.schemeAgencyId === '') ||
       (contextScheme.schemeVersionId === undefined || contextScheme.schemeVersionId === '');
