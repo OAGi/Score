@@ -736,6 +736,7 @@ export class CcListComponent {
 
       this.nodeService.createBOD(pair.verbManifestIdList, pair.nounManifestIdList)
           .subscribe(resp => {
+            this.busy.set(false);
             if (resp.manifestIdList.length === 1) {
               this.snackBar.open('A new BOD created.', '', {
                 duration: 3000,
