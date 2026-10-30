@@ -1148,7 +1148,7 @@ export class ModelBrowserAsccpNodeDetail extends ModelBrowserNodeDetail {
     this.ascc.asccManifestId = ascc.asccManifestId;
     this.ascc.guid = ascc.guid;
     this.ascc.den = ascc.den;
-    if (!ascc.definition) {
+    if (!!ascc.definition) {
       this.ascc.definition = ascc.definition.content;
     }
     this.ascc.cardinalityMin = ascc.cardinality.min;
