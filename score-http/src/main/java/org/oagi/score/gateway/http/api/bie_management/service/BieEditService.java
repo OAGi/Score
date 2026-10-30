@@ -53,6 +53,7 @@ import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Tables;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,7 +104,7 @@ public class BieEditService implements InitializingBean {
     private SessionService sessionService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private EventListenerContainer eventListenerContainer;
@@ -1142,7 +1142,7 @@ public class BieEditService implements InitializingBean {
             /*
              * Message Publishing
              */
-            redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
+            eventPublisher.publish(PURGE_BIE_EVENT_NAME, event);
         }
 
         // Issue #1635

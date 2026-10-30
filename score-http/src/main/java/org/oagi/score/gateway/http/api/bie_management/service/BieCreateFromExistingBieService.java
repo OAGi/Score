@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AppUserRecord;
@@ -45,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +94,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
     private BieRepository repository;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -150,7 +150,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
             /*
              * Message Publishing
              */
-            redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, event);
+            eventPublisher.publish(INTERESTED_EVENT_NAME, event);
         } else {
             // Create empty BIE.
             if (request.getAsccpManifestId() == null) {
@@ -189,7 +189,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         /*
          * Message Publishing
          */
-        redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, event);
+        eventPublisher.publish(INTERESTED_EVENT_NAME, event);
     }
 
 

@@ -25,6 +25,7 @@ import org.oagi.score.gateway.http.api.tag_management.model.AsccpManifestTagSumm
 import org.oagi.score.gateway.http.api.tag_management.model.BccpManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.api.tag_management.model.DtManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -34,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +79,7 @@ public class ReleaseCommandService implements InitializingBean {
     private SessionService sessionService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -367,7 +367,7 @@ public class ReleaseCommandService implements InitializingBean {
                 /*
                  * Message Publishing
                  */
-                redisTemplate.convertAndSend(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
+                eventPublisher.publish(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
             }
         }
     }
@@ -464,7 +464,7 @@ public class ReleaseCommandService implements InitializingBean {
             /*
              * Message Publishing
              */
-            redisTemplate.convertAndSend(RELEASE_CREATE_REQUEST_EVENT, releaseCreateRequestEvent);
+            eventPublisher.publish(RELEASE_CREATE_REQUEST_EVENT, releaseCreateRequestEvent);
 
             response.clearWarnings();
         }
