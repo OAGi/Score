@@ -1319,7 +1319,7 @@ public class BieEditService implements InitializingBean {
                 .fetchStream().forEach(abie -> {
                     ULong oldAbieId = abie.getAbieId();
                     String path = asbieRecord.getPath() + ">" + abie.getPath();
-                    String hashPath = sha256(abie.getPath());
+                    String hashPath = sha256(path);
 
                     // If there are any remaining ABIEs during the Reuse BIE creation process, reuse them to avoid duplication.
                     ULong abieId = dslContext.select(ABIE.ABIE_ID)
