@@ -633,25 +633,33 @@ public class CcCommandController {
     }
 
     @PostMapping(value = "/ascc/refactor")
-    public void refactorAssociation(
+    public CcCreateResponse refactorAssociation(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestParam("targetManifestId") AsccManifestId targetManifestId,
             @RequestParam("destinationManifestId") AccManifestId destinationManifestId) {
 
-        ccCommandService.refactorAscc(
+        AsccManifestId movedManifestId = ccCommandService.refactorAscc(
                 sessionService.asScoreUser(user),
                 targetManifestId, destinationManifestId);
+
+        CcCreateResponse response = new CcCreateResponse();
+        response.setManifestId(movedManifestId);
+        return response;
     }
 
     @PostMapping(value = "/bcc/refactor")
-    public void refactorAssociation(
+    public CcCreateResponse refactorAssociation(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestParam("targetManifestId") BccManifestId targetManifestId,
             @RequestParam("destinationManifestId") AccManifestId destinationManifestId) {
 
-        ccCommandService.refactorBcc(
+        BccManifestId movedManifestId = ccCommandService.refactorBcc(
                 sessionService.asScoreUser(user),
                 targetManifestId, destinationManifestId);
+
+        CcCreateResponse response = new CcCreateResponse();
+        response.setManifestId(movedManifestId);
+        return response;
     }
 
     @PostMapping(value = "/acc/{accManifestId:[\\d]+}/ungroup")
