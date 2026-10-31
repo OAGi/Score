@@ -210,7 +210,7 @@ public class CreateContextSchemePageImpl extends BasePageImpl implements CreateC
         WebElement tr = getTableRecordByValue(value);
         WebElement td = getColumnByName(tr, "select");
         WebElement checkbox = td.findElement(By.xpath("mat-checkbox"));
-        return checkbox.getAttribute("class").contains("mat-checkbox-checked");
+        return checkbox.getAttribute("class").contains("mat-mdc-checkbox-checked");
     }
 
     @Override

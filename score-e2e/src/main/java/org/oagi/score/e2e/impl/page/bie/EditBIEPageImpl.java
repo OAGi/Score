@@ -820,6 +820,20 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 
+    /**
+     * Prefer the option whose text is exactly the value domain. A value domain can be a part of another one
+     * ('positive integer' of 'non positive integer'), and a search lists both.
+     */
+    private WebElement getValueDomainOption(String valueDomain) {
+        try {
+            return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(2L), ofMillis(100L)),
+                    By.xpath("//mat-option//span[normalize-space(text()) = \"" + valueDomain + "\"]"));
+        } catch (TimeoutException e) {
+            return elementToBeClickable(PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
+                    By.xpath("//mat-option//span[contains(text(), \"" + valueDomain + "\")]"));
+        }
+    }
+
     private WebElement getTextAreaFieldByName(String name) {
         return getTextAreaFieldByName("", name);
     }
@@ -1707,9 +1721,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 }
                 sendKeys(dropdownSearchField, valueDomain);
                 waitFor(ofMillis(500L));
-                click(getDriver(), elementToBeClickable(
-                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        By.xpath("//mat-option//span[contains(text(), \"" + valueDomain + "\")]")));
+                click(getDriver(), getValueDomainOption(valueDomain));
                 escape(getDriver());
             });
         }
@@ -1951,9 +1963,7 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
                 }
                 sendKeys(dropdownSearchField, valueDomain);
                 waitFor(ofMillis(500L));
-                click(getDriver(), elementToBeClickable(
-                        PageHelper.wait(getDriver(), Duration.ofSeconds(10L), ofMillis(100L)),
-                        By.xpath("//mat-option//span[contains(text(), \"" + valueDomain + "\")]")));
+                click(getDriver(), getValueDomainOption(valueDomain));
                 escape(getDriver());
             });
         }

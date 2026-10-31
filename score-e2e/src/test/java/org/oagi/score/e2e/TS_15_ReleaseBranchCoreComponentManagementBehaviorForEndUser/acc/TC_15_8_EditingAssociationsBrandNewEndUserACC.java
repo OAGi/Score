@@ -72,7 +72,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -691,7 +690,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -1478,7 +1476,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {

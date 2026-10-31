@@ -76,7 +76,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ccStates.add("Published");
         ccStates.add("Draft");
         ccStates.add("Candidate");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
         ASCCPObject asccp;
@@ -915,7 +914,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ccStates.add("Draft");
         ccStates.add("Candidate");
         ccStates.add("Published");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -1913,7 +1911,6 @@ public class TC_10_7_EditingAssociationsRevisionDeveloperACC extends BaseTest {
         ccStates.add("Draft");
         ccStates.add("Candidate");
         ccStates.add("Published");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {

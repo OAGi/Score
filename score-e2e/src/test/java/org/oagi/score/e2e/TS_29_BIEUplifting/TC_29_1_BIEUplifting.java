@@ -1823,7 +1823,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         WebElement bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Entry Date Time Date Time", 3);
         waitFor(ofMillis(1000L));
         EditBIEPage.BBIESCPanel bbiescPanel = editBIEPage.getBBIESCPanel(bbiescNode);
-        assertEquals("gregorian month day", getText(bbiescPanel.getValueDomainField()));
+        assertEquals("gregorian month", getText(bbiescPanel.getValueDomainField()));
 
         bbiescNode = editBIEPage.getNodeByPath("/Get BOM/Data Area/BOM/BOM Header/Note/Author Text", 3);
         waitFor(ofMillis(1000L));
@@ -2980,7 +2980,7 @@ public class TC_29_1_BIEUplifting extends BaseTest {
         assertFalse(visibilityOfAllElementsLocatedBy(getDriver(), cleanSystemRows).isEmpty());
         assertUpliftReportRow(extension + "Usage Description", "BCCP", "Unmatched", "");
         assertTrue(elementToBeClickable(getDriver(), By.xpath(
-                "//score-report-dialog//button[normalize-space(.)='Download']")).isEnabled());
+                "//score-report-dialog//button[.//span[normalize-space(.)='Download']]")).isEnabled());
 
     }
 

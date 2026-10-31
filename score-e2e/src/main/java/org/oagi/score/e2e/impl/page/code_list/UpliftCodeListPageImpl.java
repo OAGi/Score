@@ -166,7 +166,8 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
         retry(() -> {
             selectCodeList(codeList.getName());
             click(getUpliftButton(true));
-            waitFor(ofMillis(1000L));
+            closeOverwrittenValuesDialog();
+            defaultWait(getDriver()).until(driver -> driver.getCurrentUrl().matches(".*/code_list/\\d+.*"));
         });
 
         String currentUrl = getDriver().getCurrentUrl();
@@ -175,6 +176,20 @@ public class UpliftCodeListPageImpl extends BaseSearchBarPageImpl implements Upl
         EditCodeListPage editCodeListPage = new EditCodeListPageImpl(this, upliftedCodeList);
         assert editCodeListPage.isOpened();
         return editCodeListPage;
+    }
+
+    /**
+     * The uplift opens the uplifted Code List only after the user closes the 'Overwritten Values' dialog, which
+     * appears when the values of the source Code List are overwritten by the ones of the target release.
+     */
+    private void closeOverwrittenValuesDialog() {
+        try {
+            click(elementToBeClickable(shortWait(getDriver()), By.xpath(
+                    "//mat-dialog-container[.//*[normalize-space(.)='Overwritten Values']]"
+                            + "//button[normalize-space(.)='Close' or .//span[normalize-space(.)='Close']]")));
+        } catch (TimeoutException ignored) {
+            // The dialog appears only when values are overwritten.
+        }
     }
 
     @Override

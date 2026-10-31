@@ -191,7 +191,8 @@ public class ViewEditBIEPageImpl extends BaseSearchBarPageImpl implements ViewEd
 
     @Override
     public void hitSearchButton() {
-        click(getSearchButton());
+        // The search bar can re-render while the click waits for a snackbar, which detaches the button found first.
+        retry(() -> click(getSearchButton()));
         invisibilityOfLoadingContainerElement(getDriver());
         waitFor(ofMillis(1000L));
     }

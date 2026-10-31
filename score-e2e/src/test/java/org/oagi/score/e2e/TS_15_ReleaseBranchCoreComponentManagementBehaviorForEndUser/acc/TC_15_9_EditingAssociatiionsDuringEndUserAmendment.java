@@ -74,7 +74,6 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ccStates.add("Production");
         ccStates.add("QA");
         ccStates.add("WIP");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         ASCCPObject asccp;
@@ -96,10 +95,8 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         }
 
         ccStates = new ArrayList<>();
+        // The State filter of a published release has no Draft or Candidate, which are the states of the Working branch.
         ccStates.add("Published");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
-        ccStates.add("Deleted");
         NamespaceObject namespaceForDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespaceForDeveloper, ccStates);
 
@@ -625,11 +622,9 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         accViewEditPage.hitAmendButton();
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         List<String> ccStates = new ArrayList<>();
+        // The State filter of a published release has no Draft or Candidate, which are the states of the Working branch.
         ccStates.add("WIP");
-        ccStates.add("Draft");
-        ccStates.add("Candidate");
         ccStates.add("Published");
-        ccStates.add("Deleted");
         NamespaceObject namespaceForDeveloper = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(developer, release, namespaceForDeveloper, ccStates);
 
@@ -655,7 +650,6 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -1525,7 +1519,6 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(anotherUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -1778,14 +1771,12 @@ public class TC_15_9_EditingAssociatiionsDuringEndUserAmendment extends BaseTest
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
-        assertEquals("Set Based ACC", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
+        // the Validation Results panel lists the duplicate property term and asks before the base ACC is set
+        List<String> validationMessages = getValidationPanelMessages(getDriver());
+        assertTrue(validationMessages.stream().anyMatch(message ->
+                message.contains("property term \"" + asccpPropertyTerm + "\"")));
 
-        String dialogMessage = getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//p")));
-        assertTrue(dialogMessage.contains("There is a duplicate property term"));
-
-        click(getDialogButtonByName(getDriver(), "Cancel"));
+        click(getValidationCancelButton(getDriver()));
     }
 
     @Test

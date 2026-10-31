@@ -26,6 +26,7 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.ExpressBIEPage;
 import org.oagi.score.e2e.page.bie.SelectProfileBIEToReuseDialog;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -209,6 +210,8 @@ public class TC_47_4_RecursiveBIEInverseModeExpression extends BaseTest {
         assertFalse(editBIEPage.getUsedCheckboxAtNode(childNode).getAttribute("class")
                         .contains("mat-mdc-checkbox-checked"),
                 "An explicit false ASBIE selection must override the mode default after reopening.");
+        // The Inverse Mode checkbox belongs to the detail panel of the root node, which the selected child replaced.
+        click(editBIEPage.getNodeByPath("/" + rootAsccp.getPropertyTerm()).findElement(By.cssSelector(".node-label")));
         assertTrue(editBIEPage.getTopLevelASBIEPPanel().getInverseModeCheckbox()
                         .getAttribute("class").contains("mat-mdc-checkbox-checked"),
                 "Reopening the BIE must retain its own Inverse Mode value.");
