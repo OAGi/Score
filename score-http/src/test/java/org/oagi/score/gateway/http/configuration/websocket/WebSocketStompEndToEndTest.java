@@ -43,6 +43,7 @@ import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -194,8 +195,9 @@ class WebSocketStompEndToEndTest {
         template.convertAndSend("/topic/webpage/info", "info");
         template.convertAndSend(WebSocketAuthorizationInterceptor.messageTopicOf("someone"), "not mine");
 
-        assertEquals(List.of("/topic/message/ben.craker|mine", "/topic/acc/12|component", "/topic/webpage/info|info"),
-                List.of(client.next(3000), client.next(3000), client.next(3000)));
+        // The simple broker delivers to each destination on its own, so the order across destinations is not fixed.
+        assertEquals(Set.of("/topic/message/ben.craker|mine", "/topic/acc/12|component", "/topic/webpage/info|info"),
+                Set.of(client.next(3000), client.next(3000), client.next(3000)));
         assertNull(client.next(500));
         assertTrue(client.errors.isEmpty(), client.errors.toString());
     }
