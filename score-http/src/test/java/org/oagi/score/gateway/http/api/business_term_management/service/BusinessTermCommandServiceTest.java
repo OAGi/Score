@@ -151,6 +151,26 @@ class BusinessTermCommandServiceTest {
     }
 
     @Test
+    void create_andUpdate_rejectUriWithSchemeThatCanRunScript() {
+        for (String uri : new String[]{"javascript:alert(1)", "JavaScript:alert(1)", "data:text/html,x", "/relative/path", "ref/1"}) {
+            assertThrows(IllegalArgumentException.class, () -> service.create(endUser,
+                    new BusinessTermCreateRequest("Ship To", "id-1", uri, "def", "comment")), uri);
+            assertThrows(IllegalArgumentException.class, () -> service.update(endUser,
+                    new BusinessTermUpdateRequest(new BusinessTermId(BigInteger.ONE),
+                            "Ship To", "id-1", uri, "def", "comment")), uri);
+        }
+        verify(command, never()).insert(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void create_acceptsHttpHttpsAndUrnUri() {
+        for (String uri : new String[]{"http://ref/1", "HTTPS://ref/1", "urn:example:term:1"}) {
+            service.create(endUser, new BusinessTermCreateRequest("Ship To", "id-1", uri, "def", "comment"));
+        }
+        verify(command, times(3)).insert(any(), any(), any(), any(), any());
+    }
+
+    @Test
     void create_withUriOwnedByAnotherName_insertsInsteadOfUpsertingOverIt() {
         // Issue #10: (Customer, U) exists; creating (Client, U) is a distinct (name + URI) pair. It must be
         // inserted, never routed through the URI-keyed upsert that would rename Customer.

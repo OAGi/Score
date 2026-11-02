@@ -453,3 +453,24 @@ export class ReplaceAllPipe implements PipeTransform {
     return value.replaceAll(searchValue, replaceValue);
   }
 }
+
+/**
+ * Opens a stored external link in a new tab only when it is an absolute http or https URL.
+ * `window.open` does not sanitize its argument, so a `javascript:` value would run in the app origin.
+ */
+export function openExternalUrl(value: string | null | undefined): boolean {
+  if (!value) {
+    return false;
+  }
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch (e) {
+    return false;
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return false;
+  }
+  window.open(url.href, '_blank', 'noopener,noreferrer');
+  return true;
+}
