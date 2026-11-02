@@ -39,6 +39,19 @@ The following search filters are typically available within the advanced search 
 
 Note: If a search filter is left blank, it will not be applied.
 
+On the Core Component and Data Type lists, and in the dialogs where a core component is picked (for example, when appending a property to an ACC),
+the list of states in the *State* filter depends on the selected branch.
+The *Working* branch offers WIP, Draft, Candidate, Release Draft, Published, and Deleted.
+A published release offers WIP, QA, Production, Published, and Deleted, because QA and Production exist only on a published release.
+The *State* filter in the pick dialogs also narrows the list; components that cannot be picked (for example, a deleted property that cannot be appended) are not offered.
+
+Narrow screens
+~~~~~~~~~~~~~~
+
+On a narrow screen, such as a phone or a window made narrow, the tables of connectCenter switch to a compact layout.
+Instead of one row with many columns, each record is shown as a compact card that keeps the most important fields, and the toolbar buttons of a page show only their icons.
+Widen the window to return to the full table layout.
+
 .. _drop-down-list-1:
 
 Drop-down List

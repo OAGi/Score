@@ -34,6 +34,11 @@ To create an OpenAPI document:
    9. License URL
    10. Description
 
+   *Terms of Service*, *Contact URL* and *License URL* must be absolute ``http`` or ``https`` URLs,
+   and *Contact Email* must be an email address. All four are optional, but when one is filled in
+   with an invalid value, an error message is displayed under the field and the "Create" button
+   is disabled until the value is corrected or cleared.
+
 5. Click the "Create" button.
 
 Edit an OpenAPI Document
@@ -49,7 +54,9 @@ To edit an OpenAPI document:
    also `How to use the Search field in general <#how-to-use-the-search-field-in-general>`__.
 
 4. You can change the *Title*, *Document Version*, *Terms of Service*, *Contact Name*, *Contact URL*, *Contact Email*
-   , *License Name*, *License URL* and *Description* fields.
+   , *License Name*, *License URL* and *Description* fields. The same rules as in the create page
+   apply to *Terms of Service*, *Contact URL*, *License URL* and *Contact Email*: an invalid value
+   disables the "Update" button (and the Ctrl+S shortcut) until it is corrected or cleared.
 
 5. Click the "Update" button.
 

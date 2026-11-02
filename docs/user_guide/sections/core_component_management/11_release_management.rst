@@ -146,6 +146,8 @@ To create a release draft:
    that CCs also include code and agency identifier lists)
    created/changed in the *Working* branch. The right, aka *Assigned*
    pane, contains CCs assigned to the release and is initially empty.
+   The *Type* filter of the page offers ACC, ASCCP, BCCP, Code List, Agency ID List, and DT.
+   A DT in the lists links to the Data Type page.
 
 3. Assign CCs to the release by selectively dragging CCs that are in the
    Candidate state from the left pane to the right pane. Alternatively,
