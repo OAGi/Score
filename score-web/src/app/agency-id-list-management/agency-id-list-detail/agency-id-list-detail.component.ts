@@ -337,7 +337,8 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
     if (agencyIdListValue.used) {
       return false;
     }
-    if (this.agencyIdList.agencyIdListValue?.agencyIdListValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
+    const agencyValueManifestId = this.agencyIdList.agencyIdListValue?.agencyIdListValueManifestId;
+    if (agencyValueManifestId && agencyValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
       return false;
     }
     return this.agencyIdList.state === 'WIP';
