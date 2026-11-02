@@ -34,6 +34,7 @@ import static org.oagi.score.gateway.http.api.cc_management.model.CcState.*;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.*;
 import static org.springframework.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -89,14 +90,23 @@ public class CodeListCommandService {
         if (request.namespaceId() == null) {
             throw new IllegalArgumentException("Namespace is required.");
         }
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Code list name cannot be empty.");
+        }
+        if (!hasText(request.listId())) {
+            throw new IllegalArgumentException("Code list List ID cannot be empty.");
+        }
+        if (!hasText(request.versionId())) {
+            throw new IllegalArgumentException("Code list version cannot be empty.");
+        }
 
         var command = command(requester);
 
         // Update the main code list details
         boolean updated = command.update(
                 codeListManifestId,
-                request.name(),
-                request.versionId(), request.listId(),
+                request.name().trim(),
+                request.versionId().trim(), request.listId().trim(),
                 request.agencyIdListValueManifestId(),
                 request.definition(), request.remark(),
                 request.namespaceId(),

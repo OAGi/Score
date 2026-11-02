@@ -76,6 +76,39 @@ class CodeListCommandServiceNamespaceTest {
     }
 
     @Test
+    void update_rejects_a_blank_name_list_id_or_version() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        NamespaceId namespace = new NamespaceId(BigInteger.ONE);
+        for (String blank : new String[]{null, "", "   "}) {
+            for (UpdateCodeListRequest request : List.of(
+                    new UpdateCodeListRequest(manifestId, blank, "1", "list", null,
+                            null, null, namespace, false, false, List.of()),
+                    new UpdateCodeListRequest(manifestId, "Name", "1", blank, null,
+                            null, null, namespace, false, false, List.of()),
+                    new UpdateCodeListRequest(manifestId, "Name", blank, "list", null,
+                            null, null, namespace, false, false, List.of()))) {
+                assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+            }
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_saves_the_trimmed_name_list_id_and_version() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        NamespaceId namespace = new NamespaceId(BigInteger.ONE);
+        service.update(requester, new UpdateCodeListRequest(manifestId, "  Name ", " 1 ", " list ", null,
+                null, null, namespace, false, false, List.of()));
+        verify(command).update(manifestId, "Name", "1", "list", null, null, null, namespace, false, false);
+    }
+
+    @Test
     void update_rejects_a_newly_added_deprecated_value() {
         CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
         when(details.state()).thenReturn(CcState.WIP);

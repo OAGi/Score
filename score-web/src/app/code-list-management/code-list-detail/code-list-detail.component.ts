@@ -331,10 +331,10 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
       !!selectedAgencyIdListValueId && this.currentAgencyIdListValues.some(
         value => value.agencyIdListValueManifestId === selectedAgencyIdListValueId) : !selectedAgencyIdListValueId;
     return (this.isUpdating) ||
-      (codeList.name === undefined || codeList.name === '') ||
-      (codeList.listId === undefined || codeList.listId === '') ||
+      !codeList.name?.trim() ||
+      !codeList.listId?.trim() ||
       !isAgencyIdListSelectionValid ||
-      (codeList.versionId === undefined || codeList.versionId === '');
+      !codeList.versionId?.trim();
   }
 
   openDialog(codeListValue?: CodeListValueDetails) {
@@ -501,13 +501,13 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.codeList.name) {
+    if (!this.codeList.name?.trim()) {
       this.snackBar.open('Name is required', '', {
         duration: 3000,
       });
       return;
     }
-    if (!this.codeList.listId) {
+    if (!this.codeList.listId?.trim()) {
       this.snackBar.open('List ID is required', '', {
         duration: 3000,
       });
@@ -521,7 +521,7 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    if (!this.codeList.versionId) {
+    if (!this.codeList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });
