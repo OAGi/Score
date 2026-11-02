@@ -49,13 +49,19 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Contact URL</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.contactUrl" maxlength="255">
+                  <input matInput [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="255">
+                  @if (contactUrl.hasError('url')) {
+                    <mat-error>The contact URL must be a valid URL</mat-error>
+                  }
                 </mat-form-field>
               </div>
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Contact Email</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.contactEmail" maxlength="255">
+                  <input matInput type="email" [(ngModel)]="oasDoc.contactEmail" [formControl]="contactEmail" maxlength="255">
+                  @if (contactEmail.hasError('email')) {
+                    <mat-error>The contact email must be in the form of an email address</mat-error>
+                  }
                 </mat-form-field>
               </div>
             </div>
@@ -69,13 +75,19 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>License URL</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.licenseUrl" maxlength="255">
+                  <input matInput [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="255">
+                  @if (licenseUrl.hasError('url')) {
+                    <mat-error>The license URL must be a valid URL</mat-error>
+                  }
                 </mat-form-field>
               </div>
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Terms of Service</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.termsOfService" maxlength="255">
+                  <input matInput [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="255">
+                  @if (termServiceUrl.hasError('url')) {
+                    <mat-error>The terms of service must be a valid URL</mat-error>
+                  }
                 </mat-form-field>
               </div>
             </div>

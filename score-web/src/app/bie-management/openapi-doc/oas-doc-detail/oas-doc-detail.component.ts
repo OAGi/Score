@@ -17,6 +17,8 @@ import {
   recomputeOperationId
 } from '../domain/oas-operation-validation';
 import {OpenAPIService} from '../domain/openapi.service';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -79,6 +81,10 @@ export class OasDocDetailComponent implements OnInit {
   hashCodeForOasDoc;
   bizCtxSearch: string;
   disabled: boolean;
+  contactUrl = new FormControl('', [httpUrlValidator]);
+  contactEmail = new FormControl('', [optionalEmailValidator]);
+  licenseUrl = new FormControl('', [httpUrlValidator]);
+  termServiceUrl = new FormControl('', [httpUrlValidator]);
 
   /** What the compact row shows of a BIE of the document: made once for a row. The controls of the endpoint go under it. */
   readonly compactRecord = memoizeRow((bie: BieForOasDoc): CompactRecord => ({
@@ -758,6 +764,8 @@ export class OasDocDetailComponent implements OnInit {
       (oasDoc1.title === undefined || oasDoc1.title === '') ||
       (oasDoc1.openAPIVersion === undefined || oasDoc1.openAPIVersion === '') ||
       (oasDoc1.version === undefined || oasDoc1.version === '') ||
+      this.termServiceUrl.invalid || this.contactUrl.invalid ||
+      this.contactEmail.invalid || this.licenseUrl.invalid ||
       // Issue #1729: block update/generate while any security scheme is incomplete.
       !this.areSecuritySchemesValid(oasDoc1) ||
       !this.areSecurityRequirementsValid(oasDoc1);

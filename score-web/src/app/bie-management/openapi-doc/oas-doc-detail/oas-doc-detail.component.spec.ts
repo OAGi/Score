@@ -3,6 +3,8 @@ import {of} from 'rxjs';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from '../../../common/utility';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 
 /**
  * Issue #1610 unit tests for the OpenAPI-document editor.
@@ -582,5 +584,37 @@ describe('OasDocDetailComponent.handleKeyboardEvent Ctrl/Cmd+S', () => {
     const ctx = saveCtx(true, false);
     press(ctx, {key: 'a', ctrlKey: true});
     expect(ctx.update).not.toHaveBeenCalled();
+  });
+
+  describe('Terms of Service, Contact URL, Contact Email and License URL are validated', () => {
+    const doc = {oasDocId: 1, title: 'T', openAPIVersion: '3.1', version: '1'};
+
+    function isDisabledCtx(values: {tos?: string; contactUrl?: string; email?: string; licenseUrl?: string}): boolean {
+      const ctx: any = {
+        disabled: false,
+        termServiceUrl: new FormControl(values.tos ?? '', [httpUrlValidator]),
+        contactUrl: new FormControl(values.contactUrl ?? '', [httpUrlValidator]),
+        contactEmail: new FormControl(values.email ?? '', [optionalEmailValidator]),
+        licenseUrl: new FormControl(values.licenseUrl ?? '', [httpUrlValidator]),
+        areSecuritySchemesValid: () => true,
+        areSecurityRequirementsValid: () => true,
+      };
+      return OasDocDetailComponent.prototype.isDisabled.call(ctx, doc as any);
+    }
+
+    it('enables Update for empty or valid values', () => {
+      expect(isDisabledCtx({})).toBe(false);
+      expect(isDisabledCtx({
+        tos: 'https://example.com/tos', contactUrl: 'http://example.com', email: 'a@b.com',
+        licenseUrl: 'https://www.apache.org/licenses/LICENSE-2.0'
+      })).toBe(false);
+    });
+
+    it('disables Update for an invalid value of any of the four fields', () => {
+      expect(isDisabledCtx({tos: 'not a url'})).toBe(true);
+      expect(isDisabledCtx({contactUrl: 'javascript:alert(1)'})).toBe(true);
+      expect(isDisabledCtx({email: 'not-an-email'})).toBe(true);
+      expect(isDisabledCtx({licenseUrl: 'ftp//bad url'})).toBe(true);
+    });
   });
 });
