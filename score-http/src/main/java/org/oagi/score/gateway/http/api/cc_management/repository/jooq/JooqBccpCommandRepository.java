@@ -150,21 +150,8 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
         }
 
         if (valueConstraint != null) {
-            if (valueConstraint.hasFixedValue() &&
-                    (bccp.valueConstraint() == null || compare(bccp.valueConstraint().fixedValue(), valueConstraint.fixedValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCCP.FIXED_VALUE, valueConstraint.fixedValue())
-                        .setNull(BCCP.DEFAULT_VALUE);
-            } else if (valueConstraint.hasDefaultValue() &&
-                    (bccp.valueConstraint() == null || compare(bccp.valueConstraint().defaultValue(), valueConstraint.defaultValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCCP.DEFAULT_VALUE, valueConstraint.defaultValue())
-                        .setNull(BCCP.FIXED_VALUE);
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(BCCP.DEFAULT_VALUE)
-                        .setNull(BCCP.FIXED_VALUE);
-            }
+            moreStep = ValueConstraintUpdates.apply(firstStep, moreStep, bccp.valueConstraint(), valueConstraint,
+                    BCCP.FIXED_VALUE, BCCP.DEFAULT_VALUE);
         }
 
         if (definition != null) {

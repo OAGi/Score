@@ -49,11 +49,12 @@ export class LibraryCreateComponent {
   }
 
   get isDisabled() {
-    return (!this.library.name) ||
+    return (!this.library.name?.trim()) ||
         (!this.linkForm.valid) ||
         (!this.namespaceUriForm.valid) ||
         (!this.library.organization) ||
-        (!this.library.domain);
+        (!this.library.domain) ||
+        (!this.library.type?.trim());
   }
 
   back() {

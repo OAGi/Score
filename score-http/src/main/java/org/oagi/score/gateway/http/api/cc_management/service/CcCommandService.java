@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.service;
 
 import org.oagi.score.gateway.http.common.util.DenUtils;
 import jakarta.annotation.Nullable;
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccCreateRequest;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.acc.AccUpdateRequest;
 import org.oagi.score.gateway.http.api.cc_management.controller.payload.ascc.AsccCreateRequest;
@@ -32,6 +33,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.repository.AccQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.DtQueryRepository;
 import org.oagi.score.gateway.http.api.graph.model.CoreComponentGraphContext;
 import org.oagi.score.gateway.http.api.graph.model.Node;
@@ -182,8 +184,31 @@ public class CcCommandService {
         repositoryFactory.accCommandRepository(requester).updateLogId(accManifestId, logId);
     }
 
+    /**
+     * The endpoint-facing append may only change a WIP ACC owned by the requester (or by anyone, for an
+     * administrator), like every other update of an ACC. The overloads taking a log action are used by the
+     * internal flows, such as user extensions, that legitimately append to an ACC of another user.
+     */
+    private void assertAccAppendable(ScoreUser requester, AccManifestId accManifestId) {
+        AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
+        if (acc == null) {
+            throw new IllegalArgumentException("Source ACC does not exist.");
+        }
+        if (CcState.WIP != acc.state()) {
+            throw new IllegalArgumentException("The ACC '" + acc.den() + "' cannot be updated " +
+                    "because it is in the '" + acc.state() + "' state. "
+                    + "Only ACCs in the 'WIP' state can be updated.");
+        }
+        if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId())) {
+            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        }
+    }
+
     public AsccManifestId createAscc(
             ScoreUser requester, AsccCreateRequest request) {
+        if (requester != null && request != null) {
+            assertAccAppendable(requester, request.accManifestId());
+        }
         return createAscc(requester, request, LogAction.Modified, LogUtils.generateHash(), false);
     }
 
@@ -214,6 +239,9 @@ public class CcCommandService {
         AsccpSummaryRecord toAsccp = asccpQuery.getAsccpSummary(request.asccpManifestId());
         if (toAsccp == null) {
             throw new IllegalArgumentException("Target ASCCP does not exist.");
+        }
+        if (toAsccp.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted ASCCP cannot be appended.");
         }
         assertReferencedReleaseAllowed(
                 requester,
@@ -256,6 +284,9 @@ public class CcCommandService {
 
     public BccManifestId createBcc(
             ScoreUser requester, BccCreateRequest request) {
+        if (requester != null && request != null) {
+            assertAccAppendable(requester, request.accManifestId());
+        }
         return createBcc(requester, request, LogAction.Modified, LogUtils.generateHash(), false);
     }
 
@@ -286,6 +317,9 @@ public class CcCommandService {
         BccpSummaryRecord toBccp = bccpQuery.getBccpSummary(request.bccpManifestId());
         if (toBccp == null) {
             throw new IllegalArgumentException("Target BCCP does not exist.");
+        }
+        if (toBccp.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted BCCP cannot be appended.");
         }
         assertReferencedReleaseAllowed(
                 requester,
@@ -336,6 +370,9 @@ public class CcCommandService {
                 "a role ACC");
         if (roleOfAcc.isAbstract()) {
             throw new IllegalArgumentException("An abstract ACC cannot be used to create a new ASCCP.");
+        }
+        if (roleOfAcc.state() == CcState.Deleted) {
+            throw new IllegalArgumentException("A deleted ACC cannot be used to create a new ASCCP.");
         }
 
         var command = repositoryFactory.asccpCommandRepository(requester);
@@ -961,8 +998,8 @@ public class CcCommandService {
         var command = repositoryFactory.bccpCommandRepository(requester);
         boolean updated = command.update(request.bccpManifestId(),
                 request.propertyTerm(),
-                request.deprecated(),
                 request.nillable(),
+                request.deprecated(),
                 request.namespaceId(),
                 hasLength(request.fixedValue()) ?
                         new ValueConstraint(null, request.fixedValue()) :
@@ -1307,10 +1344,27 @@ public class CcCommandService {
                     "The base ACC",
                     "the target ACC",
                     "a base ACC");
+            assertNoCircularBase(query, acc, basedAcc);
         }
 
         var command = repositoryFactory.accCommandRepository(requester);
         return command.updateBasedAccManifestId(accManifestId, basedAccManifestId);
+    }
+
+    /**
+     * Rejects a base ACC that is the ACC itself or that already inherits from the ACC,
+     * because the base chain would then become circular.
+     */
+    private void assertNoCircularBase(AccQueryRepository query, AccSummaryRecord acc, AccSummaryRecord basedAcc) {
+        Set<AccManifestId> visited = new HashSet<>();
+        AccSummaryRecord cur = basedAcc;
+        while (cur != null && visited.add(cur.accManifestId())) {
+            if (acc.accManifestId().equals(cur.accManifestId())) {
+                throw new IllegalArgumentException("The ACC '" + basedAcc.den() + "' cannot be the base of the ACC '"
+                        + acc.den() + "' because it would create a circular inheritance.");
+            }
+            cur = (cur.basedAccManifestId() != null) ? query.getAccSummary(cur.basedAccManifestId()) : null;
+        }
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state) {
@@ -1323,6 +1377,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, accManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1346,9 +1409,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
-            if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, acc.owner(), "restore");
+        } else {
+            if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1430,6 +1499,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, asccpManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, AsccpManifestId asccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1453,9 +1531,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
-            if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, asccp.owner(), "restore");
+        } else {
+            if (!requester.isAdministrator() && !asccp.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1535,6 +1619,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, bccpManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, BccpManifestId bccpManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1558,9 +1651,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
-            if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, bccp.owner(), "restore");
+        } else {
+            if (!requester.isAdministrator() && !bccp.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1591,6 +1690,15 @@ public class CcCommandService {
 
     public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
                                String projectFieldOptionOverride) {
+        return updateState(requester, dtManifestId, state, comment, projectFieldOptionOverride, false);
+    }
+
+    /**
+     * {@code releaseProcess} is for the release process only: it moves the components of a release to and from
+     * ReleaseDraft and to Published, whoever owns them. The endpoint-facing overloads leave those moves out.
+     */
+    public boolean updateState(ScoreUser requester, DtManifestId dtManifestId, CcState state, String comment,
+                               String projectFieldOptionOverride, boolean releaseProcess) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -1614,9 +1722,15 @@ public class CcCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        if (!releaseProcess) {
+            assertEndpointMove(requester, prevState, nextState);
+        }
+
         boolean restore = prevState == CcState.Deleted && nextState == CcState.WIP;
-        if (!restore) {
-            if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
+        if (restore) {
+            assertSameRoleAsOwner(requester, dt.owner(), "restore");
+        } else {
+            if (!requester.isAdministrator() && !dt.owner().userId().equals(requester.userId()) && !(releaseProcess && prevState.isImplicitMove(nextState))) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
 
@@ -1637,6 +1751,94 @@ public class CcCommandService {
         return updated;
     }
 
+    /**
+     * Purges the given components together. Components that reference one another (an ASCCP and the ACC
+     * it is the role of, an ACC and the BCCP of its BCCs) can only be purged in a dependency order that
+     * is not known up front, so the ones that cannot be purged yet are retried as long as a round purges
+     * something. What remains is reported, with the reason of each, instead of being skipped silently.
+     *
+     * @throws IllegalArgumentException if a component could not be purged; the request is one transaction, so
+     *                                  nothing is purged then.
+     */
+    public void purge(ScoreUser requester,
+                      Collection<AccManifestId> accManifestIdList,
+                      Collection<AsccpManifestId> asccpManifestIdList,
+                      Collection<BccpManifestId> bccpManifestIdList,
+                      Collection<DtManifestId> dtManifestIdList) {
+
+        record Purge(String label, Runnable action) {
+        }
+
+        List<Purge> pending = new ArrayList<>();
+        if (asccpManifestIdList != null) {
+            asccpManifestIdList.forEach(id -> pending.add(new Purge("ASCCP " + id, () -> purge(requester, id))));
+        }
+        if (accManifestIdList != null) {
+            accManifestIdList.forEach(id -> pending.add(new Purge("ACC " + id, () -> purge(requester, id))));
+        }
+        if (bccpManifestIdList != null) {
+            bccpManifestIdList.forEach(id -> pending.add(new Purge("BCCP " + id, () -> purge(requester, id))));
+        }
+        if (dtManifestIdList != null) {
+            dtManifestIdList.forEach(id -> pending.add(new Purge("DT " + id, () -> purge(requester, id))));
+        }
+
+        Map<String, String> failures = new LinkedHashMap<>();
+        boolean purged = true;
+        while (purged && !pending.isEmpty()) {
+            purged = false;
+            failures.clear();
+            for (Iterator<Purge> iterator = pending.iterator(); iterator.hasNext(); ) {
+                Purge purge = iterator.next();
+                try {
+                    purge.action().run();
+                    iterator.remove();
+                    purged = true;
+                } catch (RuntimeException e) {
+                    failures.put(purge.label(), e.getMessage());
+                }
+            }
+        }
+
+        if (!pending.isEmpty()) {
+            throw new IllegalArgumentException("Could not purge " + failures.size() + " component(s): " +
+                    failures.entrySet().stream()
+                            .map(e -> e.getKey() + " (" + e.getValue() + ")")
+                            .collect(Collectors.joining("; ")));
+        }
+    }
+
+    /**
+     * The moves an endpoint may ask for. ReleaseDraft is reached, left and turned into Published by the release
+     * process only, and Draft and Candidate belong to developers as QA and Production belong to end-users.
+     */
+    private void assertEndpointMove(ScoreUser requester, CcState prevState, CcState nextState) {
+        if (prevState.isImplicitMove(nextState)) {
+            throw new IllegalArgumentException("The core component in '" + prevState + "' state can move to '" +
+                    nextState + "' state only by the release process.");
+        }
+        if ((nextState == CcState.Draft || nextState == CcState.Candidate) && !requester.isDeveloper()) {
+            throw new IllegalArgumentException("Only developers can move the core component to '" + nextState + "' state.");
+        }
+        if ((nextState == CcState.QA || nextState == CcState.Production) && requester.isDeveloper()) {
+            throw new IllegalArgumentException("Only end-users can move the core component to '" + nextState + "' state.");
+        }
+    }
+
+    /**
+     * A Deleted core component can be restored or purged only by a user in the same role as its owner, as a
+     * Code List and an Agency ID List can.
+     */
+    private void assertSameRoleAsOwner(ScoreUser requester, UserSummaryRecord owner, String action) {
+        if (owner.isDeveloper() != requester.isDeveloper()) {
+            if (owner.isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can " + action + " this component.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can " + action + " this component.");
+            }
+        }
+    }
+
     public boolean purge(ScoreUser requester, AccManifestId accManifestId) {
 
         if (requester == null) {
@@ -1649,6 +1851,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.accQueryRepository(requester);
         AccSummaryRecord acc = query.getAccSummary(accManifestId);
+        assertSameRoleAsOwner(requester, acc.owner(), "purge");
         if (acc.componentType() == UserExtensionGroup) {
             var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
             AsccpSummaryRecord groupAsccp = asccpQuery.getAsccpSummaryList(accManifestId).stream().findFirst().orElse(null);
@@ -1672,7 +1875,7 @@ public class CcCommandService {
             throw new IllegalArgumentException("Please purge related-ASCCPs first before purging the ACC '" + acc.den() + "'.");
         }
 
-        if (!query.getInheritedAccSummaryList(acc.basedAccManifestId()).isEmpty()) {
+        if (!query.getInheritedAccSummaryList(accManifestId).isEmpty()) {
             throw new IllegalArgumentException("Please purge derivations first before purging the ACC '" + acc.den() + "'.");
         }
 
@@ -1696,6 +1899,9 @@ public class CcCommandService {
         var query = repositoryFactory.asccpQueryRepository(requester);
         AsccpSummaryRecord asccp = query.getAsccpSummary(asccpManifestId);
 
+        if (!skipStateCheck) {
+            assertSameRoleAsOwner(requester, asccp.owner(), "purge");
+        }
         if (!skipStateCheck && CcState.Deleted != asccp.state()) {
             throw new IllegalArgumentException("The ASCCP '" + asccp.den() + "' cannot be purged " +
                     "because it is in the '" + asccp.state() + "' state. "
@@ -1723,6 +1929,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.bccpQueryRepository(requester);
         BccpSummaryRecord bccp = query.getBccpSummary(bccpManifestId);
+        assertSameRoleAsOwner(requester, bccp.owner(), "purge");
 
         if (CcState.Deleted != bccp.state()) {
             throw new IllegalArgumentException("The BCCP '" + bccp.den() + "' cannot be purged " +
@@ -1733,7 +1940,7 @@ public class CcCommandService {
         if (!repositoryFactory.accQueryRepository(requester)
                 .getBccSummaryList(bccpManifestId)
                 .isEmpty()) {
-            new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccp.den() + "'.");
+            throw new IllegalArgumentException("Please purge related-BCCs first before purging the BCCP '" + bccp.den() + "'.");
         }
 
         return repositoryFactory.bccpCommandRepository(requester).delete(bccpManifestId);
@@ -1751,6 +1958,7 @@ public class CcCommandService {
 
         var query = repositoryFactory.dtQueryRepository(requester);
         DtSummaryRecord dt = query.getDtSummary(dtManifestId);
+        assertSameRoleAsOwner(requester, dt.owner(), "purge");
 
         if (CcState.Deleted != dt.state()) {
             throw new IllegalArgumentException("The DT '" + dt.den() + "' cannot be purged " +
@@ -2665,10 +2873,12 @@ public class CcCommandService {
                 new Definition("A system created component containing user extension to the " + eAcc.objectClassTerm() + ".", null),
                 null));
 
+        // The base ACC is a published component of another user, so this internal append bypasses the
+        // WIP/owner guard of the endpoint-facing overload.
         createAscc(requester, AsccCreateRequest.builder(eAcc.accManifestId(), ueAsccpManifestId)
                 .cardinalityMin(1)
                 .cardinalityMax(1)
-                .build());
+                .build(), LogAction.Modified, LogUtils.generateHash(), false);
 
         return ueAccManifestId;
     }

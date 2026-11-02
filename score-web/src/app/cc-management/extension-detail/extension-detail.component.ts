@@ -1,5 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
@@ -52,6 +52,7 @@ import {
   Comment,
   Embedded,
   EntityType,
+  Element as ElementEntityType,
   EntityTypes,
   Extension,
   OAGIS10BODs,
@@ -66,7 +67,7 @@ import {AppendAssociationDialogComponent} from '../acc-detail/append-association
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -85,6 +86,7 @@ import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
@@ -93,7 +95,7 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./extension-detail.component.css']
 })
-export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
+export class ExtensionDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -168,6 +170,13 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
   /** What the tree shows besides the names of the nodes, in this order. */
   readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -210,7 +219,8 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
       setAppTitleIfPresent(this.titleService, accDetails.den, 'ACC');
 
       // subscribe an event
-      this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -750,6 +760,7 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
         state: this.rootNode.state,
@@ -1259,7 +1270,7 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
     } else {
       this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
-    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+    if (nodeDetail.bcc.entityType === ElementEntityType.value) {
       // Issue #1406
       if (!!nodeDetail.bcc.defaultValue || !!nodeDetail.bcc.fixedValue) {
         const dialogConfig = this.confirmDialogService.newConfig();
@@ -1383,7 +1394,10 @@ export class ExtensionDetailComponent implements OnInit, CcTreeValidationHost {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {

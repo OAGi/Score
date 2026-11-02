@@ -6,7 +6,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
-import {hashCode} from '../../common/utility';
+import {hashCode, openExternalUrl} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AssignedBusinessTermDetails} from '../domain/business-term';
 import {Title} from '@angular/platform-browser';
@@ -189,7 +189,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   }
 
   followTheExternalUri() {
-    window.open(this.assignedBusinessTerm.externalReferenceUri, '_blank');
+    openExternalUrl(this.assignedBusinessTerm.externalReferenceUri);
   }
 
 }

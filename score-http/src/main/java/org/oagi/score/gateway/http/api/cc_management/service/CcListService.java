@@ -87,6 +87,9 @@ public class CcListService {
 
         ReleaseSummaryRecord workingRelease = repositoryFactory.releaseQueryRepository(requester)
                 .getReleaseSummary(libraryId, "Working");
+        if (workingRelease == null) {
+            return Collections.emptyList();
+        }
 
         List<ULong> uegAccManifestIds = dslContext.select(ACC_MANIFEST.ACC_MANIFEST_ID.as("id"))
                 .from(ACC)
@@ -122,7 +125,9 @@ public class CcListService {
                 .from(ASCC)
                 .join(ASCC_MANIFEST).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
                 .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
-                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .join(ACC_MANIFEST).on(and(
+                        ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID),
+                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASBIE).on(and(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ASBIE.BASED_ASCC_MANIFEST_ID), ASBIE.IS_USED.eq(isUsed)))
@@ -132,7 +137,7 @@ public class CcListService {
                 .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(TOP_LEVEL_ASBIEP).on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
-                .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASBIEP.BASED_ASCCP_MANIFEST_ID))
+                .join(ASCCP_MANIFEST.as("bie_manifest")).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("bie_manifest").ASCCP_MANIFEST_ID))
                 .join(ASCCP.as("bie")).on(ASCCP_MANIFEST.as("bie_manifest").ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
                 .where(and(
                         LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId.value())),
@@ -156,7 +161,7 @@ public class CcListService {
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
                     item.setDen(e.get(ASCCP_MANIFEST.as("bie_manifest").DEN));
                     item.setAssociationDen(e.get(ASCCP_MANIFEST.DEN));
-                    item.setSeqKey(e.get(ASBIE.SEQ_KEY).intValue());
+                    item.setSeqKey(seqKey(e.get(ASBIE.SEQ_KEY)));
                     return item;
                 }).collect(Collectors.toList());
 
@@ -182,7 +187,9 @@ public class CcListService {
                 .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
-                .join(BCC_MANIFEST).on(BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID))
+                .join(BCC_MANIFEST).on(and(
+                        BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID),
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
                 .join(BBIE).on(and(BCC_MANIFEST.BCC_MANIFEST_ID.eq(BBIE.BASED_BCC_MANIFEST_ID), BBIE.IS_USED.eq(isUsed)))
                 .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
                 .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
@@ -214,7 +221,7 @@ public class CcListService {
                     item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ASBIEP.STATE)));
                     item.setDen(e.get(ASCCP_MANIFEST.as("bie_manifest").DEN));
                     item.setAssociationDen(e.get(BCCP_MANIFEST.DEN));
-                    item.setSeqKey(e.get(BBIE.SEQ_KEY).intValue());
+                    item.setSeqKey(seqKey(e.get(BBIE.SEQ_KEY)));
                     return item;
                 }).collect(Collectors.toList());
 
@@ -231,5 +238,9 @@ public class CcListService {
             return compFirst;
         });
         return result;
+    }
+
+    private static int seqKey(Number seqKey) {
+        return (seqKey != null) ? seqKey.intValue() : 0;
     }
 }

@@ -166,4 +166,28 @@ describe('TreeViewportComponent', () => {
 
     expect(self.cdr.markForCheck).toHaveBeenCalledTimes(1);
   });
+
+  describe('onClick', () => {
+    const click = (closest: (selector: string) => unknown) => ({
+      target: {closest}, preventDefault: vi.fn(), stopPropagation: vi.fn()
+    } as any);
+
+    it('selects the node and cancels the click of a plain row', () => {
+      const event = click(() => null);
+      TreeViewportComponent.prototype.onClick.call(ctx, {id: 'n'} as any, event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(event.stopPropagation).toHaveBeenCalled();
+      expect(ctx.nodeClick.emit).toHaveBeenCalledWith({id: 'n'});
+    });
+
+    it('does not cancel the click of a checkbox, or the browser reverts the native input state', () => {
+      const event = click(selector => (selector === 'mat-checkbox' ? {} : null));
+      TreeViewportComponent.prototype.onClick.call(ctx, {id: 'n'} as any, event);
+
+      expect(event.preventDefault).not.toHaveBeenCalled();
+      expect(event.stopPropagation).toHaveBeenCalled();
+      expect(ctx.nodeClick.emit).toHaveBeenCalledWith({id: 'n'});
+    });
+  });
 });

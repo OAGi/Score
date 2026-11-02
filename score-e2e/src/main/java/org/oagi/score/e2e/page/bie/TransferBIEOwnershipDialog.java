@@ -65,6 +65,13 @@ public interface TransferBIEOwnershipDialog extends Dialog, SearchBarPage {
     WebElement getTableRecordAtIndex(int idx);
 
     /**
+     * Wait until the table has loaded and return the login IDs of the accounts that it offers, in the order listed.
+     *
+     * @return the login IDs of the offered accounts
+     */
+    java.util.List<String> getListedLoginIds();
+
+    /**
      * Return the UI element of the table record containing the given value.
      *
      * @param value value

@@ -151,7 +151,11 @@ export class TreeViewportComponent<N extends TreeViewportNode = TreeViewportNode
   }
 
   onClick(node: N, event: MouseEvent) {
-    event.preventDefault();
+    // Cancelling the click of a checkbox makes the browser revert its native state, which leaves the input
+    // unchecked while MatCheckbox (and the model) are checked.
+    if (!(event.target as Element | null)?.closest?.('mat-checkbox')) {
+      event.preventDefault();
+    }
     event.stopPropagation();
     this.nodeClick.emit(node);
   }

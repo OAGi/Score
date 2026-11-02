@@ -44,7 +44,7 @@
             <span class="new-component me-2">New</span>
           }
           <a rel="noopener noreferrer" href="/code_list/{{ element.codeListManifestId }}">
-            <span>{{ element.codeListName }}</span>
+            <span>{{ element.name }}</span>
           </a>
         </div>
         <div class="description">{{ element.guid }}</div>
@@ -52,18 +52,26 @@
     </ng-container>
 
     <ng-container scoreColumnDef="basedCodeListName">
-      <td score-cell *scoreCellDef="let element" matTooltip="{{ element.basedCodeListName }}">
-        @if (element.basedCodeListId > 0) {
-          <a target="_blank" rel="noopener noreferrer"
-            href="/code_list/{{ element.basedCodeListId }}">
-            <fa-icon [icon]="faLocationArrow"></fa-icon>
-          </a>
+      <td score-cell *scoreCellDef="let element">
+        @if (!!element.based) {
+          <div matTooltip="{{ element.based.name }}">
+            <a target="_blank" rel="noopener noreferrer"
+              href="/code_list/{{ element.based.codeListManifestId }}">
+              <fa-icon [icon]="faLocationArrow"></fa-icon>
+            </a>
+          </div>
         }
       </td>
     </ng-container>
 
     <ng-container scoreColumnDef="agencyId">
-      <td score-cell *scoreCellDef="let element" matTooltip="{{ element.agencyIdName }}"> {{ element.agencyId }}</td>
+      <td score-cell *scoreCellDef="let element">
+        @if (!!element.agencyIdListValue) {
+          <div matTooltip="{{ element.agencyIdListValue.name }}">
+            {{ element.agencyIdListValue.value }}
+          </div>
+        }
+      </td>
     </ng-container>
 
     <ng-container scoreColumnDef="versionId">
@@ -85,14 +93,14 @@
 
     <ng-container scoreColumnDef="revision">
       <td score-cell *scoreCellDef="let element">
-        <span>{{ element.revision }}</span>
+        <span>{{ element.log.revisionNum }}</span>
       </td>
     </ng-container>
 
     <ng-container scoreColumnDef="owner">
       <td score-cell *scoreCellDef="let element">
         <div class="d-flex align-items-center align-content-center justify-content-between">
-          <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner" [innerHTML]="element.owner"></span>
+          <span class="score-line-clamp-2 score-break-word" [matTooltip]="element.owner.username" [innerHTML]="element.owner.loginId"></span>
         </div>
       </td>
     </ng-container>
@@ -100,15 +108,15 @@
     <ng-container scoreColumnDef="module">
       <td score-cell *scoreCellDef="let element">
         <div class="score-line-clamp-2 score-break-word"
-        [innerHTML]="element.modulePath | highlight : tableView.applied('module') : ['bg-warning']"></div>
+        [innerHTML]="element.module | highlight : tableView.applied('module') : ['bg-warning']"></div>
       </td>
     </ng-container>
 
     <ng-container scoreColumnDef="lastUpdateTimestamp">
       <td score-cell *scoreCellDef="let element">
         <div class="score-line-clamp-2 score-break-word">
-          <div>{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-          <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdateUser }}</b></div>
+          <div>{{ element.lastUpdated.when | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+          <div class="description"><span class="pe-1">by</span><b class="score-break-word">{{ element.lastUpdated.who.loginId }}</b></div>
         </div>
       </td>
     </ng-container>

@@ -158,8 +158,24 @@ export class ModuleAddDialogComponent implements OnInit {
   }
 
 
+  /**
+   * A directory cannot be copied into itself or into one of its sub directories: the copy would be copied again
+   * and again. It only applies when the copy source is the module set that is being edited, because the destination
+   * is a module of that module set.
+   */
+  isCopyBlocked(element: ModuleElement): boolean {
+    if (!element || this.selectedModuleSetId !== this.moduleSetId) {
+      return false;
+    }
+    return element.moduleId === this.parentModuleId || this.containsModule(element, this.parentModuleId);
+  }
+
+  private containsModule(element: ModuleElement, moduleId: number): boolean {
+    return (element.children || []).some(child => child.moduleId === moduleId || this.containsModule(child, moduleId));
+  }
+
   onCopy() {
-    if (!this.selected) {
+    if (!this.selected || this.isCopyBlocked(this.selected)) {
       return;
     }
     this.isUpdating = true;

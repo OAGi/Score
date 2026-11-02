@@ -1,5 +1,5 @@
 import {AgencyIdListDetailComponent} from './agency-id-list-detail.component';
-import {AgencyIdListDetails} from '../domain/agency-id-list';
+import {AgencyIdListDetails, AgencyIdListValueDetails} from '../domain/agency-id-list';
 
 describe('AgencyIdListDetailComponent', () => {
   it('should be defined', () => {
@@ -27,5 +27,26 @@ describe('AgencyIdListDetailComponent', () => {
     component.agencyIdList.state = 'QA';
     component.updateState('WIP');
     expect(open).toHaveBeenLastCalledWith('Namespace is required', '', {duration: 3000});
+  });
+
+  describe('isAvailable', () => {
+    const create = (agencyValueManifestId?: number) => {
+      const component = Object.create(AgencyIdListDetailComponent.prototype) as AgencyIdListDetailComponent;
+      component.agencyIdList = new AgencyIdListDetails();
+      component.agencyIdList.state = 'WIP';
+      component.agencyIdList.agencyIdListValue.agencyIdListValueManifestId = agencyValueManifestId as any;
+      return component;
+    };
+
+    it('lets a new value without a manifest id be removed when the list has no Agency ID List Value', () => {
+      const value = new AgencyIdListValueDetails();
+      expect(create().isAvailable(value)).toBe(true);
+    });
+
+    it('keeps the value that is the Agency ID List Value of the list from being removed', () => {
+      const value = new AgencyIdListValueDetails();
+      value.agencyIdListValueManifestId = 1;
+      expect(create(1).isAvailable(value)).toBe(false);
+    });
   });
 });

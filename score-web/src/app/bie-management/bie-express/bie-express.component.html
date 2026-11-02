@@ -115,25 +115,25 @@
 
       <ng-container scoreColumnDef="version">
         <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version">{{ element.version }}</div>
         </td>
       </ng-container>
 
       <ng-container scoreColumnDef="status">
         <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status">{{ element.status }}</div>
         </td>
       </ng-container>
 
       <ng-container scoreColumnDef="bizTerm">
         <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+          <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
         </td>
       </ng-container>
 
       <ng-container scoreColumnDef="remark">
         <td score-cell *scoreCellDef="let element">
-          <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+          <div class="score-line-clamp-2 score-break-word">{{ element.remark }}</div>
         </td>
       </ng-container>
 

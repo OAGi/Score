@@ -88,6 +88,29 @@ public class TransferBIEOwnershipDialogImpl extends SearchBarPageImpl implements
     }
 
     @Override
+    public java.util.List<String> getListedLoginIds() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        java.util.List<String> ids = readListedLoginIds();
+        for (int i = 0; i < 5; i++) {
+            waitFor(Duration.ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
+            java.util.List<String> again = readListedLoginIds();
+            if (again.equals(ids)) {
+                return ids;
+            }
+            ids = again;
+        }
+        return ids;
+    }
+
+    private java.util.List<String> readListedLoginIds() {
+        return retry(() -> getDriver().findElements(By.xpath(
+                        "//score-transfer-ownership-dialog//tbody/tr/td[contains(@class, \"mat-column-loginId\")]//span[1]")).stream()
+                .map(e -> e.getText().trim())
+                .collect(java.util.stream.Collectors.toList()));
+    }
+
+    @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//score-transfer-ownership-dialog//td//span[contains(text(), \"" + value + "\")]/ancestor::tr"));
     }

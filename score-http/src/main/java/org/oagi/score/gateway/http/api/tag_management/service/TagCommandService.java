@@ -57,6 +57,10 @@ public class TagCommandService {
 
         request.assertValid();
 
+        if (query(requester).getTagSummaryByName(request.name()) != null) {
+            throw new IllegalArgumentException("Tag name '" + request.name() + "' already exists.");
+        }
+
         return command(requester).create(
                 request.name(),
                 request.textColor(), request.backgroundColor(),
@@ -87,6 +91,11 @@ public class TagCommandService {
         var query = query(requester);
         if (!query.exists(request.tagId())) {
             throw new TagNotFoundException(request.tagId());
+        }
+
+        var sameName = query.getTagSummaryByName(request.name());
+        if (sameName != null && !sameName.tagId().equals(request.tagId())) {
+            throw new IllegalArgumentException("Tag name '" + request.name() + "' already exists.");
         }
 
         return command(requester).update(request.tagId(),

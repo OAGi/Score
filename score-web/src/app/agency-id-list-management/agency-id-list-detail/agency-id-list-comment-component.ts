@@ -56,12 +56,20 @@ export class AgencyIdListCommentControl {
     this.replyOpened = false;
   }
 
+  /** Whether the text has something besides white space; a blank comment, reply or edit is not posted. */
+  hasText(text?: string | null): boolean {
+    return !!text?.trim();
+  }
+
   addComment(comment?: Comment) {
     let targetComment = null;
     let message = this.commentMessage;
     if (comment) {
       targetComment = comment.prevCommentId ? comment.prevCommentId : comment.commentId;
       message = this.replyMessage;
+    }
+    if (!this.hasText(message)) {
+      return;
     }
 
     this.service.postComment(this.commentReference, message, targetComment).subscribe(_ => {
@@ -87,6 +95,9 @@ export class AgencyIdListCommentControl {
   }
 
   editComment(comment: Comment) {
+    if (!this.hasText(comment.textTemp)) {
+      return;
+    }
     this.service.editComment(comment.commentId, comment.textTemp).subscribe(_ => {
       comment.text = comment.textTemp;
       comment.isEditing = false;

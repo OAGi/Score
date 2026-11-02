@@ -12,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -126,6 +127,29 @@ public class CreateBIEForSelectBusinessContextsPageImpl extends BaseSearchBarPag
     @Override
     public WebElement getTableRecordByValue(String value) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//td/div/a/span[contains(text(), \"" + value + "\")]/ancestor::tr"));
+    }
+
+    @Override
+    public List<String> getListedBusinessContextNames() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        // The rows are replaced when the result arrives, so read until two reads in a row agree.
+        List<String> names = readListedBusinessContextNames();
+        for (int i = 0; i < 5; i++) {
+            waitFor(ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
+            List<String> again = readListedBusinessContextNames();
+            if (again.equals(names)) {
+                return names;
+            }
+            names = again;
+        }
+        return names;
+    }
+
+    private List<String> readListedBusinessContextNames() {
+        return retry(() -> getDriver().findElements(By.xpath("//tbody/tr/td/div/a/span")).stream()
+                .map(e -> e.getText().trim())
+                .collect(Collectors.toList()));
     }
 
     @Override

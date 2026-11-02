@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +37,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import static java.util.stream.Collectors.toSet;
@@ -178,7 +178,7 @@ public class BiePackageQueryController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.filename() + "\"")
                 .contentType(MediaType.parseMediaType(response.contentType()))
                 .contentLength(response.file().length())
-                .body(new InputStreamResource(new FileInputStream(response.file())));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.file())));
     }
 
     @RequestMapping(value = "/{biePackageId:\\d+}/bies/{topLevelAsbiepId:\\d+}", method = RequestMethod.HEAD)

@@ -112,6 +112,7 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
                         ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(topLevelAsbiepIdList),
                         ASBIE.IS_USED.eq((byte) 1)
                 ))
+                .orderBy(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
                 .fetch(queryBuilder.mapper());
     }
 

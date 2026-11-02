@@ -113,7 +113,7 @@ public class TC_25_2_CreateTopLevelBIEFromBIENode extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
@@ -135,7 +135,7 @@ public class TC_25_2_CreateTopLevelBIEFromBIENode extends BaseTest {
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
 
         asccpNode = editBIEPage.getNodeByPath("/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("13", getText(asbiePanel.getCardinalityMaxField()));

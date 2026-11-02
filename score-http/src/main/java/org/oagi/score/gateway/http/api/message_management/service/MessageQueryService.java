@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.message_management.service;
 
+import org.oagi.score.gateway.http.configuration.websocket.WebSocketAuthorizationInterceptor;
 import org.oagi.score.gateway.http.api.message_management.model.MessageDetailsRecord;
 import org.oagi.score.gateway.http.api.message_management.model.MessageId;
 import org.oagi.score.gateway.http.api.message_management.model.MessageListEntryRecord;
@@ -46,7 +47,7 @@ public class MessageQueryService {
 
         Map<String, String> properties = new HashMap();
         properties.put("messageId", messageId.toString());
-        simpMessagingTemplate.convertAndSend("/topic/message/" + requester.username(), properties);
+        simpMessagingTemplate.convertAndSend(WebSocketAuthorizationInterceptor.messageTopicOf(requester.username()), properties);
 
         return messageDetails;
     }

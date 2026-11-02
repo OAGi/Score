@@ -24,7 +24,7 @@ export class SettingsApplicationSettingsService {
   }
 
   validateEmail(q: string): Observable<any> {
-    return this.http.post('/api/account/email_validation', {
+    return this.http.put('/api/accounts/email-validation', {
       q
     });
   }

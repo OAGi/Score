@@ -33,3 +33,42 @@ describe('BusinessTermImportDialogComponent.errorMessage precedence (#1754)', ()
     expect(errorMessage(new Error('boom'), 'fallback')).toBe('fallback');
   });
 });
+
+/**
+ * A business term is identified by its (name + External Reference URI) pair, the same rule the server,
+ * Create and Edit apply. The preview flags only a repeated pair; terms that share just a URI are
+ * distinct. Borrowed from the prototype with a minimal stand-in `this` (no TestBed).
+ */
+describe('BusinessTermImportDialogComponent duplicate (name + URI) pair', () => {
+  const revalidateAll: () => void = (BusinessTermImportDialogComponent.prototype as any).revalidateAll;
+
+  function row(id: number, businessTerm: string, externalReferenceUri: string): any {
+    return {
+      id, rowIndex: id, businessTerm, externalReferenceUri,
+      externalReferenceId: '', definition: '', comment: '', errors: [], userDeselected: false,
+    };
+  }
+
+  function validate(rows: any[]): any[] {
+    const self: any = {rows, selection: {select: () => {}, deselect: () => {}}, validCount: 0, reviewCount: 0};
+    revalidateAll.call(self);
+    return rows;
+  }
+
+  it('flags a repeated (name + URI) pair', () => {
+    const rows = validate([row(1, 'Customer', 'http://x/1'), row(2, 'Customer', 'http://x/1')]);
+    expect(rows[0].errors).toEqual([]);
+    expect(rows[1].errors).toEqual(['Duplicate business term and external reference URI in this import.']);
+  });
+
+  it('allows different names under the same URI', () => {
+    const rows = validate([row(1, 'Customer', 'http://x/1'), row(2, 'Client', 'http://x/1')]);
+    expect(rows[0].errors).toEqual([]);
+    expect(rows[1].errors).toEqual([]);
+  });
+
+  it('allows the same name under different URIs', () => {
+    const rows = validate([row(1, 'Customer', 'http://x/1'), row(2, 'Customer', 'http://x/2')]);
+    expect(rows[1].errors).toEqual([]);
+  });
+});

@@ -15,6 +15,8 @@ public interface AccountCommandRepository {
 
     boolean delinkOAuth2User(UserId userId);
 
+    boolean deletePending(OAuth2UserId appOauth2UserId);
+
     boolean updateEmail(String email);
 
     void setEmailVerified(UserId userId, boolean emailVerified);

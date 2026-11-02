@@ -45,10 +45,11 @@ import org.oagi.score.gateway.http.api.plantuml.service.PlantUmlService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseQueryService;
 import org.oagi.score.gateway.http.common.model.*;
-import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -515,7 +516,7 @@ public class CcQueryController {
     }
 
     @GetMapping(value = "/export/standalone")
-    public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
+    public ResponseEntity<InputStreamResource> exportStandaloneSchema(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList,
             @RequestParam(name = "expressionOption", required = false) String expressionOption,
@@ -534,7 +535,7 @@ public class CcQueryController {
                                         "application/xml"
                 ))
                 .contentLength(response.file().length())
-                .body(new DeleteOnCloseFileSystemResource(response.file()));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.file())));
     }
 
     @GetMapping(value = "/asccp/{asccpManifestId:[\\d]+}/plantuml")

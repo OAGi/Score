@@ -406,3 +406,48 @@ describe('BieEditComponent.toggleTreeUsed un-check guard (#1755)', () => {
     expect(node.used).toBe(false);
   });
 });
+
+describe('BieEditComponent saves pending edits before a base BIE or reusable BIE operation', () => {
+  function ctxFor(): any {
+    const ctx: any = {
+      isUpdating: false,
+      canEdit: true,
+      canRemoveBaseBIE: () => true,
+      canCreateBIEFromThis: () => true,
+      toggleTreeUsed: vi.fn(),
+      confirmDialogService: {
+        newConfig: () => ({data: {}}),
+        open: () => ({afterClosed: () => of(true)})
+      },
+      service: {removeBaseBIE: vi.fn().mockReturnValue(of(null)), makeReusableBIE: vi.fn().mockReturnValue(of(null))},
+      reloadTree: vi.fn(),
+      snackBar: {openFromComponent: vi.fn()},
+      // updateDetails() returns without saving while isUpdating is set, so record the flag it is called with
+      updateDetails: vi.fn((_include: any, callbackFn: () => void) => {
+        ctx.isUpdatingOnUpdateDetails = ctx.isUpdating;
+        callbackFn();
+      })
+    };
+    return ctx;
+  }
+
+  const node: any = {used: true, parents: [], asbieHashPath: 'p', topLevelAsbiepId: 1, asccpNode: {manifestId: 2}};
+
+  it('Remove Base BIE calls updateDetails with the updating flag cleared', () => {
+    const ctx = ctxFor();
+
+    BieEditComponent.prototype.removeBaseBIE.call(ctx, node);
+
+    expect(ctx.isUpdatingOnUpdateDetails).toBe(false);
+    expect(ctx.service.removeBaseBIE).toHaveBeenCalled();
+  });
+
+  it('Make BIE reusable calls updateDetails with the updating flag cleared', () => {
+    const ctx = ctxFor();
+
+    BieEditComponent.prototype.createBIEfromThis.call(ctx, node);
+
+    expect(ctx.isUpdatingOnUpdateDetails).toBe(false);
+    expect(ctx.service.makeReusableBIE).toHaveBeenCalled();
+  });
+});

@@ -44,3 +44,29 @@ describe('ContextSchemeCreateComponent.isDuplicateContextSchemeValue (#1744 clas
     expect(ctx.isDuplicateContextSchemeValue(value(undefined, 'CA'))).toBe(false);
   });
 });
+
+/**
+ * Whitespace-only Scheme ID, Agency ID and Version must keep the Create button disabled.
+ */
+describe('ContextSchemeCreateComponent.isDisabled', () => {
+  function disabledFor(overrides: any): boolean {
+    const ctx: any = {
+      disabled: false,
+      contextSchemeCreateRequest: {
+        contextCategoryId: 1, schemeName: 'Name', schemeId: 'GEO', schemeAgencyId: 'OAGi', schemeVersionId: '1.0',
+        ...overrides
+      }
+    };
+    return ContextSchemeCreateComponent.prototype.isDisabled.call(ctx);
+  }
+
+  it('is enabled when every required field has text', () => {
+    expect(disabledFor({})).toBe(false);
+  });
+
+  it('is disabled when Scheme ID, Agency ID or Version is whitespace-only', () => {
+    expect(disabledFor({schemeId: '   '})).toBe(true);
+    expect(disabledFor({schemeAgencyId: '   '})).toBe(true);
+    expect(disabledFor({schemeVersionId: '   '})).toBe(true);
+  });
+});

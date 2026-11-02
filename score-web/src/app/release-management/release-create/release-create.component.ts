@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -28,6 +29,7 @@ export class ReleaseCreateComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
   private auth = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
 
   title = 'Releases Detail';
@@ -52,6 +54,14 @@ export class ReleaseCreateComponent implements OnInit {
     if (!userToken.roles.includes('developer')) {
       this.router.navigateByUrl('/');
     }
+
+    this.namespaceListFilterCtrl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.namespaceList) {
+          this.filterNamespaceList();
+        }
+      });
 
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.initLibraries(libraries);
@@ -96,16 +106,15 @@ export class ReleaseCreateComponent implements OnInit {
     this.namespaceService.getNamespaceSummaries(this.library.libraryId).subscribe(namespaceList => {
       this.namespaceList = namespaceList.filter(e => e.standard);
       this.filteredNamespaceList.next(this.namespaceList.slice());
-      this.namespaceListFilterCtrl.valueChanges
-        .subscribe(() => {
-          this.filterNamespaceList();
-        });
     });
   }
 
   onLibraryChange(library: LibrarySummary) {
     this.library = library;
     saveLibrary(this.auth.getUserToken(), this.library.libraryId);
+    // The namespace belongs to the previous library, so it has to be chosen again.
+    this.selectedNamespace = undefined;
+    this.releaseDetail.namespaceId = undefined;
     this.loadNamespaces();
   }
 
@@ -131,7 +140,7 @@ export class ReleaseCreateComponent implements OnInit {
   }
 
   isDisabled() {
-    if (this.releaseDetail.releaseNum === undefined || this.releaseDetail.releaseNum === '') {
+    if (!this.releaseDetail.releaseNum?.trim()) {
       return true;
     }
     if (this.selectedNamespace === undefined || this.selectedNamespace === null) {

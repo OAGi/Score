@@ -419,6 +419,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     return base64Encode(params.toString());
   }
 
+  /** `q` for the Core Component list on the Working release, the release the Home page counts the CCs on. */
+  ccQ(set: any): string {
+    const releaseParams = this.workingRelease ?
+      [{key: 'releaseId', value: this.workingRelease.releaseId}] :
+      [];
+    return this.q([...set, ...releaseParams]);
+  }
+
   keys(obj) {
     return (obj) ? Object.keys(obj) : [];
   }

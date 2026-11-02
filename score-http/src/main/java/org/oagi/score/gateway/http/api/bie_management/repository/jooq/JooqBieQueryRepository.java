@@ -272,7 +272,8 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
                 }
             }
 
-            if (filterCriteria.tenantEnabled() != null && filterCriteria.tenantEnabled()) {
+            // An Admin sees the BIEs of every tenant.
+            if (filterCriteria.tenantEnabled() != null && filterCriteria.tenantEnabled() && !requester().isAdministrator()) {
                 Collection<TenantId> userTenantIdList = filterCriteria.userTenantIdList();
                 if (userTenantIdList == null) {
                     userTenantIdList = Collections.emptyList();
@@ -742,6 +743,9 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
     public List<SummaryBie> getSummaryBieList(
             LibraryId libraryId, ReleaseId releaseId, boolean tenantEnabled, List<TenantId> userTenantIds) {
 
+        // An Admin sees the BIEs of every tenant.
+        boolean tenantFiltered = tenantEnabled && !requester().isAdministrator();
+
         SelectOnConditionStep step = dslContext().selectDistinct(
                         TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                         TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP,
@@ -763,7 +767,7 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
                 .on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID));
 
-        if (tenantEnabled) {
+        if (tenantFiltered) {
             step.join(BIZ_CTX_ASSIGNMENT)
                     .on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID)).join(BIZ_CTX)
                     .on(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID.eq(BIZ_CTX.BIZ_CTX_ID)).leftJoin(TENANT_BUSINESS_CTX)
@@ -779,7 +783,7 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
             conditions.add(TOP_LEVEL_ASBIEP.RELEASE_ID.isNotNull());
         }
 
-        if (tenantEnabled) {
+        if (tenantFiltered) {
             conditions.add(BIZ_CTX.BIZ_CTX_ID.in(dslContext().select(TENANT_BUSINESS_CTX.BIZ_CTX_ID)
                     .from(TENANT_BUSINESS_CTX)
                     .where(TENANT_BUSINESS_CTX.TENANT_ID.in(valueOf(userTenantIds)))));

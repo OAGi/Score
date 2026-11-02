@@ -3,6 +3,8 @@ package org.oagi.score.gateway.http.api.account_management.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.oagi.score.gateway.http.api.account_management.repository.criteria.PendingListFilterCriteria;
 import org.oagi.score.gateway.http.api.account_management.model.AppOauth2User;
+import org.oagi.score.gateway.http.api.account_management.model.OAuth2UserId;
+import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.service.PendingListService;
 import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
@@ -110,8 +112,9 @@ public class PendingListController {
 
     @RequestMapping(value = "/pending/{appOauth2UserId:[\\d]+}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppOauth2User getPending(@PathVariable("appOauth2UserId") long appOauth2UserId) {
-        AppOauth2User pending = service.getPending(appOauth2UserId);
+    public AppOauth2User getPending(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                    @PathVariable("appOauth2UserId") OAuth2UserId appOauth2UserId) {
+        AppOauth2User pending = service.getPending(sessionService.asScoreUser(user), appOauth2UserId);
         if (pending == null) {
             throw new NotFoundException();
         }
@@ -120,18 +123,19 @@ public class PendingListController {
 
     @RequestMapping(value = "/pending/{appOauth2UserId:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity rejectPending(@PathVariable("appOauth2UserId") long appOauth2UserId,
-                                        @RequestBody AppOauth2User request) {
-        service.deletePending(request);
+    public ResponseEntity rejectPending(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                        @PathVariable("appOauth2UserId") OAuth2UserId appOauth2UserId) {
+        service.deletePending(sessionService.asScoreUser(user), appOauth2UserId);
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/pending/link/{appOauth2UserId:[\\d]+}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity linkToUser(@PathVariable("appOauth2UserId") long appOauth2UserId,
+    public ResponseEntity linkToUser(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                     @PathVariable("appOauth2UserId") OAuth2UserId appOauth2UserId,
                                      @RequestBody Map<String, Object> body) {
-        long appUserId = ((Integer) body.get("appUserId"));
-        service.linkPendingToAppUser(appOauth2UserId, appUserId);
+        UserId appUserId = UserId.from(String.valueOf(body.get("appUserId")));
+        service.linkPendingToAppUser(sessionService.asScoreUser(user), appOauth2UserId, appUserId);
         return ResponseEntity.noContent().build();
     }
 }

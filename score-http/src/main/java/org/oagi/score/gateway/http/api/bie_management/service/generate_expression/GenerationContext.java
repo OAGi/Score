@@ -304,7 +304,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
         Set<ReleaseId> releaseIdSet = topLevelAsbieps.stream().map(e -> e.release().releaseId()).collect(Collectors.toSet());
 
-        Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet = new HashSet();
+        Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet = new LinkedHashSet<>();
         topLevelAsbiepSet.addAll(topLevelAsbieps);
         refTopLevelAsbiepSet = findRefTopLevelAsbieps(topLevelAsbiepSet);
         topLevelAsbiepSet.addAll(refTopLevelAsbiepSet);
@@ -318,7 +318,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
     private Set<TopLevelAsbiepSummaryRecord> findRefTopLevelAsbieps(Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet) {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
 
-        Set<TopLevelAsbiepSummaryRecord> refTopLevelAsbiepSet = new HashSet();
+        Set<TopLevelAsbiepSummaryRecord> refTopLevelAsbiepSet = new LinkedHashSet<>();
         refTopLevelAsbiepSet.addAll(topLevelAsbiepQuery.getRefTopLevelAsbiepSummaryList(
                 topLevelAsbiepSet.stream().map(e -> e.topLevelAsbiepId()).collect(Collectors.toSet())));
 

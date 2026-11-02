@@ -111,10 +111,10 @@ export class ContextSchemeCreateComponent implements OnInit {
   isDisabled() {
     return (this.disabled) ||
       (this.contextSchemeCreateRequest.contextCategoryId === undefined || this.contextSchemeCreateRequest.contextCategoryId <= 0) ||
-      (this.contextSchemeCreateRequest.schemeName === undefined || this.contextSchemeCreateRequest.schemeName === '') ||
-      (this.contextSchemeCreateRequest.schemeId === undefined || this.contextSchemeCreateRequest.schemeId === '') ||
-      (this.contextSchemeCreateRequest.schemeAgencyId === undefined || this.contextSchemeCreateRequest.schemeAgencyId === '') ||
-      (this.contextSchemeCreateRequest.schemeVersionId === undefined || this.contextSchemeCreateRequest.schemeVersionId === '');
+      (this.contextSchemeCreateRequest.schemeName === undefined || this.contextSchemeCreateRequest.schemeName.trim() === '') ||
+      (this.contextSchemeCreateRequest.schemeId === undefined || this.contextSchemeCreateRequest.schemeId.trim() === '') ||
+      (this.contextSchemeCreateRequest.schemeAgencyId === undefined || this.contextSchemeCreateRequest.schemeAgencyId.trim() === '') ||
+      (this.contextSchemeCreateRequest.schemeVersionId === undefined || this.contextSchemeCreateRequest.schemeVersionId.trim() === '');
   }
 
   openDialog(contextSchemeValue?: ContextSchemeValue) {

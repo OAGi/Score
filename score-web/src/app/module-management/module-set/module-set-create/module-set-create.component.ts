@@ -65,7 +65,7 @@ export class ModuleSetCreateComponent implements OnInit {
       }
     }
 
-    return this.moduleSet.name && this.moduleSet.name.length > 0;
+    return !!this.moduleSet.name && this.moduleSet.name.trim().length > 0;
   }
 
   ngOnInit(): void {
@@ -123,6 +123,7 @@ export class ModuleSetCreateComponent implements OnInit {
 
   initReleases(releases: ReleaseSummary[]) {
     this.releaseList = releases;
+    this.moduleSet.targetReleaseId = undefined;
     this.moduleSet.targetModuleSetReleaseId = undefined;
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releaseList, (e) => e.releaseNum);
   }

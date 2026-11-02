@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -9,8 +9,8 @@ import {SemanticGroup, Semantics} from '../../domain/core-component-node';
 import {CcListComponent} from '../cc-list.component';
 import {TagService} from '../../../tag-management/domain/tag.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
-import {createTableColumns, defineTable} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE} from '../../domain/cc-dialog.table';
+import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
+import {CC_DIALOG_FILTERS as F, CC_WITHOUT_TYPE_TABLE, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 
 const CREATE_ASCCP_TABLE = defineTable({
   ...CC_WITHOUT_TYPE_TABLE,
@@ -31,16 +31,20 @@ export class CreateAsccpDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
+  readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   readonly columns = createTableColumns(CREATE_ASCCP_TABLE);
   selection = new SelectionModel<CcListEntry>(false, []);
   action: string;
 
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
-  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({tags: []});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states, tags: []});
 
-  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(params);
+  readonly load = (params: HttpParams) => this.ccListService.getCcListPage(withPickableStates(params, this.pickable));
 
   ngOnInit() {
     this.action = this.data.action;
@@ -56,7 +60,7 @@ export class CreateAsccpDialogComponent implements OnInit {
     this.extraParams.set(params);
 
     this.tagService.getTags().subscribe(tags => {
-      this.filterOptions.set({tags: tags.map(e => ({value: e.name, label: e.name}))});
+      this.filterOptions.set({states: this.states, tags: tags.map(e => ({value: e.name, label: e.name}))});
       this.ready.set(true);
     });
   }

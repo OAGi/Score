@@ -71,8 +71,8 @@ export class CodeListValueDialogComponent implements OnInit {
   }
 
   isDisabled() {
-    return (this.codeListValue.value === undefined || this.codeListValue.value === '') ||
-      (this.codeListValue.meaning === undefined || this.codeListValue.meaning === '') ||
+    return (this.codeListValue.value === undefined || this.codeListValue.value === null || this.codeListValue.value.trim() === '') ||
+      (this.codeListValue.meaning === undefined || this.codeListValue.meaning === null || this.codeListValue.meaning.trim() === '') ||
       !this.isDirty();
   }
 

@@ -16,6 +16,7 @@ import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-
 import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseSummary} from '../../release-management/domain/release';
 import {ReleaseChoice} from '../../release-management/domain/release-choice';
@@ -127,10 +128,20 @@ export class CodeListListComponent {
     this.view().onSearch();
   }
 
+  /** The namespaces of the library go to the filter; a namespace chosen for another library does not stay in the query. */
+  private applyNamespaces(namespaces: NamespaceSummary[]) {
+    this.view().setFilter('namespaces', []);
+    this.filterOptions.update(options => ({...options, namespaces: namespaces.map(e => ({value: '' + e.namespaceId, label: e.uri}))}));
+  }
+
   onLibraryChange(library: LibrarySummary) {
     this.libraryChoice.choose(library);
-    this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']).subscribe(releases => {
+    forkJoin([
+      this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']),
+      this.namespaceService.getNamespaceSummaries(library.libraryId)
+    ]).subscribe(([releases, namespaces]) => {
       this.releaseChoice.init(releases);
+      this.applyNamespaces(namespaces);
       this.applyChoices();
       this.view().onSearch();
     });

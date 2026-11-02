@@ -1,4 +1,4 @@
-import { Injectable, OnInit, inject } from '@angular/core';
+import { Injectable, Injector, OnInit, inject } from '@angular/core';
 import {
   HttpClient,
   HttpContextToken,
@@ -28,12 +28,14 @@ import {
 } from './domain/auth';
 import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {RxStompService} from '../common/score-rx-stomp';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private injector = inject(Injector);
   private logoutInProgress = false;
 
 
@@ -85,6 +87,8 @@ export class AuthService implements OnInit, CanActivate {
         if (!res.enabled) {
           return this.router.parseUrl('/disabled');
         }
+        // The WebSocket handshake needs the session, so it is opened only for a signed-in user.
+        this.injector.get(RxStompService).activate();
         return true;
       } else {
         this.logout(getResolvedUrl(route));
@@ -238,8 +242,9 @@ export class AuthService implements OnInit, CanActivate {
   logout(url?) {
     this.logoutInProgress = true;
     localStorage.removeItem(this.USER_INFO_KEY);
+    this.injector.get(RxStompService).deactivate();
 
-    this.http.get('/api/' + environment.logoutPath)
+    this.http.post('/api/' + environment.logoutPath, null)
       .subscribe(resp => {
         this.redirectToLogin(url);
       }, err => {

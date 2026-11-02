@@ -337,9 +337,9 @@ export class AsccpFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcAsccpNodeInfo).asccp.propertyTerm;
+      return (this.detail as CcAsccpNodeInfo).asccp.propertyTerm ?? '';
     }
-    return this.asccpNode.propertyTerm;
+    return this.asccpNode.propertyTerm ?? '';
   }
 
   set name(val: string) {
@@ -478,9 +478,9 @@ export class BccpFlatNode extends CcFlatNodeImpl {
 
   get name(): string {
     if (this.detail) {
-      return (this.detail as CcBccpNodeInfo).bccp.propertyTerm;
+      return (this.detail as CcBccpNodeInfo).bccp.propertyTerm ?? '';
     }
-    return this.bccpNode.propertyTerm;
+    return this.bccpNode.propertyTerm ?? '';
   }
 
   set name(val: string) {

@@ -1,14 +1,24 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.avro.BieAvroGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSONGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.Json202012Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.JsonDraft04Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.odf.BieODFSpreadsheetGenerationExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
@@ -147,7 +157,9 @@ public class BieGenerateService {
                 }
 
                 try {
-                    return Zip.compression(files, ScoreGuidUtils.randomGuid());
+                    File zip = Zip.compression(files, ScoreGuidUtils.randomGuid());
+                    files.forEach(TempFiles::deleteQuietly);
+                    return zip;
                 } catch (IOException e) {
                     throw new BieGenerateFailureException("Compression failure.", e);
                 }
@@ -245,7 +257,9 @@ public class BieGenerateService {
         files.addAll(commonFiles);
 
         try {
-            return Zip.compression(files, filename);
+            File zip = Zip.compression(files, filename);
+            files.forEach(TempFiles::deleteQuietly);
+            return zip;
         } catch (IOException e) {
             throw new BieGenerateFailureException("Compression failure.", e);
         }
@@ -314,6 +328,8 @@ public class BieGenerateService {
     public EachSchemaResult generateSchemaForEach(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) throws BieGenerateFailureException {
+        // The BIE Package export calls this method directly, so resolve the configured filename expressions here too.
+        applyConfiguredFilenameExpressions(requester, option);
         Map<TopLevelAsbiepId, File> targetFiles = new HashMap();
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbieps, option);
@@ -829,11 +845,11 @@ public class BieGenerateService {
                     case "DRAFT04":
                     case "DRAFT-05":
                     case "DRAFT05":
-                        generateExpression = applicationContext.getBean(BieJSONDraft04GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, JsonDraft04Dialect.INSTANCE);
                         break;
                     case "2020-12":
                     case "202012":
-                        generateExpression = applicationContext.getBean(BieJSON202012GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, Json202012Dialect.INSTANCE);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown JSON expression version: " + expressionVersion);
@@ -842,13 +858,13 @@ public class BieGenerateService {
             case "OPENAPI3":
                 String openApiVersion = option.getExpressionVersion();
                 if (!StringUtils.hasLength(openApiVersion) || isOpenApi31Version(openApiVersion)) {
-                    generateExpression = applicationContext.getBean(BieOpenAPI31GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi31Dialect.INSTANCE);
                 } else {
-                    generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 }
                 break;
             case "OPENAPI30":
-                generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 break;
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);

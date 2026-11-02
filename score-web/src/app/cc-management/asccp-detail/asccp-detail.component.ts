@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
@@ -41,7 +41,7 @@ import {
 import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-asccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
@@ -63,6 +63,7 @@ import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
@@ -71,7 +72,7 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./asccp-detail.component.css']
 })
-export class AsccpDetailComponent implements OnInit, CcTreeValidationHost {
+export class AsccpDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -159,6 +160,13 @@ export class AsccpDetailComponent implements OnInit, CcTreeValidationHost {
     this.router.navigateByUrl('/core_component');
   }
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -205,7 +213,8 @@ export class AsccpDetailComponent implements OnInit, CcTreeValidationHost {
       this.isGenerating = false;
 
       // subscribe an event
-      this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -700,6 +709,7 @@ export class AsccpDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         action: 'update',
         state: node.state,
         // @ts-ignore
@@ -948,7 +958,10 @@ export class AsccpDetailComponent implements OnInit, CcTreeValidationHost {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, ViewChild, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnDestroy, OnInit, ViewChild, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
@@ -27,7 +27,7 @@ import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../c
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
-import {forkJoin, Observable, of, ReplaySubject} from 'rxjs';
+import {forkJoin, Observable, of, ReplaySubject, Subscription} from 'rxjs';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {WorkingRelease} from '../../release-management/domain/release';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -47,7 +47,7 @@ import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./agency-id-list-detail.component.css']
 })
-export class AgencyIdListDetailComponent implements OnInit {
+export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
   private service = inject(AgencyIdListService);
   protected githubService = inject(GithubIntegrationService);
   private namespaceService = inject(NamespaceService);
@@ -113,6 +113,13 @@ export class AgencyIdListDetailComponent implements OnInit {
 
   commentControl: AgencyIdListCommentControl;
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new AgencyIdListCommentControl(this.sidenav, this.service);
     this.isUpdating = true;
@@ -123,6 +130,7 @@ export class AgencyIdListDetailComponent implements OnInit {
     this.route.paramMap.pipe(
         switchMap((params: ParamMap) => {
           this.manifestId = Number(params.get('manifestId'));
+          this.subscribeEvent();
           return forkJoin([
             this.service.getAgencyIdListDetails(this.manifestId)
           ]);
@@ -151,7 +159,6 @@ export class AgencyIdListDetailComponent implements OnInit {
       return;
     });
 
-    this.subscribeEvent();
   }
 
   receiveCommentEvent(evt) {
@@ -277,11 +284,11 @@ export class AgencyIdListDetailComponent implements OnInit {
       }
 
       const data = this.values;
-      if (result.isDeveloperDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.isDeveloperDefault = false);
+      if (result.developerDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
       }
-      if (result.isUserDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.isUserDefault = false);
+      if (result.userDefault) {
+        data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
       }
 
       if (isAddAction) {
@@ -330,7 +337,8 @@ export class AgencyIdListDetailComponent implements OnInit {
     if (agencyIdListValue.used) {
       return false;
     }
-    if (this.agencyIdList.agencyIdListValue?.agencyIdListValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
+    const agencyValueManifestId = this.agencyIdList.agencyIdListValue?.agencyIdListValueManifestId;
+    if (agencyValueManifestId && agencyValueManifestId === agencyIdListValue.agencyIdListValueManifestId) {
       return false;
     }
     return this.agencyIdList.state === 'WIP';
@@ -821,7 +829,8 @@ export class AgencyIdListDetailComponent implements OnInit {
   }
 
   subscribeEvent() {
-    this.stompService.watch('/topic/agency_id_list/' + this.manifestId).subscribe((message: Message) => {
+    this.eventSubscription?.unsubscribe();
+    this.eventSubscription = this.stompService.watch('/topic/agency_id_list/' + this.manifestId).subscribe((message: Message) => {
       const data = JSON.parse(message.body);
       if (data.properties.actor !== this.currentUser) {
         let noti;

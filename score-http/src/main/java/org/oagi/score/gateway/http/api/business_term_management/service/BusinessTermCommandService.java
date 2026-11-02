@@ -93,9 +93,9 @@ public class BusinessTermCommandService {
      *       record being edited.</li>
      * </ul>
      *
-     * <p>The batch import path upserts by external reference URI through the repository directly and
-     * is intentionally NOT subject to this gate: keying the upsert on the URI already keeps at most
-     * one row per URI, so it cannot introduce a (name + external reference URI) duplicate.</p>
+     * <p>The batch import path upserts by the same (name + external reference URI) pair through the
+     * repository directly and is intentionally NOT subject to this gate: an identical pair updates the
+     * existing row instead of inserting, so the import cannot introduce a duplicate pair either.</p>
      *
      * <p><b>Accepted limitation (by design, no DB change — #1754):</b> with no unique constraint on
      * {@code business_term}, this check is best-effort — two truly concurrent creates of the same
@@ -127,13 +127,15 @@ public class BusinessTermCommandService {
                 request.businessTerm(), request.externalReferenceId(), request.externalReferenceUri());
         assertCatalogUniqueOnCreate(requester, request.businessTerm(), request.externalReferenceUri());
 
+        // A plain insert, not the import's URI-keyed upsert: the (name + URI) pair was just checked above,
+        // so a different name under an already-used URI is a new term and must not rename the existing one.
         var command = repositoryFactory.businessTermCommandRepository(requester);
-        return command.upsertByExternalReferenceUri(
+        return command.insert(
                 request.businessTerm(),
                 request.externalReferenceId(),
                 request.externalReferenceUri(),
                 request.definition(),
-                request.comment()).businessTermId();
+                request.comment());
     }
 
     /**
@@ -154,9 +156,10 @@ public class BusinessTermCommandService {
      * does not roll back the rows that succeeded; the per-row outcome (created / updated / failed)
      * is returned so the dialog can show a summary and let the user fix and retry only the failures.
      *
-     * <p>The access gate is applied once up front, and an intra-batch duplicate external-reference
-     * URI is rejected (mirroring the dialog's preview), so two rows targeting the same record cannot
-     * silently overwrite each other within a single import. This method runs WITHOUT an ambient
+     * <p>The access gate is applied once up front, and an intra-batch duplicate (business term +
+     * external reference URI) pair is rejected (mirroring the dialog's preview), so two rows targeting
+     * the same record cannot silently overwrite each other within a single import. Rows that share only
+     * the URI are distinct terms and are both imported. This method runs WITHOUT an ambient
      * transaction so the per-row {@code REQUIRES_NEW} boundaries are the only commit points.</p>
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -170,7 +173,7 @@ public class BusinessTermCommandService {
                     "The import exceeds the maximum of " + MAX_IMPORT_ROWS + " rows.");
         }
 
-        Set<String> urisSeenInThisImport = new HashSet<>();
+        Set<List<String>> pairsSeenInThisImport = new HashSet<>();
         List<BusinessTermBatchImportRowResult> results = new ArrayList<>();
         int createdCount = 0;
         int updatedCount = 0;
@@ -178,9 +181,10 @@ public class BusinessTermCommandService {
 
         for (BusinessTermImportRow row : rows) {
             String uri = row.externalReferenceUri();
-            if (hasLength(uri) && !urisSeenInThisImport.add(uri)) {
+            if (hasLength(row.businessTerm()) && hasLength(uri)
+                    && !pairsSeenInThisImport.add(List.of(row.businessTerm(), uri))) {
                 failedCount++;
-                results.add(failed(row, "Duplicate external reference URI in this import."));
+                results.add(failed(row, "Duplicate business term and external reference URI in this import."));
                 continue;
             }
             try {

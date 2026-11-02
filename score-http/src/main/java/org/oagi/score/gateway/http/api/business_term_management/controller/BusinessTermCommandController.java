@@ -61,7 +61,7 @@ public class BusinessTermCommandController {
 
     /**
      * Imports the rows the user selected (and possibly inline-edited) in the import dialog. This is a
-     * best-effort upsert keyed by external reference URI: good rows are committed and bad rows are
+     * best-effort upsert keyed by (business term + external reference URI): good rows are committed and bad rows are
      * reported per row, so the response always carries a created/updated/failed breakdown rather than
      * aborting the whole import on the first bad row.
      */

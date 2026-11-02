@@ -151,6 +151,48 @@ export function buildResourcePath(
   return version ? `/${bc}/${version}/${leaf}` : `/${bc}/${leaf}`;
 }
 
+// Resource Name (Path) validity. The path becomes a key of `paths` in the generated
+// OpenAPI document, which requires a leading '/', and forbids a query string or fragment. Whitespace
+// is rejected and the `{}` path-parameter braces must be balanced and non-empty. Returns an error
+// message, or '' when the path is valid (an empty path is left to the "required" check).
+export function oasResourcePathError(path: string): string {
+  const value = path || '';
+  if (!value) {
+    return '';
+  }
+  if (!value.startsWith('/')) {
+    return 'Path must start with "/".';
+  }
+  if (/\s/.test(value)) {
+    return 'Path must not contain whitespace.';
+  }
+  if (value.includes('?') || value.includes('#')) {
+    return 'Path must not contain a query string ("?") or fragment ("#").';
+  }
+  let open = false;
+  let paramLength = 0;
+  for (const ch of value) {
+    if (ch === '{') {
+      if (open) {
+        return 'Path has unbalanced "{" and "}".';
+      }
+      open = true;
+      paramLength = 0;
+    } else if (ch === '}') {
+      if (!open) {
+        return 'Path has unbalanced "{" and "}".';
+      }
+      if (paramLength === 0) {
+        return 'Path parameter "{}" must not be empty.';
+      }
+      open = false;
+    } else if (open) {
+      paramLength++;
+    }
+  }
+  return open ? 'Path has unbalanced "{" and "}".' : '';
+}
+
 // Re-apply the array '-list' marker to an existing resource path by rebuilding ONLY its last segment
 // from the property term. Preserves the /<bc>/<version> prefix (so a customised prefix survives) while
 // guaranteeing the leaf marker exactly tracks the array indicator — even when the property term itself

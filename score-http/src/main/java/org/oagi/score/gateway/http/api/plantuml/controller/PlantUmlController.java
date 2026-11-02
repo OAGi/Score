@@ -4,12 +4,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.oagi.score.gateway.http.api.plantuml.data.GeneratePlantUmlDiagramRequest;
 import org.oagi.score.gateway.http.api.plantuml.service.PlantUmlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -27,6 +29,11 @@ public class PlantUmlController {
         GeneratePlantUmlDiagramRequest request = new GeneratePlantUmlDiagramRequest()
                 .withEncodedText(encodedText)
                 .withFormat(format);
+        try {
+            plantUmlService.toFileFormat(format);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
         response.setContentType(request.getContentType());
         plantUmlService.generatePlantUmlDiagram(request, response.getOutputStream());
     }

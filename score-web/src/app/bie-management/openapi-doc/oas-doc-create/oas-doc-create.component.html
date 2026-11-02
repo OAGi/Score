@@ -21,7 +21,7 @@
       <mat-label>Terms of Service</mat-label>
       <input matInput placeholder="A URL to the Terms of Service for the API"
         [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="65535"/>
-      @if (termServiceUrl.hasError('pattern')) {
+      @if (termServiceUrl.hasError('url')) {
         <mat-error>
           The terms of service must be a valid URL
         </mat-error>
@@ -36,7 +36,7 @@
       <mat-label>Contact URL</mat-label>
       <input matInput placeholder="The URL pointing to the contact information"
         [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="65535"/>
-      @if (contactUrl.hasError('pattern')) {
+      @if (contactUrl.hasError('url')) {
         <mat-error>
           The contact URL must be be a valid URL
         </mat-error>
@@ -46,7 +46,7 @@
       <mat-label>Contact Email</mat-label>
       <input type="email" matInput placeholder="The email address of the contact person/organization"
         [(ngModel)]="oasDoc.contactEmail"  [formControl]="contactEmail" maxlength="65535"/>
-      @if (contactEmail.hasError('pattern')) {
+      @if (contactEmail.hasError('email')) {
         <mat-error>
           The contact email must be in the form of an email address
         </mat-error>
@@ -61,7 +61,7 @@
       <mat-label>License URL</mat-label>
       <input matInput placeholder="A URL to the license used for the API (e.g., http://www.apache.org/licenses/LICENSE-2.0)"
         [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="65535"/>
-      @if (licenseUrl.hasError('pattern')) {
+      @if (licenseUrl.hasError('url')) {
         <mat-error>
           The license URL must be be a valid URL
         </mat-error>
@@ -73,7 +73,7 @@
     </mat-form-field>
   </score-detail-card>
   <ng-container ngProjectAs="[detailActions]">
-    <button mat-raised-button color="primary" (click)="createWithoutCheck()"
+    <button mat-raised-button color="primary" (click)="create()"
       [disabled]="isDisabled(oasDoc)">
       Create
     </button>

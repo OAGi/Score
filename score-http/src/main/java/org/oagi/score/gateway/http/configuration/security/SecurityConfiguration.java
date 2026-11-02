@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -38,6 +37,8 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.jwt.JwtTypeValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.ObjectPostProcessor;
@@ -47,13 +48,13 @@ import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyConfig
 import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationFilter;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.util.StringUtils;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -130,21 +131,12 @@ public class SecurityConfiguration {
         return new HttpSessionCsrfTokenRepository();
     }
 
+    @Value("${score.cors.allowed-origins:}")
+    private List<String> corsAllowedOrigins;
+
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.applyPermitDefaultValues();
-        corsConfiguration.setAllowedMethods(
-                Arrays.asList(
-                        HttpMethod.GET.name(), HttpMethod.HEAD.name(),
-                        HttpMethod.POST.name(), HttpMethod.PUT.name(),
-                        HttpMethod.PATCH.name(), HttpMethod.DELETE.name())
-        );
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("*"));
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
+    public ScoreCorsConfigurationSource corsConfigurationSource() {
+        return new ScoreCorsConfigurationSource(corsAllowedOrigins);
     }
 
     @Bean
@@ -177,13 +169,19 @@ public class SecurityConfiguration {
     )
             throws Exception {
         if (!applicationConfigurationService.isTenantEnabled(sessionService.getScoreSystemUser()) && StringUtils.hasText(jwkSetUri)) {
-            JOSEObjectTypeVerifier typeVerifier = StringUtils.hasLength(allowedTypes) ?
+            List<String> tokenTypes = StringUtils.hasLength(allowedTypes) ?
+                    Arrays.stream(allowedTypes.split(",")).map(String::trim).toList() :
+                    List.of();
+            JOSEObjectTypeVerifier typeVerifier = tokenTypes.isEmpty() ?
+                    DefaultJOSEObjectTypeVerifier.JWT :
                     new DefaultJOSEObjectTypeVerifier<>(
-                            Arrays.stream(allowedTypes.split(","))
-                                    .map(e -> new JOSEObjectType(e.trim()))
-                                    .collect(Collectors.toSet())
-                    ) :
-                    DefaultJOSEObjectTypeVerifier.JWT;
+                            tokenTypes.stream().map(JOSEObjectType::new).collect(Collectors.toSet()));
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                    .jwtProcessorCustomizer(processor -> processor.setJWSTypeVerifier(typeVerifier)).build();
+            if (!tokenTypes.isEmpty()) {
+                // The default validators only accept the type JWT, which would reject the configured types again.
+                jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(new JwtTypeValidator(tokenTypes)));
+            }
 
             http
                     .securityMatchers((matchers) -> matchers
@@ -199,11 +197,7 @@ public class SecurityConfiguration {
                     .cors(cors -> cors.disable())
                     .csrf(csrf -> csrf.disable())
                     .oauth2ResourceServer(oauth2 ->
-                            oauth2.jwt(jwt -> jwt.decoder(
-                                    NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
-                                            .jwtProcessorCustomizer(processor ->
-                                                    processor.setJWSTypeVerifier(typeVerifier)).build()
-                            )));
+                            oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
         } else {
             http
                     .securityMatchers((matchers) -> matchers
@@ -233,7 +227,7 @@ public class SecurityConfiguration {
                     // permitAll here so they still pass through the filter chain (#1750).
                     List<String> permitAllPaths = new ArrayList<>(
                             Arrays.asList("/favicon.ico", "/resources/**", "/error",
-                                    "/health", "/info/**", "/ws/**", "/oauth2/**", "/ai/**",
+                                    "/health", "/info/**", "/oauth2/**", "/ai/**",
                                     // Passkey sign-in is available before authentication. When score.passkey.* is
                                     // not set, PasskeyFeatureFilter answers 404 for these paths.
                                     "/webauthn/authenticate/options", "/login/webauthn"));
@@ -268,7 +262,8 @@ public class SecurityConfiguration {
                 })
                 .logout(logoutConfigurer -> {
                     logoutConfigurer
-                            .logoutUrl("/logout")
+                            // With CSRF off, logoutUrl() alone accepts every HTTP method, so a link or <img> could log out.
+                            .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/logout"))
                             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                             .invalidateHttpSession(true)
                             .clearAuthentication(true);
@@ -282,6 +277,8 @@ public class SecurityConfiguration {
                 .csrf(csrfConfigurer -> {
                     csrfConfigurer.disable();
                 })
+                // CSRF tokens are not used (the web app sends none); state-changing requests are checked by Origin.
+                .addFilterBefore(new SameOriginRequestFilter(corsConfigurationSource()), CorsFilter.class)
                 .rememberMe(rememberMeConfigurer -> {
                     rememberMeConfigurer.rememberMeServices(rememberMeServices());
                 })

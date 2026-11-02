@@ -1199,21 +1199,8 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         }
 
         if (valueConstraint != null) {
-            if (valueConstraint.hasFixedValue() &&
-                    (bcc.valueConstraint() == null || compare(bcc.valueConstraint().fixedValue(), valueConstraint.fixedValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCC.FIXED_VALUE, valueConstraint.fixedValue())
-                        .setNull(BCC.DEFAULT_VALUE);
-            } else if (valueConstraint.hasDefaultValue() &&
-                    (bcc.valueConstraint() == null || compare(bcc.valueConstraint().defaultValue(), valueConstraint.defaultValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCC.DEFAULT_VALUE, valueConstraint.defaultValue())
-                        .setNull(BCC.FIXED_VALUE);
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(BCC.DEFAULT_VALUE)
-                        .setNull(BCC.FIXED_VALUE);
-            }
+            moreStep = ValueConstraintUpdates.apply(firstStep, moreStep, bcc.valueConstraint(), valueConstraint,
+                    BCC.FIXED_VALUE, BCC.DEFAULT_VALUE);
         }
 
         int numOfUpdatedRecords = 0;

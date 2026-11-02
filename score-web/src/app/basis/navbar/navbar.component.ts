@@ -155,7 +155,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // subscribe an event
     const userToken = this.auth.getUserToken();
     if (userToken) {
-      this.stompService.watch('/topic/message/' + userToken.username).subscribe((message: Message) => {
+      this.stompService.watch(messageTopicOf(userToken.username)).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (!!data.messageId || !!data.messageIdList) {
           this.reloadNotiCount();
@@ -291,4 +291,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     window.open(url, '_blank');
   }
 
+}
+
+/** The message topic of an account: the characters that make a destination a pattern are written as %XX (as the server does). */
+export function messageTopicOf(username: string): string {
+  return '/topic/message/' + username.replace(/%/g, '%25').replace(/\*/g, '%2A').replace(/\?/g, '%3F').replace(/\{/g, '%7B');
 }

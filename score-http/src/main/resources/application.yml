@@ -98,6 +98,14 @@ springdoc:
     tags-sorter: alpha
 
 score:
+  # Origins that may send credentialed cross-origin requests to the API, separated by commas. Empty by default: the
+  # origin a request is addressed to (same host name, http or https) is always accepted, so a web app served from the
+  # same host, including `ng serve` proxying /api, needs nothing here. Set this when the Host the backend sees differs
+  # from the address users open: a web app on another domain, a proxy that rewrites Host, or a non-standard port
+  # behind nginx `proxy_set_header Host $host` (which drops the port; `$http_host` keeps it). Any other origin gets no
+  # CORS headers.
+  cors:
+    allowed-origins: ${SCORE_CORS_ALLOWED_ORIGINS:}
   # What the readers of cached records are told (see spring.cache above). The defaults are the smallest values measured to be enough
   # (CcDocumentTuningBenchmark); there is rarely a reason to change them.
   #   batch-size                    the most ids sent to the database in one IN list. Smaller lists are no heavier for the

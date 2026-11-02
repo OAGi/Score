@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.external.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.apache.commons.io.FileUtils;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -56,8 +57,7 @@ public class ExternalComponentsService {
             throw new IllegalArgumentException();
         }
 
-        File baseDir = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
-        FileUtils.forceMkdir(baseDir);
+        File baseDir = TempFiles.newDirectory();
 
         try {
             List<File> files = new ArrayList<>();
@@ -97,7 +97,7 @@ public class ExternalComponentsService {
 
             if (files.size() == 1) {
                 File srcFile = files.get(0);
-                File destFile = File.createTempFile("oagis-", null);
+                File destFile = TempFiles.newFile(srcFile.getName());
                 if (!srcFile.renameTo(destFile)) {
                     FileUtils.copyFile(srcFile, destFile);
                 }

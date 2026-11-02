@@ -32,6 +32,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -41,11 +42,9 @@ import {LibrarySummary} from '../../library-management/domain/library';
 import {LibraryChoice} from '../../library-management/domain/library-choice';
 import {LibraryService} from '../../library-management/domain/library.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
+import {ccStateList, ccStateOptions} from '../domain/cc-dialog.table';
 
-const WORKING_STATE_LIST = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
-const RELEASE_STATE_LIST = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
 const TRUE_FALSE = [{value: 'true', label: 'True'}, {value: 'false', label: 'False'}];
-const separate = (state: string) => state.replace(/[A-Z][a-z]/g, (str) => ' ' + str).trim();
 
 const CC_TABLE = defineTable({
   storageKey: 'TableColumns-CoreComponentPage',
@@ -122,8 +121,6 @@ export class CcListComponent {
   faFlask = faFlask;
   title = this.isBrowseStandardMode ? 'Standard' : 'Core Component';
 
-  workingStateList = WORKING_STATE_LIST;
-  releaseStateList = RELEASE_STATE_LIST;
   workingRelease = WorkingRelease;
   // Issue #1700: Browser mode limits type filters to the browseable property components.
   private readonly browserModeTypes = ['ASCCP', 'BCCP'];
@@ -285,8 +282,8 @@ export class CcListComponent {
   /** The library and the branch go to the query. Returns whether the query for the endpoint changed. */
   private applyChoices(): boolean {
     this.view().setFilter('releaseId', '' + (this.releaseChoice.release?.releaseId || 0));
-    const states = this.releaseChoice.release?.workingRelease ? WORKING_STATE_LIST : RELEASE_STATE_LIST;
-    this.filterOptions.update(options => ({...options, states: states.map(e => ({value: e, label: separate(e)}))}));
+    const states = ccStateOptions(ccStateList(!!this.releaseChoice.release?.workingRelease));
+    this.filterOptions.update(options => ({...options, states}));
     return this.updateParams();
   }
 
@@ -335,13 +332,23 @@ export class CcListComponent {
     }
   }
 
+  /** The namespaces of the library go to the filter; a namespace chosen for another library does not stay in the query. */
+  private applyNamespaces(namespaces: NamespaceSummary[]) {
+    this.view().setFilter('namespaces', []);
+    this.filterOptions.update(options => ({...options, namespaces: namespaces.map(e => ({value: '' + e.namespaceId, label: e.uri}))}));
+  }
+
   onLibraryChange(library: LibrarySummary) {
     this.busy.set(true);
     this.libraryChoice.choose(library);
-    this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']).pipe(
+    forkJoin([
+      this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']),
+      this.namespaceService.getNamespaceSummaries(library.libraryId)
+    ]).pipe(
       finalize(() => this.busy.set(false))
-    ).subscribe(releases => {
+    ).subscribe(([releases, namespaces]) => {
       this.releaseChoice.init(releases);
+      this.applyNamespaces(namespaces);
       if (!this.applyChoices()) {
         this.view().onSearch();
       }
@@ -643,7 +650,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',
@@ -682,7 +689,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',
@@ -722,6 +729,7 @@ export class CcListComponent {
       data: {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
+        workingRelease: true,
         action: 'create',
       },
       width: '100%',
@@ -739,6 +747,7 @@ export class CcListComponent {
 
       this.nodeService.createBOD(pair.verbManifestIdList, pair.nounManifestIdList)
           .subscribe(resp => {
+            this.busy.set(false);
             if (resp.manifestIdList.length === 1) {
               this.snackBar.open('A new BOD created.', '', {
                 duration: 3000,
@@ -763,7 +772,7 @@ export class CcListComponent {
         libraryId: this.libraryChoice.library?.libraryId,
         releaseId: this.releaseChoice.release?.releaseId,
         action: 'create',
-        stateList: (this.releaseChoice.release?.workingRelease) ? this.workingStateList : this.releaseStateList
+        workingRelease: !!this.releaseChoice.release?.workingRelease
       },
       width: '100%',
       maxWidth: '100%',

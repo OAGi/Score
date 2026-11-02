@@ -131,6 +131,7 @@ export class CodeListUpliftComponent {
     saveBranch(this.auth.getUserToken(), this.cookieType, source.releaseId);
 
     this.targetRelease = undefined;
+    this.selection.clear();
     this.applySourceRelease();
     this.view().onSearch();
 
@@ -145,7 +146,11 @@ export class CodeListUpliftComponent {
 
   initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
-    if (this.releases.length > 0) {
+    this.selection.clear();
+    if (this.releases.length === 0) {
+      this.sourceRelease = undefined;
+      this.targetRelease = undefined;
+    } else {
       const savedReleaseId = loadBranch(this.auth.getUserToken(), this.cookieType);
       if (savedReleaseId) {
         this.sourceRelease = this.releases.filter(e => e.releaseId === savedReleaseId)[0];

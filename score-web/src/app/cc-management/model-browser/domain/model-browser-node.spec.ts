@@ -1,6 +1,7 @@
 import {
   ModelBrowserAccNode,
   ModelBrowserAsccpNode,
+  ModelBrowserAsccpNodeDetail,
   ModelBrowserBccpNode,
   ModelBrowserNodeDatabase,
   ModelBrowserNodeDataSource
@@ -249,5 +250,29 @@ describe('ModelBrowserNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', 
 
     expect(seen).toEqual([]);
     expect(parent.expanded).toBe(false);
+  });
+});
+
+describe('ModelBrowserAsccpNodeDetail.updateAscc (association definition)', () => {
+  function detail(): ModelBrowserAsccpNodeDetail {
+    const child = asccChild('Child', 5);
+    accParent(1, [child]);
+    return new ModelBrowserAsccpNodeDetail(child);
+  }
+
+  function ascc(definition: any): any {
+    return {asccManifestId: 1, guid: 'g', den: 'd', definition, cardinality: {min: 0, max: 1}, deprecated: false};
+  }
+
+  it('copies the ASCC definition into the detail', () => {
+    const d = detail();
+    d.updateAscc(ascc({content: 'An association definition'}));
+    expect(d.ascc.definition).toBe('An association definition');
+  });
+
+  it('does not throw when the ASCC has no definition', () => {
+    const d = detail();
+    expect(() => d.updateAscc(ascc(null))).not.toThrow();
+    expect(d.ascc.cardinalityMax).toBe(1);
   });
 });

@@ -23,6 +23,15 @@ import {NamespaceDetails} from '../../namespace-management/domain/namespace';
 import {filter, hashCode} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
 
+export const RELEASE_ASSIGN_TYPE_OPTIONS: { value: string, label: string }[] = [
+  {value: 'ACC', label: 'ACC'},
+  {value: 'ASCCP', label: 'ASCCP'},
+  {value: 'BCCP', label: 'BCCP'},
+  {value: 'CODE_LIST', label: 'Code List'},
+  {value: 'AGENCY_ID_LIST', label: 'Agency ID List'},
+  {value: 'DT', label: 'DT'},
+];
+
 @Component({
   standalone: false,
   selector: 'score-release-list',
@@ -46,7 +55,7 @@ export class ReleaseAssignComponent implements OnInit {
   faSort = faSort;
   title = 'Releases Assign';
   $hashCode: string;
-  typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'DT'];
+  typeList = RELEASE_ASSIGN_TYPE_OPTIONS;
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
@@ -430,6 +439,9 @@ export class ReleaseAssignComponent implements OnInit {
   }
 
   hrefLink(item: AssignableNode): string[] {
+    if (item.type === 'DT') {
+      return ['/data_type', String(item.manifestId)];
+    }
     const arr = [];
     if (item.type === 'CODE_LIST' || item.type === 'AGENCY_ID_LIST') {
       arr.push('');

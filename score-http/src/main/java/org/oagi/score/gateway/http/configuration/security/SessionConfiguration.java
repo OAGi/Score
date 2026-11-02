@@ -20,6 +20,7 @@ public class SessionConfiguration {
         cookieSerializer.setDomainNamePattern("^([\\s\\S]+)$");
         cookieSerializer.setCookiePath("/");
         cookieSerializer.setUseHttpOnlyCookie(true);
+        cookieSerializer.setSameSite("Lax");
         httpSessionIdResolver.setCookieSerializer(cookieSerializer);
         return httpSessionIdResolver;
     }

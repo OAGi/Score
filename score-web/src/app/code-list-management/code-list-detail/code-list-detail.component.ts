@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, ViewChild, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, OnDestroy, OnInit, ViewChild, viewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatSidenav} from '@angular/material/sidenav';
@@ -28,7 +28,7 @@ import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../c
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
-import {forkJoin, Observable, of, ReplaySubject} from 'rxjs';
+import {forkJoin, Observable, of, ReplaySubject, Subscription} from 'rxjs';
 import {hashCode, initFilter, saveBranch} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -49,7 +49,7 @@ import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-list-detail.component.css']
 })
-export class CodeListDetailComponent implements OnInit {
+export class CodeListDetailComponent implements OnInit, OnDestroy {
   private service = inject(CodeListService);
   protected githubService = inject(GithubIntegrationService);
   private agencyIdListService = inject(AgencyIdListService);
@@ -126,6 +126,13 @@ export class CodeListDetailComponent implements OnInit {
 
   commentControl: CodeListCommentControl;
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CodeListCommentControl(this.sidenav, this.service);
     this.isUpdating = true;
@@ -145,6 +152,7 @@ export class CodeListDetailComponent implements OnInit {
     this.route.paramMap.pipe(
         switchMap((params: ParamMap) => {
           this.manifestId = Number(params.get('manifestId'));
+          this.subscribeEvent();
           return forkJoin([
             this.service.getCodeListDetails(this.manifestId)
           ]);
@@ -186,7 +194,6 @@ export class CodeListDetailComponent implements OnInit {
       return;
     });
 
-    this.subscribeEvent();
   }
 
   receiveCommentEvent(evt) {
@@ -324,10 +331,10 @@ export class CodeListDetailComponent implements OnInit {
       !!selectedAgencyIdListValueId && this.currentAgencyIdListValues.some(
         value => value.agencyIdListValueManifestId === selectedAgencyIdListValueId) : !selectedAgencyIdListValueId;
     return (this.isUpdating) ||
-      (codeList.name === undefined || codeList.name === '') ||
-      (codeList.listId === undefined || codeList.listId === '') ||
+      !codeList.name?.trim() ||
+      !codeList.listId?.trim() ||
       !isAgencyIdListSelectionValid ||
-      (codeList.versionId === undefined || codeList.versionId === '');
+      !codeList.versionId?.trim();
   }
 
   openDialog(codeListValue?: CodeListValueDetails) {
@@ -466,6 +473,8 @@ export class CodeListDetailComponent implements OnInit {
       } else {
         this.doUpdate();
       }
+    }, _ => {
+      this.isUpdating = false;
     });
   }
 
@@ -492,13 +501,13 @@ export class CodeListDetailComponent implements OnInit {
       return;
     }
 
-    if (!this.codeList.name) {
+    if (!this.codeList.name?.trim()) {
       this.snackBar.open('Name is required', '', {
         duration: 3000,
       });
       return;
     }
-    if (!this.codeList.listId) {
+    if (!this.codeList.listId?.trim()) {
       this.snackBar.open('List ID is required', '', {
         duration: 3000,
       });
@@ -512,7 +521,7 @@ export class CodeListDetailComponent implements OnInit {
       });
       return;
     }
-    if (!this.codeList.versionId) {
+    if (!this.codeList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });
@@ -955,7 +964,8 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   subscribeEvent() {
-    this.stompService.watch('/topic/code_list/' + this.manifestId).subscribe((message: Message) => {
+    this.eventSubscription?.unsubscribe();
+    this.eventSubscription = this.stompService.watch('/topic/code_list/' + this.manifestId).subscribe((message: Message) => {
       const data = JSON.parse(message.body);
       if (data.properties.actor !== this.currentUser) {
         let noti;

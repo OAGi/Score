@@ -19,7 +19,7 @@
     <ng-container scoreColumnDef="den">
       <td score-cell *scoreCellDef="let element">
         <div class="den score-break-word">
-          <a routerLink="{{ 'core_component/dt/' + element.manifestId }}"
+          <a routerLink="{{ 'data_type/' + element.manifestId }}"
             target="_blank" rel="noopener noreferrer"
             matTooltip="{{ element.den }}">
             <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
@@ -71,7 +71,7 @@
 
     <!-- A narrow screen: the record as one block, not the columns squeezed. -->
     <ng-container *scoreCompactDef="let element">
-      <score-cc-compact-row [element]="element" [label]="element.den" [link]="'core_component/dt/' + element.manifestId" external>
+      <score-cc-compact-row [element]="element" [label]="element.den" [link]="'data_type/' + element.manifestId" external>
         @if (element.defaultValueDomain) {
           <span>Value Domain: {{ element.defaultValueDomain }}</span>
         }

@@ -49,7 +49,7 @@
             <div class="row">
               <div class="col-12">
                 <button mat-raised-button color="primary" (click)="update(tag)"
-                  [disabled]="!tag.name || !tag.textColor || !tag.backgroundColor">
+                  [disabled]="!tag.name || !tag.name.trim() || !tag.textColor || !tag.backgroundColor">
                   Update
                 </button>
                 <button mat-raised-button class="ms-2" color="warn" (click)="discard(tag)">
@@ -105,7 +105,7 @@
           <div class="row">
             <div class="col-12">
               <button mat-raised-button color="primary" (click)="add(newTag)"
-                [disabled]="!newTag.name || !newTag.textColor || !newTag.backgroundColor">
+                [disabled]="!newTag.name || !newTag.name.trim() || !newTag.textColor || !newTag.backgroundColor">
                 Add
               </button>
             </div>

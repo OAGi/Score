@@ -5,6 +5,9 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummar
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApiDialect;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
@@ -12,8 +15,7 @@ import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIGenerateExpre
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPITemplateForVerbOption;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.BieGenerateOpenApiExpression;
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OasOperationCollisionValidator;
-import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI30GenerateExpression;
-import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPI31GenerateExpression;
+import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.OpenAPIGenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import tools.jackson.core.JacksonException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,6 +102,10 @@ public class OpenAPIGenerateService {
             TopLevelAsbiepSummaryRecord confirmRecord = topLevelAsbiepMap.get(confirmId);
             if (confirmRecord == null) {
                 confirmRecord = topLevelAsbiepQuery.getTopLevelAsbiepSummary(confirmId);
+                if (confirmRecord == null) {
+                    throw new IllegalArgumentException("The ConfirmMessage BIE '" + confirmId
+                            + "' of the error response no longer exists. Select another BIE in the error response settings.");
+                }
                 topLevelAsbieps.add(confirmRecord);
                 topLevelAsbiepMap.put(confirmId, confirmRecord);
             }
@@ -107,9 +115,10 @@ public class OpenAPIGenerateService {
         long millis = System.currentTimeMillis();
         String filename;
         if (StringUtils.hasLength(option.getOasDoc().getVersion())) {
-            filename = option.getOasDoc().getTitle() + "-" + option.getOasDoc().getVersion() + "-" + millis;
+            filename = toFileNamePart(option.getOasDoc().getTitle()) + "-"
+                    + toFileNamePart(option.getOasDoc().getVersion()) + "-" + millis;
         } else {
-            filename = option.getOasDoc().getTitle() + "-" + millis;
+            filename = toFileNamePart(option.getOasDoc().getTitle()) + "-" + millis;
         }
 
         // Issue #1730: a document may contain only bodyless (BIE-less) operations, so there may be no BIEs.
@@ -140,10 +149,19 @@ public class OpenAPIGenerateService {
         File schemaExpressionFile;
         try {
             schemaExpressionFile = generateExpression.asFile(filename);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             throw new BieGenerateFailureException("I/O operation failure.", e);
         }
         return schemaExpressionFile;
+    }
+
+    /**
+     * The title and the version of an OpenAPI Document may hold characters that a file name cannot (and a path
+     * separator would leave the temp directory), so anything but letters, digits, space, '-', '_' and '.' becomes '_'.
+     */
+    static String toFileNamePart(String text) {
+        String name = (text == null) ? "" : text.replaceAll("[^\\p{L}\\p{N} _.-]", "_").strip();
+        return name.isEmpty() || name.chars().allMatch(c -> c == '.') ? "openapi" : name;
     }
 
     private void defineSchemaName(BieGenerateOpenApiExpression generateExpression,
@@ -330,10 +348,9 @@ public class OpenAPIGenerateService {
         // declares a 3.1.x version; otherwise keep the OpenAPI 3.0 generator.
         String openAPIVersion = (option != null && option.getOasDoc() != null)
                 ? option.getOasDoc().getOpenAPIVersion() : null;
-        if (isOpenApi31Version(openAPIVersion)) {
-            return applicationContext.getBean(OpenAPI31GenerateExpression.class, generationContext, option);
-        }
-        return applicationContext.getBean(OpenAPI30GenerateExpression.class, generationContext, option);
+        BieOpenApiDialect dialect = isOpenApi31Version(openAPIVersion)
+                ? BieOpenApi31Dialect.INSTANCE : BieOpenApi30Dialect.INSTANCE;
+        return applicationContext.getBean(OpenAPIGenerateExpression.class, generationContext, option, dialect);
     }
 
     // Issue #1347: the distinct ConfirmMessage BIEs referenced by CONFIRM_MESSAGE operations, in

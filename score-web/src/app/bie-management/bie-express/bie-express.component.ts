@@ -150,12 +150,10 @@ export class BieExpressComponent implements OnInit {
   generate() {
     const selectedTopLevelAsbiepIds = this.selection.selected;
 
+    // The server names the files by the configured filename expression.
     this.option.filenames = {};
     this.option.bizCtxIds = {};
     for (const selectedTopLevelAsbiepId of selectedTopLevelAsbiepIds) {
-      const filename = this.getFilename(selectedTopLevelAsbiepId);
-      this.option.filenames[selectedTopLevelAsbiepId] = filename;
-
       const selectedBusinessContext = this.businessContextSelection[selectedTopLevelAsbiepId];
       this.option.bizCtxIds[selectedTopLevelAsbiepId] = selectedBusinessContext.businessContextId;
     }
@@ -168,27 +166,6 @@ export class BieExpressComponent implements OnInit {
     }, err => {
       this.busy.set(false);
     });
-  }
-
-  getFilename(topLevelAsbiepId: number): string {
-    const topLevelAsbiep = this.view().dataSource.data.filter(e => e.topLevelAsbiepId === topLevelAsbiepId)[0];
-    const separator = '-';
-
-    let filename = topLevelAsbiep.propertyTerm.trim().split(' ').join(separator);
-    if (this.option.includeBusinessContextInFilename) {
-      const selectedBusinessContext = this.businessContextSelection[topLevelAsbiepId];
-      if (!!selectedBusinessContext) {
-        filename += '-' + selectedBusinessContext.name.trim().split(' ').join(separator);
-      }
-    }
-    if (this.option.includeVersionInFilename) {
-      if (!!topLevelAsbiep.version) {
-        const versionSeparator = '_';
-        filename += '-' + topLevelAsbiep.version.trim().split(' ').join(versionSeparator)
-          .split('.').join(versionSeparator);
-      }
-    }
-    return filename;
   }
 
   toggleMetaHeaderOption(event, disabled: boolean,

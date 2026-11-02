@@ -17,6 +17,7 @@ export interface CommentDrawerControl {
   openReply(comment: Comment): void;
   closeReply(): void;
   addComment(comment?: Comment): void;
+  hasText(text?: string | null): boolean;
 }
 
 /**

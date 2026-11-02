@@ -44,7 +44,7 @@
                     <mat-form-field>
                       <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
                     </mat-form-field>
-                    <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
+                    <button mat-stroked-button [disabled]="!commentControl.hasText(comment.textTemp)" (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
                     <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
                   </div>
                 }
@@ -59,7 +59,7 @@
                   <mat-form-field>
                     <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
                   </mat-form-field>
-                  <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
+                  <button mat-stroked-button [disabled]="!commentControl.hasText(commentControl.replyMessage)" (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
                   <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
                 </div>
               }
@@ -71,7 +71,7 @@
             <mat-form-field>
               <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
             </mat-form-field>
-            <button mat-stroked-button (click)="commentControl.addComment()">
+            <button mat-stroked-button [disabled]="!commentControl.hasText(commentControl.commentMessage)" (click)="commentControl.addComment()">
               Comment
             </button>
           </div>

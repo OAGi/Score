@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
@@ -58,7 +58,7 @@ import {
 } from '../domain/core-component-node';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
@@ -78,6 +78,7 @@ import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 
 @Component({
@@ -87,7 +88,7 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bdt-detail.component.css']
 })
-export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValidationHost {
+export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
@@ -193,6 +194,13 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
     this.router.navigateByUrl('/data_type');
   }
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
 
@@ -236,7 +244,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
       setAppTitleIfPresent(this.titleService, dtDetails.den, 'Data Type');
 
       // subscribe an event
-      this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/dt/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -459,9 +468,8 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
         }
       }
 
-      // Recover the state of 'Hide Cardinality' and 'Hide Prohibited' property.
+      // Recover the state of 'Hide Cardinality'; 'Hide Prohibited' was carried over above.
       this.cardinality.restore();
-      this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, false);
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -1032,7 +1040,10 @@ export class BdtDetailComponent implements OnInit, DtPrimitiveAware, CcTreeValid
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {

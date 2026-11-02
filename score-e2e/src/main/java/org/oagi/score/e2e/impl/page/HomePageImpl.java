@@ -42,6 +42,9 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     private static final By BROWSE_STANDARD_MENU_LOCATOR =
             By.xpath("//mat-toolbar-row//button[contains(., \"Browse Standard\")]");
 
+    private static final By ADMIN_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row//button[contains(., \"Admin\")]");
+
     private static final By CONTEXT_MENU_LOCATOR =
             By.xpath("//mat-toolbar-row//button[contains(., \"Context\")]");
 
@@ -159,6 +162,11 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     @Override
     public boolean hasBrowseStandardMenu() {
         return !getDriver().findElements(BROWSE_STANDARD_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
+    public boolean hasAdminMenu() {
+        return !getDriver().findElements(ADMIN_MENU_LOCATOR).isEmpty();
     }
 
     @Override

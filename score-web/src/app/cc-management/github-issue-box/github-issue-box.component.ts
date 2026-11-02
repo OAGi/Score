@@ -114,7 +114,8 @@ export class GithubIssueBoxComponent implements OnInit, OnChanges {
   }
 
   get connectHref(): string {
-    return this.service.connectUrl(window.location.href);
+    const {pathname, search, hash} = window.location;
+    return this.service.connectUrl(pathname + search + hash);
   }
 
   /**

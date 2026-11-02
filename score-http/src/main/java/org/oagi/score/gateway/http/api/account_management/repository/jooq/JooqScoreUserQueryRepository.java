@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.noCondition;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.*;
 import static org.oagi.score.gateway.http.common.model.ScoreUser.SYSTEM_USER_ID;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.APP_OAUTH2_USER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.OAUTH2_APP;
 
 public class JooqScoreUserQueryRepository extends JooqBaseRepository implements ScoreUserQueryRepository {
 
@@ -42,10 +45,14 @@ public class JooqScoreUserQueryRepository extends JooqBaseRepository implements 
     }
 
     @Override
-    public ScoreUser getScoreUserByOidcSub(String oidcSub) {
+    public ScoreUser getScoreUserByOidcSub(String providerName, String oidcSub) {
         var queryBuilder = new GetScoreUserQueryBuilder();
         return queryBuilder.select()
-                .where(APP_OAUTH2_USER.SUB.equalIgnoreCase(oidcSub))
+                .where(and(
+                        APP_OAUTH2_USER.SUB.equalIgnoreCase(oidcSub),
+                        (providerName != null) ? APP_OAUTH2_USER.OAUTH2_APP_ID.in(
+                                dslContext().select(OAUTH2_APP.OAUTH2_APP_ID).from(OAUTH2_APP)
+                                        .where(OAUTH2_APP.PROVIDER_NAME.eq(providerName))) : noCondition()))
                 .fetchOne(queryBuilder.mapper());
     }
 

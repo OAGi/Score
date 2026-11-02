@@ -945,9 +945,9 @@ export class AsccpNodeInfo {
 
   get den(): string {
     if (this.roleOfAccNode && this.roleOfAccNode.accNode) {
-      return this.propertyTerm + '. ' + this.roleOfAccNode.accNode.objectClassTerm;
+      return (this.propertyTerm ?? '') + '. ' + this.roleOfAccNode.accNode.objectClassTerm;
     } else {
-      return this._den ? this._den : this.propertyTerm;
+      return this._den ? this._den : (this.propertyTerm ?? '');
     }
 
   }
@@ -1342,7 +1342,7 @@ export class BccpNodeInfo {
   }
 
   get den(): string {
-    return (this.propertyTerm + '. ' + this._node.bdtNode.den).replace('. Type', '');
+    return ((this.propertyTerm ?? '') + '. ' + this._node.bdtNode.den).replace('. Type', '');
   }
 
   set den(val: string) { // do nothing

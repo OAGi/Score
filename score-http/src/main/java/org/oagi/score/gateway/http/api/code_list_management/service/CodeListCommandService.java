@@ -34,6 +34,7 @@ import static org.oagi.score.gateway.http.api.cc_management.model.CcState.*;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.*;
 import static org.springframework.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -89,14 +90,31 @@ public class CodeListCommandService {
         if (request.namespaceId() == null) {
             throw new IllegalArgumentException("Namespace is required.");
         }
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Code list name cannot be empty.");
+        }
+        if (!hasText(request.listId())) {
+            throw new IllegalArgumentException("Code list List ID cannot be empty.");
+        }
+        if (!hasText(request.versionId())) {
+            throw new IllegalArgumentException("Code list version cannot be empty.");
+        }
+        for (var value : request.valueList()) {
+            if (!hasText(value.value())) {
+                throw new IllegalArgumentException("Code list value code cannot be empty.");
+            }
+            if (!hasText(value.meaning())) {
+                throw new IllegalArgumentException("Code list value meaning cannot be empty.");
+            }
+        }
 
         var command = command(requester);
 
         // Update the main code list details
         boolean updated = command.update(
                 codeListManifestId,
-                request.name(),
-                request.versionId(), request.listId(),
+                request.name().trim(),
+                request.versionId().trim(), request.listId().trim(),
                 request.agencyIdListValueManifestId(),
                 request.definition(), request.remark(),
                 request.namespaceId(),
@@ -116,17 +134,22 @@ public class CodeListCommandService {
                 CodeListValueManifestId valueId = value.codeListValueManifestId();
                 if (existingValues.containsKey(valueId)) {
                     command.updateValue(valueId,
-                            value.value(), value.meaning(),
+                            value.value().trim(), value.meaning().trim(),
                             value.definition(),
                             value.deprecated()
                     );
                     existingValues.remove(valueId);
                 } else {
+                    // A newly added value cannot be deprecated (same rule as the UI).
+                    if (Boolean.TRUE.equals(value.deprecated())) {
+                        throw new IllegalArgumentException("A newly added value cannot be deprecated.");
+                    }
                     command.createValue(codeListManifestId,
                             codeListDetails.codeListId(),
                             codeListDetails.release().releaseId(),
-                            value.value(), value.meaning(),
-                            value.definition());
+                            value.value().trim(), value.meaning().trim(),
+                            value.definition(),
+                            Boolean.TRUE.equals(value.deprecated()));
                 }
             });
 
@@ -396,17 +419,41 @@ public class CodeListCommandService {
                 CcType.CODE_LIST, codeListManifestId, prevCodeListDetails.state(), WIP, requester.userId());
     }
 
+    private void assertCancellable(ScoreUser requester, CodeListDetailsRecord codeListDetails) {
+        if (CcState.WIP != codeListDetails.state()) {
+            throw new IllegalArgumentException("The Code List '" + codeListDetails.name() + "' cannot be cancelled " +
+                    "because it is in the '" + codeListDetails.state() + "' state. "
+                    + "Only Code Lists in the 'WIP' state can be cancelled.");
+        }
+
+        if (requester.isDeveloper()) {
+            if (!codeListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
+            }
+        } else {
+            if (codeListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
+            }
+        }
+
+        if (requester.isDeveloper() != codeListDetails.owner().isDeveloper()) {
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
+        }
+    }
+
     public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId, String comment, String projectFieldOptionOverride) {
 
         CodeListDetailsRecord codeListDetails =
                 query(requester).getCodeListDetails(codeListManifestId);
 
         if (codeListDetails == null) {
-            throw new IllegalArgumentException("Not found a target Agency Id List");
+            throw new IllegalArgumentException("Not found a target Code List");
         }
         if (codeListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
+
+        assertCancellable(requester, codeListDetails);
 
         CcState prevState = codeListDetails.state();
 
@@ -436,6 +483,13 @@ public class CodeListCommandService {
 
         if (!Deleted.equals(codeListSummary.state())) {
             throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
+        }
+        if (codeListSummary.owner().isDeveloper() != requester.isDeveloper()) {
+            if (codeListSummary.owner().isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can purge this Code List.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can purge this Code List.");
+            }
         }
 
         boolean result = command(requester).delete(codeListManifestId);

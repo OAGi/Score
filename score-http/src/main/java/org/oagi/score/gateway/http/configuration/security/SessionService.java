@@ -7,7 +7,10 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.session.Session;
 import org.springframework.session.data.redis.RedisIndexedSessionRepository;
@@ -64,15 +67,34 @@ public class SessionService {
         return query().getScoreUsersByRole(ScoreRole.ADMINISTRATOR);
     }
 
+    /** The user of an authentication that is not the one of the current request, such as a WebSocket session. */
+    public ScoreUser asScoreUser(Authentication authentication) {
+        if (authentication == null) {
+            throw new IllegalArgumentException("Authentication cannot be null");
+        }
+        return findScoreUser(authentication.getPrincipal(), authentication.getName(), providerNameOf(authentication));
+    }
+
     public ScoreUser asScoreUser(AuthenticatedPrincipal user) {
         if (user == null) {
             throw new IllegalArgumentException("AuthenticatedPrincipal cannot be null");
         }
-        if (user instanceof OAuth2User) {
-            String sub = ((OAuth2User) user).getAttribute("sub");
-            return query().getScoreUserByOidcSub(sub);
-        } else {
-            return query().getScoreUserByUsername(user.getName());
+        // The same sub of another identity provider is another person, so the provider of the request is used.
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String providerName = (authentication != null && authentication.getPrincipal() == user) ?
+                providerNameOf(authentication) : null;
+        return findScoreUser(user, user.getName(), providerName);
+    }
+
+    private String providerNameOf(Authentication authentication) {
+        return (authentication instanceof OAuth2AuthenticationToken token) ?
+                token.getAuthorizedClientRegistrationId() : null;
+    }
+
+    private ScoreUser findScoreUser(Object principal, String username, String providerName) {
+        if (principal instanceof OAuth2User oAuth2User) {
+            return query().getScoreUserByOidcSub(providerName, oAuth2User.getAttribute("sub"));
         }
+        return query().getScoreUserByUsername(username);
     }
 }

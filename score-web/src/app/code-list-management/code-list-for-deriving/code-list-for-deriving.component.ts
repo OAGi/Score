@@ -71,13 +71,13 @@ export class CodeListForDerivingComponent {
   }
 
   private start() {
-    // The published code lists, to begin with.
-    this.view().setFilter('states', ['Published']);
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.libraryChoice.init(libraries);
       this.releaseService.getReleaseSummaryList(this.libraryChoice.library?.libraryId, ['Published']).subscribe(releases => {
         this.releaseChoice.init(releases, 0);
         this.applyChoices();
+        // The published code lists, to begin with; set once the first render is over.
+        this.view().setFilter('states', ['Published']);
         this.ready.set(true);
       });
     });
@@ -111,11 +111,13 @@ export class CodeListForDerivingComponent {
     });
   }
 
+  /** Derives a code list from the selected one, as the code list page does, and opens the new code list. */
   next() {
-    this.router.navigate(['/code_list/create/' + this.selection.selected[0]], {
-      queryParams: {
-        releaseId: this.releaseChoice.release.releaseId
-      },
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+    this.service.create(this.releaseChoice.release.releaseId, this.selection.selected[0]).subscribe(resp => {
+      this.router.navigate(['/code_list/' + resp.codeListManifestId]);
     });
   }
 }

@@ -318,11 +318,16 @@ export class BieListComponent {
     });
   }
 
+  /** The link of the BIE from the origin and the path, without the query string the list puts in its URL. */
+  bieLink(bie: BieListEntry): string {
+    return window.location.origin + window.location.pathname.replace(/\/+$/, '') + '/' + bie.topLevelAsbiepId;
+  }
+
   requestOwnershipTransfer(bie: BieListEntry) {
     this.busy.set(true);
     this.mailService.sendMail('bie-ownership-transfer-request', bie.owner.userId, {
       parameters: {
-        bie_link: window.location.href + '/' + bie.topLevelAsbiepId,
+        bie_link: this.bieLink(bie),
         bie_name: bie.den,
         topLevelAsbiepId: bie.topLevelAsbiepId,
         targetLoginId: this.auth.getUserToken().username

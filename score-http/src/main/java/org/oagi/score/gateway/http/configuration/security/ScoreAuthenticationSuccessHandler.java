@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.OAUTH2_APP;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppOauth2User.APP_OAUTH2_USER;
 
@@ -118,17 +119,26 @@ public class ScoreAuthenticationSuccessHandler
         return targetUrl.replaceAll("/login", "/");
     }
 
-    private AppOauth2UserRecord storeOAuth2UserInfoIfAbsent(Authentication authentication, OAuth2User oAuth2User) {
+    AppOauth2UserRecord storeOAuth2UserInfoIfAbsent(Authentication authentication, OAuth2User oAuth2User) {
         String sub = oAuth2User.getAttribute("sub");
+        // The sub is unique only within one identity provider.
+        OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
+        // Only enabled providers are registered as client registrations, and provider_name is not unique in the DB.
+        String registrationId = authenticationToken.getAuthorizedClientRegistrationId();
+        Oauth2AppRecord oauth2AppRecord = dslContext.selectFrom(OAUTH2_APP)
+                .where(and(
+                        OAUTH2_APP.PROVIDER_NAME.eq(registrationId),
+                        OAUTH2_APP.IS_DISABLED.eq((byte) 0)))
+                .fetchOne();
+        Assert.state(oauth2AppRecord != null,
+                () -> "No enabled OAuth2 app is registered for the provider '" + registrationId + "'");
         AppOauth2UserRecord appOauth2UserRecord = dslContext.selectFrom(APP_OAUTH2_USER)
-                .where(APP_OAUTH2_USER.SUB.eq(sub))
+                .where(and(
+                        APP_OAUTH2_USER.OAUTH2_APP_ID.eq(oauth2AppRecord.getOauth2AppId()),
+                        APP_OAUTH2_USER.SUB.eq(sub)))
                 .fetchOptional().orElse(null);
 
         if (appOauth2UserRecord == null) {
-            OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
-            Oauth2AppRecord oauth2AppRecord = dslContext.selectFrom(OAUTH2_APP)
-                    .where(OAUTH2_APP.PROVIDER_NAME.eq(authenticationToken.getAuthorizedClientRegistrationId()))
-                    .fetchOne();
 
             String name = oAuth2User.getAttribute("name");
             String email = oAuth2User.getAttribute("email");

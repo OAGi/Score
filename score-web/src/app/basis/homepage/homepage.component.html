@@ -65,8 +65,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
                     <td mat-cell *matCellDef="let element">
                       <a [routerLink]="['/core_component']"
-                        [class.disabled]="selectedRelease.releaseId < 0"
-                       [queryParams]="{q: q([
+                       [queryParams]="{q: ccQ([
                        {key: 'ownerLoginIdList', value: element.username}])}">
                         <span class="score-line-clamp-2 score-break-word">{{ element.username }}</span>
                       </a>
@@ -76,7 +75,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> WIP</th>
                     <td mat-cell *matCellDef="let element">
                       <a [routerLink]="['/core_component']"
-                       [queryParams]="{q: q([
+                       [queryParams]="{q: ccQ([
                        {key: 'states', value: 'WIP'},
                        {key: 'ownerLoginIdList', value: element.username}]) }">
                         {{ element.WIP }}
@@ -87,7 +86,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Draft</th>
                     <td mat-cell *matCellDef="let element">
                       <a [routerLink]="['/core_component']"
-                       [queryParams]="{q: q([
+                       [queryParams]="{q: ccQ([
                        {key: 'states', value: 'Draft'},
                        {key: 'ownerLoginIdList', value: element.username}]) }">
                         {{ element.Draft }}
@@ -98,7 +97,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
                     <td mat-cell *matCellDef="let element">
                       <a [routerLink]="['/core_component']"
-                       [queryParams]="{q: q([
+                       [queryParams]="{q: ccQ([
                        {key: 'states', value: 'Candidate'},
                        {key: 'ownerLoginIdList', value: element.username}]) }">
                         {{ element.Candidate }}
@@ -109,7 +108,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
                     <td mat-cell *matCellDef="let element">
                       <a [routerLink]="['/core_component']"
-                       [queryParams]="{q: q([
+                       [queryParams]="{q: ccQ([
                        {key: 'ownerLoginIdList', value: element.username}]) }">
                         {{ element.total }}
                       </a>
@@ -161,7 +160,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
                     <td mat-cell *matCellDef="let element">
                       <div class="den score-break-word">
-                        <a routerLink="/core_component/{{ element.type.endsWith('DT') ? 'dt' : element.type.toLowerCase() }}/{{ element.manifestId }}"
+                        <a routerLink="{{ element.type.endsWith('DT') ? '/data_type' : '/core_component/' + element.type.toLowerCase() }}/{{ element.manifestId }}"
                           matTooltip="{{ element.den }}">
                           <span class="score-line-clamp-2 score-break-word">{{ element.den }}</span>
                         </a>

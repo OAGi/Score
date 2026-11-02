@@ -74,7 +74,7 @@ public interface DtQueryRepository {
 
     boolean hasRecordsByNamespaceId(NamespaceId namespaceId);
 
-    boolean hasDuplicateSixDigitId(DtManifestId dtManifestId);
+    boolean hasDuplicateSixDigitId(DtManifestId dtManifestId, String sixDigitId);
 
     boolean hasSamePropertyTerm(DtScManifestId dtScManifestId, String propertyTerm);
 

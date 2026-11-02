@@ -7,7 +7,7 @@ import {CcListEntry} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {WebPageInfoService} from '../../../basis/basis.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
-import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE} from '../../domain/cc-dialog.table';
+import {CC_DIALOG_FILTERS as F, CC_WITH_TYPE_TABLE, ccStateOptions, pickableCcStates, withPickableStates} from '../../domain/cc-dialog.table';
 
 
 
@@ -29,17 +29,20 @@ export class AppendAssociationDialogComponent implements OnInit {
   webPageInfo = inject(WebPageInfoService);
   private confirmDialogService = inject(ConfirmDialogService);
   data = inject(MAT_DIALOG_DATA);
+  /** A component is picked in the states that a new component may be built on, and none else is offered. */
+  private readonly pickable = pickableCcStates(!!this.data.workingRelease);
+  private readonly states = ccStateOptions(this.pickable);
 
   readonly view = viewChild.required<ScoreTableViewComponent<CcListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<CcListEntry>(false, []);
 
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
-  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({});
+  readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: this.states});
 
   readonly load = (params: HttpParams) => this.ccListService.getCcListPage(
     // Without a type chosen, every type that can be appended is asked for.
-    params.has('types') ? params : params.set('types', this.typeList.map(e => e.toLowerCase()).join(',')));
+    withPickableStates(params.has('types') ? params : params.set('types', this.typeList.map(e => e.toLowerCase()).join(',')), this.pickable));
   readonly columns = createTableColumns(APPEND_ASSOCIATION_TABLE);
   typeList: string[] = ['ASCCP', 'BCCP'];
   action: string;
@@ -65,7 +68,7 @@ export class AppendAssociationDialogComponent implements OnInit {
       params['excludes'] = this.data.excludes.join(',');
     }
     this.extraParams.set(params);
-    this.filterOptions.set({types: this.typeList.map(e => ({value: e.toLowerCase(), label: e}))});
+    this.filterOptions.set({states: this.states, types: this.typeList.map(e => ({value: e.toLowerCase(), label: e}))});
   }
 
   onNoClick(): void {

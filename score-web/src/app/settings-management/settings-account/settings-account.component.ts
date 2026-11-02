@@ -80,6 +80,8 @@ export class SettingsAccountComponent implements OnInit {
       Validators.required, Validators.minLength(5), Validators.maxLength(100),
       this.equals(this.newPasswordFormControl)
     ]);
+    // The confirmation is compared with the new password, so it is checked again whenever that changes.
+    this.newPasswordFormControl.valueChanges.subscribe(() => this.confirmPasswordFormControl.updateValueAndValidity());
   }
 
   isPersonInfoFormDisabled() {
@@ -150,6 +152,7 @@ export class SettingsAccountComponent implements OnInit {
       this.snackBar.open('Password form is invalid.', '', {
         duration: 3000,
       });
+      return;
     }
     this.service.updatePassword(this.oldPasswordFormControl.value, this.newPasswordFormControl.value)
       .subscribe(_ => {

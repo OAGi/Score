@@ -53,6 +53,26 @@ public interface ApplicationSettingsAPI {
     /** Set whether the global BIE Inverse Mode feature is enabled. */
     void setBIEInverseModeEnable(boolean bieInverseModeEnable);
 
+    /** Return the BIE Schema filename expression, or {@code null} if none is stored. */
+    String getBIESchemaFilenameExpression();
+
+    /**
+     * Set the BIE Schema filename expression.
+     *
+     * @param expression the expression, or {@code null} to remove the stored value
+     */
+    void setBIESchemaFilenameExpression(String expression);
+
+    /** Return the BIE Package Schema filename expression, or {@code null} if none is stored. */
+    String getBIEPackageSchemaFilenameExpression();
+
+    /**
+     * Set the BIE Package Schema filename expression.
+     *
+     * @param expression the expression, or {@code null} to remove the stored value
+     */
+    void setBIEPackageSchemaFilenameExpression(String expression);
+
     /**
      * Remove every passkey (and the WebAuthn identity) of an account, so the account can be deleted.
      *

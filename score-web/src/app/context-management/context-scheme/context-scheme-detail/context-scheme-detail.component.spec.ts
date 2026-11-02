@@ -29,3 +29,27 @@ describe('ContextSchemeDetailComponent', () => {
     expect(callback).toHaveBeenCalled();
   });
 });
+
+/**
+ * Whitespace-only Scheme ID, Agency ID and Version must keep the Update button disabled.
+ */
+describe('ContextSchemeDetailComponent.isDisabled', () => {
+  function disabledFor(overrides: any): boolean {
+    const ctx: any = {disabled: false, isUpdating: false};
+    const scheme: any = {
+      contextCategoryId: 1, schemeName: 'Name', schemeId: 'GEO', schemeAgencyId: 'OAGi', schemeVersionId: '1.0',
+      ...overrides
+    };
+    return ContextSchemeDetailComponent.prototype.isDisabled.call(ctx, scheme);
+  }
+
+  it('is enabled when every required field has text', () => {
+    expect(disabledFor({})).toBe(false);
+  });
+
+  it('is disabled when Scheme ID, Agency ID or Version is whitespace-only', () => {
+    expect(disabledFor({schemeId: '   '})).toBe(true);
+    expect(disabledFor({schemeAgencyId: '   '})).toBe(true);
+    expect(disabledFor({schemeVersionId: '   '})).toBe(true);
+  });
+});

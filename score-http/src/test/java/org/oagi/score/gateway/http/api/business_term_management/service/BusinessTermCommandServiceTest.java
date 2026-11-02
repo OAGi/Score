@@ -11,7 +11,6 @@ import org.oagi.score.gateway.http.api.business_term_management.controller.paylo
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.BusinessTermImportRow;
 import org.oagi.score.gateway.http.api.business_term_management.controller.payload.BusinessTermUpdateRequest;
 import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermId;
-import org.oagi.score.gateway.http.api.business_term_management.model.BusinessTermUpsertResult;
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermCommandRepository;
 import org.oagi.score.gateway.http.api.business_term_management.repository.BusinessTermQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -86,8 +85,7 @@ class BusinessTermCommandServiceTest {
         when(repositoryFactory.businessTermQueryRepository(any())).thenReturn(query);
         when(query.checkUniqueness(any(), any())).thenReturn(true);          // create: (name + URI)
         when(query.checkUniqueness(any(), any(), any())).thenReturn(true);   // update: (id + name + URI)
-        when(command.upsertByExternalReferenceUri(any(), any(), any(), any(), any()))
-                .thenReturn(new BusinessTermUpsertResult(CREATED_ID, true));
+        when(command.insert(any(), any(), any(), any(), any())).thenReturn(CREATED_ID);
     }
 
     private static BusinessTermCreateRequest createRequest() {
@@ -108,14 +106,14 @@ class BusinessTermCommandServiceTest {
     @Test
     void create_rejectsDeveloperWith403() {
         assertThrows(DataAccessForbiddenException.class, () -> service.create(developer, createRequest()));
-        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
+        verify(command, never()).insert(any(), any(), any(), any(), any());
     }
 
     @Test
     void create_rejectsWhenFeatureDisabledWith403() {
         when(applicationConfigurationQueryService.isBusinessTermEnabled(any())).thenReturn(false);
         assertThrows(DataAccessForbiddenException.class, () -> service.create(endUser, createRequest()));
-        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
+        verify(command, never()).insert(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -139,7 +137,7 @@ class BusinessTermCommandServiceTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.create(endUser, createRequest()));
         assertTrue(ex.getMessage().contains("external reference URI"));
-        verify(command, never()).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
+        verify(command, never()).insert(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -148,14 +146,47 @@ class BusinessTermCommandServiceTest {
         // create must succeed (there is no name-only check).
         BusinessTermId id = service.create(endUser, createRequest());
         assertEquals(CREATED_ID, id);
-        verify(command).upsertByExternalReferenceUri(any(), any(), any(), any(), any());
+        verify(command).insert(any(), any(), any(), any(), any());
+        verify(command, never()).upsertByBusinessTermAndUri(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void create_andUpdate_rejectUriWithSchemeThatCanRunScript() {
+        for (String uri : new String[]{"javascript:alert(1)", "JavaScript:alert(1)", "data:text/html,x", "/relative/path", "ref/1"}) {
+            assertThrows(IllegalArgumentException.class, () -> service.create(endUser,
+                    new BusinessTermCreateRequest("Ship To", "id-1", uri, "def", "comment")), uri);
+            assertThrows(IllegalArgumentException.class, () -> service.update(endUser,
+                    new BusinessTermUpdateRequest(new BusinessTermId(BigInteger.ONE),
+                            "Ship To", "id-1", uri, "def", "comment")), uri);
+        }
+        verify(command, never()).insert(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void create_acceptsHttpHttpsAndUrnUri() {
+        for (String uri : new String[]{"http://ref/1", "HTTPS://ref/1", "urn:example:term:1"}) {
+            service.create(endUser, new BusinessTermCreateRequest("Ship To", "id-1", uri, "def", "comment"));
+        }
+        verify(command, times(3)).insert(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void create_withUriOwnedByAnotherName_insertsInsteadOfUpsertingOverIt() {
+        // Issue #10: (Customer, U) exists; creating (Client, U) is a distinct (name + URI) pair. It must be
+        // inserted, never routed through the URI-keyed upsert that would rename Customer.
+        when(query.checkUniqueness("Client", "http://ref/1")).thenReturn(true);
+        BusinessTermId id = service.create(endUser,
+                new BusinessTermCreateRequest("Client", "id-1", "http://ref/1", "def", "comment"));
+        assertEquals(CREATED_ID, id);
+        verify(command).insert(eq("Client"), any(), eq("http://ref/1"), any(), any());
+        verify(command, never()).upsertByBusinessTermAndUri(any(), any(), any(), any(), any());
     }
 
     @Test
     void create_succeedsWhenUnique() {
         BusinessTermId id = service.create(endUser, createRequest());
         assertEquals(CREATED_ID, id);
-        verify(command).upsertByExternalReferenceUri(
+        verify(command).insert(
                 eq("Ship To"), eq("id-1"), eq("http://ref/1"), eq("def"), eq("comment"));
     }
 
@@ -194,11 +225,11 @@ class BusinessTermCommandServiceTest {
     }
 
     @Test
-    void createBatch_intraBatchDuplicateUriIsFailedNotReimported() {
+    void createBatch_intraBatchDuplicatePairIsFailedNotReimported() {
         when(rowImporter.importOne(any(), any())).thenReturn(BusinessTermRowImporter.Outcome.CREATED);
 
         BusinessTermImportRow first = new BusinessTermImportRow(1, "A", "", "http://dup", "", "");
-        BusinessTermImportRow second = new BusinessTermImportRow(2, "B", "", "http://dup", "", "");
+        BusinessTermImportRow second = new BusinessTermImportRow(2, "A", "", "http://dup", "", "");
 
         BusinessTermBatchImportResult result = service.createBatch(endUser, List.of(first, second));
 
@@ -211,7 +242,22 @@ class BusinessTermCommandServiceTest {
                 .filter(r -> BusinessTermBatchImportRowResult.OUTCOME_FAILED.equals(r.outcome()))
                 .findFirst().orElseThrow();
         assertEquals(2, failed.rowIndex());
-        assertTrue(failed.message().contains("Duplicate external reference URI"));
+        assertTrue(failed.message().contains("Duplicate business term and external reference URI"));
+    }
+
+    @Test
+    void createBatch_sameUriWithDifferentNamesAreBothImported() {
+        // The identity is the (name + URI) pair, so two terms sharing a URI are distinct, not duplicates.
+        when(rowImporter.importOne(any(), any())).thenReturn(BusinessTermRowImporter.Outcome.CREATED);
+
+        BusinessTermImportRow first = new BusinessTermImportRow(1, "Customer", "", "http://shared", "", "");
+        BusinessTermImportRow second = new BusinessTermImportRow(2, "Client", "", "http://shared", "", "");
+
+        BusinessTermBatchImportResult result = service.createBatch(endUser, List.of(first, second));
+
+        assertEquals(2, result.createdCount());
+        assertEquals(0, result.failedCount());
+        verify(rowImporter, times(2)).importOne(any(), any());
     }
 
     @Test

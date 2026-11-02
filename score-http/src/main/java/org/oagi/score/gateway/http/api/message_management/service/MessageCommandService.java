@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.message_management.service;
 
+import org.oagi.score.gateway.http.configuration.websocket.WebSocketAuthorizationInterceptor;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.message_management.model.MessageId;
 import org.oagi.score.gateway.http.api.message_management.repository.MessageCommandRepository;
@@ -51,7 +52,7 @@ public class MessageCommandService {
                 properties.put("messageId", resp.getValue().toString());
 
                 ScoreUser recipient = sessionService.getScoreUserByUserId(resp.getKey());
-                simpMessagingTemplate.convertAndSend("/topic/message/" + recipient.username(), properties);
+                simpMessagingTemplate.convertAndSend(WebSocketAuthorizationInterceptor.messageTopicOf(recipient.username()), properties);
             }
             return messageIdMap;
         });
@@ -76,7 +77,7 @@ public class MessageCommandService {
             properties.put("messageIdList", messageIdList.stream()
                     .map(e -> e.toString()).collect(Collectors.joining(", ")));
         }
-        simpMessagingTemplate.convertAndSend("/topic/message/" + requester.username(), properties);
+        simpMessagingTemplate.convertAndSend(WebSocketAuthorizationInterceptor.messageTopicOf(requester.username()), properties);
 
         return numOfDeletedRecords;
     }

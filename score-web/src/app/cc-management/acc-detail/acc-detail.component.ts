@@ -1,5 +1,5 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
@@ -51,6 +51,7 @@ import {
   Comment,
   Embedded,
   EntityType,
+  Element as ElementEntityType,
   EntityTypes,
   Extension,
   OAGIS10BODs,
@@ -67,7 +68,7 @@ import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.compo
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -90,6 +91,7 @@ import {ValidationService} from '../../validation/validation.service';
 import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
 import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
@@ -98,7 +100,7 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./acc-detail.component.css']
 })
-export class AccDetailComponent implements OnInit, CcTreeValidationHost {
+export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -192,6 +194,13 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
     this.router.navigateByUrl('/core_component');
   }
 
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
+  }
+
   ngOnInit() {
     this.commentControl = new CommentControl(this.sidenav, this.service);
     this.hasBasedAcc = false;
@@ -241,7 +250,8 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       this.isNameGenerating = false;
 
       // subscribe an event
-      this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -889,6 +899,7 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
         state: this.rootNode.state,
@@ -1012,6 +1023,7 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         action: 'set'
       },
@@ -1586,7 +1598,7 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
 
-    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+    if (nodeDetail.bcc.entityType === ElementEntityType.value) {
       // Issue #1406
       if (!!nodeDetail.bcc.defaultValue || !!nodeDetail.bcc.fixedValue) {
         const dialogConfig = this.confirmDialogService.newConfig();
@@ -1710,7 +1722,10 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {
@@ -1997,7 +2012,11 @@ export class AccDetailComponent implements OnInit, CcTreeValidationHost {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        if (result?.check) {
+        if (!result) {
+          // cancelled: nothing was moved, and the unsaved edits stay
+          return;
+        }
+        if (result.check) {
           // the move would break something: it is made only if the user says so, and until then it is not made
           this.validation.askAboutChange(result.check, () => {
             this.isUpdating = true;

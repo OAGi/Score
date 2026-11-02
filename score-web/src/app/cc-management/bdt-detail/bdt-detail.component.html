@@ -163,7 +163,7 @@
           </button>
         }
         <mat-divider></mat-divider>
-        @if (!!contextMenuItem && contextMenuItem.level !== 0) {
+        @if (!!contextMenuItem && contextMenuItem.level !== 0 && contextMenuItem.type !== 'DT_SC') {
           <button mat-menu-item (click)="openCoreComponent(contextMenuItem)">
             <span class="context-menu-item">Open in new tab</span>
           </button>

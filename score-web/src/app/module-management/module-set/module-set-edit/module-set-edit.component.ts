@@ -52,7 +52,7 @@ export class ModuleSetEditComponent implements OnInit {
   }
 
   get canUpdate(): boolean {
-    if (this.moduleSet && !this.moduleSet.name) {
+    if (this.moduleSet && !this.moduleSet.name?.trim()) {
       return false;
     }
     return hashCode(this.moduleSet) !== this.$hashCode;

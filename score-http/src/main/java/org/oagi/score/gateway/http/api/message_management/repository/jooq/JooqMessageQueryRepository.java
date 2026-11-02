@@ -214,6 +214,10 @@ public class JooqMessageQueryRepository extends JooqBaseRepository implements Me
                         field = APP_USER.as("sender").LOGIN_ID;
                         break;
 
+                    case "subject":
+                        field = MESSAGE.SUBJECT;
+                        break;
+
                     case "timestamp":
                         field = MESSAGE.CREATION_TIMESTAMP;
                         break;

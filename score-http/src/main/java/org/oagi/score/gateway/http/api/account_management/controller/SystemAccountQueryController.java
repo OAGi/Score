@@ -27,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -106,8 +107,10 @@ public class SystemAccountQueryController implements InitializingBean {
         } else if (principal instanceof OAuth2User) {
             OAuth2User oAuth2User = (OAuth2User) principal;
             String sub = oAuth2User.getAttribute("sub");
-            OAuth2UserRecord oAuth2UserRecord = accountQueryService.getOAuth2User(requester, sub);
-            AppOauth2User appOauth2User = pendingListService.getPendingBySub(sub);
+            String providerName = (authentication instanceof OAuth2AuthenticationToken oAuth2Token) ?
+                    oAuth2Token.getAuthorizedClientRegistrationId() : null;
+            OAuth2UserRecord oAuth2UserRecord = accountQueryService.getOAuth2User(requester, providerName, sub);
+            AppOauth2User appOauth2User = pendingListService.getPendingBySub(requester, providerName, sub);
 
             if (oAuth2UserRecord != null && oAuth2UserRecord.userId() != null) {
                 accountDetails = accountQueryService.getAccountDetails(requester, oAuth2UserRecord.userId());

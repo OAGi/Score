@@ -6,6 +6,8 @@ import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import java.time.LocalDateTime;
 
 /**
@@ -137,6 +139,13 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
      * @return the UI element of the table record at the given index
      */
     WebElement getTableRecordAtIndex(int idx);
+
+    /**
+     * Wait until the table has loaded and return the DENs of the BIEs that it lists, in the order listed.
+     *
+     * @return the DENs of the listed BIEs
+     */
+    List<String> getListedDENs();
 
     /**
      * Return the UI element of the table record containing the given value.

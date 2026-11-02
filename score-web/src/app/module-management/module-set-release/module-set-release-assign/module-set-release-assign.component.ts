@@ -346,4 +346,11 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     });
   }
 
+
+  hrefLink(item: AssignableNode): string[] {
+    if (item.type === 'DT') {
+      return ['/data_type', String(item.manifestId)];
+    }
+    return ['/core_component', item.type.toLowerCase(), String(item.manifestId)];
+  }
 }

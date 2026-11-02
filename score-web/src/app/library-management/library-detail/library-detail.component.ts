@@ -108,10 +108,11 @@ export class LibraryDetailComponent {
   }
 
   isDisabled() {
-    return (!this.library.name) ||
-        (!this.library.link || !this.uriForm.valid) ||
+    return (!this.library.name?.trim()) ||
+        (!this.uriForm.valid) ||
         (!this.library.organization) ||
-        (!this.library.domain);
+        (!this.library.domain) ||
+        (!this.library.type?.trim());
   }
 
   back() {

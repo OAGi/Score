@@ -1,24 +1,24 @@
 <score-detail-page [title]="title" [showActions]="false">
   <ng-container ngProjectAs="[detailToolbar]">
-    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+    @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
       <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-        [disabled]="!isChanged() || isDisabled(biePackage)">
+        [disabled]="updateDisabled">
         Update
       </button>
     }
-    @if (biePackage.state === 'WIP' && (biePackage.access === 'CanEdit' || isAdmin)) {
+    @if (biePackage.state === 'WIP' && biePackage.access === 'CanEdit') {
       <button mat-raised-button class="ms-2" color="accent" (click)="updateState('QA')"
         [disabled]="loading || isChanged()">
         Move to QA
       </button>
     }
-    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+    @if (biePackage.state === 'QA' && biePackage.access === 'CanMove') {
       <button mat-raised-button class="ms-2" color="warn" (click)="updateState('WIP')"
         [disabled]="loading">
         Back to WIP
       </button>
     }
-    @if (biePackage.state === 'QA' && (biePackage.access === 'CanMove' || isAdmin)) {
+    @if (biePackage.state === 'QA' && biePackage.access === 'CanMove') {
       <button mat-raised-button class="ms-2" color="accent" (click)="updateState('Production')"
         [disabled]="loading">
         Move to Production
@@ -198,54 +198,40 @@
 
         <ng-container scoreColumnDef="businessContexts">
           <td score-cell *scoreCellDef="let element">
-            <div class="business-contexts-menu-wrapper">
-              <div class="business-contexts-menu-trigger"
-                [class.is-clickable]="element.businessContextList.length > 1"
-                [matMenuTriggerFor]="businessContextsMenu"
-                (click)="$event.stopPropagation()">
-                <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
-                  [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
-                  {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
+            <div class="business-context-list score-line-clamp-2 score-break-word">
+              @for (businessContext of element.businessContextList; track businessContext; let i = $index) {
+                <span class="businessContext">
+                  <a target="_blank" rel="noopener noreferrer"
+                    routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                    <span>{{ businessContext.name }}</span>
+                  </a>
                 </span>
-                @if (element.businessContextList.length > 1) {
-                  <mat-icon
-                  class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
-                }
-              </div>
-
-              <mat-menu #businessContextsMenu="matMenu">
-                @for (businessContext of element.businessContextList; track businessContext) {
-                  <button mat-menu-item type="button"
-                    (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
-                    <span class="score-break-word">{{ businessContext.name }}</span>
-                  </button>
-                }
-              </mat-menu>
+              }
             </div>
           </td>
         </ng-container>
 
         <ng-container scoreColumnDef="version">
           <td score-cell *scoreCellDef="let element">
-            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version" [innerHTML]="element.version"></div>
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.version">{{ element.version }}</div>
           </td>
         </ng-container>
 
         <ng-container scoreColumnDef="status">
           <td score-cell *scoreCellDef="let element">
-            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status" [innerHTML]="element.status"></div>
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.status">{{ element.status }}</div>
           </td>
         </ng-container>
 
         <ng-container scoreColumnDef="bizTerm">
           <td score-cell *scoreCellDef="let element">
-            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm" [innerHTML]="element.bizTerm"></div>
+            <div class="score-line-clamp-2 score-break-word" [matTooltip]="element.bizTerm">{{ element.bizTerm }}</div>
           </td>
         </ng-container>
 
         <ng-container scoreColumnDef="remark">
           <td score-cell *scoreCellDef="let element">
-            <div class="score-line-clamp-2 score-break-word" [innerHTML]="element.remark"></div>
+            <div class="score-line-clamp-2 score-break-word">{{ element.remark }}</div>
           </td>
         </ng-container>
 

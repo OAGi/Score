@@ -16,6 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -111,7 +114,7 @@ public class GitHubIntegrationService {
         String state = UUID.randomUUID().toString().replace("-", "");
         Map<String, String> stateData = new HashMap<>();
         stateData.put("userId", String.valueOf(user.userId()));
-        stateData.put("returnUrl", (returnUrl == null) ? "" : returnUrl);
+        stateData.put("returnUrl", isSafeReturnUrl(returnUrl) ? returnUrl : "");
         redisTemplate.opsForValue().set(STATE_KEY + state, stateData, Duration.ofMinutes(10));
 
         return UriComponentsBuilder.fromUriString(properties.getAuthorizationUri())
@@ -137,6 +140,11 @@ public class GitHubIntegrationService {
         Map<?, ?> stateData = (Map<?, ?>) raw;
         String userId = String.valueOf(stateData.get("userId"));
         String returnUrl = (stateData.get("returnUrl") == null) ? "" : stateData.get("returnUrl").toString();
+        // Re-validated here (on top of beginConnect's check) so the value this method returns — which the
+        // controller passes straight to sendRedirect — can never be an off-site URL.
+        if (!isSafeReturnUrl(returnUrl)) {
+            returnUrl = "";
+        }
 
         GitHubApiClient.OAuthToken token = gitHubApiClient.exchangeOAuthCode(code, state);
         if (token == null || !hasText(token.accessToken())) {
@@ -156,6 +164,37 @@ public class GitHubIntegrationService {
         }
         redisTemplate.opsForSet().add(CONNECTED_USERS, userId);
         return returnUrl;
+    }
+
+    /**
+     * Whether {@code returnUrl} is safe to redirect the browser to after the OAuth callback:
+     * either a same-origin relative path (starts with {@code "/"}, not {@code "//"}, and has no backslash
+     * — both of which a browser can interpret as protocol-relative) or an absolute URL whose scheme, host,
+     * and port exactly match the configured {@link #getWebBaseUrl()}. Anything else — a different origin,
+     * a bare scheme, or garbage that fails to parse — is rejected.
+     */
+    private boolean isSafeReturnUrl(String returnUrl) {
+        if (!hasText(returnUrl) || returnUrl.chars().anyMatch(c -> Character.isISOControl(c) || Character.isWhitespace(c))) {
+            // Browsers strip tab/CR/LF anywhere in a URL, so "/\t/evil.example" would become "//evil.example".
+            return false;
+        }
+        if (returnUrl.charAt(0) == '/') {
+            return !returnUrl.startsWith("//") && returnUrl.indexOf('\\') < 0;
+        }
+        if (!hasText(properties.getWebBaseUrl())) {
+            return false;
+        }
+        try {
+            URI target = new URI(returnUrl);
+            URI base = new URI(properties.getWebBaseUrl());
+            return target.isAbsolute()
+                    && target.getHost() != null
+                    && Objects.equals(target.getScheme(), base.getScheme())
+                    && Objects.equals(target.getHost(), base.getHost())
+                    && target.getPort() == base.getPort();
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     public void disconnect(ScoreUser user) {

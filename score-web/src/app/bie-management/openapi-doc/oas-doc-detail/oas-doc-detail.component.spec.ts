@@ -3,6 +3,8 @@ import {of} from 'rxjs';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from '../../../common/utility';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 
 /**
  * Issue #1610 unit tests for the OpenAPI-document editor.
@@ -502,5 +504,117 @@ describe('OasDocDetailComponent.generate guards unsaved changes (#1610)', () => 
     expect(ctx.snackBar.open).not.toHaveBeenCalled();
     expect(ctx.openAPIService.generateOpenAPI).toHaveBeenCalledWith(123, sortPage);
     expect(ctx.loading).toBe(true);
+  });
+});
+
+describe('OasDocDetailComponent.update duplicate check (same check as Create)', () => {
+  function ctx(unique: boolean): any {
+    const c: any = {
+      oasDoc: {oasDocId: 7, title: 'dup title', openAPIVersion: '3.1', version: '1.0', licenseName: 'MIT'},
+      openAPIService: {checkUniqueness: vi.fn(() => of(unique))},
+      doUpdate: vi.fn(),
+      openDialogOasDocUpdate: vi.fn(),
+    };
+    c.checkUniqueness = OasDocDetailComponent.prototype.checkUniqueness;
+    return c;
+  }
+
+  it('opens the duplicate dialog and does not update when the check fails', () => {
+    const c = ctx(false);
+    OasDocDetailComponent.prototype.update.call(c);
+    expect(c.openAPIService.checkUniqueness).toHaveBeenCalledWith(c.oasDoc);
+    expect(c.openDialogOasDocUpdate).toHaveBeenCalledTimes(1);
+    expect(c.doUpdate).not.toHaveBeenCalled();
+  });
+
+  it('updates when the check passes', () => {
+    const c = ctx(true);
+    OasDocDetailComponent.prototype.update.call(c);
+    expect(c.doUpdate).toHaveBeenCalledTimes(1);
+    expect(c.openDialogOasDocUpdate).not.toHaveBeenCalled();
+  });
+
+  it('opens a dialog that does not mention the License Name', () => {
+    const dialogConfig: any = {data: {}};
+    const open = vi.fn(() => ({afterClosed: () => of(undefined)}));
+    const c: any = {confirmDialogService: {newConfig: () => dialogConfig, open}};
+    OasDocDetailComponent.prototype.openDialogOasDocUpdate.call(c);
+    expect(dialogConfig.data.content[0]).not.toMatch(/license/i);
+  });
+});
+
+describe('OasDocDetailComponent.handleKeyboardEvent Ctrl/Cmd+S', () => {
+  function saveCtx(changed: boolean, disabled: boolean): any {
+    const ctx: any = {
+      oasDoc: {},
+      isChanged: () => changed,
+      isDisabled: () => disabled,
+      update: vi.fn(),
+    };
+    ctx.handleKeyboardEvent = OasDocDetailComponent.prototype.handleKeyboardEvent;
+    return ctx;
+  }
+
+  function press(ctx: any, init: Partial<KeyboardEvent> = {key: 's', ctrlKey: true}) {
+    const event: any = {preventDefault: vi.fn(), stopPropagation: vi.fn(), ...init};
+    ctx.handleKeyboardEvent(event);
+    return event;
+  }
+
+  it('saves when the document is changed and the Update button would be enabled', () => {
+    const ctx = saveCtx(true, false);
+    press(ctx);
+    expect(ctx.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not save while the Update button is disabled (blank Title or Version, invalid security)', () => {
+    const ctx = saveCtx(true, true);
+    const event = press(ctx);
+    expect(ctx.update).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  it('does not save when nothing has changed', () => {
+    const ctx = saveCtx(false, false);
+    press(ctx);
+    expect(ctx.update).not.toHaveBeenCalled();
+  });
+
+  it('ignores other keys', () => {
+    const ctx = saveCtx(true, false);
+    press(ctx, {key: 'a', ctrlKey: true});
+    expect(ctx.update).not.toHaveBeenCalled();
+  });
+
+  describe('Terms of Service, Contact URL, Contact Email and License URL are validated', () => {
+    const doc = {oasDocId: 1, title: 'T', openAPIVersion: '3.1', version: '1'};
+
+    function isDisabledCtx(values: {tos?: string; contactUrl?: string; email?: string; licenseUrl?: string}): boolean {
+      const ctx: any = {
+        disabled: false,
+        termServiceUrl: new FormControl(values.tos ?? '', [httpUrlValidator]),
+        contactUrl: new FormControl(values.contactUrl ?? '', [httpUrlValidator]),
+        contactEmail: new FormControl(values.email ?? '', [optionalEmailValidator]),
+        licenseUrl: new FormControl(values.licenseUrl ?? '', [httpUrlValidator]),
+        areSecuritySchemesValid: () => true,
+        areSecurityRequirementsValid: () => true,
+      };
+      return OasDocDetailComponent.prototype.isDisabled.call(ctx, doc as any);
+    }
+
+    it('enables Update for empty or valid values', () => {
+      expect(isDisabledCtx({})).toBe(false);
+      expect(isDisabledCtx({
+        tos: 'https://example.com/tos', contactUrl: 'http://example.com', email: 'a@b.com',
+        licenseUrl: 'https://www.apache.org/licenses/LICENSE-2.0'
+      })).toBe(false);
+    });
+
+    it('disables Update for an invalid value of any of the four fields', () => {
+      expect(isDisabledCtx({tos: 'not a url'})).toBe(true);
+      expect(isDisabledCtx({contactUrl: 'javascript:alert(1)'})).toBe(true);
+      expect(isDisabledCtx({email: 'not-an-email'})).toBe(true);
+      expect(isDisabledCtx({licenseUrl: 'ftp//bad url'})).toBe(true);
+    });
   });
 });

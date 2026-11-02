@@ -41,7 +41,8 @@ public interface CodeListCommandRepository {
             CodeListId codeListId,
             ReleaseId releaseId,
             String value, String meaning,
-            Definition definition);
+            Definition definition,
+            boolean deprecated);
 
     boolean updateValue(
             CodeListValueManifestId valueId,
