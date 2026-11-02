@@ -64,7 +64,6 @@ export class BiePackageDetailComponent implements OnInit {
   readonly view = viewChild.required<ScoreTableViewComponent<BieListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<BieListEntry>(true, [], true, (a, b) => a.topLevelAsbiepId === b.topLevelAsbiepId);
   readonly rowKey = (row: BieListEntry) => row;
-  businessContextSelection = {};
   readonly rowClass = (row: BieListEntry) => ({'highlight': row.status === 'Duplication'});
   biePackageId: number;
   /** The list waits for the package. */
@@ -80,14 +79,9 @@ export class BiePackageDetailComponent implements OnInit {
     tap({
       next: resp => {
         this.rows = resp.list;
-        this.businessContextSelection = {};
-        resp.list.forEach(elm => {
-          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
-        });
       },
       error: () => {
         this.rows = [];
-        this.businessContextSelection = {};
       }
     })
   );
@@ -334,18 +328,8 @@ export class BiePackageDetailComponent implements OnInit {
     this.option.separateFileReferencesForReusedSchemas = true;
     this.option.includeBusinessContextInFilename = true;
     this.option.includeVersionInFilename = true;
-    this.option.filenames = {};
-    this.option.bizCtxIds = {};
-
-    const targetBieLists = (selectedBieLists && selectedBieLists.length > 0)
-      ? selectedBieLists
-      : this.rows;
-    for (const bieList of targetBieLists) {
-      const selectedBusinessContext = this.businessContextSelection[bieList.topLevelAsbiepId];
-      if (!!selectedBusinessContext) {
-        this.option.bizCtxIds[bieList.topLevelAsbiepId] = selectedBusinessContext.businessContextId;
-      }
-    }
+    // The server names the files by the configured BIE Package Schema filename expression,
+    // so neither `filenames` nor `bizCtxIds` is sent.
 
     this.loading = true;
     this.biePackageService.generateBiePackage(

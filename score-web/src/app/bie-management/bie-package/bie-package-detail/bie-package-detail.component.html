@@ -198,29 +198,15 @@
 
         <ng-container scoreColumnDef="businessContexts">
           <td score-cell *scoreCellDef="let element">
-            <div class="business-contexts-menu-wrapper">
-              <div class="business-contexts-menu-trigger"
-                [class.is-clickable]="element.businessContextList.length > 1"
-                [matMenuTriggerFor]="businessContextsMenu"
-                (click)="$event.stopPropagation()">
-                <span class="business-contexts-menu-label score-line-clamp-2 score-break-word"
-                  [matTooltip]="businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || ''">
-                  {{ businessContextSelection[element.topLevelAsbiepId]?.name || element.businessContextList[0]?.name || '' }}
+            <div class="business-context-list score-line-clamp-2 score-break-word">
+              @for (businessContext of element.businessContextList; track businessContext; let i = $index) {
+                <span class="businessContext">
+                  <a target="_blank" rel="noopener noreferrer"
+                    routerLink="/context_management/business_context/{{ businessContext.businessContextId }}">
+                    <span>{{ businessContext.name }}</span>
+                  </a>
                 </span>
-                @if (element.businessContextList.length > 1) {
-                  <mat-icon
-                  class="business-contexts-menu-icon">arrow_drop_down</mat-icon>
-                }
-              </div>
-
-              <mat-menu #businessContextsMenu="matMenu">
-                @for (businessContext of element.businessContextList; track businessContext) {
-                  <button mat-menu-item type="button"
-                    (click)="businessContextSelection[element.topLevelAsbiepId] = businessContext">
-                    <span class="score-break-word">{{ businessContext.name }}</span>
-                  </button>
-                }
-              </mat-menu>
+              }
             </div>
           </td>
         </ng-container>

@@ -100,7 +100,10 @@ public class BiePackageQueryService {
         // #1711: Package export filenames always use package pattern metadata.
         option.setIncludeBusinessContextInFilename(true);
         option.setIncludeVersionInFilename(true);
+        // Filenames come only from the configured BIE Package Schema filename expression:
+        // a requested filename or Business Context selection must not override it.
         option.setFilenames(Collections.emptyMap());
+        option.setBizCtxIds(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
         BieGenerateService.EachSchemaResult generated =
