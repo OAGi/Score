@@ -132,8 +132,8 @@ public class BieOpenApiSchemaBuilder {
         fillProperties(parent, asbiep, typeAbie);
     }
 
-    private void fillProperties(Map<String, Object> parent,
-                                AsbieSummaryRecord asbie) {
+    void fillProperties(Map<String, Object> parent,
+                        AsbieSummaryRecord asbie) {
 
         Map<String, Object> properties = new LinkedHashMap();
         if (!parent.containsKey("properties")) {
@@ -162,6 +162,8 @@ public class BieOpenApiSchemaBuilder {
         if (reused) {
             String ref = reference(asbiep);
             properties.put("$ref", ref);
+            // A nillable ASBIE that reuses another BIE is nillable like any other ASBIE.
+            properties = dialect.asbie(allOf(properties), asbie, isNillable);
         } else {
             AbieSummaryRecord typeAbie = generationContext.queryTargetABIE(asbiep);
             AsccSummaryRecord ascc = generationContext.queryBasedASCC(asbie);
