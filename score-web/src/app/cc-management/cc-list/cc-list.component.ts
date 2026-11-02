@@ -32,6 +32,7 @@ import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.s
 import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 import {AboutService} from '../../basis/about/domain/about.service';
 import {TagService} from '../../tag-management/domain/tag.service';
+import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {WebPageInfoService} from '../../basis/basis.service';
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
@@ -331,13 +332,23 @@ export class CcListComponent {
     }
   }
 
+  /** The namespaces of the library go to the filter; a namespace chosen for another library does not stay in the query. */
+  private applyNamespaces(namespaces: NamespaceSummary[]) {
+    this.view().setFilter('namespaces', []);
+    this.filterOptions.update(options => ({...options, namespaces: namespaces.map(e => ({value: '' + e.namespaceId, label: e.uri}))}));
+  }
+
   onLibraryChange(library: LibrarySummary) {
     this.busy.set(true);
     this.libraryChoice.choose(library);
-    this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']).pipe(
+    forkJoin([
+      this.releaseService.getReleaseSummaryList(library.libraryId, ['Draft', 'Published']),
+      this.namespaceService.getNamespaceSummaries(library.libraryId)
+    ]).pipe(
       finalize(() => this.busy.set(false))
-    ).subscribe(releases => {
+    ).subscribe(([releases, namespaces]) => {
       this.releaseChoice.init(releases);
+      this.applyNamespaces(namespaces);
       if (!this.applyChoices()) {
         this.view().onSearch();
       }
