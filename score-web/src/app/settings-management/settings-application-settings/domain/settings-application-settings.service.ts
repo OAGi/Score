@@ -4,6 +4,13 @@ import {Observable} from 'rxjs';
 import {ApplicationSettingsInfo} from './application-settings';
 import {SUPPRESS_ERROR_ALERT} from '../../../authentication/auth.service';
 
+/** Replace `[from, to)` of the text with `insert`; the caret then goes `caretBack` characters before the end of it. */
+export interface FilenameExpressionSuggestions {
+  from: number;
+  to: number;
+  items: { label: string, insert: string, detail: string, caretBack: number }[];
+}
+
 @Injectable()
 export class SettingsApplicationSettingsService {
   private http = inject(HttpClient);
@@ -78,10 +85,28 @@ export class SettingsApplicationSettingsService {
 
   previewFilenameExpression(type: 'bie-schema' | 'bie-package-schema',
                             expression: string,
-                            duplicateHandlerExpression: string): Observable<any> {
+                            duplicateHandlerExpression: string,
+                            sampleValues?: Record<string, string>,
+                            sampleBusinessContextNames?: string[]): Observable<any> {
     return this.http.post('/api/application/filename-expression/' + type + '/preview', {
       expression,
-      duplicateHandlerExpression
+      duplicateHandlerExpression,
+      sampleValues,
+      sampleBusinessContextNames
+    }, {
+      context: this.suppressErrorAlert()
+    });
+  }
+
+  /** Completions at the caret of a filename expression; the backend owns the grammar, so it answers. */
+  suggestFilenameExpression(type: 'bie-schema' | 'bie-package-schema',
+                            text: string,
+                            caret: number,
+                            duplicateHandler: boolean): Observable<FilenameExpressionSuggestions> {
+    return this.http.post<FilenameExpressionSuggestions>('/api/application/filename-expression/' + type + '/suggest', {
+      text,
+      caret,
+      duplicateHandler
     }, {
       context: this.suppressErrorAlert()
     });

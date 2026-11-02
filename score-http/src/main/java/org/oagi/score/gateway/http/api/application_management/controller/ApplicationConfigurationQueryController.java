@@ -1,7 +1,10 @@
 package org.oagi.score.gateway.http.api.application_management.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionPreviewRequest;
 import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionPreviewResponse;
+import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionSuggestRequest;
+import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionSuggestResponse;
 import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionValidationRequest;
 import org.oagi.score.gateway.http.api.application_management.model.ApplicationSettingsInfo;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
@@ -53,10 +56,29 @@ public class ApplicationConfigurationQueryController {
     public FilenameExpressionPreviewResponse previewFilenameExpression(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("type") String type,
-            @RequestBody FilenameExpressionValidationRequest request) {
+            @RequestBody FilenameExpressionPreviewRequest request) {
 
         return service.previewFilenameExpression(sessionService.asScoreUser(user), type,
-                request.getExpression(), request.getDuplicateHandlerExpression());
+                request.getExpression(), request.getDuplicateHandlerExpression(),
+                request.getSampleValues(), request.getSampleBusinessContextNames());
+    }
+
+    /**
+     * Completions for the filename expression text at the caret.
+     *
+     * @param user authenticated principal requesting the suggestions
+     * @param type expression target type such as {@code bie-schema} or {@code bie-package-schema}
+     * @param request the text, the caret and whether it is the duplicate handler expression
+     * @return the range to replace and the suggestions that fit the grammar there
+     */
+    @PostMapping(value = "/filename-expression/{type}/suggest", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FilenameExpressionSuggestResponse suggestFilenameExpression(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("type") String type,
+            @RequestBody FilenameExpressionSuggestRequest request) {
+
+        return service.suggestFilenameExpression(sessionService.asScoreUser(user), type,
+                request.getText(), request.getCaret(), request.isDuplicateHandler());
     }
 
 }

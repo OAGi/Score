@@ -68,3 +68,35 @@
 .feature-disabled-label {
   text-decoration: line-through;
 }
+
+.filename-expression-valid {
+  margin-left: 8px;
+  color: #2e7d32;
+}
+
+.filename-sample-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.filename-sample-input {
+  width: 100%;
+}
+
+.filename-sample-bc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 575.98px) {
+  .filename-sample-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filename-sample-label {
+    margin-top: 6px;
+  }
+}

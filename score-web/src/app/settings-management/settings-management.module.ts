@@ -10,6 +10,7 @@ import {SettingsAccountService} from './settings-account/domain/settings-account
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
 import {SettingsPasskeysComponent} from './settings-passkeys/settings-passkeys.component';
 import {SettingsApplicationSettingsComponent} from './settings-application-settings/settings-application-settings.component';
+import {FilenameExpressionInputComponent} from './settings-application-settings/filename-expression-input.component';
 import {SettingsApplicationSettingsService} from './settings-application-settings/domain/settings-application-settings.service';
 import {MarkdownModule} from 'ngx-markdown';
 import {EmailValidationComponent} from './email-validation/email-validation.component';
@@ -98,7 +99,8 @@ const routes: Routes = [
     MaterialModule,
     CommonModule,
     MarkdownModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    FilenameExpressionInputComponent
   ],
   declarations: [
     SettingsMenuComponent,

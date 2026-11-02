@@ -1,10 +1,13 @@
 package org.oagi.score.gateway.http.api.application_management.service;
 
 import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionPreviewResponse;
+import org.oagi.score.gateway.http.api.application_management.controller.payload.FilenameExpressionSuggestResponse;
 import org.oagi.score.gateway.http.api.application_management.model.ApplicationSettingsInfo;
 import org.oagi.score.gateway.http.api.application_management.model.SMTPSettingsInfo;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameExpressionSuggester;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameExpressionValidationService;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameSampleValues;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -29,6 +32,9 @@ public class ApplicationConfigurationQueryService {
 
     @Autowired
     private FilenameExpressionValidationService filenameExpressionValidationService;
+
+    @Autowired
+    private FilenameExpressionSuggester filenameExpressionSuggester;
 
     /**
      * Returns a raw configuration value by its persisted parameter name.
@@ -198,10 +204,14 @@ public class ApplicationConfigurationQueryService {
      * @param type expression target type such as {@code bie-schema} or {@code bie-package-schema}
      * @param expression base filename expression
      * @param duplicateHandlerExpression duplicate filename handler expression
-     * @return preview response containing sample filename values
+     * @param sampleValues optional per-placeholder sample overrides
+     * @param sampleBusinessContextNames optional ordered sample Business Context names
+     * @return preview response containing sample filename values and the sample data used
      */
     public FilenameExpressionPreviewResponse previewFilenameExpression(
-            ScoreUser requester, String type, String expression, String duplicateHandlerExpression) {
+            ScoreUser requester, String type, String expression, String duplicateHandlerExpression,
+            java.util.Map<String, String> sampleValues, java.util.List<String> sampleBusinessContextNames) {
+        FilenameSampleValues samples = FilenameSampleValues.merge(sampleValues, sampleBusinessContextNames);
         String normalizedType = StringUtils.trim(type).toLowerCase();
         String normalizedExpression = StringUtils.trim(expression);
         String normalizedDuplicateHandlerExpression = StringUtils.trim(duplicateHandlerExpression);
@@ -209,18 +219,48 @@ public class ApplicationConfigurationQueryService {
         switch (normalizedType) {
             case "bie-schema":
                 previewResult = filenameExpressionValidationService.previewBieSchemaExpression(
-                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                        normalizedExpression, normalizedDuplicateHandlerExpression, samples);
                 break;
             case "bie-package-schema":
                 previewResult = filenameExpressionValidationService.previewBiePackageSchemaExpression(
-                        normalizedExpression, normalizedDuplicateHandlerExpression);
+                        normalizedExpression, normalizedDuplicateHandlerExpression, samples);
                 break;
             default:
                 throw new IllegalArgumentException("Unregistered type: " + type);
         }
         return new FilenameExpressionPreviewResponse(
                 previewResult.sampleFilename(),
-                previewResult.sampleDuplicateFilename());
+                previewResult.sampleDuplicateFilename(),
+                previewResult.sampleValues().values(),
+                previewResult.sampleValues().businessContextNames());
+    }
+
+    /**
+     * Completions for a filename expression at the caret, from the same grammar the validator enforces.
+     *
+     * @param type expression target type such as {@code bie-schema} or {@code bie-package-schema}
+     * @param duplicateHandler whether the text is the duplicate handler expression
+     */
+    public FilenameExpressionSuggestResponse suggestFilenameExpression(
+            ScoreUser requester, String type, String text, Integer caret, boolean duplicateHandler) {
+        FilenameExpressionSuggester.Kind kind;
+        if (duplicateHandler) {
+            kind = FilenameExpressionSuggester.Kind.DUPLICATE;
+        } else {
+            kind = switch (StringUtils.trim(type).toLowerCase()) {
+                case "bie-schema" -> FilenameExpressionSuggester.Kind.SCHEMA;
+                case "bie-package-schema" -> FilenameExpressionSuggester.Kind.PACKAGE;
+                default -> throw new IllegalArgumentException("Unregistered type: " + type);
+            };
+        }
+        String content = text == null ? "" : text;
+        FilenameExpressionSuggester.Suggestions suggestions = filenameExpressionSuggester.suggest(
+                content, caret != null ? caret : content.length(), kind);
+        return new FilenameExpressionSuggestResponse(suggestions.from(), suggestions.to(),
+                suggestions.items().stream()
+                        .map(i -> new FilenameExpressionSuggestResponse.Item(
+                                i.label(), i.insert(), i.detail(), i.caretBack()))
+                        .toList());
     }
 
     private String getPropertyOrDefault(ScoreUser requester, String key, String defaultValue) {
