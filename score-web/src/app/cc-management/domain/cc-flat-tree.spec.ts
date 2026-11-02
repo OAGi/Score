@@ -1,5 +1,5 @@
-import {AccFlatNode, CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
-import {CcAccNodeInfo, CcGraph} from './core-component-node';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
+import {CcAccNodeInfo, CcAsccpNodeInfo, CcBccpNodeInfo, CcGraph, CcGraphNode} from './core-component-node';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
 import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 import {PathPattern} from '../../common/tree-search/path-pattern';
@@ -196,5 +196,26 @@ describe('the definition of a component that is being edited', () => {
 
     info.definition = '';
     expect(accNode.definition).toBeUndefined();
+  });
+});
+
+describe('CcFlatNode with a cleared Property Term', () => {
+  const graphNode = {deprecated: false} as unknown as CcGraphNode;
+
+  it('has an empty name and query path for a BCCP whose Property Term is cleared', () => {
+    const node = new BccpFlatNode({...graphNode, propertyTerm: undefined} as CcGraphNode, undefined);
+    node.detail = {bccp: {propertyTerm: undefined}} as unknown as CcBccpNodeInfo;
+
+    expect(node.name).toBe('');
+    expect(() => node.queryPath).not.toThrow();
+    expect(node.queryPath).toBe('');
+  });
+
+  it('has an empty name and query path for an ASCCP whose Property Term is cleared', () => {
+    const node = new AsccpFlatNode({...graphNode, propertyTerm: undefined} as CcGraphNode);
+    node.detail = {asccp: {propertyTerm: undefined}} as unknown as CcAsccpNodeInfo;
+
+    expect(node.name).toBe('');
+    expect(() => node.queryPath).not.toThrow();
   });
 });
