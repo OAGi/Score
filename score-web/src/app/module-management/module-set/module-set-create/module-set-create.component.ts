@@ -123,6 +123,7 @@ export class ModuleSetCreateComponent implements OnInit {
 
   initReleases(releases: ReleaseSummary[]) {
     this.releaseList = releases;
+    this.moduleSet.targetReleaseId = undefined;
     this.moduleSet.targetModuleSetReleaseId = undefined;
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releaseList, (e) => e.releaseNum);
   }
