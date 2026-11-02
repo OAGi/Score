@@ -137,6 +137,7 @@ public class ViewEditBusinessTermPageImpl extends BaseSearchBarPageImpl implemen
     @Override
     public void hitSearchButton() {
         retry(() -> click(getSearchButton()));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
     @Override

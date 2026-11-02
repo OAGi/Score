@@ -53,6 +53,7 @@ import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Tables;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +80,7 @@ import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.ScoreDigestUtils.sha256;
+import org.oagi.score.gateway.http.common.util.StringUtils;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
 @Service
@@ -104,7 +105,7 @@ public class BieEditService implements InitializingBean {
     private SessionService sessionService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private EventListenerContainer eventListenerContainer;
@@ -1142,7 +1143,7 @@ public class BieEditService implements InitializingBean {
             /*
              * Message Publishing
              */
-            redisTemplate.convertAndSend(PURGE_BIE_EVENT_NAME, event);
+            eventPublisher.publish(PURGE_BIE_EVENT_NAME, event);
         }
 
         // Issue #1635
@@ -1319,7 +1320,7 @@ public class BieEditService implements InitializingBean {
                 .fetchStream().forEach(abie -> {
                     ULong oldAbieId = abie.getAbieId();
                     String path = asbieRecord.getPath() + ">" + abie.getPath();
-                    String hashPath = sha256(abie.getPath());
+                    String hashPath = sha256(path);
 
                     // If there are any remaining ABIEs during the Reuse BIE creation process, reuse them to avoid duplication.
                     ULong abieId = dslContext.select(ABIE.ABIE_ID)
@@ -1706,8 +1707,8 @@ public class BieEditService implements InitializingBean {
 
         dslContext.update(TOP_LEVEL_ASBIEP)
                 .set(TOP_LEVEL_ASBIEP.IS_DEPRECATED, (byte) 1)
-                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, request.getReason())
-                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, request.getRemark())
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, StringUtils.trimToNull(request.getReason()))
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, StringUtils.trimToNull(request.getRemark()))
                 .set(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY, ULong.valueOf(requester.userId().value()))
                 .set(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value())))

@@ -1,0 +1,24 @@
+<score-base-page [title]="title" [subtitle]="subtitle" [toolbarClass]="effectiveToolbarClass" [spacer]="spacer">
+  <ng-container ngProjectAs="[baseTitle]">
+    <ng-content select="[listTitle]"></ng-content>
+  </ng-container>
+  <ng-container ngProjectAs="[baseActions]">
+    <ng-content select="[listActions]"></ng-content>
+  </ng-container>
+
+  <mat-card class="pt-3">
+    <ng-content select="[listHeader]"></ng-content>
+    <ng-content></ng-content>
+    <ng-content select="[listExtra]"></ng-content>
+  </mat-card>
+
+  <ng-content select="[listFooter]"></ng-content>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <ng-content select="[listActionBar]"></ng-content>
+      </div>
+    </div>
+  </div>
+</score-base-page>

@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild, inject} from '@angular/core';
+import {Component, OnDestroy, ViewChild, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatTableDataSource} from '@angular/material/table';
@@ -31,6 +31,7 @@ type ImportPhase = 'upload' | 'map' | 'preview' | 'result';
   standalone: false,
   selector: 'score-business-term-import-dialog',
   templateUrl: './business-term-import-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./business-term-import-dialog.component.scss'],
 })
 export class BusinessTermImportDialogComponent implements OnDestroy {
@@ -339,14 +340,17 @@ export class BusinessTermImportDialogComponent implements OnDestroy {
     for (const row of this.rows) {
       const errors = validateImportRow(row);
       const uri = row.externalReferenceUri ?? '';
-      // Only a row that will actually be submitted (otherwise-valid AND not user-deselected) claims a
-      // URI, so neither an invalid row nor a deselected row falsely flags a later row as a duplicate.
-      // This mirrors the server, which dedupes only the rows it receives.
+      // A business term is identified by its (name + URI) pair, the same rule the server, Create and
+      // Edit apply; rows that share only the URI are distinct terms. Only a row that will actually be
+      // submitted (otherwise-valid AND not user-deselected) claims a pair, so neither an invalid row nor
+      // a deselected row falsely flags a later row as a duplicate. This mirrors the server, which
+      // dedupes only the rows it receives.
       if (errors.length === 0 && uri.length > 0 && !row.userDeselected) {
-        if (seen.has(uri)) {
-          errors.push('Duplicate external reference URI in this import.');
+        const pair = JSON.stringify([row.businessTerm ?? '', uri]);
+        if (seen.has(pair)) {
+          errors.push('Duplicate business term and external reference URI in this import.');
         } else {
-          seen.add(uri);
+          seen.add(pair);
         }
       }
       row.errors = errors;

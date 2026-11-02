@@ -1,57 +1,44 @@
-<div class="context-section">
-  <div class="ps-2 pe-2">
-    <mat-toolbar class="bg-white">
-      <score-title-with-library-selector [title]="title"
-        [libraries]="mappedLibraries"
-        (libraryChange)="onLibraryChange($event)"/>
-      <span class="flex-11-auto"></span>
-    </mat-toolbar>
-  </div>
+<score-detail-page>
+  <ng-container ngProjectAs="[detailTitle]">
+    <score-title-with-library-selector [title]="title"
+      [libraries]="mappedLibraries"
+      (libraryChange)="onLibraryChange($event)"/>
+  </ng-container>
+  <score-detail-card>
+    <mat-form-field>
+      <mat-label>Release Number</mat-label>
+      <input matInput required [(ngModel)]="releaseDetail.releaseNum" maxlength="45"/>
+    </mat-form-field>
 
-  <div class="p-3">
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field>
-          <mat-label>Release Number</mat-label>
-          <input matInput required [(ngModel)]="releaseDetail.releaseNum" maxlength="45"/>
-        </mat-form-field>
+    <mat-form-field>
+      <mat-label>Release Namespace</mat-label>
+      <mat-select [(ngModel)]="selectedNamespace" [required]="true">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+            [placeholderLabel]="'Search...'"
+          [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+        </mat-option>
+        @for (namespace of filteredNamespaceList | async; track namespace) {
+          <mat-option [value]="namespace">
+            {{ namespace.uri }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Release Namespace</mat-label>
-          <mat-select [(ngModel)]="selectedNamespace" [required]="true">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
-                [placeholderLabel]="'Search...'"
-              [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
-            </mat-option>
-            @for (namespace of filteredNamespaceList | async; track namespace) {
-              <mat-option [value]="namespace">
-                {{ namespace.uri }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+    <mat-form-field>
+      <mat-label>Release Note</mat-label>
+      <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseNote"></textarea>
+    </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Release Note</mat-label>
-          <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseNote"></textarea>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Release License</mat-label>
-          <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseLicense"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="row action-group m-0">
-    <div class="col-12 actions-wrap">
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="create()" [disabled]="isDisabled()">
-          Create
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    <mat-form-field>
+      <mat-label>Release License</mat-label>
+      <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseLicense"></textarea>
+    </mat-form-field>
+  </score-detail-card>
+  <ng-container ngProjectAs="[detailActions]">
+    <button mat-raised-button color="primary" (click)="create()" [disabled]="isDisabled()">
+      Create
+    </button>
+  </ng-container>
+</score-detail-page>

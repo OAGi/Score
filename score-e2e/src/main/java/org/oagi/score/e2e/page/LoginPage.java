@@ -30,6 +30,12 @@ public interface LoginPage extends Page {
     WebElement getPasswordInput();
 
     /**
+     * @return the password input textbox, or, on an instance with passkey sign-in where the page first asks for the
+     * username only, the Continue button that leads to it
+     */
+    WebElement getPasswordInputOrContinueButton();
+
+    /**
      * Return the UI element of the 'Sign In' button.
      *
      * @return the UI element of the 'Sign In' button

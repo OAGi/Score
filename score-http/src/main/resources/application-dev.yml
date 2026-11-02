@@ -1,7 +1,6 @@
 spring:
   devtools:
-    livereload:
-      enabled: true
+    # spring.devtools.livereload.* was removed in Spring Boot 4 (LiveReload dropped, no replacement) (#1750).
     restart:
       enabled: true
       additional-paths:
@@ -13,3 +12,14 @@ spring:
 logging:
   level:
     org.springframework.boot.devtools: INFO
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.springframework.websocket: DEBUG
+    org.springframework.messaging: DEBUG
+    org.jooq: DEBUG
+    org.oagi.score: DEBUG
+
+score:
+  # `ng serve` (4200) opens the STOMP WebSocket on the backend (9000) directly, which is a cross-origin request.
+  cors:
+    allowed-origins: ${SCORE_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}

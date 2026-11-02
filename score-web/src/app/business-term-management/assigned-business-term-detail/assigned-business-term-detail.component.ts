@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
@@ -6,7 +6,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort} from '@angular/material/sort';
-import {hashCode} from '../../common/utility';
+import {hashCode, openExternalUrl} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {AssignedBusinessTermDetails} from '../domain/business-term';
 import {Title} from '@angular/platform-browser';
@@ -16,6 +16,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   standalone: false,
   selector: 'score-business-term-detail',
   templateUrl: './assigned-business-term-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./assigned-business-term-detail.component.css']
 })
 export class AssignedBusinessTermDetailComponent implements OnInit {
@@ -188,7 +189,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
   }
 
   followTheExternalUri() {
-    window.open(this.assignedBusinessTerm.externalReferenceUri, '_blank');
+    openExternalUrl(this.assignedBusinessTerm.externalReferenceUri);
   }
 
 }

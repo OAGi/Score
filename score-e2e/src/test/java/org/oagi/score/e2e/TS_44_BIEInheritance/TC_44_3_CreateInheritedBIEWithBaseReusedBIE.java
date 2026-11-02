@@ -379,16 +379,8 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(securityClassificationRemark, getText(securityClassificationAsbiePanel.getRemarkField()));
         assertEquals(securityClassificationContextDefinition, getText(securityClassificationAsbiePanel.getContextDefinitionField()));
 
-        EditBIEPage.ASBIEPanel baseSecurityClassificationAsbiePanel = securityClassificationAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMinField());
-        assertDisabled(baseSecurityClassificationAsbiePanel.getCardinalityMaxField());
-        assertDisabled(baseSecurityClassificationAsbiePanel.getRemarkField());
-        assertDisabled(baseSecurityClassificationAsbiePanel.getContextDefinitionField());
-
-        assertEquals(Integer.toString(securityClassificationCardinalityMin), getText(baseSecurityClassificationAsbiePanel.getCardinalityMinField()));
-        assertEquals(Integer.toString(securityClassificationCardinalityMax), getText(baseSecurityClassificationAsbiePanel.getCardinalityMaxField()));
-        assertEquals(securityClassificationRemark, getText(baseSecurityClassificationAsbiePanel.getRemarkField()));
-        assertEquals(securityClassificationContextDefinition, getText(baseSecurityClassificationAsbiePanel.getContextDefinitionField()));
+        // These children belong to the reused BOM Header BIE. The inherited BOM shows
+        // their values through that reuse, but they do not have a separate base tab.
 
         statusAsbieNode = editBIEPage.getNodeByPath("/" + bomAsccp.getPropertyTerm() + "/BOM Header/Status");
         statusAsbiePanel = editBIEPage.getASBIEPanel(statusAsbieNode);
@@ -405,16 +397,6 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(statusRemark, getText(statusAsbiePanel.getRemarkField()));
         assertEquals(statusContextDefinition, getText(statusAsbiePanel.getContextDefinitionField()));
 
-        EditBIEPage.ASBIEPanel baseStatusAsbiePanel = statusAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseStatusAsbiePanel.getCardinalityMinField());
-        assertDisabled(baseStatusAsbiePanel.getCardinalityMaxField());
-        assertDisabled(baseStatusAsbiePanel.getRemarkField());
-        assertDisabled(baseStatusAsbiePanel.getContextDefinitionField());
-
-        assertEquals(Integer.toString(statusCardinalityMin), getText(baseStatusAsbiePanel.getCardinalityMinField()));
-        assertEquals(Integer.toString(statusCardinalityMax), getText(baseStatusAsbiePanel.getCardinalityMaxField()));
-        assertEquals(statusRemark, getText(baseStatusAsbiePanel.getRemarkField()));
-        assertEquals(statusContextDefinition, getText(baseStatusAsbiePanel.getContextDefinitionField()));
 
         effectivityAsbieNode = editBIEPage.getNodeByPath("/" + bomAsccp.getPropertyTerm() + "/BOM Header/Effectivity");
         effectivityAsbiePanel = editBIEPage.getASBIEPanel(effectivityAsbieNode);
@@ -431,16 +413,6 @@ public class TC_44_3_CreateInheritedBIEWithBaseReusedBIE extends BaseTest {
         assertEquals(effectivityRemark, getText(effectivityAsbiePanel.getRemarkField()));
         assertEquals(effectivityContextDefinition, getText(effectivityAsbiePanel.getContextDefinitionField()));
 
-        EditBIEPage.ASBIEPanel baseEffectivityAsbiePanel = effectivityAsbiePanel.getBaseASBIEPanel();
-        assertDisabled(baseEffectivityAsbiePanel.getCardinalityMinField());
-        assertDisabled(baseEffectivityAsbiePanel.getCardinalityMaxField());
-        assertDisabled(baseEffectivityAsbiePanel.getRemarkField());
-        assertDisabled(baseEffectivityAsbiePanel.getContextDefinitionField());
-
-        assertEquals(Integer.toString(effectivityCardinalityMin), getText(baseEffectivityAsbiePanel.getCardinalityMinField()));
-        assertEquals(Integer.toString(effectivityCardinalityMax), getText(baseEffectivityAsbiePanel.getCardinalityMaxField()));
-        assertEquals(effectivityRemark, getText(baseEffectivityAsbiePanel.getRemarkField()));
-        assertEquals(effectivityContextDefinition, getText(baseEffectivityAsbiePanel.getContextDefinitionField()));
     }
 
     @Test

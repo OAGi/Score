@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -20,6 +20,7 @@ import {LibraryService} from '../../../library-management/domain/library.service
   standalone: false,
   selector: 'score-module-set-create',
   templateUrl: './module-set-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-create.component.css']
 })
 export class ModuleSetCreateComponent implements OnInit {
@@ -64,7 +65,7 @@ export class ModuleSetCreateComponent implements OnInit {
       }
     }
 
-    return this.moduleSet.name && this.moduleSet.name.length > 0;
+    return !!this.moduleSet.name && this.moduleSet.name.trim().length > 0;
   }
 
   ngOnInit(): void {
@@ -122,6 +123,7 @@ export class ModuleSetCreateComponent implements OnInit {
 
   initReleases(releases: ReleaseSummary[]) {
     this.releaseList = releases;
+    this.moduleSet.targetReleaseId = undefined;
     this.moduleSet.targetModuleSetReleaseId = undefined;
     initFilter(this.releaseListFilterCtrl, this.filteredReleaseList, this.releaseList, (e) => e.releaseNum);
   }

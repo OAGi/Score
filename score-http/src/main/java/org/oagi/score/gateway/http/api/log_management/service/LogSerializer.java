@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -64,7 +64,7 @@ public class LogSerializer {
 
     public String serialize(ScoreUser requester, AccDetailsRecord acc) {
 
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "acc");
         properties.put("guid", acc.guid().value());
@@ -102,11 +102,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(acc, assocList));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(AccDetailsRecord acc, List<CcAssociation> assocList) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("accManifest", toMetadata(
                 dslContext.selectFrom(ACC_MANIFEST)
@@ -121,7 +121,7 @@ public class LogSerializer {
         List<Map<String, Object>> associations = new ArrayList();
         metadata.put("associations", associations);
         for (CcAssociation assoc : assocList) {
-            Map<String, Object> assocMetadata = new HashMap();
+            Map<String, Object> assocMetadata = new LinkedHashMap();
             if (assoc.isAscc()) {
                 AsccSummaryRecord ascc = (AsccSummaryRecord) assoc;
                 assocMetadata.put("asccManifest", toMetadata(
@@ -165,9 +165,9 @@ public class LogSerializer {
 
     private Map<String, Object> toMetadata(Record record) {
         if (record == null) {
-            return new HashMap();
+            return new LinkedHashMap();
         }
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
         for (Field field : record.fields()) {
             String name = field.getName();
             // ignore deprecated columns
@@ -190,7 +190,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public Map<String, Object> serialize(AsccDetailsRecord ascc) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "ascc");
         properties.put("guid", ascc.guid().value());
@@ -208,7 +208,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public Map<String, Object> serialize(BccDetailsRecord bcc) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "bcc");
         properties.put("guid", bcc.guid().value());
@@ -232,7 +232,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, AsccpDetailsRecord asccp) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "asccp");
         properties.put("guid", asccp.guid().value());
@@ -252,11 +252,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(asccp));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(AsccpDetailsRecord asccp) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("asccpManifest", toMetadata(
                 dslContext.selectFrom(ASCCP_MANIFEST)
@@ -274,7 +274,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, BccpDetailsRecord bccp) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "bccp");
         properties.put("guid", bccp.guid().value());
@@ -298,11 +298,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(bccp));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(BccpDetailsRecord bccp) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("bccpManifest", toMetadata(
                 dslContext.selectFrom(BCCP_MANIFEST)
@@ -320,7 +320,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, DtDetailsRecord dt) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "dt");
         properties.put("guid", dt.guid().value());
@@ -351,11 +351,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(dt, dtScList));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(DtDetailsRecord dt, List<DtScDetailsRecord> dtScList) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("dtManifest", toMetadata(
                 dslContext.selectFrom(DT_MANIFEST)
@@ -371,7 +371,7 @@ public class LogSerializer {
         metadata.put("supplementaryComponents", supplementaryComponents);
 
         for (DtScDetailsRecord dtSc : dtScList) {
-            Map<String, Object> dtScMetadata = new HashMap();
+            Map<String, Object> dtScMetadata = new LinkedHashMap();
             dtScMetadata.put("dtScManifest", toMetadata(
                     dslContext.selectFrom(DT_SC_MANIFEST)
                             .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtSc.dtScManifestId().value())))
@@ -390,7 +390,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     private Map<String, Object> serialize(DtScDetailsRecord dtSc) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "dtSc");
         properties.put("guid", dtSc.guid().value());
@@ -413,7 +413,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, CodeListDetailsRecord codeList) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "codeList");
         properties.put("guid", codeList.guid().value());
@@ -442,11 +442,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(codeList));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(CodeListDetailsRecord codeList) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("codeListManifest", toMetadata(
                 dslContext.selectFrom(CODE_LIST_MANIFEST)
@@ -472,7 +472,7 @@ public class LogSerializer {
                         codeList.valueList().stream().map(e -> ULong.valueOf(e.codeListValueManifestId().value())).collect(Collectors.toSet())
                 )).fetch()) {
             CodeListValueRecord codeListValueRecord = codeListValueRecordMap.get(codeListValueManifestRecord.getCodeListValueId());
-            Map<String, Object> codeListValueMetadata = new HashMap();
+            Map<String, Object> codeListValueMetadata = new LinkedHashMap();
             codeListValueMetadata.put("codeListValueManifest", toMetadata(codeListValueManifestRecord));
             codeListValueMetadata.put("codeListValue", toMetadata(codeListValueRecord));
             values.add(codeListValueMetadata);
@@ -483,7 +483,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     private Map<String, Object> serialize(CodeListValueDetailsRecord codeListValue) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "codeListValue");
         properties.put("guid", codeListValue.guid().value());
@@ -500,7 +500,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, AgencyIdListDetailsRecord agencyIdListDetails) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "agencyIdList");
         properties.put("guid", agencyIdListDetails.guid().value());
@@ -530,12 +530,12 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(agencyIdListDetails));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     @SneakyThrows(JsonIOException.class)
     private Map<String, Object> serialize(AgencyIdListValueDetailsRecord agencyIdListValue) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "agencyIdListValue");
         properties.put("guid", agencyIdListValue.guid().value());
@@ -551,7 +551,7 @@ public class LogSerializer {
     }
 
     private Map<String, Object> toMetadata(AgencyIdListDetailsRecord agencyIdList) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("agencyIdListManifest", toMetadata(
                 dslContext.selectFrom(AGENCY_ID_LIST_MANIFEST)
@@ -577,7 +577,7 @@ public class LogSerializer {
                         agencyIdList.valueList().stream().map(e -> ULong.valueOf(e.agencyIdListValueManifestId().value())).collect(Collectors.toSet())
                 )).fetch()) {
             AgencyIdListValueRecord agencyIdListValueRecord = agencyIdListValueRecordMap.get(agencyIdListValueManifestRecord.getAgencyIdListValueId());
-            Map<String, Object> agencyIdListValueMetadata = new HashMap();
+            Map<String, Object> agencyIdListValueMetadata = new LinkedHashMap();
             agencyIdListValueMetadata.put("agencyIdListValueManifest", toMetadata(agencyIdListValueManifestRecord));
             agencyIdListValueMetadata.put("agencyIdListValue", toMetadata(agencyIdListValueRecord));
             values.add(agencyIdListValueMetadata);
@@ -588,7 +588,7 @@ public class LogSerializer {
 
     @SneakyThrows(JsonIOException.class)
     public String serialize(ScoreUser requester, XbtDetailsRecord xbtDetails) {
-        Map<String, Object> properties = new HashMap();
+        Map<String, Object> properties = new LinkedHashMap();
 
         properties.put("component", "xbt");
         properties.put("guid", xbtDetails.guid().value());
@@ -608,11 +608,11 @@ public class LogSerializer {
 
         properties.put("_metadata", toMetadata(xbtDetails));
 
-        return gson.toJson(properties, HashMap.class);
+        return gson.toJson(properties, LinkedHashMap.class);
     }
 
     private Map<String, Object> toMetadata(XbtDetailsRecord xbtDetails) {
-        Map<String, Object> metadata = new HashMap();
+        Map<String, Object> metadata = new LinkedHashMap();
 
         metadata.put("xbtManifest", toMetadata(
                 dslContext.selectFrom(XBT_MANIFEST)

@@ -76,7 +76,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
 
         BusinessTermObject businessTerm = new BusinessTermObject();
         businessTerm.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
-        businessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
+        businessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAlphanumeric(3, 8) + ".com");
         viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(businessTerm);
         EditBusinessTermPage editBusinessTermPage = viewEditBusinessTermPage.openEditBusinessTermPageByTerm(businessTerm.getBusinessTerm());
         assertEquals(businessTerm.getBusinessTerm(), editBusinessTermPage.getBusinessTermFieldText());
@@ -99,7 +99,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm1));
 
         BusinessTermObject businessTerm2 = new BusinessTermObject();
-        businessTerm2.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
+        businessTerm2.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAlphanumeric(3, 8) + ".com");
         assertThrows(TimeoutException.class, () -> createBusinessTermPage.createBusinessTerm(businessTerm2));
     }
 
@@ -158,7 +158,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         assertNotEquals(oldTermName, randomBusinessTerm.getBusinessTerm());
 
         String oldExternalRefUri = randomBusinessTerm.getExternalReferenceUri();
-        randomBusinessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAscii(3, 8) + ".com");
+        randomBusinessTerm.setExternalReferenceUri("http://www." + RandomStringUtils.secure().nextAlphanumeric(3, 8) + ".com");
         assertNotEquals(oldExternalRefUri, randomBusinessTerm.getExternalReferenceUri());
 
         String oldExternalRefID = randomBusinessTerm.getExternalReferenceId();
@@ -430,7 +430,7 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         BIEMenu bieMenu = homePage.getBIEMenu();
 
-        // #1753 - L6: one row reuses an existing external reference URI (-> updated) and one is new
+        // #1753 - L6: one row reuses an existing (name + external reference URI) pair (-> updated) and one is new
         // (-> created); the import dialog's result step must report 1 created and 1 updated.
         String newName = "bt_" + RandomStringUtils.secure().nextAlphanumeric(8);
         String newUri = "https://example.org/" + RandomStringUtils.secure().nextAlphanumeric(12);
@@ -511,6 +511,36 @@ public class TC_42_1_EndUserViewOrEditBusinessTerm extends BaseTest {
                 + ",\"businessTerm\":\"" + existing.getBusinessTerm()
                 + "\",\"externalReferenceUri\":\"" + other.getExternalReferenceUri() + "\"}";
         assertEquals(204, api.putJson("/api/business-terms/" + other.getBusinessTermId(), updateSameNameOwnUri).statusCode());
+    }
+
+    @Test
+    @DisplayName("TC_42_1_18")
+    public void end_user_creating_a_term_with_a_used_uri_but_a_new_name_adds_a_distinct_term() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessTermObject existing = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditBusinessTermPage viewEditBusinessTermPage = homePage.getBIEMenu().openViewEditBusinessTermSubMenu();
+        CreateBusinessTermPage createBusinessTermPage = viewEditBusinessTermPage.openCreateBusinessTermPage();
+
+        // A business term is identified by its (name + External Reference URI) pair, so a different name
+        // under an already-used URI is a distinct term. It must be added, and must not rename the term
+        // that owns the URI.
+        BusinessTermObject sameUriNewName = new BusinessTermObject();
+        sameUriNewName.setBusinessTerm("bt_" + RandomStringUtils.secure().nextAlphanumeric(5, 10));
+        sameUriNewName.setExternalReferenceUri(existing.getExternalReferenceUri());
+        viewEditBusinessTermPage = createBusinessTermPage.createBusinessTerm(sameUriNewName);
+
+        viewEditBusinessTermPage.openPage();
+        viewEditBusinessTermPage.showAdvancedSearchPanel();
+        viewEditBusinessTermPage.setExternalReferenceURI(existing.getExternalReferenceUri());
+        viewEditBusinessTermPage.hitSearchButton();
+        assertEquals(2, viewEditBusinessTermPage.getTotalNumberOfItems());
+
+        // The pre-existing term keeps its name.
+        assertEquals(existing.getBusinessTerm(),
+                getAPIFactory().getBusinessTermAPI().getBusinessTermByName(existing.getBusinessTerm()).getBusinessTerm());
     }
 
     @AfterEach

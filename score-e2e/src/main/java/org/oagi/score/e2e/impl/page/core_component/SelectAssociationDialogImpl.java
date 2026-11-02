@@ -80,7 +80,7 @@ public class SelectAssociationDialogImpl extends SearchBarPageImpl implements Se
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override
@@ -293,10 +293,10 @@ public class SelectAssociationDialogImpl extends SearchBarPageImpl implements Se
 
         retry(() -> {
             WebElement tr;
-            WebElement td;
             try {
-                tr = getTableRecordAtIndex(1);
-                td = getColumnByName(tr, "den");
+                tr = visibilityOfElementLocated(getDriver(), By.xpath(
+                        "//mat-dialog-container//tbody/tr[.//td[contains(@class, 'mat-column-den')]"
+                                + "//a[normalize-space(.) = " + xpathLiteral(den) + "]]"));
             } catch (TimeoutException e) {
                 throw new NoSuchElementException("Cannot locate an association using " + den, e);
             }

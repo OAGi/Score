@@ -1,3 +1,4 @@
+import {SCORE_TABLE} from '../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CodeListListComponent} from './code-list-list/code-list-list.component';
@@ -17,6 +18,7 @@ import {ColumnSelectorModule} from '../common/column-selector/column-selector.mo
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 import {GithubIssueBoxComponent} from '../cc-management/github-issue-box/github-issue-box.component';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
 
 const routes: Routes = [
   {
@@ -68,7 +70,9 @@ const routes: Routes = [
         ColumnSelectorModule,
         SearchBarModule,
         TitleWithLibrarySelector,
-        GithubIssueBoxComponent
+        GithubIssueBoxComponent,
+        RecordCompactRowComponent,
+        ...SCORE_TABLE
     ],
   declarations: [
     CodeListListComponent,

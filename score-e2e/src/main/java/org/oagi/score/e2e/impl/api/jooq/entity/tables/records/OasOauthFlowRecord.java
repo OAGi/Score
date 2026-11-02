@@ -22,89 +22,87 @@ public class OasOauthFlowRecord extends UpdatableRecordImpl<OasOauthFlowRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.oas_oauth_flow_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_oauth_flow.oas_oauth_flow_id</code>. The primary key
+     * of the record.
      */
     public void setOasOauthFlowId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.oas_oauth_flow_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_oauth_flow.oas_oauth_flow_id</code>. The primary key
+     * of the record.
      */
     public ULong getOasOauthFlowId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.guid</code>. The GUID of the record.
+     * Setter for <code>oas_oauth_flow.guid</code>. The GUID of the record.
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.guid</code>. The GUID of the record.
+     * Getter for <code>oas_oauth_flow.guid</code>. The GUID of the record.
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.oas_security_scheme_id</code>. The
-     * owning oauth2 security scheme; one entry of that scheme's flows map.
+     * Setter for <code>oas_oauth_flow.oas_security_scheme_id</code>. The owning
+     * oauth2 security scheme; one entry of that scheme's flows map.
      */
     public void setOasSecuritySchemeId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.oas_security_scheme_id</code>. The
-     * owning oauth2 security scheme; one entry of that scheme's flows map.
+     * Getter for <code>oas_oauth_flow.oas_security_scheme_id</code>. The owning
+     * oauth2 security scheme; one entry of that scheme's flows map.
      */
     public ULong getOasSecuritySchemeId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.flow_type</code>. REQUIRED. The
-     * OAuth Flows key: implicit | password | clientCredentials |
-     * authorizationCode | deviceAuthorization (deviceAuthorization requires
-     * OpenAPI 3.2+).
+     * Setter for <code>oas_oauth_flow.flow_type</code>. REQUIRED. The OAuth
+     * Flows key: implicit | password | clientCredentials | authorizationCode |
+     * deviceAuthorization (deviceAuthorization requires OpenAPI 3.2+).
      */
     public void setFlowType(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.flow_type</code>. REQUIRED. The
-     * OAuth Flows key: implicit | password | clientCredentials |
-     * authorizationCode | deviceAuthorization (deviceAuthorization requires
-     * OpenAPI 3.2+).
+     * Getter for <code>oas_oauth_flow.flow_type</code>. REQUIRED. The OAuth
+     * Flows key: implicit | password | clientCredentials | authorizationCode |
+     * deviceAuthorization (deviceAuthorization requires OpenAPI 3.2+).
      */
     public String getFlowType() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.authorization_url</code>. REQUIRED
-     * for the implicit and authorizationCode flows. MUST be a URL.
+     * Setter for <code>oas_oauth_flow.authorization_url</code>. REQUIRED for
+     * the implicit and authorizationCode flows. MUST be a URL.
      */
     public void setAuthorizationUrl(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.authorization_url</code>. REQUIRED
-     * for the implicit and authorizationCode flows. MUST be a URL.
+     * Getter for <code>oas_oauth_flow.authorization_url</code>. REQUIRED for
+     * the implicit and authorizationCode flows. MUST be a URL.
      */
     public String getAuthorizationUrl() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.token_url</code>. REQUIRED for the
+     * Setter for <code>oas_oauth_flow.token_url</code>. REQUIRED for the
      * password, clientCredentials, authorizationCode and deviceAuthorization
      * flows. MUST be a URL.
      */
@@ -113,7 +111,7 @@ public class OasOauthFlowRecord extends UpdatableRecordImpl<OasOauthFlowRecord> 
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.token_url</code>. REQUIRED for the
+     * Getter for <code>oas_oauth_flow.token_url</code>. REQUIRED for the
      * password, clientCredentials, authorizationCode and deviceAuthorization
      * flows. MUST be a URL.
      */
@@ -122,89 +120,89 @@ public class OasOauthFlowRecord extends UpdatableRecordImpl<OasOauthFlowRecord> 
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.refresh_url</code>. Optional. The
-     * OAuth refreshUrl for obtaining refresh tokens. MUST be a URL.
+     * Setter for <code>oas_oauth_flow.refresh_url</code>. Optional. The OAuth
+     * refreshUrl for obtaining refresh tokens. MUST be a URL.
      */
     public void setRefreshUrl(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.refresh_url</code>. Optional. The
-     * OAuth refreshUrl for obtaining refresh tokens. MUST be a URL.
+     * Getter for <code>oas_oauth_flow.refresh_url</code>. Optional. The OAuth
+     * refreshUrl for obtaining refresh tokens. MUST be a URL.
      */
     public String getRefreshUrl() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.device_authorization_url</code>.
-     * OpenAPI 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST
-     * be a URL.
+     * Setter for <code>oas_oauth_flow.device_authorization_url</code>. OpenAPI
+     * 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST be a
+     * URL.
      */
     public void setDeviceAuthorizationUrl(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.device_authorization_url</code>.
-     * OpenAPI 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST
-     * be a URL.
+     * Getter for <code>oas_oauth_flow.device_authorization_url</code>. OpenAPI
+     * 3.2+. REQUIRED for the deviceAuthorization flow (RFC 8628). MUST be a
+     * URL.
      */
     public String getDeviceAuthorizationUrl() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.created_by</code>. The user who
-     * creates the record.
+     * Setter for <code>oas_oauth_flow.created_by</code>. The user who creates
+     * the record.
      */
     public void setCreatedBy(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.created_by</code>. The user who
-     * creates the record.
+     * Getter for <code>oas_oauth_flow.created_by</code>. The user who creates
+     * the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.last_updated_by</code>. The user who
-     * last updates the record.
+     * Setter for <code>oas_oauth_flow.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.last_updated_by</code>. The user who
-     * last updates the record.
+     * Getter for <code>oas_oauth_flow.last_updated_by</code>. The user who last
+     * updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Setter for <code>oas_oauth_flow.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * Getter for <code>oas_oauth_flow.creation_timestamp</code>. The timestamp
+     * when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>oagi.oas_oauth_flow.last_update_timestamp</code>. The
+     * Setter for <code>oas_oauth_flow.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -212,7 +210,7 @@ public class OasOauthFlowRecord extends UpdatableRecordImpl<OasOauthFlowRecord> 
     }
 
     /**
-     * Getter for <code>oagi.oas_oauth_flow.last_update_timestamp</code>. The
+     * Getter for <code>oas_oauth_flow.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

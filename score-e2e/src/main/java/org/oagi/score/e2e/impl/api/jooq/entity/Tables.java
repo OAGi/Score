@@ -14,6 +14,7 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValueManifest;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppOauth2User;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppWebauthnUser;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsbieBizterm;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep;
@@ -127,12 +128,13 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.TopLevelAsbiep;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRule;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UsageRuleExpression;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.UserTenant;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.WebauthnCredential;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Xbt;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.XbtManifest;
 
 
 /**
- * Convenience access to all tables in oagi.
+ * Convenience access to all tables in the default schema.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
@@ -165,12 +167,18 @@ public class Tables {
     public static final Acc ACC = Acc.ACC;
 
     /**
-     * The table <code>oagi.acc_manifest</code>.
+     * The ACC_MANIFEST table is a release-specific handle to an ACC record,
+     * pinning a particular ACC (a complex data structured concept such as
+     * OAGIS's Components, Nouns, and BODs) to a RELEASE. It carries the
+     * revision chain via the PREV_ACC_MANIFEST_ID and NEXT_ACC_MANIFEST_ID
+     * self-references across releases, and also records the based (supertype)
+     * and replacement manifests for the ACC in that release.
      */
     public static final AccManifest ACC_MANIFEST = AccManifest.ACC_MANIFEST;
 
     /**
-     * The table <code>oagi.acc_manifest_tag</code>.
+     * This is a many-to-many join table that assigns TAG rows to ACC_MANIFEST
+     * rows, associating tags with a release-specific ACC.
      */
     public static final AccManifestTag ACC_MANIFEST_TAG = AccManifestTag.ACC_MANIFEST_TAG;
 
@@ -181,7 +189,10 @@ public class Tables {
     public static final AgencyIdList AGENCY_ID_LIST = AgencyIdList.AGENCY_ID_LIST;
 
     /**
-     * The table <code>oagi.agency_id_list_manifest</code>.
+     * The AGENCY_ID_LIST_MANIFEST table is a release-specific handle to an
+     * AGENCY_ID_LIST record; it pins the agency identification list to a
+     * RELEASE and carries the revision chain (prev/next manifest) across
+     * releases.
      */
     public static final AgencyIdListManifest AGENCY_ID_LIST_MANIFEST = AgencyIdListManifest.AGENCY_ID_LIST_MANIFEST;
 
@@ -191,12 +202,20 @@ public class Tables {
     public static final AgencyIdListValue AGENCY_ID_LIST_VALUE = AgencyIdListValue.AGENCY_ID_LIST_VALUE;
 
     /**
-     * The table <code>oagi.agency_id_list_value_manifest</code>.
+     * A release-specific handle to an AGENCY_ID_LIST_VALUE record, pinning a
+     * value within an agency identification list to a RELEASE and to its owning
+     * AGENCY_ID_LIST_MANIFEST. It carries the revision chain, referencing the
+     * corresponding AGENCY_ID_LIST_VALUE_MANIFEST records in the previous and
+     * next releases.
      */
     public static final AgencyIdListValueManifest AGENCY_ID_LIST_VALUE_MANIFEST = AgencyIdListValueManifest.AGENCY_ID_LIST_VALUE_MANIFEST;
 
     /**
-     * The table <code>oagi.app_oauth2_user</code>.
+     * This table captures the OpenID Connect claims (such as the sub, name, and
+     * email) of a user authenticated through an external OAuth2 provider
+     * registered in OAUTH2_APP, linking that identity to a record in APP_USER.
+     * When the APP_USER reference is not set, the record is treated as a
+     * pending one that has not yet been associated with an application user.
      */
     public static final AppOauth2User APP_OAUTH2_USER = AppOauth2User.APP_OAUTH2_USER;
 
@@ -205,6 +224,12 @@ public class Tables {
      * authorization purposes.
      */
     public static final AppUser APP_USER = AppUser.APP_USER;
+
+    /**
+     * WebAuthn identity (user handle) of an app_user; created on the first
+     * passkey registration.
+     */
+    public static final AppWebauthnUser APP_WEBAUTHN_USER = AppWebauthnUser.APP_WEBAUTHN_USER;
 
     /**
      * An ASBIE represents a relationship/association between two ABIEs through
@@ -242,7 +267,11 @@ public class Tables {
     public static final AsccBizterm ASCC_BIZTERM = AsccBizterm.ASCC_BIZTERM;
 
     /**
-     * The table <code>oagi.ascc_manifest</code>.
+     * A release-specific handle to an ASCC record, which represents a
+     * relationship/association between two ACCs through an ASCCP. It pins the
+     * ASCC to a RELEASE, resolves the association's FROM_ACC_MANIFEST_ID and
+     * TO_ASCCP_MANIFEST_ID ends, and carries the revision chain
+     * (PREV/NEXT_ASCC_MANIFEST_ID) across releases.
      */
     public static final AsccManifest ASCC_MANIFEST = AsccManifest.ASCC_MANIFEST;
 
@@ -253,12 +282,17 @@ public class Tables {
     public static final Asccp ASCCP = Asccp.ASCCP;
 
     /**
-     * The table <code>oagi.asccp_manifest</code>.
+     * A release-specific handle to an ASCCP, which specifies a role (or
+     * property) an ACC may play under another ACC; it pins the ASCCP to a
+     * RELEASE and carries the revision chain to the corresponding
+     * ASCCP_MANIFEST records in the previous and next releases.
      */
     public static final AsccpManifest ASCCP_MANIFEST = AsccpManifest.ASCCP_MANIFEST;
 
     /**
-     * The table <code>oagi.asccp_manifest_tag</code>.
+     * This is an intersection table that assigns TAG rows to ASCCP_MANIFEST
+     * rows, allowing a release-specific ASCCP handle to be tagged with one or
+     * more TAGs in a many-to-many relationship.
      */
     public static final AsccpManifestTag ASCCP_MANIFEST_TAG = AsccpManifestTag.ASCCP_MANIFEST_TAG;
 
@@ -306,7 +340,12 @@ public class Tables {
     public static final BccBizterm BCC_BIZTERM = BccBizterm.BCC_BIZTERM;
 
     /**
-     * The table <code>oagi.bcc_manifest</code>.
+     * BCC_MANIFEST is a release-specific handle to a BCC, which represents a
+     * relationship/association between an ACC and a BCCP that creates a data
+     * element for an ACC. It pins the BCC to a RELEASE (linking the
+     * FROM_ACC_MANIFEST and TO_BCCP_MANIFEST ends within that release) and
+     * carries the revision chain to the corresponding records in the previous
+     * and next releases.
      */
     public static final BccManifest BCC_MANIFEST = BccManifest.BCC_MANIFEST;
 
@@ -317,22 +356,39 @@ public class Tables {
     public static final Bccp BCCP = Bccp.BCCP;
 
     /**
-     * The table <code>oagi.bccp_manifest</code>.
+     * A BCCP_MANIFEST is a release-specific handle to a BCCP record, pinning it
+     * to a RELEASE and carrying the revision chain to the corresponding
+     * BCCP_MANIFEST in the previous and next releases. A BCCP specifies a
+     * property concept and the data type associated with it, which can then be
+     * added as a property of an ACC; the manifest also binds the BCCP to the
+     * BDT that specifies its data format through BDT_MANIFEST_ID (DT_MANIFEST).
      */
     public static final BccpManifest BCCP_MANIFEST = BccpManifest.BCCP_MANIFEST;
 
     /**
-     * The table <code>oagi.bccp_manifest_tag</code>.
+     * This is an intersection table that assigns TAG rows to BCCP_MANIFEST
+     * rows, allowing a many-to-many relationship between tags and BCCP
+     * manifests.
      */
     public static final BccpManifestTag BCCP_MANIFEST_TAG = BccpManifestTag.BCCP_MANIFEST_TAG;
 
     /**
-     * The table <code>oagi.bie_package</code>.
+     * The BIE_PACKAGE table stores information about a BIE package, which
+     * groups a set of top-level BIEs (TOP_LEVEL_ASBIEP records, associated
+     * through the BIE_PACKAGE_TOP_LEVEL_ASBIEP table) released together under a
+     * common package version within a LIBRARY. It carries the revision life
+     * cycle state and a chain to the previous version of the package, and may
+     * reference a source BIE_PACKAGE from which it was created by a Copy or
+     * Uplift action.
      */
     public static final BiePackage BIE_PACKAGE = BiePackage.BIE_PACKAGE;
 
     /**
-     * The table <code>oagi.bie_package_top_level_asbiep</code>.
+     * This is an intersection table that assigns TOP_LEVEL_ASBIEP records to a
+     * BIE_PACKAGE, capturing the top-level BIEs that make up the package. The
+     * referenced TOP_LEVEL_ASBIEP must belong to the same RELEASE as the
+     * BIE_PACKAGE, and the PREV_TOP_LEVEL_ASBIEP_ID column tracks the previous
+     * version of the Top-Level ASBIEP within the package.
      */
     public static final BiePackageTopLevelAsbiep BIE_PACKAGE_TOP_LEVEL_ASBIEP = BiePackageTopLevelAsbiep.BIE_PACKAGE_TOP_LEVEL_ASBIEP;
 
@@ -370,7 +426,9 @@ public class Tables {
     public static final BizCtx BIZ_CTX = BizCtx.BIZ_CTX;
 
     /**
-     * The table <code>oagi.biz_ctx_assignment</code>.
+     * This is an intersection table that assigns business contexts to a
+     * top-level ASBIEP. It provides the many-to-many associations between the
+     * BIZ_CTX and TOP_LEVEL_ASBIEP tables.
      */
     public static final BizCtxAssignment BIZ_CTX_ASSIGNMENT = BizCtxAssignment.BIZ_CTX_ASSIGNMENT;
 
@@ -388,7 +446,11 @@ public class Tables {
     public static final BlobContent BLOB_CONTENT = BlobContent.BLOB_CONTENT;
 
     /**
-     * The table <code>oagi.blob_content_manifest</code>.
+     * The BLOB_CONTENT_MANIFEST table is a release-specific handle to a
+     * BLOB_CONTENT record, which stores a schema whose content is only imported
+     * as a whole and is represented in Blob. It pins the BLOB_CONTENT to a
+     * RELEASE and carries the revision chain via its previous and next manifest
+     * self-references across releases.
      */
     public static final BlobContentManifest BLOB_CONTENT_MANIFEST = BlobContentManifest.BLOB_CONTENT_MANIFEST;
 
@@ -412,7 +474,12 @@ public class Tables {
     public static final CodeList CODE_LIST = CodeList.CODE_LIST;
 
     /**
-     * The table <code>oagi.code_list_manifest</code>.
+     * The CODE_LIST_MANIFEST table is a release-specific handle to a CODE_LIST
+     * record, pinning that code list to a particular RELEASE and carrying the
+     * revision chain (the PREV/NEXT self-references linking the same code list
+     * across releases). When a code list is derived from another, the
+     * BASED_CODE_LIST_MANIFEST_ID self-reference records its base within the
+     * release.
      */
     public static final CodeListManifest CODE_LIST_MANIFEST = CodeListManifest.CODE_LIST_MANIFEST;
 
@@ -428,12 +495,22 @@ public class Tables {
     public static final CodeListValue CODE_LIST_VALUE = CodeListValue.CODE_LIST_VALUE;
 
     /**
-     * The table <code>oagi.code_list_value_manifest</code>.
+     * A release-specific handle to a CODE_LIST_VALUE record, pinning a code
+     * list value of a code list to a RELEASE (and to its owning
+     * CODE_LIST_MANIFEST) and carrying the revision chain via the PREV/NEXT
+     * self-references across releases.
      */
     public static final CodeListValueManifest CODE_LIST_VALUE_MANIFEST = CodeListValueManifest.CODE_LIST_VALUE_MANIFEST;
 
     /**
-     * The table <code>oagi.comment</code>.
+     * This table stores user comments associated with a component, where the
+     * associated component is identified by the REFERENCE column in the form of
+     * the component type and its manifest ID (e.g., 'CODE_LIST-123'). Replies
+     * are captured through the self-referencing PREV_COMMENT_ID chain, and a
+     * comment with replies is hidden via IS_HIDDEN instead of being deleted so
+     * the reply chain is preserved, while IS_DELETED marks a comment as
+     * soft-deleted and excluded from queries rather than physically removing
+     * it.
      */
     public static final Comment COMMENT = Comment.COMMENT;
 
@@ -479,12 +556,17 @@ public class Tables {
     public static final DtAwdPri DT_AWD_PRI = DtAwdPri.DT_AWD_PRI;
 
     /**
-     * The table <code>oagi.dt_manifest</code>.
+     * The DT_MANIFEST table is a release-specific handle to a DT record (both
+     * CDT and BDT, as stored in the DT table), pinning it to a particular
+     * RELEASE. It carries the revision chain across releases through the
+     * PREV_DT_MANIFEST_ID and NEXT_DT_MANIFEST_ID self-references, and records
+     * the DT's base/supertype via BASED_DT_MANIFEST_ID.
      */
     public static final DtManifest DT_MANIFEST = DtManifest.DT_MANIFEST;
 
     /**
-     * The table <code>oagi.dt_manifest_tag</code>.
+     * A many-to-many join table that assigns TAG rows to DT_MANIFEST rows,
+     * attaching tags to the release-specific manifest of a data type (DT).
      */
     public static final DtManifestTag DT_MANIFEST_TAG = DtManifestTag.DT_MANIFEST_TAG;
 
@@ -509,7 +591,13 @@ public class Tables {
     public static final DtScAwdPri DT_SC_AWD_PRI = DtScAwdPri.DT_SC_AWD_PRI;
 
     /**
-     * The table <code>oagi.dt_sc_manifest</code>.
+     * A release-specific handle to a DT_SC record, pinning the supplementary
+     * component (SC) of a data type to a RELEASE and linking it to the owning
+     * DT_MANIFEST. It carries the revision chain to the corresponding
+     * DT_SC_MANIFEST in the previous and next releases
+     * (PREV_DT_SC_MANIFEST_ID/NEXT_DT_SC_MANIFEST_ID), though as noted for
+     * DT_SC the supplementary component is an intrinsic part of the DT and is
+     * re-created with each new revision of the data type.
      */
     public static final DtScManifest DT_SC_MANIFEST = DtScManifest.DT_SC_MANIFEST;
 
@@ -523,12 +611,15 @@ public class Tables {
     public static final DtUsageRule DT_USAGE_RULE = DtUsageRule.DT_USAGE_RULE;
 
     /**
-     * The table <code>oagi.exception</code>.
+     * This table logs exceptions raised by the application, capturing the
+     * exception message, its serialized stacktrace, and a searchable tag, along
+     * with the APP_USER who was working when the exception occurred and the
+     * time it was created.
      */
     public static final Exception EXCEPTION = Exception.EXCEPTION;
 
     /**
-     * The table <code>oagi.flyway_schema_history</code>.
+     * The table <code>flyway_schema_history</code>.
      */
     public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
@@ -569,17 +660,29 @@ public class Tables {
     public static final GithubIssueDtManifest GITHUB_ISSUE_DT_MANIFEST = GithubIssueDtManifest.GITHUB_ISSUE_DT_MANIFEST;
 
     /**
-     * The table <code>oagi.library</code>.
+     * This table stores information about a library, the top-level workspace
+     * that groups the components, code lists, and releases managed within it.
+     * It captures the library's name, type, owning organization, description,
+     * application domain, and state, and flags whether the library is read-only
+     * or the default shown to users without a preference.
      */
     public static final Library LIBRARY = Library.LIBRARY;
 
     /**
-     * The table <code>oagi.log</code>.
+     * The LOG table records the revision history of component records, storing
+     * one entry per change with the component's serialized state SNAPSHOT, its
+     * REVISION_NUM and REVISION_TRACKING_NUM, and the LOG_ACTION taken. Because
+     * it logs many different component types, it references the target
+     * component by its GUID (the REFERENCE column) rather than a foreign key,
+     * and the PREV_LOG_ID and NEXT_LOG_ID columns chain the entries into a
+     * per-component revision history.
      */
     public static final Log LOG = Log.LOG;
 
     /**
-     * The table <code>oagi.message</code>.
+     * This table stores messages exchanged between users, referencing APP_USER
+     * for both the sender and the recipient, along with each message's subject,
+     * body, and read status.
      */
     public static final Message MESSAGE = Message.MESSAGE;
 
@@ -590,52 +693,76 @@ public class Tables {
     public static final Module MODULE = Module.MODULE;
 
     /**
-     * The table <code>oagi.module_acc_manifest</code>.
+     * This intersection table assigns ACC_MANIFEST components to a MODULE
+     * within a MODULE_SET_RELEASE, indicating the physical file into which each
+     * ACC will be generated during the expression generation.
      */
     public static final ModuleAccManifest MODULE_ACC_MANIFEST = ModuleAccManifest.MODULE_ACC_MANIFEST;
 
     /**
-     * The table <code>oagi.module_agency_id_list_manifest</code>.
+     * This table assigns an AGENCY_ID_LIST_MANIFEST to a MODULE within a
+     * MODULE_SET_RELEASE, indicating the physical file into which the agency
+     * identification list will be generated during the expression generation.
      */
     public static final ModuleAgencyIdListManifest MODULE_AGENCY_ID_LIST_MANIFEST = ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST;
 
     /**
-     * The table <code>oagi.module_asccp_manifest</code>.
+     * This table assigns ASCCP_MANIFEST components to a MODULE within a
+     * MODULE_SET_RELEASE, indicating the physical file into which each ASCCP
+     * will be generated during the expression generation.
      */
     public static final ModuleAsccpManifest MODULE_ASCCP_MANIFEST = ModuleAsccpManifest.MODULE_ASCCP_MANIFEST;
 
     /**
-     * The table <code>oagi.module_bccp_manifest</code>.
+     * This is an intersection table that assigns a BCCP_MANIFEST to a MODULE
+     * within a MODULE_SET_RELEASE, indicating the physical file into which the
+     * BCCP will be generated during the expression generation.
      */
     public static final ModuleBccpManifest MODULE_BCCP_MANIFEST = ModuleBccpManifest.MODULE_BCCP_MANIFEST;
 
     /**
-     * The table <code>oagi.module_blob_content_manifest</code>.
+     * This table assigns BLOB_CONTENT_MANIFEST records to a MODULE within a
+     * MODULE_SET_RELEASE, associating each imported whole-schema blob with the
+     * physical file into which it is emitted during schema generation and
+     * export.
      */
     public static final ModuleBlobContentManifest MODULE_BLOB_CONTENT_MANIFEST = ModuleBlobContentManifest.MODULE_BLOB_CONTENT_MANIFEST;
 
     /**
-     * The table <code>oagi.module_code_list_manifest</code>.
+     * This table assigns a CODE_LIST_MANIFEST to a MODULE within a
+     * MODULE_SET_RELEASE, indicating the physical file into which the code list
+     * is generated during the expression generation.
      */
     public static final ModuleCodeListManifest MODULE_CODE_LIST_MANIFEST = ModuleCodeListManifest.MODULE_CODE_LIST_MANIFEST;
 
     /**
-     * The table <code>oagi.module_dt_manifest</code>.
+     * This intersection table assigns DT_MANIFEST components to a MODULE within
+     * a MODULE_SET_RELEASE, indicating the physical file into which each data
+     * type will be generated during expression generation.
      */
     public static final ModuleDtManifest MODULE_DT_MANIFEST = ModuleDtManifest.MODULE_DT_MANIFEST;
 
     /**
-     * The table <code>oagi.module_set</code>.
+     * This table stores information about a module set, which is a named,
+     * library-scoped collection of MODULE records that organizes CC components
+     * into physical schema files. A module set is pinned to a RELEASE through
+     * the MODULE_SET_RELEASE table for use in expression/schema generation.
      */
     public static final ModuleSet MODULE_SET = ModuleSet.MODULE_SET;
 
     /**
-     * The table <code>oagi.module_set_release</code>.
+     * This table pairs a MODULE_SET with a RELEASE, associating a set of
+     * MODULEs with a particular release for schema generation and export. Each
+     * pairing has its own name and description, and the IS_DEFAULT indicator
+     * marks the default module set to be used for a release.
      */
     public static final ModuleSetRelease MODULE_SET_RELEASE = ModuleSetRelease.MODULE_SET_RELEASE;
 
     /**
-     * The table <code>oagi.module_xbt_manifest</code>.
+     * This table assigns XBT_MANIFEST components (the XML Schema and OAGIS
+     * built-in types) to a MODULE within a MODULE_SET_RELEASE, so that they are
+     * generated into the appropriate physical schema file during expression
+     * generation.
      */
     public static final ModuleXbtManifest MODULE_XBT_MANIFEST = ModuleXbtManifest.MODULE_XBT_MANIFEST;
 
@@ -646,7 +773,10 @@ public class Tables {
     public static final Namespace NAMESPACE = Namespace.NAMESPACE;
 
     /**
-     * The table <code>oagi.oas_doc</code>.
+     * The root of the OpenAPI Specification document object model that the
+     * other OAS_* tables hang off; each row is an OpenAPI Object holding the
+     * openapi version string together with the Info Object metadata (title,
+     * description, terms of service, version, and contact and license details).
      */
     public static final OasDoc OAS_DOC = OasDoc.OAS_DOC;
 
@@ -661,12 +791,15 @@ public class Tables {
     public static final OasDocSecurityScope OAS_DOC_SECURITY_SCOPE = OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE;
 
     /**
-     * The table <code>oagi.oas_doc_tag</code>.
+     * A many-to-many join assigning OAS_TAG rows to an OAS_DOC, populating the
+     * OpenAPI document's root-level tags array.
      */
     public static final OasDocTag OAS_DOC_TAG = OasDocTag.OAS_DOC_TAG;
 
     /**
-     * The table <code>oagi.oas_example</code>.
+     * OpenAPI Example Object holding a single example, either an embedded
+     * literal in the value field or a reference to an external example via the
+     * ref (externalValue) field; the two are mutually exclusive.
      */
     public static final OasExample OAS_EXAMPLE = OasExample.OAS_EXAMPLE;
 
@@ -676,22 +809,31 @@ public class Tables {
     public static final OasExternalDoc OAS_EXTERNAL_DOC = OasExternalDoc.OAS_EXTERNAL_DOC;
 
     /**
-     * The table <code>oagi.oas_external_doc_doc</code>.
+     * A many-to-many join that attaches OAS_EXTERNAL_DOC external documentation
+     * references to OAS_DOC OpenAPI documents.
      */
     public static final OasExternalDocDoc OAS_EXTERNAL_DOC_DOC = OasExternalDocDoc.OAS_EXTERNAL_DOC_DOC;
 
     /**
-     * The table <code>oagi.oas_http_header</code>.
+     * OpenAPI Header Object, defining an HTTP header by its name, description,
+     * and schema type reference ($ref); attached to an OAS_RESPONSE through the
+     * OAS_RESPONSE_HEADERS join and referenced by an OAS_PARAMETER when the
+     * parameter location is header.
      */
     public static final OasHttpHeader OAS_HTTP_HEADER = OasHttpHeader.OAS_HTTP_HEADER;
 
     /**
-     * The table <code>oagi.oas_media_type</code>.
+     * OpenAPI Media Type Object, which represents a media type (such as
+     * application/json) used within the content of a request body or response
+     * in an OpenAPI document.
      */
     public static final OasMediaType OAS_MEDIA_TYPE = OasMediaType.OAS_MEDIA_TYPE;
 
     /**
-     * The table <code>oagi.oas_message_body</code>.
+     * The OAS_MESSAGE_BODY table holds an OpenAPI message body whose schema is
+     * defined by the referenced TOP_LEVEL_ASBIEP. The OAS_REQUEST and
+     * OAS_RESPONSE tables both reference this table to bind that BIE as the
+     * content of an operation's request or response body.
      */
     public static final OasMessageBody OAS_MESSAGE_BODY = OasMessageBody.OAS_MESSAGE_BODY;
 
@@ -707,7 +849,11 @@ public class Tables {
     public static final OasOauthScope OAS_OAUTH_SCOPE = OasOauthScope.OAS_OAUTH_SCOPE;
 
     /**
-     * The table <code>oagi.oas_operation</code>.
+     * OpenAPI Operation Object; a single HTTP verb (get, put, post, delete,
+     * etc.) exposed on an OAS_RESOURCE path item, carrying its operationId,
+     * summary, description, deprecation flag, and defaulted error-response body
+     * settings, with any per-operation security overrides captured in
+     * OAS_OPERATION_SECURITY.
      */
     public static final OasOperation OAS_OPERATION = OasOperation.OAS_OPERATION;
 
@@ -722,42 +868,61 @@ public class Tables {
     public static final OasOperationSecurityScope OAS_OPERATION_SECURITY_SCOPE = OasOperationSecurityScope.OAS_OPERATION_SECURITY_SCOPE;
 
     /**
-     * The table <code>oagi.oas_parameter</code>.
+     * OpenAPI Parameter Object describing a single operation parameter,
+     * identified by its name and location (in = query, header, path, or cookie)
+     * along with its required, schema type, and serialization settings; when in
+     * = header it may reference an OAS_HTTP_HEADER.
      */
     public static final OasParameter OAS_PARAMETER = OasParameter.OAS_PARAMETER;
 
     /**
-     * The table <code>oagi.oas_parameter_link</code>.
+     * OpenAPI Link Object parameter binding declared on an OAS_RESPONSE; each
+     * row ties an OAS_PARAMETER to a runtime EXPRESSION that supplies its
+     * value, optionally targeting the linked OAS_OPERATION.
      */
     public static final OasParameterLink OAS_PARAMETER_LINK = OasParameterLink.OAS_PARAMETER_LINK;
 
     /**
-     * The table <code>oagi.oas_request</code>.
+     * OpenAPI Request Body Object for an OAS_OPERATION; it defines the
+     * operation's request payload from a BIE-based OAS_MESSAGE_BODY, along with
+     * whether the body is required and generation options such as array
+     * wrapping, root suppression, and optional meta-header and pagination
+     * TOP_LEVEL_ASBIEP references.
      */
     public static final OasRequest OAS_REQUEST = OasRequest.OAS_REQUEST;
 
     /**
-     * The table <code>oagi.oas_request_parameter</code>.
+     * A many-to-many join assigning OAS_PARAMETER entries (an operation's
+     * query, header, path, or cookie parameters) to an OAS_REQUEST.
      */
     public static final OasRequestParameter OAS_REQUEST_PARAMETER = OasRequestParameter.OAS_REQUEST_PARAMETER;
 
     /**
-     * The table <code>oagi.oas_resource</code>.
+     * A resource (path) belonging to an OpenAPI document; each row is an entry
+     * of the OAS_DOC Paths Object, keyed by PATH (the OpenAPI path, defaulting
+     * to the BIE name) and optionally pointing to an externally defined Path
+     * Item Object via the REF ($ref) column.
      */
     public static final OasResource OAS_RESOURCE = OasResource.OAS_RESOURCE;
 
     /**
-     * The table <code>oagi.oas_resource_tag</code>.
+     * A many-to-many join assigning OAS_TAG entries to an OAS_OPERATION,
+     * representing the tags list of an OpenAPI Operation Object that groups the
+     * operation under those tags.
      */
     public static final OasResourceTag OAS_RESOURCE_TAG = OasResourceTag.OAS_RESOURCE_TAG;
 
     /**
-     * The table <code>oagi.oas_response</code>.
+     * OpenAPI Response Object owned by an OAS_OPERATION; one entry of the
+     * operation's responses map keyed by HTTP status code, binding the response
+     * body to an OAS_MESSAGE_BODY (which references a BIE) with optional
+     * meta-header and pagination TOP_LEVEL_ASBIEP references.
      */
     public static final OasResponse OAS_RESPONSE = OasResponse.OAS_RESPONSE;
 
     /**
-     * The table <code>oagi.oas_response_headers</code>.
+     * The headers map of an OpenAPI Response Object; a many-to-many join
+     * assigning OAS_HTTP_HEADER definitions to an OAS_RESPONSE.
      */
     public static final OasResponseHeaders OAS_RESPONSE_HEADERS = OasResponseHeaders.OAS_RESPONSE_HEADERS;
 
@@ -768,27 +933,36 @@ public class Tables {
     public static final OasSecurityScheme OAS_SECURITY_SCHEME = OasSecurityScheme.OAS_SECURITY_SCHEME;
 
     /**
-     * The table <code>oagi.oas_server</code>.
+     * OpenAPI Server Object; one entry of the servers array of an OAS_DOC,
+     * providing connectivity information to a target host via a URL (optionally
+     * with a description and URL-template variables).
      */
     public static final OasServer OAS_SERVER = OasServer.OAS_SERVER;
 
     /**
-     * The table <code>oagi.oas_server_variable</code>.
+     * OpenAPI Server Variable Object; one named entry of an OAS_SERVER's
+     * variables map, holding the default value, optional enum, and description
+     * used for server URL template substitution.
      */
     public static final OasServerVariable OAS_SERVER_VARIABLE = OasServerVariable.OAS_SERVER_VARIABLE;
 
     /**
-     * The table <code>oagi.oas_tag</code>.
+     * OpenAPI Tag Object; adds metadata to a single tag (a name and an optional
+     * description) that is used to group the Operation Objects of an OpenAPI
+     * document.
      */
     public static final OasTag OAS_TAG = OasTag.OAS_TAG;
 
     /**
-     * The table <code>oagi.oauth2_app</code>.
+     * This table stores OAuth 2.0 / OpenID Connect provider registrations,
+     * including client credentials, endpoint URIs, and login-button display
+     * settings, used to authenticate end users.
      */
     public static final Oauth2App OAUTH2_APP = Oauth2App.OAUTH2_APP;
 
     /**
-     * The table <code>oagi.oauth2_app_scope</code>.
+     * This table captures the OAuth2 scopes requested for an OAUTH2_APP,
+     * storing one scope value per row.
      */
     public static final Oauth2AppScope OAUTH2_APP_SCOPE = Oauth2AppScope.OAUTH2_APP_SCOPE;
 
@@ -803,12 +977,20 @@ public class Tables {
     public static final ReleaseDep RELEASE_DEP = ReleaseDep.RELEASE_DEP;
 
     /**
-     * The table <code>oagi.seq_key</code>.
+     * This table stores the ordering of the associations (ASCC and BCC) that
+     * belong to an ACC. Each record points, through FROM_ACC_MANIFEST_ID, to
+     * the owning ACC via ACC_MANIFEST and, through exactly one of
+     * ASCC_MANIFEST_ID or BCC_MANIFEST_ID, to the ordered association; the
+     * PREV_SEQ_KEY_ID and NEXT_SEQ_KEY_ID columns form a doubly-linked chain
+     * that defines the sequence of these associations within the ACC.
      */
     public static final SeqKey SEQ_KEY = SeqKey.SEQ_KEY;
 
     /**
-     * The table <code>oagi.tag</code>.
+     * The TAG table stores the tags (each with a name, description, and text
+     * and background color) that can be attached to core component and data
+     * type manifests through the intersection tables ACC_MANIFEST_TAG,
+     * ASCCP_MANIFEST_TAG, BCCP_MANIFEST_TAG, and DT_MANIFEST_TAG.
      */
     public static final Tag TAG = Tag.TAG;
 
@@ -823,7 +1005,10 @@ public class Tables {
     public static final TenantBusinessCtx TENANT_BUSINESS_CTX = TenantBusinessCtx.TENANT_BUSINESS_CTX;
 
     /**
-     * The table <code>oagi.text_template</code>.
+     * This table stores named text templates, each with a subject, content
+     * type, and body containing placeholders that are substituted at rendering
+     * time. Templates are looked up by name to compose output such as email
+     * messages.
      */
     public static final TextTemplate TEXT_TEMPLATE = TextTemplate.TEXT_TEMPLATE;
 
@@ -857,6 +1042,11 @@ public class Tables {
     public static final UserTenant USER_TENANT = UserTenant.USER_TENANT;
 
     /**
+     * Registered passkeys (WebAuthn credentials) of local accounts.
+     */
+    public static final WebauthnCredential WEBAUTHN_CREDENTIAL = WebauthnCredential.WEBAUTHN_CREDENTIAL;
+
+    /**
      * This table stores XML schema built-in types and OAGIS built-in types.
      * OAGIS built-in types are those types defined in the XMLSchemaBuiltinType
      * and the XMLSchemaBuiltinType Patterns schemas.
@@ -864,7 +1054,11 @@ public class Tables {
     public static final Xbt XBT = Xbt.XBT;
 
     /**
-     * The table <code>oagi.xbt_manifest</code>.
+     * A release-specific handle to an XBT record, pinning an XML schema
+     * built-in type or OAGIS built-in type to a RELEASE and carrying the
+     * revision chain (PREV_XBT_MANIFEST_ID and NEXT_XBT_MANIFEST_ID) across
+     * releases. It also records how the built-in type maps to an allowed CDT
+     * primitive via CDT_PRI.
      */
     public static final XbtManifest XBT_MANIFEST = XbtManifest.XBT_MANIFEST;
 }

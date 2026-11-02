@@ -50,7 +50,7 @@ A list filter such as `External Reference URI` survives a page reload/bookmark: 
 Creating a Business Term with a malformed `External Reference URI` is rejected server-side with a clear validation error, even though the create form performs no URI format check.
 
 #### Test Assertion #42.1.15
-An import reports a created/updated summary on the import dialog's result step: a row whose `External Reference URI` already exists is counted as updated and a row with a new URI is counted as created (e.g. `1 created`, `1 updated`).
+An import reports a created/updated summary on the import dialog's result step: a row whose (`Business Term` name + `External Reference URI`) pair already exists is counted as updated and a row with a new pair is counted as created (e.g. `1 created`, `1 updated`).
 
 #### Test Assertion #42.1.16
 `PUT /business-terms/{id}` honors the path id and rejects a request body that targets a different id with HTTP 400; a body whose id matches the path succeeds.
@@ -92,7 +92,7 @@ Catalog uniqueness is enforced server-side, not only in the UI. A Business Term 
 26. Verify that the filter value and the filtered result are preserved after the reload. (Assertion [#13](#test-assertion-42113))
 27. The end user creates a Business Term with a malformed `External Reference URI`.
 28. Verify that the create request is rejected with a validation error. (Assertion [#14](#test-assertion-42114))
-29. The end user imports a CSV containing one row with an already-existing `External Reference URI` and one row with a new `External Reference URI`.
+29. The end user imports a CSV containing one row with an already-existing (`Business Term` name + `External Reference URI`) pair and one row with a new pair.
 30. Verify that the import reports one created and one updated. (Assertion [#15](#test-assertion-42115))
 31. An authorized tester issues `PUT /business-terms/{id}` with a body id different from the path id, then with a matching id.
 32. Verify that the mismatched request is rejected with HTTP 400 and the matching update succeeds. (Assertion [#16](#test-assertion-42116))
@@ -269,8 +269,8 @@ and lets the user remap any column or synthesize the required External Reference
 plus an ID column), **Review &amp; select** (parsed rows are shown in a table; valid rows are
 pre-checked, rows that need review are unchecked, flagged, and inline-editable with live
 re-validation), and **Result** (a per-row created / updated / failed summary). The file is parsed
-server-side without persisting; only the rows the user selects are imported, upserting by External
-Reference URI. A top-right close (**X**) button cancels the import at any step before the result step,
+server-side without persisting; only the rows the user selects are imported, upserting by the (Business Term
+name + External Reference URI) pair, the same identity Create and Edit enforce. A top-right close (**X**) button cancels the import at any step before the result step,
 and choosing an unsupported/oversized replacement file keeps the file already selected rather than
 discarding it.
 

@@ -1,7 +1,9 @@
+import {BieCompactRowComponent} from '../bie-compact-row/bie-compact-row.component';
+import {SCORE_TABLE} from '../../common/score-table';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
@@ -15,6 +17,8 @@ import {BiePackageUpliftDialogComponent} from './bie-package-uplift-dialog/bie-p
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
+import {RecordCompactRowComponent} from '../../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../../common/responsive-button';
 
 
 const routes: Routes = [
@@ -54,14 +58,18 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         CommonModule,
         MaterialModule,
-        TranslateModule,
+        TranslatePipe,
         FormsModule,
         ReactiveFormsModule,
         ScoreCommonModule,
         MatMultiSortModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        BieCompactRowComponent,
+        RecordCompactRowComponent,
+        ResponsiveButtonComponent,
+        ...SCORE_TABLE
     ],
   exports: [
     BiePackageListComponent,

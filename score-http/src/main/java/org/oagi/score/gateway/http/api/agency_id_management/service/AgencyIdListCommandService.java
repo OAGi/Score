@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.agency_id_management.service;
 
 import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.CreateAgencyIdListRequest;
 import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.UpdateAgencyIdListRequest;
-import org.oagi.score.gateway.http.api.agency_id_management.controller.payload.UpdateAgencyIdListValueRequest;
 import org.oagi.score.gateway.http.api.agency_id_management.model.*;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListCommandRepository;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.WIP;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.*;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -79,6 +79,19 @@ public class AgencyIdListCommandService {
         if (!agencyIdListDetails.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
+        if (request.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required.");
+        }
+        if (request.valueList() != null) {
+            for (var value : request.valueList()) {
+                if (!hasText(value.value())) {
+                    throw new IllegalArgumentException("Agency ID list value cannot be empty.");
+                }
+                if (!hasText(value.name())) {
+                    throw new IllegalArgumentException("Agency ID list value meaning cannot be empty.");
+                }
+            }
+        }
 
         var command = command(requester);
 
@@ -104,33 +117,42 @@ public class AgencyIdListCommandService {
 
             // Issue #1647
             // Only one 'developer default' and one 'user default' are allowed.
-            UpdateAgencyIdListValueRequest developerDefaultValueRequest =
-                    request.valueList().stream()
-                            .filter(e -> e.developerDefault() != null && e.developerDefault())
-                            .findAny().orElse(null);
-            UpdateAgencyIdListValueRequest userDefaultValueRequest =
-                    request.valueList().stream()
-                            .filter(e -> e.userDefault() != null && e.userDefault())
-                            .findAny().orElse(null);
+            long developerDefaultCount = request.valueList().stream()
+                    .filter(e -> Boolean.TRUE.equals(e.developerDefault())).count();
+            if (developerDefaultCount > 1) {
+                throw new IllegalArgumentException("Only one value can be flagged as 'developer default'.");
+            }
+            long userDefaultCount = request.valueList().stream()
+                    .filter(e -> Boolean.TRUE.equals(e.userDefault())).count();
+            if (userDefaultCount > 1) {
+                throw new IllegalArgumentException("Only one value can be flagged as 'user default'.");
+            }
 
             // Process updates and additions of agency ID list values
             request.valueList().forEach(value -> {
                 AgencyIdListValueManifestId valueId = value.agencyIdListValueManifestId();
+                boolean developerDefault = Boolean.TRUE.equals(value.developerDefault());
+                boolean userDefault = Boolean.TRUE.equals(value.userDefault());
                 if (existingValues.containsKey(valueId)) {
                     command.updateValue(valueId,
                             value.value(), value.name(),
                             value.definition(),
                             value.deprecated(),
-                            (developerDefaultValueRequest != null && developerDefaultValueRequest.agencyIdListValueManifestId().equals(value.agencyIdListValueManifestId())) ? value.developerDefault() : null,
-                            (userDefaultValueRequest != null && userDefaultValueRequest.agencyIdListValueManifestId().equals(value.agencyIdListValueManifestId())) ? value.userDefault() : null
+                            developerDefault, userDefault
                     );
                     existingValues.remove(valueId);
                 } else {
+                    // A newly added value cannot be deprecated (same rule as the UI).
+                    if (Boolean.TRUE.equals(value.deprecated())) {
+                        throw new IllegalArgumentException("A newly added value cannot be deprecated.");
+                    }
                     command.createValue(agencyIdListManifestId,
                             agencyIdListDetails.agencyIdListId(),
                             agencyIdListDetails.release().releaseId(),
                             value.value(), value.name(),
-                            value.definition());
+                            value.definition(),
+                            Boolean.TRUE.equals(value.deprecated()),
+                            developerDefault, userDefault);
                 }
             });
 
@@ -166,6 +188,7 @@ public class AgencyIdListCommandService {
             throw new IllegalArgumentException("The core component in '" + prevState + "' state cannot move to '" + nextState + "' state.");
         }
 
+        boolean restore = prevState == Deleted && nextState == WIP;
         if (prevState == Deleted) {
             boolean isOwnerDeveloper = agencyIdListSummary.owner().isDeveloper();
             boolean isRequesterDeveloper = requester.isDeveloper();
@@ -190,6 +213,10 @@ public class AgencyIdListCommandService {
             if (!agencyIdListSummary.owner().userId().equals(requester.userId()) && !prevState.isImplicitMove(nextState)) {
                 throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
             }
+        }
+
+        if (!restore && nextState != Deleted && agencyIdListSummary.namespaceId() == null) {
+            throw new IllegalArgumentException("Namespace is required before changing the Agency ID List state.");
         }
 
         var command = command(requester);
@@ -251,6 +278,28 @@ public class AgencyIdListCommandService {
                 CcState.WIP, requester.userId());
     }
 
+    private void assertCancellable(ScoreUser requester, AgencyIdListDetailsRecord agencyIdListDetails) {
+        if (CcState.WIP != agencyIdListDetails.state()) {
+            throw new IllegalArgumentException("The Agency ID List '" + agencyIdListDetails.name() + "' cannot be cancelled " +
+                    "because it is in the '" + agencyIdListDetails.state() + "' state. "
+                    + "Only Agency ID Lists in the 'WIP' state can be cancelled.");
+        }
+
+        if (requester.isDeveloper()) {
+            if (!agencyIdListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
+            }
+        } else {
+            if (agencyIdListDetails.release().isWorkingRelease()) {
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
+            }
+        }
+
+        if (requester.isDeveloper() != agencyIdListDetails.owner().isDeveloper()) {
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
+        }
+    }
+
     public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, String comment, String projectFieldOptionOverride) {
 
         AgencyIdListDetailsRecord agencyIdListDetails =
@@ -262,6 +311,8 @@ public class AgencyIdListCommandService {
         if (agencyIdListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
+
+        assertCancellable(requester, agencyIdListDetails);
 
         CcState prevState = agencyIdListDetails.state();
 
@@ -290,7 +341,14 @@ public class AgencyIdListCommandService {
                 query(requester).getAgencyIdListSummary(agencyIdListManifestId);
 
         if (!CcState.Deleted.equals(agencyIdListSummary.state())) {
-            throw new IllegalArgumentException("Only the Code List in 'Deleted' state can be deleted.");
+            throw new IllegalArgumentException("Only the Agency ID List in 'Deleted' state can be deleted.");
+        }
+        if (agencyIdListSummary.owner().isDeveloper() != requester.isDeveloper()) {
+            if (agencyIdListSummary.owner().isDeveloper()) {
+                throw new IllegalArgumentException("Only developers can purge this Agency ID List.");
+            } else {
+                throw new IllegalArgumentException("Only end-users can purge this Agency ID List.");
+            }
         }
 
         boolean result = command(requester).delete(agencyIdListManifestId);

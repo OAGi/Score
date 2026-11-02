@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {
   AccDetails,
@@ -307,10 +307,13 @@ export class CcNodeService {
           return node.detail;
         }));
       case 'BCCP':
+        const bccpNode = node as BccpFlatNode;
+        const prefetchedBccpDetails = bccpNode.prefetchedBccpDetails;
+        bccpNode.prefetchedBccpDetails = undefined;
         return forkJoin([
-          this.getBccDetails((node as BccpFlatNode).bccManifestId),
-          this.getBccpDetails(node.manifestId),
-          this.getDtDetails((node as BccpFlatNode).bdtManifestId),
+          this.getBccDetails(bccpNode.bccManifestId),
+          prefetchedBccpDetails ? of(prefetchedBccpDetails) : this.getBccpDetails(node.manifestId),
+          this.getDtDetails(bccpNode.bdtManifestId),
         ]).pipe(map(([bccDetails, bccpDetails, dtDetails]) => {
           node.detail = new CcBccpNodeInfo(node as BccpFlatNode, bccDetails, bccpDetails, dtDetails);
           return node.detail;
@@ -354,21 +357,6 @@ export class CcNodeService {
     return new HttpParams().set('data', data);
   }
 
-  verifyAppendAssociation(accManifestId: number,
-                          manifestId: number, type: string): Observable<VerifyAppendAssociationResponse> {
-
-    let params = new HttpParams();
-    if (type === 'ASCCP') {
-      params = params.set('asccpManifestId', manifestId);
-    } else if (type === 'BCCP') {
-      params = params.set('bccpManifestId', manifestId);
-    }
-
-    return this.http.get<VerifyAppendAssociationResponse>('/api/core-components/acc/' + accManifestId + '/verify', {
-      params
-    });
-  }
-
   appendAscc(accManifestId: number, asccpManifestId: number,
              pos: number, attribute: boolean): Observable<any> {
 
@@ -382,12 +370,6 @@ export class CcNodeService {
 
     return this.http.post('/api/core-components/acc/' + accManifestId + '/bcc/' + bccpManifestId, {}, {
       params: new HttpParams().set('pos', '' + pos).set('attribute', attribute)
-    });
-  }
-
-  verifySetBasedAcc(accManifestId: number, basedAccManifestId: number): Observable<VerifyAppendAssociationResponse> {
-    return this.http.get<VerifyAppendAssociationResponse>('/api/core-components/acc/' + accManifestId + '/verify', {
-      params: new HttpParams().set('basedAccManifestId', basedAccManifestId)
     });
   }
 

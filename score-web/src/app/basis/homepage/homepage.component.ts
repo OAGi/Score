@@ -1,5 +1,6 @@
+import {ccCountOfState, ccCountsByUsersAndStates} from './cc-summary-counts';
 import {HttpParams} from '@angular/common/http';
-import { AfterViewInit, Component, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -37,6 +38,7 @@ export interface UserStatesItem {
   standalone: false,
   selector: 'score-homepage',
   templateUrl: './homepage.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
@@ -221,12 +223,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       [{key: 'releaseId', value: this.workingRelease.releaseId}] :
       [];
     this.ccService.getSummaryCcList(this.library.libraryId).subscribe(summaryCcInfo => {
+      const ccByUsersAndStates = ccCountsByUsersAndStates(summaryCcInfo.ccByTypesUsersAndStates);
+
       this.numberOfTotalCCByStates = [];
       this.numberOfMyCCByStates = [];
       for (const item of this.stateColorList) {
         this.numberOfTotalCCByStates.push({
           name: item.state,
-          value: summaryCcInfo.numberOfTotalCcByStates[item.state] || 0,
+          value: ccCountOfState(ccByUsersAndStates, item.state),
           href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams]],
           disabled: false,
           style: {
@@ -236,7 +240,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         });
         this.numberOfMyCCByStates.push({
           name: item.state,
-          value: summaryCcInfo.numberOfMyCcByStates[item.state] || 0,
+          value: ccCountOfState(ccByUsersAndStates, item.state, userToken.username),
           href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams, {key: 'ownerLoginIdList', value: userToken.username}]],
           disabled: false,
           style: {
@@ -250,11 +254,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.numberOfCCsByUsers_usernameList = [];
       let data = {};
       let total = 0;
-      for (const username of this.keys(summaryCcInfo.ccByUsersAndStates)) {
+      for (const username of this.keys(ccByUsersAndStates)) {
         total = 0;
         data = {username};
         for (const item of this.stateColorList) {
-          data[item.state] = summaryCcInfo.ccByUsersAndStates[username][item.state] || 0;
+          data[item.state] = ccByUsersAndStates[username][item.state] || 0;
           total += data[item.state];
         }
         data['total'] = total;
@@ -416,6 +420,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       params = params.set(param.key, param.value);
     }
     return base64Encode(params.toString());
+  }
+
+  /** `q` for the Core Component list on the Working release, the release the Home page counts the CCs on. */
+  ccQ(set: any): string {
+    const releaseParams = this.workingRelease ?
+      [{key: 'releaseId', value: this.workingRelease.releaseId}] :
+      [];
+    return this.q([...set, ...releaseParams]);
   }
 
   keys(obj) {

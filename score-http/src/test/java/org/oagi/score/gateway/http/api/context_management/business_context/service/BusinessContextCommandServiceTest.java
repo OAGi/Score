@@ -62,7 +62,7 @@ class BusinessContextCommandServiceTest {
         UserSummaryRecord owner = new UserSummaryRecord(requester.userId(), "tester", "Tester",
                 List.of(ScoreRole.DEVELOPER));
         TopLevelAsbiepSummaryRecord ownedByRequester = new TopLevelAsbiepSummaryRecord(
-                null, null, TLA_ID, null, null, null,
+                null, null, TLA_ID, null, null, null, null,
                 "den", "propertyTerm", "displayName", "1.0", "status",
                 BieState.WIP, false, false, owner, null, null);
         lenient().when(repositoryFactory.topLevelAsbiepQueryRepository(any())).thenReturn(topLevelAsbiepQuery);

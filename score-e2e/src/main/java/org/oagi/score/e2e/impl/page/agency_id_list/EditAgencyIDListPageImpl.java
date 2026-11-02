@@ -13,6 +13,7 @@ import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.openqa.selenium.*;
 
 import java.time.Duration;
+import java.util.List;
 
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
@@ -41,7 +42,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By VERSION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Version\")]//ancestor::mat-form-field//input");
     private static final By AGENCY_ID_LIST_VALUE_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//mat-label[contains(text(), \"Agency ID List Value\")]//ancestor::mat-form-field//*[self::mat-select or self::score-mat-select]");
     private static final By NAMESPACE_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-select[@placeholder = \"Namespace\"]");
     private static final By DEPRECATED_CHECKBOX_LOCATOR =
@@ -98,7 +99,7 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     private static final By REMOVE_AGENCY_ID_LIST_VALUE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By SEARCH_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"Search\")]//ancestor::mat-form-field//input");
+            By.xpath("//score-search-bar//input");
     private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
             By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By SEARCH_BUTTON_LOCATOR =
@@ -158,7 +159,15 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
 
     @Override
     public WebElement getGUIDField() {
-        return visibilityOfElementLocated(getDriver(), GUID_FIELD_LOCATOR);
+        return defaultWait(getDriver()).until(driver -> {
+            List<WebElement> fields = driver.findElements(GUID_FIELD_LOCATOR);
+            if (fields.isEmpty()) {
+                return null;
+            }
+            WebElement field = fields.get(0);
+            String value = field.getAttribute("value");
+            return field.isDisplayed() && value != null && !value.isBlank() ? field : null;
+        });
     }
 
     @Override
@@ -215,13 +224,15 @@ public class EditAgencyIDListPageImpl extends BasePageImpl implements EditAgency
     @Override
     public void setNamespace(NamespaceObject namespace) {
         retry(() -> {
-            click(getDriver(), getNamespaceSelectField());
-            waitFor(ofMillis(1000L));
-            sendKeys(visibilityOfElementLocated(longWait(getDriver()), DROPDOWN_SEARCH_FIELD_LOCATOR), namespace.getUri());
-            WebElement optionField = elementToBeClickable(longWait(getDriver()),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" +
-                            namespace.getUri() + "\")]//ancestor::mat-option[1]"));
-            click(getDriver(), optionField);
+            WebElement namespaceSelect = openMatSelect(getDriver(), NAMESPACE_SELECT_FIELD_LOCATOR);
+            List<WebElement> searchFields = namespaceSelect.findElements(
+                    By.cssSelector("input[aria-label='dropdown search']"));
+            if (!searchFields.isEmpty() && searchFields.get(0).isDisplayed()) {
+                clear(searchFields.get(0));
+                sendKeys(searchFields.get(0), namespace.getUri());
+            }
+            click(matSelectOption(getDriver(), namespaceSelect, namespace.getUri()));
+            escape(getDriver());
         });
     }
 

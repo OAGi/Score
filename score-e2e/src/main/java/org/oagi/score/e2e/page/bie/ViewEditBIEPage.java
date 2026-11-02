@@ -6,6 +6,8 @@ import org.oagi.score.e2e.page.SearchBarPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import java.time.LocalDateTime;
 
 /**
@@ -139,6 +141,13 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
     WebElement getTableRecordAtIndex(int idx);
 
     /**
+     * Wait until the table has loaded and return the DENs of the BIEs that it lists, in the order listed.
+     *
+     * @return the DENs of the listed BIEs
+     */
+    List<String> getListedDENs();
+
+    /**
      * Return the UI element of the table record containing the given value.
      *
      * @param value value
@@ -241,6 +250,13 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
     WebElement getDiscardButton(boolean enabled);
 
     /**
+     * Return {@code true} if the 'Discard' action is hidden or disabled.
+     *
+     * @return {@code true} when the 'Discard' action cannot be invoked
+     */
+    boolean isDiscardButtonUnavailable();
+
+    /**
      * Discard the top-level ASBIEP.
      *
      * @param topLevelASBIEP Top-Level ASBIEP
@@ -254,6 +270,15 @@ public interface ViewEditBIEPage extends Page, SearchBarPage {
      * @return the quantity of Only BIEs by state
      */
     int getNumberOfOnlyBIEsPerStateAreListed(String state);
+
+    /**
+     * Wait until at least the expected number of BIEs in the given state are listed.
+     *
+     * @param state the BIE state: WIP, QA or Production
+     * @param minimumCount the minimum number of listed BIEs
+     * @return the number of listed BIEs when the minimum is reached
+     */
+    int waitForNumberOfOnlyBIEsPerStateAreListed(String state, int minimumCount);
 
     /**
      * Return the UI element of the 'Move to QA' button.

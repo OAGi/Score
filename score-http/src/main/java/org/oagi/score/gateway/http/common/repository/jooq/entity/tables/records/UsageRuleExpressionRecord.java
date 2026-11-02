@@ -21,47 +21,45 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.usage_rule_expression.usage_rule_expression_id</code>. Primary
-     * key of the usage rule expression
+     * Setter for <code>usage_rule_expression.usage_rule_expression_id</code>.
+     * Primary key of the usage rule expression
      */
     public void setUsageRuleExpressionId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.usage_rule_expression.usage_rule_expression_id</code>. Primary
-     * key of the usage rule expression
+     * Getter for <code>usage_rule_expression.usage_rule_expression_id</code>.
+     * Primary key of the usage rule expression
      */
     public ULong getUsageRuleExpressionId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.usage_rule_expression.constraint_type</code>.
-     * Constraint type according to the CC spec. It represents the expression
-     * language (syntax) used in the CONSTRAINT column. It is a value list
-     * column. 0 = 'Unstructured' which is basically a description of the rule,
-     * 1 = 'Schematron'.
+     * Setter for <code>usage_rule_expression.constraint_type</code>. Constraint
+     * type according to the CC spec. It represents the expression language
+     * (syntax) used in the CONSTRAINT column. It is a value list column. 0 =
+     * 'Unstructured' which is basically a description of the rule, 1 =
+     * 'Schematron'.
      */
     public void setConstraintType(Integer value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.usage_rule_expression.constraint_type</code>.
-     * Constraint type according to the CC spec. It represents the expression
-     * language (syntax) used in the CONSTRAINT column. It is a value list
-     * column. 0 = 'Unstructured' which is basically a description of the rule,
-     * 1 = 'Schematron'.
+     * Getter for <code>usage_rule_expression.constraint_type</code>. Constraint
+     * type according to the CC spec. It represents the expression language
+     * (syntax) used in the CONSTRAINT column. It is a value list column. 0 =
+     * 'Unstructured' which is basically a description of the rule, 1 =
+     * 'Schematron'.
      */
     public Integer getConstraintType() {
         return (Integer) get(1);
     }
 
     /**
-     * Setter for <code>oagi.usage_rule_expression.constraint_text</code>. This
+     * Setter for <code>usage_rule_expression.constraint_text</code>. This
      * column capture the constraint expressing the usage rule. In other words,
      * this is the expression.
      */
@@ -70,7 +68,7 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     /**
-     * Getter for <code>oagi.usage_rule_expression.constraint_text</code>. This
+     * Getter for <code>usage_rule_expression.constraint_text</code>. This
      * column capture the constraint expressing the usage rule. In other words,
      * this is the expression.
      */
@@ -79,18 +77,16 @@ public class UsageRuleExpressionRecord extends UpdatableRecordImpl<UsageRuleExpr
     }
 
     /**
-     * Setter for
-     * <code>oagi.usage_rule_expression.represented_usage_rule_id</code>. The
-     * usage rule which the expression represents
+     * Setter for <code>usage_rule_expression.represented_usage_rule_id</code>.
+     * The usage rule which the expression represents
      */
     public void setRepresentedUsageRuleId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.usage_rule_expression.represented_usage_rule_id</code>. The
-     * usage rule which the expression represents
+     * Getter for <code>usage_rule_expression.represented_usage_rule_id</code>.
+     * The usage rule which the expression represents
      */
     public ULong getRepresentedUsageRuleId() {
         return (ULong) get(3);

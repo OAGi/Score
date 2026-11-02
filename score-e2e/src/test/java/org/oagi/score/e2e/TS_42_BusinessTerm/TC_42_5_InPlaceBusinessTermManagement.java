@@ -12,6 +12,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.BieBusinessTermAssignDialog;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
+import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -419,38 +420,58 @@ public class TC_42_5_InPlaceBusinessTermManagement extends BaseTest {
     }
 
     /**
-     * #42.5.10 — on the base (inherited) tab the chip field is read-only and non-interactive: it has
-     * no '+' button and its chips carry no interactive preferred-star/remove controls.
+     * #42.5.10 — the base tab of an inherited BIE renders its business-term field as read-only.
      */
     @Test
     @DisplayName("TC_42_5_10")
     public void base_inherited_tab_chip_field_is_read_only() {
-        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
-        thisAccountWillBeDeletedAfterTests(developer);
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
 
-        TopLevelASBIEPObject topLevelASBIEP = generateBbieTopLevelASBIEP(developer, endUser, "WIP");
+        BusinessContextObject businessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(endUser);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
+        ASCCPObject bomAsccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(library, "BOM. BOM", release.getReleaseNumber());
+        TopLevelASBIEPObject baseBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Collections.singletonList(businessContext), bomAsccp, endUser, "WIP");
+
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
-        String path = bbiePath(topLevelASBIEP);
-        WebElement bbieNode = editBIEPage.getNodeByPath(path);
-        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(bbieNode);
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(baseBIE);
+        String path = "/" + bomAsccp.getPropertyTerm() + "/Action Code";
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(editBIEPage.getNodeByPath(path));
         bbiePanel.toggleUsed();
         editBIEPage.hitUpdateButton();
 
-        // Switch to the base (inherited) tab; its chip field is read-only.
+        // The Base tab exists on an inherited BIE, so create one from the prepared source BIE.
+        ViewEditBIEPage viewEditBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu();
+        viewEditBIEPage.showAdvancedSearchPanel();
+        viewEditBIEPage.setBusinessContext(businessContext.getName());
+        viewEditBIEPage.setOwner(endUser.getLoginId());
+        viewEditBIEPage.setDEN(bomAsccp.getDen());
+        viewEditBIEPage.hitSearchButton();
+        viewEditBIEPage.hitCreateInheritedBIE(viewEditBIEPage.getTableRecordByValue(bomAsccp.getDen()));
+        viewEditBIEPage.hitSearchButton();
+
+        WebElement inheritedBieRow = null;
+        for (int rowIndex = 1; rowIndex <= viewEditBIEPage.getTotalNumberOfItems(); rowIndex++) {
+            WebElement row = viewEditBIEPage.getTableRecordAtIndex(rowIndex);
+            if (getText(viewEditBIEPage.getColumnByName(row, "den")).contains("Based on:")) {
+                inheritedBieRow = row;
+                break;
+            }
+        }
+        assertNotNull(inheritedBieRow, "The inherited BOM BIE should be listed after creation.");
+
+        editBIEPage = viewEditBIEPage.openEditBIEPage(inheritedBieRow);
         editBIEPage.getBBIEPanel(editBIEPage.getNodeByPath(path)).getBaseBBIEPanel();
 
-        // The read-only base chip field is present, but the interactive '+' add button is not rendered
-        // for the base tab (TODO(#1754): verify selector on live stack).
-        WebElement baseChipField = getDriver().findElement(By.xpath(
-                "//mat-form-field[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-badges-field-readonly \")]"
-                        + "//mat-chip-grid[@data-bie-type=\"BBIE\"]"));
+        WebElement baseChipField = getDriver().findElement(By.cssSelector(
+                "mat-form-field.bt-badges-field-readonly mat-chip-grid[data-bie-type='BBIE']"));
         assertTrue(baseChipField.isDisplayed());
-        assertEquals(0, baseChipField.findElements(By.xpath(
-                "ancestor::mat-form-field[1]"
-                        + "//button[contains(concat(\" \", normalize-space(@class), \" \"), \" bt-add-btn \")]")).size());
+        assertEquals(0, baseChipField.findElements(By.cssSelector(
+                "button.bt-add-btn")).size());
     }
 
     @AfterEach

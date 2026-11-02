@@ -17,7 +17,7 @@ import java.util.List;
  * </p>
  *
  * <p><strong>Note:</strong> Do not switch this class to a Java record.
- * {@code GenericJackson2JsonRedisSerializer} cannot handle Java records properly at the time of writing.</p> *
+ * {@code GenericJacksonJsonRedisSerializer} cannot handle Java records properly at the time of writing.</p> *
  *
  * <p>
  * The event is initialized with:

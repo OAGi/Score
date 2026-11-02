@@ -479,19 +479,20 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
     }
 
     private AccessPrivilege toAccessPrivilege(UserId biePackageOwnerId, BieState state) {
-        UserId requesterId = requester().userId();
+        // An administrator acts as the owner, as for a BIE (Issue #1576).
+        boolean ownerOrAdministrator = requester().userId().equals(biePackageOwnerId) || requester().isAdministrator();
 
         AccessPrivilege accessPrivilege = Prohibited;
         switch (state) {
             case WIP:
-                if (requesterId.equals(biePackageOwnerId)) {
+                if (ownerOrAdministrator) {
                     accessPrivilege = CanEdit;
                 } else {
                     accessPrivilege = Prohibited;
                 }
                 break;
             case QA:
-                if (requesterId.equals(biePackageOwnerId)) {
+                if (ownerOrAdministrator) {
                     accessPrivilege = CanMove;
                 } else {
                     accessPrivilege = CanView;

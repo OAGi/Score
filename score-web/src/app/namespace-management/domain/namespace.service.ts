@@ -1,7 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
-import {NamespaceDetails, NamespaceListEntry, NamespaceListRequest, NamespaceSummary} from './namespace';
+import {NamespaceDetails, NamespaceListEntry, NamespaceSummary} from './namespace';
 import {PageResponse} from '../../basis/basis';
 import {map} from 'rxjs/operators';
 
@@ -9,39 +9,7 @@ import {map} from 'rxjs/operators';
 export class NamespaceService {
   private http = inject(HttpClient);
 
-
-  getNamespaceList(request: NamespaceListRequest): Observable<PageResponse<NamespaceListEntry>> {
-    let params = new HttpParams()
-        .set('libraryId', '' + request.library.libraryId)
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.standard.length > 0) {
-      params = params.set('standard', request.standard.join(','));
-    }
-    if (request.filters.uri) {
-      params = params.set('uri', request.filters.uri);
-    }
-    if (request.filters.prefix) {
-      params = params.set('prefix', request.filters.prefix);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
-    if (request.ownerLoginIdList.length > 0) {
-      params = params.set('ownerLoginIdList', request.ownerLoginIdList.join(','));
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
+  getNamespaceListPage(params: HttpParams): Observable<PageResponse<NamespaceListEntry>> {
     return this.http.get<PageResponse<NamespaceListEntry>>('/api/namespaces', {params}).pipe(
         map((res: PageResponse<NamespaceListEntry>) => ({
           ...res,

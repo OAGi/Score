@@ -104,7 +104,11 @@ public class Helper {
         /*
          * Issue #589
          */
-        sb.append(agencyIdListValue.value()).append('_');
+        if (agencyIdListValue != null) {
+            sb.append(agencyIdListValue.value()).append('_');
+        } else {
+            sb.append('_');
+        }
         sb.append(agencyIdList.versionId()).append('_');
         String name = agencyIdList.name();
         if (StringUtils.hasLength(name)) {

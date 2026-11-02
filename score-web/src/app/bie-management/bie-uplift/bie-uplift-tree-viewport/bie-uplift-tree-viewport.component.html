@@ -1,0 +1,33 @@
+<score-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [height]="height"
+                     [contextMenuFor]="menuOf" [cursorNode]="selectedNode"
+                     [showCopyLink]="false" [keyboardNavigation]="false"
+                     (nodeClick)="nodeClick.emit($event)" (contextMenuOpen)="contextMenuOpen.emit($event)">
+  <ng-template #prefix let-node>
+    @if (side === 'source') {
+      @if (host.isSourceNodeCheckable(node)) {
+        <mat-checkbox [checked]="node.target !== undefined" [disabled]="true"></mat-checkbox>
+      }
+    } @else {
+      @if (host.isTargetNodeCheckable(node)) {
+        <mat-checkbox [checked]="node.source !== undefined"
+                      (change)="host.checkMatch($event, node)"
+                      [disabled]="!host.canMatch(node)"
+                      [attr.aria-label]="host.canMatch(node) ? 'Map ' + node.name : host.getMatchDisabledReason(node)">
+        </mat-checkbox>
+      }
+    }
+  </ng-template>
+
+  <ng-template #content let-node>
+    <span class="node-label"
+          [class]="[(node.typeClass || node.type || node.bieType || '').toLowerCase(),
+                    searcher.isSearchResult(node) ? 'inside' : 'outside']"
+          [class.deprecated]="node.deprecated"
+          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+          [class.search-index]="searcher.isCurrentSearchIndex(node)"
+          [innerHTML]="(side === 'source' && node.displayName ? node.displayName : node.name) | highlight : searcher.keywordFor(node, (side === 'source' && node.displayName ? node.displayName : node.name))">
+    </span>
+
+    <score-tree-decorations [node]="node" [decorators]="decorators"/>
+  </ng-template>
+</score-tree-viewport>

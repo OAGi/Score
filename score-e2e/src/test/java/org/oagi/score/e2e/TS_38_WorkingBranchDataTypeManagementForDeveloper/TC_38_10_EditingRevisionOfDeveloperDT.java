@@ -216,7 +216,7 @@ public class TC_38_10_EditingRevisionOfDeveloperDT extends BaseTest {
             assertFalse(dtViewEditPage.getContentComponentDefinitionFieldValue().equals(baseBDTContentComponentDefinition));
             dtViewEditPage.showValueDomain();
             assertDoesNotThrow(() -> dtViewEditPage.getTableRecordByValue(codeList.getName()));
-            supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + dtSCName);
+            supplementaryComponentNode = dtViewEditPage.getNodeByPath("/" + derivedDT.getDen() + "/" + dtSCName);
             assertTrue(supplementaryComponentNode.isDisplayed());
             SCPanel = dtViewEditPage.getSCPanel(supplementaryComponentNode);
         }

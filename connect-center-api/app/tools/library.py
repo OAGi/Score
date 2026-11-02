@@ -51,7 +51,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.security import AuthenticatedUser
 from app.services.library_service import LibraryService
-from app.tools import _to_tool_error, get_tool_authenticated_user, str_to_bool, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, str_to_bool, tool_session
 from app.tools.models.library import (
     CreateLibraryResponse,
     GetLibraryPaginationResponse,
@@ -818,15 +819,17 @@ async def discard_library(
     if row is None:
         raise ToolError(f"The library with ID {library_id} was not found. Please check the ID and try again.")
 
-    elicit_result = await ctx.elicit(
+    elicit_result = await elicit_confirmation(
+        ctx,
         message=(
             f"Are you sure you want to discard library '{row.name}' permanently?\n\n"
             "This permanently deletes the library record, its current working release, "
             "its namespaces, and the current working-release authored data tied to that library. "
             "This cannot be undone."
         ),
-        response_type=None,
     )
+    if isinstance(elicit_result, InputRequiredResult):
+        return elicit_result
     match elicit_result:
         case AcceptedElicitation():
             pass

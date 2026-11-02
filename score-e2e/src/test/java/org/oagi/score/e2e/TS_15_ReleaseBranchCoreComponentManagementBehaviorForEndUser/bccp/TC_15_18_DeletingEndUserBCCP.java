@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -47,6 +48,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_18_TA_1")
     public void if_a_bccp_revision_number_is_1_the_end_user_who_is_the_owner_of_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -76,6 +78,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_18_TA_2")
     public void upon_opening_an_ancestor_acc_that_has_an_acc_using_a_deleted_bccp_as_the_ancestor() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -109,6 +112,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_18_TA_3")
     public void upon_opening_an_acc_that_uses_the_bccp_the_bcc_that_uses_that_bccp_shall_be() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -158,6 +162,7 @@ public class TC_15_18_DeletingEndUserBCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_18_TA_4")
     public void bccp_whose_revision_number_is_more_than_1_in_any_state_cannot_be_deleted() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

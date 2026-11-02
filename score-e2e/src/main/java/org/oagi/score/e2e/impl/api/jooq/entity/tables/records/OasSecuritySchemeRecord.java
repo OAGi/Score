@@ -22,75 +22,73 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.oas_security_scheme_id</code>.
-     * The primary key of the record.
+     * Setter for <code>oas_security_scheme.oas_security_scheme_id</code>. The
+     * primary key of the record.
      */
     public void setOasSecuritySchemeId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.oas_security_scheme_id</code>.
-     * The primary key of the record.
+     * Getter for <code>oas_security_scheme.oas_security_scheme_id</code>. The
+     * primary key of the record.
      */
     public ULong getOasSecuritySchemeId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.guid</code>. The GUID of the
-     * record.
+     * Setter for <code>oas_security_scheme.guid</code>. The GUID of the record.
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.guid</code>. The GUID of the
-     * record.
+     * Getter for <code>oas_security_scheme.guid</code>. The GUID of the record.
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.oas_doc_id</code>. Owning
-     * OpenAPI document; one entry of that doc components.securitySchemes map.
+     * Setter for <code>oas_security_scheme.oas_doc_id</code>. Owning OpenAPI
+     * document; one entry of that doc components.securitySchemes map.
      */
     public void setOasDocId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.oas_doc_id</code>. Owning
-     * OpenAPI document; one entry of that doc components.securitySchemes map.
+     * Getter for <code>oas_security_scheme.oas_doc_id</code>. Owning OpenAPI
+     * document; one entry of that doc components.securitySchemes map.
      */
     public ULong getOasDocId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.scheme_name</code>. REQUIRED.
-     * The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth,
-     * BearerAuth); also the schemeName used in Security Requirement Objects.
-     * Unique within an oas_doc.
+     * Setter for <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
+     * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
+     * also the schemeName used in Security Requirement Objects. Unique within
+     * an oas_doc.
      */
     public void setSchemeName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.scheme_name</code>. REQUIRED.
-     * The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth,
-     * BearerAuth); also the schemeName used in Security Requirement Objects.
-     * Unique within an oas_doc.
+     * Getter for <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
+     * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
+     * also the schemeName used in Security Requirement Objects. Unique within
+     * an oas_doc.
      */
     public String getSchemeName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.type</code>. REQUIRED. Security
+     * Setter for <code>oas_security_scheme.type</code>. REQUIRED. Security
      * Scheme type: apiKey | http | oauth2 | openIdConnect | mutualTLS.
      * mutualTLS requires OpenAPI 3.1+ output; enforced by the service layer per
      * the doc open_api_version.
@@ -100,7 +98,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.type</code>. REQUIRED. Security
+     * Getter for <code>oas_security_scheme.type</code>. REQUIRED. Security
      * Scheme type: apiKey | http | oauth2 | openIdConnect | mutualTLS.
      * mutualTLS requires OpenAPI 3.1+ output; enforced by the service layer per
      * the doc open_api_version.
@@ -110,105 +108,103 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.description</code>. Optional
-     * (all types). Short description; CommonMark MAY be used.
+     * Setter for <code>oas_security_scheme.description</code>. Optional (all
+     * types). Short description; CommonMark MAY be used.
      */
     public void setDescription(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.description</code>. Optional
-     * (all types). Short description; CommonMark MAY be used.
+     * Getter for <code>oas_security_scheme.description</code>. Optional (all
+     * types). Short description; CommonMark MAY be used.
      */
     public String getDescription() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.api_key_name</code>. REQUIRED
-     * when type=apiKey: header/query/cookie parameter name. NULL otherwise.
+     * Setter for <code>oas_security_scheme.api_key_name</code>. REQUIRED when
+     * type=apiKey: header/query/cookie parameter name. NULL otherwise.
      */
     public void setApiKeyName(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.api_key_name</code>. REQUIRED
-     * when type=apiKey: header/query/cookie parameter name. NULL otherwise.
+     * Getter for <code>oas_security_scheme.api_key_name</code>. REQUIRED when
+     * type=apiKey: header/query/cookie parameter name. NULL otherwise.
      */
     public String getApiKeyName() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.api_key_in</code>. REQUIRED
-     * when type=apiKey: query | header | cookie (NOT path). NULL otherwise.
+     * Setter for <code>oas_security_scheme.api_key_in</code>. REQUIRED when
+     * type=apiKey: query | header | cookie (NOT path). NULL otherwise.
      */
     public void setApiKeyIn(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.api_key_in</code>. REQUIRED
-     * when type=apiKey: query | header | cookie (NOT path). NULL otherwise.
+     * Getter for <code>oas_security_scheme.api_key_in</code>. REQUIRED when
+     * type=apiKey: query | header | cookie (NOT path). NULL otherwise.
      */
     public String getApiKeyIn() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.http_scheme</code>. REQUIRED
-     * when type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
+     * Setter for <code>oas_security_scheme.http_scheme</code>. REQUIRED when
+     * type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
      */
     public void setHttpScheme(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.http_scheme</code>. REQUIRED
-     * when type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
+     * Getter for <code>oas_security_scheme.http_scheme</code>. REQUIRED when
+     * type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
      */
     public String getHttpScheme() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.bearer_format</code>. Optional;
-     * only when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for
-     * basic.
+     * Setter for <code>oas_security_scheme.bearer_format</code>. Optional; only
+     * when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for basic.
      */
     public void setBearerFormat(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.bearer_format</code>. Optional;
-     * only when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for
-     * basic.
+     * Getter for <code>oas_security_scheme.bearer_format</code>. Optional; only
+     * when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for basic.
      */
     public String getBearerFormat() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.open_id_connect_url</code>.
-     * REQUIRED when type=openIdConnect: discovery URL. NULL otherwise.
+     * Setter for <code>oas_security_scheme.open_id_connect_url</code>. REQUIRED
+     * when type=openIdConnect: discovery URL. NULL otherwise.
      */
     public void setOpenIdConnectUrl(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.open_id_connect_url</code>.
-     * REQUIRED when type=openIdConnect: discovery URL. NULL otherwise.
+     * Getter for <code>oas_security_scheme.open_id_connect_url</code>. REQUIRED
+     * when type=openIdConnect: discovery URL. NULL otherwise.
      */
     public String getOpenIdConnectUrl() {
         return (String) get(10);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.oauth2_flow_type</code>. oauth2
+     * Setter for <code>oas_security_scheme.oauth2_flow_type</code>. oauth2
      * only. The single OAuth Flows key emitted for this scheme: implicit |
      * password | clientCredentials | authorizationCode | deviceAuthorization.
      * deviceAuthorization requires OpenAPI 3.2+. NULL =&gt; authorizationCode
@@ -219,7 +215,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.oauth2_flow_type</code>. oauth2
+     * Getter for <code>oas_security_scheme.oauth2_flow_type</code>. oauth2
      * only. The single OAuth Flows key emitted for this scheme: implicit |
      * password | clientCredentials | authorizationCode | deviceAuthorization.
      * deviceAuthorization requires OpenAPI 3.2+. NULL =&gt; authorizationCode
@@ -230,99 +226,95 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.authorization_url</code>.
-     * oauth2; REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt;
-     * legacy default https://example.com/oauth/authorize.
+     * Setter for <code>oas_security_scheme.authorization_url</code>. oauth2;
+     * REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt; legacy
+     * default https://example.com/oauth/authorize.
      */
     public void setAuthorizationUrl(String value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.authorization_url</code>.
-     * oauth2; REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt;
-     * legacy default https://example.com/oauth/authorize.
+     * Getter for <code>oas_security_scheme.authorization_url</code>. oauth2;
+     * REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt; legacy
+     * default https://example.com/oauth/authorize.
      */
     public String getAuthorizationUrl() {
         return (String) get(12);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.token_url</code>. oauth2;
-     * REQUIRED for password, clientCredentials, authorizationCode,
-     * deviceAuthorization flows. NULL =&gt; legacy default
-     * https://example.com/oauth/token.
+     * Setter for <code>oas_security_scheme.token_url</code>. oauth2; REQUIRED
+     * for password, clientCredentials, authorizationCode, deviceAuthorization
+     * flows. NULL =&gt; legacy default https://example.com/oauth/token.
      */
     public void setTokenUrl(String value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.token_url</code>. oauth2;
-     * REQUIRED for password, clientCredentials, authorizationCode,
-     * deviceAuthorization flows. NULL =&gt; legacy default
-     * https://example.com/oauth/token.
+     * Getter for <code>oas_security_scheme.token_url</code>. oauth2; REQUIRED
+     * for password, clientCredentials, authorizationCode, deviceAuthorization
+     * flows. NULL =&gt; legacy default https://example.com/oauth/token.
      */
     public String getTokenUrl() {
         return (String) get(13);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_security_scheme.device_authorization_url</code>. oauth2,
-     * OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC 8628). NULL
-     * otherwise.
+     * Setter for <code>oas_security_scheme.device_authorization_url</code>.
+     * oauth2, OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC
+     * 8628). NULL otherwise.
      */
     public void setDeviceAuthorizationUrl(String value) {
         set(14, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_security_scheme.device_authorization_url</code>. oauth2,
-     * OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC 8628). NULL
-     * otherwise.
+     * Getter for <code>oas_security_scheme.device_authorization_url</code>.
+     * oauth2, OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC
+     * 8628). NULL otherwise.
      */
     public String getDeviceAuthorizationUrl() {
         return (String) get(14);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.refresh_url</code>. oauth2;
-     * optional refreshUrl for the flow. Emitted only when present.
+     * Setter for <code>oas_security_scheme.refresh_url</code>. oauth2; optional
+     * refreshUrl for the flow. Emitted only when present.
      */
     public void setRefreshUrl(String value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.refresh_url</code>. oauth2;
-     * optional refreshUrl for the flow. Emitted only when present.
+     * Getter for <code>oas_security_scheme.refresh_url</code>. oauth2; optional
+     * refreshUrl for the flow. Emitted only when present.
      */
     public String getRefreshUrl() {
         return (String) get(15);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.oauth2_metadata_url</code>.
-     * oauth2, OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization
-     * Server Metadata (RFC 8414). NULL otherwise.
+     * Setter for <code>oas_security_scheme.oauth2_metadata_url</code>. oauth2,
+     * OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization Server
+     * Metadata (RFC 8414). NULL otherwise.
      */
     public void setOauth2MetadataUrl(String value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.oauth2_metadata_url</code>.
-     * oauth2, OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization
-     * Server Metadata (RFC 8414). NULL otherwise.
+     * Getter for <code>oas_security_scheme.oauth2_metadata_url</code>. oauth2,
+     * OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization Server
+     * Metadata (RFC 8414). NULL otherwise.
      */
     public String getOauth2MetadataUrl() {
         return (String) get(16);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.deprecated</code>. OpenAPI 3.2+
+     * Setter for <code>oas_security_scheme.deprecated</code>. OpenAPI 3.2+
      * Security Scheme deprecated flag. Emitted only for 3.2+ output.
      */
     public void setDeprecated(Byte value) {
@@ -330,7 +322,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.deprecated</code>. OpenAPI 3.2+
+     * Getter for <code>oas_security_scheme.deprecated</code>. OpenAPI 3.2+
      * Security Scheme deprecated flag. Emitted only for 3.2+ output.
      */
     public Byte getDeprecated() {
@@ -338,7 +330,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.created_by</code>. The user who
+     * Setter for <code>oas_security_scheme.created_by</code>. The user who
      * creates the record.
      */
     public void setCreatedBy(ULong value) {
@@ -346,7 +338,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.created_by</code>. The user who
+     * Getter for <code>oas_security_scheme.created_by</code>. The user who
      * creates the record.
      */
     public ULong getCreatedBy() {
@@ -354,23 +346,23 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.last_updated_by</code>. The
-     * user who last updates the record.
+     * Setter for <code>oas_security_scheme.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.last_updated_by</code>. The
-     * user who last updates the record.
+     * Getter for <code>oas_security_scheme.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(19);
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.creation_timestamp</code>. The
+     * Setter for <code>oas_security_scheme.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -378,7 +370,7 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.creation_timestamp</code>. The
+     * Getter for <code>oas_security_scheme.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -386,16 +378,16 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
     }
 
     /**
-     * Setter for <code>oagi.oas_security_scheme.last_update_timestamp</code>.
-     * The timestamp when the record is last updated.
+     * Setter for <code>oas_security_scheme.last_update_timestamp</code>. The
+     * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(21, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_security_scheme.last_update_timestamp</code>.
-     * The timestamp when the record is last updated.
+     * Getter for <code>oas_security_scheme.last_update_timestamp</code>. The
+     * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(21);

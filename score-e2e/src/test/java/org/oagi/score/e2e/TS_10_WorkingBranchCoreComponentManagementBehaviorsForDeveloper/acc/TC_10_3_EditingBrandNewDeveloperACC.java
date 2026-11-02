@@ -211,7 +211,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         assertThrows(TimeoutException.class, () -> accViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
@@ -328,7 +328,7 @@ public class TC_10_3_EditingBrandNewDeveloperACC extends BaseTest {
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
-        WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getObjectClassTerm() + " Extension. Details");
+        WebElement extensionNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Extension/" + acc.getObjectClassTerm() + " Extension. Details");
         ACCViewEditPage.ACCPanel extensionACCPanel = accViewEditPage.getACCPanel(extensionNode);
         String extensionObjectClassTerm = getText(extensionACCPanel.getObjectClassTermField());
         assertEquals(acc.getObjectClassTerm() + " Extension", extensionObjectClassTerm);

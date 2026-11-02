@@ -7,7 +7,8 @@ export const environment = {
   loginPath: 'login',
   logoutPath: 'logout',
   statePath: 'state',
-  stompBrokerUrl: 'ws://127.0.0.1:9000/ws'
+  // Through the dev server proxy, so the handshake carries the session cookie of the page origin.
+  stompBrokerUrl: 'ws://' + window.location.host + '/ws'
 };
 
 /*

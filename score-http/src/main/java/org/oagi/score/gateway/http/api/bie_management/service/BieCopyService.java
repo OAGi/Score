@@ -29,7 +29,9 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManife
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.Guid;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
@@ -40,11 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -80,7 +83,7 @@ public class BieCopyService implements InitializingBean {
     private BusinessInformationEntityRepository bieRepository;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -90,6 +93,9 @@ public class BieCopyService implements InitializingBean {
 
     @Autowired
     private EventListenerContainer eventListenerContainer;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     private final String INTERESTED_EVENT_NAME = "bieCopyRequestEvent";
     private BieCommandService bieCommandService;
@@ -121,6 +127,9 @@ public class BieCopyService implements InitializingBean {
         var query = repositoryFactory.topLevelAsbiepQueryRepository(requester);
 
         TopLevelAsbiepSummaryRecord sourceTopLevelAsbiep = query.getTopLevelAsbiepSummary(sourceTopLevelAsbiepId);
+        if (sourceTopLevelAsbiep == null) {
+            throw new NotFoundException("The BIE to copy does not exist.");
+        }
         TopLevelAsbiepId copiedTopLevelAsbiepId = new InsertTopLevelAsbiepArguments(
                 repositoryFactory.topLevelAsbiepCommandRepository(requester))
                 .setReleaseId(sourceTopLevelAsbiep.release().releaseId())
@@ -139,9 +148,10 @@ public class BieCopyService implements InitializingBean {
         );
 
         /*
-         * Message Publishing
+         * Message Publishing: the listener reads the row inserted above, so it is told only once the
+         * transaction has committed it.
          */
-        redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, bieCopyRequestEvent);
+        eventPublisher.publish(INTERESTED_EVENT_NAME, bieCopyRequestEvent);
     }
 
     /**
@@ -149,7 +159,6 @@ public class BieCopyService implements InitializingBean {
      *
      * @param bieCopyRequestEvent
      */
-    @Transactional
     public void onEventReceived(BieCopyRequestEvent bieCopyRequestEvent) {
         RLock lock = redissonClient.getLock("BieCopyRequestEvent: " + bieCopyRequestEvent.hashCode());
         if (!lock.tryLock()) {
@@ -159,10 +168,34 @@ public class BieCopyService implements InitializingBean {
             logger.debug("Received BieCopyRequestEvent: " + bieCopyRequestEvent);
 
             ScoreUser requester = sessionService.getScoreUserByUserId(bieCopyRequestEvent.getUserId());
-            BieCopyContext copyContext = new BieCopyContext(requester, bieCopyRequestEvent);
-            copyContext.execute();
+            try {
+                // This is called through the raw bean by the message listener, so the transaction is made here:
+                // the copy is all or nothing.
+                new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+                    BieCopyContext copyContext = new BieCopyContext(requester, bieCopyRequestEvent);
+                    copyContext.execute();
+                });
+            } catch (RuntimeException e) {
+                logger.error("Failed to copy " + bieCopyRequestEvent.getSourceTopLevelAsbiepId() +
+                        " to " + bieCopyRequestEvent.getCopiedTopLevelAsbiepId(), e);
+                discardFailedCopy(requester, bieCopyRequestEvent.getCopiedTopLevelAsbiepId());
+            }
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * The copy was rolled back, but its top-level ASBIEP row was committed before it, in the Initiating state that
+     * hides it from every list. Nothing else could remove it, so it is removed here.
+     */
+    private void discardFailedCopy(ScoreUser requester, TopLevelAsbiepId copiedTopLevelAsbiepId) {
+        try {
+            new TransactionTemplate(transactionManager).executeWithoutResult(status ->
+                    repositoryFactory.bieCommandRepository(requester)
+                            .deleteByTopLevelAsbiepIdList(Collections.singletonList(copiedTopLevelAsbiepId)));
+        } catch (RuntimeException e) {
+            logger.error("Failed to remove the half-made copy " + copiedTopLevelAsbiepId, e);
         }
     }
 

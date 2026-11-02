@@ -44,7 +44,7 @@ public class TransferBIEOwnershipDialogImpl extends SearchBarPageImpl implements
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]/span"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"mat-mdc-dialog-title\")]//span"));
     }
 
     @Override
@@ -85,6 +85,29 @@ public class TransferBIEOwnershipDialogImpl extends SearchBarPageImpl implements
     @Override
     public WebElement getTableRecordAtIndex(int idx) {
         return visibilityOfElementLocated(getDriver(), By.xpath("//score-transfer-ownership-dialog//tbody/tr[" + idx + "]"));
+    }
+
+    @Override
+    public java.util.List<String> getListedLoginIds() {
+        invisibilityOfLoadingContainerElement(getDriver());
+        java.util.List<String> ids = readListedLoginIds();
+        for (int i = 0; i < 5; i++) {
+            waitFor(Duration.ofMillis(500L));
+            invisibilityOfLoadingContainerElement(getDriver());
+            java.util.List<String> again = readListedLoginIds();
+            if (again.equals(ids)) {
+                return ids;
+            }
+            ids = again;
+        }
+        return ids;
+    }
+
+    private java.util.List<String> readListedLoginIds() {
+        return retry(() -> getDriver().findElements(By.xpath(
+                        "//score-transfer-ownership-dialog//tbody/tr/td[contains(@class, \"mat-column-loginId\")]//span[1]")).stream()
+                .map(e -> e.getText().trim())
+                .collect(java.util.stream.Collectors.toList()));
     }
 
     @Override

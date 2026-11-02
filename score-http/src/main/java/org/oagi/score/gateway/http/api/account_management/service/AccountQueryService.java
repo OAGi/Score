@@ -51,9 +51,9 @@ public class AccountQueryService {
         return query.getLoginIdList();
     }
 
-    public OAuth2UserRecord getOAuth2User(ScoreUser requester, String sub) {
+    public OAuth2UserRecord getOAuth2User(ScoreUser requester, String providerName, String sub) {
 
         var query = repositoryFactory.accountQueryRepository(requester);
-        return query.getOAuth2User(sub);
+        return query.getOAuth2User(providerName, sub);
     }
 }

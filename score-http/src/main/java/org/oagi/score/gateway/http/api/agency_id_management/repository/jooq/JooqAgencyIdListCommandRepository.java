@@ -520,7 +520,9 @@ public class JooqAgencyIdListCommandRepository
             AgencyIdListId agencyIdListId,
             ReleaseId releaseId,
             String value, String name,
-            Definition definition) {
+            Definition definition,
+            boolean deprecated,
+            boolean isDeveloperDefault, boolean isUserDefault) {
 
         LocalDateTime timestamp = LocalDateTime.now();
 
@@ -538,9 +540,9 @@ public class JooqAgencyIdListCommandRepository
         agencyIdListValueRecord.setLastUpdatedBy(valueOf(requester().userId()));
         agencyIdListValueRecord.setCreationTimestamp(timestamp);
         agencyIdListValueRecord.setLastUpdateTimestamp(timestamp);
-        agencyIdListValueRecord.setIsDeprecated((byte) 0);
-        agencyIdListValueRecord.setIsDeveloperDefault((byte) 0);
-        agencyIdListValueRecord.setIsUserDefault((byte) 0);
+        agencyIdListValueRecord.setIsDeprecated((byte) (deprecated ? 1 : 0));
+        agencyIdListValueRecord.setIsDeveloperDefault((byte) (isDeveloperDefault ? 1 : 0));
+        agencyIdListValueRecord.setIsUserDefault((byte) (isUserDefault ? 1 : 0));
 
         AgencyIdListValueId agencyIdListValueId = new AgencyIdListValueId(
                 dslContext().insertInto(AGENCY_ID_LIST_VALUE)

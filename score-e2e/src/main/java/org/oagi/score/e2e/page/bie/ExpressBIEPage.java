@@ -156,6 +156,10 @@ public interface ExpressBIEPage extends Page, SearchBarPage {
      */
     void selectXMLSchemaExpression();
 
+    void selectODFExpression(String format);
+
+    void selectAvroExpression();
+
     /**
      * Return the JSON Schema expression radio button.
      *
@@ -336,7 +340,11 @@ public interface ExpressBIEPage extends Page, SearchBarPage {
     enum ExpressionFormat {
         XML,
         JSON,
-        YML
+        YML,
+        ODS,
+        FODS,
+        XLSX,
+        AVRO
     }
 
     interface JSONSchemaExpressionOptions {

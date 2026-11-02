@@ -21,18 +21,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsbieBizterm.AsbieBiztermPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Ascc.AsccPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BusinessTerm.BusinessTermPath;
@@ -49,7 +50,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.ascc_bizterm</code>
+     * The reference instance of <code>ascc_bizterm</code>
      */
     public static final AsccBizterm ASCC_BIZTERM = new AsccBizterm();
 
@@ -62,46 +63,46 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     }
 
     /**
-     * The column <code>oagi.ascc_bizterm.ascc_bizterm_id</code>. An internal,
-     * primary database key of an Business term.
+     * The column <code>ascc_bizterm.ascc_bizterm_id</code>. An internal,
+     * primary database key of an ascc_bizterm record.
      */
-    public final TableField<AsccBiztermRecord, ULong> ASCC_BIZTERM_ID = createField(DSL.name("ascc_bizterm_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "An internal, primary database key of an Business term.");
+    public final TableField<AsccBiztermRecord, ULong> ASCC_BIZTERM_ID = createField(DSL.name("ascc_bizterm_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "An internal, primary database key of an ascc_bizterm record.");
 
     /**
-     * The column <code>oagi.ascc_bizterm.business_term_id</code>. An internal
-     * ID of the associated business term
+     * The column <code>ascc_bizterm.business_term_id</code>. An internal ID of
+     * the associated business term
      */
     public final TableField<AsccBiztermRecord, ULong> BUSINESS_TERM_ID = createField(DSL.name("business_term_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the associated business term");
 
     /**
-     * The column <code>oagi.ascc_bizterm.ascc_id</code>. An internal ID of the
+     * The column <code>ascc_bizterm.ascc_id</code>. An internal ID of the
      * associated ASCC
      */
     public final TableField<AsccBiztermRecord, ULong> ASCC_ID = createField(DSL.name("ascc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the associated ASCC");
 
     /**
-     * The column <code>oagi.ascc_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the ascc_bizterm record. The creator of
-     * the ascc_bizterm is also its owner by default.
+     * The column <code>ascc_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the ascc_bizterm record. The creator of the
+     * ascc_bizterm is also its owner by default.
      */
     public final TableField<AsccBiztermRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the ascc_bizterm record. The creator of the ascc_bizterm is also its owner by default.");
 
     /**
-     * The column <code>oagi.ascc_bizterm.last_updated_by</code>. A foreign key
+     * The column <code>ascc_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the ascc_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
     public final TableField<AsccBiztermRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the ascc_bizterm record. This may be the user who is in the same group as the creator.");
 
     /**
-     * The column <code>oagi.ascc_bizterm.creation_timestamp</code>. Timestamp
-     * when the ascc_bizterm record was first created.
+     * The column <code>ascc_bizterm.creation_timestamp</code>. Timestamp when
+     * the ascc_bizterm record was first created.
      */
     public final TableField<AsccBiztermRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the ascc_bizterm record was first created.");
 
     /**
-     * The column <code>oagi.ascc_bizterm.last_update_timestamp</code>. The
-     * timestamp when the ascc_bizterm was last updated.
+     * The column <code>ascc_bizterm.last_update_timestamp</code>. The timestamp
+     * when the ascc_bizterm was last updated.
      */
     public final TableField<AsccBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the ascc_bizterm was last updated.");
 
@@ -114,21 +115,21 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.ascc_bizterm</code> table reference
+     * Create an aliased <code>ascc_bizterm</code> table reference
      */
     public AsccBizterm(String alias) {
         this(DSL.name(alias), ASCC_BIZTERM);
     }
 
     /**
-     * Create an aliased <code>oagi.ascc_bizterm</code> table reference
+     * Create an aliased <code>ascc_bizterm</code> table reference
      */
     public AsccBizterm(Name alias) {
         this(alias, ASCC_BIZTERM);
     }
 
     /**
-     * Create a <code>oagi.ascc_bizterm</code> table reference
+     * Create a <code>ascc_bizterm</code> table reference
      */
     public AsccBizterm() {
         this(DSL.name("ascc_bizterm"), null);
@@ -169,7 +170,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -190,7 +191,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     private transient AsccPath _ascc;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc</code> table.
+     * Get the implicit join path to the <code>ascc</code> table.
      */
     public AsccPath ascc() {
         if (_ascc == null)
@@ -202,7 +203,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     private transient BusinessTermPath _businessTerm;
 
     /**
-     * Get the implicit join path to the <code>oagi.business_term</code> table.
+     * Get the implicit join path to the <code>business_term</code> table.
      */
     public BusinessTermPath businessTerm() {
         if (_businessTerm == null)
@@ -214,7 +215,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     private transient AsbieBiztermPath _asbieBizterm;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie_bizterm</code>
+     * Get the implicit to-many join path to the <code>asbie_bizterm</code>
      * table
      */
     public AsbieBiztermPath asbieBizterm() {
@@ -268,7 +269,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
      */
     @Override
     public AsccBizterm where(Condition condition) {
-        return new AsccBizterm(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new AsccBizterm(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -335,7 +336,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsccBizterm whereExists(Select<?> select) {
+    public AsccBizterm whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -343,7 +344,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsccBizterm whereNotExists(Select<?> select) {
+    public AsccBizterm whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

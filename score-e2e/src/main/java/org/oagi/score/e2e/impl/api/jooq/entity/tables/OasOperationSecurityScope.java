@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.OasOperationSecurityScopeRecord;
@@ -47,7 +47,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_operation_security_scope</code>
+     * The reference instance of <code>oas_operation_security_scope</code>
      */
     public static final OasOperationSecurityScope OAS_OPERATION_SECURITY_SCOPE = new OasOperationSecurityScope();
 
@@ -61,54 +61,52 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
 
     /**
      * The column
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_scope_id</code>.
+     * <code>oas_operation_security_scope.oas_operation_security_scope_id</code>.
      * The primary key of the record.
      */
     public final TableField<OasOperationSecurityScopeRecord, ULong> OAS_OPERATION_SECURITY_SCOPE_ID = createField(DSL.name("oas_operation_security_scope_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_operation_security_scope.guid</code>. The GUID
-     * of the record.
+     * The column <code>oas_operation_security_scope.guid</code>. The GUID of
+     * the record.
      */
     public final TableField<OasOperationSecurityScopeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
      * The column
-     * <code>oagi.oas_operation_security_scope.oas_operation_security_id</code>.
-     * The owning operation-level security entry.
+     * <code>oas_operation_security_scope.oas_operation_security_id</code>. The
+     * owning operation-level security entry.
      */
     public final TableField<OasOperationSecurityScopeRecord, ULong> OAS_OPERATION_SECURITY_ID = createField(DSL.name("oas_operation_security_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning operation-level security entry.");
 
     /**
-     * The column <code>oagi.oas_operation_security_scope.scope_name</code>. A
-     * scope name required by this entry (oauth2: from the scheme's flows;
+     * The column <code>oas_operation_security_scope.scope_name</code>. A scope
+     * name required by this entry (oauth2: from the scheme's flows;
      * openIdConnect: from the provider).
      */
     public final TableField<OasOperationSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider).");
 
     /**
-     * The column <code>oagi.oas_operation_security_scope.created_by</code>. The
-     * user who creates the record.
+     * The column <code>oas_operation_security_scope.created_by</code>. The user
+     * who creates the record.
      */
     public final TableField<OasOperationSecurityScopeRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column
-     * <code>oagi.oas_operation_security_scope.last_updated_by</code>. The user
-     * who last updates the record.
+     * The column <code>oas_operation_security_scope.last_updated_by</code>. The
+     * user who last updates the record.
      */
     public final TableField<OasOperationSecurityScopeRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column
-     * <code>oagi.oas_operation_security_scope.creation_timestamp</code>. The
-     * timestamp when the record is created.
+     * The column <code>oas_operation_security_scope.creation_timestamp</code>.
+     * The timestamp when the record is created.
      */
     public final TableField<OasOperationSecurityScopeRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
      * The column
-     * <code>oagi.oas_operation_security_scope.last_update_timestamp</code>. The
+     * <code>oas_operation_security_scope.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasOperationSecurityScopeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -122,7 +120,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     }
 
     /**
-     * Create an aliased <code>oagi.oas_operation_security_scope</code> table
+     * Create an aliased <code>oas_operation_security_scope</code> table
      * reference
      */
     public OasOperationSecurityScope(String alias) {
@@ -130,7 +128,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     }
 
     /**
-     * Create an aliased <code>oagi.oas_operation_security_scope</code> table
+     * Create an aliased <code>oas_operation_security_scope</code> table
      * reference
      */
     public OasOperationSecurityScope(Name alias) {
@@ -138,7 +136,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     }
 
     /**
-     * Create a <code>oagi.oas_operation_security_scope</code> table reference
+     * Create a <code>oas_operation_security_scope</code> table reference
      */
     public OasOperationSecurityScope() {
         this(DSL.name("oas_operation_security_scope"), null);
@@ -179,7 +177,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -205,8 +203,8 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     private transient AppUserPath _oasOperationSecurityScopeCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_operation_security_scope_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_operation_security_scope_created_by_fk</code> key.
      */
     public AppUserPath oasOperationSecurityScopeCreatedByFk() {
         if (_oasOperationSecurityScopeCreatedByFk == null)
@@ -218,8 +216,8 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     private transient OasOperationSecurityPath _oasOperationSecurity;
 
     /**
-     * Get the implicit join path to the
-     * <code>oagi.oas_operation_security</code> table.
+     * Get the implicit join path to the <code>oas_operation_security</code>
+     * table.
      */
     public OasOperationSecurityPath oasOperationSecurity() {
         if (_oasOperationSecurity == null)
@@ -231,8 +229,8 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     private transient AppUserPath _oasOperationSecurityScopeLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_operation_security_scope_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_operation_security_scope_last_updated_by_fk</code> key.
      */
     public AppUserPath oasOperationSecurityScopeLastUpdatedByFk() {
         if (_oasOperationSecurityScopeLastUpdatedByFk == null)

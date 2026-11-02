@@ -1,25 +1,17 @@
-<div class="context-section">
-  @if (loading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-
+<score-base-page [loading]="loading" [showToolbar]="false">
   <div class="settings-layout">
-    <score-settings-menu active="ApplicationSettings"></score-settings-menu>
+    <score-settings-menu [active]="menuItem"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
         <mat-card class="p-0">
           <mat-toolbar class="bg-white">
-            <span class="title">{{ title }}</span>
+            <span class="title">{{ sectionTitle }}</span>
             <span class="flex-11-auto"></span>
           </mat-toolbar>
           <mat-card class="mb-2">
             <mat-card-content class="mat-card-container">
+              @if (section === 'features') {
               <div>
-                <div class="subhead">
-                  <h4 class="subhead-heading">Application Features</h4>
-                </div>
                 <div class="row">
                   <div class="col-md-4 col-sm-12">
                     <mat-label>Multi-tenant mode</mat-label>
@@ -104,11 +96,9 @@
                   </div>
                 </div>
               </div>
-              @if (!!applicationSettingsInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">SMTP settings</h4>
-                  </div>
+              }
+              @if (section === 'smtp' && !!applicationSettingsInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-3">
@@ -173,11 +163,8 @@
                   </div>
                 </div>
               }
-              @if (!!applicationSettingsInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">Filename Expressions</h4>
-                  </div>
+              @if (section === 'filename-expressions' && !!applicationSettingsInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-12">
@@ -206,27 +193,21 @@
                       </div>
                     </div>
                     <div class="row pt-2">
-                      <div class="col-6">
+                      <div class="col-12 col-xl-6">
                         <div class="subsubhead">
                           <h5 class="subsubhead-heading">BIE Schema Expression</h5>
                         </div>
-                        <textarea class="width-max"
-                          [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
-                          cdkTextareaAutosize
-                          [cdkAutosizeMinRows]="3"
-                          [cdkAutosizeMaxRows]="8"
-                          [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameExpression"
-                        (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
+                        <score-filename-expression-input type="bie-schema" [duplicateHandler]="false"
+                          [minRows]="3" [maxRows]="8" [invalid]="!!bieSchemaFilenameExpressionError"
+                          [value]="applicationSettingsInfo.bieSchemaFilenameExpression"
+                          (valueChange)="applicationSettingsInfo.bieSchemaFilenameExpression = $event; queueBieSchemaFilenamePreview()"></score-filename-expression-input>
                         <div class="subsubhead pt-2">
                           <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
                         </div>
-                        <textarea class="width-max"
-                          [class.filename-expression-input-error]="!!bieSchemaFilenameExpressionError"
-                          cdkTextareaAutosize
-                          [cdkAutosizeMinRows]="2"
-                          [cdkAutosizeMaxRows]="4"
-                          [(ngModel)]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"
-                        (ngModelChange)="queueBieSchemaFilenamePreview()"></textarea>
+                        <score-filename-expression-input type="bie-schema" [duplicateHandler]="true"
+                          [minRows]="2" [maxRows]="4" [invalid]="!!bieSchemaFilenameExpressionError"
+                          [value]="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression"
+                          (valueChange)="applicationSettingsInfo.bieSchemaFilenameDuplicateHandlerExpression = $event; queueBieSchemaFilenamePreview()"></score-filename-expression-input>
                         @if (bieSchemaFilenameExpressionError) {
                           <div
                             class="filename-expression-error"
@@ -236,28 +217,29 @@
                         }
                         <div class="pt-2"><b>Sample Filename:</b> <code>{{ bieSchemaSampleFilename || '-' }}</code></div>
                         <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ bieSchemaSampleDuplicateFilename || '-' }}</code></div>
+                        <div class="pt-2">
+                          <button mat-stroked-button type="button" (click)="validateExpression('bie-schema')">Validate</button>
+                          @if (bieSchemaValidationMessage) {
+                            <span class="filename-expression-valid" role="status">{{ bieSchemaValidationMessage }}</span>
+                          }
+                        </div>
+                        <ng-container *ngTemplateOutlet="sampleEditor; context: {type: 'bie-schema'}"></ng-container>
                       </div>
-                      <div class="col-6">
+                      <div class="col-12 col-xl-6 pt-4 pt-xl-0">
                         <div class="subsubhead">
                           <h5 class="subsubhead-heading">BIE Package Schema Expression</h5>
                         </div>
-                        <textarea class="width-max"
-                          [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
-                          cdkTextareaAutosize
-                          [cdkAutosizeMinRows]="3"
-                          [cdkAutosizeMaxRows]="8"
-                          [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameExpression"
-                        (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
+                        <score-filename-expression-input type="bie-package-schema" [duplicateHandler]="false"
+                          [minRows]="3" [maxRows]="8" [invalid]="!!biePackageSchemaFilenameExpressionError"
+                          [value]="applicationSettingsInfo.biePackageSchemaFilenameExpression"
+                          (valueChange)="applicationSettingsInfo.biePackageSchemaFilenameExpression = $event; queueBiePackageSchemaFilenamePreview()"></score-filename-expression-input>
                         <div class="subsubhead pt-2">
                           <h5 class="subsubhead-heading">Duplicate Handler Expression</h5>
                         </div>
-                        <textarea class="width-max"
-                          [class.filename-expression-input-error]="!!biePackageSchemaFilenameExpressionError"
-                          cdkTextareaAutosize
-                          [cdkAutosizeMinRows]="2"
-                          [cdkAutosizeMaxRows]="4"
-                          [(ngModel)]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"
-                        (ngModelChange)="queueBiePackageSchemaFilenamePreview()"></textarea>
+                        <score-filename-expression-input type="bie-package-schema" [duplicateHandler]="true"
+                          [minRows]="2" [maxRows]="4" [invalid]="!!biePackageSchemaFilenameExpressionError"
+                          [value]="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression"
+                          (valueChange)="applicationSettingsInfo.biePackageSchemaFilenameDuplicateHandlerExpression = $event; queueBiePackageSchemaFilenamePreview()"></score-filename-expression-input>
                         @if (biePackageSchemaFilenameExpressionError) {
                           <div
                             class="filename-expression-error"
@@ -267,6 +249,13 @@
                         }
                         <div class="pt-2"><b>Sample Filename:</b> <code>{{ biePackageSchemaSampleFilename || '-' }}</code></div>
                         <div class="pt-1"><b>Sample Duplicate Filename:</b> <code>{{ biePackageSchemaSampleDuplicateFilename || '-' }}</code></div>
+                        <div class="pt-2">
+                          <button mat-stroked-button type="button" (click)="validateExpression('bie-package-schema')">Validate</button>
+                          @if (biePackageSchemaValidationMessage) {
+                            <span class="filename-expression-valid" role="status">{{ biePackageSchemaValidationMessage }}</span>
+                          }
+                        </div>
+                        <ng-container *ngTemplateOutlet="sampleEditor; context: {type: 'bie-package-schema'}"></ng-container>
                       </div>
                     </div>
                     <div class="actions pt-4">
@@ -277,11 +266,8 @@
                   </div>
                 </div>
               }
-              @if (!!webPageInfo) {
-                <div class="mt-4">
-                  <div class="subhead">
-                    <h4 class="subhead-heading">Web Page Settings</h4>
-                  </div>
+              @if (section === 'web-page' && !!webPageInfo) {
+                <div>
                   <div class="webpage-setting">
                     <div class="row">
                       <div class="col-8">
@@ -715,4 +701,41 @@
       </div>
     </div>
   </div>
-</div>
+</score-base-page>
+
+<ng-template #sampleEditor let-type="type">
+  @if (samplesOf(type); as samples) {
+    <details class="pt-2 filename-sample-editor">
+      <summary><b>Sample Values</b> (edit to try other inputs)</summary>
+      <div class="filename-sample-grid pt-2">
+        @for (key of sampleKeysOf(type); track key) {
+          <label class="filename-sample-label">{{ key }}</label>
+          <input class="filename-sample-input" type="text"
+                 [ngModel]="samples.values[key]" [ngModelOptions]="{standalone: true}"
+                 (ngModelChange)="setSampleValue(type, key, $event)"/>
+        }
+        <label class="filename-sample-label">Business Context Names</label>
+        <div>
+          @for (name of samples.businessContextNames; track $index; let i = $index) {
+            <div class="filename-sample-bc">
+              <span class="filename-sample-index">[{{ i }}]</span>
+              <input class="filename-sample-input" type="text"
+                     [ngModel]="name" [ngModelOptions]="{standalone: true}"
+                     (ngModelChange)="setSampleBusinessContextName(type, i, $event)"/>
+              <button mat-icon-button type="button" aria-label="Remove Business Context"
+                      (click)="removeSampleBusinessContextName(type, i)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+          <button mat-stroked-button type="button" (click)="addSampleBusinessContextName(type)">
+            Add Business Context
+          </button>
+        </div>
+      </div>
+      <div class="pt-2">
+        <button mat-button type="button" (click)="resetSamples(type)">Reset to defaults</button>
+      </div>
+    </details>
+  }
+</ng-template>

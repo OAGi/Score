@@ -1,0 +1,34 @@
+<score-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [height]="height" [contextMenu]="contextMenu"
+                     [cursorNode]="cursorNode" (cursorNodeChange)="cursorNodeChange.emit($event)"
+                     [isDraggable]="isDraggable" [showDragHandle]="showDragHandle" [canDrop]="canDrop"
+                     (nodeClick)="nodeClick.emit($event)" (nodeKey)="nodeKey.emit($event)"
+                     (copyLink)="copyLink.emit($event)" (contextMenuOpen)="contextMenuOpen.emit($event)"
+                     (dropped)="dropped.emit($event)">
+  <ng-template #content let-node>
+    <span class="node-label"
+          [class]="[node.typeClass.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
+          [class.search-index]="searcher.isCurrentSearchIndex(node)"
+          [class.prohibited]="node.prohibited"
+          [class.deprecated]="node.deprecated"
+          [class.text-danger]="node.state === 'Deleted'"
+          [class.text-line-through]="node.state === 'Deleted'"
+          [matTooltip]="node.state === 'Deleted' ? 'Deleted' : (node.deprecated ? 'Deprecated' : '')"
+          [innerHTML]="node.name | highlight : searcher.keywordFor(node, node.name)">
+    </span>
+
+    @if (isInvalidState(node)) {
+      <div class="ps-3 align-self-center">
+        <mat-icon matTooltip="Invalid state">error</mat-icon>
+      </div>
+    }
+
+    <score-tree-decorations [node]="node" [decorators]="decorators"/>
+
+    <div class="tag-list ps-3">
+      @for (tag of node.tagList; track tag) {
+        <span class="tag ms-2" [style.background-color]="tag.backgroundColor"
+              [style.color]="tag.textColor">{{ tag.name }}</span>
+      }
+    </div>
+  </ng-template>
+</score-tree-viewport>

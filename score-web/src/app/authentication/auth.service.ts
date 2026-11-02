@@ -1,4 +1,4 @@
-import { Injectable, OnInit, inject } from '@angular/core';
+import { Injectable, Injector, OnInit, inject } from '@angular/core';
 import {
   HttpClient,
   HttpContextToken,
@@ -15,22 +15,27 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTre
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog} from '@angular/material/dialog';
 import {
   BIEProperties,
   BrowseStandardModeProperties,
   BusinessTermProperties,
   FunctionsRequiringEmailTransmissionProperties,
   OAuth2AppInfo,
+  PasskeyProperties,
   TenantProperties,
   UserToken
 } from './domain/auth';
 import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {RxStompService} from '../common/score-rx-stomp';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private injector = inject(Injector);
   private logoutInProgress = false;
 
 
@@ -82,6 +87,8 @@ export class AuthService implements OnInit, CanActivate {
         if (!res.enabled) {
           return this.router.parseUrl('/disabled');
         }
+        // The WebSocket handshake needs the session, so it is opened only for a signed-in user.
+        this.injector.get(RxStompService).activate();
         return true;
       } else {
         this.logout(getResolvedUrl(route));
@@ -126,6 +133,15 @@ export class AuthService implements OnInit, CanActivate {
     localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
   }
 
+  /**
+   * Whether the signed-in user can manage passkeys: passkey sign-in is on, and the account signs in with a username
+   * and password (single sign-on accounts use their provider's own passkeys).
+   */
+  canUsePasskeys(): boolean {
+    const token = this.getUserToken();
+    return !!token?.passkey?.enabled && (token.authentication === 'basic' || token.authentication === 'passkey');
+  }
+
   getUserToken(): UserToken {
     let value;
     try {
@@ -155,6 +171,11 @@ export class AuthService implements OnInit, CanActivate {
       if (!value.browseStandardMode) {
         value.browseStandardMode = new BrowseStandardModeProperties();
         value.browseStandardMode.enabled = false;
+        this.storeUserInfo(value);
+      }
+      if (!value.passkey) {
+        value.passkey = new PasskeyProperties();
+        value.passkey.enabled = false;
         this.storeUserInfo(value);
       }
     } catch (ignore) {
@@ -221,8 +242,9 @@ export class AuthService implements OnInit, CanActivate {
   logout(url?) {
     this.logoutInProgress = true;
     localStorage.removeItem(this.USER_INFO_KEY);
+    this.injector.get(RxStompService).deactivate();
 
-    this.http.get('/api/' + environment.logoutPath)
+    this.http.post('/api/' + environment.logoutPath, null)
       .subscribe(resp => {
         this.redirectToLogin(url);
       }, err => {
@@ -246,6 +268,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   redirectToLogin(url?) {
+    this.dialog.closeAll();
     const commands = ['/' + environment.loginPath];
     const next = this.nextParam(url);
     if (!!next) {

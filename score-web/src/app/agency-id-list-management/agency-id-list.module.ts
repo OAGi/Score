@@ -14,6 +14,8 @@ import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 import {GithubIssueBoxComponent} from '../cc-management/github-issue-box/github-issue-box.component';
+import {SCORE_TABLE} from '../common/score-table';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
 
 const routes: Routes = [
   {
@@ -47,7 +49,9 @@ const routes: Routes = [
         SearchBarModule,
         ColumnSelectorModule,
         TitleWithLibrarySelector,
-        GithubIssueBoxComponent
+        GithubIssueBoxComponent,
+        RecordCompactRowComponent,
+        ...SCORE_TABLE
     ],
   declarations: [
     AgencyIdListListComponent,

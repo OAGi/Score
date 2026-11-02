@@ -26,9 +26,9 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.FlywaySchemaHistoryRecord;
 
 
@@ -41,7 +41,7 @@ public class FlywaySchemaHistory extends TableImpl<FlywaySchemaHistoryRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.flyway_schema_history</code>
+     * The reference instance of <code>flyway_schema_history</code>
      */
     public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = new FlywaySchemaHistory();
 
@@ -54,52 +54,52 @@ public class FlywaySchemaHistory extends TableImpl<FlywaySchemaHistoryRecord> {
     }
 
     /**
-     * The column <code>oagi.flyway_schema_history.installed_rank</code>.
+     * The column <code>flyway_schema_history.installed_rank</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, Integer> INSTALLED_RANK = createField(DSL.name("installed_rank"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.version</code>.
+     * The column <code>flyway_schema_history.version</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, String> VERSION = createField(DSL.name("version"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.description</code>.
+     * The column <code>flyway_schema_history.description</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(200).nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.type</code>.
+     * The column <code>flyway_schema_history.type</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(20).nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.script</code>.
+     * The column <code>flyway_schema_history.script</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, String> SCRIPT = createField(DSL.name("script"), SQLDataType.VARCHAR(1000).nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.checksum</code>.
+     * The column <code>flyway_schema_history.checksum</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, Integer> CHECKSUM = createField(DSL.name("checksum"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.installed_by</code>.
+     * The column <code>flyway_schema_history.installed_by</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, String> INSTALLED_BY = createField(DSL.name("installed_by"), SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.installed_on</code>.
+     * The column <code>flyway_schema_history.installed_on</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, LocalDateTime> INSTALLED_ON = createField(DSL.name("installed_on"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp()"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.execution_time</code>.
+     * The column <code>flyway_schema_history.execution_time</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, Integer> EXECUTION_TIME = createField(DSL.name("execution_time"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>oagi.flyway_schema_history.success</code>.
+     * The column <code>flyway_schema_history.success</code>.
      */
     public final TableField<FlywaySchemaHistoryRecord, Byte> SUCCESS = createField(DSL.name("success"), SQLDataType.TINYINT.nullable(false), this, "");
 
@@ -112,21 +112,21 @@ public class FlywaySchemaHistory extends TableImpl<FlywaySchemaHistoryRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.flyway_schema_history</code> table reference
+     * Create an aliased <code>flyway_schema_history</code> table reference
      */
     public FlywaySchemaHistory(String alias) {
         this(DSL.name(alias), FLYWAY_SCHEMA_HISTORY);
     }
 
     /**
-     * Create an aliased <code>oagi.flyway_schema_history</code> table reference
+     * Create an aliased <code>flyway_schema_history</code> table reference
      */
     public FlywaySchemaHistory(Name alias) {
         this(alias, FLYWAY_SCHEMA_HISTORY);
     }
 
     /**
-     * Create a <code>oagi.flyway_schema_history</code> table reference
+     * Create a <code>flyway_schema_history</code> table reference
      */
     public FlywaySchemaHistory() {
         this(DSL.name("flyway_schema_history"), null);
@@ -134,7 +134,7 @@ public class FlywaySchemaHistory extends TableImpl<FlywaySchemaHistoryRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override

@@ -30,7 +30,9 @@ import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface CcDocument {
 
@@ -66,6 +68,23 @@ public interface CcDocument {
 
     List<AccSummaryRecord> getAccListByBasedAccManifestId(AccManifestId basedAccManifestId);
 
+    /** Whether any ACC has the given ACC as its base; a document that knows it without the ACCs overrides this. */
+    default boolean hasAccByBasedAccManifestId(AccManifestId basedAccManifestId) {
+        return !getAccListByBasedAccManifestId(basedAccManifestId).isEmpty();
+    }
+
+    /**
+     * The ACCs that have each of the given ACCs as their base, by base. A document that can answer many at once
+     * (one read for all of them) overrides this; the default asks one by one.
+     */
+    default Map<AccManifestId, List<AccSummaryRecord>> getAccListByBasedAccManifestIds(Collection<AccManifestId> basedAccManifestIds) {
+        Map<AccManifestId, List<AccSummaryRecord>> result = new LinkedHashMap<>();
+        for (AccManifestId basedAccManifestId : basedAccManifestIds) {
+            result.put(basedAccManifestId, getAccListByBasedAccManifestId(basedAccManifestId));
+        }
+        return result;
+    }
+
     List<AsccpSummaryRecord> getAsccpListByRoleOfAccManifestId(AccManifestId roleOfAccManifestId);
 
     List<AccSummaryRecord> getAccListByToAsccpManifestId(AsccpManifestId toAsccpManifestId);
@@ -99,5 +118,20 @@ public interface CcDocument {
     AgencyIdListSummaryRecord getAgencyIdList(AgencyIdListManifestId agencyIdListManifestId);
 
     BlobContentSummaryRecord getBlobContent(BlobContentManifestId blobContentManifestId);
+
+    /**
+     * A hint that the children of these components are about to be looked up, one by one.
+     * A document that loads on demand can fetch them all at once instead; the default does nothing, and the
+     * answers of the lookups never depend on it.
+     */
+    default void prefetchChildren(CcType type, Collection<? extends ManifestId> manifestIds) {
+    }
+
+    /**
+     * A hint that the dependencies of this component are about to be walked, so that a document that loads on demand
+     * can fetch everything it depends on at once. Like {@link #prefetchChildren} it changes no answer.
+     */
+    default void prefetchDependencies(CcType type, ManifestId root) {
+    }
 
 }

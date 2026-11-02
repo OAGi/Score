@@ -21,43 +21,43 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     private static final By CORE_COMPONENT_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Core Component\")]//ancestor::mat-form-field//input");
     private static final By RELEASE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Release\")]//ancestor::mat-form-field//input");
     private static final By REVISION_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Revision\")]//ancestor::mat-form-field//input");
     private static final By STATE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"State\")]//ancestor::mat-form-field//input");
     private static final By OWNER_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Owner\")]//ancestor::mat-form-field//input");
     private static final By QUALIFIER_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Qualifier\")]//ancestor::mat-form-field//input");
     private static final By GUID_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"GUID\")]//ancestor::mat-form-field//input");
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
     private static final By OBJECT_CLASS_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Object Class Term\")]//ancestor::mat-form-field//input");
     private static final By PROPERTY_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Property Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_SELECTOR_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//mat-select");
     private static final By DATA_TYPE_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Data Type Term\")]//ancestor::mat-form-field//input");
     private static final By REPRESENTATION_TERM_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Representation Term\")]//ancestor::mat-form-field//input");
     private static final By NAMESPACE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Namespace\")]//ancestor::mat-form-field//mat-select");
     private static final By CARDINALITY_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Cardinality\")]//ancestor::mat-form-field//mat-select");
     private static final By VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Value Constraint\")]//ancestor::mat-form-field//mat-select");
     private static final By DEFINITION_SOURCE_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-label[contains(text(), \"Definition Source\")]//ancestor::mat-form-field//input");
     private static final By DEFINITION_FIELD_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//textarea[@placeholder=\"Definition\"]");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//textarea[@placeholder=\"Definition\"]");
     private static final By VALUE_DOMAIN_LOCATOR =
-            By.xpath("//div[contains(@class, \"cc-node-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
+            By.xpath("//div[contains(@class, \"tree-detail-container\")]//mat-panel-title[contains(text(), \"Value Domain\")]");
 
     private static final By ADD_VALUE_DOMAIN_LOCATOR =
             By.xpath("//span[contains(text(), \"Add\")]//ancestor::button[1]");
@@ -254,6 +254,12 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     @Override
+    public WebElement getNamespaceOption(String namespaceUri) {
+        return elementToBeClickable(getDriver(), By.xpath(
+                "//mat-option[normalize-space(.) = " + xpathLiteral(namespaceUri) + "]"));
+    }
+
+    @Override
     public String getNamespaceFieldValue() {
         return getText(getNamespaceField());
     }
@@ -304,11 +310,11 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainType = getColumnByName(tr, "type");
         click(getDriver(), tdDomainType);
         click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+                "//mat-option[normalize-space(.) = " + xpathLiteral("Code List") + "]")));
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(getDriver(), tdDomainName);
         click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomainName + "\")]//ancestor::mat-option[1]")));
+                "//mat-option[.//span[normalize-space(.) = " + xpathLiteral(valueDomainName) + "]]")));
     }
 
     @Override
@@ -375,7 +381,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         click(tdDomainName);
 
         visibilityOfElementLocated(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]//span[@class=\"text-line-through\"]"));
+                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]//span[contains(@class, \"text-line-through\")]"));
     }
 
     @Override
@@ -384,18 +390,17 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         WebElement tdDomainType = getColumnByName(tr, "type");
         click(tdDomainType);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"Code List\")]//ancestor::mat-option[1]")));
+                "//mat-option[normalize-space(.) = " + xpathLiteral("Code List") + "]")));
         WebElement tdDomainName = getColumnByName(tr, "name");
         click(tdDomainName);
         click(elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + codeListName + "\")]//ancestor::mat-option[1]")));
+                "//mat-option[.//span[normalize-space(.) = " + xpathLiteral(codeListName) + "]]")));
     }
 
     @Override
     public void setDefaultValueDomain(String name) {
-        click(getDriver(), getDefaultValueDomainField());
-        click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + name + "\")]//ancestor::mat-option[1]")));
+        WebElement select = openMatSelect(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+        click(getDriver(), matSelectOptionContaining(getDriver(), select, name));
     }
 
     @Override
@@ -407,9 +412,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     public void setNamespace(NamespaceObject namespace) {
         click(getNamespaceField());
         waitFor(ofMillis(1000L));
-        WebElement option = elementToBeClickable(getDriver(), By.xpath(
-                "//span[contains(text(), \"" + namespace.getUri() + "\")]//ancestor::mat-option"));
-        click(option);
+        click(getNamespaceOption(namespace.getUri()));
         waitFor(ofMillis(1000L));
         assert getNamespaceFieldValue().equals(namespace.getUri());
     }
@@ -438,7 +441,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed()) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -448,7 +451,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed();
         return node;
     }
 
@@ -463,8 +466,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
@@ -478,7 +483,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     public WebElement getNodeByName(String name) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + name + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+                "//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + name + "\" or contains(., \"" + name + "\")]]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
@@ -489,7 +494,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
@@ -788,7 +793,7 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
     @Override
     public String getInvalidStateIconText(WebElement node) {
-        WebElement element = node.findElement(By.xpath("//mat-icon[contains(text(), \"error\")]"));
+        WebElement element = node.findElement(By.xpath(".//mat-icon[contains(text(), \"error\")]"));
         return element.getAttribute("mattooltip").toString();
     }
 
@@ -807,11 +812,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     private class SupplementaryComponentPanelImpl implements DTViewEditPage.SupplementaryComponentPanel {
         @Override
         public void setCardinality(String cardinality) {
-            click(getDriver(), getCardinalityField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + cardinality + "\")]//ancestor::mat-option"));
-            click(getDriver(), option);
+            WebElement select = openMatSelect(getDriver(), CARDINALITY_FIELD_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, cardinality));
         }
 
         @Override
@@ -821,11 +823,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void setValueConstraintType(String valueConstraintType) {
-            click(getDriver(), getValueConstraintTypeField());
-            waitFor(ofMillis(1000L));
-            WebElement option = elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueConstraintType + "\")]//ancestor::mat-option"));
-            click(getDriver(), option);
+            WebElement select = openMatSelect(getDriver(), VALUE_CONSTRAINT_TYPE_FIELD_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, valueConstraintType));
         }
 
         @Override
@@ -916,9 +915,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void selectRepresentationTerm(String representationTerm) {
-            click(getDriver(), getRepresentationSelectField());
-            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[text() = \"" + representationTerm + "\"]//ancestor::mat-option[1]")));
+            WebElement select = openMatSelect(getDriver(), REPRESENTATION_TERM_SELECTOR_LOCATOR);
+            click(getDriver(), matSelectOption(getDriver(), select, representationTerm));
         }
 
         @Override
@@ -944,9 +942,8 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
 
         @Override
         public void setDefaultValueDomain(String valueDomain) {
-            click(getDriver(), getDefaultValueDomainField());
-            click(getDriver(), elementToBeClickable(PageHelper.longWait(getDriver()), By.xpath(
-                    "//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(), \"" + valueDomain + "\")]//ancestor::mat-option[1]")));
+            WebElement select = openMatSelect(getDriver(), DEFAULT_VALUE_DOMAIN_SELECT_LOCATOR);
+            click(getDriver(), matSelectOptionContaining(getDriver(), select, valueDomain));
         }
 
         @Override

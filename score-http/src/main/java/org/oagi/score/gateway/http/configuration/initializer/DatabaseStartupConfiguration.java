@@ -6,6 +6,7 @@ import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
+import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.stream.Stream;
@@ -33,6 +34,8 @@ public class DatabaseStartupConfiguration {
     public static BeanFactoryPostProcessor dependsOnPostProcessor() {
         return beanFactory -> Stream.of(beanFactory.getBeanNamesForType(DSLContext.class))
                 .map(beanFactory::getBeanDefinition)
-                .forEach(it -> it.setDependsOn("databaseStartupValidator"));
+                // Add to, not replace, the dependencies Spring Boot registered (notably Flyway), so a new
+                // database is migrated before the first bean queries it.
+                .forEach(it -> it.setDependsOn(StringUtils.addStringToArray(it.getDependsOn(), "databaseStartupValidator")));
     }
 }

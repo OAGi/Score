@@ -32,9 +32,10 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseState;
 import org.oagi.score.gateway.http.api.release_management.repository.criteria.ReleaseListFilterCriteria;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseQueryService;
 import org.oagi.score.gateway.http.common.model.*;
-import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -306,7 +307,7 @@ public class ExternalComponentsController {
                                                 (response.filename().endsWith(".zip") ? "application/zip"
                                                                 : "application/xml")))
                                 .contentLength(response.file().length())
-                                .body(new DeleteOnCloseFileSystemResource(response.file()));
+                                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.file())));
         }
 
         @RequestMapping(value = "/ext/auth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

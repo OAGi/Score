@@ -61,6 +61,11 @@ public class CcInfoQueryService {
                 .collect(groupingBy(SummaryCc::getOwnerUsername,
                         Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum)));
 
+        Map<String, Map<String, Map<CcState, Integer>>> ccByTypesUsersAndStates = summaryCcList.stream()
+                .collect(groupingBy(SummaryCc::getType,
+                        groupingBy(SummaryCc::getOwnerUsername,
+                                Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum))));
+
         ReleaseSummaryRecord workingRelease = repositoryFactory.releaseQueryRepository(requester)
                 .getReleaseSummary(libraryId, "Working");
 
@@ -72,7 +77,8 @@ public class CcInfoQueryService {
                         .build(), pageRequest(0, 5, "-lastUpdateTimestamp")).result();
 
         return new SummaryCcInfoRecord(
-                numberOfTotalCcByStates, numberOfMyCcByStates, ccByUsersAndStates, myRecentCCs);
+                numberOfTotalCcByStates, numberOfMyCcByStates, ccByUsersAndStates, myRecentCCs,
+                ccByTypesUsersAndStates);
     }
 
     public SummaryCcExtInfoRecord getSummaryCcExtInfo(ScoreUser requester, LibraryId libraryId, ReleaseId releaseId) {
@@ -88,7 +94,9 @@ public class CcInfoQueryService {
                         .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
 
         Map<CcState, Integer> numberOfMyCcExtByStates =
-                summaryCcExtList.stream().collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
+                summaryCcExtList.stream()
+                        .filter(e -> e.getOwnerUserId().equals(requester.userId()))
+                        .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
 
 //        Map<CcState, Integer> numberOfMyBieByStates =
 //                summaryCcExtList.stream()

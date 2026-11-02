@@ -37,6 +37,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.notExists;
+import static org.jooq.impl.DSL.selectOne;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
 public class JooqBieCommandRepository extends JooqBaseRepository implements BieCommandRepository {
@@ -68,6 +71,8 @@ public class JooqBieCommandRepository extends JooqBaseRepository implements BieC
             // Issue #1659
             deleteAsbiepSupportDocList(topLevelAsbiepIdList);
 
+            deleteBusinessTermAssignmentList(topLevelAsbiepIdList);
+
             deleteAbieList(topLevelAsbiepIdList);
             deleteAsbieList(topLevelAsbiepIdList);
             deleteAsbiepList(topLevelAsbiepIdList);
@@ -91,6 +96,51 @@ public class JooqBieCommandRepository extends JooqBaseRepository implements BieC
 
         // Issue #1635
         resetBasedTopLevelAsbiepList(topLevelAsbiepIdList);
+    }
+
+    /**
+     * Removes the business term assignments of the ASBIEs/BBIEs about to be deleted, and then the
+     * ASCC/BCC business terms that no assignment references any more, so the business term is not
+     * reported as in use by BIEs that no longer exist.
+     */
+    private void deleteBusinessTermAssignmentList(Collection<TopLevelAsbiepId> topLevelAsbiepIdList) {
+        var ownerIds = valueOf(topLevelAsbiepIdList);
+
+        var asbieIds = dslContext().select(ASBIE.ASBIE_ID).from(ASBIE)
+                .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(ownerIds));
+        List<ULong> asccBizTermIds = dslContext().selectDistinct(ASBIE_BIZTERM.ASCC_BIZTERM_ID)
+                .from(ASBIE_BIZTERM)
+                .where(ASBIE_BIZTERM.ASBIE_ID.in(asbieIds))
+                .fetchInto(ULong.class);
+        dslContext().deleteFrom(ASBIE_BIZTERM)
+                .where(ASBIE_BIZTERM.ASBIE_ID.in(asbieIds))
+                .execute();
+        if (!asccBizTermIds.isEmpty()) {
+            dslContext().deleteFrom(ASCC_BIZTERM)
+                    .where(and(
+                            ASCC_BIZTERM.ASCC_BIZTERM_ID.in(asccBizTermIds),
+                            notExists(selectOne().from(ASBIE_BIZTERM)
+                                    .where(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID)))))
+                    .execute();
+        }
+
+        var bbieIds = dslContext().select(BBIE.BBIE_ID).from(BBIE)
+                .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.in(ownerIds));
+        List<ULong> bccBizTermIds = dslContext().selectDistinct(BBIE_BIZTERM.BCC_BIZTERM_ID)
+                .from(BBIE_BIZTERM)
+                .where(BBIE_BIZTERM.BBIE_ID.in(bbieIds))
+                .fetchInto(ULong.class);
+        dslContext().deleteFrom(BBIE_BIZTERM)
+                .where(BBIE_BIZTERM.BBIE_ID.in(bbieIds))
+                .execute();
+        if (!bccBizTermIds.isEmpty()) {
+            dslContext().deleteFrom(BCC_BIZTERM)
+                    .where(and(
+                            BCC_BIZTERM.BCC_BIZTERM_ID.in(bccBizTermIds),
+                            notExists(selectOne().from(BBIE_BIZTERM)
+                                    .where(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID)))))
+                    .execute();
+        }
     }
 
     private void deleteAbieList(Collection<TopLevelAsbiepId> topLevelAsbiepIdList) {

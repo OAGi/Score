@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -45,6 +46,7 @@ public class TC_15_7_RestoringEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_7_TA_1")
     public void end_user_can_open_an_acc_and_restore_it_all_of_its_associations_shall_be_restored() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

@@ -1,5 +1,9 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
+import java.util.Objects;
+import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceDetailsRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdListCommandService;
@@ -23,6 +27,7 @@ import org.oagi.score.gateway.http.api.tag_management.model.AsccpManifestTagSumm
 import org.oagi.score.gateway.http.api.tag_management.model.BccpManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.api.tag_management.model.DtManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -32,10 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -77,7 +82,7 @@ public class ReleaseCommandService implements InitializingBean {
     private SessionService sessionService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private AfterCommitEventPublisher eventPublisher;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -102,13 +107,24 @@ public class ReleaseCommandService implements InitializingBean {
      * @param requester The user requesting the release creation.
      * @param request   The details of the release to be created.
      * @return The ID of the newly created release.
-     * @throws IllegalArgumentException if a release with the same release number already exists.
+     * @throws IllegalArgumentException if the requester is not a developer or a release with the
+     *                                  same release number already exists.
      */
     public ReleaseId create(ScoreUser requester, CreateReleaseRequest request) {
+        if (!requester.hasRole(DEVELOPER)) {
+            throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can create a release.");
+        }
+
+        if (!StringUtils.hasText(request.releaseNum())) {
+            throw new IllegalArgumentException("'releaseNum' must not be blank.");
+        }
+
         var query = repositoryFactory.releaseQueryRepository(requester);
         if (query.hasDuplicateReleaseNumber(request.libraryId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
         }
+
+        requireNamespaceOfLibrary(requester, request.namespaceId(), request.libraryId());
 
         var command = repositoryFactory.releaseCommandRepository(requester);
         return command.create(
@@ -124,7 +140,9 @@ public class ReleaseCommandService implements InitializingBean {
      *
      * @param requester The user requesting the update.
      * @param request   The details of the release update.
-     * @throws IllegalArgumentException if the release does not exist or if the release number is duplicated.
+     * @throws IllegalArgumentException if the requester is not a developer, the release does not exist,
+     *                                  the release is in the 'Published' or 'Processing' state, the update
+     *                                  attempts to rename the 'Working' release, or the release number is duplicated.
      */
     @Transactional
     public void update(ScoreUser requester, UpdateReleaseRequest request) {
@@ -132,15 +150,30 @@ public class ReleaseCommandService implements InitializingBean {
         if (request.releaseId() == null) {
             throw new IllegalArgumentException("'releaseId' is required.");
         }
+        if (!requester.hasRole(DEVELOPER)) {
+            throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can update a release.");
+        }
+        if (!StringUtils.hasText(request.releaseNum())) {
+            throw new IllegalArgumentException("'releaseNum' must not be blank.");
+        }
 
         var query = repositoryFactory.releaseQueryRepository(requester);
 
-        if (!query.exists(request.releaseId())) {
+        ReleaseSummaryRecord releaseSummary = query.getReleaseSummary(request.releaseId());
+        if (releaseSummary == null) {
             throw new IllegalArgumentException("'" + request.releaseId() + "' does not exist.");
+        }
+        if (releaseSummary.state() == Published || releaseSummary.state() == Processing) {
+            throw new IllegalArgumentException("The release in '" + releaseSummary.state() + "' state cannot be updated.");
+        }
+        if (releaseSummary.isWorkingRelease() && !releaseSummary.releaseNum().equals(request.releaseNum())) {
+            throw new IllegalArgumentException("'" + releaseSummary.releaseNum() + "' release number cannot be changed.");
         }
         if (query.hasDuplicateReleaseNumberExcludingCurrent(request.releaseId(), request.releaseNum())) {
             throw new IllegalArgumentException("'" + request.releaseNum() + "' already exists.");
         }
+
+        requireNamespaceOfLibrary(requester, request.namespaceId(), releaseSummary.libraryId());
 
         var command = repositoryFactory.releaseCommandRepository(requester);
         command.update(
@@ -149,6 +182,17 @@ public class ReleaseCommandService implements InitializingBean {
                 request.releaseNum(),
                 request.releaseNote(),
                 request.releaseLicense());
+    }
+
+    private void requireNamespaceOfLibrary(ScoreUser requester, NamespaceId namespaceId, LibraryId libraryId) {
+        if (namespaceId == null) {
+            return;
+        }
+        NamespaceDetailsRecord namespace = repositoryFactory.namespaceQueryRepository(requester)
+                .getNamespaceDetails(namespaceId, requester.userId());
+        if (namespace == null || !Objects.equals(namespace.libraryId(), libraryId)) {
+            throw new IllegalArgumentException("The namespace does not belong to the library of the release.");
+        }
     }
 
     /**
@@ -260,13 +304,13 @@ public class ReleaseCommandService implements InitializingBean {
             if (toCcState == ReleaseDraft) {
                 ReleaseValidationRequest validationRequest = request.getValidationRequest();
                 for (AccManifestId accManifestId : validationRequest.getAssignedAccComponentManifestIds()) {
-                    ccCommandService.updateState(requester, accManifestId, toCcState);
+                    ccCommandService.updateState(requester, accManifestId, toCcState, null, null, true);
                 }
                 for (AsccpManifestId asccpManifestId : validationRequest.getAssignedAsccpComponentManifestIds()) {
-                    ccCommandService.updateState(requester, asccpManifestId, toCcState);
+                    ccCommandService.updateState(requester, asccpManifestId, toCcState, null, null, true);
                 }
                 for (BccpManifestId bccpManifestId : validationRequest.getAssignedBccpComponentManifestIds()) {
-                    ccCommandService.updateState(requester, bccpManifestId, toCcState);
+                    ccCommandService.updateState(requester, bccpManifestId, toCcState, null, null, true);
                 }
                 for (CodeListManifestId codeListManifestId : validationRequest.getAssignedCodeListComponentManifestIds()) {
                     codeListCommandService.updateState(requester, codeListManifestId, toCcState);
@@ -275,7 +319,7 @@ public class ReleaseCommandService implements InitializingBean {
                     agencyIdListCommandService.updateState(requester, agencyIdListManifestId, toCcState);
                 }
                 for (DtManifestId dtManifestId : validationRequest.getAssignedDtComponentManifestIds()) {
-                    ccCommandService.updateState(requester, dtManifestId, toCcState);
+                    ccCommandService.updateState(requester, dtManifestId, toCcState, null, null, true);
                 }
             } else if (toCcState == Candidate) {
                 updateCCStates(requester, release, fromCcState, toCcState, timestamp);
@@ -340,7 +384,7 @@ public class ReleaseCommandService implements InitializingBean {
                 /*
                  * Message Publishing
                  */
-                redisTemplate.convertAndSend(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
+                eventPublisher.publish(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
             }
         }
     }
@@ -349,17 +393,17 @@ public class ReleaseCommandService implements InitializingBean {
                                 CcState fromCcState, CcState toCcState, LocalDateTime timestamp) {
         var accQuery = repositoryFactory.accQueryRepository(requester);
         for (var acc : accQuery.getAccSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, acc.accManifestId(), toCcState);
+            ccCommandService.updateState(requester, acc.accManifestId(), toCcState, null, null, true);
         }
 
         var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
         for (var asccp : asccpQuery.getAsccpSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, asccp.asccpManifestId(), toCcState);
+            ccCommandService.updateState(requester, asccp.asccpManifestId(), toCcState, null, null, true);
         }
 
         var bccpQuery = repositoryFactory.bccpQueryRepository(requester);
         for (var bccp : bccpQuery.getBccpSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, bccp.bccpManifestId(), toCcState);
+            ccCommandService.updateState(requester, bccp.bccpManifestId(), toCcState, null, null, true);
         }
 
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
@@ -374,7 +418,7 @@ public class ReleaseCommandService implements InitializingBean {
 
         var dtQuery = repositoryFactory.dtQueryRepository(requester);
         for (var dt : dtQuery.getDtSummaryList(release.libraryId(), "Working", fromCcState)) {
-            ccCommandService.updateState(requester, dt.dtManifestId(), toCcState);
+            ccCommandService.updateState(requester, dt.dtManifestId(), toCcState, null, null, true);
         }
     }
 
@@ -437,7 +481,7 @@ public class ReleaseCommandService implements InitializingBean {
             /*
              * Message Publishing
              */
-            redisTemplate.convertAndSend(RELEASE_CREATE_REQUEST_EVENT, releaseCreateRequestEvent);
+            eventPublisher.publish(RELEASE_CREATE_REQUEST_EVENT, releaseCreateRequestEvent);
 
             response.clearWarnings();
         }

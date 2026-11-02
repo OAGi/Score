@@ -115,7 +115,10 @@ This section describes end user Agency ID List editing when its revision number 
       See the `Non-standard Namespace
       Management <#non-standard-namespace-management>`__ section to
       create an end user namespace if needed or how namespace may be
-      used in connectCenter. *Namespace* is required.
+      used in connectCenter. *Namespace* is required, and the Agency ID
+      List cannot be updated or moved to another state until a namespace
+      is specified. Deleting or restoring an Agency ID List does not
+      require a namespace.
 
    6. *Definition*. Specify the description of the Agency ID List.
       *Definition* is optional, but a warning is given if none is

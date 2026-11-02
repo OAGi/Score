@@ -19,40 +19,40 @@ public class ReleaseDepRecord extends UpdatableRecordImpl<ReleaseDepRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.release_dep.release_dep_id</code>. Primary,
-     * internal database key.
+     * Setter for <code>release_dep.release_dep_id</code>. Primary, internal
+     * database key.
      */
     public void setReleaseDepId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.release_dep.release_dep_id</code>. Primary,
-     * internal database key.
+     * Getter for <code>release_dep.release_dep_id</code>. Primary, internal
+     * database key.
      */
     public ULong getReleaseDepId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.release_dep.release_id</code>. A foreign key
-     * pointing to a release record.
+     * Setter for <code>release_dep.release_id</code>. A foreign key pointing to
+     * a release record.
      */
     public void setReleaseId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.release_dep.release_id</code>. A foreign key
-     * pointing to a release record.
+     * Getter for <code>release_dep.release_id</code>. A foreign key pointing to
+     * a release record.
      */
     public ULong getReleaseId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.release_dep.depend_on_release_id</code>. A foreign
-     * key pointing to dependent release records of the release specified in
+     * Setter for <code>release_dep.depend_on_release_id</code>. A foreign key
+     * pointing to dependent release records of the release specified in
      * release_id.
      */
     public void setDependOnReleaseId(ULong value) {
@@ -60,8 +60,8 @@ public class ReleaseDepRecord extends UpdatableRecordImpl<ReleaseDepRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release_dep.depend_on_release_id</code>. A foreign
-     * key pointing to dependent release records of the release specified in
+     * Getter for <code>release_dep.depend_on_release_id</code>. A foreign key
+     * pointing to dependent release records of the release specified in
      * release_id.
      */
     public ULong getDependOnReleaseId() {

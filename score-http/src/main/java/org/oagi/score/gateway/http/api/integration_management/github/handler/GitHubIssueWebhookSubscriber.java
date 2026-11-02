@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.integration_management.github.handler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.integration_management.github.model.event.GitHubIssueWebhookEvent;
 import org.oagi.score.gateway.http.api.integration_management.github.service.GitHubIssueLinkService;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;

@@ -379,7 +379,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         waitFor(ofMillis(1000L));
         try {
             if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed()) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -389,7 +389,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")][.//div[contains(@class, \"mat-mdc-menu-panel\")]]")).isDisplayed();
         return node;
     }
 
@@ -400,7 +400,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     private WebElement goToNode(String path) {
@@ -413,8 +413,11 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        waitFor(ofMillis(1000L));
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
@@ -423,7 +426,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private WebElement getNodeByName(String nodeName) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+                "//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + nodeName + "\" or contains(., \"" + nodeName + "\")]]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
@@ -439,7 +442,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
                 click(asccpNode);
                 waitFor(ofMillis(500L));
             }
-            return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+            return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCCP\"]]");
         });
     }
 
@@ -448,7 +451,7 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+            return new ACCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ACC\"]]");
         });
     }
 
@@ -460,12 +463,12 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
-                    return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new ASCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCC\"]]");
                 }
 
                 @Override
                 public ASCCPPanel getASCCPPanel() {
-                    return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCCP\"]]");
                 }
             };
         });
@@ -514,17 +517,17 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {
-                    return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new BCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCC\"]]");
                 }
 
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCCP\"]]");
                 }
 
                 @Override
                 public DTPanel getDTPanel() {
-                    return new DTPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][3]");
+                    return new DTPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BDT\"]]");
                 }
             };
         });
@@ -555,17 +558,20 @@ public class ASCCPViewEditPageImpl extends BasePageImpl implements ASCCPViewEdit
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//input | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]//input | " +
+                baseXPath + "//input[contains(@placeholder, \"" + name + "\")]"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//mat-select | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]/mat-select"));
     }
 
     private WebElement getCheckboxByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+                baseXPath + "//mat-checkbox[contains(., \"" + name + "\")]"));
     }
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {

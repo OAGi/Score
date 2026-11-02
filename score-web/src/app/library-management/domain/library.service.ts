@@ -5,7 +5,6 @@ import {
   DiscardLibraryCheck,
   LibraryDetails,
   LibraryListEntry,
-  LibraryListRequest,
   LibraryReleaseDependenciesResponse,
   LibrarySummary
 } from './library';
@@ -16,7 +15,6 @@ import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 @Injectable()
 export class LibraryService {
   private http = inject(HttpClient);
-
 
   getLibrarySummaryList(): Observable<LibrarySummary[]> {
     return this.http.get<LibrarySummary[]>('/api/libraries/summaries', {});
@@ -72,40 +70,7 @@ export class LibraryService {
     });
   }
 
-  getLibraryList(request: LibraryListRequest): Observable<PageResponse<LibraryListEntry>> {
-    let params = new HttpParams()
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-    if (request.filters.type) {
-      params = params.set('type', request.filters.type);
-    }
-    if (request.filters.organization) {
-      params = params.set('organization', request.filters.organization);
-    }
-    if (request.filters.domain) {
-      params = params.set('domain', request.filters.domain);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
-    if (request.filters.state) {
-      params = params.set('state', request.filters.state);
-    }
+  getLibraryList(params: HttpParams): Observable<PageResponse<LibraryListEntry>> {
     return this.http.get<PageResponse<LibraryListEntry>>('/api/libraries', {params}).pipe(
         map((res: PageResponse<LibraryListEntry>) => ({
           ...res,

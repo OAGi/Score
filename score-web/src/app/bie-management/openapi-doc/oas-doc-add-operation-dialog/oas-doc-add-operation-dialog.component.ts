@@ -1,8 +1,9 @@
-import {Component, Inject, inject} from '@angular/core';
+import {Component, Inject, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
 import {AddOperationForOasDoc, OasDoc} from '../domain/openapi-doc';
+import {oasResourcePathError} from '../domain/oas-operation-validation';
 
 /**
  * Issue #1730: Dialog to add an API operation (endpoint) that does NOT reference a BIE.
@@ -13,6 +14,7 @@ import {AddOperationForOasDoc, OasDoc} from '../domain/openapi-doc';
   standalone: false,
   selector: 'score-oas-doc-add-operation-dialog',
   templateUrl: './oas-doc-add-operation-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-add-operation-dialog.component.css']
 })
 export class OasDocAddOperationDialogComponent {
@@ -71,9 +73,18 @@ export class OasDocAddOperationDialogComponent {
     return resource ? action + resource : '';
   }
 
+  // The path is used verbatim as a key of `paths`, so it must be a valid OpenAPI path.
+  // Material only shows <mat-error> in an error state; this input has no validator, so drive it here.
+  resourceNameErrorStateMatcher = {isErrorState: (): boolean => !!this.resourceNameError};
+
+  get resourceNameError(): string {
+    return oasResourcePathError(this.operation.resourceName);
+  }
+
   get isValid(): boolean {
     return !!this.operation.verb
       && !!this.operation.resourceName
+      && !this.resourceNameError
       && !!this.operation.operationId;
   }
 

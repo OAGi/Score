@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.log_management.repository.jooq;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -134,7 +135,7 @@ public class JooqLogCommandRepository extends JooqBaseRepository implements LogC
         }
         logRecord.setLogAction(logAction.name());
 
-        logRecord.setSnapshot(serializedString);
+        logRecord.setSnapshot(JSON.jsonOrNull(serializedString));
         logRecord.setReference(reference.value());
         logRecord.setCreatedBy(valueOf(requester().userId()));
         logRecord.setCreationTimestamp(LocalDateTime.now());

@@ -13,6 +13,8 @@ connectCenter multi-tenant feature enables organizations to offer connectCenter-
 The visibility is restricted by the business contexts associated with the BIE and the tenant.
 In other words, if a BIE has a business context that is associated with a tenant, then end users in that tenant can see the BIE.
 Users can also see BIEs whose business contexts do not belong to any tenant.
+An Admin is not restricted by tenants and sees the BIEs and the business contexts of every tenant.
+A business context that is associated with several tenants is listed only once.
 
 Enable multi-tenant mode
 ~~~~~~~~~~~~~~~~~~~~~~~~

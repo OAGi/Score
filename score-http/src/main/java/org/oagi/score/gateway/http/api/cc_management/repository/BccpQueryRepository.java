@@ -20,6 +20,8 @@ public interface BccpQueryRepository {
 
     BccpSummaryRecord getBccpSummary(BccpManifestId bccpManifestId);
 
+    List<BccpSummaryRecord> getBccpSummaryListByManifestIds(Collection<BccpManifestId> bccpManifestIdList);
+
     List<BccpSummaryRecord> getBccpSummaryList(Collection<ReleaseId> releaseIdList);
 
     List<BccpSummaryRecord> getBccpSummaryList(DtManifestId dtManifestId);

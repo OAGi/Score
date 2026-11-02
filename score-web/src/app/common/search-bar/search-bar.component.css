@@ -53,3 +53,81 @@
   margin: 0 8px;
   padding: 8px 0 !important;
 }
+
+/* What is before the search box (the branch selector): it takes no place of its own, so that the box is just as it was. */
+.search-box .main-search > .branch-slot {
+  display: contents;
+}
+
+/* A narrow screen: the branch selector goes to a line above, and the search box (with its button) takes the line under it. */
+@media (max-width: 600px) {
+  .search-box .main-search {
+    flex-wrap: wrap;
+  }
+
+  .search-box .main-search > .branch-slot {
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .search-box .main-search > .branch-slot:empty {
+    display: none;
+  }
+
+  /* The vertical line that parts the selector from the box (see the lists) parts nothing now: a line across, under the selector, does. */
+  .search-box .main-search > .branch-slot mat-divider {
+    display: none;
+  }
+
+  .search-box .main-search > .branch-slot:not(:empty) {
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 600px) {
+  /* What the screen puts there has a width of its own in some lists: it is not wider than the line. */
+  .search-box .main-search > .branch-slot > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* The same for a wide branch selector (`wideBranchSelector`), which does not fit beside the box on a tablet either (a media query cannot take
+   a variable: the rules are written once more). */
+@media (max-width: 1024px) {
+  .search-box.wide-branch-selector .main-search {
+    flex-wrap: wrap;
+  }
+
+  .search-box.wide-branch-selector .main-search > .branch-slot {
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .search-box.wide-branch-selector .main-search > .branch-slot:empty {
+    display: none;
+  }
+
+  /* The vertical line that parts the selector from the box (see the lists) parts nothing now: a line across, under the selector, does. */
+  .search-box.wide-branch-selector .main-search > .branch-slot mat-divider {
+    display: none;
+  }
+
+  .search-box.wide-branch-selector .main-search > .branch-slot:not(:empty) {
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 1024px) {
+  /* What the screen puts there has a width of its own in some lists: it is not wider than the line. */
+  .search-box.wide-branch-selector .main-search > .branch-slot > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}

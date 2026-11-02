@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -43,6 +44,7 @@ public class TC_15_5_EndUserACCStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_5_TA_1")
     public void end_user_can_change_the_acc_state_from_wip_to_qa_the_system_shall_then_change() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -103,6 +105,7 @@ public class TC_15_5_EndUserACCStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_5_TA_2")
     public void end_user_can_change_the_acc_state_from_qa_back_to_wip_state_of_the_associations() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -177,6 +180,7 @@ public class TC_15_5_EndUserACCStateManagement extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_5_TA_3")
     public void end_user_can_change_the_acc_state_from_qa_to_production_state_of_the_associations_also() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);

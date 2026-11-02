@@ -64,7 +64,8 @@ from app.security import AuthenticatedUser
 from app.services.app_user_service import AppUserService
 from app.services.code_list_service import CodeListService
 from app.services.release_service import ReleaseService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, tool_session
 from app.tools.models.code_list import (
     CodeListLifecycleState,
     CodeListResponseEntry,
@@ -1285,10 +1286,12 @@ async def transfer_code_list_ownership(
             target_user_label = f"{target_user.login_id} ({target_user.username})"
         code_list_label = row.name or row.list_id or f"Code list {code_list_manifest_id}"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(f"Are you sure you want to transfer ownership of '{code_list_label}' to {target_user_label}?"),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
         match elicit_result:
             case AcceptedElicitation():
                 payload = await code_list_service.transfer_code_list_ownership(

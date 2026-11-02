@@ -15,6 +15,8 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcListTypes;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.validator.AccStructureChangeValidationService;
+import org.oagi.score.gateway.http.api.cc_management.validator.StructureChangeReport;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
@@ -43,10 +45,11 @@ import org.oagi.score.gateway.http.api.plantuml.service.PlantUmlService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseQueryService;
 import org.oagi.score.gateway.http.common.model.*;
-import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +82,9 @@ public class CcQueryController {
 
     @Autowired
     private CcQueryService ccQueryService;
+
+    @Autowired
+    private AccStructureChangeValidationService structureChangeValidationService;
 
     @Autowired
     private CcQueryInterpreter interpreter;
@@ -353,6 +359,57 @@ public class CcQueryController {
                 targetManifestId, destinationManifestId);
     }
 
+    /** What moving the association to a base ACC would break in the ACCs it affects; asked before it is moved. */
+    @GetMapping(value = "/ascc/refactor/check")
+    public StructureChangeReport refactorCheck(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam("targetManifestId") AsccManifestId targetManifestId,
+            @RequestParam("destinationManifestId") AccManifestId destinationManifestId) {
+
+        return structureChangeValidationService.refactorAscc(
+                sessionService.asScoreUser(user),
+                targetManifestId, destinationManifestId);
+    }
+
+    @GetMapping(value = "/bcc/refactor/check")
+    public StructureChangeReport refactorCheck(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam("targetManifestId") BccManifestId targetManifestId,
+            @RequestParam("destinationManifestId") AccManifestId destinationManifestId) {
+
+        return structureChangeValidationService.refactorBcc(
+                sessionService.asScoreUser(user),
+                targetManifestId, destinationManifestId);
+    }
+
+    /** What appending an association to the ACC would break in the ACC and in the ACCs it affects; asked before it is appended. */
+    @GetMapping(value = "/acc/{accManifestId:[\\d]+}/append/check")
+    public StructureChangeReport appendCheck(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("accManifestId") AccManifestId accManifestId,
+            @RequestParam(value = "asccpManifestId", required = false) AsccpManifestId asccpManifestId,
+            @RequestParam(value = "bccpManifestId", required = false) BccpManifestId bccpManifestId) {
+
+        ScoreUser requester = sessionService.asScoreUser(user);
+        if (asccpManifestId != null) {
+            return structureChangeValidationService.appendAscc(requester, accManifestId, asccpManifestId);
+        }
+        if (bccpManifestId != null) {
+            return structureChangeValidationService.appendBcc(requester, accManifestId, bccpManifestId);
+        }
+        throw new IllegalArgumentException("Either 'asccpManifestId' or 'bccpManifestId' is required.");
+    }
+
+    /** What making the ACC based on another ACC would break in the ACC and in the ACCs it affects; asked before it is set. */
+    @GetMapping(value = "/acc/{accManifestId:[\\d]+}/base/check")
+    public StructureChangeReport setBaseCheck(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("accManifestId") AccManifestId accManifestId,
+            @RequestParam("basedAccManifestId") AccManifestId basedAccManifestId) {
+
+        return structureChangeValidationService.setBase(sessionService.asScoreUser(user), accManifestId, basedAccManifestId);
+    }
+
     @GetMapping(value = "/acc/{accManifestId:[\\d]+}/verify")
     public CcVerifyAppendResponse verifyAppendNode(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
@@ -459,7 +516,7 @@ public class CcQueryController {
     }
 
     @GetMapping(value = "/export/standalone")
-    public ResponseEntity<DeleteOnCloseFileSystemResource> exportStandaloneSchema(
+    public ResponseEntity<InputStreamResource> exportStandaloneSchema(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestParam(name = "asccpManifestIdList") String asccpManifestIdList,
             @RequestParam(name = "expressionOption", required = false) String expressionOption,
@@ -478,7 +535,7 @@ public class CcQueryController {
                                         "application/xml"
                 ))
                 .contentLength(response.file().length())
-                .body(new DeleteOnCloseFileSystemResource(response.file()));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.file())));
     }
 
     @GetMapping(value = "/asccp/{asccpManifestId:[\\d]+}/plantuml")

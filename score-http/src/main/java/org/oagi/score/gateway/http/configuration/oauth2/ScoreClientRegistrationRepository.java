@@ -32,8 +32,10 @@ public class ScoreClientRegistrationRepository
             Arrays.asList(CLIENT_SECRET_BASIC, CLIENT_SECRET_POST)
                     .stream().collect(Collectors.toMap(ClientAuthenticationMethod::getValue, Function.identity()));
 
+    // Spring Security 7 removed AuthorizationGrantType.PASSWORD (#1750). A DB row still carrying a
+    // "password" grant value is handled by the new-AuthorizationGrantType(...) fallback below.
     private static final Map<String, AuthorizationGrantType> predefinedAuthorizationGrantTypeMap =
-            Arrays.asList(AUTHORIZATION_CODE, REFRESH_TOKEN, CLIENT_CREDENTIALS, PASSWORD)
+            Arrays.asList(AUTHORIZATION_CODE, REFRESH_TOKEN, CLIENT_CREDENTIALS)
                     .stream().collect(Collectors.toMap(AuthorizationGrantType::getValue, Function.identity()));
 
     @Autowired

@@ -10,5 +10,6 @@ public record SummaryCcInfoRecord(
         Map<CcState, Integer> numberOfTotalCcByStates,
         Map<CcState, Integer> numberOfMyCcByStates,
         Map<String, Map<CcState, Integer>> ccByUsersAndStates,
-        List<CcListEntryRecord> myRecentCCs) {
+        List<CcListEntryRecord> myRecentCCs,
+        Map<String, Map<String, Map<CcState, Integer>>> ccByTypesUsersAndStates) {
 }

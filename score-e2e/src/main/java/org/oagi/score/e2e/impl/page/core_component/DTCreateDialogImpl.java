@@ -10,7 +10,7 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDialog {
 
     private static final By CREATE_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Create\")]//ancestor::button[1]");
 
     private ViewEditDataTypePageImpl parent;
 
@@ -30,13 +30,13 @@ public class DTCreateDialogImpl extends SearchBarPageImpl implements DTCreateDia
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select based DT".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select based DT".equals(getText(title));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override

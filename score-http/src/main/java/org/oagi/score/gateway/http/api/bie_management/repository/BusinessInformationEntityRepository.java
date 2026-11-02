@@ -22,7 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.*;
@@ -174,7 +176,14 @@ public class BusinessInformationEntityRepository {
                 List<ULong> result = basedTopLevelAsbiepIds.stream()
                         .map(e -> ULong.valueOf(e.value())).collect(Collectors.toList());
                 List<ULong> allInheritedTopLevelAsbiepIds = new ArrayList<>();
+                Set<ULong> visited = new HashSet<>();
                 while (!result.isEmpty()) {
+                    result = result.stream()
+                            .filter(visited::add)
+                            .collect(Collectors.toList());
+                    if (result.isEmpty()) {
+                        break;
+                    }
                     allInheritedTopLevelAsbiepIds.addAll(result);
                     result = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
                             .from(TOP_LEVEL_ASBIEP)

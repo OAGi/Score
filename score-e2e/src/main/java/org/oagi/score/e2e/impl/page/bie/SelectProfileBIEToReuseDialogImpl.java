@@ -66,7 +66,7 @@ public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl impleme
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override
@@ -164,7 +164,9 @@ public class SelectProfileBIEToReuseDialogImpl extends SearchBarPageImpl impleme
             setVersion(bie.getVersion());
             hitSearchButton();
 
-            WebElement tr = getTableRecordByValue(bie.getPropertyTerm());
+            WebElement tr = visibilityOfElementLocated(getDriver(), By.xpath(
+                    "//score-reuse-bie-dialog//a[@href='/profile_bie/" +
+                            bie.getTopLevelAsbiepId() + "']/ancestor::tr"));
             WebElement td = getColumnByName(tr, "select");
             click(td.findElement(By.xpath("mat-checkbox")));
         });

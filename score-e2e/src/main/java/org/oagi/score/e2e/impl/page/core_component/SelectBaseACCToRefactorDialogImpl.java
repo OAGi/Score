@@ -47,7 +47,7 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-content\")]//div[contains(@class, \"header\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//*[contains(@class, \"dialog-subtitle\")]"));
     }
 
     @Override
@@ -99,6 +99,8 @@ public class SelectBaseACCToRefactorDialogImpl implements SelectBaseACCToRefacto
     @Override
     public ACCViewEditPage hitRefactorButton() {
         click(getRefactorButton(true));
+        WebElement snackBar = getSnackBar(getDriver(), "Refactored");
+        assert snackBar.isDisplayed();
         return parent;
     }
 }

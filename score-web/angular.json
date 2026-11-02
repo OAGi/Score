@@ -17,7 +17,7 @@
       "prefix": "score",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": {
               "base": "dist/score-web"
@@ -27,6 +27,7 @@
               "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
+            "webWorkerTsConfig": "tsconfig.worker.json",
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -50,6 +51,9 @@
             "extractLicenses": false,
             "allowedCommonJsDependencies": [
               "webfontloader", "util", "crypto-js", "@types/uuid", "@stomp/rx-stomp", "angular2-uuid", "file-saver"
+            ],
+            "externalDependencies": [
+              "marked-katex-extension"
             ],
             "browser": "src/main.ts"
           },
@@ -83,7 +87,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "proxyConfig": "src/proxy.conf.json",
             "buildTarget": "score-web:build"
@@ -95,7 +99,7 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "score-web:build"
           }

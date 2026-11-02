@@ -16,7 +16,6 @@ import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListPage;
 import org.oagi.score.e2e.page.agency_id_list.EditAgencyIDListValueDialog;
 import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -369,7 +368,7 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         // New agency ID list value with any references cannot be discarded.
         WebElement tr2 = editAgencyIDListPage.getTableRecordByValue(agencyIDListValue2.getValue());
         WebElement td2 = editAgencyIDListPage.getColumnByName(tr2, "select");
-        assertThrows(ElementNotInteractableException.class, () -> assertDisabled(td2));
+        assertDisabled(td2.findElement(By.tagName("mat-checkbox")));
     }
 
     @Test
@@ -454,7 +453,7 @@ public class TC_37_3_EditingBrandNewEndUserAgencyIDList extends BaseTest {
         // New agency ID list value with any references cannot be discarded.
         WebElement tr = editAgencyIDListPage.getTableRecordByValue(agencyIDListValue.getValue());
         WebElement td = editAgencyIDListPage.getColumnByName(tr, "select");
-        assertThrows(ElementNotInteractableException.class, () -> assertDisabled(td));
+        assertDisabled(td.findElement(By.tagName("mat-checkbox")));
     }
 
 }

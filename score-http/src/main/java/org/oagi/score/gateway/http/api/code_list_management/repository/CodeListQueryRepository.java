@@ -18,6 +18,15 @@ import java.util.List;
 
 public interface CodeListQueryRepository {
 
+    /** The code lists with these manifest ids (each with its values). */
+    List<CodeListSummaryRecord> getCodeListSummaryListByManifestIds(Collection<CodeListManifestId> codeListManifestIds);
+
+    /** The release of each of these code list manifests; a manifest that does not exist is not in the map. */
+    java.util.Map<CodeListManifestId, ReleaseId> getCodeListReleaseIds(Collection<CodeListManifestId> codeListManifestIds);
+
+    /** The release of the code list manifest, or null when there is none. */
+    ReleaseId getCodeListReleaseId(CodeListManifestId codeListManifestId);
+
     CodeListSummaryRecord getCodeListSummary(
             CodeListManifestId codeListManifestId);
 
@@ -29,9 +38,23 @@ public interface CodeListQueryRepository {
 
     List<CodeListSummaryRecord> getCodeListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
+    /**
+     * Returns code lists explicitly linked to the DT, including their related
+     * manifests. Callers must consult {@link #hasCodeListAvailabilityByDtManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states);
 
+    /**
+     * Returns code lists explicitly linked to the DT_SC, including their
+     * related manifests. Callers must consult {@link #hasCodeListAvailabilityByDtScManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states);
+
+    boolean hasCodeListAvailabilityByDtManifestId(DtManifestId dtManifestId);
+
+    boolean hasCodeListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
 
     /**
      * Returns the top-level BIEs that currently assign the given code list.

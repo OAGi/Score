@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDoc.OasDocPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
@@ -51,7 +51,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_security_scheme</code>
+     * The reference instance of <code>oas_security_scheme</code>
      */
     public static final OasSecurityScheme OAS_SECURITY_SCHEME = new OasSecurityScheme();
 
@@ -64,33 +64,32 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     }
 
     /**
-     * The column <code>oagi.oas_security_scheme.oas_security_scheme_id</code>.
-     * The primary key of the record.
+     * The column <code>oas_security_scheme.oas_security_scheme_id</code>. The
+     * primary key of the record.
      */
     public final TableField<OasSecuritySchemeRecord, ULong> OAS_SECURITY_SCHEME_ID = createField(DSL.name("oas_security_scheme_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.guid</code>. The GUID of the
-     * record.
+     * The column <code>oas_security_scheme.guid</code>. The GUID of the record.
      */
     public final TableField<OasSecuritySchemeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.oas_doc_id</code>. Owning
-     * OpenAPI document; one entry of that doc components.securitySchemes map.
+     * The column <code>oas_security_scheme.oas_doc_id</code>. Owning OpenAPI
+     * document; one entry of that doc components.securitySchemes map.
      */
     public final TableField<OasSecuritySchemeRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Owning OpenAPI document; one entry of that doc components.securitySchemes map.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.scheme_name</code>. REQUIRED.
-     * The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth,
-     * BearerAuth); also the schemeName used in Security Requirement Objects.
-     * Unique within an oas_doc.
+     * The column <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
+     * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
+     * also the schemeName used in Security Requirement Objects. Unique within
+     * an oas_doc.
      */
     public final TableField<OasSecuritySchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(100).nullable(false), this, "REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.type</code>. REQUIRED. Security
+     * The column <code>oas_security_scheme.type</code>. REQUIRED. Security
      * Scheme type: apiKey | http | oauth2 | openIdConnect | mutualTLS.
      * mutualTLS requires OpenAPI 3.1+ output; enforced by the service layer per
      * the doc open_api_version.
@@ -98,44 +97,43 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     public final TableField<OasSecuritySchemeRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(20).nullable(false), this, "REQUIRED. Security Scheme type: apiKey | http | oauth2 | openIdConnect | mutualTLS. mutualTLS requires OpenAPI 3.1+ output; enforced by the service layer per the doc open_api_version.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.description</code>. Optional
-     * (all types). Short description; CommonMark MAY be used.
+     * The column <code>oas_security_scheme.description</code>. Optional (all
+     * types). Short description; CommonMark MAY be used.
      */
     public final TableField<OasSecuritySchemeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Optional (all types). Short description; CommonMark MAY be used.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.api_key_name</code>. REQUIRED
-     * when type=apiKey: header/query/cookie parameter name. NULL otherwise.
+     * The column <code>oas_security_scheme.api_key_name</code>. REQUIRED when
+     * type=apiKey: header/query/cookie parameter name. NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> API_KEY_NAME = createField(DSL.name("api_key_name"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED when type=apiKey: header/query/cookie parameter name. NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.api_key_in</code>. REQUIRED
-     * when type=apiKey: query | header | cookie (NOT path). NULL otherwise.
+     * The column <code>oas_security_scheme.api_key_in</code>. REQUIRED when
+     * type=apiKey: query | header | cookie (NOT path). NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> API_KEY_IN = createField(DSL.name("api_key_in"), SQLDataType.VARCHAR(10).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED when type=apiKey: query | header | cookie (NOT path). NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.http_scheme</code>. REQUIRED
-     * when type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
+     * The column <code>oas_security_scheme.http_scheme</code>. REQUIRED when
+     * type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> HTTP_SCHEME = createField(DSL.name("http_scheme"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED when type=http: RFC7235 scheme name, e.g. basic, bearer. NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.bearer_format</code>. Optional;
-     * only when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for
-     * basic.
+     * The column <code>oas_security_scheme.bearer_format</code>. Optional; only
+     * when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for basic.
      */
     public final TableField<OasSecuritySchemeRecord, String> BEARER_FORMAT = createField(DSL.name("bearer_format"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Optional; only when type=http AND http_scheme=bearer (e.g. JWT). NULL/omit for basic.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.open_id_connect_url</code>.
-     * REQUIRED when type=openIdConnect: discovery URL. NULL otherwise.
+     * The column <code>oas_security_scheme.open_id_connect_url</code>. REQUIRED
+     * when type=openIdConnect: discovery URL. NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> OPEN_ID_CONNECT_URL = createField(DSL.name("open_id_connect_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED when type=openIdConnect: discovery URL. NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.oauth2_flow_type</code>. oauth2
+     * The column <code>oas_security_scheme.oauth2_flow_type</code>. oauth2
      * only. The single OAuth Flows key emitted for this scheme: implicit |
      * password | clientCredentials | authorizationCode | deviceAuthorization.
      * deviceAuthorization requires OpenAPI 3.2+. NULL =&gt; authorizationCode
@@ -144,68 +142,66 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     public final TableField<OasSecuritySchemeRecord, String> OAUTH2_FLOW_TYPE = createField(DSL.name("oauth2_flow_type"), SQLDataType.VARCHAR(30).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2 only. The single OAuth Flows key emitted for this scheme: implicit | password | clientCredentials | authorizationCode | deviceAuthorization. deviceAuthorization requires OpenAPI 3.2+. NULL => authorizationCode (legacy default).");
 
     /**
-     * The column <code>oagi.oas_security_scheme.authorization_url</code>.
-     * oauth2; REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt;
-     * legacy default https://example.com/oauth/authorize.
+     * The column <code>oas_security_scheme.authorization_url</code>. oauth2;
+     * REQUIRED for implicit &amp; authorizationCode flows. NULL =&gt; legacy
+     * default https://example.com/oauth/authorize.
      */
     public final TableField<OasSecuritySchemeRecord, String> AUTHORIZATION_URL = createField(DSL.name("authorization_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2; REQUIRED for implicit & authorizationCode flows. NULL => legacy default https://example.com/oauth/authorize.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.token_url</code>. oauth2;
-     * REQUIRED for password, clientCredentials, authorizationCode,
-     * deviceAuthorization flows. NULL =&gt; legacy default
-     * https://example.com/oauth/token.
+     * The column <code>oas_security_scheme.token_url</code>. oauth2; REQUIRED
+     * for password, clientCredentials, authorizationCode, deviceAuthorization
+     * flows. NULL =&gt; legacy default https://example.com/oauth/token.
      */
     public final TableField<OasSecuritySchemeRecord, String> TOKEN_URL = createField(DSL.name("token_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2; REQUIRED for password, clientCredentials, authorizationCode, deviceAuthorization flows. NULL => legacy default https://example.com/oauth/token.");
 
     /**
-     * The column
-     * <code>oagi.oas_security_scheme.device_authorization_url</code>. oauth2,
-     * OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC 8628). NULL
-     * otherwise.
+     * The column <code>oas_security_scheme.device_authorization_url</code>.
+     * oauth2, OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC
+     * 8628). NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> DEVICE_AUTHORIZATION_URL = createField(DSL.name("device_authorization_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2, OpenAPI 3.2+; REQUIRED for the deviceAuthorization flow (RFC 8628). NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.refresh_url</code>. oauth2;
-     * optional refreshUrl for the flow. Emitted only when present.
+     * The column <code>oas_security_scheme.refresh_url</code>. oauth2; optional
+     * refreshUrl for the flow. Emitted only when present.
      */
     public final TableField<OasSecuritySchemeRecord, String> REFRESH_URL = createField(DSL.name("refresh_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2; optional refreshUrl for the flow. Emitted only when present.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.oauth2_metadata_url</code>.
-     * oauth2, OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization
-     * Server Metadata (RFC 8414). NULL otherwise.
+     * The column <code>oas_security_scheme.oauth2_metadata_url</code>. oauth2,
+     * OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization Server
+     * Metadata (RFC 8414). NULL otherwise.
      */
     public final TableField<OasSecuritySchemeRecord, String> OAUTH2_METADATA_URL = createField(DSL.name("oauth2_metadata_url"), SQLDataType.VARCHAR(250).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "oauth2, OpenAPI 3.2+; scheme-level URL of the OAuth 2.0 Authorization Server Metadata (RFC 8414). NULL otherwise.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.deprecated</code>. OpenAPI 3.2+
+     * The column <code>oas_security_scheme.deprecated</code>. OpenAPI 3.2+
      * Security Scheme deprecated flag. Emitted only for 3.2+ output.
      */
     public final TableField<OasSecuritySchemeRecord, Byte> DEPRECATED = createField(DSL.name("deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "OpenAPI 3.2+ Security Scheme deprecated flag. Emitted only for 3.2+ output.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.created_by</code>. The user who
+     * The column <code>oas_security_scheme.created_by</code>. The user who
      * creates the record.
      */
     public final TableField<OasSecuritySchemeRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.last_updated_by</code>. The
-     * user who last updates the record.
+     * The column <code>oas_security_scheme.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public final TableField<OasSecuritySchemeRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.creation_timestamp</code>. The
+     * The column <code>oas_security_scheme.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public final TableField<OasSecuritySchemeRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.oas_security_scheme.last_update_timestamp</code>.
-     * The timestamp when the record is last updated.
+     * The column <code>oas_security_scheme.last_update_timestamp</code>. The
+     * timestamp when the record is last updated.
      */
     public final TableField<OasSecuritySchemeRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
 
@@ -218,21 +214,21 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_security_scheme</code> table reference
+     * Create an aliased <code>oas_security_scheme</code> table reference
      */
     public OasSecurityScheme(String alias) {
         this(DSL.name(alias), OAS_SECURITY_SCHEME);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_security_scheme</code> table reference
+     * Create an aliased <code>oas_security_scheme</code> table reference
      */
     public OasSecurityScheme(Name alias) {
         this(alias, OAS_SECURITY_SCHEME);
     }
 
     /**
-     * Create a <code>oagi.oas_security_scheme</code> table reference
+     * Create a <code>oas_security_scheme</code> table reference
      */
     public OasSecurityScheme() {
         this(DSL.name("oas_security_scheme"), null);
@@ -273,7 +269,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -299,8 +295,8 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private transient AppUserPath _oasSecuritySchemeCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_security_scheme_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_security_scheme_created_by_fk</code> key.
      */
     public AppUserPath oasSecuritySchemeCreatedByFk() {
         if (_oasSecuritySchemeCreatedByFk == null)
@@ -312,8 +308,8 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private transient AppUserPath _oasSecuritySchemeLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_security_scheme_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_security_scheme_last_updated_by_fk</code> key.
      */
     public AppUserPath oasSecuritySchemeLastUpdatedByFk() {
         if (_oasSecuritySchemeLastUpdatedByFk == null)
@@ -325,7 +321,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private transient OasDocPath _oasDoc;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     * Get the implicit join path to the <code>oas_doc</code> table.
      */
     public OasDocPath oasDoc() {
         if (_oasDoc == null)
@@ -337,8 +333,8 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private transient OasDocSecurityPath _oasDocSecurity;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security</code> table
+     * Get the implicit to-many join path to the <code>oas_doc_security</code>
+     * table
      */
     public OasDocSecurityPath oasDocSecurity() {
         if (_oasDocSecurity == null)
@@ -350,8 +346,8 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     private transient OasOauthFlowPath _oasOauthFlow;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_flow</code> table
+     * Get the implicit to-many join path to the <code>oas_oauth_flow</code>
+     * table
      */
     public OasOauthFlowPath oasOauthFlow() {
         if (_oasOauthFlow == null)
@@ -364,7 +360,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security</code> table
+     * <code>oas_operation_security</code> table
      */
     public OasOperationSecurityPath oasOperationSecurity() {
         if (_oasOperationSecurity == null)

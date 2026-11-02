@@ -31,7 +31,7 @@ export class BieEditNode {
   topLevelAsbiepState: string;
   inverseMode: boolean;
   deprecated: boolean;
-  basedTopLevelAsbiepId: number;
+  basedTopLevelAsbiepId?: number;
   private $hashCode: number;
   private _version: string;
   private _status: string;
@@ -54,7 +54,10 @@ export class BieEditNode {
     this.topLevelAsbiepState = obj && obj.topLevelAsbiepState || '';
     this.inverseMode = obj && obj.inverseMode || false;
     this.deprecated = obj && obj.deprecated || false;
-    this.basedTopLevelAsbiepId = obj && obj.basedTopLevelAsbiepId || 0;
+    // Null/undefined means this is a normal BIE. Do not convert a missing
+    // inheritance base to 0: 0 is not a valid BIE id and can become a
+    // non-empty backend filter that matches no BIEs.
+    this.basedTopLevelAsbiepId = obj?.basedTopLevelAsbiepId;
     this.libraryName = obj && obj.libraryName || '';
     this.releaseNum = obj && obj.releaseNum || '';
     this.loginId = obj && obj.loginId || '';
@@ -311,6 +314,8 @@ export class UsedBie {
   cardinalityMin: number;
   cardinalityMax: number;
   deprecated: boolean;
+  /** The definition of the ASBIE, BBIE or BBIE_SC itself (its Context Definition). */
+  definition?: string;
 
   constructor(obj) {
     this.used = obj && obj.used;
@@ -323,6 +328,7 @@ export class UsedBie {
     this.cardinalityMin = obj && obj.cardinalityMin || 0;
     this.cardinalityMax = obj && obj.cardinalityMax || 0;
     this.deprecated = obj && obj.deprecated || false;
+    this.definition = obj && obj.definition || undefined;
   }
 }
 

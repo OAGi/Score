@@ -15,4 +15,10 @@ public interface MessageCommandRepository {
 
     int deleteMessages(Collection<MessageId> messageIdList);
 
+    /**
+     * Deletes every message the user has received, so that the account can be deleted: a message refers to its
+     * recipient.
+     */
+    int deleteMessagesReceivedBy(UserId userId);
+
 }

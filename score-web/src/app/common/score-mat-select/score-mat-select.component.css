@@ -1,0 +1,38 @@
+score-mat-select .score-select-value {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+score-mat-select .score-select-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+score-mat-select .score-select-clear.mat-mdc-icon-button.mat-mdc-button-base {
+  --mdc-icon-button-state-layer-size: 12px;
+  --mat-icon-button-state-layer-size: 12px;
+  --mat-icon-button-touch-target-size: 12px;
+  width: 12px !important;
+  min-width: 12px;
+  height: 12px !important;
+  line-height: 12px;
+  padding: 0 !important;
+  margin-inline-start: 8px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+score-mat-select .score-select-clear > .mat-icon {
+  /* Override the application's shared 24px button icon rule. */
+  width: 12px !important;
+  height: 12px !important;
+  font-size: 12px !important;
+  line-height: 12px;
+}

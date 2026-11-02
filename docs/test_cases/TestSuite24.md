@@ -89,7 +89,7 @@ Retain all enabled properties under the reused BIE hierarchy when the user click
 2. Invoke `Reuse BIE` on valid descendant nodes, verify the selection dialog contents, and reuse top-level BIEs owned by the same user, other end users, and developers where covered by the suite. (Assertions [#24.1.1](#test-assertion-2411), [#24.1.2](#test-assertion-2412))
 3. Verify the reused-node UI behavior: reuse icon, detail-pane content, nested reuse behavior, remove-reuse behavior, and visibility of reused BIEs owned by another user. (Assertions [#24.1.1](#test-assertion-2411), [#24.1.3](#test-assertion-2413), [#24.1.4](#test-assertion-2414), [#24.1.12](#test-assertion-24112), [#24.1.14](#test-assertion-24114), [#24.1.16](#test-assertion-24116))
 4. Verify the state-transition restrictions and allowed transitions between reusing and reused BIEs across WIP, QA, and Production scenarios. (Assertions [#24.1.5](#test-assertion-2415), [#24.1.6](#test-assertion-2416), [#24.1.7](#test-assertion-2417), [#24.1.8](#test-assertion-2418), [#24.1.9](#test-assertion-2419), [#24.1.10](#test-assertion-24110), [#24.1.11](#test-assertion-24111))
-5. Verify reused-node retain behavior on the reusing BIE so that reused references are removed while retained association details remain editable in the resulting node. (Assertion [#24.1.16](#test-assertion-24116))
+5. Verify reused-node retain behavior on the reusing BIE so that reused references are removed while retained association details remain editable in the resulting node. Then edit the remark of the retained node, save the BIE, reopen it, and verify that the edited remark is shown. (Assertion [#24.1.16](#test-assertion-24116))
 ## Test Case 24.2
 
 **Create a Top-level BIE from a BIE node**

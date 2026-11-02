@@ -39,7 +39,7 @@ public class ModuleSetReleaseXMLSchemaValidationDialogImpl implements ModuleSetR
     @Override
     public WebElement getTitle() {
         return visibilityOfElementLocated(PageHelper.wait(getDriver(), Duration.ofSeconds(30L), ofMillis(200L)),
-                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]/span"));
+                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]//span"));
     }
 
     @Override

@@ -1,0 +1,225 @@
+package org.oagi.score.e2e.TS_20_NamespaceManagement;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.obj.AppUserObject;
+import org.oagi.score.e2e.obj.LibraryObject;
+import org.oagi.score.e2e.obj.NamespaceObject;
+import org.oagi.score.e2e.obj.ReleaseObject;
+import org.oagi.score.e2e.page.HomePage;
+import org.oagi.score.e2e.page.namespace.CreateNamespacePage;
+import org.oagi.score.e2e.page.namespace.EditNamespacePage;
+import org.oagi.score.e2e.page.namespace.TransferNamespaceOwershipDialog;
+import org.oagi.score.e2e.page.namespace.ViewEditNamespacePage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.oagi.score.e2e.AssertionHelper.assertNotChecked;
+import static org.oagi.score.e2e.impl.PageHelper.*;
+
+@Execution(ExecutionMode.CONCURRENT)
+public class TC_20_2_EndUserManagementOfNamespaces extends BaseTest {
+    private List<AppUserObject> randomAccounts = new ArrayList<>();
+
+    @BeforeEach
+    public void init() {
+        super.init();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        super.tearDown();
+
+        // Delete random accounts
+        this.randomAccounts.forEach(randomAccount -> {
+            getAPIFactory().getAppUserAPI().deleteAppUserByLoginId(randomAccount.getLoginId());
+        });
+    }
+
+    private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
+        this.randomAccounts.add(appUser);
+    }
+
+    @Test
+    @DisplayName("TC_20_2_TA_1")
+    public void end_user_management_of_namespaces_uri_is_required_and_unique_this_is_a_text() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        assertNotChecked(createNamespacePage.getStandardCheckboxField());
+        assertDisabled(createNamespacePage.getStandardCheckboxField());
+
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.setPrefix(randomDomain);
+        createNamespacePage.hitCreateButton();
+        viewEditNamespacePage.openPage();
+        viewEditNamespacePage.setURI(testURI);
+        viewEditNamespacePage.hitSearchButton();
+        WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
+
+        createNamespacePage.openPage();
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.hitCreateButton();
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + testURI + "' already exists."));
+        click(elementToBeClickable(getDriver(), By.xpath("//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+    }
+
+    @Test
+    @DisplayName("TC_20_2_TA_2")
+    public void end_user_who_is_an_owner_of_the_namespace_can_change_details_of_an_existing_namespace() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        assertNotChecked(createNamespacePage.getStandardCheckboxField());
+        assertDisabled(createNamespacePage.getStandardCheckboxField());
+
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.setPrefix(randomDomain);
+        createNamespacePage.setDescription("a description");
+        createNamespacePage.hitCreateButton();
+        viewEditNamespacePage.openPage();
+        viewEditNamespacePage.setURI(testURI);
+        viewEditNamespacePage.hitSearchButton();
+        WebElement tr = viewEditNamespacePage.getTableRecordAtIndex(1);
+
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(testURI, endUser.getLoginId());
+        assertEquals(randomDomain, getText(editNamespacePage.getPrefixField()));
+        assertEquals("a description", getText(editNamespacePage.getDescriptionField()));
+        assertNotChecked(editNamespacePage.getStandardCheckboxField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+        editNamespacePage.getURIField().clear();
+        String existingURI = "http://www.openapplications.org/oagis/10";
+        editNamespacePage.setURI(existingURI);
+        editNamespacePage.hitUpdateButton();
+        String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
+        String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
+        assertTrue(snackBarMessage.contains("Namespace URI '" + existingURI + "' already exists."));
+        click(elementToBeClickable(getDriver(), By.xpath("//score-multi-actions-snack-bar//span[contains(text(), \"Close\")]//ancestor::button[1]")));
+        editNamespacePage.hitBackButton();
+        waitFor(Duration.ofMillis(3000L));
+        String namespaceXpath = "//*[contains(text(),\"" + testURI + "\")]//ancestor::tr[1]//span[contains(text(),\"" + endUser.getLoginId() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(namespaceXpath)).size());
+    }
+    @Test
+    @DisplayName("TC_20_2_TA_3_and_TA_5")
+    public void developer_and_end_user_who_does_not_own_the_namespace_cannot_update_it() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId());
+        assertDisabled(editNamespacePage.getURIField());
+        assertDisabled(editNamespacePage.getPrefixField());
+        assertDisabled(editNamespacePage.getDescriptionField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+
+        homePage.logout();
+        homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
+
+        viewEditNamespacePage.openPage();
+        editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId());
+        assertDisabled(editNamespacePage.getURIField());
+        assertDisabled(editNamespacePage.getPrefixField());
+        assertDisabled(editNamespacePage.getDescriptionField());
+        assertDisabled(editNamespacePage.getStandardCheckboxField());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[contains(text(),\"Discard\")]//ancestor::button[1]")).size());
+        homePage.logout();
+    }
+
+    @Test
+    @DisplayName("TC_20_2_TA_4")
+    public void end_user_who_is_the_owner_of_the_namespace_can_discard_it_if_the_namespace_has() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject euNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId());
+        editNamespacePage.hitDiscardButton();
+
+        viewEditNamespacePage.openPage();
+        assertThrows(NoSuchElementException.class, () -> viewEditNamespacePage.openNamespaceByURIAndOwner(euNamespace.getUri(), endUser.getLoginId()));
+    }
+
+    @Test
+    @DisplayName("TC_20_2_TA_6")
+    public void owner_end_user_of_the_namespace_can_transfer_ownership_only_to_another_end_user() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        AppUserObject anotherUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(anotherUser);
+
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getTheLatestRelease(library);
+        HomePage homePage = loginPage().signIn(anotherUser.getLoginId(), anotherUser.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+        String randomDomain = RandomStringUtils.secure().nextAlphabetic(5, 10);
+        String testURI = "https://test." + randomDomain + ".com";
+        createNamespacePage.setURI(testURI);
+        createNamespacePage.setPrefix(randomDomain);
+        createNamespacePage.hitCreateButton();
+        {
+            viewEditNamespacePage.setURI(testURI);
+            viewEditNamespacePage.hitSearchButton();
+
+            WebElement tr = viewEditNamespacePage.getTableRecordByValue(testURI);
+            WebElement td = viewEditNamespacePage.getColumnByName(tr, "owner");
+            assertTrue(td.findElement(By.className("mat-icon")).isEnabled());
+
+            TransferNamespaceOwershipDialog transferNamespaceOwershipDialog = viewEditNamespacePage.openTransferNamespaceOwnershipDialog(tr);
+            transferNamespaceOwershipDialog.transfer(endUser.getLoginId());
+
+            viewEditNamespacePage.setURI(testURI);
+            viewEditNamespacePage.hitSearchButton();
+
+            tr = viewEditNamespacePage.getTableRecordByValue(testURI);
+            td = viewEditNamespacePage.getColumnByName(tr, "owner");
+            assertEquals(endUser.getLoginId(), getText(td));
+        }
+
+    }
+
+}

@@ -7,6 +7,7 @@ import org.oagi.score.e2e.obj.ReleaseObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * APIs for the code list management.
@@ -16,6 +17,8 @@ public interface CodeListAPI {
     CodeListObject getCodeListByManifestId(BigInteger codeListManifestId);
 
     CodeListObject getCodeListByCodeListNameAndReleaseNum(String codeListName, String releaseNum);
+
+    List<CodeListObject> getCodeListsByCodeListNameAndReleaseNum(String codeListName, String releaseNum);
 
     CodeListObject createRandomCodeList(AppUserObject creator, NamespaceObject namespace,
                                         ReleaseObject release, String state);

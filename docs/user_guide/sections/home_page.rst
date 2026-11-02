@@ -37,6 +37,8 @@ This tab provides analytics about core components and comprises the following pa
    It includes a "User" filter.
    To narrow the results, click the "User" field and select one or more users.
    The values in the table are links to the "Core Component" page with matching filters applied.
+   Because the counts on this tab are made for the *Working* branch, the links open the "Core Component" page on the *Working* branch.
+   The user name in the first column links to the "Core Component" page filtered by that owner.
 
 -  "My recent core components".
    This panel displays recently updated core components for the current user.

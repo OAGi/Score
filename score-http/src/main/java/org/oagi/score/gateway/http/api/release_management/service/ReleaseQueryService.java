@@ -1,9 +1,9 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.apache.commons.io.FileUtils;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.export.ExportContext;
@@ -23,6 +23,7 @@ import org.oagi.score.gateway.http.api.release_management.model.*;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.criteria.ReleaseListFilterCriteria;
 import org.oagi.score.gateway.http.common.model.ExportStandaloneSchemaResponse;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -123,13 +124,57 @@ public class ReleaseQueryService {
         return query(requester).getReleaseDetails(releaseId);
     }
 
+    /**
+     * Checks whether {@code targetReleaseId} occurs after {@code sourceReleaseId}
+     * in the release chain. Release IDs are database identifiers and do not define
+     * release ordering, so this follows each release's {@code next} link instead.
+     */
+    public boolean isLaterRelease(ScoreUser requester,
+                                  ReleaseId sourceReleaseId,
+                                  ReleaseId targetReleaseId) {
+        if (sourceReleaseId == null || targetReleaseId == null) {
+            throw new IllegalArgumentException("Source and target releases are required.");
+        }
+        if (sourceReleaseId.equals(targetReleaseId)) {
+            return false;
+        }
+
+        Set<ReleaseId> visited = new HashSet<>();
+        ReleaseId currentReleaseId = sourceReleaseId;
+        while (visited.add(currentReleaseId)) {
+            ReleaseDetailsRecord currentRelease = getReleaseDetails(requester, currentReleaseId);
+            if (currentRelease == null || currentRelease.next() == null) {
+                return false;
+            }
+
+            ReleaseId nextReleaseId = currentRelease.next().releaseId();
+            if (nextReleaseId == null) {
+                return false;
+            }
+            if (targetReleaseId.equals(nextReleaseId)) {
+                return true;
+            }
+            currentReleaseId = nextReleaseId;
+        }
+        return false;
+    }
+
+    private ReleaseSummaryRecord requireReleaseSummary(ScoreUser requester, ReleaseId releaseId) {
+        ReleaseSummaryRecord release = query(requester).getReleaseSummary(releaseId);
+        if (release == null) {
+            throw new NotFoundException("The release '" + releaseId + "' does not exist.");
+        }
+        return release;
+    }
+
     public AssignComponents getAssignComponents(ScoreUser requester, ReleaseId releaseId) {
+        requireReleaseSummary(requester, releaseId);
         return query(requester).getAssignComponents(releaseId);
     }
 
     public GenerateMigrationScriptResponse generateMigrationScript(ScoreUser requester, ReleaseId releaseId,
                                                                    boolean includeBieViewOrder) throws IOException {
-        ReleaseSummaryRecord release = query(requester).getReleaseSummary(releaseId);
+        ReleaseSummaryRecord release = requireReleaseSummary(requester, releaseId);
 
         MigrationScriptGenerator generator = new MigrationScriptGenerator(dslContext, resourceLoader,
                 BigInteger.valueOf(100000000L), includeBieViewOrder);
@@ -154,14 +199,13 @@ public class ReleaseQueryService {
         String normalizedExpressionOption = normalizeExpressionOption(expressionOption);
         validateExpressionVersion(normalizedExpressionOption, expressionVersion);
 
-        File baseDir = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
-        FileUtils.forceMkdir(baseDir);
+        File baseDir = TempFiles.newDirectory();
 
         try {
             List<File> files = Collections.synchronizedList(new ArrayList<>());
 
             Map<AsccpManifestId, ReleaseId> releaseIdMap = getReleaseIdMapByAsccpManifestIdList(requester, asccpManifestIdList);
-            CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIdMap.values());
+            CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseIdMap.values());
             Map<String, Integer> pathCounter = new ConcurrentHashMap<>();
             List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
             asccpManifestIdList.parallelStream().forEach(asccpManifestId -> {
@@ -193,7 +237,7 @@ public class ReleaseQueryService {
 
             if (files.size() == 1) {
                 File srcFile = files.get(0);
-                File destFile = File.createTempFile("oagis-", null);
+                File destFile = TempFiles.newFile(srcFile.getName());
                 if (!srcFile.renameTo(destFile)) {
                     FileUtils.copyFile(srcFile, destFile);
                 }

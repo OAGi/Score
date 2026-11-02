@@ -22,7 +22,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
 
     /**
      * Setter for
-     * <code>oagi.github_issue_asccp_manifest.github_issue_asccp_manifest_id</code>.
+     * <code>github_issue_asccp_manifest.github_issue_asccp_manifest_id</code>.
      * Primary key column.
      */
     public void setGithubIssueAsccpManifestId(ULong value) {
@@ -31,7 +31,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
 
     /**
      * Getter for
-     * <code>oagi.github_issue_asccp_manifest.github_issue_asccp_manifest_id</code>.
+     * <code>github_issue_asccp_manifest.github_issue_asccp_manifest_id</code>.
      * Primary key column.
      */
     public ULong getGithubIssueAsccpManifestId() {
@@ -39,27 +39,25 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_asccp_manifest.asccp_manifest_id</code>. Foreign
-     * key to asccp_manifest; the ASCCP (in a given release) linked to a GitHub
-     * issue.
+     * Setter for <code>github_issue_asccp_manifest.asccp_manifest_id</code>.
+     * Foreign key to asccp_manifest; the ASCCP (in a given release) linked to a
+     * GitHub issue.
      */
     public void setAsccpManifestId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_asccp_manifest.asccp_manifest_id</code>. Foreign
-     * key to asccp_manifest; the ASCCP (in a given release) linked to a GitHub
-     * issue.
+     * Getter for <code>github_issue_asccp_manifest.asccp_manifest_id</code>.
+     * Foreign key to asccp_manifest; the ASCCP (in a given release) linked to a
+     * GitHub issue.
      */
     public ULong getAsccpManifestId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_asccp_manifest.github_issue_id</code>.
+     * Setter for <code>github_issue_asccp_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public void setGithubIssueId(ULong value) {
@@ -67,7 +65,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Getter for <code>oagi.github_issue_asccp_manifest.github_issue_id</code>.
+     * Getter for <code>github_issue_asccp_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public ULong getGithubIssueId() {
@@ -75,23 +73,23 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Setter for <code>oagi.github_issue_asccp_manifest.created_by</code>.
-     * Foreign key to app_user; who created the link.
+     * Setter for <code>github_issue_asccp_manifest.created_by</code>. Foreign
+     * key to app_user; who created the link.
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_asccp_manifest.created_by</code>.
-     * Foreign key to app_user; who created the link.
+     * Getter for <code>github_issue_asccp_manifest.created_by</code>. Foreign
+     * key to app_user; who created the link.
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_asccp_manifest.last_updated_by</code>.
+     * Setter for <code>github_issue_asccp_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -99,7 +97,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Getter for <code>oagi.github_issue_asccp_manifest.last_updated_by</code>.
+     * Getter for <code>github_issue_asccp_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public ULong getLastUpdatedBy() {
@@ -107,8 +105,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_asccp_manifest.creation_timestamp</code>.
+     * Setter for <code>github_issue_asccp_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -116,8 +113,7 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_asccp_manifest.creation_timestamp</code>.
+     * Getter for <code>github_issue_asccp_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -126,8 +122,8 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
 
     /**
      * Setter for
-     * <code>oagi.github_issue_asccp_manifest.last_update_timestamp</code>.
-     * Timestamp when this record was last updated.
+     * <code>github_issue_asccp_manifest.last_update_timestamp</code>. Timestamp
+     * when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(6, value);
@@ -135,8 +131,8 @@ public class GithubIssueAsccpManifestRecord extends UpdatableRecordImpl<GithubIs
 
     /**
      * Getter for
-     * <code>oagi.github_issue_asccp_manifest.last_update_timestamp</code>.
-     * Timestamp when this record was last updated.
+     * <code>github_issue_asccp_manifest.last_update_timestamp</code>. Timestamp
+     * when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(6);

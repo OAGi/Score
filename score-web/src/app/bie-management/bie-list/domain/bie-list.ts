@@ -7,6 +7,10 @@ import {ReleaseSummary} from '../../../release-management/domain/release';
 import {LibrarySummary} from '../../../library-management/domain/library';
 import {ScoreUser} from '../../../authentication/domain/auth';
 
+export function normalizeBasedTopLevelAsbiepIds(ids: number[] | undefined): number[] {
+  return (ids || []).filter(id => Number.isInteger(id) && id > 0);
+}
+
 export class BieListRequest {
   library: LibrarySummary = new LibrarySummary();
   releases: ReleaseSummary[] = [];
@@ -109,8 +113,9 @@ export class BieListRequest {
     if (this.topLevelAsbiepIds && this.topLevelAsbiepIds.length > 0) {
       params = params.set('topLevelAsbiepIds', this.topLevelAsbiepIds.join(','));
     }
-    if (this.basedTopLevelAsbiepIds && this.basedTopLevelAsbiepIds.length > 0) {
-      params = params.set('basedTopLevelAsbiepIds', this.basedTopLevelAsbiepIds.join(','));
+    const basedTopLevelAsbiepIds = normalizeBasedTopLevelAsbiepIds(this.basedTopLevelAsbiepIds);
+    if (basedTopLevelAsbiepIds.length > 0) {
+      params = params.set('basedTopLevelAsbiepIds', basedTopLevelAsbiepIds.join(','));
     }
     if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
       params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));

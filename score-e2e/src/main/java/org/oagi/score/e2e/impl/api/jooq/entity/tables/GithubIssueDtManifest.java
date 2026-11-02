@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.DtManifest.DtManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.GithubIssue.GithubIssuePath;
@@ -48,7 +48,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.github_issue_dt_manifest</code>
+     * The reference instance of <code>github_issue_dt_manifest</code>
      */
     public static final GithubIssueDtManifest GITHUB_ISSUE_DT_MANIFEST = new GithubIssueDtManifest();
 
@@ -62,45 +62,43 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
 
     /**
      * The column
-     * <code>oagi.github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
+     * <code>github_issue_dt_manifest.github_issue_dt_manifest_id</code>.
      * Primary key column.
      */
     public final TableField<GithubIssueDtManifestRecord, ULong> GITHUB_ISSUE_DT_MANIFEST_ID = createField(DSL.name("github_issue_dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.github_issue_dt_manifest.dt_manifest_id</code>.
-     * Foreign key to dt_manifest; the DT (in a given release) linked to a
-     * GitHub issue.
+     * The column <code>github_issue_dt_manifest.dt_manifest_id</code>. Foreign
+     * key to dt_manifest; the DT (in a given release) linked to a GitHub issue.
      */
     public final TableField<GithubIssueDtManifestRecord, ULong> DT_MANIFEST_ID = createField(DSL.name("dt_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to dt_manifest; the DT (in a given release) linked to a GitHub issue.");
 
     /**
-     * The column <code>oagi.github_issue_dt_manifest.github_issue_id</code>.
-     * Foreign key to github_issue; the linked GitHub issue.
+     * The column <code>github_issue_dt_manifest.github_issue_id</code>. Foreign
+     * key to github_issue; the linked GitHub issue.
      */
     public final TableField<GithubIssueDtManifestRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to github_issue; the linked GitHub issue.");
 
     /**
-     * The column <code>oagi.github_issue_dt_manifest.created_by</code>. Foreign
-     * key to app_user; who created the link.
+     * The column <code>github_issue_dt_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public final TableField<GithubIssueDtManifestRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who created the link.");
 
     /**
-     * The column <code>oagi.github_issue_dt_manifest.last_updated_by</code>.
-     * Foreign key to app_user; who last updated the link.
+     * The column <code>github_issue_dt_manifest.last_updated_by</code>. Foreign
+     * key to app_user; who last updated the link.
      */
     public final TableField<GithubIssueDtManifestRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to app_user; who last updated the link.");
 
     /**
-     * The column <code>oagi.github_issue_dt_manifest.creation_timestamp</code>.
+     * The column <code>github_issue_dt_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public final TableField<GithubIssueDtManifestRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
-     * The column
-     * <code>oagi.github_issue_dt_manifest.last_update_timestamp</code>.
+     * The column <code>github_issue_dt_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public final TableField<GithubIssueDtManifestRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
@@ -114,23 +112,21 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_dt_manifest</code> table
-     * reference
+     * Create an aliased <code>github_issue_dt_manifest</code> table reference
      */
     public GithubIssueDtManifest(String alias) {
         this(DSL.name(alias), GITHUB_ISSUE_DT_MANIFEST);
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue_dt_manifest</code> table
-     * reference
+     * Create an aliased <code>github_issue_dt_manifest</code> table reference
      */
     public GithubIssueDtManifest(Name alias) {
         this(alias, GITHUB_ISSUE_DT_MANIFEST);
     }
 
     /**
-     * Create a <code>oagi.github_issue_dt_manifest</code> table reference
+     * Create a <code>github_issue_dt_manifest</code> table reference
      */
     public GithubIssueDtManifest() {
         this(DSL.name("github_issue_dt_manifest"), null);
@@ -171,7 +167,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -197,8 +193,8 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     private transient AppUserPath _githubIssueDtManifestCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_dt_manifest_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_dt_manifest_created_by_fk</code> key.
      */
     public AppUserPath githubIssueDtManifestCreatedByFk() {
         if (_githubIssueDtManifestCreatedByFk == null)
@@ -210,7 +206,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     private transient DtManifestPath _dtManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.dt_manifest</code> table.
+     * Get the implicit join path to the <code>dt_manifest</code> table.
      */
     public DtManifestPath dtManifest() {
         if (_dtManifest == null)
@@ -222,7 +218,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     private transient GithubIssuePath _githubIssue;
 
     /**
-     * Get the implicit join path to the <code>oagi.github_issue</code> table.
+     * Get the implicit join path to the <code>github_issue</code> table.
      */
     public GithubIssuePath githubIssue() {
         if (_githubIssue == null)
@@ -234,8 +230,8 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     private transient AppUserPath _githubIssueDtManifestLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>github_issue_dt_manifest_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>github_issue_dt_manifest_last_updated_by_fk</code> key.
      */
     public AppUserPath githubIssueDtManifestLastUpdatedByFk() {
         if (_githubIssueDtManifestLastUpdatedByFk == null)

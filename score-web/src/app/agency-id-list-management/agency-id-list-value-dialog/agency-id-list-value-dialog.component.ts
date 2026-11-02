@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {AgencyIdListValue} from '../domain/agency-id-list';
 import {hashCode} from '../../common/utility';
@@ -7,6 +7,7 @@ import {hashCode} from '../../common/utility';
   standalone: false,
   selector: 'score-agency-id-list-value-dialog',
   templateUrl: './agency-id-list-value-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./agency-id-list-value-dialog.component.css']
 })
 export class AgencyIdListValueDialogComponent implements OnInit {
@@ -78,8 +79,8 @@ export class AgencyIdListValueDialogComponent implements OnInit {
   }
 
   isDisabled() {
-    return (this.agencyIdListValue.value === undefined || this.agencyIdListValue.value === '') ||
-      (this.agencyIdListValue.name === undefined || this.agencyIdListValue.name === '') ||
+    return (this.agencyIdListValue.value === undefined || this.agencyIdListValue.value === null || this.agencyIdListValue.value.trim() === '') ||
+      (this.agencyIdListValue.name === undefined || this.agencyIdListValue.name === null || this.agencyIdListValue.name.trim() === '') ||
       !this.isDirty();
   }
 

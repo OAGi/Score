@@ -21,25 +21,23 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.oas_operation_security.oas_operation_security_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_operation_security.oas_operation_security_id</code>.
+     * The primary key of the record.
      */
     public void setOasOperationSecurityId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_operation_security.oas_operation_security_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_operation_security.oas_operation_security_id</code>.
+     * The primary key of the record.
      */
     public ULong getOasOperationSecurityId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.guid</code>. The GUID of the
+     * Setter for <code>oas_operation_security.guid</code>. The GUID of the
      * record.
      */
     public void setGuid(String value) {
@@ -47,7 +45,7 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.guid</code>. The GUID of the
+     * Getter for <code>oas_operation_security.guid</code>. The GUID of the
      * record.
      */
     public String getGuid() {
@@ -55,7 +53,7 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.oas_operation_id</code>. The
+     * Setter for <code>oas_operation_security.oas_operation_id</code>. The
      * owning operation; one entry of the operation's security array (overrides
      * the document-level security).
      */
@@ -64,7 +62,7 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.oas_operation_id</code>. The
+     * Getter for <code>oas_operation_security.oas_operation_id</code>. The
      * owning operation; one entry of the operation's security array (overrides
      * the document-level security).
      */
@@ -73,28 +71,27 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.requirement_group</code>.
-     * Index of the Security Requirement Object within the security array (OR).
-     * Rows sharing a group are ANDed into one requirement object.
+     * Setter for <code>oas_operation_security.requirement_group</code>. Index
+     * of the Security Requirement Object within the security array (OR). Rows
+     * sharing a group are ANDed into one requirement object.
      */
     public void setRequirementGroup(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.requirement_group</code>.
-     * Index of the Security Requirement Object within the security array (OR).
-     * Rows sharing a group are ANDed into one requirement object.
+     * Getter for <code>oas_operation_security.requirement_group</code>. Index
+     * of the Security Requirement Object within the security array (OR). Rows
+     * sharing a group are ANDed into one requirement object.
      */
     public Integer getRequirementGroup() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_operation_security.oas_security_scheme_id</code>. FK to
-     * oas_security_scheme. The scheme this entry references (its scheme_name is
-     * the components.securitySchemes key). NULL marks an empty requirement
+     * Setter for <code>oas_operation_security.oas_security_scheme_id</code>. FK
+     * to oas_security_scheme. The scheme this entry references (its scheme_name
+     * is the components.securitySchemes key). NULL marks an empty requirement
      * object {} (anonymous / optional).
      */
     public void setOasSecuritySchemeId(ULong value) {
@@ -102,10 +99,9 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_operation_security.oas_security_scheme_id</code>. FK to
-     * oas_security_scheme. The scheme this entry references (its scheme_name is
-     * the components.securitySchemes key). NULL marks an empty requirement
+     * Getter for <code>oas_operation_security.oas_security_scheme_id</code>. FK
+     * to oas_security_scheme. The scheme this entry references (its scheme_name
+     * is the components.securitySchemes key). NULL marks an empty requirement
      * object {} (anonymous / optional).
      */
     public ULong getOasSecuritySchemeId() {
@@ -113,56 +109,55 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.created_by</code>. The user
-     * who creates the record.
+     * Setter for <code>oas_operation_security.created_by</code>. The user who
+     * creates the record.
      */
     public void setCreatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.created_by</code>. The user
-     * who creates the record.
+     * Getter for <code>oas_operation_security.created_by</code>. The user who
+     * creates the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.last_updated_by</code>. The
-     * user who last updates the record.
+     * Setter for <code>oas_operation_security.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.last_updated_by</code>. The
-     * user who last updates the record.
+     * Getter for <code>oas_operation_security.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.oas_operation_security.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * Setter for <code>oas_operation_security.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_operation_security.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * Getter for <code>oas_operation_security.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for
-     * <code>oagi.oas_operation_security.last_update_timestamp</code>. The
+     * Setter for <code>oas_operation_security.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -170,8 +165,7 @@ public class OasOperationSecurityRecord extends UpdatableRecordImpl<OasOperation
     }
 
     /**
-     * Getter for
-     * <code>oagi.oas_operation_security.last_update_timestamp</code>. The
+     * Getter for <code>oas_operation_security.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

@@ -27,8 +27,7 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for
-     * <code>oagi.bie_user_ext_revision.bie_user_ext_revision_id</code>.
+     * Setter for <code>bie_user_ext_revision.bie_user_ext_revision_id</code>.
      * Primary, internal database key.
      */
     public void setBieUserExtRevisionId(ULong value) {
@@ -36,8 +35,7 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Getter for
-     * <code>oagi.bie_user_ext_revision.bie_user_ext_revision_id</code>.
+     * Getter for <code>bie_user_ext_revision.bie_user_ext_revision_id</code>.
      * Primary, internal database key.
      */
     public ULong getBieUserExtRevisionId() {
@@ -45,57 +43,55 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.ext_abie_id</code>. This
-     * points to an ABIE record corresponding to the EXTENSION_ACC_ID record.
-     * For example, this column can point to the ApplicationAreaExtension ABIE
-     * which is based on the ApplicationAreaExtension ACC (referred to by the
-     * EXT_ACC_ID column). This column can be NULL only when the extension is
-     * the AllExtension because there is no corresponding ABIE for the
-     * AllExtension ACC.
+     * Setter for <code>bie_user_ext_revision.ext_abie_id</code>. This points to
+     * an ABIE record corresponding to the EXTENSION_ACC_ID record. For example,
+     * this column can point to the ApplicationAreaExtension ABIE which is based
+     * on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID
+     * column). This column can be NULL only when the extension is the
+     * AllExtension because there is no corresponding ABIE for the AllExtension
+     * ACC.
      */
     public void setExtAbieId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_user_ext_revision.ext_abie_id</code>. This
-     * points to an ABIE record corresponding to the EXTENSION_ACC_ID record.
-     * For example, this column can point to the ApplicationAreaExtension ABIE
-     * which is based on the ApplicationAreaExtension ACC (referred to by the
-     * EXT_ACC_ID column). This column can be NULL only when the extension is
-     * the AllExtension because there is no corresponding ABIE for the
-     * AllExtension ACC.
+     * Getter for <code>bie_user_ext_revision.ext_abie_id</code>. This points to
+     * an ABIE record corresponding to the EXTENSION_ACC_ID record. For example,
+     * this column can point to the ApplicationAreaExtension ABIE which is based
+     * on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID
+     * column). This column can be NULL only when the extension is the
+     * AllExtension because there is no corresponding ABIE for the AllExtension
+     * ACC.
      */
     public ULong getExtAbieId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
-     * points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID
-     * column is based. E.g. It may point to an ApplicationAreaExtension ACC,
-     * AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that
-     * an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2
-     * (Extension).
+     * Setter for <code>bie_user_ext_revision.ext_acc_id</code>. This points to
+     * an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is
+     * based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension
+     * ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC
+     * record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).
      */
     public void setExtAccId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_user_ext_revision.ext_acc_id</code>. This
-     * points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID
-     * column is based. E.g. It may point to an ApplicationAreaExtension ACC,
-     * AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that
-     * an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2
-     * (Extension).
+     * Getter for <code>bie_user_ext_revision.ext_acc_id</code>. This points to
+     * an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is
+     * based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension
+     * ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC
+     * record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).
      */
     public ULong getExtAccId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.user_ext_acc_id</code>. This
+     * Setter for <code>bie_user_ext_revision.user_ext_acc_id</code>. This
      * column points to the specific revision of a User Extension ACC (this is
      * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
      * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
@@ -106,7 +102,7 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Getter for <code>oagi.bie_user_ext_revision.user_ext_acc_id</code>. This
+     * Getter for <code>bie_user_ext_revision.user_ext_acc_id</code>. This
      * column points to the specific revision of a User Extension ACC (this is
      * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
      * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
@@ -117,8 +113,8 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.revised_indicator</code>.
-     * This column is a flag indicating to whether the User Extension ACC (as
+     * Setter for <code>bie_user_ext_revision.revised_indicator</code>. This
+     * column is a flag indicating to whether the User Extension ACC (as
      * identified in the USER_EXT_ACC_ID column) has been revised, i.e., there
      * is a newer version of the user extension ACC than the one currently used
      * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
@@ -129,8 +125,8 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Getter for <code>oagi.bie_user_ext_revision.revised_indicator</code>.
-     * This column is a flag indicating to whether the User Extension ACC (as
+     * Getter for <code>bie_user_ext_revision.revised_indicator</code>. This
+     * column is a flag indicating to whether the User Extension ACC (as
      * identified in the USER_EXT_ACC_ID column) has been revised, i.e., there
      * is a newer version of the user extension ACC than the one currently used
      * by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is
@@ -141,16 +137,16 @@ public class BieUserExtRevisionRecord extends UpdatableRecordImpl<BieUserExtRevi
     }
 
     /**
-     * Setter for <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
-     * This is a foreign key to the top-level ASBIEP.
+     * Setter for <code>bie_user_ext_revision.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public void setTopLevelAsbiepId(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bie_user_ext_revision.top_level_asbiep_id</code>.
-     * This is a foreign key to the top-level ASBIEP.
+     * Getter for <code>bie_user_ext_revision.top_level_asbiep_id</code>. This
+     * is a foreign key to the top-level ASBIEP.
      */
     public ULong getTopLevelAsbiepId() {
         return (ULong) get(5);

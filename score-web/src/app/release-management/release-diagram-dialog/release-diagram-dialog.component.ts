@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import {ReleaseService} from '../domain/release.service';
   standalone: false,
   selector: 'score-release-diagram-dialog',
   templateUrl: './release-diagram-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./release-diagram-dialog.component.css']
 })
 export class ReleaseDiagramDialogComponent implements OnInit {

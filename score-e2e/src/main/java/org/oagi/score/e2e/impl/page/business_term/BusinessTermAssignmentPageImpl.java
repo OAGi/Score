@@ -49,7 +49,7 @@ public class BusinessTermAssignmentPageImpl extends BaseSearchBarPageImpl implem
             By.xpath("//mat-label[contains(text(), \"Type Code\")]//ancestor::div[1]/input");
 
     private static final By PREFERRED_ONLY_CHECKBOX_LOCATOR =
-            By.xpath("//label[contains(text(), \"Preferred Only\")]//ancestor::mat-checkbox[1]");
+            By.xpath("//label[contains(., \"Preferred Only\")]//ancestor::mat-checkbox[1]");
 
     private static final By TURNOFF_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Turn off\")]//ancestor::button[1]");

@@ -1,13 +1,16 @@
 package org.oagi.score.gateway.http.api.log_management.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.RecordMapper;
+import org.jooq.SortField;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 import org.jooq.types.ULong;
@@ -81,7 +84,7 @@ public class LogRepository {
                 .join(APP_USER)
                 .on(LOG.CREATED_BY.eq(APP_USER.APP_USER_ID))
                 .where(conditions)
-                .orderBy(LOG.LOG_ID.desc())
+                .orderBy(orderFields(pageRequest))
                 .limit(pageRequest.pageOffset(), pageRequest.pageSize())
                 .fetch(mapper());
 
@@ -91,6 +94,48 @@ public class LogRepository {
         response.setLength(length);
 
         return response;
+    }
+
+    /**
+     * Maps the sort properties requested by the History list (issue #5) to their LOG/APP_USER columns,
+     * defaulting to {@code LOG_ID desc} when no sort, or only unknown columns, were requested.
+     */
+    List<SortField<?>> orderFields(PageRequest pageRequest) {
+        List<SortField<?>> orderFields = new ArrayList<>();
+        for (Sort sort : pageRequest.sorts()) {
+            Field<?> field;
+            switch (sort.field()) {
+                case "commit":
+                    field = LOG.HASH;
+                    break;
+
+                case "revisionNum":
+                    field = LOG.REVISION_NUM;
+                    break;
+
+                case "revisionAction":
+                    field = LOG.LOG_ACTION;
+                    break;
+
+                case "loginId":
+                    field = APP_USER.LOGIN_ID;
+                    break;
+
+                case "creationTimestamp":
+                    field = LOG.CREATION_TIMESTAMP;
+                    break;
+
+                default:
+                    continue;
+            }
+
+            orderFields.add((sort.direction() == DESC) ? field.desc() : field.asc());
+        }
+
+        if (orderFields.isEmpty()) {
+            orderFields.add(LOG.LOG_ID.desc());
+        }
+        return orderFields;
     }
 
     private RecordMapper<org.jooq.Record, Log> mapper() {
@@ -114,12 +159,13 @@ public class LogRepository {
             return "{}";
         }
 
-        return serializer.deserialize(
+        JsonObject snapshot = serializer.deserialize(
                 dslContext.select(LOG.SNAPSHOT)
                         .from(LOG)
                         .where(LOG.LOG_ID.eq(ULong.valueOf(logId)))
                         .fetchOptionalInto(String.class).orElse(null)
-        ).toString();
+        );
+        return (snapshot != null) ? snapshot.toString() : "{}";
     }
 
     /** The LOG row's identity (reference + revision) and raw snapshot, for diffing two revisions (issue #1533). */
@@ -136,7 +182,7 @@ public class LogRepository {
                         record.get(LOG.REFERENCE),
                         record.get(LOG.REVISION_NUM).intValue(),
                         record.get(LOG.REVISION_TRACKING_NUM).intValue(),
-                        record.get(LOG.SNAPSHOT)));
+                        (record.get(LOG.SNAPSHOT) != null) ? record.get(LOG.SNAPSHOT).data() : null));
     }
 
     private static Field<String> jsonExtract(Field<?> field, String jsonPath) {
@@ -464,7 +510,7 @@ public class LogRepository {
             }
 
             return dslContext.insertInto(LOG)
-                    .set(LOG.SNAPSHOT, content != null ? content.toString() : null)
+                    .set(LOG.SNAPSHOT, content != null ? JSON.json(content.toString()) : null)
                     .set(LOG.PREV_LOG_ID, getPrevLogId())
                     .set(LOG.CREATED_BY, getCreatedBy())
                     .set(LOG.CREATION_TIMESTAMP, getCreationTimestamp())
@@ -489,8 +535,8 @@ public class LogRepository {
                     .fetchOne();
             this.logId = logRecord.getLogId();
             try {
-                this.content = (ObjectNode) new ObjectMapper().readTree(logRecord.getSnapshot().toString());
-            } catch (JsonProcessingException e) {
+                this.content = (ObjectNode) JsonMapper.builder().build().readTree(logRecord.getSnapshot().toString());
+            } catch (JacksonException e) {
                 this.content = nodeFactory.objectNode();
             }
         }
@@ -521,7 +567,7 @@ public class LogRepository {
             }
 
             dslContext.update(LOG)
-                    .set(LOG.SNAPSHOT, content != null ? content.toString() : null)
+                    .set(LOG.SNAPSHOT, content != null ? JSON.json(content.toString()) : null)
                     .where(LOG.LOG_ID.eq(this.logId))
                     .returning().fetchOne();
         }

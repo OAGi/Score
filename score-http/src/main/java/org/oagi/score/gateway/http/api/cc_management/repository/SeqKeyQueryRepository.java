@@ -16,4 +16,6 @@ public interface SeqKeyQueryRepository {
 
     List<SeqKeySummaryRecord> getSeqKeySummaryList(AccManifestId fromAccManifestId);
 
+    List<SeqKeySummaryRecord> getSeqKeySummaryListByFromAccManifestIds(Collection<AccManifestId> fromAccManifestIdList);
+
 }

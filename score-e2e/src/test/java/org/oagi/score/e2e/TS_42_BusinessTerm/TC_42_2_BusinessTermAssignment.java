@@ -17,11 +17,17 @@ import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.business_term.AssignBusinessTermBTPage;
 import org.oagi.score.e2e.page.business_term.BusinessTermAssignmentPage;
+import org.jooq.Condition;
+import org.jooq.CloseableDSLContext;
+import org.jooq.DSLContext;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.impl.DSL;
+import org.jooq.types.ULong;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigInteger;
-import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.elementToBeClickable;
@@ -692,11 +699,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertEquals("Discarded", getSnackBarMessage(getDriver()));
 
         // #1752 - C1: the assignment row must be removed, while the catalog business term remains.
-        assertEquals(0L, countByLong(
-                "select count(*) from bbie_bizterm where bbie_bizterm_id = ?", bbieBiztermId));
-        assertEquals(1L, countByLong(
-                "select count(*) from business_term where business_term_id = ?",
-                randomBusinessTerm.getBusinessTermId()));
+        assertEquals(0L, dsl().fetchCount(BBIE_BIZTERM, BBIE_BIZTERM.BBIE_BIZTERM_ID.eq(ULong.valueOf(bbieBiztermId))));
+        assertEquals(1L, dsl().fetchCount(BUSINESS_TERM, BUSINESS_TERM.BUSINESS_TERM_ID.eq(ULong.valueOf(randomBusinessTerm.getBusinessTermId()))));
     }
 
     @Test
@@ -781,10 +785,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         click(elementToBeClickable(getDriver(), By.xpath("//mat-dialog-container//span[contains(text(), \"Update\")]//ancestor::button[1]")));
         assertEquals("Updated", getSnackBarMessage(getDriver()));
 
-        assertEquals(1L, countByLong(
-                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", secondBiztermId));
-        assertEquals(0L, countByLong(
-                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", firstBiztermId));
+        assertEquals(1L, primaryIndicatorOf(secondBiztermId));
+        assertEquals(0L, primaryIndicatorOf(firstBiztermId));
     }
 
     @Test
@@ -814,9 +816,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         // (node, business term, type code) twice must not create a duplicate row.
         assertEquals(204, api.postJson("/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign", assignBody).statusCode());
         assertEquals(204, api.postJson("/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign", assignBody).statusCode());
-        assertEquals(1L, countByLong(
-                "select count(*) from bbie_bizterm bbt join bcc_bizterm bcbt on bbt.bcc_bizterm_id = bcbt.bcc_bizterm_id where bcbt.business_term_id = ?",
-                randomBusinessTerm.getBusinessTermId()));
+        assertEquals(1L, dsl().fetchCount(BBIE_BIZTERM.join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID)),
+                BCC_BIZTERM.BUSINESS_TERM_ID.eq(ULong.valueOf(randomBusinessTerm.getBusinessTermId()))));
     }
 
     @Test
@@ -864,10 +865,8 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         // #1752 - M9: the batch discard runs in a single transaction, so a mid-batch in-use failure
         // rolls back the whole batch (neither term is deleted) and returns a clean 400.
         assertEquals(400, api.deleteJson("/api/business-terms", batchBody).statusCode());
-        assertEquals(1L, countByLong(
-                "select count(*) from business_term where business_term_id = ?", unusedTerm.getBusinessTermId()));
-        assertEquals(1L, countByLong(
-                "select count(*) from business_term where business_term_id = ?", usedTerm.getBusinessTermId()));
+        assertEquals(1L, dsl().fetchCount(BUSINESS_TERM, BUSINESS_TERM.BUSINESS_TERM_ID.eq(ULong.valueOf(unusedTerm.getBusinessTermId()))));
+        assertEquals(1L, dsl().fetchCount(BUSINESS_TERM, BUSINESS_TERM.BUSINESS_TERM_ID.eq(ULong.valueOf(usedTerm.getBusinessTermId()))));
     }
 
     @Test
@@ -917,15 +916,17 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         assertEquals("Updated", getSnackBarMessage(getDriver()));
 
         // The second (type code B) is now preferred; the first (type code A) has been demoted.
-        assertEquals(1L, countByLong(
-                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", secondBiztermId));
-        assertEquals(0L, countByLong(
-                "select primary_indicator from bbie_bizterm where bbie_bizterm_id = ?", firstBiztermId));
+        assertEquals(1L, primaryIndicatorOf(secondBiztermId));
+        assertEquals(0L, primaryIndicatorOf(firstBiztermId));
     }
 
     @AfterEach
     public void tearDown() {
         super.tearDown();
+        if (dsl != null) {
+            dsl.close();
+            dsl = null;
+        }
 
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
@@ -933,34 +934,38 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         });
     }
 
-    private BigInteger findBbieBiztermId(BigInteger businessTermId) {
-        String sql = "select bbt.bbie_bizterm_id from bbie_bizterm bbt " +
-                "join bcc_bizterm bcbt on bbt.bcc_bizterm_id = bcbt.bcc_bizterm_id " +
-                "where bcbt.business_term_id = ? order by bbt.bbie_bizterm_id desc limit 1";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, businessTermId.longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to find bbie_bizterm id for business term " + businessTermId, e);
+    private CloseableDSLContext dsl;
+
+    private DSLContext dsl() {
+        if (dsl == null) {
+            dsl = DSL.using(
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.url"),
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.username"),
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.password"));
         }
-        throw new IllegalStateException("Unable to find bbie_bizterm id for business term " + businessTermId);
+        return dsl;
     }
 
-    private long countByLong(String sql, BigInteger param) {
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, param.longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getLong(1) : 0L;
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to count rows: " + sql, e);
+    private BigInteger findBbieBiztermId(BigInteger businessTermId) {
+        ULong id = dsl().select(BBIE_BIZTERM.BBIE_BIZTERM_ID)
+                .from(BBIE_BIZTERM)
+                .join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))
+                .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(ULong.valueOf(businessTermId)))
+                .orderBy(BBIE_BIZTERM.BBIE_BIZTERM_ID.desc())
+                .limit(1)
+                .fetchOneInto(ULong.class);
+        if (id == null) {
+            throw new IllegalStateException("Unable to find bbie_bizterm id for business term " + businessTermId);
         }
+        return id.toBigInteger();
+    }
+
+    private long primaryIndicatorOf(BigInteger bbieBiztermId) {
+        Byte indicator = dsl().select(BBIE_BIZTERM.PRIMARY_INDICATOR)
+                .from(BBIE_BIZTERM)
+                .where(BBIE_BIZTERM.BBIE_BIZTERM_ID.eq(ULong.valueOf(bbieBiztermId)))
+                .fetchOneInto(Byte.class);
+        return indicator == null ? 0L : indicator;
     }
 
     private BusinessTermAssignmentPage openBusinessTermAssignmentPage(String... bieTypes) {
@@ -1078,11 +1083,9 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
                                                           boolean primaryIndicator) {
         ensureBbiePersisted(topLevelASBIEP, creator, path);
         BigInteger bbieId = findBieId("bbie", topLevelASBIEP.getTopLevelAsbiepId(), path);
-        BigInteger bccId = findRelatedCcId("bbie", "bcc", "based_bcc_manifest_id", "bcc_manifest_id", bbieId);
-        BigInteger bccBiztermId = findOrCreateCcBizterm("bcc_bizterm", "bcc_bizterm_id", "bcc_id",
-                bccId, businessTerm.getBusinessTermId(), creator.getAppUserId());
-        insertBieBizterm("bbie_bizterm", "bbie_bizterm_id", "bbie_id", "bcc_bizterm_id",
-                bbieId, bccBiztermId, creator.getAppUserId(), typeCode, primaryIndicator);
+        BigInteger bccId = findRelatedBccId(bbieId);
+        BigInteger bccBiztermId = findOrCreateBccBizterm(bccId, businessTerm.getBusinessTermId(), creator.getAppUserId());
+        insertBbieBizterm(bbieId, bccBiztermId, creator.getAppUserId(), typeCode, primaryIndicator);
     }
 
     private void ensureAsbiePersisted(TopLevelASBIEPObject topLevelASBIEP,
@@ -1125,244 +1128,158 @@ public class TC_42_2_BusinessTermAssignment extends BaseTest {
         return cssClass != null && cssClass.contains("mat-mdc-checkbox-checked");
     }
 
+    /** The columns of asbie or bbie that the lookups below use. */
+    private record BieTable(Table<?> table, TableField<?, ULong> id, TableField<?, ULong> owner,
+                            TableField<?, String> path, TableField<?, String> hashPath) {
+    }
+
+    private static BieTable bieTable(String name) {
+        return switch (name) {
+            case "asbie" -> new BieTable(ASBIE, ASBIE.ASBIE_ID, ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID, ASBIE.PATH, ASBIE.HASH_PATH);
+            case "bbie" -> new BieTable(BBIE, BBIE.BBIE_ID, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID, BBIE.PATH, BBIE.HASH_PATH);
+            default -> throw new IllegalArgumentException("Unknown BIE table: " + name);
+        };
+    }
+
     private boolean hasSpecificBieRow(String bieTable, BigInteger ownerTopLevelAsbiepId, String path) {
-        String sql = "select count(*) from " + bieTable +
-                " where owner_top_level_asbiep_id = ? and (path = ? or hash_path = ?)";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, ownerTopLevelAsbiepId.longValueExact());
-            ps.setString(2, path);
-            ps.setString(3, ObjectHelper.sha256(path));
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() && rs.getLong(1) > 0;
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to determine whether the target " + bieTable + " row exists.", e);
-        }
+        BieTable t = bieTable(bieTable);
+        return dsl().fetchExists(t.table(), t.owner().eq(ULong.valueOf(ownerTopLevelAsbiepId))
+                .and(t.path().eq(path).or(t.hashPath().eq(ObjectHelper.sha256(path)))));
     }
 
     private BigInteger findBieId(String bieTable, BigInteger ownerTopLevelAsbiepId, String path) {
-        String sql = "select " + bieTable + "_id from " + bieTable +
-                " where owner_top_level_asbiep_id = ? and (path = ? or hash_path = ?)";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, ownerTopLevelAsbiepId.longValueExact());
-            ps.setString(2, path);
-            ps.setString(3, ObjectHelper.sha256(path));
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
+        BieTable t = bieTable(bieTable);
+        ULong owner = ULong.valueOf(ownerTopLevelAsbiepId);
+        ULong id = dsl().select(t.id()).from(t.table())
+                .where(t.owner().eq(owner), t.path().eq(path).or(t.hashPath().eq(ObjectHelper.sha256(path))))
+                .limit(1)
+                .fetchOneInto(ULong.class);
+        if (id != null) {
+            return id.toBigInteger();
+        }
 
-            String suffix = path.startsWith("/") ? path.substring(1) : path;
-            BigInteger fallback = findBieIdByPathSuffix(connection, bieTable, ownerTopLevelAsbiepId, suffix);
+        String suffix = path.startsWith("/") ? path.substring(1) : path;
+        BigInteger fallback = findOnlyBieId(t, t.owner().eq(owner).and(t.path().like("%" + suffix)));
+        if (fallback != null) {
+            return fallback;
+        }
+
+        int idx = suffix.lastIndexOf('/');
+        if (idx >= 0 && idx + 1 < suffix.length()) {
+            fallback = findOnlyBieId(t, t.owner().eq(owner).and(t.path().like("%" + suffix.substring(idx + 1))));
             if (fallback != null) {
                 return fallback;
             }
+        }
 
-            int idx = suffix.lastIndexOf('/');
-            if (idx >= 0 && idx + 1 < suffix.length()) {
-                fallback = findBieIdByPathSuffix(connection, bieTable, ownerTopLevelAsbiepId, suffix.substring(idx + 1));
-                if (fallback != null) {
-                    return fallback;
-                }
-            }
-
-            fallback = findOnlyBieId(connection, bieTable, ownerTopLevelAsbiepId);
-            if (fallback != null) {
-                return fallback;
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to find " + bieTable + " by path " + path, e);
+        fallback = findOnlyBieId(t, t.owner().eq(owner));
+        if (fallback != null) {
+            return fallback;
         }
         throw new IllegalStateException("Unable to find " + bieTable + " for path " + path
                 + ". Candidates: " + dumpBieRows(bieTable, ownerTopLevelAsbiepId));
     }
 
-    private BigInteger findBieIdByPathSuffix(Connection connection, String bieTable,
-                                             BigInteger ownerTopLevelAsbiepId, String pathSuffix) throws SQLException {
-        String sql = "select " + bieTable + "_id from " + bieTable +
-                " where owner_top_level_asbiep_id = ? and path like ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, ownerTopLevelAsbiepId.longValueExact());
-            ps.setString(2, "%" + pathSuffix);
-            try (ResultSet rs = ps.executeQuery()) {
-                BigInteger result = null;
-                while (rs.next()) {
-                    BigInteger current = rs.getBigDecimal(1).toBigInteger();
-                    if (result != null && !result.equals(current)) {
-                        return null;
-                    }
-                    result = current;
-                }
-                return result;
-            }
-        }
-    }
-
-    private BigInteger findOnlyBieId(Connection connection, String bieTable,
-                                     BigInteger ownerTopLevelAsbiepId) throws SQLException {
-        String sql = "select " + bieTable + "_id from " + bieTable +
-                " where owner_top_level_asbiep_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, ownerTopLevelAsbiepId.longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                BigInteger result = null;
-                while (rs.next()) {
-                    BigInteger current = rs.getBigDecimal(1).toBigInteger();
-                    if (result != null && !result.equals(current)) {
-                        return null;
-                    }
-                    result = current;
-                }
-                return result;
-            }
-        }
+    /** The id of the only row that matches, or null when none or more than one match. */
+    private BigInteger findOnlyBieId(BieTable t, Condition condition) {
+        List<ULong> ids = dsl().selectDistinct(t.id()).from(t.table()).where(condition).fetchInto(ULong.class);
+        return ids.size() == 1 ? ids.get(0).toBigInteger() : null;
     }
 
     private String dumpBieRows(String bieTable, BigInteger ownerTopLevelAsbiepId) {
-        String sql = "select " + bieTable + "_id, path, hash_path from " + bieTable +
-                " where owner_top_level_asbiep_id = ? order by path";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, ownerTopLevelAsbiepId.longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                List<String> rows = new ArrayList<>();
-                while (rs.next()) {
-                    rows.add(rs.getBigDecimal(1).toBigInteger() + ":" + rs.getString(2));
-                }
-                return rows.toString();
-            }
-        } catch (SQLException e) {
+        BieTable t = bieTable(bieTable);
+        try {
+            List<String> rows = new ArrayList<>();
+            dsl().select(t.id(), t.path()).from(t.table())
+                    .where(t.owner().eq(ULong.valueOf(ownerTopLevelAsbiepId)))
+                    .orderBy(t.path())
+                    .forEach(r -> rows.add(r.value1().toBigInteger() + ":" + r.value2()));
+            return rows.toString();
+        } catch (RuntimeException e) {
             return "<failed to dump " + bieTable + " rows: " + e.getMessage() + ">";
         }
     }
 
     private BigInteger findAssignedAsbieId(BusinessTermObject businessTerm, AppUserObject creator) {
-        String sql = "select abt.asbie_id from asbie_bizterm abt " +
-                "join ascc_bizterm acbt on abt.ascc_bizterm_id = acbt.ascc_bizterm_id " +
-                "where acbt.business_term_id = ? " +
-                "order by abt.asbie_bizterm_id desc limit 1";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, businessTerm.getBusinessTermId().longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to find assigned ASBIE id for business term "
-                    + businessTerm.getBusinessTerm(), e);
+        ULong id = dsl().select(ASBIE_BIZTERM.ASBIE_ID)
+                .from(ASBIE_BIZTERM)
+                .join(ASCC_BIZTERM).on(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID))
+                .where(ASCC_BIZTERM.BUSINESS_TERM_ID.eq(ULong.valueOf(businessTerm.getBusinessTermId())))
+                .orderBy(ASBIE_BIZTERM.ASBIE_BIZTERM_ID.desc())
+                .limit(1)
+                .fetchOneInto(ULong.class);
+        if (id == null) {
+            throw new IllegalStateException("Unable to find assigned ASBIE id for business term "
+                    + businessTerm.getBusinessTerm());
         }
-        throw new IllegalStateException("Unable to find assigned ASBIE id for business term "
-                + businessTerm.getBusinessTerm());
+        return id.toBigInteger();
     }
 
     private BigInteger findAssignedBbieId(BusinessTermObject businessTerm, AppUserObject creator) {
-        String sql = "select bbt.bbie_id from bbie_bizterm bbt " +
-                "join bcc_bizterm bcbt on bbt.bcc_bizterm_id = bcbt.bcc_bizterm_id " +
-                "where bcbt.business_term_id = ? " +
-                "order by bbt.bbie_bizterm_id desc limit 1";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, businessTerm.getBusinessTermId().longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to find assigned BBIE id for business term "
-                    + businessTerm.getBusinessTerm(), e);
+        ULong id = dsl().select(BBIE_BIZTERM.BBIE_ID)
+                .from(BBIE_BIZTERM)
+                .join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))
+                .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(ULong.valueOf(businessTerm.getBusinessTermId())))
+                .orderBy(BBIE_BIZTERM.BBIE_BIZTERM_ID.desc())
+                .limit(1)
+                .fetchOneInto(ULong.class);
+        if (id == null) {
+            throw new IllegalStateException("Unable to find assigned BBIE id for business term "
+                    + businessTerm.getBusinessTerm());
         }
-        throw new IllegalStateException("Unable to find assigned BBIE id for business term "
-                + businessTerm.getBusinessTerm());
+        return id.toBigInteger();
     }
 
-    private BigInteger findRelatedCcId(String bieTable, String ccTable, String manifestFkColumn,
-                                       String manifestPkColumn, BigInteger bieId) {
-        String sql = "select " + ccTable + "_id from " + bieTable + " b join " + ccTable + "_manifest m" +
-                " on b." + manifestFkColumn + " = m." + manifestPkColumn +
-                " where b." + bieTable + "_id = ?";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, bieId.longValueExact());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to resolve related CC for " + bieTable + " " + bieId, e);
+    private BigInteger findRelatedBccId(BigInteger bbieId) {
+        ULong id = dsl().select(BCC_MANIFEST.BCC_ID)
+                .from(BBIE)
+                .join(BCC_MANIFEST).on(BBIE.BASED_BCC_MANIFEST_ID.eq(BCC_MANIFEST.BCC_MANIFEST_ID))
+                .where(BBIE.BBIE_ID.eq(ULong.valueOf(bbieId)))
+                .fetchOneInto(ULong.class);
+        if (id == null) {
+            throw new IllegalStateException("Unable to resolve related CC for bbie " + bbieId);
         }
-        throw new IllegalStateException("Unable to resolve related CC for " + bieTable + " " + bieId);
+        return id.toBigInteger();
     }
 
-    private BigInteger findOrCreateCcBizterm(String tableName, String pkColumn, String ccIdColumn,
-                                             BigInteger ccId, BigInteger businessTermId, BigInteger userId) {
-        String selectSql = "select " + pkColumn + " from " + tableName + " where business_term_id = ? and " + ccIdColumn + " = ?";
-        try (Connection connection = newConnection();
-             PreparedStatement selectPs = connection.prepareStatement(selectSql)) {
-            selectPs.setLong(1, businessTermId.longValueExact());
-            selectPs.setLong(2, ccId.longValueExact());
-            try (ResultSet rs = selectPs.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBigDecimal(1).toBigInteger();
-                }
-            }
-
-            String insertSql = "insert into " + tableName + " (" + ccIdColumn + ", business_term_id, created_by, last_updated_by, creation_timestamp, last_update_timestamp)" +
-                    " values (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement insertPs = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
-                Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-                insertPs.setLong(1, ccId.longValueExact());
-                insertPs.setLong(2, businessTermId.longValueExact());
-                insertPs.setLong(3, userId.longValueExact());
-                insertPs.setLong(4, userId.longValueExact());
-                insertPs.setTimestamp(5, now);
-                insertPs.setTimestamp(6, now);
-                insertPs.executeUpdate();
-                try (ResultSet keys = insertPs.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        return keys.getBigDecimal(1).toBigInteger();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to create " + tableName + " record.", e);
+    private BigInteger findOrCreateBccBizterm(BigInteger bccId, BigInteger businessTermId, BigInteger userId) {
+        ULong existing = dsl().select(BCC_BIZTERM.BCC_BIZTERM_ID)
+                .from(BCC_BIZTERM)
+                .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(ULong.valueOf(businessTermId)),
+                        BCC_BIZTERM.BCC_ID.eq(ULong.valueOf(bccId)))
+                .fetchAnyInto(ULong.class);
+        if (existing != null) {
+            return existing.toBigInteger();
         }
-        throw new IllegalStateException("Unable to create " + tableName + " record.");
+
+        LocalDateTime now = LocalDateTime.now();
+        ULong id = dsl().insertInto(BCC_BIZTERM)
+                .set(BCC_BIZTERM.BCC_ID, ULong.valueOf(bccId))
+                .set(BCC_BIZTERM.BUSINESS_TERM_ID, ULong.valueOf(businessTermId))
+                .set(BCC_BIZTERM.CREATED_BY, ULong.valueOf(userId))
+                .set(BCC_BIZTERM.LAST_UPDATED_BY, ULong.valueOf(userId))
+                .set(BCC_BIZTERM.CREATION_TIMESTAMP, now)
+                .set(BCC_BIZTERM.LAST_UPDATE_TIMESTAMP, now)
+                .returning(BCC_BIZTERM.BCC_BIZTERM_ID)
+                .fetchOne(BCC_BIZTERM.BCC_BIZTERM_ID);
+        if (id == null) {
+            throw new IllegalStateException("Unable to create bcc_bizterm record.");
+        }
+        return id.toBigInteger();
     }
 
-    private void insertBieBizterm(String tableName, String pkColumn, String bieIdColumn, String ccBiztermIdColumn,
-                                  BigInteger bieId, BigInteger ccBiztermId, BigInteger userId,
-                                  String typeCode, boolean primaryIndicator) {
-        String insertSql = "insert into " + tableName + " (" + bieIdColumn + ", " + ccBiztermIdColumn +
-                ", primary_indicator, type_code, created_by, last_updated_by, creation_timestamp, last_update_timestamp)" +
-                " values (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = newConnection();
-             PreparedStatement ps = connection.prepareStatement(insertSql)) {
-            Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-            ps.setLong(1, bieId.longValueExact());
-            ps.setLong(2, ccBiztermId.longValueExact());
-            ps.setByte(3, (byte) (primaryIndicator ? 1 : 0));
-            ps.setString(4, typeCode);
-            ps.setLong(5, userId.longValueExact());
-            ps.setLong(6, userId.longValueExact());
-            ps.setTimestamp(7, now);
-            ps.setTimestamp(8, now);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to create " + tableName + " record for BIE " + bieId, e);
-        }
-    }
-
-    private Connection newConnection() throws SQLException {
-        return DriverManager.getConnection(
-                getConfig().getProperty("org.oagi.score.e2e.datasource.url"),
-                getConfig().getProperty("org.oagi.score.e2e.datasource.username"),
-                getConfig().getProperty("org.oagi.score.e2e.datasource.password"));
+    private void insertBbieBizterm(BigInteger bbieId, BigInteger bccBiztermId, BigInteger userId,
+                                   String typeCode, boolean primaryIndicator) {
+        LocalDateTime now = LocalDateTime.now();
+        dsl().insertInto(BBIE_BIZTERM)
+                .set(BBIE_BIZTERM.BBIE_ID, ULong.valueOf(bbieId))
+                .set(BBIE_BIZTERM.BCC_BIZTERM_ID, ULong.valueOf(bccBiztermId))
+                .set(BBIE_BIZTERM.PRIMARY_INDICATOR, (byte) (primaryIndicator ? 1 : 0))
+                .set(BBIE_BIZTERM.TYPE_CODE, typeCode)
+                .set(BBIE_BIZTERM.CREATED_BY, ULong.valueOf(userId))
+                .set(BBIE_BIZTERM.LAST_UPDATED_BY, ULong.valueOf(userId))
+                .set(BBIE_BIZTERM.CREATION_TIMESTAMP, now)
+                .set(BBIE_BIZTERM.LAST_UPDATE_TIMESTAMP, now)
+                .execute();
     }
 }

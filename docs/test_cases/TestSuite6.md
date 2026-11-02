@@ -138,6 +138,11 @@ Current automation status: not automated yet.
 #### Test Assertion #6.2.15
 The end user can view the details of a BIE that is in WIP state and owned by another user (developer or end user) but cannot make any change (Issue #1312).
 
+#### Test Assertion #6.2.16
+On the page of a local extension (the user extension group ACC), appending a property that would add a duplicate property term shows the Validation Results panel, which lists the problem and asks Cancel or Proceed anyway. It works as it does for an ACC (assertion [#15.8.1.g](TestSuite15.md#test-assertion-1581g)): a property that breaks nothing is appended without asking, and Cancel appends nothing. The same panel is opened for the extension by Validate in the context menu of its root node.
+
+Current automation status: automated. Appending is covered by `end_user_is_asked_before_appending_a_property_that_the_local_extension_already_has`, and Validate on the extension page by `end_user_can_validate_the_local_extension` (the two properties of one property term are added through the API, since the page would not let the user append them).
+
 ### Test Step Pre-condition:
 
 1. The tests create end user and developer accounts, core components, BIEs, extensions, business contexts, and code lists as needed for each scenario.
@@ -158,6 +163,8 @@ The end user can view the details of a BIE that is in WIP state and owned by ano
 8. The test verifies that an end user cannot create a BIE from a selectable ASCCP whose ACC has a group component type, can reset a BIE node to its initial values after confirmation, can create BIEs from production end-user ASCCPs regardless of ownership, and still cannot create a BIE when such a production end-user ASCCP is backed by a group-type ACC. (Assertions [#9](#test-assertion-629), [#10](#test-assertion-6210), [#12](#test-assertion-6212), [#13](#test-assertion-6213))
 9. The test verifies BIE editability when the end-user ASCCP is in `Production`, and then checks the locking/flagging behavior after amendment, `QA`, `Deprecated`, and non-production base-ACC scenarios. Assertions `6.2.14.e` and `6.2.14.f` are documented but not automated yet. (Assertions [#14](#test-assertion-6214), [#14.a](#test-assertion-6214a), [#14.b](#test-assertion-6214b), [#14.c](#test-assertion-6214c), [#14.d](#test-assertion-6214d), [#14.e](#test-assertion-6214e), [#14.f](#test-assertion-6214f))
 10. The test opens another user's WIP BIE (owned by a developer, then by an end user) and verifies that its details can be viewed but every field is disabled, so no change can be made. (Assertion [#15](#test-assertion-6215))
+11. The test opens the local extension of a WIP end-user BIE, appends a property, and appends it again. The first append is not asked about; the second one shows the Validation Results panel with the duplicate property term, and Cancel closes it. (Assertion [#16](#test-assertion-6216))
+12. The test opens the local extension of a WIP end-user BIE whose extension has two properties of one property term, chooses Validate in the context menu of the root node, and verifies that the Validation Results panel lists the duplicate property term and asks nothing. (Assertion [#16](#test-assertion-6216))
 
 ## Test Case 6.3
 
@@ -324,6 +331,9 @@ The end user can generate an expression of a single BIE, in Open API 3.0 in JSON
 #### Test Assertion #6.3.47
 The end user can generate an expression of multiple BIEs, in Open API 3.0 in JSON with Code Generation Friendly, GET Operation Template that includes Meta Header, Pagination Response, and Make Array option as well as POST Operation Template that includes Meta Header, Pagination Response, and Make Array option, in different packages.
 
+#### Test Assertion #6.3.48
+For a BIE whose BBIE_SC uses a custom Agency ID List with no list-level Agency ID List Value selected, the end user can generate valid non-empty XML Schema, JSON Schema, OpenAPI, Open Document Spreadsheet, and Avro outputs. XML Schema includes the custom Agency ID List values, and none of the formats returns a server error.
+
 ### Test Step Pre-condition:
 
 1. The tests create end-user-owned and developer-owned BIEs in multiple releases and states as needed for each expression-generation scenario.
@@ -341,3 +351,4 @@ The end user can generate an expression of multiple BIEs, in Open API 3.0 in JSO
 7. The test verifies the search filters and index count on the `Express BIE` page and confirms that expressions can be generated for a BIE with multiple business contexts. (Assertions [#20](#test-assertion-6320), [#21](#test-assertion-6321), [#22](#test-assertion-6322))
 8. The test generates OpenAPI 3.0 YAML and JSON expressions across the supported combinations, including code-generation-friendly mode, GET and POST operation templates, single-file and multi-file output, and Meta Header / Pagination Response / Make Array option combinations. (Assertions [#23](#test-assertion-6323), [#24](#test-assertion-6324), [#28](#test-assertion-6328), [#29](#test-assertion-6329), [#30](#test-assertion-6330), [#31](#test-assertion-6331), [#32](#test-assertion-6332), [#33](#test-assertion-6333), [#34](#test-assertion-6334), [#35](#test-assertion-6335), [#36](#test-assertion-6336), [#37](#test-assertion-6337), [#38](#test-assertion-6338), [#39](#test-assertion-6339), [#40](#test-assertion-6340), [#41](#test-assertion-6341), [#42](#test-assertion-6342), [#43](#test-assertion-6343), [#44](#test-assertion-6344), [#45](#test-assertion-6345), [#46](#test-assertion-6346), [#47](#test-assertion-6347))
 9. The test also verifies reuse handling during expression generation when the same reused BIE is referenced in multiple places. (Assertion [#27](#test-assertion-6327))
+10. For a BIE whose `Scheme Agency Identifier` BBIE_SC uses a custom Agency ID List with the list-level Agency ID List Value unset, generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro outputs. Verify each output is valid and non-empty and the XML Schema includes the custom Agency ID List value. (Assertion [#48](#test-assertion-6348))

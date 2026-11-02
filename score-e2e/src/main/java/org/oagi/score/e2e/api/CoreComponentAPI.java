@@ -197,6 +197,12 @@ public interface CoreComponentAPI {
 
     void updateBCCP(BCCPObject bccp);
 
+    /**
+     * Rename the property term of the BCCP (and its DEN). The API appends any BCCP, so this is the way to give two
+     * different BCCPs the same property term.
+     */
+    void updateBCCPPropertyTerm(BCCPObject bccp, String propertyTerm);
+
     void updateBasedDT(BCCPObject bccp, DTObject dataType);
 
     ACCObject createRandomACCSemanticGroupType(AppUserObject creator, ReleaseObject release,

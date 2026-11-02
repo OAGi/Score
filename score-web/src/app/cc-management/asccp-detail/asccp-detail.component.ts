@@ -1,6 +1,6 @@
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -9,6 +9,10 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AsccpFlatNode, CcFlatNode, CcFlatNodeDatabase, CcFlatNodeDataSource, CcFlatNodeDataSourceSearcher} from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
+import {ValidationService} from '../../validation/validation.service';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
@@ -37,14 +41,14 @@ import {
 import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-asccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
 import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, trim} from '../../common/utility';
+import {initFilter, trim} from '../../common/utility';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
 import {MatMenuTrigger} from '@angular/material/menu';
@@ -57,19 +61,25 @@ import {SettingsPreferencesService} from '../../settings-management/settings-pre
 import {ModelBrowserNode} from '../model-browser/domain/model-browser-node';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
   selector: 'score-asccp-detail',
   templateUrl: './asccp-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./asccp-detail.component.css']
 })
-export class AsccpDetailComponent implements OnInit {
+export class AsccpDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
   private releaseService = inject(ReleaseService);
   private snackBar = inject(MatSnackBar);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
   private namespaceService = inject(NamespaceService);
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
@@ -87,8 +97,6 @@ export class AsccpDetailComponent implements OnInit {
   protected readonly trim = trim;
 
   title: string;
-  _innerHeight: number = window.innerHeight;
-  paddingPixel = 12;
   manifestId: number;
   type = 'ASCCP';
   isUpdating: boolean;
@@ -108,7 +116,7 @@ export class AsccpDetailComponent implements OnInit {
   cursorNode: CcFlatNode;
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -117,31 +125,32 @@ export class AsccpDetailComponent implements OnInit {
 
   initialExpandDepth = 10;
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
-  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
   }
 
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
+  get element(): HTMLElement {
+    return this.host.nativeElement;
   }
+
+  @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
+
+  get sidenav(): MatSidenav {
+    return this.sidenavPage.sidenav;
+  }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<CcFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'CC-Settings-Hide-Cardinality'});
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows besides the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
 
   private redirectToCcList() {
     this.isUpdating = false;
@@ -149,6 +158,13 @@ export class AsccpDetailComponent implements OnInit {
       duration: 3000,
     });
     this.router.navigateByUrl('/core_component');
+  }
+
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -197,7 +213,8 @@ export class AsccpDetailComponent implements OnInit {
       this.isGenerating = false;
 
       // subscribe an event
-      this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/asccp/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -224,7 +241,7 @@ export class AsccpDetailComponent implements OnInit {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       this.workingRelease = asccpDetails.release.workingRelease;
 
@@ -232,6 +249,7 @@ export class AsccpDetailComponent implements OnInit {
       this.rootNode.access = asccpDetails.access;
       this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(asccpDetails);
 
       // Issue #1254
       // Initial expanding by the query path
@@ -258,6 +276,11 @@ export class AsccpDetailComponent implements OnInit {
     });
   }
 
+  /* The root node has no ASCC, so its detail is built from the already fetched ASCCP without another request. */
+  private seedRootDetail(asccpDetails: AsccpDetails) {
+    this.rootNode.detail = new CcAsccpNodeInfo(this.rootNode, undefined, asccpDetails);
+  }
+
   goToPath(path: string) {
     let curNode = this.dataSource.data[0];
     let idx = 0;
@@ -275,7 +298,7 @@ export class AsccpDetailComponent implements OnInit {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -354,6 +377,7 @@ export class AsccpDetailComponent implements OnInit {
       this.service.getAsccpDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([asccpDetails, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ASCCP', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
@@ -365,6 +389,7 @@ export class AsccpDetailComponent implements OnInit {
       this.rootNode.access = asccpDetails.access;
       this.rootNode.state = asccpDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(asccpDetails);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -391,7 +416,7 @@ export class AsccpDetailComponent implements OnInit {
       this.originalText = undefined;
 
       // Recover the state of 'Hide Cardinality' property.
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -406,13 +431,7 @@ export class AsccpDetailComponent implements OnInit {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (this.rootNode) ? this.rootNode.state : '';
@@ -450,14 +469,6 @@ export class AsccpDetailComponent implements OnInit {
     });
   }
 
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   /* For type casting of detail property */
   isAccDetail(node?: CcFlatNode): boolean {
@@ -698,6 +709,7 @@ export class AsccpDetailComponent implements OnInit {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         action: 'update',
         state: node.state,
         // @ts-ignore
@@ -946,7 +958,10 @@ export class AsccpDetailComponent implements OnInit {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {
@@ -1045,67 +1060,12 @@ export class AsccpDetailComponent implements OnInit {
     }
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 
@@ -1164,16 +1124,4 @@ export class AsccpDetailComponent implements OnInit {
       });
   }
 
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
 }

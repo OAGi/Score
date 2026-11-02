@@ -1,0 +1,47 @@
+/* The Material dialog parts below sit inside a plain wrapper (as in the app's confirm dialog), so the wrapper
+   supplies the breathing room that the dialog container would otherwise give. */
+.passkey-offer-dialog {
+  box-sizing: border-box;
+  padding: 12px 20px 8px;
+}
+
+/* The Material dialog parts add their own horizontal padding; zero it so the title, text and buttons share
+   the wrapper's left and right edges. */
+.passkey-offer-dialog .header {
+  font-size: 18px;
+  font-weight: 500;
+  padding: 0 0 4px;
+}
+
+.passkey-offer-dialog .content {
+  padding: 8px 0;
+}
+
+.content p {
+  margin-bottom: 12px;
+}
+
+.passkey-offer-icon {
+  color: #1976d2;
+  flex: none;
+  margin-right: 8px;
+}
+
+.passkey-offer-success {
+  color: #2e7d32;
+}
+
+.passkey-offer-message {
+  font-size: 13px;
+}
+
+.passkey-offer-error {
+  color: #c62828;
+}
+
+.passkey-offer-dialog .actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 8px 0 0;
+}

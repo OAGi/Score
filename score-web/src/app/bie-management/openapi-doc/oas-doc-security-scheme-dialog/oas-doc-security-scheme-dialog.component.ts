@@ -1,4 +1,4 @@
-import {Component, Inject, inject} from '@angular/core';
+import {Component, Inject, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {OasOAuthFlow, OasSecurityScheme} from '../domain/openapi-doc';
 
@@ -11,6 +11,7 @@ import {OasOAuthFlow, OasSecurityScheme} from '../domain/openapi-doc';
   standalone: false,
   selector: 'score-oas-doc-security-scheme-dialog',
   templateUrl: './oas-doc-security-scheme-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-security-scheme-dialog.component.css']
 })
 export class OasDocSecuritySchemeDialogComponent {

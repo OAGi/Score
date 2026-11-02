@@ -33,7 +33,7 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
 
     @Override
     protected String getPageUrl() {
-        return getConfig().getBaseUrl().resolve("/settings/account").toString();
+        return getConfig().getBaseUrl().resolve("/settings/account/personal-info").toString();
     }
 
     @Override
@@ -48,8 +48,26 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
         return visibilityOfElementLocated(getDriver(), By.className("title"));
     }
 
+    /** The pages under Account are reached through the settings menu; nothing happens if the page is already open. */
+    private void openAccountPage(String name) {
+        if (!getDriver().getCurrentUrl().endsWith("/settings/account/" + name)) {
+            click(elementToBeClickable(getDriver(), By.cssSelector("a[href='/settings/account/" + name + "']")));
+        }
+    }
+
+    @Override
+    public void openPasswordPage() {
+        openAccountPage("password");
+    }
+
+    @Override
+    public void openPasskeysPage() {
+        openAccountPage("passkeys");
+    }
+
     @Override
     public WebElement getOldPasswordField() {
+        openPasswordPage();
         return visibilityOfElementLocated(getDriver(), OLD_PASSWORD_FIELD_LOCATOR);
     }
 
@@ -60,6 +78,7 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
 
     @Override
     public WebElement getNewPasswordField() {
+        openPasswordPage();
         return visibilityOfElementLocated(getDriver(), NEW_PASSWORD_FIELD_LOCATOR);
     }
 
@@ -70,6 +89,7 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
 
     @Override
     public WebElement getConfirmNewPasswordField() {
+        openPasswordPage();
         return visibilityOfElementLocated(getDriver(), CONFIRM_NEW_PASSWORD_FIELD_LOCATOR);
     }
 
@@ -80,6 +100,7 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
 
     @Override
     public WebElement getUpdateButton() {
+        openPasswordPage();
         return elementToBeClickable(getDriver(), PASSWORD_UPDATE_BUTTON_LOCATOR);
     }
 
@@ -106,6 +127,7 @@ public class SettingsAccountPageImpl extends BasePageImpl implements SettingsAcc
 
     @Override
     public String getPasswordErrorMessage() {
+        openPasswordPage();
         return getText(visibilityOfElementLocated(getDriver(), By.xpath("//mat-label[contains(text(), \"New password\")]/../../../../..//mat-error")));
     }
 

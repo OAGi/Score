@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -7,6 +7,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   standalone: false,
   selector: 'score-bie-accept-ownership-transfer-request',
   templateUrl: 'bie-accept-ownership-transfer-request.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['bie-accept-ownership-transfer-request.component.css']
 })
 export class BieAcceptOwnershipTransferRequestComponent implements OnInit {

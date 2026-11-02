@@ -9,9 +9,10 @@ import {ContextCategoryCreateComponent} from './context-category-create/context-
 import {ContextCategoryDetailComponent} from './context-category-detail/context-category-detail.component';
 import {AuthService} from '../../authentication/auth.service';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
-import {SearchBarModule} from '../../common/search-bar/search-bar.module';
-import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
+import {SCORE_TABLE} from '../../common/score-table';
 import {ScoreCommonModule} from '../../common/score-common.module';
+import {RecordCompactRowComponent} from '../../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -47,9 +48,10 @@ const routes: Routes = [
         MaterialModule,
         ConfirmDialogModule,
         CommonModule,
-        SearchBarModule,
-        ColumnSelectorModule,
-        ScoreCommonModule
+        ScoreCommonModule,
+        RecordCompactRowComponent,
+        ResponsiveButtonComponent,
+        ...SCORE_TABLE
     ],
   declarations: [
     ContextCategoryListComponent,

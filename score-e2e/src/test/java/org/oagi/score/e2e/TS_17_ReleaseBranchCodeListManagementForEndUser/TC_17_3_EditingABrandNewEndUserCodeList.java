@@ -15,6 +15,8 @@ import org.oagi.score.e2e.page.agency_id_list.ViewEditAgencyIDListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListPage;
 import org.oagi.score.e2e.page.code_list.EditCodeListValueDialog;
 import org.oagi.score.e2e.page.code_list.ViewEditCodeListPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,10 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
         LibraryObject library;
         ReleaseObject branch;
         CodeListObject codeList;
+        AgencyIDListObject agencyIDList;
+        AgencyIDListValueObject agencyIDListValue;
+        AgencyIDListObject otherAgencyIDList;
+        AgencyIDListValueObject otherAgencyIDListValue;
         {
             endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
             thisAccountWillBeDeletedAfterTests(endUser);
@@ -61,18 +67,45 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             codeList = getAPIFactory().getCodeListAPI().
                     createRandomCodeList(endUser, namespaceEU, branch, "WIP");
             getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+            agencyIDList = getAPIFactory().getAgencyIDListAPI()
+                    .createRandomAgencyIDList(endUser, namespaceEU, branch, "Production");
+            agencyIDListValue = getAPIFactory().getAgencyIDListValueAPI()
+                    .createRandomAgencyIDListValue(endUser, agencyIDList);
+            otherAgencyIDList = getAPIFactory().getAgencyIDListAPI()
+                    .createRandomAgencyIDList(endUser, namespaceEU, branch, "Production");
+            otherAgencyIDListValue = getAPIFactory().getAgencyIDListValueAPI()
+                    .createRandomAgencyIDListValue(endUser, otherAgencyIDList);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
+        assertEquals("false", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        // Clear any inherited/default pair so the optional empty-pair behavior is explicit.
+        if (!getDriver().findElements(By.xpath("//button[@aria-label='Clear Agency ID List']")).isEmpty()) {
+            click(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//button[@aria-label='Clear Agency ID List']")));
+        }
+        assertEquals("false", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"),
+                "Agency ID List Value must be optional while the list is unset (selected list: " +
+                        getText(editCodeListPage.getAgencyIDListField()) + ", required attribute: " +
+                        editCodeListPage.getAgencyIDListValueField().getAttribute("required") + ").");
+        editCodeListPage.setAgencyIDList(agencyIDList);
+        assertEquals("true", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"));
+        click(editCodeListPage.getAgencyIDListValueField());
+        assertTrue(getDriver().findElements(By.xpath("//mat-option//span[contains(text(), \"" + agencyIDListValue.getValue() + "\")]"))
+                .size() > 0, "The selected Agency ID List's values should be available.");
+        assertTrue(getDriver().findElements(By.xpath("//mat-option//span[contains(text(), \"" + otherAgencyIDListValue.getValue() + "\")]"))
+                .isEmpty(), "Values from another Agency ID List must not be available.");
+        escape(getDriver());
+        editCodeListPage.setAgencyIDListValue(agencyIDListValue);
         /**
          * Test Assertion #11.3.1.a
          */
         editCodeListPage.setName("new name");
         editCodeListPage.setVersion("new version");
         editCodeListPage.hitUpdateButton();
-        String agencyIDList = getText(editCodeListPage.getAgencyIDListField());
-        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDList));
+        String agencyIDListText = getText(editCodeListPage.getAgencyIDListField());
+        assertTrue(getAPIFactory().getCodeListAPI().checkCodeListUniqueness(codeList, agencyIDListText));
         /**
          * Test Assertion #11.3.1.b
          * Note: For developer Based Code list is not visible on the UI
@@ -82,7 +115,8 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
          * Test Assertion #11.3.1.c
          */
         assertEquals("true", editCodeListPage.getCodeListNameField().getAttribute("aria-required"));
-        assertEquals("true", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        assertEquals("false", editCodeListPage.getAgencyIDListField().getAttribute("aria-required"));
+        assertEquals("true", editCodeListPage.getAgencyIDListValueField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getVersionField().getAttribute("aria-required"));
         assertEquals("true", editCodeListPage.getNamespaceSelectField().getAttribute("aria-required"));
         assertDisabled(editCodeListPage.getDeprecatedSelectField());
@@ -347,44 +381,30 @@ public class TC_17_3_EditingABrandNewEndUserCodeList extends BaseTest {
             thisAccountWillBeDeletedAfterTests(endUser);
 
             library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
-            branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
             namespaceEU = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
-
-            /**
-             * Create derived WIP end-user Code List for a particular release branch.
-             */
-            codeList = getAPIFactory().getCodeListAPI().
-                    createRandomCodeList(endUser, namespaceEU, branch, "WIP");
-            getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
         }
         HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
-        ViewEditAgencyIDListPage viewEditAgencyIDListPage = homePage.getCoreComponentMenu().openViewEditAgencyIDListSubMenu();
-        EditAgencyIDListPage editAgencyIDListPage = viewEditAgencyIDListPage.openNewAgencyIDList(endUser, branch.getReleaseNumber());
-        waitFor(ofMillis(1000L));
-        editAgencyIDListPage.setName("TestAgencyIDList");
-        editAgencyIDListPage.setNamespace(namespaceEU);
-        editAgencyIDListPage.setDefinition("some definition");
-        editAgencyIDListPage.setVersion("some version");
+        homePage.setLibrary("connectSpec");
+        branch = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+        assertNotNull(branch, "The Published branch used by the End User list scenario must exist.");
+        assertEquals("Published", branch.getState());
 
-        EditAgencyIDListValueDialog editAgencyIDListValueDialog = editAgencyIDListPage.addAgencyIDListValue();
-        editAgencyIDListValueDialog.setValue("value");
-        editAgencyIDListValueDialog.setMeaning("value meaning");
-        editAgencyIDListValueDialog.setDefinition("value definition");
-        editAgencyIDListValueDialog.setDefinitionSource("value definition source");
-        editAgencyIDListValueDialog.hitAddButton();
-        editAgencyIDListPage.hitUpdateButton();
-        editAgencyIDListPage.moveToQA();
-        editAgencyIDListPage.moveToProduction();
-
-        AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI().getNewlyCreatedAgencyIDList(endUser, branch.getReleaseNumber());
-        List<AgencyIDListValueObject> agencyIDListValues = getAPIFactory().getAgencyIDListValueAPI().getAgencyIDListValueByAgencyListID(agencyIDList);
+        // Seed both records through the API; this case verifies that the Code List UI can select
+        // a Production End User Agency ID List on the same published branch.
+        codeList = getAPIFactory().getCodeListAPI().
+                createRandomCodeList(endUser, namespaceEU, branch, "WIP");
+        getAPIFactory().getCodeListValueAPI().createRandomCodeListValue(codeList, endUser);
+        AgencyIDListObject agencyIDList = getAPIFactory().getAgencyIDListAPI()
+                .createRandomAgencyIDList(endUser, namespaceEU, branch, "Production");
+        AgencyIDListValueObject agencyIDListValue = getAPIFactory().getAgencyIDListValueAPI()
+                .createRandomAgencyIDListValue(endUser, agencyIDList);
         AppUserObject owner = getAPIFactory().getAppUserAPI().getAppUserByID(agencyIDList.getOwnerUserId());
-        assertTrue(agencyIDList.getState().equals("Production"));
+        assertEquals("Production", agencyIDList.getState());
         assertFalse(owner.isDeveloper());
         ViewEditCodeListPage viewEditCodeListPage = homePage.getCoreComponentMenu().openViewEditCodeListSubMenu();
         EditCodeListPage editCodeListPage = viewEditCodeListPage.openCodeListViewEditPage(codeList);
         editCodeListPage.setAgencyIDList(agencyIDList);
-        editCodeListPage.setAgencyIDListValue(agencyIDListValues.get(0));
+        editCodeListPage.setAgencyIDListValue(agencyIDListValue);
         editCodeListPage.hitUpdateButton();
     }
 

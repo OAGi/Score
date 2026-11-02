@@ -27,7 +27,9 @@ public class DSLInterpreter {
                 int currentPrecedence = (token.equalsIgnoreCase("and")) ? 1 : 0; // 'and' has higher precedence than 'or'
 
                 while (!operators.isEmpty() && precedence.peek() >= currentPrecedence) {
-                    applyOperator(operators.pop(), predicates.pop(), predicates.pop());
+                    Predicate<DSLRecord> right = predicates.pop();
+                    Predicate<DSLRecord> left = predicates.pop();
+                    predicates.push(applyOperator(operators.pop(), right, left));
                     precedence.pop();
                 }
 

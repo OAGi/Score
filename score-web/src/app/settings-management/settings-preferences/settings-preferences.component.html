@@ -1,10 +1,4 @@
-<div class="context-section">
-  @if (loading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-
+<score-base-page [loading]="loading" [showToolbar]="false">
   <div class="settings-layout">
     <score-settings-menu active="Preferences"></score-settings-menu>
     <div class="layout-main">
@@ -83,4 +77,4 @@
       </div>
     </div>
   </div>
-</div>
+</score-base-page>

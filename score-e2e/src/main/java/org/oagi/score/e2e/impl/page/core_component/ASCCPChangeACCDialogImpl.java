@@ -65,13 +65,13 @@ public class ASCCPChangeACCDialogImpl extends SearchBarPageImpl implements ASCCP
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to update ASCCP".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select ACC to update ASCCP".equals(getText(title));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override

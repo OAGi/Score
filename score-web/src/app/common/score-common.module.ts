@@ -19,6 +19,20 @@ import {MatButtonModule} from '@angular/material/button';
 import {ConfirmDialogModule} from './confirm-dialog/confirm-dialog.module';
 import {MultiActionsSnackBarModule} from './multi-actions-snack-bar/multi-actions-snack-bar.module';
 import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score-table-column-resize.directive';
+import {DetailPageComponent} from './detail-page/detail-page.component';
+import {DetailCardComponent} from './detail-card/detail-card.component';
+import {SidenavPageComponent} from './sidenav-page/sidenav-page.component';
+import {MaterialModule} from '../material.module';
+import {BasePageComponent} from './base-page/base-page.component';
+import {ListPageComponent} from './list-page/list-page.component';
+import {DialogPageComponent} from './dialog-page/dialog-page.component';
+import {ScoreMatSelectComponent} from './score-mat-select/score-mat-select.component';
+import {BranchSelectorComponent} from './branch-selector/branch-selector.component';
+import {TreeSearchBarComponent} from './tree-search-bar/tree-search-bar.component';
+import {TreeBreadcrumbsComponent} from './tree-breadcrumbs/tree-breadcrumbs.component';
+import {TreeDetailComponent} from './tree-detail/tree-detail.component';
+import {TreeSettingsButtonComponent} from './tree-settings-button/tree-settings-button.component';
+import {TreeViewportComponent} from './tree-viewport/tree-viewport.component';
 
 @NgModule({
   declarations: [
@@ -32,9 +46,23 @@ import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score
     TruncatePipe,
     PastTensePipe,
     ReplaceAllPipe,
-    ScoreTableColumnResizeDirective
+    SidenavPageComponent
   ],
   imports: [
+    ScoreTableColumnResizeDirective,
+    MaterialModule,
+    BasePageComponent,
+    DetailPageComponent,
+    DetailCardComponent,
+    ListPageComponent,
+    DialogPageComponent,
+    ScoreMatSelectComponent,
+    BranchSelectorComponent,
+    TreeSearchBarComponent,
+    TreeBreadcrumbsComponent,
+    TreeDetailComponent,
+    TreeSettingsButtonComponent,
+    TreeViewportComponent,
     MatDialogModule,
     MatCardModule,
     CommonModule,
@@ -44,6 +72,19 @@ import {ScoreTableColumnResizeDirective} from './score-table-column-resize/score
     MultiActionsSnackBarModule
   ],
   exports: [
+    SidenavPageComponent,
+    BasePageComponent,
+    DetailPageComponent,
+    DetailCardComponent,
+    ListPageComponent,
+    DialogPageComponent,
+    ScoreMatSelectComponent,
+    BranchSelectorComponent,
+    TreeSearchBarComponent,
+    TreeBreadcrumbsComponent,
+    TreeDetailComponent,
+    TreeSettingsButtonComponent,
+    TreeViewportComponent,
     UnboundedPipe,
     HighlightSearch,
     DateAgoPipe,

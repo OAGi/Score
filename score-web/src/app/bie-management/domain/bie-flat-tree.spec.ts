@@ -6,6 +6,10 @@ import {
   BieFlatNodeDataSource
 } from './bie-flat-tree';
 import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
+import {of} from 'rxjs';
+import {DagPathSearch} from '../../common/tree-search/dag-path-search';
+import {PathPattern} from '../../common/tree-search/path-pattern';
+import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 
 /**
  * #1638 BIE-editor wiring tests. The editor reads the SAME instance-level sibling order as the model
@@ -97,6 +101,151 @@ describe('BieFlatNodeDatabase view-order store (#1638)', () => {
 
     expect(db.getViewOrderWeight(738304, asbiep)).toBeUndefined();
     expect(db.getViewOrderWeight(7383040, asbiep)).toBe(2);
+  });
+});
+
+describe('BieFlatNode inherited identity', () => {
+  it('rejects inherited nodes without a based top-level BIE id', () => {
+    const node = new AsbiepFlatNode();
+
+    expect(() => node.inherited = true).toThrow(/basedTopLevelAsbiepId/);
+  });
+
+  it('accepts an inherited node with a positive based top-level BIE id', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+
+    node.inherited = true;
+
+    expect(node.inherited).toBe(true);
+  });
+
+  it('rejects clearing the base id while the node is inherited', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+    node.inherited = true;
+
+    expect(() => node.basedTopLevelAsbiepId = undefined).toThrow(/basedTopLevelAsbiepId/);
+    expect(node.inherited).toBe(true);
+    expect(node.basedTopLevelAsbiepId).toBe(27);
+  });
+
+  it('allows clearing the base id after inheritance is disabled', () => {
+    const node = new AsbiepFlatNode();
+    node.basedTopLevelAsbiepId = 27;
+    node.inherited = true;
+
+    node.inherited = false;
+    node.basedTopLevelAsbiepId = undefined;
+
+    expect(node.inherited).toBe(false);
+    expect(node.basedTopLevelAsbiepId).toBeUndefined();
+  });
+});
+
+describe('BieFlatNodeDataSource inherited reused details', () => {
+  it.each([undefined, 40])('loads the incoming association in its owner family (owner base %s)', ownerBaseId => {
+    const parent = abieParent(43);
+    parent.topLevelAsbiepId = 43;
+    parent.basedTopLevelAsbiepId = ownerBaseId;
+    const node = asbiepChild('Reused', 11);
+    node.parent = parent;
+    node.reused = true;
+    node.topLevelAsbiepId = 29;
+    node.basedTopLevelAsbiepId = 17;
+    node.inherited = true;
+
+    const asbieDetails = {
+      asbieId: 1,
+      toAsbiepId: 29,
+      basedAscc: {},
+      cardinality: {min: 0, max: 1},
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 43, version: '1.0', status: 'Published'}
+    };
+    const basedAsbieDetails = {
+      ...asbieDetails,
+      asbieId: 4,
+      toAsbiepId: 18,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 40, version: '0.9', status: 'Published'}
+    };
+    const asbiepDetails = {
+      asbiepId: 2,
+      basedAsccp: {},
+      roleOfAbieId: 3,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 29, version: '1.0', status: 'Published'}
+    };
+    const basedAsbiepDetails = {
+      ...asbiepDetails,
+      asbiepId: 18,
+      roleOfAbieId: 19,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 17, version: '0.9', status: 'Published'}
+    };
+    const abieDetails = {
+      abieId: 3,
+      basedAcc: {},
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 29, version: '1.0', status: 'Published'}
+    };
+    const basedAbieDetails = {
+      ...abieDetails,
+      abieId: 19,
+      ownerTopLevelAsbiep: {topLevelAsbiepId: 17, version: '0.9', status: 'Published'}
+    };
+    const service = {
+      getAsbieDetailsByPath: vi.fn((ownerId: number, manifestId: number, path: string) => {
+        // BOM's incoming ASCC does not exist inside the referenced child BIE.
+        expect([43, 40]).toContain(ownerId);
+        expect(path).toBe('ASCCP-90043>ACC-43>ASCC-11');
+        return of(ownerId === 40 ? basedAsbieDetails : asbieDetails);
+      }),
+      getAsbiepDetailsByPath: vi.fn(() => of(asbiepDetails)),
+      getAbieDetailsByPath: vi.fn(() => of(abieDetails)),
+      getAsbiepDetails: vi.fn(() => of(basedAsbiepDetails)),
+      getAbieDetails: vi.fn(() => of(basedAbieDetails))
+    };
+    const dataSource = new BieFlatNodeDataSource(newDb(), service as any, null as any);
+    const callback = vi.fn();
+
+    dataSource.loadDetails(node, callback);
+
+    expect(service.getAsbieDetailsByPath.mock.calls.map(([ownerId]) => ownerId)).toEqual([43, ownerBaseId ?? 43]);
+    if (ownerBaseId) {
+      expect(service.getAsbiepDetails).toHaveBeenCalledWith(18);
+      expect(service.getAbieDetails).toHaveBeenCalledWith(19);
+    } else {
+      expect(service.getAsbiepDetails).not.toHaveBeenCalled();
+      expect(service.getAbieDetails).not.toHaveBeenCalled();
+    }
+    expect(callback).toHaveBeenCalledWith(node);
+    expect(node.detail.isLoaded).toBe(true);
+    expect((node.detail as any).base).toBeDefined();
+  });
+});
+
+describe('PatternExpressionEvaluator on BIE nodes', () => {
+  const adapter = {
+    namesOf: (n: any) => n.isGroup ? undefined : [n.name, n.displayName].filter(name => !!name),
+    attributesOf: (n: any) => ({name: n.name, displayName: n.displayName || n.name, used: !!n.used}),
+    strictRootedPaths: true
+  };
+
+  it('matches path segments exactly so Party does not resolve to Manufacturing Party', () => {
+    const parent = {name: 'BOM Item Data', parent: undefined, isGroup: false} as any;
+    const party = {name: 'Party', parent, isGroup: false} as any;
+    const manufacturingParty = {name: 'Manufacturing Party', parent, isGroup: false} as any;
+    const evaluator = new PatternExpressionEvaluator('/BOM Item Data/Party', adapter);
+
+    expect(evaluator.eval(party)).toBe(true);
+    expect(evaluator.eval(manufacturingParty)).toBe(false);
+  });
+
+  it('judges a step by its predicates on the node', () => {
+    const parent = {name: 'Sender', parent: undefined, isGroup: false} as any;
+    const used = {name: 'Code', parent, isGroup: false, used: true} as any;
+    const unused = {name: 'Code', parent, isGroup: false, used: false} as any;
+    const evaluator = new PatternExpressionEvaluator('Sender/Code[used = true]', adapter);
+
+    expect(evaluator.eval(used)).toBe(true);
+    expect(evaluator.eval(unused)).toBe(false);
   });
 });
 
@@ -208,5 +357,317 @@ describe('BieFlatNodeDataSource.nodeExpanded$ (#1638 lazy-fetch trigger)', () =>
 
     // childB must be inserted AFTER parentB (index 2), not after the colliding parentA (index 1).
     expect(ds.data).toEqual([parentA, parentB, childB]);
+  });
+});
+
+describe('Association expansion after loading', () => {
+  it.each([AbieFlatNode, AsbiepFlatNode])('caches an empty association after loading', NodeType => {
+    const db = newDb();
+    const node = new NodeType();
+    node.dataSource = {database: db, hideUnused: false} as any;
+    const associations = vi.spyOn(db, 'getAssociations').mockReturnValue([]);
+    expect(node.expandable).toBe(false);
+    expect(node.expandable).toBe(false);
+    expect(associations).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads an initially empty root during initialization and preserves filter changes', () => {
+    const db = newDb();
+    const node = new AbieFlatNode();
+    node.required = true;
+    const child = {used: false, required: false, children: []} as any;
+    vi.spyOn(db, 'rootNode', 'get').mockReturnValue(node);
+    const load = vi.spyOn(db, 'loadChildren').mockImplementation(parent => { parent.children = [child]; });
+    const ds = new BieFlatNodeDataSource<any>(db, null as any, null as any);
+    node.dataSource = ds;
+    ds.init();
+    expect(node.expandable).toBe(true);
+    ds.hideUnused = true;
+    expect(node.expandable).toBe(false);
+    child.used = true;
+    expect(node.expandable).toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not traverse a circular association when checking expansion', () => {
+    const db = newDb();
+    const node = new AsbiepFlatNode();
+    node.isCycle = true;
+    node.dataSource = {database: db} as any;
+    const associations = vi.spyOn(db, 'getAssociations');
+    expect(node.expandable).toBe(false);
+    expect(associations).not.toHaveBeenCalled();
+  });
+});
+
+describe('BBIE supplementary-component expansion', () => {
+  it.each(['Attribute', 'Element'])('uses positive SC cardinality for %s BBIEs', entityType => {
+    const node = bbiepChild('Field', 1);
+    node.bccNode.entityType = entityType;
+    expect(node.expandable).toBe(false);
+    node.children = [{cardinalityMax: 0} as any];
+    expect(node.expandable).toBe(false);
+    node.children = [{cardinalityMax: 0} as any, {cardinalityMax: 1} as any];
+    expect(node.expandable).toBe(true);
+    node.expandable = undefined;
+    expect(node.expandable).toBe(true);
+    node.children[1].cardinalityMax = 0;
+    expect(node.expandable).toBe(false);
+  });
+
+  it('loads the immediate SC list before deciding whether a lazy BBIE expands', () => {
+    const node = bbiepChild('Identifier', 2);
+    const loadChildren = vi.fn((parent: BbiepFlatNode) => {
+      parent.children = [{cardinalityMax: 1} as any];
+    });
+    node.dataSource = {database: {loadChildren}, hideUnused: false} as any;
+    expect(node.expandable).toBe(true);
+    expect(node.expandable).toBe(true);
+    expect(loadChildren).toHaveBeenCalledTimes(1);
+    expect(loadChildren).toHaveBeenCalledWith(node);
+  });
+});
+
+
+describe('Hide unused bounded traversal', () => {
+  it('filters unused branches without materializing their CC descendants', () => {
+    const db = newDb();
+    const used = asbiepChild('Used', 1);
+    const unused = asbiepChild('Unused', 2);
+    const parent = abieParent(10, [used, unused]);
+    used.used = true;
+    unused.used = false;
+    parent.used = true;
+    const ds = new BieFlatNodeDataSource<any>(db, null as any, null as any);
+    ds.data = [parent, used, unused];
+    const load = vi.spyOn(db, 'loadChildren').mockImplementation(() => {});
+
+    ds.hideUnused = true;
+
+    expect(ds.data).toEqual([parent, used]);
+    expect(load).not.toHaveBeenCalled();
+    expect(unused.getChildren()).toEqual([]);
+  });
+
+  it('retains loaded inherited descendants and reflects later usage changes', () => {
+    const db = newDb();
+    const child = asbiepChild('Inherited', 1);
+    child.basedTopLevelAsbiepId = 27;
+    child.inherited = true;
+    const parent = abieParent(10, [child]);
+    parent.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+    child.inherited = false;
+    child.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(false);
+    child.used = true;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+  });
+
+  it('keeps repeated occurrences independent even when their persisted paths match', () => {
+    const db = newDb();
+    const first = abieParent(10);
+    const second = abieParent(10);
+    first.used = false;
+    second.used = true;
+    expect(first.path).toBe(second.path);
+    expect(db.hasUsedOrInheritedDescendant(first)).toBe(false);
+    expect(db.hasUsedOrInheritedDescendant(second)).toBe(true);
+  });
+
+  it('terminates for cycles in loaded children without dropping a used sibling', () => {
+    const db = newDb();
+    const parent = abieParent(10);
+    parent.used = false;
+    const used = asbiepChild('Used', 1);
+    used.parent = parent;
+    // Model loaded flags without the editor setter propagating usage to ancestors.
+    Object.defineProperty(used, 'used', {value: true, writable: true});
+    parent.children = [parent as any, used];
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(true);
+    used.used = false;
+    expect(db.hasUsedOrInheritedDescendant(parent)).toBe(false);
+  });
+});
+
+describe('BieFlatNodeDatabase.searchGraph', () => {
+  /** A database whose nodes are all given up front (nothing is loaded from a CC graph). */
+  class FixedDatabase extends BieFlatNodeDatabase<any> {
+    constructor() {
+      super(null as any, null as any, 0, [], []);
+    }
+
+    loadChildren() {
+    }
+  }
+
+  /** The same component as another node: same ASCCP and ACC, so the same children. */
+  function sameComponentAs(node: AsbiepFlatNode, name: string, asccManifestId: number): AsbiepFlatNode {
+    const copy = asbiepChild(name, asccManifestId);
+    copy.asccpNode = node.asccpNode;
+    copy.accNode = node.accNode;
+    return copy;
+  }
+
+  function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean}) {
+    // the tree answers for its own filters: the search does not pass its state in
+    db.filters.setActive('hideUnused', !!options?.hideUnused);
+    const graph = db.searchGraph(root);
+    const pattern = new PathPattern(expr, false, mode);
+    const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
+    const attributes = [(a: string) => ({name: root.name, displayName: root.displayName || root.name, used: !!root.used})[a]];
+    const found = new DagPathSearch(graph.dag, pattern)
+      .search({ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll(names, attributes)});
+    return {graph, found};
+  }
+
+  /** Root -> Item (a plain place of component I), Box -> Item' (another place of I, with its own display name). */
+  function tree() {
+    const item = asbiepChild('Item', 10);
+    item.children = [bbiepChild('Code', 20)];
+    const item2 = sameComponentAs(item, 'Item', 12);
+    item2.children = [bbiepChild('Code', 20)];
+    const box = asbiepChild('Box', 11);
+    box.children = [item2];
+    const root = abieParent(1, [item, box]);
+    root.used = true;
+    [item, box, item2].forEach(n => n.parent = n === item2 ? box : root);
+    return {root, item, box, item2};
+  }
+
+  it('shares one record between the places of a component', () => {
+    const {root} = tree();
+    const {graph} = search(new FixedDatabase(), root, 'Item');
+
+    // Root, Item, Code, Box: the second Item place is the same component as the first
+    expect(graph.dag.names.length).toBe(4);
+    expect(search(new FixedDatabase(), root, 'Item').found.total).toBe(2);
+    expect(search(new FixedDatabase(), root, 'Item/Code').found.total).toBe(2);
+  });
+
+  it('gives a place with its own display name a record of its own, and matches by either name', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+    item2.displayName = 'Special';
+
+    const {graph, found} = search(new FixedDatabase(), root, 'Special');
+
+    expect(found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Box/Special/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item/Code').found.total).toBe(2);
+    // the clone shares the component's identity, so it is not expanded below the component's other places
+    expect(graph.dag.identity[graph.recordOf(item2)]).toBe(graph.dag.identity[graph.recordOf(root.children[0] as any)]);
+    expect(graph.recordOf(item2)).not.toBe(graph.recordOf(root.children[0] as any));
+  });
+
+  it('tells the places of a component apart by what the BIE says about them', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+
+    expect(search(new FixedDatabase(), root, 'Item').found.total).toBe(2);
+    expect(search(new FixedDatabase(), root, 'Item[used = true]').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item[used = false]').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Box/Item[used]/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Item[type = "ASBIEP" and used]').found.total).toBe(1);
+  });
+
+  it('searches the tree the user sees, which is only what the BIE uses, the same way', () => {
+    const {root, item2} = tree();
+    item2.used = true;
+
+    const all = search(new FixedDatabase(), root, 'Item');
+    const hidden = search(new FixedDatabase(), root, 'Item', {}, {hideUnused: true});
+
+    expect(all.found.total).toBe(2);
+    expect(hidden.found.total).toBe(1);
+    // Root, Box (leads to a used node), Item (used)
+    expect(hidden.graph.dag.names.length).toBe(3);
+    expect(search(new FixedDatabase(), root, 'Code', {}, {hideUnused: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, 'Box/Item', {}, {hideUnused: true}).found.total).toBe(1);
+  });
+
+  it('reads a root path as whole names from the root', () => {
+    const {root} = tree();
+
+    expect(search(new FixedDatabase(), root, '/Parent-1/Box/Item/Code', {exact: true, anchored: true}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, '/Box/Item', {exact: true, anchored: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, '/Parent-1/Bo', {exact: true, anchored: true}).found.total).toBe(0);
+  });
+
+  it('tells the places of a component apart by the definition of their BIE', () => {
+    const {root, item, item2} = tree();
+    item2.definition = 'The second item';
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    expect(found('Item')).toBe(2);
+    expect(found("Item[definition = '']")).toBe(1);
+    expect(found("Item[definition != '']")).toBe(1);
+    expect(found('Item[contains(definition, "second")]')).toBe(1);
+    // the place without one shares the record of its component, the other is a record of its own
+    const {graph} = search(new FixedDatabase(), root, 'Item');
+    expect(graph.recordOf(item2)).not.toBe(graph.recordOf(item));
+  });
+
+  it('reads the definition of the loaded details before the one the tree was loaded with', () => {
+    const {root, item2} = tree();
+    item2.definition = 'Old text';
+    item2._detail = {asbie: {definition: 'New text'}} as any;
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    expect(found("Item[definition = 'New text']")).toBe(1);
+    expect(found("Item[definition = 'Old text']")).toBe(0);
+    // a definition that is loaded but has no text is empty
+    item2._detail = {asbie: {definition: null}} as any;
+    expect(found("Item[definition = '']")).toBe(2);
+  });
+
+  it('asks for the definitions of the core components a row shows by their own names', () => {
+    const {root, item, item2} = tree();
+    item.asccpNode.definition = 'Item component';
+    item.accNode.definition = 'Item type';
+    item.asccNode.definition = 'An association';
+    item2.asccNode.definition = 'Another association';
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+    // the component and its type are the same in both places, the association is not
+    expect(found("Item[component_definition = 'Item component']")).toBe(2);
+    expect(found("Item[type_definition = 'Item type']")).toBe(2);
+    expect(found("Item[association_definition = 'An association']")).toBe(1);
+    expect(found("Item[association_definition = 'Another association']")).toBe(1);
+    expect(found("Item[association_definition = '']")).toBe(0);
+    // the BIE's own definition is not the core component's
+    expect(found("Item[definition = 'Item component']")).toBe(0);
+    expect(found("Item[definition = '']")).toBe(2);
+  });
+
+  it('does not say the definition of a part a row does not have is empty', () => {
+    const {root} = tree();
+    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+
+    // a BBIEP has an association and a component, but no type
+    expect(found("Code[association_definition = '' and component_definition = '']")).toBe(2);
+    expect(found("Code[type_definition = '']")).toBe(0);
+    expect(found("Item[type_definition = '']")).toBe(2);
+  });
+
+  it('keeps a place that shows only some of its children apart from its component', () => {
+    class FilteringDatabase extends FixedDatabase {
+      constructor(private readonly filtered: Set<any>) {
+        super();
+      }
+
+      protected override hasFilteredChildren(node: any): boolean {
+        return this.filtered.has(node.self || node);
+      }
+    }
+    const {root, item2} = tree();
+    item2.used = true;
+    item2.children = [];
+
+    const db = new FilteringDatabase(new Set([item2]));
+    const found = search(db, root, 'Code').found;
+
+    // Item's own Code, and none below the filtered place
+    expect(found.total).toBe(1);
   });
 });

@@ -2,12 +2,15 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
+import {ScoreCommonModule} from '../common/score-common.module';
 import {CommonModule} from '@angular/common';
-import {CanActivateUser} from '../authentication/auth.service';
+import {CanActivateAdmin, CanActivateUser} from '../authentication/auth.service';
 import {SettingsAccountComponent} from './settings-account/settings-account.component';
 import {SettingsAccountService} from './settings-account/domain/settings-account.service';
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
+import {SettingsPasskeysComponent} from './settings-passkeys/settings-passkeys.component';
 import {SettingsApplicationSettingsComponent} from './settings-application-settings/settings-application-settings.component';
+import {FilenameExpressionInputComponent} from './settings-application-settings/filename-expression-input.component';
 import {SettingsApplicationSettingsService} from './settings-application-settings/domain/settings-application-settings.service';
 import {MarkdownModule} from 'ngx-markdown';
 import {EmailValidationComponent} from './email-validation/email-validation.component';
@@ -17,9 +20,29 @@ import {SettingsPreferencesService} from './settings-preferences/domain/settings
 const routes: Routes = [
   {
     path: 'settings/account',
+    pathMatch: 'full',
+    redirectTo: 'settings/account/personal-info'
+  },
+  {
+    path: 'settings/account/personal-info',
     component: SettingsAccountComponent,
+    data: {section: 'personal-info'},
     canActivate: [CanActivateUser],
-    title: 'Settings'
+    title: 'Personal Info'
+  },
+  {
+    path: 'settings/account/password',
+    component: SettingsAccountComponent,
+    data: {section: 'password'},
+    canActivate: [CanActivateUser],
+    title: 'Change password'
+  },
+  {
+    path: 'settings/account/passkeys',
+    component: SettingsAccountComponent,
+    data: {section: 'passkeys'},
+    canActivate: [CanActivateUser],
+    title: 'Passkeys'
   },
   {
     path: 'settings/email_validation',
@@ -35,9 +58,36 @@ const routes: Routes = [
   },
   {
     path: 'settings/application_settings',
+    pathMatch: 'full',
+    redirectTo: 'settings/application_settings/features'
+  },
+  {
+    path: 'settings/application_settings/features',
     component: SettingsApplicationSettingsComponent,
-    canActivate: [CanActivateUser],
-    title: 'Application Settings'
+    data: {section: 'features'},
+    canActivate: [CanActivateAdmin],
+    title: 'Application Features'
+  },
+  {
+    path: 'settings/application_settings/smtp',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'smtp'},
+    canActivate: [CanActivateAdmin],
+    title: 'SMTP Settings'
+  },
+  {
+    path: 'settings/application_settings/filename-expressions',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'filename-expressions'},
+    canActivate: [CanActivateAdmin],
+    title: 'Filename Expressions'
+  },
+  {
+    path: 'settings/application_settings/web-page',
+    component: SettingsApplicationSettingsComponent,
+    data: {section: 'web-page'},
+    canActivate: [CanActivateAdmin],
+    title: 'Web Page Settings'
   }
 ];
 
@@ -48,11 +98,14 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     CommonModule,
-    MarkdownModule
+    MarkdownModule,
+    ScoreCommonModule,
+    FilenameExpressionInputComponent
   ],
   declarations: [
     SettingsMenuComponent,
     SettingsAccountComponent,
+    SettingsPasskeysComponent,
     SettingsPreferencesComponent,
     SettingsApplicationSettingsComponent,
     EmailValidationComponent

@@ -145,6 +145,11 @@ public class DSLContextAPIFactory implements APIFactory {
     }
 
     @Override
+    public TenantAPI getTenantAPI() {
+        return new DSLContextTenantAPIImpl(dslContext);
+    }
+
+    @Override
     public void close() throws Exception {
         if (dataSource != null) {
             dataSource.close();

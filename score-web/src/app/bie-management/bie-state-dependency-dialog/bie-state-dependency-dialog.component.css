@@ -1,21 +1,3 @@
-.header {
-  border-bottom: 1px solid transparent;
-  box-sizing: border-box;
-  font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: .1px;
-  line-height: 24px;
-  padding-top: 8px;
-  width: 100%;
-}
-
-.close {
-  position: relative;
-  margin-left: auto;
-  left: 12px;
-}
-
 .content {
   max-height: 65vh;
   overflow: auto;
@@ -128,15 +110,6 @@
 
 .mat-column-state {
   width: 160px;
-}
-
-.actions {
-  bottom: 0;
-  left: 0;
-  overflow: visible;
-  width: 100%;
-  opacity: 1;
-  padding: 0 24px;
 }
 
 :host ::ng-deep .dependency-relation-tooltip {

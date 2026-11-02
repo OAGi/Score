@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {CommonModule} from '@angular/common';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {EditTagsDialogComponent} from './edit-tags-dialog.component';
@@ -11,7 +11,7 @@ import {EditTagsDialogComponent} from './edit-tags-dialog.component';
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule
   ],

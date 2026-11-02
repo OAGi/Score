@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.Revised;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
@@ -47,6 +48,43 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
     public JooqAgencyIdListQueryRepository(DSLContext dslContext, ScoreUser requester,
                                            RepositoryFactory repositoryFactory) {
         super(dslContext, requester, repositoryFactory);
+    }
+
+    @Override
+    public List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListByManifestIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds) {
+        if (agencyIdListManifestIds == null || agencyIdListManifestIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetAgencyIdListSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(valueOf(agencyIdListManifestIds)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
+    public Map<AgencyIdListManifestId, ReleaseId> getAgencyIdListReleaseIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds) {
+        if (agencyIdListManifestIds == null || agencyIdListManifestIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<AgencyIdListManifestId, ReleaseId> releaseIds = new HashMap<>();
+        dslContext().select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.in(valueOf(agencyIdListManifestIds)))
+                .forEach(r -> releaseIds.put(new AgencyIdListManifestId(r.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()),
+                        new ReleaseId(r.get(AGENCY_ID_LIST_MANIFEST.RELEASE_ID).toBigInteger())));
+        return releaseIds;
+    }
+
+    @Override
+    public ReleaseId getAgencyIdListReleaseId(AgencyIdListManifestId agencyIdListManifestId) {
+        if (agencyIdListManifestId == null) {
+            return null;
+        }
+        ULong releaseId = dslContext().select(AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(valueOf(agencyIdListManifestId)))
+                .fetchOne(AGENCY_ID_LIST_MANIFEST.RELEASE_ID);
+        return (releaseId != null) ? new ReleaseId(releaseId.toBigInteger()) : null;
     }
 
     @Override
@@ -120,6 +158,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
                             AGENCY_ID_LIST.AGENCY_ID_LIST_ID,
                             AGENCY_ID_LIST.GUID, AGENCY_ID_LIST.ENUM_TYPE_GUID,
+                            AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
                             AGENCY_ID_LIST.NAME, AGENCY_ID_LIST.LIST_ID, AGENCY_ID_LIST.VERSION_ID,
                             AGENCY_ID_LIST.DEFINITION, AGENCY_ID_LIST.DEFINITION_SOURCE,
                             AGENCY_ID_LIST.NAMESPACE_ID,
@@ -153,6 +192,9 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         new AgencyIdListId(record.get(AGENCY_ID_LIST.AGENCY_ID_LIST_ID).toBigInteger()),
                         new Guid(record.get(AGENCY_ID_LIST.GUID)),
                         record.get(AGENCY_ID_LIST.ENUM_TYPE_GUID),
+                        record.get(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID) != null
+                                ? new AgencyIdListManifestId(record.get(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID).toBigInteger())
+                                : null,
                         record.get(AGENCY_ID_LIST.NAME),
                         record.get(AGENCY_ID_LIST.LIST_ID),
                         record.get(AGENCY_ID_LIST.VERSION_ID),
@@ -181,9 +223,6 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
     public List<AgencyIdListSummaryRecord> availableAgencyIdListByDtManifestId(
             DtManifestId dtManifestId, List<CcState> states) {
 
-        var dtQuery = repositoryFactory().dtQueryRepository(requester());
-        DtSummaryRecord dt = dtQuery.getDtSummary(dtManifestId);
-
         Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
                         AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
                         DT_MANIFEST.RELEASE_ID)
@@ -203,26 +242,20 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
 
         if (result.size() > 0) {
             return result.stream().map(e ->
-                            availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()),
-                                    new ReleaseId(e.get(AGENCY_ID_LIST_MANIFEST.RELEASE_ID).toBigInteger()), states))
+                            availableAgencyIdListByManifestId(
+                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()), states))
                     .flatMap(e -> e.stream())
                     .distinct()
                     .sorted(Comparator.comparing(AgencyIdListSummaryRecord::name))
                     .collect(Collectors.toList());
 
-        } else {
-            return availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-                    null, dt.release().releaseId(), states);
         }
+        return Collections.emptyList();
     }
 
     @Override
     public List<AgencyIdListSummaryRecord> availableAgencyIdListByDtScManifestId(
             DtScManifestId dtScManifestId, List<CcState> states) {
-
-        var dtQuery = repositoryFactory().dtQueryRepository(requester());
-        DtScSummaryRecord dtSc = dtQuery.getDtScSummary(dtScManifestId);
 
         Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
                         AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
@@ -243,43 +276,60 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
 
         if (result.size() > 0) {
             return result.stream().map(e ->
-                            availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()),
-                                    new ReleaseId(e.get(AGENCY_ID_LIST_MANIFEST.RELEASE_ID).toBigInteger()), states))
+                            availableAgencyIdListByManifestId(
+                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()), states))
                     .flatMap(e -> e.stream())
                     .distinct()
                     .sorted(Comparator.comparing(AgencyIdListSummaryRecord::name))
                     .collect(Collectors.toList());
-        } else {
-            return availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-                    null, dtSc.release().releaseId(), states);
         }
+        return Collections.emptyList();
     }
 
-    private List<AgencyIdListSummaryRecord> availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-            AgencyIdListManifestId agencyIdListManifestId, ReleaseId releaseId, List<CcState> states) {
+    @Override
+    public boolean hasAgencyIdListAvailabilityByDtManifestId(DtManifestId dtManifestId) {
+        return dtManifestId != null && dslContext().fetchExists(
+                selectOne().from(DT_MANIFEST).join(DT_AWD_PRI).on(and(
+                        DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
+                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
+                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
+                        .and(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull()));
+    }
 
-        var queryBuilder = new GetAgencyIdListSummaryQueryBuilder();
+    @Override
+    public boolean hasAgencyIdListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId) {
+        return dtScManifestId != null && dslContext().fetchExists(
+                selectOne().from(DT_SC_MANIFEST).join(DT_SC_AWD_PRI).on(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
+                        DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
+                        .and(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull()));
+    }
+
+    private List<AgencyIdListSummaryRecord> availableAgencyIdListByManifestId(
+            AgencyIdListManifestId agencyIdListManifestId, List<CcState> states) {
+
         if (agencyIdListManifestId == null) {
-            return queryBuilder.select()
-                    .where(and(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                            states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)
-                    ))
-                    .fetch(queryBuilder.mapper());
+            return Collections.emptyList();
         }
 
         List<AgencyIdListSummaryRecord> availableAgencyIdLists = new ArrayList<>();
-        availableAgencyIdLists.add(getAgencyIdListSummary(agencyIdListManifestId));
+        AgencyIdListSummaryRecord agencyIdList = getAgencyIdListSummary(agencyIdListManifestId);
+        if (agencyIdList == null || (!states.isEmpty() && !states.contains(agencyIdList.state()))) {
+            return Collections.emptyList();
+        }
+        availableAgencyIdLists.add(agencyIdList);
 
         List<AgencyIdListManifestId> associatedAgencyIdLists = dslContext().selectDistinct(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(AGENCY_ID_LIST_MANIFEST)
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
                 .where(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.in(
                         availableAgencyIdLists.stream()
                                 .filter(e -> e.agencyIdListManifestId() != null)
                                 .map(e -> e.agencyIdListManifestId())
                                 .distinct()
                                 .collect(Collectors.toList())
-                ))
+                ).and(states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)))
                 .fetchStream().map(record ->
                         new AgencyIdListManifestId(record.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()))
                 .collect(Collectors.toList());
@@ -288,8 +338,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
         mergedAgencyIdLists.addAll(availableAgencyIdLists);
         for (AgencyIdListManifestId associatedAgencyId : associatedAgencyIdLists) {
             mergedAgencyIdLists.addAll(
-                    availableAgencyIdListByAgencyIdListManifestIdOrReleaseId(
-                            associatedAgencyId, releaseId, states)
+                    availableAgencyIdListByManifestId(
+                            associatedAgencyId, states)
             );
         }
         return mergedAgencyIdLists.stream().distinct().collect(Collectors.toList());
@@ -518,7 +568,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST.as("based_agency_id_list")).on(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.as("based_agency_id_list").AGENCY_ID_LIST_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -687,7 +737,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST.as("based_agency_id_list")).on(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.as("based_agency_id_list").AGENCY_ID_LIST_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -801,7 +851,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST_VALUE.LAST_UPDATE_TIMESTAMP,
 
                             AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(AGENCY_ID_LIST_VALUE_MANIFEST)
                     .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -828,7 +879,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_DEPRECATED),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_DEVELOPER_DEFAULT),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.IS_USER_DEFAULT),
-                        isUsed(agencyIdListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
 
                         fetchOwnerSummary(record),
                         new WhoAndWhen(
@@ -868,15 +919,38 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         .fetchOneInto(Integer.class) > 0;
     }
 
-    private boolean isUsed(AgencyIdListValueManifestId agencyIdListValueManifestId) {
-        return dslContext().selectCount()
-                .from(AGENCY_ID_LIST_MANIFEST)
-                .where(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId)))
-                .fetchOneInto(Integer.class) > 0 ||
-                dslContext().selectCount()
-                        .from(CODE_LIST_MANIFEST)
-                        .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(valueOf(agencyIdListValueManifestId)))
-                        .fetchOneInto(Integer.class) > 0;
+    private static final String VALUE_USED_FIELD_NAME = "used";
+
+    private Field<Boolean> valueUsedField() {
+        var valueManifestId =
+                AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID;
+
+        var based = AGENCY_ID_LIST_VALUE_MANIFEST.as("based");
+        var replacement = AGENCY_ID_LIST_VALUE_MANIFEST.as("replacement");
+
+        return field(
+                exists(selectOne()
+                        .from(AGENCY_ID_LIST_MANIFEST)
+                        .where(and(
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId),
+                                // A reference from the value's own parent list is not a usage
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.ne(
+                                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                        )))
+                        .or(exists(selectOne()
+                                .from(CODE_LIST_MANIFEST)
+                                .where(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+                        .or(exists(selectOne()
+                                .from(based)
+                                .where(based.BASED_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+                        .or(exists(selectOne()
+                                .from(replacement)
+                                .where(replacement.REPLACEMENT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                                        .eq(valueManifestId))))
+        ).as(VALUE_USED_FIELD_NAME);
     }
 
     private List<AgencyIdListValueDetailsRecord> getPrevAgencyIdListValueDetailsList(
@@ -908,7 +982,8 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                             AGENCY_ID_LIST_VALUE.as("prev").LAST_UPDATE_TIMESTAMP,
 
                             AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
-                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID
+                            AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                            valueUsedField()
                     ), ownerFields(), creatorFields(), updaterFields()))
                     .from(AGENCY_ID_LIST_VALUE_MANIFEST)
                     .join(AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
@@ -941,7 +1016,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_DEPRECATED),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_DEVELOPER_DEFAULT),
                         (byte) 1 == record.get(AGENCY_ID_LIST_VALUE.as("prev").IS_USER_DEFAULT),
-                        isUsed(agencyIdListValueManifestId),
+                        record.get(VALUE_USED_FIELD_NAME, Boolean.class),
 
                         fetchOwnerSummary(record),
                         new WhoAndWhen(
@@ -1016,7 +1091,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(LOG).on(AGENCY_ID_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)

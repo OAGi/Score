@@ -8,7 +8,6 @@ import {
   ModuleElement,
   ModuleSet,
   ModuleSetListEntry,
-  ModuleSetListRequest,
   ModuleSetMetadata,
   ModuleSetRelease,
   ModuleSetReleaseDetails,
@@ -23,36 +22,13 @@ import {
 export class ModuleService {
   private http = inject(HttpClient);
 
-
   getModuleSetSummaries(libraryId: number): Observable<ModuleSetSummary[]> {
     let params = new HttpParams()
         .set('libraryId', '' + libraryId);
     return this.http.get<ModuleSetSummary[]>('/api/module-sets/summaries', {params});
   }
 
-  getModuleSetList(request?: ModuleSetListRequest): Observable<PageResponse<ModuleSetListEntry>> {
-    let params = new HttpParams()
-        .set('libraryId', '' + request.library.libraryId)
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-    if (request.filters.description) {
-      params = params.set('description', request.filters.description);
-    }
+  getModuleSetListPage(params: HttpParams): Observable<PageResponse<ModuleSetListEntry>> {
     return this.http.get<PageResponse<ModuleSetListEntry>>('/api/module-sets', {params}).pipe(
         map((res: PageResponse<ModuleSetListEntry>) => ({
           ...res,
@@ -210,6 +186,11 @@ export class ModuleService {
     if (request.isDefault) {
       params = params.set('isDefault', request.isDefault);
     }
+    return this.getModuleSetReleaseListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getModuleSetReleaseListPage(params: HttpParams): Observable<PageResponse<ModuleSetReleaseListEntry>> {
     return this.http.get<PageResponse<ModuleSetReleaseListEntry>>('/api/module-set-releases', {params}).pipe(
         map((res: PageResponse<ModuleSetReleaseListEntry>) => ({
           ...res,

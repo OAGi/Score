@@ -1,6 +1,6 @@
 package org.oagi.score.gateway.http.api.integration_management.github.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Outcome of a conditional GitHub issue fetch (ETag / {@code If-None-Match}). Issue #1533.

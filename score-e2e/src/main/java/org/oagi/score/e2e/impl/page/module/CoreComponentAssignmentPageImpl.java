@@ -124,22 +124,22 @@ public class CoreComponentAssignmentPageImpl extends BasePageImpl implements Cor
     }
     @Override
     public WebElement getTableRecordByValueUnassignedCC(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"assign-cc-table-wrapper\")][1]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
     }
 
     @Override
     public WebElement getTableRecordAtIndexUnassignedCC(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][1]//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"assign-cc-table-wrapper\")][1]//tbody/tr[" + idx + "]"));
     }
 
     @Override
     public WebElement getTableRecordByValueAssignedCC(String value) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"assign-cc-table-wrapper\")][2]//td//a[text()=\"" + value + "\"]/ancestor::tr"));
     }
 
     @Override
     public WebElement getTableRecordAtIndexAssignedCC(int idx) {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//div[@class=\"assign-cc-table-wrapper\"][2]//tbody/tr[" + idx + "]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"assign-cc-table-wrapper\")][2]//tbody/tr[" + idx + "]"));
     }
 
     @Override

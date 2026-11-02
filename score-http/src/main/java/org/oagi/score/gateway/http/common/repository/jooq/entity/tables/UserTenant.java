@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Tenant.TenantPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.UserTenantRecord;
@@ -46,7 +47,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.user_tenant</code>
+     * The reference instance of <code>user_tenant</code>
      */
     public static final UserTenant USER_TENANT = new UserTenant();
 
@@ -59,19 +60,18 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     }
 
     /**
-     * The column <code>oagi.user_tenant.user_tenant_id</code>. Primary key
-     * column.
+     * The column <code>user_tenant.user_tenant_id</code>. Primary key column.
      */
-    public final TableField<UserTenantRecord, ULong> USER_TENANT_ID = createField(DSL.name("user_tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+    public final TableField<UserTenantRecord, ULong> USER_TENANT_ID = createField(DSL.name("user_tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.user_tenant.tenant_id</code>. Assigned tenant to
-     * the user.
+     * The column <code>user_tenant.tenant_id</code>. Assigned tenant to the
+     * user.
      */
     public final TableField<UserTenantRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Assigned tenant to the user.");
 
     /**
-     * The column <code>oagi.user_tenant.app_user_id</code>. Application user.
+     * The column <code>user_tenant.app_user_id</code>. Application user.
      */
     public final TableField<UserTenantRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Application user.");
 
@@ -84,21 +84,21 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.user_tenant</code> table reference
+     * Create an aliased <code>user_tenant</code> table reference
      */
     public UserTenant(String alias) {
         this(DSL.name(alias), USER_TENANT);
     }
 
     /**
-     * Create an aliased <code>oagi.user_tenant</code> table reference
+     * Create an aliased <code>user_tenant</code> table reference
      */
     public UserTenant(Name alias) {
         this(alias, USER_TENANT);
     }
 
     /**
-     * Create a <code>oagi.user_tenant</code> table reference
+     * Create a <code>user_tenant</code> table reference
      */
     public UserTenant() {
         this(DSL.name("user_tenant"), null);
@@ -139,7 +139,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     private transient AppUserPath _appUser;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table.
+     * Get the implicit join path to the <code>app_user</code> table.
      */
     public AppUserPath appUser() {
         if (_appUser == null)
@@ -177,7 +177,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
     private transient TenantPath _tenant;
 
     /**
-     * Get the implicit join path to the <code>oagi.tenant</code> table.
+     * Get the implicit join path to the <code>tenant</code> table.
      */
     public TenantPath tenant() {
         if (_tenant == null)
@@ -230,7 +230,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
      */
     @Override
     public UserTenant where(Condition condition) {
-        return new UserTenant(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new UserTenant(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -297,7 +297,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UserTenant whereExists(Select<?> select) {
+    public UserTenant whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -305,7 +305,7 @@ public class UserTenant extends TableImpl<UserTenantRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UserTenant whereNotExists(Select<?> select) {
+    public UserTenant whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

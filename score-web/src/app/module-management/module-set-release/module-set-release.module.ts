@@ -16,6 +16,9 @@ import {
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../../common/title-with-library-selector/title-with-library-selector';
+import {SCORE_TABLE} from '../../common/score-table';
+import {RecordCompactRowComponent} from '../../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -59,7 +62,10 @@ const routes: Routes = [
         DragDropModule,
         SearchBarModule,
         ColumnSelectorModule,
-        TitleWithLibrarySelector
+        TitleWithLibrarySelector,
+        RecordCompactRowComponent,
+        ResponsiveButtonComponent,
+        ...SCORE_TABLE
     ],
   declarations: [
     ModuleSetReleaseListComponent,

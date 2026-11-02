@@ -106,6 +106,15 @@ public class JooqAccountCommandRepository extends JooqBaseRepository implements 
     }
 
     @Override
+    public boolean deletePending(OAuth2UserId appOauth2UserId) {
+
+        int numOfDeletedRecords = dslContext().deleteFrom(APP_OAUTH2_USER)
+                .where(APP_OAUTH2_USER.APP_OAUTH2_USER_ID.eq(valueOf(appOauth2UserId)))
+                .execute();
+        return numOfDeletedRecords == 1;
+    }
+
+    @Override
     public boolean updateEmail(String email) {
 
         int numOfUpdatedRecords = dslContext().update(APP_USER)

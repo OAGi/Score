@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -16,6 +16,7 @@ import {setAppTitleIfPresent} from '../../common/app-title.strategy';
   standalone: false,
   selector: 'score-namespace-detail',
   templateUrl: './namespace-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./namespace-detail.component.css']
 })
 export class NamespaceDetailComponent implements OnInit {

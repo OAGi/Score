@@ -16,7 +16,7 @@
     <div class="column-selector overlay-spacing" cdkDropList (cdkDropListDropped)="drop($event)"
       (click)="handleOverlayClick($event)"
       style="min-width: 132px;">
-      @for (column of columns; track column) {
+      @for (column of items; track column) {
         <div class="column" cdkDrag>
           @if (multiple) {
             <mat-checkbox [checked]="column.selected">
@@ -37,11 +37,11 @@
         </div>
       }
 
-      @if (onReset.observed) {
+      @if (resettable) {
         <mat-divider/>
       }
 
-      @if (onReset.observed) {
+      @if (resettable) {
         <div class="d-flex justify-content-end mt-2">
           <button mat-stroked-button (click)="onResetButtonClick()">
             <span class="f12">Reset</span>

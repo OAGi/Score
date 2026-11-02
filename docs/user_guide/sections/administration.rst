@@ -199,8 +199,8 @@ Password Management
 Change password
 ~~~~~~~~~~~~~~~
 
-A user can change the password through the account settings page when the account uses local password-based sign-in.
-The same page also allows the user to update the email address and resend an email verification request when needed.
+A user can change the password on the "Password" page under "Account" in the settings when the account uses local password-based sign-in.
+The "Personal Info" page under "Account" allows the user to update the email address and resend an email verification request when needed.
 
 To change it:
 
@@ -208,7 +208,7 @@ To change it:
 
 2. Choose "Settings" from the drop-down list.
 
-3. On the "Account" settings page, go to the "Change password" section and fill out the fields:
+3. In the settings menu on the left, click "Password" under "Account" and fill out the fields:
 
    1. *Old password*, which is the current password.
 
@@ -248,8 +248,8 @@ Application Settings
 
 Only users with the Admin right can access "Application settings" from the Settings area.
 Administrators can change application settings from the Settings area.
-The "Application settings" page currently includes Application Features, SMTP settings, Filename Expressions, and Web Page Settings.
-Each feature can be enabled or disabled from this page, while the other sections provide editable settings and preview areas.
+The "Application settings" menu in the settings menu is divided into four pages: "Features", "SMTP", "Filename Expressions", and "Web Page".
+Each feature can be enabled or disabled on the "Features" page, while the other pages provide editable settings and preview areas.
 
 To change configurations:
 
@@ -257,9 +257,11 @@ To change configurations:
 
 2. Choose "Settings" from the drop-down list.
 
-3. Click "Application settings" on the left side of the page.
+3. In the settings menu on the left side of the page, click the page you need under "Application settings".
+   Clicking "Application settings" itself opens the "Features" page.
 
-The following subsections explain each setting.
+The following subsections explain each setting, and each says which page it is on.
+The multi-tenant mode, business term function, BIE inverse mode, email-based workflows, and Browse Standard mode settings are on the "Features" page.
 
 Multi-tenant Mode
 ~~~~~~~~~~~~~~~~~
@@ -391,7 +393,7 @@ To disable Browse Standard mode:
 SMTP settings
 ~~~~~~~~~~~~~
 
-Administrators can configure SMTP host, port, authentication, STARTTLS, SSL, auth method, auth username, and auth password on the Application settings page.
+Administrators can configure SMTP host, port, authentication, STARTTLS, SSL, auth method, auth username, and auth password on the "SMTP" page under "Application settings".
 The page also provides a "Test" button to validate the email settings.
 
 To update SMTP settings:
@@ -414,7 +416,7 @@ Filename Expressions
 ~~~~~~~~~~~~~~~~~~~~
 
 Administrators can configure filename expressions for generated BIE schema files and BIE Package schema files.
-The page includes editable expressions, duplicate-handler expressions, and sample filename previews.
+The "Filename Expressions" page under "Application settings" includes editable expressions, duplicate-handler expressions, and sample filename previews.
 Open the built-in "Guide" area on the page to see the same syntax reference while editing.
 
 The filename expression syntax supports the following forms:
@@ -475,7 +477,7 @@ To update filename expressions:
 Web Page Settings
 ~~~~~~~~~~~~~~~~~
 
-In Web Page Settings, administrators can change the brand logo on the navigation bar, the favicon of the webpage, the sign-in page statement, and colors for component state, release state, and user role.
+On the "Web Page" page under "Application settings", administrators can change the brand logo on the navigation bar, the favicon of the webpage, the sign-in page statement, and colors for component state, release state, and user role.
 
 To update Web Page Settings:
 

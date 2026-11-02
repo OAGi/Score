@@ -23,8 +23,6 @@ public class ViewEditCodeListPageImpl extends BaseSearchBarPageImpl implements V
 
     private static final By BRANCH_SELECT_FIELD_LOCATOR =
             By.xpath("//div[contains(@class, \"branch-selector\")]//mat-select[1]");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By NEW_CODE_LIST_BUTTON_LOCATOR =
             By.xpath("//button[contains(@mattooltip, \"New Code List\")]");
     private static final By DEPRECATED_SELECT_FIELD_LOCATOR =
@@ -154,13 +152,15 @@ public class ViewEditCodeListPageImpl extends BaseSearchBarPageImpl implements V
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(searchedSelectField);
+            WebElement branchSelect = openBranchDropdown();
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
+    }
+
+    private WebElement openBranchDropdown() {
+        return openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
     }
 
     @Override

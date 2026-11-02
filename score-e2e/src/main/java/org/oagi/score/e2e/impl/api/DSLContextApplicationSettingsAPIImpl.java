@@ -3,7 +3,10 @@ package org.oagi.score.e2e.impl.api;
 import org.jooq.DSLContext;
 import org.oagi.score.e2e.api.ApplicationSettingsAPI;
 
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.APP_USER;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.APP_WEBAUTHN_USER;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.CONFIGURATION;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.WEBAUTHN_CREDENTIAL;
 
 public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettingsAPI {
 
@@ -11,6 +14,11 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
     private static final String TENANT_ENABLED_CONFIG_NAME = "score.tenant.enabled";
     private static final String BUSINESS_TERM_ENABLED_CONFIG_NAME = "score.business-term.enabled";
     private static final String BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME = "score.browse-standard-mode.enabled";
+    private static final String BIE_INVERSE_MODE_ENABLED_CONFIG_NAME = "score.bie.inverse-mode";
+
+    private static final String STRING_TYPE = "String";
+    private static final String BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME = "score.bie.schema-filename-expression";
+    private static final String BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME = "score.bie.package-schema-filename-expression";
 
     private final DSLContext dslContext;
 
@@ -46,6 +54,84 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
     @Override
     public void setBrowseStandardModeEnable(boolean browseStandardModeEnable) {
         upsertBooleanConfiguration(BROWSE_STANDARD_MODE_ENABLED_CONFIG_NAME, browseStandardModeEnable);
+    }
+
+    @Override
+    public boolean isBIEInverseModeEnabled() {
+        return getBooleanConfiguration(BIE_INVERSE_MODE_ENABLED_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBIEInverseModeEnable(boolean bieInverseModeEnable) {
+        upsertBooleanConfiguration(BIE_INVERSE_MODE_ENABLED_CONFIG_NAME, bieInverseModeEnable);
+    }
+
+    @Override
+    public String getBIESchemaFilenameExpression() {
+        return getStringConfiguration(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBIESchemaFilenameExpression(String expression) {
+        setStringConfiguration(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME, expression);
+    }
+
+    @Override
+    public String getBIEPackageSchemaFilenameExpression() {
+        return getStringConfiguration(BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBIEPackageSchemaFilenameExpression(String expression) {
+        setStringConfiguration(BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME, expression);
+    }
+
+    private String getStringConfiguration(String configurationName) {
+        return dslContext.select(CONFIGURATION.VALUE)
+                .from(CONFIGURATION)
+                .where(CONFIGURATION.NAME.eq(configurationName))
+                .fetchOptionalInto(String.class).orElse(null);
+    }
+
+    /** Store a String configuration; a {@code null} value removes it. */
+    private void setStringConfiguration(String configurationName, String value) {
+        if (value == null) {
+            dslContext.deleteFrom(CONFIGURATION)
+                    .where(CONFIGURATION.NAME.eq(configurationName))
+                    .execute();
+            return;
+        }
+        int updated = dslContext.update(CONFIGURATION)
+                .set(CONFIGURATION.VALUE, value)
+                .where(CONFIGURATION.NAME.eq(configurationName))
+                .execute();
+        if (updated == 0) {
+            dslContext.insertInto(CONFIGURATION)
+                    .set(CONFIGURATION.NAME, configurationName)
+                    .set(CONFIGURATION.TYPE, STRING_TYPE)
+                    .set(CONFIGURATION.VALUE, value)
+                    .execute();
+        }
+    }
+
+    @Override
+    public void deletePasskeysOfLoginId(String loginId) {
+        var appWebauthnUserIds = dslContext.select(APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID)
+                .from(APP_WEBAUTHN_USER)
+                .join(APP_USER).on(APP_USER.APP_USER_ID.eq(APP_WEBAUTHN_USER.APP_USER_ID))
+                .where(APP_USER.LOGIN_ID.eq(loginId));
+        dslContext.deleteFrom(WEBAUTHN_CREDENTIAL)
+                .where(WEBAUTHN_CREDENTIAL.APP_WEBAUTHN_USER_ID.in(appWebauthnUserIds))
+                .execute();
+        dslContext.deleteFrom(APP_WEBAUTHN_USER)
+                .where(APP_WEBAUTHN_USER.APP_WEBAUTHN_USER_ID.in(appWebauthnUserIds))
+                .execute();
+    }
+
+    @Override
+    public boolean hasPasskeyRecords(java.math.BigInteger appUserId) {
+        return dslContext.fetchExists(APP_WEBAUTHN_USER,
+                APP_WEBAUTHN_USER.APP_USER_ID.eq(org.jooq.types.ULong.valueOf(appUserId)));
     }
 
     private boolean getBooleanConfiguration(String configurationName) {

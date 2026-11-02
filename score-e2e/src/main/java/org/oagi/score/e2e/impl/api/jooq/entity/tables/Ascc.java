@@ -32,12 +32,11 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc.AccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm.AsccBiztermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccManifest.AsccManifestPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asccp.AsccpPath;
@@ -54,7 +53,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.ascc</code>
+     * The reference instance of <code>ascc</code>
      */
     public static final Ascc ASCC = new Ascc();
 
@@ -67,32 +66,31 @@ public class Ascc extends TableImpl<AsccRecord> {
     }
 
     /**
-     * The column <code>oagi.ascc.ascc_id</code>. An internal, primary database
-     * key of an ASCC.
+     * The column <code>ascc.ascc_id</code>. An internal, primary database key
+     * of an ASCC.
      */
     public final TableField<AsccRecord, ULong> ASCC_ID = createField(DSL.name("ascc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "An internal, primary database key of an ASCC.");
 
     /**
-     * The column <code>oagi.ascc.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>ascc.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<AsccRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.ascc.cardinality_min</code>. Minimum occurrence of
-     * the TO_ASCCP_ID. The valid values are non-negative integer.
+     * The column <code>ascc.cardinality_min</code>. Minimum occurrence of the
+     * TO_ASCCP_ID. The valid values are non-negative integer.
      */
     public final TableField<AsccRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false), this, "Minimum occurrence of the TO_ASCCP_ID. The valid values are non-negative integer.");
 
     /**
-     * The column <code>oagi.ascc.cardinality_max</code>. Maximum cardinality of
-     * the TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1
-     * means unbounded. 0 means prohibited or not to use.
+     * The column <code>ascc.cardinality_max</code>. Maximum cardinality of the
+     * TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1 means
+     * unbounded. 0 means prohibited or not to use.
      */
     public final TableField<AsccRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.nullable(false), this, "Maximum cardinality of the TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.");
 
     /**
-     * The column <code>oagi.ascc.seq_key</code>. @deprecated since 2.0.0. This
+     * The column <code>ascc.seq_key</code>. @deprecated since 2.0.0. This
      * indicates the order of the associations among other siblings. A valid
      * value is positive integer. The SEQ_KEY at the CC side is localized. In
      * other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs
@@ -101,21 +99,21 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, Integer> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "@deprecated since 2.0.0. This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again.");
 
     /**
-     * The column <code>oagi.ascc.from_acc_id</code>. FROM_ACC_ID is a foreign
-     * key pointing to an ACC record. It is basically pointing to a parent data
+     * The column <code>ascc.from_acc_id</code>. FROM_ACC_ID is a foreign key
+     * pointing to an ACC record. It is basically pointing to a parent data
      * element (type) of the TO_ASCCP_ID.
      */
     public final TableField<AsccRecord, ULong> FROM_ACC_ID = createField(DSL.name("from_acc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "FROM_ACC_ID is a foreign key pointing to an ACC record. It is basically pointing to a parent data element (type) of the TO_ASCCP_ID.");
 
     /**
-     * The column <code>oagi.ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign
-     * key to an ASCCP table record. It is basically pointing to a child data
-     * element of the FROM_ACC_ID. 
+     * The column <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
+     * an ASCCP table record. It is basically pointing to a child data element
+     * of the FROM_ACC_ID. 
      */
     public final TableField<AsccRecord, ULong> TO_ASCCP_ID = createField(DSL.name("to_asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "TO_ASCCP_ID is a foreign key to an ASCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. ");
 
     /**
-     * The column <code>oagi.ascc.definition</code>. This is a documentation or
+     * The column <code>ascc.definition</code>. This is a documentation or
      * description of the ASCC. Since ASCC is business context independent, this
      * is a business context independent description of the ASCC. Since there
      * are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID
@@ -126,27 +124,27 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID column) and the ACC under that ASCCP, definition in the ASCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the ASCCP.");
 
     /**
-     * The column <code>oagi.ascc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * The column <code>ascc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public final TableField<AsccRecord, String> DEFINITION_SOURCE = createField(DSL.name("definition_source"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is typically a URL identifying the source of the DEFINITION column.");
 
     /**
-     * The column <code>oagi.ascc.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * The column <code>ascc.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public final TableField<AsccRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).");
 
     /**
-     * The column <code>oagi.ascc.replacement_ascc_id</code>. This refers to a
+     * The column <code>ascc.replacement_ascc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public final TableField<AsccRecord, ULong> REPLACEMENT_ASCC_ID = createField(DSL.name("replacement_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This refers to a replacement if the record is deprecated.");
 
     /**
-     * The column <code>oagi.ascc.created_by</code>. A foreign key to the
-     * APP_USER table referring to the user who creates the entity.
+     * The column <code>ascc.created_by</code>. A foreign key to the APP_USER
+     * table referring to the user who creates the entity.
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -155,9 +153,9 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key to the APP_USER table referring to the user who creates the entity.\n\nThis column never change between the history and the current record for a given revision. The history record should have the same value as that of its current record.");
 
     /**
-     * The column <code>oagi.ascc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * The column <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -165,7 +163,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
-     * The column <code>oagi.ascc.last_updated_by</code>. A foreign key to the
+     * The column <code>ascc.last_updated_by</code>. A foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -174,7 +172,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key to the APP_USER table referring to the last user who has updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).");
 
     /**
-     * The column <code>oagi.ascc.creation_timestamp</code>. Timestamp when the
+     * The column <code>ascc.creation_timestamp</code>. Timestamp when the
      * revision of the ASCC was created. 
      * 
      * This never change for a revision.
@@ -182,8 +180,8 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the ASCC was created. \n\nThis never change for a revision.");
 
     /**
-     * The column <code>oagi.ascc.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * The column <code>ascc.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -192,24 +190,24 @@ public class Ascc extends TableImpl<AsccRecord> {
     public final TableField<AsccRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.\n\nThe value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the change has occurred.");
 
     /**
-     * The column <code>oagi.ascc.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the BCC.
+     * The column <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCC.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
-    public final TableField<AsccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the BCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
+    public final TableField<AsccRecord, String> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Deleted, WIP, Draft, QA, Candidate, Production, Release Draft, Published. This the revision life cycle state of the ASCC.\n\nState change can't be undone. But the history record can still keep the records of when the state was changed.");
 
     /**
-     * The column <code>oagi.ascc.prev_ascc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * The column <code>ascc.prev_ascc_id</code>. A self-foreign key to indicate
+     * the previous history record.
      */
     public final TableField<AsccRecord, ULong> PREV_ASCC_ID = createField(DSL.name("prev_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the previous history record.");
 
     /**
-     * The column <code>oagi.ascc.next_ascc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * The column <code>ascc.next_ascc_id</code>. A self-foreign key to indicate
+     * the next history record.
      */
     public final TableField<AsccRecord, ULong> NEXT_ASCC_ID = createField(DSL.name("next_ascc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A self-foreign key to indicate the next history record.");
 
@@ -222,21 +220,21 @@ public class Ascc extends TableImpl<AsccRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.ascc</code> table reference
+     * Create an aliased <code>ascc</code> table reference
      */
     public Ascc(String alias) {
         this(DSL.name(alias), ASCC);
     }
 
     /**
-     * Create an aliased <code>oagi.ascc</code> table reference
+     * Create an aliased <code>ascc</code> table reference
      */
     public Ascc(Name alias) {
         this(alias, ASCC);
     }
 
     /**
-     * Create a <code>oagi.ascc</code> table reference
+     * Create a <code>ascc</code> table reference
      */
     public Ascc() {
         this(DSL.name("ascc"), null);
@@ -277,7 +275,7 @@ public class Ascc extends TableImpl<AsccRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -303,8 +301,8 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AppUserPath _asccCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>ascc_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>ascc_created_by_fk</code> key.
      */
     public AppUserPath asccCreatedByFk() {
         if (_asccCreatedByFk == null)
@@ -316,7 +314,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AccPath _acc;
 
     /**
-     * Get the implicit join path to the <code>oagi.acc</code> table.
+     * Get the implicit join path to the <code>acc</code> table.
      */
     public AccPath acc() {
         if (_acc == null)
@@ -328,8 +326,8 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AppUserPath _asccLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>ascc_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>ascc_last_updated_by_fk</code> key.
      */
     public AppUserPath asccLastUpdatedByFk() {
         if (_asccLastUpdatedByFk == null)
@@ -341,7 +339,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccPath _asccNextAsccIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc</code> table, via the
+     * Get the implicit join path to the <code>ascc</code> table, via the
      * <code>ascc_next_ascc_id_fk</code> key.
      */
     public AsccPath asccNextAsccIdFk() {
@@ -354,8 +352,8 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AppUserPath _asccOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>ascc_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>ascc_owner_user_id_fk</code> key.
      */
     public AppUserPath asccOwnerUserIdFk() {
         if (_asccOwnerUserIdFk == null)
@@ -367,7 +365,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccPath _asccPrevAsccIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc</code> table, via the
+     * Get the implicit join path to the <code>ascc</code> table, via the
      * <code>ascc_prev_ascc_id_fk</code> key.
      */
     public AsccPath asccPrevAsccIdFk() {
@@ -380,7 +378,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccPath _asccReplacementAsccIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc</code> table, via the
+     * Get the implicit join path to the <code>ascc</code> table, via the
      * <code>ascc_replacement_ascc_id_fk</code> key.
      */
     public AsccPath asccReplacementAsccIdFk() {
@@ -393,7 +391,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccpPath _asccp;
 
     /**
-     * Get the implicit join path to the <code>oagi.asccp</code> table.
+     * Get the implicit join path to the <code>asccp</code> table.
      */
     public AsccpPath asccp() {
         if (_asccp == null)
@@ -405,8 +403,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccBiztermPath _asccBizterm;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc_bizterm</code>
-     * table
+     * Get the implicit to-many join path to the <code>ascc_bizterm</code> table
      */
     public AsccBiztermPath asccBizterm() {
         if (_asccBizterm == null)
@@ -418,7 +415,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     private transient AsccManifestPath _asccManifest;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc_manifest</code>
+     * Get the implicit to-many join path to the <code>ascc_manifest</code>
      * table
      */
     public AsccManifestPath asccManifest() {

@@ -305,3 +305,34 @@
   line-height: 1.2;
   color: #c62828;
 }
+
+/* The controls of an endpoint in the compact layout: as many in a line as there is room for. */
+.compact-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px 16px;
+  align-items: start;
+}
+
+.compact-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.compact-label {
+  font-size: 12px;
+  color: #767676;
+}
+
+.compact-checks {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 4px 24px;
+}
+
+.compact-checks .compact-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}

@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperation.OasOperationPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasOperationSecurityScope.OasOperationSecurityScopePath;
@@ -49,7 +49,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_operation_security</code>
+     * The reference instance of <code>oas_operation_security</code>
      */
     public static final OasOperationSecurity OAS_OPERATION_SECURITY = new OasOperationSecurity();
 
@@ -62,62 +62,59 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     }
 
     /**
-     * The column
-     * <code>oagi.oas_operation_security.oas_operation_security_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_operation_security.oas_operation_security_id</code>.
+     * The primary key of the record.
      */
     public final TableField<OasOperationSecurityRecord, ULong> OAS_OPERATION_SECURITY_ID = createField(DSL.name("oas_operation_security_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_operation_security.guid</code>. The GUID of the
+     * The column <code>oas_operation_security.guid</code>. The GUID of the
      * record.
      */
     public final TableField<OasOperationSecurityRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_operation_security.oas_operation_id</code>. The
+     * The column <code>oas_operation_security.oas_operation_id</code>. The
      * owning operation; one entry of the operation's security array (overrides
      * the document-level security).
      */
     public final TableField<OasOperationSecurityRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning operation; one entry of the operation's security array (overrides the document-level security).");
 
     /**
-     * The column <code>oagi.oas_operation_security.requirement_group</code>.
-     * Index of the Security Requirement Object within the security array (OR).
-     * Rows sharing a group are ANDed into one requirement object.
+     * The column <code>oas_operation_security.requirement_group</code>. Index
+     * of the Security Requirement Object within the security array (OR). Rows
+     * sharing a group are ANDed into one requirement object.
      */
     public final TableField<OasOperationSecurityRecord, Integer> REQUIREMENT_GROUP = createField(DSL.name("requirement_group"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "Index of the Security Requirement Object within the security array (OR). Rows sharing a group are ANDed into one requirement object.");
 
     /**
-     * The column
-     * <code>oagi.oas_operation_security.oas_security_scheme_id</code>. FK to
-     * oas_security_scheme. The scheme this entry references (its scheme_name is
-     * the components.securitySchemes key). NULL marks an empty requirement
+     * The column <code>oas_operation_security.oas_security_scheme_id</code>. FK
+     * to oas_security_scheme. The scheme this entry references (its scheme_name
+     * is the components.securitySchemes key). NULL marks an empty requirement
      * object {} (anonymous / optional).
      */
     public final TableField<OasOperationSecurityRecord, ULong> OAS_SECURITY_SCHEME_ID = createField(DSL.name("oas_security_scheme_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "FK to oas_security_scheme. The scheme this entry references (its scheme_name is the components.securitySchemes key). NULL marks an empty requirement object {} (anonymous / optional).");
 
     /**
-     * The column <code>oagi.oas_operation_security.created_by</code>. The user
-     * who creates the record.
+     * The column <code>oas_operation_security.created_by</code>. The user who
+     * creates the record.
      */
     public final TableField<OasOperationSecurityRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_operation_security.last_updated_by</code>. The
-     * user who last updates the record.
+     * The column <code>oas_operation_security.last_updated_by</code>. The user
+     * who last updates the record.
      */
     public final TableField<OasOperationSecurityRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_operation_security.creation_timestamp</code>.
-     * The timestamp when the record is created.
+     * The column <code>oas_operation_security.creation_timestamp</code>. The
+     * timestamp when the record is created.
      */
     public final TableField<OasOperationSecurityRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column
-     * <code>oagi.oas_operation_security.last_update_timestamp</code>. The
+     * The column <code>oas_operation_security.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasOperationSecurityRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -131,23 +128,21 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     }
 
     /**
-     * Create an aliased <code>oagi.oas_operation_security</code> table
-     * reference
+     * Create an aliased <code>oas_operation_security</code> table reference
      */
     public OasOperationSecurity(String alias) {
         this(DSL.name(alias), OAS_OPERATION_SECURITY);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_operation_security</code> table
-     * reference
+     * Create an aliased <code>oas_operation_security</code> table reference
      */
     public OasOperationSecurity(Name alias) {
         this(alias, OAS_OPERATION_SECURITY);
     }
 
     /**
-     * Create a <code>oagi.oas_operation_security</code> table reference
+     * Create a <code>oas_operation_security</code> table reference
      */
     public OasOperationSecurity() {
         this(DSL.name("oas_operation_security"), null);
@@ -188,7 +183,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -214,8 +209,8 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     private transient AppUserPath _oasOperationSecurityCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_operation_security_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_operation_security_created_by_fk</code> key.
      */
     public AppUserPath oasOperationSecurityCreatedByFk() {
         if (_oasOperationSecurityCreatedByFk == null)
@@ -227,8 +222,8 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     private transient AppUserPath _oasOperationSecurityLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_operation_security_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_operation_security_last_updated_by_fk</code> key.
      */
     public AppUserPath oasOperationSecurityLastUpdatedByFk() {
         if (_oasOperationSecurityLastUpdatedByFk == null)
@@ -240,7 +235,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     private transient OasOperationPath _oasOperation;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_operation</code> table.
+     * Get the implicit join path to the <code>oas_operation</code> table.
      */
     public OasOperationPath oasOperation() {
         if (_oasOperation == null)
@@ -252,8 +247,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     private transient OasSecuritySchemePath _oasSecurityScheme;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_security_scheme</code>
-     * table.
+     * Get the implicit join path to the <code>oas_security_scheme</code> table.
      */
     public OasSecuritySchemePath oasSecurityScheme() {
         if (_oasSecurityScheme == null)
@@ -266,7 +260,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security_scope</code> table
+     * <code>oas_operation_security_scope</code> table
      */
     public OasOperationSecurityScopePath oasOperationSecurityScope() {
         if (_oasOperationSecurityScope == null)

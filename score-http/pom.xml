@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.15</version>
+        <version>4.1.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -56,62 +56,53 @@
         <!-- CI-friendly version (used by <version>${revision}</version> above).
              Keep this in sync with the VERSION file, which is the single source of truth.
              docker/build.sh overrides it for release builds via -Drevision="$(cat VERSION)". -->
-        <revision>3.5.2</revision>
+        <revision>3.6.0</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
-        <db.url>jdbc:mariadb://localhost:3306/oagi</db.url>
-        <db.user>oagi</db.user>
-        <db.password>oagi</db.password>
-
         <cglib.version>3.3.0</cglib.version>
-        <aspectj.version>1.9.25.1</aspectj.version>
-        <lettuce.version>6.8.2.RELEASE</lettuce.version>
-        <redisson.version>3.52.0</redisson.version>
-        <netty.version>4.2.15.Final</netty.version>
-        <lombok.version>1.18.46</lombok.version>
-        <mariadb-client.version>3.5.9</mariadb-client.version>
-        <log4j.version>2.25.4</log4j.version>
-        <jOOQ.version>3.20.17</jOOQ.version>
-        <guava.version>33.5.0-jre</guava.version>
-        <gson.version>2.13.2</gson.version>
+        <aspectj.version>1.9.26</aspectj.version>
+        <!-- lettuce/netty versions are managed by the Spring Boot 4 BOM (pins removed for #1750). -->
+        <redisson.version>4.8.0</redisson.version>
+        <lombok.version>1.18.48</lombok.version>
+        <mariadb-client.version>3.5.11</mariadb-client.version>
+        <log4j.version>2.26.1</log4j.version>
+        <jOOQ.version>3.21.9</jOOQ.version>
+        <guava.version>33.7.2-jre</guava.version>
+        <gson.version>2.15.0</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
-        <commons-io.version>2.21.0</commons-io.version>
-        <commons-lang.version>3.20.0</commons-lang.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <commons-lang.version>3.21.0</commons-lang.version>
         <commons-text.version>1.15.0</commons-text.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <fastods.version>0.8.1</fastods.version>
         <poi.version>5.5.1</poi.version>
-        <plantuml.version>1.2026.6</plantuml.version>
-        <springdoc.version>2.8.17</springdoc.version>
-        <snakeyaml.version>2.6</snakeyaml.version>
-        <json-schema-validator.version>2.0.2</json-schema-validator.version>
-        <saxon.version>10.6</saxon.version>
+        <plantuml.version>1.2026.9</plantuml.version>
+        <springdoc.version>3.2.0</springdoc.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
+        <json-schema-validator.version>2.0.8</json-schema-validator.version>
+        <saxon.version>10.9</saxon.version>
         <xsom.version>4.0.9</xsom.version>
-        <spring-ai.version>1.1.8</spring-ai.version>
+        <spring-ai.version>2.0.2</spring-ai.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-properties-migrator</artifactId>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+            <artifactId>spring-boot-starter-security-oauth2-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -123,23 +114,36 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-messaging</artifactId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <artifactId>spring-security-webauthn</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <!-- Spring Boot 4 modularized the cache auto-configuration (CacheAutoConfiguration, spring.cache.*)
+             into spring-boot-cache. Caffeine is the local provider it selects with spring.cache.type=caffeine. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <!-- Spring Boot 4 modularized autoconfiguration: JooqAutoConfiguration (the DSLContext bean)
+             moved out of spring-boot-autoconfigure into the spring-boot-jooq module. starter-jooq
+             pulls that autoconfig + starter-jdbc (#1750). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -148,6 +152,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- RestClient/RestTemplate is no longer implied by the web starter in Spring Boot 4 (#1750). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -161,17 +170,30 @@
             <version>${springdoc.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-        <!-- Model Context Protocol (MCP) -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-ollama</artifactId>
+            <exclusions>
+                <!-- TEMPORARY: remove this exclusion once Spring AI ships a release whose
+                     spring-ai-client-chat depends on MCP Java SDK (mcp-core) 1.0.0 or later.
+                     Why: spring-ai-client-chat 1.1.8 declares mcp-json-jackson2 -> mcp-core 0.18.3 in
+                     its pom, but none of its classes use the SDK (verified by scanning the jar), so
+                     the SDK is dead weight here. mcp-core 0.18.3 has CVE-2026-35568 (DNS rebinding,
+                     fixed in 1.0.0), which Trivy flags in the WAR. We do not use MCP anywhere in
+                     score-http, and spring-ai-starter-mcp-client was removed for the same reason.
+                     Do NOT re-add that starter with this exclusion: its auto-configuration needs the
+                     SDK classes and the application fails to start (NoClassDefFoundError: McpSchema$Tool).
+                     When upgrading Spring AI: drop this block, run
+                     `mvn dependency:tree -Dincludes=io.modelcontextprotocol.sdk`, and rescan with Trivy;
+                     if mcp-core is >= 1.0.0 (or absent) the exclusion is no longer needed. -->
+                <exclusion>
+                    <groupId>io.modelcontextprotocol.sdk</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Support AOP -->
@@ -225,17 +247,11 @@
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
-            <version>${lettuce.version}</version>
         </dependency>
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
             <version>${redisson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>${netty.version}</version>
         </dependency>
 
         <dependency>
@@ -373,25 +389,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.11.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.reporting</groupId>
                         <artifactId>maven-reporting-impl</artifactId>
-                        <version>4.0.0-M3</version>
+                        <version>4.0.0</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.maven.reporting</groupId>
                         <artifactId>maven-reporting-api</artifactId>
-                        <version>4.0.0-M4</version>
+                        <version>4.1.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -429,7 +451,9 @@
 
                         <database>
                             <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
-                            <inputSchema>oagi</inputSchema>
+                            <inputSchema>${db.name}</inputSchema>
+                            <!-- generate into the default schema, so the generated code carries no database name -->
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
                             <includes>.*</includes>
                             <excludes></excludes>
                         </database>
@@ -451,8 +475,34 @@
                 <spring-boot.run.profiles>dev</spring-boot.run.profiles>
                 <spring-boot.run.fork>true</spring-boot.run.fork>
                 <spring-boot.run.addResources>true</spring-boot.run.addResources>
-                <spring-boot.run.jvmArguments>-Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true</spring-boot.run.jvmArguments>
+                <spring-boot.run.jvmArguments>-Dspring.devtools.restart.enabled=true</spring-boot.run.jvmArguments>
             </properties>
+        </profile>
+
+        <!-- macOS dev only: supply Netty's native macOS DNS resolver so Lettuce/Redisson stop logging
+             "Unable to load ...MacOSDnsServerAddressStreamProvider, fallback to system defaults".
+             Runtime scope + os=mac activation keeps it OUT of the Linux production WAR. Both classifiers
+             are listed so it works on Apple-Silicon and Intel Macs (the non-matching jar is inert).
+             Version is managed by the Spring Boot 4.1 / Netty BOM. -->
+        <profile>
+            <id>macos-netty-dns</id>
+            <activation>
+                <os><family>mac</family></os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-resolver-dns-native-macos</artifactId>
+                    <classifier>osx-aarch_64</classifier>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-resolver-dns-native-macos</artifactId>
+                    <classifier>osx-x86_64</classifier>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

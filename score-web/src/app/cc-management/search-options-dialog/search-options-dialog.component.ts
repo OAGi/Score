@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {SearchOptions} from './domain/search-options';
 import {SearchOptionsService} from './domain/search-options-service';
@@ -7,6 +7,7 @@ import {SearchOptionsService} from './domain/search-options-service';
   standalone: false,
   selector: 'score-search-options-dialog',
   templateUrl: './search-options-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./search-options-dialog.component.css']
 })
 export class SearchOptionsDialogComponent implements OnInit {

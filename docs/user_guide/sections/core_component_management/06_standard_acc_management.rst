@@ -454,6 +454,42 @@ Both ACC4 and ACC2 are affected as Property1 has to also be removed from ACC2.
 The refactored property is inserted at the bottom of the property sequence in the target ACC.
 In the above example, Property1 is inserted as the last property of ACC1.
 
+Validate an ACC
+^^^^^^^^^^^^^^^
+
+An ACC can be checked for problems at any time, before it is published or released, so that they do not first show up in the Release validation.
+The check is read-only: it does not change the ACC, and it can be run on an ACC in any state, owned by anyone.
+
+1. On the `ACC detail page <#view-detail-of-an-acc>`__, click on the ellipsis next to the root node of the ACC tree and select "Validate".
+
+2. If nothing is found, the message "No issues found" is shown. Otherwise, the validation panel opens at the bottom of the page and lists the problems.
+
+   1. Each problem has an icon for its severity (error, warning or information) and a message. The links under the message are the nodes involved. Click on one to go to the node in the tree.
+
+   2. The nodes involved in a problem are marked in the tree with the icon of their most serious problem. Hover over the icon to read the message, or click on it to show the problem in the panel.
+
+   3. When the panel is closed, a button on the root node shows that problems remain. Click on it to open the panel again.
+
+   4. After the ACC is edited, the results are dimmed and the message "Results may be outdated" is shown. Select "Validate" again to refresh them.
+
+The validation covers, among other things, the cardinalities, the attributes and the based ACC (for example, a cycle in the base ACCs) of the ACC.
+In particular, it reports a *duplicate property* – two properties with the same property term that make the content of the ACC ambiguous.
+Duplicates are reported in three cases:
+
+- the property term is used by more than one association of this ACC;
+- the property term is used by this ACC and also by one of its base ACCs;
+- the property term is brought in through a group (a *Semantic Group* ACC), and this ACC or its base ACC already has it.
+
+Both properties of a duplicate are listed in the problem, as "first occurrence" and "conflicts with".
+
+The same "Validate" menu item is available on the root node of the ASCCP, BCCP, BDT and OAGi Extension detail pages. Those pages check the attributes of the component (for example, a BCCP with a fixed value must not be nillable) and warn when it refers to a deprecated ACC or data type; the duplicate property check is made on ACCs only.
+
+**Checks before a change**: the effect of a change on other ACCs is checked before the change is made.
+When the user sets a based ACC, appends a property to an ACC, or refactors a property, every ACC that the change reaches is checked (the ACC itself, the ACCs derived from it directly or indirectly, and, when it is a *Semantic Group*, the ACCs that contain it), and only the problems that the change would newly introduce are shown.
+If the change would introduce problems, the validation panel opens with them, together with the number of ACCs checked, and asks "Make the change all the same?".
+Click "Cancel" (or close the panel) to leave the ACC as it is, or "Proceed anyway" to make the change.
+If the change would break nothing, it is made without asking.
+
 Cancel an ACC revision
 ^^^^^^^^^^^^^^^^^^^^^^
 

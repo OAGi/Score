@@ -5,7 +5,6 @@ import {
   ContextSchemeCreateRequest,
   ContextSchemeDetails,
   ContextSchemeListEntry,
-  ContextSchemeListRequest,
   ContextSchemeSummary,
   ContextSchemeUpdateRequest,
   ContextSchemeValue,
@@ -27,26 +26,7 @@ export class ContextSchemeService {
     return this.http.get<ContextSchemeValueSummary[]>('/api/context-schemes/values/summaries');
   }
 
-  getContextSchemeList(request: ContextSchemeListRequest): Observable<PageResponse<ContextSchemeListEntry>> {
-    let params = new HttpParams()
-        .set('pageIndex', '' + request.page.pageIndex)
-        .set('pageSize', '' + request.page.pageSize);
-
-    if (!!request.page.sortActive && !!request.page.sortDirection) {
-      params = params.set('orderBy', ((request.page.sortDirection === 'desc') ? '-' : '+') + request.page.sortActive);
-    }
-    if (request.updaterLoginIdList.length > 0) {
-      params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
-    }
-    if (!!request.updatedDate.start || !!request.updatedDate.end) {
-      params = params.set('lastUpdatedOn',
-          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
-          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
-    }
-    if (request.filters.name) {
-      params = params.set('name', request.filters.name);
-    }
-
+  getContextSchemeList(params: HttpParams): Observable<PageResponse<ContextSchemeListEntry>> {
     return this.http.get<PageResponse<ContextSchemeListEntry>>('/api/context-schemes', {params}).pipe(
         map((res: PageResponse<ContextSchemeListEntry>) => ({
           ...res,

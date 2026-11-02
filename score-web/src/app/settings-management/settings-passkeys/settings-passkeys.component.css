@@ -1,0 +1,74 @@
+.passkeys-intro, .passkeys-empty {
+  color: #666;
+  font-size: 14px;
+}
+
+.passkeys-loading {
+  padding: 8px 0;
+}
+
+.passkey-row {
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.passkey-icon {
+  color: #666;
+  flex: none;
+}
+
+.passkey-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.passkey-label {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passkey-meta {
+  color: #666;
+  font-size: 13px;
+}
+
+.passkey-chip {
+  background: #eef2f6;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 8px;
+  padding: 1px 6px;
+}
+
+.passkey-chip-warn {
+  background: #fff3e0;
+  color: #8a5300;
+}
+
+.passkey-rename, .passkey-add {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.passkey-add {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+}
+
+.passkey-label-input {
+  max-width: 320px;
+  width: 100%;
+}
+
+.passkey-name {
+  color: #666;
+  font-size: 13px;
+  font-weight: 400;
+  margin-left: 8px;
+}

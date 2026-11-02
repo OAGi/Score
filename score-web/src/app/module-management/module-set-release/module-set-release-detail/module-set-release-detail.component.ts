@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -25,6 +25,7 @@ import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
   standalone: false,
   selector: 'score-module-set-detail',
   templateUrl: './module-set-release-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-release-detail.component.css']
 })
 export class ModuleSetReleaseDetailComponent implements OnInit {

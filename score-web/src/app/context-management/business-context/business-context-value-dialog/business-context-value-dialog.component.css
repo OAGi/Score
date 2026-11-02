@@ -1,32 +1,14 @@
-.mat-mdc-dialog-content {
+.value-cards {
   display: flex;
   flex-direction: row;
 }
 
-.mat-mdc-dialog-content > mat-card {
+.value-cards > mat-card {
   width: 33%;
   padding: 0 8px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
-.mat-mdc-card-container .mat-mdc-card {
+.value-cards > mat-card.me-2 {
   margin-right: 10px;
-  margin-top: 3px;
-}
-
-.mat-mdc-card-container .mat-mdc-card:last-child {
-  margin-top: 3px;
-}
-
-.header {
-  padding-top: 8px;
-}
-
-.actions {
-  bottom: 0;
-  left: 0;
-  overflow: visible;
-  width: 100%;
-  opacity: 1;
-  padding: 0 24px 16px;
 }

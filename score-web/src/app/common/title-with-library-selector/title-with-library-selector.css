@@ -5,3 +5,28 @@
 .subtitle {
   line-height: 20px;
 }
+
+/* In a toolbar that is too narrow for the title, the library and the buttons of the page, the title is what gives way: it is cut, with an
+   ellipsis, and the rest stays whole. (The styles of this component are global: they are tied to its element.) */
+score-title-with-library-selector {
+  min-width: 0;
+}
+
+score-title-with-library-selector .d-flex {
+  min-width: 0;
+}
+
+score-title-with-library-selector .d-flex.flex-column {
+  flex: 0 1 auto;
+}
+
+score-title-with-library-selector .title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+score-title-with-library-selector .library-divider,
+score-title-with-library-selector score-column-selector {
+  flex: 0 0 auto;
+}

@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {
   OasSecurityRequirement,
@@ -25,6 +25,7 @@ export interface OasDocSecurityRequirementDialogData {
   standalone: false,
   selector: 'score-oas-doc-security-requirement-dialog',
   templateUrl: './oas-doc-security-requirement-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-security-requirement-dialog.component.css']
 })
 export class OasDocSecurityRequirementDialogComponent {

@@ -16,3 +16,5 @@ connectCenter User Guide
 .. include:: sections/multi_tenant_management.rst
 
 .. include:: sections/github_integration.rst
+
+.. include:: sections/passkeys.rst

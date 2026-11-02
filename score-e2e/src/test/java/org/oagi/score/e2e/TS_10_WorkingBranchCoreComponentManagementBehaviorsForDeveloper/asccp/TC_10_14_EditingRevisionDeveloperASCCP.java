@@ -15,7 +15,6 @@ import org.oagi.score.e2e.page.core_component.ASCCPChangeACCDialog;
 import org.oagi.score.e2e.page.core_component.ASCCPViewEditPage;
 import org.oagi.score.e2e.page.core_component.ViewEditCoreComponentPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -218,8 +217,6 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp_not_reusable.getAsccpManifestId());
         WebElement asccNodeNotReusable = asccpViewEditPage.getNodeByPath("/" + asccp_not_reusable.getPropertyTerm());
         asccpPanel = asccpViewEditPage.getASCCPanelContainer(asccNodeNotReusable).getASCCPPanel();
-        ASCCPViewEditPage.ASCCPPanel finalAsccpPanel = asccpPanel;
-        assertThrows(ElementClickInterceptedException.class, () -> finalAsccpPanel.toggleReusable());
         assertNotChecked(asccpPanel.getReusableCheckbox());
         assertDisabled(asccpPanel.getReusableCheckbox());
         asccpViewEditPage.hitReviseButton();
@@ -481,7 +478,7 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         ASCCPViewEditPage finalAsccpViewEditPage = asccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalAsccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
 
     }
 
@@ -550,6 +547,8 @@ public class TC_10_14_EditingRevisionDeveloperASCCP extends BaseTest {
         asccpViewEditPage = viewEditCoreComponentPage.openASCCPViewEditPageByManifestID(asccp.getAsccpManifestId());
         WebElement bccpNode = asccpViewEditPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + acc_association.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ASCCPViewEditPage.BCCPPanel bccpPanel = asccpViewEditPage.getBCCPanelContainer(bccpNode).getBCCPPanel();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> "BCCP".equals(getText(bccpPanel.getCoreComponentField())));
         assertFalse(bccpPanel.getCoreComponentField().isEnabled());
         assertEquals("BCCP", getText(bccpPanel.getCoreComponentField()));
         assertFalse(bccpPanel.getReleaseField().isEnabled());

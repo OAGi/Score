@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -14,6 +15,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_1.a")
     public void selected_asccp_can_be_in_any_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -69,7 +72,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -92,6 +94,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_1.b")
     public void warning_shall_be_given_if_the_asccp_is_deprecated() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -133,10 +136,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_1.c")
     public void acc_shall_not_already_contain_an_asccp_or_bccp_with_the_same_property_term() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -156,7 +160,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendASCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
         appendASCCPDialog.selectAssociation("Account Identifiers. Named Identifiers");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -174,6 +178,43 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_1.g")
+    public void validation_panel_asks_before_appending_an_association_that_would_duplicate_a_property_term() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        ACCObject acc = getAPIFactory().getCoreComponentAPI().createRandomACC(endUser, release, namespace, "WIP");
+        BCCPObject bccp = getAPIFactory().getCoreComponentAPI().getBCCPByDENAndReleaseNum(
+                library, "Accrued Amount. Open_ Amount", branch);
+        getAPIFactory().getCoreComponentAPI().appendBCC(acc, bccp, "WIP");
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
+        appendBCCPDialog.selectAssociation(bccp.getDen());
+
+        List<String> messages = getValidationPanelMessages(getDriver());
+        assertTrue(messages.stream().anyMatch(message -> message.contains(bccp.getPropertyTerm())));
+
+        click(getValidationCancelButton(getDriver()));
+        assertFalse(isValidationDecisionDisplayed(getDriver()));
+
+        // Cancel appends nothing
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertTrue(accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp.getPropertyTerm()).isDisplayed());
+        String xpathExpr = "//div[contains(@class, \"mat-tree-node\")][contains(., \"" + bccp.getPropertyTerm() + "\")]";
+        assertEquals(1, getDriver().findElements(By.xpath(xpathExpr)).size());
+    }
+
+    @Test
+    @DisplayName("TC_15_8_TA_1.d")
     public void resulting_ascc_shall_be_in_the_wip_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -198,6 +239,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_1.e")
     public void if_the_asccp_is_not_reusable_check_that_there_is_no_ascc_already_using() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -276,6 +318,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_2")
     public void end_user_can_click_on_any_associations_and_insert_an_asccp_before_or_after() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -301,11 +344,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -319,6 +362,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.a")
     public void min_0() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -367,6 +411,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.b")
     public void max_1_and_max_min_when_max_1() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -421,7 +466,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         asccPanel.setCardinalityMaxField("222");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
         click(elementToBeClickable(getDriver(), By.xpath(
                 "//mat-dialog-container//span[contains(text(), \"Update anyway\")]//ancestor::button[1]")));
 
@@ -429,6 +474,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.c")
     public void user_may_type_in_unbounded_in_place_of_1_for_max_if_the_user() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -476,6 +522,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.d")
     public void min_max_and_deprecated_are_required() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -526,6 +573,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.e")
     public void warning_should_be_given_when_the_definition_is_empty() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -572,10 +620,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         asccPanel.setCardinalityMaxField("111");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_3.f")
     public void deprecated_must_be_false_and_locked_because_it_is_a_new_association_it_shouldn() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -621,6 +670,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_4.a")
     public void selected_bccp_can_be_in_any_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -640,7 +690,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -663,6 +712,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_4.b")
     public void warning_shall_be_given_if_the_bccp_is_deprecated() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -714,10 +764,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPEND_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_4.c")
     public void added_bccp_shall_not_cause_a_property_uniqueness_violation_to_the_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -745,11 +796,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         SelectAssociationDialog appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
+        appendBCCPDialog.selectAssociation("Accrued Amount. Open_ Amount");
 
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Accrued Amount");
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        appendBCCPDialog.selectAssociation("Accrued Amount. Open_ Amount");
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -768,6 +819,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_4.d")
     public void resulting_bcc_shall_be_in_the_wip_state() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -804,6 +856,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_5")
     public void end_user_can_right_click_on_any_associations_and_insert_a_bccp_before_or() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -856,10 +909,13 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_after.getPropertyTerm());
         ACCViewEditPage.BCCPPanel bccp_after_panel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPPanel();
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> bccp_after.getDen().equals(getText(bccp_after_panel.getDENField())));
         assertEquals(bccp_after.getDen(), getText(bccp_after_panel.getDENField()));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.a")
     public void min_0_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -906,6 +962,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.b")
     public void max_1_and_max_min_when_max_1_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -955,6 +1012,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.c")
     public void user_may_type_in_unbounded_in_place_of_1_for_max_if_the_user_scenario_2() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -994,6 +1052,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.d")
     public void all_fields_except_definition_and_definition_source_are_required_however_a_warning_should_be() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1038,10 +1097,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         bccPanel.setCardinalityMaxField("111");
         click(accViewEditPage.getUpdateButton(true));
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.e")
     public void deprecated_must_be_false_because_it_is_a_new_association_it_shouldn_t_be() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1074,10 +1134,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         WebElement bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/" + bccp_to_append.getPropertyTerm());
         ACCViewEditPage.BCCPanel bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
         assertNotChecked(bccPanel.getDeprecatedCheckbox());
-        assertDisabled(bccPanel.getDeprecatedCheckbox());
+        assertDisabled(() -> bccPanel.getDeprecatedCheckbox());
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.f")
     public void default_and_fixed_value_shall_be_disabled_and_cleared_of_value_if_the_entity() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1117,7 +1178,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Record Set Total");
+        appendBCCPDialog.selectAssociation("Record Set Total. Positive Integer Number_ Number");
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Record Set Total");
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
@@ -1139,6 +1200,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_6.g")
     public void editing_associations_of_a_brand_new_end_user_acc_if_the_entity_type_is() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1178,7 +1240,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Open Invoice Count. Number");
+        appendBCCPDialog.selectAssociation("Open Invoice Count. Positive Integer Number_ Number");
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Open Invoice Count");
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
@@ -1199,7 +1261,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
         appendBCCPDialog = accViewEditPage.appendPropertyAtLast("/" + acc.getDen());
-        appendBCCPDialog.selectAssociation("Confirmation Code. Code");
+        appendBCCPDialog.selectAssociation("Confirmation Code. Confirmation_ Code");
 
         bccNode = accViewEditPage.getNodeByPath("/" + acc.getDen() + "/Confirmation Code");
         bccPanel = accViewEditPage.getBCCPanelContainer(bccNode).getBCCPanel();
@@ -1209,17 +1271,146 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_7")
     public void end_user_can_change_move_up_or_down_the_sequence_of_an_association_to() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+        ACCObject associatedAccFirst = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+        ACCObject associatedAccSecond = coreComponentAPI.createRandomACC(endUser, release, namespace, "Production");
+        ASCCPObject asccpFirst = coreComponentAPI.createRandomASCCP(associatedAccFirst, endUser, namespace, "WIP");
+        ASCCPObject asccpSecond = coreComponentAPI.createRandomASCCP(associatedAccSecond, endUser, namespace, "WIP");
 
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.appendPropertyAtLast("/" + acc.getDen()).selectAssociation(asccpFirst.getDen());
+        accViewEditPage.appendPropertyAtLast("/" + acc.getDen()).selectAssociation(asccpSecond.getDen());
 
+        moveAssociationBefore(accViewEditPage, acc, asccpSecond.getPropertyTerm(), asccpFirst.getPropertyTerm());
+        waitForSequenceUpdate();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertAssociationOrder(accViewEditPage, acc, asccpSecond.getPropertyTerm(), asccpFirst.getPropertyTerm());
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_8")
     public void end_user_can_change_move_up_or_down_the_sequence_of_an_association_to_scenario_2() {
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        String branch = "10.8.7.1";
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, branch);
+        NamespaceObject namespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(endUser, library);
+        CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+        ACCObject acc = coreComponentAPI.createRandomACC(endUser, release, namespace, "WIP");
+        DTObject dataType = coreComponentAPI.getBDTByGuidAndReleaseNum(
+                library, "dd0c8f86b160428da3a82d2866a5b48d", release.getReleaseNumber());
+        BCCPObject bccpFirst = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
+        BCCPObject bccpSecond = coreComponentAPI.createRandomBCCP(release, dataType, endUser, namespace, "WIP");
 
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        ViewEditCoreComponentPage viewEditCoreComponentPage =
+                homePage.getCoreComponentMenu().openViewEditCoreComponentSubMenu();
+        ACCViewEditPage accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        accViewEditPage.appendPropertyAtLast("/" + acc.getDen()).selectAssociation(bccpFirst.getDen());
+        accViewEditPage.appendPropertyAtLast("/" + acc.getDen()).selectAssociation(bccpSecond.getDen());
+
+        moveAssociationAfter(accViewEditPage, acc, bccpFirst.getPropertyTerm(), bccpSecond.getPropertyTerm(), null);
+        waitForSequenceUpdate();
+        viewEditCoreComponentPage.openPage();
+        accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
+        assertAssociationOrder(accViewEditPage, acc, bccpSecond.getPropertyTerm(), bccpFirst.getPropertyTerm());
+    }
+
+    private void moveAssociationAfter(ACCViewEditPage page, ACCObject acc, String sourcePropertyTerm,
+                                      String targetPropertyTerm, String targetChildNodeName) {
+        page.getNodeByPath("/" + acc.getDen() + "/" + sourcePropertyTerm);
+        String targetPath = "/" + acc.getDen() + "/" + targetPropertyTerm;
+        if (targetChildNodeName != null) {
+            targetPath += "/" + targetChildNodeName;
+        }
+        page.getNodeByPath(targetPath);
+        List<WebElement> nodes = getDriver().findElements(By.cssSelector("div.mat-tree-node"));
+        WebElement source = findNodeContaining(nodes, sourcePropertyTerm);
+        WebElement target = findNodeContaining(nodes, targetPropertyTerm);
+        WebElement dragHandle = source.findElement(By.cssSelector(".dragHandle"));
+        Actions actions = new Actions(getDriver());
+        actions.moveToElement(dragHandle).perform();
+        actions.clickAndHold().perform();
+        actions.moveByOffset(0, 12).pause(Duration.ofMillis(300)).perform();
+        assertFalse(getDriver().findElements(By.cssSelector(".cdk-drag-dragging")).isEmpty(),
+                "Expected the association row to enter CDK dragging state");
+        actions.moveToElement(target, 0, Math.max(1, target.getSize().getHeight() / 2 - 2))
+                .pause(Duration.ofMillis(500)).perform();
+        actions.release().perform();
+    }
+
+    private void moveAssociationBefore(ACCViewEditPage page, ACCObject acc, String sourcePropertyTerm,
+                                       String targetPropertyTerm) {
+        page.getNodeByPath("/" + acc.getDen() + "/" + sourcePropertyTerm);
+        page.getNodeByPath("/" + acc.getDen() + "/" + targetPropertyTerm);
+        List<WebElement> nodes = getDriver().findElements(By.cssSelector("div.mat-tree-node"));
+        WebElement source = findNodeContaining(nodes, sourcePropertyTerm);
+        WebElement target = findNodeContaining(nodes, targetPropertyTerm);
+        WebElement dragHandle = source.findElement(By.cssSelector(".dragHandle"));
+        Actions actions = new Actions(getDriver());
+        actions.moveToElement(dragHandle).perform();
+        actions.clickAndHold().perform();
+        actions.moveByOffset(0, -12).pause(Duration.ofMillis(300)).perform();
+        assertFalse(getDriver().findElements(By.cssSelector(".cdk-drag-dragging")).isEmpty(),
+                "Expected the association row to enter CDK dragging state");
+        actions.moveToElement(target, 0, -Math.max(1, target.getSize().getHeight() / 2 - 2))
+                .pause(Duration.ofMillis(500)).perform();
+        actions.release().perform();
+    }
+
+    private void waitForSequenceUpdate() {
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), Duration.ofSeconds(10))
+                .until(driver -> driver.findElements(By.cssSelector(".mat-mdc-snack-bar-container"))
+                        .stream().anyMatch(snackBar -> snackBar.isDisplayed()
+                                && snackBar.getText().contains("Updated")));
+        waitForSnackBarToDisappear(getDriver());
+    }
+
+    private void assertAssociationOrder(ACCViewEditPage page, ACCObject acc, String firstPropertyTerm,
+                                       String secondPropertyTerm) {
+        page.getNodeByPath("/" + acc.getDen() + "/" + firstPropertyTerm);
+        page.getNodeByPath("/" + acc.getDen() + "/" + secondPropertyTerm);
+        List<WebElement> nodes = getDriver().findElements(By.cssSelector("div.mat-tree-node"));
+        int firstIndex = indexOfNodeContaining(nodes, firstPropertyTerm);
+        int secondIndex = indexOfNodeContaining(nodes, secondPropertyTerm);
+        assertTrue(firstIndex >= 0 && secondIndex >= 0 && firstIndex < secondIndex,
+                "Expected " + firstPropertyTerm + " to appear before " + secondPropertyTerm);
+    }
+
+    private int indexOfNodeContaining(List<WebElement> nodes, String propertyTerm) {
+        for (int i = 0; i < nodes.size(); i++) {
+            if (getText(nodes.get(i)).contains(propertyTerm)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private WebElement findNodeContaining(List<WebElement> nodes, String propertyTerm) {
+        for (WebElement node : nodes) {
+            if (getText(node).contains(propertyTerm)) {
+                return node;
+            }
+        }
+        throw new NoSuchElementException("Cannot locate tree node for property term: " + propertyTerm);
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_9")
     public void end_user_can_remove_an_association_ascc_or_bcc_that_has_no_reference_such() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1245,11 +1436,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
 
         appendASCCPDialog = accViewEditPage.insertPropertyBefore("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_before.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         appendASCCPDialog = accViewEditPage.insertPropertyAfter("/" + acc.getDen() + "/" + asccp.getPropertyTerm());
         appendASCCPDialog.selectAssociation(asccp_after.getDen());
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         viewEditCoreComponentPage.openPage();
         accViewEditPage = viewEditCoreComponentPage.openACCViewEditPageByManifestID(acc.getAccManifestId());
@@ -1261,6 +1452,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_10.a")
     public void new_based_acc_can_be_in_any_state() {
 
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
@@ -1284,7 +1476,6 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         ccStates.add("WIP");
         ccStates.add("QA");
         ccStates.add("Production");
-        ccStates.add("Deleted");
         RandomCoreComponentWithStateContainer randomCoreComponentWithStateContainer = new RandomCoreComponentWithStateContainer(endUser, release, namespace, ccStates);
 
         for (Map.Entry<String, ACCObject> entry : randomCoreComponentWithStateContainer.stateACCs.entrySet()) {
@@ -1311,6 +1502,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_10.b")
     public void if_the_chosen_based_acc_is_deprecated_a_warning_shall_be_given() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1363,10 +1555,11 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
 
         assertEquals("Confirmation required", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_10.c")
     public void based_acc_can_be_only_of_base_or_semantics_component_type() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1415,6 +1608,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_10.d")
     public void end_user_cannot_change_the_fields_of_the_base_acc() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1462,6 +1656,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_10.e")
     public void based_acc_should_not_contain_an_asccp_or_a_bccp_with_the_same_property() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1523,7 +1718,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
         }
         click(tr.findElement(By.className("mat-column-" + "select")));
         click(elementToBeClickable(getDriver(), APPLY_BUTTON_LOCATOR));
-        click(getDialogButtonByName(getDriver(), "Proceed anyway"));
+        click(getValidationProceedButton(getDriver()));
 
         String xpathExpr = "//score-multi-actions-snack-bar//div[contains(@class, \"message\")]";
         String snackBarMessage = getText(visibilityOfElementLocated(getDriver(), By.xpath(xpathExpr)));
@@ -1534,6 +1729,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_11")
     public void end_user_can_remove_the_based_acc_when_one_exists() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -1568,6 +1764,7 @@ public class TC_15_8_EditingAssociationsBrandNewEndUserACC extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_8_TA_12")
     public void end_user_can_transfer_the_ownership_of_an_acc_which_is_in_wip_states() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
         thisAccountWillBeDeletedAfterTests(developer);

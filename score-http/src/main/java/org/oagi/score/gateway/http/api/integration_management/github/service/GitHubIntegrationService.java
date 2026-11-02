@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.integration_management.github.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.oagi.score.gateway.http.api.integration_management.github.client.GitHubApiClient;
 import org.oagi.score.gateway.http.api.integration_management.github.config.GitHubIntegrationProperties;
 import org.oagi.score.gateway.http.api.integration_management.github.model.ProjectFieldOptions;
@@ -16,6 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -111,7 +114,7 @@ public class GitHubIntegrationService {
         String state = UUID.randomUUID().toString().replace("-", "");
         Map<String, String> stateData = new HashMap<>();
         stateData.put("userId", String.valueOf(user.userId()));
-        stateData.put("returnUrl", (returnUrl == null) ? "" : returnUrl);
+        stateData.put("returnUrl", isSafeReturnUrl(returnUrl) ? returnUrl : "");
         redisTemplate.opsForValue().set(STATE_KEY + state, stateData, Duration.ofMinutes(10));
 
         return UriComponentsBuilder.fromUriString(properties.getAuthorizationUri())
@@ -137,6 +140,11 @@ public class GitHubIntegrationService {
         Map<?, ?> stateData = (Map<?, ?>) raw;
         String userId = String.valueOf(stateData.get("userId"));
         String returnUrl = (stateData.get("returnUrl") == null) ? "" : stateData.get("returnUrl").toString();
+        // Re-validated here (on top of beginConnect's check) so the value this method returns — which the
+        // controller passes straight to sendRedirect — can never be an off-site URL.
+        if (!isSafeReturnUrl(returnUrl)) {
+            returnUrl = "";
+        }
 
         GitHubApiClient.OAuthToken token = gitHubApiClient.exchangeOAuthCode(code, state);
         if (token == null || !hasText(token.accessToken())) {
@@ -156,6 +164,37 @@ public class GitHubIntegrationService {
         }
         redisTemplate.opsForSet().add(CONNECTED_USERS, userId);
         return returnUrl;
+    }
+
+    /**
+     * Whether {@code returnUrl} is safe to redirect the browser to after the OAuth callback:
+     * either a same-origin relative path (starts with {@code "/"}, not {@code "//"}, and has no backslash
+     * — both of which a browser can interpret as protocol-relative) or an absolute URL whose scheme, host,
+     * and port exactly match the configured {@link #getWebBaseUrl()}. Anything else — a different origin,
+     * a bare scheme, or garbage that fails to parse — is rejected.
+     */
+    private boolean isSafeReturnUrl(String returnUrl) {
+        if (!hasText(returnUrl) || returnUrl.chars().anyMatch(c -> Character.isISOControl(c) || Character.isWhitespace(c))) {
+            // Browsers strip tab/CR/LF anywhere in a URL, so "/\t/evil.example" would become "//evil.example".
+            return false;
+        }
+        if (returnUrl.charAt(0) == '/') {
+            return !returnUrl.startsWith("//") && returnUrl.indexOf('\\') < 0;
+        }
+        if (!hasText(properties.getWebBaseUrl())) {
+            return false;
+        }
+        try {
+            URI target = new URI(returnUrl);
+            URI base = new URI(properties.getWebBaseUrl());
+            return target.isAbsolute()
+                    && target.getHost() != null
+                    && Objects.equals(target.getScheme(), base.getScheme())
+                    && Objects.equals(target.getHost(), base.getHost())
+                    && target.getPort() == base.getPort();
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     public void disconnect(ScoreUser user) {
@@ -347,6 +386,17 @@ public class GitHubIntegrationService {
      */
     public String moveIssueToFieldOption(ScoreUser user, String owner, String repo, int number,
                                   String cachedMetadata, String desiredFieldOption, boolean force) {
+        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata, desiredFieldOption, force, true);
+    }
+
+    /**
+     * Moves an issue to a fieldOption, optionally leaving an existing project card untouched. The latter is used
+     * when an issue is linked to a component: linking should add a missing card in the configured initial option,
+     * but must not overwrite a status that is already managed on the board.
+     */
+    private String moveIssueToFieldOption(ScoreUser user, String owner, String repo, int number,
+                                  String cachedMetadata, String desiredFieldOption, boolean force,
+                                  boolean moveExisting) {
         String token = getAccessToken(user);
         if (!hasText(token) || !hasText(desiredFieldOption)) {
             return null;
@@ -381,6 +431,9 @@ public class GitHubIntegrationService {
             }
             if (!hasText(itemId)) {
                 return null;
+            }
+            if (!moveExisting && item != null) {
+                return currentFieldOption;
             }
             // Anti-clobber: never undo a maintainer's review decision — unless the user explicitly
             // forced this fieldOption (an override), which is a deliberate human choice.
@@ -432,13 +485,13 @@ public class GitHubIntegrationService {
     /**
      * Places the linked issue in the initial fieldOption ({@link ProjectFieldOptions#getDefaultFieldOption}, e.g. "New") on
      * the configured board, adding it first if absent (issue #1533, Feature 2). Linking a component
-     * starts tracking the issue, so it is reset to the initial fieldOption even when it is already on the board
-     * at another fieldOption (e.g. left there by another linked component) — unless it sits in a maintainer gate
-     * fieldOption, which is left untouched. Best-effort; returns the resulting fieldOption name or {@code null}. Used
-     * when a GitHub issue is linked to a component, with the linking user's token.
+     * starts tracking the issue: a missing card is added and initialized in the initial fieldOption, while an issue
+     * already on the board is left in its current fieldOption. Best-effort; returns the resulting fieldOption name
+     * or {@code null}. Used when a GitHub issue is linked to a component, with the linking user's token.
      */
     public String addIssueToProjectOnLink(ScoreUser user, String owner, String repo, int number, String cachedMetadata) {
-        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata, projectFieldOptions.getDefaultFieldOption());
+        return moveIssueToFieldOption(user, owner, repo, number, cachedMetadata,
+                projectFieldOptions.getDefaultFieldOption(), false, false);
     }
 
     /**

@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDoc.OasDocPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.OasDocSecurityScope.OasDocSecurityScopePath;
@@ -49,7 +49,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.oas_doc_security</code>
+     * The reference instance of <code>oas_doc_security</code>
      */
     public static final OasDocSecurity OAS_DOC_SECURITY = new OasDocSecurity();
 
@@ -62,58 +62,57 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     }
 
     /**
-     * The column <code>oagi.oas_doc_security.oas_doc_security_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_doc_security.oas_doc_security_id</code>. The primary
+     * key of the record.
      */
     public final TableField<OasDocSecurityRecord, ULong> OAS_DOC_SECURITY_ID = createField(DSL.name("oas_doc_security_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "The primary key of the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security.guid</code>. The GUID of the
-     * record.
+     * The column <code>oas_doc_security.guid</code>. The GUID of the record.
      */
     public final TableField<OasDocSecurityRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security.oas_doc_id</code>. The owning
-     * OpenAPI document; one entry of the document's root-level security array.
+     * The column <code>oas_doc_security.oas_doc_id</code>. The owning OpenAPI
+     * document; one entry of the document's root-level security array.
      */
     public final TableField<OasDocSecurityRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The owning OpenAPI document; one entry of the document's root-level security array.");
 
     /**
-     * The column <code>oagi.oas_doc_security.requirement_group</code>. Index of
-     * the Security Requirement Object within the security array (OR). Rows
-     * sharing a group are ANDed into one requirement object.
+     * The column <code>oas_doc_security.requirement_group</code>. Index of the
+     * Security Requirement Object within the security array (OR). Rows sharing
+     * a group are ANDed into one requirement object.
      */
     public final TableField<OasDocSecurityRecord, Integer> REQUIREMENT_GROUP = createField(DSL.name("requirement_group"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "Index of the Security Requirement Object within the security array (OR). Rows sharing a group are ANDed into one requirement object.");
 
     /**
-     * The column <code>oagi.oas_doc_security.oas_security_scheme_id</code>. FK
-     * to oas_security_scheme. The scheme this entry references (its scheme_name
-     * is the components.securitySchemes key). NULL marks an empty requirement
+     * The column <code>oas_doc_security.oas_security_scheme_id</code>. FK to
+     * oas_security_scheme. The scheme this entry references (its scheme_name is
+     * the components.securitySchemes key). NULL marks an empty requirement
      * object {} (anonymous / optional).
      */
     public final TableField<OasDocSecurityRecord, ULong> OAS_SECURITY_SCHEME_ID = createField(DSL.name("oas_security_scheme_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "FK to oas_security_scheme. The scheme this entry references (its scheme_name is the components.securitySchemes key). NULL marks an empty requirement object {} (anonymous / optional).");
 
     /**
-     * The column <code>oagi.oas_doc_security.created_by</code>. The user who
-     * creates the record.
+     * The column <code>oas_doc_security.created_by</code>. The user who creates
+     * the record.
      */
     public final TableField<OasDocSecurityRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who creates the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security.last_updated_by</code>. The user
-     * who last updates the record.
+     * The column <code>oas_doc_security.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public final TableField<OasDocSecurityRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The user who last updates the record.");
 
     /**
-     * The column <code>oagi.oas_doc_security.creation_timestamp</code>. The
+     * The column <code>oas_doc_security.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public final TableField<OasDocSecurityRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is created.");
 
     /**
-     * The column <code>oagi.oas_doc_security.last_update_timestamp</code>. The
+     * The column <code>oas_doc_security.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public final TableField<OasDocSecurityRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record is last updated.");
@@ -127,21 +126,21 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.oas_doc_security</code> table reference
+     * Create an aliased <code>oas_doc_security</code> table reference
      */
     public OasDocSecurity(String alias) {
         this(DSL.name(alias), OAS_DOC_SECURITY);
     }
 
     /**
-     * Create an aliased <code>oagi.oas_doc_security</code> table reference
+     * Create an aliased <code>oas_doc_security</code> table reference
      */
     public OasDocSecurity(Name alias) {
         this(alias, OAS_DOC_SECURITY);
     }
 
     /**
-     * Create a <code>oagi.oas_doc_security</code> table reference
+     * Create a <code>oas_doc_security</code> table reference
      */
     public OasDocSecurity() {
         this(DSL.name("oas_doc_security"), null);
@@ -182,7 +181,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -208,8 +207,8 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     private transient AppUserPath _oasDocSecurityCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_doc_security_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_doc_security_created_by_fk</code> key.
      */
     public AppUserPath oasDocSecurityCreatedByFk() {
         if (_oasDocSecurityCreatedByFk == null)
@@ -221,8 +220,8 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     private transient AppUserPath _oasDocSecurityLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>oas_doc_security_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>oas_doc_security_last_updated_by_fk</code> key.
      */
     public AppUserPath oasDocSecurityLastUpdatedByFk() {
         if (_oasDocSecurityLastUpdatedByFk == null)
@@ -234,7 +233,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     private transient OasDocPath _oasDoc;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_doc</code> table.
+     * Get the implicit join path to the <code>oas_doc</code> table.
      */
     public OasDocPath oasDoc() {
         if (_oasDoc == null)
@@ -246,8 +245,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     private transient OasSecuritySchemePath _oasSecurityScheme;
 
     /**
-     * Get the implicit join path to the <code>oagi.oas_security_scheme</code>
-     * table.
+     * Get the implicit join path to the <code>oas_security_scheme</code> table.
      */
     public OasSecuritySchemePath oasSecurityScheme() {
         if (_oasSecurityScheme == null)
@@ -260,7 +258,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security_scope</code> table
+     * <code>oas_doc_security_scope</code> table
      */
     public OasDocSecurityScopePath oasDocSecurityScope() {
         if (_oasDocSecurityScope == null)

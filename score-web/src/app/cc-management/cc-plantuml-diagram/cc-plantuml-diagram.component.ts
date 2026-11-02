@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {switchMap} from 'rxjs/operators';
@@ -13,6 +13,7 @@ import {forkJoin} from 'rxjs';
   standalone: false,
   selector: 'score-cc-plantuml-diagram',
   templateUrl: './cc-plantuml-diagram.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./cc-plantuml-diagram.component.css']
 })
 export class CcPlantumlDiagramComponent implements OnInit {

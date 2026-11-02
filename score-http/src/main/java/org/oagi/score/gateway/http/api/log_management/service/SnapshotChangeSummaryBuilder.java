@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.log_management.service;
 
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -392,7 +393,7 @@ final class SnapshotChangeSummaryBuilder {
         String propertyTerm = str(sc, "propertyTerm");
         String representationTerm = str(sc, "representationTerm");
         if (propertyTerm != null && representationTerm != null) {
-            return propertyTerm + ". " + representationTerm;
+            return DenUtils.dtScDen(propertyTerm, representationTerm);
         }
         return (propertyTerm != null) ? propertyTerm : str(sc, "guid");
     }

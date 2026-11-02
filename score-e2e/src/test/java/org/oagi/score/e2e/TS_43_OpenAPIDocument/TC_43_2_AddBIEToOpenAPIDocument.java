@@ -65,7 +65,7 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
                 editOpenAPIDocumentPage.openAddBIEForOpenAPIDocumentDialog();
 
         assertEquals("Add BIE For OpenAPI Document",
-                getText(addBIEForOpenAPIDocumentDialog.getTitle().findElement(By.tagName("span"))));
+                getText(addBIEForOpenAPIDocumentDialog.getTitle()));
     }
 
     @Test

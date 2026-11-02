@@ -267,3 +267,43 @@ The end user can open a deleted end user CL and restore it or select one or more
 2. The user opens the page, branch, release, or entity required for "Restoring end user code list".
 3. The user performs the workflow described by the assertions.
 4. The user verifies the expected result for each assertion in this test case.
+
+## Test Case 17.8
+
+**Using a custom end user code list in a BIE expression**
+
+Pre-condition: A release branch is selected. An end user account can create and manage code lists and BIEs in that release. A BIE can be created with both a BBIE and a BBIE_SC whose underlying data types have a Token primitive, and both nodes permit the custom code lists used in this test.
+
+
+### Test Assertion:
+
+#### Test Assertion #17.8.1
+The end user can create a custom code list without a base, add unique code values, move the code list to Production, select it as the code-list value domain of both a BBIE and a BBIE_SC in BIEs in the same release, save the BIEs, and reopen them with the selected code list and values intact.
+
+#### Test Assertion #17.8.2
+The end user can create a custom code list based on a compatible Published developer code list in the same release, add a unique code value, move the code list to Production, select it as the code-list value domain of both a BBIE and a BBIE_SC in BIEs in the same release, save the BIEs, and reopen them with the selected code list and inherited and added values intact.
+
+#### Test Assertion #17.8.3
+The end user can generate XML Schema, JSON Schema, OpenAPI, Open Document Spreadsheet (ODS), and Avro expressions for a BIE that uses a custom Code List. Each format produces a valid non-empty output. XML Schema and JSON Schema include the selected custom Code List values for both BBIE and BBIE_SC, including values inherited from a developer Code List. ODS and Avro include the selected BBIE and BBIE_SC fields but do not serialize Code List values as enumerations. OpenAPI Template generation is checked for successful output and its component schemas include the custom Code List values.
+
+#### Test Assertion #17.8.4
+The Agency ID List and Agency ID List Value fields on Code List details can both be left empty. If an Agency ID List is selected, an Agency ID List Value from that list is required; changing or clearing the list clears any value that is no longer valid. Code List Namespace is required to update the list or change its state, except that a list can still be deleted and a deleted list can be restored.
+
+#### Test Assertion #17.8.5
+A custom Code List can be managed by a custom Agency ID List when a value from that Agency ID List is selected on the Code List. When assigned to a BBIE and BBIE_SC, the BIE expression retains the custom Code List values and uses the selected Agency ID List Value in the Code List type name. A BIE inheriting from that BIE retains the same effective value domains.
+
+#### Test Assertion #17.8.6
+A custom Code List and its managing custom Agency ID List remain available to an expression when their assigned nodes are inherited from a base BIE. Repeated BBIE and BBIE_SC references to the same list manifest resolve to one compatible definition, and the definition uses the values belonging to that manifest.
+
+### Test Step Pre-condition:
+1. A release branch, an end user account, and the BIE permissions needed for this test are available in connectCenter.
+2. A compatible Token-based BBIE and a compatible Token-based BBIE_SC are available in the selected release. A Published developer code list compatible with both node types is available for the based-list scenario.
+
+### Test Step:
+1. Sign in as an end user and select the target release branch.
+2. Create a custom code list without a base and add multiple unique values. Change its state to `Production`. (Assertions [#17.2.1](#test-assertion-1721), [#17.2.2](#test-assertion-1722), [#17.5.2.c](#test-assertion-1752c))
+3. Create a second custom code list based on a compatible Published developer code list in the same release, add a unique value, and change its state to `Production`. (Assertions [#17.2.5](#test-assertion-1725), [#17.3.2](#test-assertion-1732), [#17.5.2.c](#test-assertion-1752c))
+4. Create end-user BIEs with a compatible Token-based BBIE and BBIE_SC, select the custom code list as the code-list value domain for each node, save the BIEs, and reopen them to verify that the selections and values are retained. Repeat for the based and no-base code lists. (Assertions [#17.8.1](#test-assertion-1781), [#17.8.2](#test-assertion-1782))
+5. Generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro expressions for each BIE using the single-BIE flow and default annotations. Verify a valid non-empty output for each format. In XSD and JSON Schema, verify that the BBIE and BBIE_SC resolve to the selected list and that custom and inherited values are present. Verify that ODS contains the `DefaultIndicator` BBIE and Language Code BBIE_SC fields and that Avro contains corresponding fields. Confirm that ODS and Avro do not serialize custom or inherited Code List values as enums. Verify the OpenAPI GET/POST templates and confirm component schemas include custom and inherited values. (Assertion [#17.8.3](#test-assertion-1783))
+6. Open Code List details and verify Agency ID List and Agency ID List Value are not marked required while the pair is empty. Save with both empty and verify it succeeds; select a list and verify its value field becomes required and only its values are available, and that selecting a different list clears an incompatible value. Verify update and ordinary state changes, including returning to WIP, are blocked while Namespace is empty; deletion and restoration remain available. (Assertion [#17.8.4](#test-assertion-1784))
+7. Create a custom Agency ID List and value, associate that pair with a custom Code List, and assign the Code List to the BBIE and BBIE_SC. Generate the BIE expression and verify the generated Code List type name uses the selected Agency ID List Value and the enum contains the custom Code List values. Make a second BIE inherit from the configured BIE and confirm the expression keeps those value domains. (Assertions [#17.8.5](#test-assertion-1785), [#17.8.6](#test-assertion-1786))

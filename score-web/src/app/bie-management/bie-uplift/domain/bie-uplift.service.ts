@@ -1,6 +1,7 @@
 import { Injectable, OnInit, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {BieUpliftMap, BieValidationResponse, FindTargetAsccpManifestResponse, MatchInfo, UpliftNode} from './bie-uplift';
 
 @Injectable()
@@ -18,7 +19,8 @@ export class BieUpliftService implements OnInit {
   }
 
   getUpliftBieMap(topLevelAsbiepId: number, targetReleaseId: number): Observable<BieUpliftMap> {
-    return this.http.get<BieUpliftMap>('/api/profile_bie/' + topLevelAsbiepId + '/uplifting?targetReleaseId=' + targetReleaseId);
+    return this.http.get<any>('/api/profile_bie/' + topLevelAsbiepId + '/uplifting?targetReleaseId=' + targetReleaseId)
+      .pipe(map(response => new BieUpliftMap(response)));
   }
 
   createUpliftBie(topLevelAsbiepId: number, targetAsccpManifestId: number, matched: UpliftNode[]): Observable<any> {

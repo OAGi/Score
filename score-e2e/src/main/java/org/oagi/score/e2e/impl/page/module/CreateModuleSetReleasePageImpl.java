@@ -133,6 +133,6 @@ public class CreateModuleSetReleasePageImpl extends BasePageImpl implements Crea
     }
     private WebElement getCheckboxByName(String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                "//label[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox"));
+                "//label[contains(., \"" + name + "\")]//ancestor::mat-checkbox"));
     }
 }

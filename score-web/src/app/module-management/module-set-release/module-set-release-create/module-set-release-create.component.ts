@@ -1,5 +1,5 @@
 import {Location} from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -21,6 +21,7 @@ import {LibraryService} from '../../../library-management/domain/library.service
   standalone: false,
   selector: 'score-module-set-create',
   templateUrl: './module-set-release-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-release-create.component.css']
 })
 export class ModuleSetReleaseCreateComponent implements OnInit {

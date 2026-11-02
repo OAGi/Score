@@ -2,6 +2,7 @@ package org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorFor
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -55,6 +56,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_10_TA_1")
     public void end_user_cannot_create_a_brand_new_asccp_when_the_working_branch_is_selected() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -69,6 +71,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_10_TA_2")
     public void on_the_cc_list_page_where_a_release_branch_is_selected_the_end_user_can_create() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(true);
         thisAccountWillBeDeletedAfterTests(developer);
@@ -158,6 +161,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_10_TA_3")
     public void if_the_underlying_acc_has_changed_particularly_the_object_class_term_of_the_acc_after_the() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);
@@ -186,6 +190,7 @@ public class TC_15_10_CreatingBrandNewEndUserASCCP extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_15_10_TA_4")
     public void end_user_can_create_an_asccp_from_an_acc_in_wip_state_using_the_function_create() {
         AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
         thisAccountWillBeDeletedAfterTests(endUser);

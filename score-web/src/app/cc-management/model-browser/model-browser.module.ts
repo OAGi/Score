@@ -3,13 +3,14 @@ import {CommonModule} from '@angular/common';
 import {MatBadgeModule} from '@angular/material/badge';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {AngularSplitModule} from 'angular-split';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ModelBrowserComponent} from './model-browser.component';
+import {ModelBrowserTreeViewportComponent} from './model-browser-tree-viewport/model-browser-tree-viewport.component';
 import {AuthService} from '../../authentication/auth.service';
 import {MaterialModule} from '../../material.module';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
@@ -45,9 +46,10 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     ScoreCommonModule,
+    ModelBrowserTreeViewportComponent,
     MatBadgeModule,
     MatDialogModule,
     NgxMatSelectSearchModule,

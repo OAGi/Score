@@ -1,6 +1,8 @@
 package org.oagi.score.gateway.http.api.module_management.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.oagi.score.gateway.http.common.util.TempFiles;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.networknt.schema.Error;
 import com.networknt.schema.InputFormat;
 import com.networknt.schema.Schema;
@@ -74,7 +76,7 @@ import java.util.stream.Collectors;
 public class ModuleSetReleaseQueryService implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builder().build();
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -140,8 +142,7 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
             String expressionOption, String expressionVersion) throws Exception {
 
         String requestId = UUID.randomUUID().toString();
-        File baseDirectory = new File(FileUtils.getTempDirectory(), requestId);
-        FileUtils.forceMkdir(baseDirectory);
+        File baseDirectory = TempFiles.newDirectory();
 
         List<File> schemaFiles = exportModuleSetReleaseWithoutCompression(
                 requester, moduleSetReleaseId, baseDirectory, expressionOption, expressionVersion);
@@ -307,7 +308,7 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
                     schemaSources.put(schemaId, content);
                     schemaSources.put("/" + schemaId, content);
                 }
-            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            } catch (tools.jackson.core.JacksonException e) {
                 logger.warn("Skipping JSON schema id registration for invalid JSON source: {}", schemaFile, e);
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to read JSON schema source: " + schemaFile, e);
@@ -458,7 +459,7 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
                 moduleSetQuery(requester).getModuleSetDetails(moduleSetRelease.moduleSet().moduleSetId());
 
         String fileName = moduleSet.name().replace(" ", "");
-        File baseDirectory = new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString());
+        File baseDirectory = TempFiles.newDirectory();
         File rootDirectory = new File(baseDirectory, fileName);
         FileUtils.forceMkdir(rootDirectory);
 

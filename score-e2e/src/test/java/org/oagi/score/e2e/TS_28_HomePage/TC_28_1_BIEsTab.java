@@ -91,7 +91,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForWIP.setOwner(developer.getLoginId());
         viewEditBIEPageForWIP.hitSearchButton();
 
-        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
+        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.waitForNumberOfOnlyBIEsPerStateAreListed("WIP", container.numberOfWIPBIEs));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
@@ -102,8 +102,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForQA.setOwner(developer.getLoginId());
         viewEditBIEPageForQA.hitSearchButton();
 
+        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.waitForNumberOfOnlyBIEsPerStateAreListed("QA", container.numberOfQABIEs));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getConnectCenterLogo()); // to go to the home page again.
@@ -113,9 +113,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
         viewEditBIEPageForProduction.setOwner(developer.getLoginId());
         viewEditBIEPageForProduction.hitSearchButton();
 
+        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.waitForNumberOfOnlyBIEsPerStateAreListed("Production", container.numberOfProductionBIEs));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
         ViewEditBIEPage viewEditBIEPageForWIP = myBIEsByStatesPanel.clickStateProgressBar("WIP");
 
-        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
+        assertEquals(container.numberOfWIPBIEs, viewEditBIEPageForWIP.waitForNumberOfOnlyBIEsPerStateAreListed("WIP", container.numberOfWIPBIEs));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
@@ -174,17 +174,17 @@ public class TC_28_1_BIEsTab extends BaseTest {
         click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForQA = myBIEsByStatesPanel.clickStateProgressBar("QA");
 
+        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.waitForNumberOfOnlyBIEsPerStateAreListed("QA", container.numberOfQABIEs));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-        assertEquals(container.numberOfQABIEs, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
         assertEquals(0, viewEditBIEPageForQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
         click(homePage.getConnectCenterLogo()); // to go to the home page again.
         click(homePage.getBIEsTab());
         ViewEditBIEPage viewEditBIEPageForProduction = myBIEsByStatesPanel.clickStateProgressBar("Production");
 
+        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.waitForNumberOfOnlyBIEsPerStateAreListed("Production", container.numberOfProductionBIEs));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
         assertEquals(0, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-        assertEquals(container.numberOfProductionBIEs, viewEditBIEPageForProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
     }
 
     @Test
@@ -367,7 +367,7 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
             ViewEditBIEPage viewEditBIEPageByUserAndWIP = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "WIP");
-            assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndWIP.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
+            assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndWIP.waitForNumberOfOnlyBIEsPerStateAreListed("WIP", container.numberOfWIPBIEs));
             assertEquals(0, viewEditBIEPageByUserAndWIP.getNumberOfOnlyBIEsPerStateAreListed("QA"));
             assertEquals(0, viewEditBIEPageByUserAndWIP.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
@@ -414,8 +414,8 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
             ViewEditBIEPage viewEditBIEPageByUserAndQA = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "QA");
+            assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndQA.waitForNumberOfOnlyBIEsPerStateAreListed("QA", container.numberOfQABIEs));
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-            assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("QA"));
             assertEquals(0, viewEditBIEPageByUserAndQA.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getConnectCenterLogo()); // to go to the home page again.
@@ -461,9 +461,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
 
             ViewEditBIEPage viewEditBIEPageByUserAndProduction = biesByUsersAndStatesPanel.openViewEditBIEPageByUsernameAndColumnName(
                     devUser.getLoginId(), "Production");
+            assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndProduction.waitForNumberOfOnlyBIEsPerStateAreListed("Production", container.numberOfProductionBIEs));
             assertEquals(0, viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
             assertEquals(0, viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-            assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndProduction.getNumberOfOnlyBIEsPerStateAreListed("Production"));
 
             click(homePage.getConnectCenterLogo()); // to go to the home page again.
             click(homePage.getBIEsTab());
@@ -511,9 +511,9 @@ public class TC_28_1_BIEsTab extends BaseTest {
             // The total number of randomly-generated BIEs could be more than the default size of items, 10.
             // Thus, it should set 'Items per page' to more than 10 to count the total number of BIEs.
             viewEditBIEPageByUserAndTotal.setItemsPerPage(50);
-            assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("WIP"));
-            assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("QA"));
-            assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndTotal.getNumberOfOnlyBIEsPerStateAreListed("Production"));
+            assertTrue(container.numberOfWIPBIEs <= viewEditBIEPageByUserAndTotal.waitForNumberOfOnlyBIEsPerStateAreListed("WIP", container.numberOfWIPBIEs));
+            assertTrue(container.numberOfQABIEs <= viewEditBIEPageByUserAndTotal.waitForNumberOfOnlyBIEsPerStateAreListed("QA", container.numberOfQABIEs));
+            assertTrue(container.numberOfProductionBIEs <= viewEditBIEPageByUserAndTotal.waitForNumberOfOnlyBIEsPerStateAreListed("Production", container.numberOfProductionBIEs));
 
             click(homePage.getConnectCenterLogo()); // to go to the home page again.
             click(homePage.getBIEsTab());
@@ -670,4 +670,3 @@ public class TC_28_1_BIEsTab extends BaseTest {
     }
 
 }
-

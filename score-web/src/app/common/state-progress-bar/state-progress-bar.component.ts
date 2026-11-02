@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {StateProgressBarItem} from './state-progress-bar';
 import {HttpParams} from '@angular/common/http';
 import {base64Encode} from '../utility';
@@ -7,6 +7,7 @@ import {base64Encode} from '../utility';
   standalone: false,
   selector: 'score-state-progress-bar',
   templateUrl: './state-progress-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./state-progress-bar.component.css']
 })
 export class StateProgressBarComponent implements OnInit {

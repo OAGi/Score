@@ -13,10 +13,10 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class LibraryMenuImpl extends DelegateBasePageImpl implements LibraryMenu {
 
     private final By LIBRARY_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Library\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Library\")]");
 
     private final By VIEW_LIBRARY_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View Library\")]//ancestor::button[1]");
+            By.xpath("//button[contains(., \"View Library\")]");
 
     public LibraryMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);

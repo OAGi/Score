@@ -20,11 +20,14 @@ public class NewAccountPageImpl extends BasePageImpl implements NewAccountPage {
     private static final By ORGANIZATION_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Organization\")]//ancestor::div[1]/input");
 
+    // Material wraps a checkbox's label text in a nested <span>, so the <label> itself has no
+    // matching direct text node. Match on the string value of the whole subtree instead.
     private static final By DEVELOPER_CHECKBOX_LOCATOR =
-            By.xpath("//label[contains(text(), \"Standard Developer\")]");
+            By.xpath("//label[contains(., \"Standard Developer\")]");
 
+    // Anchored on the checkbox's data-id: a bare "Admin" text match hits the Admin toolbar menu first.
     private static final By ADMIN_CHECKBOX_LOCATOR =
-            By.xpath("//span[contains(text(), \"Admin\")]");
+            By.xpath("//mat-checkbox[@data-id=\"user.admin\"]//label");
 
     private static final By PASSWORD_FIELD_LOCATOR =
             By.xpath("//mat-label[contains(text(), \"Password\")]//ancestor::div[1]/input");

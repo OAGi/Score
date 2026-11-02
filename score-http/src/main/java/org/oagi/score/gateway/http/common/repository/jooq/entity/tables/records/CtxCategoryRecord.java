@@ -22,39 +22,39 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ctx_category.ctx_category_id</code>. Internal,
-     * primary, database key.
+     * Setter for <code>ctx_category.ctx_category_id</code>. Internal, primary,
+     * database key.
      */
     public void setCtxCategoryId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.ctx_category_id</code>. Internal,
-     * primary, database key.
+     * Getter for <code>ctx_category.ctx_category_id</code>. Internal, primary,
+     * database key.
      */
     public ULong getCtxCategoryId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>ctx_category.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.guid</code>. A globally unique
-     * identifier (GUID).
+     * Getter for <code>ctx_category.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.name</code>. Short name of the context
+     * Setter for <code>ctx_category.name</code>. Short name of the context
      * category.
      */
     public void setName(String value) {
@@ -62,7 +62,7 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.name</code>. Short name of the context
+     * Getter for <code>ctx_category.name</code>. Short name of the context
      * category.
      */
     public String getName() {
@@ -70,23 +70,23 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.description</code>. Explanation of
-     * what the context category is.
+     * Setter for <code>ctx_category.description</code>. Explanation of what the
+     * context category is.
      */
     public void setDescription(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.description</code>. Explanation of
-     * what the context category is.
+     * Getter for <code>ctx_category.description</code>. Explanation of what the
+     * context category is.
      */
     public String getDescription() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.created_by</code>. Foreign key to the
+     * Setter for <code>ctx_category.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who created the context category.
      */
     public void setCreatedBy(ULong value) {
@@ -94,7 +94,7 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.created_by</code>. Foreign key to the
+     * Getter for <code>ctx_category.created_by</code>. Foreign key to the
      * APP_USER table. It indicates the user who created the context category.
      */
     public ULong getCreatedBy() {
@@ -102,8 +102,8 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
+     * Setter for <code>ctx_category.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the context
      * category.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -111,8 +111,8 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.last_updated_by</code>. Foreign key to
-     * the APP_USER table. It identifies the user who last updated the context
+     * Getter for <code>ctx_category.last_updated_by</code>. Foreign key to the
+     * APP_USER table. It identifies the user who last updated the context
      * category.
      */
     public ULong getLastUpdatedBy() {
@@ -120,32 +120,32 @@ public class CtxCategoryRecord extends UpdatableRecordImpl<CtxCategoryRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
-     * when the context category was created.
+     * Setter for <code>ctx_category.creation_timestamp</code>. Timestamp when
+     * the context category was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.creation_timestamp</code>. Timestamp
-     * when the context category was created.
+     * Getter for <code>ctx_category.creation_timestamp</code>. Timestamp when
+     * the context category was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>oagi.ctx_category.last_update_timestamp</code>.
-     * Timestamp when the context category was last updated.
+     * Setter for <code>ctx_category.last_update_timestamp</code>. Timestamp
+     * when the context category was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.ctx_category.last_update_timestamp</code>.
-     * Timestamp when the context category was last updated.
+     * Getter for <code>ctx_category.last_update_timestamp</code>. Timestamp
+     * when the context category was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(7);

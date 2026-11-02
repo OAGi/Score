@@ -95,7 +95,7 @@ public class OpenAPIDocService {
         validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
         // Enforce document uniqueness server-side (the frontend's check_uniqueness is advisory only).
         assertOasDocUnique(requester, null,
-                request.getTitle(), request.getOpenAPIVersion(), request.getVersion(), request.getLicenseName());
+                request.getTitle(), request.getOpenAPIVersion(), request.getVersion());
         CreateOasDocResponse response = command(requester).createOasDoc(request);
         return response;
     }
@@ -115,7 +115,7 @@ public class OpenAPIDocService {
         // check_uniqueness is advisory only).
         assertOasDocUnique(requester,
                 (request.getOasDocId() != null) ? request.getOasDocId().value() : null,
-                request.getTitle(), request.getOpenAPIVersion(), request.getVersion(), request.getLicenseName());
+                request.getTitle(), request.getOpenAPIVersion(), request.getVersion());
         UpdateOasDocResponse response = command(requester).updateOasDoc(request);
         return response;
     }
@@ -665,10 +665,10 @@ public class OpenAPIDocService {
     }
 
     // Server-side guard mirroring the frontend `check_uniqueness`: an OpenAPI document is unique on
-    // (Title, OpenAPI Version, Document Version, License Name). `oasDocId` is null on create (no
+    // (Title, OpenAPI Version, Document Version). `oasDocId` is null on create (no
     // self-exclusion) and the current id on update (so a document does not conflict with itself).
     private void assertOasDocUnique(ScoreUser requester, BigInteger oasDocId,
-                                    String title, String openAPIVersion, String version, String licenseName) {
+                                    String title, String openAPIVersion, String version) {
         // The uniqueness query requires title + OpenAPI version; if either is absent, leave it to the
         // field-level validation / persistence to surface the problem rather than throwing a vague error.
         if (isBlank(title) || isBlank(openAPIVersion)) {
@@ -679,11 +679,10 @@ public class OpenAPIDocService {
         probe.setTitle(title);
         probe.setOpenAPIVersion(openAPIVersion);
         probe.setVersion(version);
-        probe.setLicenseName(licenseName);
         // checkOasDocUniqueness returns true when unique (no conflicting row).
         if (!checkOasDocUniqueness(requester, probe)) {
             throw new IllegalArgumentException(
-                    "An OpenAPI document with the same Title, OpenAPI Version, Document Version, and License Name already exists.");
+                    "An OpenAPI document with the same Title, OpenAPI Version, and Document Version already exists.");
         }
     }
 

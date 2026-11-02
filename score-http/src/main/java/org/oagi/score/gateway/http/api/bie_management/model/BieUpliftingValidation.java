@@ -9,7 +9,9 @@ public class BieUpliftingValidation {
 
     private String bieType;
     private BigInteger bieId;
+    private String sourcePath;
     private boolean isValid;
     private String message;
+    private String status;
 
 }

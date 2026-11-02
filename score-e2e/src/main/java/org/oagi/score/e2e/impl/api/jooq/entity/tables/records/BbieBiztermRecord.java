@@ -22,7 +22,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bbie_bizterm_id</code>. An internal,
+     * Setter for <code>bbie_bizterm.bbie_bizterm_id</code>. An internal,
      * primary database key of an bbie_bizterm record.
      */
     public void setBbieBiztermId(ULong value) {
@@ -30,7 +30,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.bbie_bizterm_id</code>. An internal,
+     * Getter for <code>bbie_bizterm.bbie_bizterm_id</code>. An internal,
      * primary database key of an bbie_bizterm record.
      */
     public ULong getBbieBiztermId() {
@@ -38,23 +38,23 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bcc_bizterm_id</code>. An internal ID
-     * of the bbie_bizterm record.
+     * Setter for <code>bbie_bizterm.bcc_bizterm_id</code>. An internal ID of
+     * the bcc_bizterm record.
      */
     public void setBccBiztermId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.bcc_bizterm_id</code>. An internal ID
-     * of the bbie_bizterm record.
+     * Getter for <code>bbie_bizterm.bcc_bizterm_id</code>. An internal ID of
+     * the bcc_bizterm record.
      */
     public ULong getBccBiztermId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.bbie_id</code>. An internal ID of the
+     * Setter for <code>bbie_bizterm.bbie_id</code>. An internal ID of the
      * associated BBIE
      */
     public void setBbieId(ULong value) {
@@ -62,7 +62,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.bbie_id</code>. An internal ID of the
+     * Getter for <code>bbie_bizterm.bbie_id</code>. An internal ID of the
      * associated BBIE
      */
     public ULong getBbieId() {
@@ -70,23 +70,23 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned BBIE.
+     * Setter for <code>bbie_bizterm.primary_indicator</code>. The indicator
+     * shows if the business term is primary for the assigned BBIE.
      */
     public void setPrimaryIndicator(Byte value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned BBIE.
+     * Getter for <code>bbie_bizterm.primary_indicator</code>. The indicator
+     * shows if the business term is primary for the assigned BBIE.
      */
     public Byte getPrimaryIndicator() {
         return (Byte) get(3);
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.type_code</code>. The type code of the
+     * Setter for <code>bbie_bizterm.type_code</code>. The type code of the
      * assignment.
      */
     public void setTypeCode(String value) {
@@ -94,7 +94,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.type_code</code>. The type code of the
+     * Getter for <code>bbie_bizterm.type_code</code>. The type code of the
      * assignment.
      */
     public String getTypeCode() {
@@ -102,25 +102,25 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the bbie_bizterm record. The creator of
-     * the asbie_bizterm is also its owner by default.
+     * Setter for <code>bbie_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the bbie_bizterm record. The creator of the
+     * bbie_bizterm is also its owner by default.
      */
     public void setCreatedBy(ULong value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the bbie_bizterm record. The creator of
-     * the asbie_bizterm is also its owner by default.
+     * Getter for <code>bbie_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the bbie_bizterm record. The creator of the
+     * bbie_bizterm is also its owner by default.
      */
     public ULong getCreatedBy() {
         return (ULong) get(5);
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.last_updated_by</code>. A foreign key
+     * Setter for <code>bbie_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the bbie_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
@@ -129,7 +129,7 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.last_updated_by</code>. A foreign key
+     * Getter for <code>bbie_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the bbie_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
@@ -138,32 +138,32 @@ public class BbieBiztermRecord extends UpdatableRecordImpl<BbieBiztermRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the bbie_bizterm record was first created.
+     * Setter for <code>bbie_bizterm.creation_timestamp</code>. Timestamp when
+     * the bbie_bizterm record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the bbie_bizterm record was first created.
+     * Getter for <code>bbie_bizterm.creation_timestamp</code>. Timestamp when
+     * the bbie_bizterm record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>oagi.bbie_bizterm.last_update_timestamp</code>. The
-     * timestamp when the bbie_bizterm was last updated.
+     * Setter for <code>bbie_bizterm.last_update_timestamp</code>. The timestamp
+     * when the bbie_bizterm was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.bbie_bizterm.last_update_timestamp</code>. The
-     * timestamp when the bbie_bizterm was last updated.
+     * Getter for <code>bbie_bizterm.last_update_timestamp</code>. The timestamp
+     * when the bbie_bizterm was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(8);

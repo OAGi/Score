@@ -49,13 +49,13 @@ public class SearchBarPageImpl implements SearchBarPage {
     @Override
     public WebElement getSearchButton() {
         return visibilityOfElementLocated(getDriver(),
-                xpath("//score-search-bar//div[@class=\"main-search\"]//button[1]"));
+                xpath("//score-search-bar//div[contains(@class, \"main-search\")]//button[1]"));
     }
 
     @Override
     public WebElement getInputFieldInSearchBar() {
         return visibilityOfElementLocated(getDriver(),
-                xpath("//score-search-bar//div[@class=\"main-search\"]//mat-form-field//input"));
+                xpath("//score-search-bar//div[contains(@class, \"main-search\")]//mat-form-field//input"));
     }
 
     @Override

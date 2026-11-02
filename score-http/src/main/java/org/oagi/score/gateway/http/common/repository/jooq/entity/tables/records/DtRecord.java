@@ -22,60 +22,58 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.dt.dt_id</code>. Internal, primary database key.
+     * Setter for <code>dt.dt_id</code>. Internal, primary database key.
      */
     public void setDtId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.dt_id</code>. Internal, primary database key.
+     * Getter for <code>dt.dt_id</code>. Internal, primary database key.
      */
     public ULong getDtId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.dt.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>dt.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>dt.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.dt.data_type_term</code>. This is the data type
-     * term assigned to the DT. The allowed set of data type terms are defined
-     * in the DTC specification. This column is derived from the Based_DT_ID
-     * when the column is not blank. 
+     * Setter for <code>dt.data_type_term</code>. This is the data type term
+     * assigned to the DT. The allowed set of data type terms are defined in the
+     * DTC specification. This column is derived from the Based_DT_ID when the
+     * column is not blank. 
      */
     public void setDataTypeTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.data_type_term</code>. This is the data type
-     * term assigned to the DT. The allowed set of data type terms are defined
-     * in the DTC specification. This column is derived from the Based_DT_ID
-     * when the column is not blank. 
+     * Getter for <code>dt.data_type_term</code>. This is the data type term
+     * assigned to the DT. The allowed set of data type terms are defined in the
+     * DTC specification. This column is derived from the Based_DT_ID when the
+     * column is not blank. 
      */
     public String getDataTypeTerm() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.dt.qualifier</code>. This column shall be blank
-     * when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If
-     * the column is not blank it is a qualified BDT. If blank then the row may
-     * be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete
+     * Setter for <code>dt.qualifier</code>. This column shall be blank when the
+     * DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column
+     * is not blank it is a qualified BDT. If blank then the row may be a
+     * default BDT or an unqualified BDT. Default BDT is OAGIS concrete
      * implementation of the CDT, these are the DT with numbers in the name,
      * e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are
      * almost like permutation of the CDT options into concrete data types.
@@ -89,10 +87,10 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.qualifier</code>. This column shall be blank
-     * when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If
-     * the column is not blank it is a qualified BDT. If blank then the row may
-     * be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete
+     * Getter for <code>dt.qualifier</code>. This column shall be blank when the
+     * DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column
+     * is not blank it is a qualified BDT. If blank then the row may be a
+     * default BDT or an unqualified BDT. Default BDT is OAGIS concrete
      * implementation of the CDT, these are the DT with numbers in the name,
      * e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are
      * almost like permutation of the CDT options into concrete data types.
@@ -106,38 +104,40 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.representation_term</code>.
+     * Setter for <code>dt.representation_term</code>. This is the
+     * representation term assigned to the DT.
      */
     public void setRepresentationTerm(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.representation_term</code>.
+     * Getter for <code>dt.representation_term</code>. This is the
+     * representation term assigned to the DT.
      */
     public String getRepresentationTerm() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.dt.six_digit_id</code>. The six number suffix comes
-     * from the UN/CEFACT XML Schema NDR.
+     * Setter for <code>dt.six_digit_id</code>. The six number suffix comes from
+     * the UN/CEFACT XML Schema NDR.
      */
     public void setSixDigitId(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.six_digit_id</code>. The six number suffix comes
-     * from the UN/CEFACT XML Schema NDR.
+     * Getter for <code>dt.six_digit_id</code>. The six number suffix comes from
+     * the UN/CEFACT XML Schema NDR.
      */
     public String getSixDigitId() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.dt.based_dt_id</code>. Foreign key pointing to the
-     * DT table itself. This column must be blank when the DT_TYPE is CDT. This
+     * Setter for <code>dt.based_dt_id</code>. Foreign key pointing to the DT
+     * table itself. This column must be blank when the DT_TYPE is CDT. This
      * column must not be blank when the DT_TYPE is BDT.
      */
     public void setBasedDtId(ULong value) {
@@ -145,8 +145,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.based_dt_id</code>. Foreign key pointing to the
-     * DT table itself. This column must be blank when the DT_TYPE is CDT. This
+     * Getter for <code>dt.based_dt_id</code>. Foreign key pointing to the DT
+     * table itself. This column must be blank when the DT_TYPE is CDT. This
      * column must not be blank when the DT_TYPE is BDT.
      */
     public ULong getBasedDtId() {
@@ -154,77 +154,75 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.definition</code>. Description of the data type.
+     * Setter for <code>dt.definition</code>. Description of the data type.
      */
     public void setDefinition(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.definition</code>. Description of the data type.
+     * Getter for <code>dt.definition</code>. Description of the data type.
      */
     public String getDefinition() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.dt.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>dt.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>dt.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>oagi.dt.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Setter for <code>dt.namespace_id</code>. Foreign key to the NAMESPACE
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public void setNamespaceId(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Getter for <code>dt.namespace_id</code>. Foreign key to the NAMESPACE
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public ULong getNamespaceId() {
         return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.dt.content_component_definition</code>. Description
-     * of the content component of the data type.
+     * Setter for <code>dt.content_component_definition</code>. Description of
+     * the content component of the data type.
      */
     public void setContentComponentDefinition(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.content_component_definition</code>. Description
-     * of the content component of the data type.
+     * Getter for <code>dt.content_component_definition</code>. Description of
+     * the content component of the data type.
      */
     public String getContentComponentDefinition() {
         return (String) get(10);
     }
 
     /**
-     * Setter for <code>oagi.dt.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the DT.
+     * Setter for <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the DT.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -234,9 +232,9 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the DT.
+     * Getter for <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the DT.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -246,7 +244,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.commonly_used</code>. This is a flag to indicate
+     * Setter for <code>dt.commonly_used</code>. This is a flag to indicate
      * commonly used DT(s) by BCCPs.
      */
     public void setCommonlyUsed(Byte value) {
@@ -254,7 +252,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.commonly_used</code>. This is a flag to indicate
+     * Getter for <code>dt.commonly_used</code>. This is a flag to indicate
      * commonly used DT(s) by BCCPs.
      */
     public Byte getCommonlyUsed() {
@@ -262,24 +260,24 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.created_by</code>. Foreign key to the APP_USER
-     * table. It indicates the user who created this DT.
+     * Setter for <code>dt.created_by</code>. Foreign key to the APP_USER table.
+     * It indicates the user who created this DT.
      */
     public void setCreatedBy(ULong value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.created_by</code>. Foreign key to the APP_USER
-     * table. It indicates the user who created this DT.
+     * Getter for <code>dt.created_by</code>. Foreign key to the APP_USER table.
+     * It indicates the user who created this DT.
      */
     public ULong getCreatedBy() {
         return (ULong) get(13);
     }
 
     /**
-     * Setter for <code>oagi.dt.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
+     * Setter for <code>dt.last_updated_by</code>. Foreign key to the APP_USER
+     * table referring to the last user who updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
@@ -289,8 +287,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
+     * Getter for <code>dt.last_updated_by</code>. Foreign key to the APP_USER
+     * table referring to the last user who updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
@@ -300,9 +298,9 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.\n\nThe
+     * Setter for <code>dt.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
      */
@@ -311,9 +309,9 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.\n\nThe
+     * Getter for <code>dt.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
      */
@@ -322,7 +320,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.creation_timestamp</code>. Timestamp when the
+     * Setter for <code>dt.creation_timestamp</code>. Timestamp when the
      * revision of the DT was created. 
      * 
      * This never change for a revision.
@@ -332,7 +330,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.creation_timestamp</code>. Timestamp when the
+     * Getter for <code>dt.creation_timestamp</code>. Timestamp when the
      * revision of the DT was created. 
      * 
      * This never change for a revision.
@@ -342,7 +340,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.last_update_timestamp</code>. Timestamp when the
+     * Setter for <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
      * 
      * The value of this column in the latest history record should be the same
@@ -354,7 +352,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.last_update_timestamp</code>. Timestamp when the
+     * Getter for <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
      * 
      * The value of this column in the latest history record should be the same
@@ -366,8 +364,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Setter for <code>dt.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
@@ -375,8 +373,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Getter for <code>dt.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public Byte getIsDeprecated() {
@@ -384,7 +382,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.replacement_dt_id</code>. This refers to a
+     * Setter for <code>dt.replacement_dt_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public void setReplacementDtId(ULong value) {
@@ -392,7 +390,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Getter for <code>oagi.dt.replacement_dt_id</code>. This refers to a
+     * Getter for <code>dt.replacement_dt_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public ULong getReplacementDtId() {
@@ -400,32 +398,32 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     }
 
     /**
-     * Setter for <code>oagi.dt.prev_dt_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Setter for <code>dt.prev_dt_id</code>. A self-foreign key to indicate the
+     * previous history record.
      */
     public void setPrevDtId(ULong value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.prev_dt_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Getter for <code>dt.prev_dt_id</code>. A self-foreign key to indicate the
+     * previous history record.
      */
     public ULong getPrevDtId() {
         return (ULong) get(20);
     }
 
     /**
-     * Setter for <code>oagi.dt.next_dt_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Setter for <code>dt.next_dt_id</code>. A self-foreign key to indicate the
+     * next history record.
      */
     public void setNextDtId(ULong value) {
         set(21, value);
     }
 
     /**
-     * Getter for <code>oagi.dt.next_dt_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Getter for <code>dt.next_dt_id</code>. A self-foreign key to indicate the
+     * next history record.
      */
     public ULong getNextDtId() {
         return (ULong) get(21);

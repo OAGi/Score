@@ -10,7 +10,7 @@ import org.jooq.impl.AbstractRoutine;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 
 
 /**
@@ -22,17 +22,17 @@ public class Levenshtein extends AbstractRoutine<Integer> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The parameter <code>oagi.levenshtein.RETURN_VALUE</code>.
+     * The parameter <code>levenshtein.RETURN_VALUE</code>.
      */
     public static final Parameter<Integer> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.INTEGER, false, false);
 
     /**
-     * The parameter <code>oagi.levenshtein.s1</code>.
+     * The parameter <code>levenshtein.s1</code>.
      */
     public static final Parameter<String> S1 = Internal.createParameter("s1", SQLDataType.VARCHAR(255), false, false);
 
     /**
-     * The parameter <code>oagi.levenshtein.s2</code>.
+     * The parameter <code>levenshtein.s2</code>.
      */
     public static final Parameter<String> S2 = Internal.createParameter("s2", SQLDataType.VARCHAR(255), false, false);
 
@@ -40,7 +40,7 @@ public class Levenshtein extends AbstractRoutine<Integer> {
      * Create a new routine call instance
      */
     public Levenshtein() {
-        super("levenshtein", Oagi.OAGI, DSL.comment(""), SQLDataType.INTEGER);
+        super("levenshtein", DefaultSchema.DEFAULT_SCHEMA, DSL.comment(""), SQLDataType.INTEGER);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(S1);

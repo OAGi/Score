@@ -371,7 +371,7 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         assertDoesNotThrow(() -> editModuleSetReleasePage.hitValidateButton());
 
         WebElement dialogHeader = visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]/span"));
+                By.xpath("//div[contains(@class, \"mat-mdc-dialog-title\")]//span"));
         assertEquals("Module Set Release - XML Schema Validation", getText(dialogHeader));
     }
 

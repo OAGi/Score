@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CtxSchemeValue.CtxSchemeValuePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BizCtxValueRecord;
@@ -48,7 +49,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.biz_ctx_value</code>
+     * The reference instance of <code>biz_ctx_value</code>
      */
     public static final BizCtxValue BIZ_CTX_VALUE = new BizCtxValue();
 
@@ -61,20 +62,20 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     }
 
     /**
-     * The column <code>oagi.biz_ctx_value.biz_ctx_value_id</code>. Primary,
-     * internal database key.
+     * The column <code>biz_ctx_value.biz_ctx_value_id</code>. Primary, internal
+     * database key.
      */
-    public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_VALUE_ID = createField(DSL.name("biz_ctx_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_VALUE_ID = createField(DSL.name("biz_ctx_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.biz_ctx_value.biz_ctx_id</code>. Foreign key to the
+     * The column <code>biz_ctx_value.biz_ctx_id</code>. Foreign key to the
      * biz_ctx table.
      */
     public final TableField<BizCtxValueRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the biz_ctx table.");
 
     /**
-     * The column <code>oagi.biz_ctx_value.ctx_scheme_value_id</code>. Foreign
-     * key to the CTX_SCHEME_VALUE table.
+     * The column <code>biz_ctx_value.ctx_scheme_value_id</code>. Foreign key to
+     * the CTX_SCHEME_VALUE table.
      */
     public final TableField<BizCtxValueRecord, ULong> CTX_SCHEME_VALUE_ID = createField(DSL.name("ctx_scheme_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the CTX_SCHEME_VALUE table.");
 
@@ -87,21 +88,21 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.biz_ctx_value</code> table reference
+     * Create an aliased <code>biz_ctx_value</code> table reference
      */
     public BizCtxValue(String alias) {
         this(DSL.name(alias), BIZ_CTX_VALUE);
     }
 
     /**
-     * Create an aliased <code>oagi.biz_ctx_value</code> table reference
+     * Create an aliased <code>biz_ctx_value</code> table reference
      */
     public BizCtxValue(Name alias) {
         this(alias, BIZ_CTX_VALUE);
     }
 
     /**
-     * Create a <code>oagi.biz_ctx_value</code> table reference
+     * Create a <code>biz_ctx_value</code> table reference
      */
     public BizCtxValue() {
         this(DSL.name("biz_ctx_value"), null);
@@ -142,7 +143,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -163,7 +164,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     private transient BizCtxPath _bizCtx;
 
     /**
-     * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
+     * Get the implicit join path to the <code>biz_ctx</code> table.
      */
     public BizCtxPath bizCtx() {
         if (_bizCtx == null)
@@ -175,8 +176,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     private transient CtxSchemeValuePath _ctxSchemeValue;
 
     /**
-     * Get the implicit join path to the <code>oagi.ctx_scheme_value</code>
-     * table.
+     * Get the implicit join path to the <code>ctx_scheme_value</code> table.
      */
     public CtxSchemeValuePath ctxSchemeValue() {
         if (_ctxSchemeValue == null)
@@ -229,7 +229,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
      */
     @Override
     public BizCtxValue where(Condition condition) {
-        return new BizCtxValue(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new BizCtxValue(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -296,7 +296,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BizCtxValue whereExists(Select<?> select) {
+    public BizCtxValue whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -304,7 +304,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public BizCtxValue whereNotExists(Select<?> select) {
+    public BizCtxValue whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

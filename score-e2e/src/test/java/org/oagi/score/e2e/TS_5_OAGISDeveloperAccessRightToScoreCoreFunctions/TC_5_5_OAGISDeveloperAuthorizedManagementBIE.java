@@ -1187,9 +1187,10 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getPropertyTerm());
         WebElement td = viewEditBIEPage.getColumnByName(tr, "select");
-        assertDisabled(td.findElement(By.tagName("input")));
+        assertEnabled(td.findElement(By.tagName("input")));
+        click(td);
 
-        assertThrows(TimeoutException.class, () -> viewEditBIEPage.getDiscardButton(false));
+        assertTrue(viewEditBIEPage.isDiscardButtonUnavailable());
     }
 
     @Test
@@ -3804,12 +3805,12 @@ public class TC_5_5_OAGISDeveloperAuthorizedManagementBIE extends BaseTest {
         EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
 
         String extensionPath = "/" + asccp.getPropertyTerm() + "/Application Area/Extension";
-        assertThrows(WebDriverException.class, () -> editBIEPage.extendBIELocallyOnNode(extensionPath));
+        editBIEPage.clickOnDropDownMenuByPath(extensionPath);
+
         WebElement createABIEExtensionLocallyButton = visibilityOfElementLocated(getDriver(),
                 By.xpath("//span[text() = \"Create ABIE Extension Locally\"]/ancestor::button"));
         assertFalse(createABIEExtensionLocallyButton.isEnabled());
 
-        assertThrows(WebDriverException.class, () -> editBIEPage.extendBIEGloballyOnNode(extensionPath));
         WebElement createABIEExtensionGloballyButton = visibilityOfElementLocated(getDriver(),
                 By.xpath("//span[text() = \"Create ABIE Extension Globally\"]/ancestor::button"));
         assertFalse(createABIEExtensionGloballyButton.isEnabled());

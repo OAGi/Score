@@ -159,6 +159,14 @@ public interface DTViewEditPage extends Page {
     WebElement getNamespaceField();
 
     /**
+     * Return the selectable namespace option matching the given URI.
+     *
+     * @param namespaceUri namespace URI displayed by the option
+     * @return the matching clickable option
+     */
+    WebElement getNamespaceOption(String namespaceUri);
+
+    /**
      * Return the value of the 'Namespace' field.
      *
      * @return the value of the 'Namespace' field

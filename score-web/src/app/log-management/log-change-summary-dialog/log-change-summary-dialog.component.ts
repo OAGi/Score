@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {finalize} from 'rxjs/operators';
 import {ComponentChangeSummary, ComponentFieldChange} from '../domain/log';
@@ -12,6 +12,7 @@ import {LogService} from '../domain/log.service';
   standalone: false,
   selector: 'score-log-change-summary-dialog',
   templateUrl: './log-change-summary-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./log-change-summary-dialog.component.css'],
 })
 export class LogChangeSummaryDialogComponent implements OnInit {

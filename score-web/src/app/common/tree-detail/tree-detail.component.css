@@ -1,0 +1,95 @@
+score-tree-detail {
+  display: block;
+}
+
+score-tree-detail .search-box-container {
+  padding: 0;
+  height: auto;
+  min-height: 81px;
+}
+
+/* Search and actions share a line while they fit and wrap (never overlap) when they do not. */
+score-tree-detail .tree-detail-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  padding: 0 12px;
+}
+
+score-tree-detail .tree-detail-search {
+  flex: 1 1 280px;
+  max-width: max(420px, 42%);
+  min-width: 0;
+}
+
+score-tree-detail .tree-detail-actions {
+  flex: 0 1 auto;
+  margin-left: auto;
+  min-width: 0;
+}
+
+score-tree-detail .tree-detail-actions .actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 4px;
+}
+
+/* A small screen: the tree sits above the detail pane and the page scrolls. */
+score-tree-detail.narrow .search-box-container {
+  position: static !important;
+}
+
+/* angular-split lays its areas out as a grid: put both areas in one column. */
+score-tree-detail.narrow as-split.tree-detail-stacked {
+  grid-template: auto / 100% !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area {
+  grid-column: 1 !important;
+  height: auto !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area.left-panel {
+  grid-row: 1 !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-area.right-panel {
+  grid-row: 2 !important;
+}
+
+score-tree-detail.narrow as-split.tree-detail-stacked > as-split-gutter {
+  display: none !important;
+}
+
+score-tree-detail .tree-panel {
+  margin-bottom: 4px;
+  padding: 8px;
+}
+
+score-tree-detail .tree-panel mat-card-content {
+  margin-bottom: 0;
+}
+
+score-tree-detail .left-panel,
+score-tree-detail .right-panel {
+  margin-bottom: 0;
+}
+
+/* Detail pane of the selected node. */
+score-tree-detail .tree-detail-panel {
+  padding: 0 12px;
+}
+
+score-tree-detail .tree-detail-container {
+  padding: 1.25em;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 0;
+  background-color: white;
+}
+
+score-tree-detail .tree-detail-container div.checkbox {
+  padding-bottom: 1.25em;
+}

@@ -26,25 +26,25 @@ import static org.oagi.score.e2e.impl.PageHelper.*;
 public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreComponentMenu {
 
     private final By CORE_COMPONENT_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Core Component\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Core Component\")]");
 
     private final By VIEW_EDIT_CORE_COMPONENT_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Core Component\")]");
+            By.xpath("//button[contains(., \"View/Edit Core Component\")]");
 
     private final By VIEW_EDIT_DATA_TYPE_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Data Type\")]");
+            By.xpath("//button[contains(., \"View/Edit Data Type\")]");
 
     private final By VIEW_EDIT_CODE_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Code List\")]");
+            By.xpath("//button[contains(., \"View/Edit Code List\")]");
 
     private final By VIEW_EDIT_AGENCY_ID_LIST_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Agency ID List\")]");
+            By.xpath("//button[contains(., \"View/Edit Agency ID List\")]");
 
     private final By VIEW_EDIT_RELEASE_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Release\")]");
+            By.xpath("//button[contains(., \"View/Edit Release\")]");
 
     private final By VIEW_EDIT_NAMESPACE_SUB_MENU_LOCATOR =
-            By.xpath("//span[contains(text(), \"View/Edit Namespace\")]");
+            By.xpath("//button[contains(., \"View/Edit Namespace\")]");
 
     public CoreComponentMenuImpl(BasePageImpl basePageImpl) {
         super(basePageImpl);
@@ -112,7 +112,10 @@ public class CoreComponentMenuImpl extends DelegateBasePageImpl implements CoreC
     public ViewEditCodeListPage openViewEditCodeListSubMenu() {
         retry(() -> click(getViewEditCodeListSubMenu()));
         ViewEditCodeListPage viewEditCodeListPage = new ViewEditCodeListPageImpl(this);
-        waitFor(Duration.ofMillis(2000));
+        // Route navigation and the Angular component initialization are asynchronous.  The
+        // branch selector is the first control used by the page object, so wait for that
+        // control instead of relying on a fixed delay.
+        viewEditCodeListPage.getBranchSelectField();
         assert viewEditCodeListPage.isOpened();
         return viewEditCodeListPage;
     }

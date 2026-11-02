@@ -4,16 +4,8 @@
   </div>
 }
 
-<div class="d-block">
-  <div class="header d-flex align-items-center" mat-dialog-title>
-    <span>Add module file/directory to {{(!parentDirName) ? 'the root' : ("'" + parentDirName + "'")}} directory</span>
-    <div class="close pe-2">
-      <button mat-icon-button mat-small-icon-button (click)="onNoClick()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="content" mat-dialog-content>
+<score-dialog-page title="Add module file/directory to {{ parentDirName ? &quot;'&quot; + parentDirName + &quot;'&quot; : 'the root' }} directory">
+  <div class="content dialog-form">
     <mat-accordion [@.disabled]="disableAnimation">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
@@ -95,7 +87,7 @@
                       @for (element of tile.elements; track element) {
                         <div class="grid-element">
                           <div (click)="onClickElement(tile, element)"
-                            [ngClass]="{'grid-element-content': true, 'selected': tile.current === element}">
+                            [ngClass]="{'grid-element-content': true, 'selected': tile.current === element, 'copy-blocked': isCopyBlocked(element)}">
                             @if (element.directory) {
                               <mat-icon class="float-start" inline=true>folder_open</mat-icon>
                             }
@@ -105,6 +97,9 @@
                             <div class="float-start element-title">
                               <span>{{ element.name }}</span>
                             </div>
+                            @if (isCopyBlocked(element)) {
+                              <mat-icon class="float-end" inline=true>block</mat-icon>
+                            }
                           </div>
                         </div>
                       }
@@ -114,8 +109,14 @@
               </div>
             </div>
           }
+          @if (isCopyBlocked(selected)) {
+            <div class="copy-blocked-hint mb-2" role="alert">
+              '{{ selected.name }}' cannot be copied into '{{ parentDirName || 'the root directory' }}' because the
+              destination is the module itself or inside it. Open it to pick a module inside, or select another module.
+            </div>
+          }
           <div class="d-flex align-items-center">
-            <button (click)="onCopy()" color="primary" mat-raised-button [disabled]="!this.selected">
+            <button (click)="onCopy()" color="primary" mat-raised-button [disabled]="!this.selected || isCopyBlocked(selected)">
               <mat-icon>content_copy</mat-icon>
               <span class="ps-2">Copy</span>
             </button>
@@ -125,10 +126,11 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <div class="actions ms-auto" mat-dialog-actions>
+
+  <ng-container ngProjectAs="[dialogActions]">
     <button color="warn" mat-raised-button (click)="cancel()">
       <mat-icon>close</mat-icon>
-      Cancel
+      <span class="ps-2">Cancel</span>
     </button>
-  </div>
-</div>
+  </ng-container>
+</score-dialog-page>

@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsccBizterm.AsccBiztermPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsbieBiztermRecord;
@@ -48,7 +48,7 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.asbie_bizterm</code>
+     * The reference instance of <code>asbie_bizterm</code>
      */
     public static final AsbieBizterm ASBIE_BIZTERM = new AsbieBizterm();
 
@@ -61,57 +61,57 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     }
 
     /**
-     * The column <code>oagi.asbie_bizterm.asbie_bizterm_id</code>. An internal,
+     * The column <code>asbie_bizterm.asbie_bizterm_id</code>. An internal,
      * primary database key of an asbie_bizterm record.
      */
     public final TableField<AsbieBiztermRecord, ULong> ASBIE_BIZTERM_ID = createField(DSL.name("asbie_bizterm_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "An internal, primary database key of an asbie_bizterm record.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.ascc_bizterm_id</code>. An internal
-     * ID of the ascc_business_term record.
+     * The column <code>asbie_bizterm.ascc_bizterm_id</code>. An internal ID of
+     * the ascc_business_term record.
      */
     public final TableField<AsbieBiztermRecord, ULong> ASCC_BIZTERM_ID = createField(DSL.name("ascc_bizterm_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the ascc_business_term record.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.asbie_id</code>. An internal ID of
-     * the associated ASBIE
+     * The column <code>asbie_bizterm.asbie_id</code>. An internal ID of the
+     * associated ASBIE
      */
     public final TableField<AsbieBiztermRecord, ULong> ASBIE_ID = createField(DSL.name("asbie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "An internal ID of the associated ASBIE");
 
     /**
-     * The column <code>oagi.asbie_bizterm.primary_indicator</code>. The
-     * indicator shows if the business term is primary for the assigned ASBIE.
+     * The column <code>asbie_bizterm.primary_indicator</code>. The indicator
+     * shows if the business term is primary for the assigned ASBIE.
      */
     public final TableField<AsbieBiztermRecord, Byte> PRIMARY_INDICATOR = createField(DSL.name("primary_indicator"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The indicator shows if the business term is primary for the assigned ASBIE.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.type_code</code>. The type code of
-     * the assignment.
+     * The column <code>asbie_bizterm.type_code</code>. The type code of the
+     * assignment.
      */
     public final TableField<AsbieBiztermRecord, String> TYPE_CODE = createField(DSL.name("type_code"), SQLDataType.CHAR(30).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CHAR)), this, "The type code of the assignment.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.created_by</code>. A foreign key
-     * referring to the user who creates the asbie_bizterm record. The creator
-     * of the asbie_bizterm is also its owner by default.
+     * The column <code>asbie_bizterm.created_by</code>. A foreign key referring
+     * to the user who creates the asbie_bizterm record. The creator of the
+     * asbie_bizterm is also its owner by default.
      */
     public final TableField<AsbieBiztermRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the asbie_bizterm record. The creator of the asbie_bizterm is also its owner by default.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.last_updated_by</code>. A foreign key
+     * The column <code>asbie_bizterm.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the asbie_bizterm record. This
      * may be the user who is in the same group as the creator.
      */
     public final TableField<AsbieBiztermRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the asbie_bizterm record. This may be the user who is in the same group as the creator.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.creation_timestamp</code>. Timestamp
-     * when the asbie_bizterm record was first created.
+     * The column <code>asbie_bizterm.creation_timestamp</code>. Timestamp when
+     * the asbie_bizterm record was first created.
      */
     public final TableField<AsbieBiztermRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the asbie_bizterm record was first created.");
 
     /**
-     * The column <code>oagi.asbie_bizterm.last_update_timestamp</code>. The
+     * The column <code>asbie_bizterm.last_update_timestamp</code>. The
      * timestamp when the asbie_bizterm was last updated.
      */
     public final TableField<AsbieBiztermRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the asbie_bizterm was last updated.");
@@ -125,21 +125,21 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.asbie_bizterm</code> table reference
+     * Create an aliased <code>asbie_bizterm</code> table reference
      */
     public AsbieBizterm(String alias) {
         this(DSL.name(alias), ASBIE_BIZTERM);
     }
 
     /**
-     * Create an aliased <code>oagi.asbie_bizterm</code> table reference
+     * Create an aliased <code>asbie_bizterm</code> table reference
      */
     public AsbieBizterm(Name alias) {
         this(alias, ASBIE_BIZTERM);
     }
 
     /**
-     * Create a <code>oagi.asbie_bizterm</code> table reference
+     * Create a <code>asbie_bizterm</code> table reference
      */
     public AsbieBizterm() {
         this(DSL.name("asbie_bizterm"), null);
@@ -180,7 +180,7 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -201,7 +201,7 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     private transient AsbiePath _asbie;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbie</code> table.
+     * Get the implicit join path to the <code>asbie</code> table.
      */
     public AsbiePath asbie() {
         if (_asbie == null)
@@ -213,7 +213,7 @@ public class AsbieBizterm extends TableImpl<AsbieBiztermRecord> {
     private transient AsccBiztermPath _asccBizterm;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc_bizterm</code> table.
+     * Get the implicit join path to the <code>ascc_bizterm</code> table.
      */
     public AsccBiztermPath asccBizterm() {
         if (_asccBizterm == null)

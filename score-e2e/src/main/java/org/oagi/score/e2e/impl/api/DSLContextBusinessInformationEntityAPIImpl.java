@@ -3,12 +3,15 @@ package org.oagi.score.e2e.impl.api;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Table;
 import org.jooq.types.ULong;
+import org.jooq.impl.DSL;
 import org.oagi.score.e2e.api.APIFactory;
 import org.oagi.score.e2e.api.BusinessInformationEntityAPI;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AbieRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AsbiepRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbieScRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BbiepRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BiePackageTopLevelAsbiepRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.BizCtxAssignmentRecord;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.*;
 import static org.oagi.score.e2e.obj.ObjectHelper.sha256;
 
@@ -58,6 +62,23 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     }
 
     @Override
+    public TopLevelASBIEPObject getLatestInheritedTopLevelASBIEP(
+            BigInteger basedTopLevelAsbiepId, BigInteger ownerUserId) {
+        ULong inheritedTopLevelAsbiepId = dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .where(and(
+                        TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.eq(
+                                ULong.valueOf(basedTopLevelAsbiepId)),
+                        TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(ULong.valueOf(ownerUserId))))
+                .orderBy(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.desc())
+                .limit(1)
+                .fetchOne(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID);
+        return inheritedTopLevelAsbiepId == null
+                ? null
+                : getTopLevelASBIEPByID(inheritedTopLevelAsbiepId.toBigInteger());
+    }
+
+    @Override
     public TopLevelASBIEPObject getTopLevelASBIEPByDENAndReleaseNum(String den, String releaseNum) {
         ULong releaseId = getReleaseIdByReleaseNum(releaseNum);
         List<Field<?>> fields = new ArrayList();
@@ -85,6 +106,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                 .set(TOP_LEVEL_ASBIEP.VERSION, topLevelASBIEP.getVersion())
                 .set(TOP_LEVEL_ASBIEP.STATUS, topLevelASBIEP.getStatus())
                 .set(TOP_LEVEL_ASBIEP.STATE, topLevelASBIEP.getState())
+                .set(TOP_LEVEL_ASBIEP.INVERSE_MODE, (byte) (topLevelASBIEP.isInverseMode() ? 1 : 0))
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelASBIEP.getTopLevelAsbiepId())))
                 .execute();
     }
@@ -92,10 +114,16 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     private TopLevelASBIEPObject topLevelASBIEPMapper(Record record) {
         TopLevelASBIEPObject topLevelASBIEPObject = new TopLevelASBIEPObject();
         topLevelASBIEPObject.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
+        ULong basedTopLevelAsbiepId = record.get(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID);
+        if (basedTopLevelAsbiepId != null) {
+            topLevelASBIEPObject.setBasedTopLevelAsbiepId(basedTopLevelAsbiepId.toBigInteger());
+        }
         topLevelASBIEPObject.setAsbiepId(record.get(TOP_LEVEL_ASBIEP.ASBIEP_ID).toBigInteger());
         topLevelASBIEPObject.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
         topLevelASBIEPObject.setStatus(record.get(TOP_LEVEL_ASBIEP.STATUS));
         topLevelASBIEPObject.setState(record.get(TOP_LEVEL_ASBIEP.STATE));
+        topLevelASBIEPObject.setInverseMode(record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) != null &&
+                record.get(TOP_LEVEL_ASBIEP.INVERSE_MODE) != 0);
         topLevelASBIEPObject.setLastUpdatedBy(record.get(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY).toBigInteger());
         topLevelASBIEPObject.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
         topLevelASBIEPObject.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
@@ -238,14 +266,14 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     @Override
     public void deleteTopLevelASBIEPByTopLevelASBIEPId(TopLevelASBIEPObject topLevelAsbiep) {
 
+        // Delete dependent BBIE_SC rows before their parent BBIE rows.
+        dslContext.deleteFrom(BBIE_SC).where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
+
         //Delete all BBIEs associated to the provided Top-level ASBIEP
         dslContext.deleteFrom(BBIE).where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
 
         //Delene all BBIEPs associated to the provided Top-level ASBIEP
         dslContext.deleteFrom(BBIEP).where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
-
-        //Delete all BBIE_SC associated to the provided Top-level ASBIEP
-        dslContext.deleteFrom(BBIE_SC).where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.getTopLevelAsbiepId()))).execute();
 
         //Delete all ASBIEs associated to the provided Top-level ASBIEP
         updateTopLevelAsbiepWithAsbiepID(topLevelAsbiep, null);
@@ -265,7 +293,7 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
     }
 
     @Override
-    public void materializeUsedBbieChildren(BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
+    public void createBbieNodesForUsedElements(BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
         ULong ownerId = ULong.valueOf(topLevelAsbiepId);
         ULong userId = ULong.valueOf(createdByUserId);
 
@@ -275,20 +303,31 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                 .fetchAny();
         if (rootAbie == null) {
             throw new IllegalStateException(
-                    "No root ABIE found for top-level ASBIEP " + topLevelAsbiepId + "; cannot materialize BBIEs.");
+                    "No root ABIE found for top-level ASBIEP " + topLevelAsbiepId + "; cannot create BBIE nodes.");
         }
         ULong abieId = rootAbie.getAbieId();
         String abiePath = rootAbie.getPath();
 
-        // The element BCCs (entity_type = 1) declared directly on the ABIE's ACC. createRandomACC
-        // produces a base-less ACC, so the directly-declared BCCs are the whole element set.
+        // Include the ACC base chain so fixtures built on inherited OAGIS ACCs
+        // receive the same element materialization as the editor.
+        List<ULong> accManifestIds = new ArrayList<>();
+        ULong accManifestId = rootAbie.getBasedAccManifestId();
+        while (accManifestId != null && !accManifestIds.contains(accManifestId)) {
+            accManifestIds.add(accManifestId);
+            accManifestId = dslContext.select(ACC_MANIFEST.BASED_ACC_MANIFEST_ID)
+                    .from(ACC_MANIFEST)
+                    .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(accManifestId))
+                    .fetchOne(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
+        }
+
         var bccManifests = dslContext
                 .select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.TO_BCCP_MANIFEST_ID,
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID,
                         BCC.CARDINALITY_MIN, BCC.CARDINALITY_MAX)
                 .from(BCC_MANIFEST)
                 .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
                 .where(and(
-                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(rootAbie.getBasedAccManifestId()),
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.in(accManifestIds),
                         BCC.ENTITY_TYPE.eq(1)))
                 .fetch();
 
@@ -300,7 +339,9 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
             Integer cardinalityMin = bccManifest.get(BCC.CARDINALITY_MIN);
             Integer cardinalityMax = bccManifest.get(BCC.CARDINALITY_MAX);
 
-            String bbiepPath = abiePath + ">BCCP-" + bccpManifestId.toBigInteger();
+            String bbiePath = elementBbiePath(abiePath, accManifestIds,
+                    bccManifest.get(BCC_MANIFEST.FROM_ACC_MANIFEST_ID), bccManifestId);
+            String bbiepPath = bbiePath + ">BCCP-" + bccpManifestId.toBigInteger();
             BbiepRecord bbiep = new BbiepRecord();
             bbiep.setGuid(randomGuid());
             bbiep.setBasedBccpManifestId(bccpManifestId);
@@ -316,7 +357,6 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                     .returning(BBIEP.BBIEP_ID)
                     .fetchOne().getBbiepId();
 
-            String bbiePath = abiePath + ">BCC-" + bccManifestId.toBigInteger();
             BbieRecord bbie = new BbieRecord();
             bbie.setGuid(randomGuid());
             bbie.setBasedBccManifestId(bccManifestId);
@@ -340,6 +380,223 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
 
             seqKey = seqKey.add(BigDecimal.ONE);
         }
+    }
+
+    @Override
+    public void createBbieScForFirstBbie(BigInteger topLevelAsbiepId, BigInteger createdByUserId) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        ULong userId = ULong.valueOf(createdByUserId);
+        BbieRecord bbie = dslContext.selectFrom(BBIE)
+                .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId))
+                .orderBy(BBIE.BBIE_ID.asc())
+                .fetchAny();
+        if (bbie == null) {
+            throw new IllegalStateException("No BBIE found for top-level ASBIEP " + topLevelAsbiepId);
+        }
+
+        createBbieSc(bbie, ownerId, userId, null, null);
+    }
+
+    @Override
+    public void createBbieScForBbieAndDtSc(BigInteger topLevelAsbiepId, BigInteger createdByUserId,
+                                           String bbiePropertyTerm, String dtScPropertyTerm,
+                                           String dtScRepresentationTerm) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        ULong userId = ULong.valueOf(createdByUserId);
+        ULong bbieId = dslContext.select(BBIE.BBIE_ID)
+                .from(BBIE)
+                .join(BCC_MANIFEST).on(BBIE.BASED_BCC_MANIFEST_ID.eq(BCC_MANIFEST.BCC_MANIFEST_ID))
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .where(and(
+                        BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId),
+                        BCCP.PROPERTY_TERM.eq(bbiePropertyTerm)))
+                .orderBy(BBIE.BBIE_ID.asc())
+                .limit(1)
+                .fetchOne(BBIE.BBIE_ID);
+        if (bbieId == null) {
+            throw new IllegalStateException("No BBIE with property term '" + bbiePropertyTerm
+                    + "' found for top-level ASBIEP " + topLevelAsbiepId);
+        }
+
+        BbieRecord bbie = dslContext.selectFrom(BBIE)
+                .where(BBIE.BBIE_ID.eq(bbieId))
+                .fetchOne();
+        createBbieSc(bbie, ownerId, userId, dtScPropertyTerm, dtScRepresentationTerm);
+    }
+
+    private void createBbieSc(BbieRecord bbie, ULong ownerId, ULong userId,
+                              String dtScPropertyTerm, String dtScRepresentationTerm) {
+        var scManifest = dslContext.select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID,
+                        BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BDT_MANIFEST_ID)
+                .from(BCC_MANIFEST)
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .join(DT_SC_MANIFEST).on(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(BCCP_MANIFEST.BDT_MANIFEST_ID))
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .where(and(
+                        BCC_MANIFEST.BCC_MANIFEST_ID.eq(bbie.getBasedBccManifestId()),
+                        dtScPropertyTerm == null ? DSL.noCondition() : DT_SC.PROPERTY_TERM.eq(dtScPropertyTerm),
+                        dtScRepresentationTerm == null ? DSL.noCondition() :
+                                DT_SC.REPRESENTATION_TERM.eq(dtScRepresentationTerm)))
+                .orderBy(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.asc())
+                .limit(1)
+                .fetchOne();
+        if (scManifest == null) {
+            throw new IllegalStateException("No DT_SC manifest found for BBIE " + bbie.getBbieId());
+        }
+
+        ULong dtScManifestId = scManifest.get(DT_SC_MANIFEST.DT_SC_MANIFEST_ID);
+        // The edit tree's BBIEP path is BBIE.PATH>BCCP-...>DT-...; BBIE_SC
+        // extends that path with its DT_SC manifest segment.
+        String path = bbie.getPath()
+                + ">BCCP-" + scManifest.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)
+                + ">DT-" + scManifest.get(BCCP_MANIFEST.BDT_MANIFEST_ID)
+                + ">DT_SC-" + dtScManifestId;
+        LocalDateTime timestamp = LocalDateTime.now();
+        BbieScRecord bbieSc = new BbieScRecord();
+        bbieSc.setGuid(randomGuid());
+        bbieSc.setBasedDtScManifestId(dtScManifestId);
+        bbieSc.setPath(path);
+        bbieSc.setHashPath(sha256(path));
+        bbieSc.setBbieId(bbie.getBbieId());
+        bbieSc.setCardinalityMin(0);
+        bbieSc.setCardinalityMax(1);
+        bbieSc.setIsUsed((byte) 1);
+        bbieSc.setIsDeprecated((byte) 0);
+        bbieSc.setCreatedBy(userId);
+        bbieSc.setLastUpdatedBy(userId);
+        bbieSc.setCreationTimestamp(timestamp);
+        bbieSc.setLastUpdateTimestamp(timestamp);
+        bbieSc.setOwnerTopLevelAsbiepId(ownerId);
+        dslContext.insertInto(BBIE_SC).set(bbieSc).execute();
+    }
+
+    /** Match the editor's root-to-declaring-ACC path for inherited elements. */
+    static String elementBbiePath(String abiePath, List<ULong> accChain,
+                                  ULong declaringAccId, ULong bccManifestId) {
+        int declaringIndex = accChain.indexOf(declaringAccId);
+        if (declaringIndex < 0) {
+            throw new IllegalArgumentException("Declaring ACC is not in the root ACC base chain: " + declaringAccId);
+        }
+        StringBuilder path = new StringBuilder(abiePath);
+        for (int i = 1; i <= declaringIndex; i++) {
+            path.append(">ACC-").append(accChain.get(i));
+        }
+        return path.append(">BCC-").append(bccManifestId).toString();
+    }
+
+    @Override
+    public List<BigInteger> getReusedTopLevelAsbiepIds(BigInteger topLevelAsbiepId) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        return dslContext.select(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(ASBIE)
+                .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .where(and(
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId),
+                        ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.ne(ownerId)))
+                .fetch(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .stream()
+                .map(ULong::toBigInteger)
+                .toList();
+    }
+
+    @Override
+    public int countBbieSc(BigInteger topLevelAsbiepId) {
+        return dslContext.selectCount()
+                .from(BBIE_SC)
+                .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                .fetchOne(0, int.class);
+    }
+
+    @Override
+    public List<String> getBbiePathsHavingBbieSc(BigInteger topLevelAsbiepId) {
+        return dslContext.select(BBIE.PATH)
+                .from(BBIE_SC)
+                .join(BBIE).on(BBIE_SC.BBIE_ID.eq(BBIE.BBIE_ID))
+                .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                .orderBy(BBIE.PATH.asc())
+                .fetch(BBIE.PATH);
+    }
+
+    @Override
+    public BigInteger getBbieXbtIdByPath(BigInteger topLevelAsbiepId, String bbiePath) {
+        return getXbtIdByBiePath(
+                topLevelAsbiepId,
+                bbiePath,
+                BBIE,
+                BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
+                BBIE.PATH,
+                BBIE.XBT_MANIFEST_ID);
+    }
+
+    @Override
+    public BigInteger getBbieScXbtIdByBbiePathAndPropertyAndRepresentationTerm(BigInteger topLevelAsbiepId,
+                                                                                 String bbiePath,
+                                                                                 String propertyTerm,
+                                                                                 String representationTerm) {
+        List<ULong> xbtIds = dslContext.select(XBT_MANIFEST.XBT_ID)
+                .from(BBIE_SC)
+                .join(BBIE).on(BBIE_SC.BBIE_ID.eq(BBIE.BBIE_ID))
+                .join(DT_SC_MANIFEST).on(BBIE_SC.BASED_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.DT_SC_MANIFEST_ID))
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .join(XBT_MANIFEST).on(BBIE_SC.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
+                .where(and(
+                        BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
+                        BBIE.PATH.eq(bbiePath),
+                        DT_SC.PROPERTY_TERM.eq(propertyTerm),
+                        DT_SC.REPRESENTATION_TERM.eq(representationTerm)))
+                .fetch(XBT_MANIFEST.XBT_ID);
+        if (xbtIds.size() != 1) {
+            throw new IllegalStateException("Expected exactly one BBIE_SC primitive for path '"
+                    + bbiePath + "', property term '" + propertyTerm + "', representation term '"
+                    + representationTerm + "', found " + xbtIds.size());
+        }
+        return xbtIds.get(0).toBigInteger();
+    }
+
+    private BigInteger getXbtIdByBiePath(BigInteger topLevelAsbiepId,
+                                         String biePath,
+                                         Table<?> bieTable,
+                                         Field<ULong> ownerField,
+                                         Field<String> pathField,
+                                         Field<ULong> xbtManifestField) {
+        List<ULong> xbtIds = dslContext.select(XBT_MANIFEST.XBT_ID)
+                .from(bieTable)
+                .join(XBT_MANIFEST).on(xbtManifestField.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
+                .where(and(
+                        ownerField.eq(ULong.valueOf(topLevelAsbiepId)),
+                        pathField.eq(biePath)))
+                .fetch(XBT_MANIFEST.XBT_ID);
+        if (xbtIds.size() != 1) {
+            throw new IllegalStateException("Expected exactly one BBIE primitive for path '"
+                    + biePath + "', found " + xbtIds.size());
+        }
+        return xbtIds.get(0).toBigInteger();
+    }
+
+    @Override
+    public boolean hasValidBbieOwnership(BigInteger topLevelAsbiepId) {
+        ULong ownerId = ULong.valueOf(topLevelAsbiepId);
+        Integer invalidCount = dslContext.selectCount()
+                .from(BBIE)
+                .leftJoin(ABIE).on(BBIE.FROM_ABIE_ID.eq(ABIE.ABIE_ID))
+                .where(and(
+                        BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId),
+                        or(
+                                ABIE.ABIE_ID.isNull(),
+                                ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.ne(ownerId))))
+                .fetchOne(0, int.class);
+        Integer invalidBbieScCount = dslContext.selectCount()
+                .from(BBIE_SC)
+                .leftJoin(BBIE).on(BBIE_SC.BBIE_ID.eq(BBIE.BBIE_ID))
+                .where(and(
+                        BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ownerId),
+                        or(
+                                BBIE.BBIE_ID.isNull(),
+                                BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.ne(ownerId))))
+                .fetchOne(0, int.class);
+        return invalidCount != null && invalidCount == 0
+                && invalidBbieScCount != null && invalidBbieScCount == 0;
     }
 
     private static String randomGuid() {

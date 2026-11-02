@@ -121,6 +121,8 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         BCCPViewEditPage.BCCPPanel bccpPanel = bccpViewEditPage.getBCCPPanelContainer().getBCCPPanel();
         assertEquals("Fixed Value", getText(bccpPanel.getValueConstraintSelectField()));
         assertEquals(randomBCCP.getFixedValue(), getText(bccpPanel.getFixedValueField()));
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(10))
+                .until(driver -> !bccpPanel.getFixedValueField().isEnabled());
         assertDisabled(bccpPanel.getFixedValueField());
     }
 
@@ -387,7 +389,7 @@ public class TC_10_21_EditingRevisionDeveloperBCCP extends BaseTest {
         BCCPViewEditPage finalBccpViewEditPage = bccpViewEditPage;
         assertThrows(TimeoutException.class, () -> finalBccpViewEditPage.hitUpdateButton());
         assertEquals("Update without definitions.", getText(visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]/span"))));
+                By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span"))));
     }
 
     @Test

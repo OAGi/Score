@@ -11,6 +11,9 @@ import {ColumnSelectorModule} from '../common/column-selector/column-selector.mo
 import {LibraryListComponent} from './library-list/library-list.component';
 import {LibraryCreateComponent} from './library-create/library-create.component';
 import {LibraryDetailComponent} from './library-detail/library-detail.component';
+import {SCORE_TABLE} from '../common/score-table';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 const routes: Routes = [
   {
@@ -47,7 +50,10 @@ const routes: Routes = [
     CommonModule,
     ScoreCommonModule,
     SearchBarModule,
-    ColumnSelectorModule
+    ColumnSelectorModule,
+    RecordCompactRowComponent,
+    ResponsiveButtonComponent,
+    ...SCORE_TABLE
   ],
   declarations: [
     LibraryListComponent,

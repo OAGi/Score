@@ -1,0 +1,34 @@
+<score-tree-viewport [dataSource]="dataSource" [searcher]="searcher" [height]="height"
+                     [contextMenuFor]="menuOf"
+                     [cursorNode]="cursorNode" (cursorNodeChange)="cursorNodeChange.emit($event)"
+                     [isDraggable]="isDraggable" [showDragHandle]="isDraggable" [canDrop]="canDrop"
+                     [isDragHandleHidden]="isDragHandleHidden" [dragHandleStopsClick]="true"
+                     [dropInvalid]="dropInvalid"
+                     (nodeClick)="nodeClick.emit($event)" (nodeKey)="nodeKey.emit($event)"
+                     (copyLink)="copyLink.emit($event)" (contextMenuOpen)="contextMenuOpen.emit($event)"
+                     (dropped)="dropped.emit($event)" (dragStarted)="dragStarted.emit($event)"
+                     (dragMoved)="dragMoved.emit($event)" (dragEnded)="dragEnded.emit()">
+  <ng-template #lead let-node>
+    @for (guide of host.choiceGuides(node); track $index) {
+      <span class="choice-branch-guide"
+            [class.choice-branch-guide-continue]="guide.continuation"
+            [class.choice-branch-guide-first]="guide.first && !guide.continuation"
+            [class.choice-branch-guide-last]="guide.last && !guide.continuation"
+            [class.choice-branch-guide-only]="guide.only && !guide.continuation"
+            [style.--choice-guide-extra-offset.px]="guide.offset"
+            [matTooltip]="guide.tooltip"></span>
+    }
+  </ng-template>
+
+  <ng-template #content let-node>
+    <span class="node-label"
+          [class]="[node.type.toLowerCase(), searcher.isSearchResult(node) ? 'inside' : 'outside']"
+          [class.deprecated]="node.deprecated"
+          [matTooltip]="node.deprecated ? 'Deprecated' : ''"
+          [class.search-index]="searcher.isCurrentSearchIndex(node)"
+          [innerHTML]="node.name | highlight : searcher.keywordFor(node, node.name)">
+    </span>
+
+    <score-tree-decorations [node]="node" [decorators]="decorators"/>
+  </ng-template>
+</score-tree-viewport>

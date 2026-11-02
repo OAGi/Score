@@ -133,6 +133,29 @@ A documentation-only or metadata-only change (for example editing the definition
 12. For a value domain narrowed in XML only, verify `xmlSchema = false` and `jsonSchema = true`. (Assertion [#8](#test-assertion-4628))
 13. For a documentation-only change, verify `xmlSchema = true` and `jsonSchema = true`. (Assertion [#9](#test-assertion-4629))
 
+## Test Case 46.3
+
+**BIE Package export names its schema files by the configured BIE Package Schema filename expression**
+
+Pre-condition: The `BIE Package Schema Expression` of the Filename Expressions application setting can be changed and is restored after the test. The test runs alone, because the setting is global.
+
+### Test Assertion:
+
+#### Test Assertion #46.3.1
+When a BIE Package is generated, each schema file in the ZIP is named by the `BIE Package Schema Expression` configured in the Filename Expressions application setting, not by the built-in default. With `PKGEXPR-{BIE Property Term:separator('_')}`, a BIE whose property term is `Person Name` is generated as `PKGEXPR-Person_Name.xsd`.
+
+### Test Step Pre-condition:
+
+1. The `BIE Package Schema Expression` is set to `PKGEXPR-{BIE Property Term:separator('_')}`.
+2. An end-user account that can manage BIEs and BIE Packages is available, with a `WIP` BIE whose property term is `Person Name`.
+3. A BIE Package containing that BIE exists.
+
+### Test Step:
+
+1. The end-user logs into the system and opens the BIE Package.
+2. The end-user clicks **Generate** and downloads the BIE Package ZIP.
+3. Verify that the ZIP contains a schema file named `PKGEXPR-Person_Name.xsd`. (Assertion [#1](#test-assertion-4631))
+
 ## Known coverage gaps
 
 This suite covers the issue [#1733](https://github.com/OAGi/Score/issues/1733) manifest surface (Revision Reason and Backward Compatibility Indicator, plus the `0.2`/`0.3` Manifest Version selector). It is **not** a comprehensive BIE Package suite. The following BIE Package behaviors shipped alongside #1733 but are **not yet automated** here; they are tracked so the suite is not mistaken for full coverage:

@@ -21,20 +21,20 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Module.ModulePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAccManifest.ModuleAccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAgencyIdListManifest.ModuleAgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleAsccpManifest.ModuleAsccpManifestPath;
@@ -58,7 +58,7 @@ public class Module extends TableImpl<ModuleRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.module</code>
+     * The reference instance of <code>module</code>
      */
     public static final Module MODULE = new Module();
 
@@ -71,64 +71,63 @@ public class Module extends TableImpl<ModuleRecord> {
     }
 
     /**
-     * The column <code>oagi.module.module_id</code>. Primary, internal database
-     * key.
+     * The column <code>module.module_id</code>. Primary, internal database key.
      */
-    public final TableField<ModuleRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<ModuleRecord, ULong> MODULE_ID = createField(DSL.name("module_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.module.module_set_id</code>. This indicates a
-     * module set.
+     * The column <code>module.module_set_id</code>. This indicates a module
+     * set.
      */
     public final TableField<ModuleRecord, ULong> MODULE_SET_ID = createField(DSL.name("module_set_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This indicates a module set.");
 
     /**
-     * The column <code>oagi.module.parent_module_id</code>. This indicates a
-     * parent module id. root module will be NULL.
+     * The column <code>module.parent_module_id</code>. This indicates a parent
+     * module id. root module will be NULL.
      */
     public final TableField<ModuleRecord, ULong> PARENT_MODULE_ID = createField(DSL.name("parent_module_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "This indicates a parent module id. root module will be NULL.");
 
     /**
-     * The column <code>oagi.module.type</code>. This is a type column for
-     * indicates module is FILE or DIRECTORY.
+     * The column <code>module.type</code>. This is a type column that indicates
+     * whether the module is FILE or DIRECTORY.
      */
-    public final TableField<ModuleRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(45).nullable(false), this, "This is a type column for indicates module is FILE or DIRECTORY.");
+    public final TableField<ModuleRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(45).nullable(false), this, "This is a type column that indicates whether the module is FILE or DIRECTORY.");
 
     /**
-     * The column <code>oagi.module.path</code>. Absolute path to the module.
+     * The column <code>module.path</code>. Absolute path to the module.
      */
     public final TableField<ModuleRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).nullable(false), this, "Absolute path to the module.");
 
     /**
-     * The column <code>oagi.module.name</code>. The is the filename of the
-     * module. The reason to not including the extension is that the extension
-     * maybe dependent on the expression. For XML schema, '.xsd' maybe added; or
-     * for JSON, '.json' maybe added as the file extension.
+     * The column <code>module.name</code>. This is the filename of the module.
+     * The reason to not including the extension is that the extension maybe
+     * dependent on the expression. For XML schema, '.xsd' maybe added; or for
+     * JSON, '.json' maybe added as the file extension.
      */
-    public final TableField<ModuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "The is the filename of the module. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, '.xsd' maybe added; or for JSON, '.json' maybe added as the file extension.");
+    public final TableField<ModuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "This is the filename of the module. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, '.xsd' maybe added; or for JSON, '.json' maybe added as the file extension.");
 
     /**
-     * The column <code>oagi.module.namespace_id</code>. Note that a release
-     * record has a namespace associated. The NAMESPACE_ID, if specified here,
+     * The column <code>module.namespace_id</code>. Note that a release record
+     * has a namespace associated. The NAMESPACE_ID, if specified here,
      * overrides the release's namespace. However, the NAMESPACE_ID associated
      * with the component takes the highest precedence.
      */
     public final TableField<ModuleRecord, ULong> NAMESPACE_ID = createField(DSL.name("namespace_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release's namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.");
 
     /**
-     * The column <code>oagi.module.version_num</code>. This is the version
-     * number to be assigned to the schema module.
+     * The column <code>module.version_num</code>. This is the version number to
+     * be assigned to the schema module.
      */
     public final TableField<ModuleRecord, String> VERSION_NUM = createField(DSL.name("version_num"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the version number to be assigned to the schema module.");
 
     /**
-     * The column <code>oagi.module.created_by</code>. Foreign key to the
-     * APP_USER table. It indicates the user who created this MODULE.
+     * The column <code>module.created_by</code>. Foreign key to the APP_USER
+     * table. It indicates the user who created this MODULE.
      */
     public final TableField<ModuleRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. It indicates the user who created this MODULE.");
 
     /**
-     * The column <code>oagi.module.last_updated_by</code>. Foreign key to the
+     * The column <code>module.last_updated_by</code>. Foreign key to the
      * APP_USER table referring to the last user who updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -137,20 +136,20 @@ public class Module extends TableImpl<ModuleRecord> {
     public final TableField<ModuleRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the last user who updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).");
 
     /**
-     * The column <code>oagi.module.owner_user_id</code>. Foreign key to the
-     * APP_USER table identifying the user who can update or delete the record.
+     * The column <code>module.owner_user_id</code>. Foreign key to the APP_USER
+     * table identifying the user who can update or delete the record.
      */
     public final TableField<ModuleRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table identifying the user who can update or delete the record.");
 
     /**
-     * The column <code>oagi.module.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * The column <code>module.creation_timestamp</code>. The timestamp when the
+     * record was first created.
      */
     public final TableField<ModuleRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was first created.");
 
     /**
-     * The column <code>oagi.module.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * The column <code>module.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      */
     public final TableField<ModuleRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the record was last updated.");
 
@@ -163,21 +162,21 @@ public class Module extends TableImpl<ModuleRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.module</code> table reference
+     * Create an aliased <code>module</code> table reference
      */
     public Module(String alias) {
         this(DSL.name(alias), MODULE);
     }
 
     /**
-     * Create an aliased <code>oagi.module</code> table reference
+     * Create an aliased <code>module</code> table reference
      */
     public Module(Name alias) {
         this(alias, MODULE);
     }
 
     /**
-     * Create a <code>oagi.module</code> table reference
+     * Create a <code>module</code> table reference
      */
     public Module() {
         this(DSL.name("module"), null);
@@ -218,7 +217,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -239,8 +238,8 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient AppUserPath _moduleCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>module_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>module_created_by_fk</code> key.
      */
     public AppUserPath moduleCreatedByFk() {
         if (_moduleCreatedByFk == null)
@@ -252,8 +251,8 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient AppUserPath _moduleLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>module_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>module_last_updated_by_fk</code> key.
      */
     public AppUserPath moduleLastUpdatedByFk() {
         if (_moduleLastUpdatedByFk == null)
@@ -265,7 +264,7 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient ModuleSetPath _moduleSet;
 
     /**
-     * Get the implicit join path to the <code>oagi.module_set</code> table.
+     * Get the implicit join path to the <code>module_set</code> table.
      */
     public ModuleSetPath moduleSet() {
         if (_moduleSet == null)
@@ -277,7 +276,7 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient NamespacePath _namespace;
 
     /**
-     * Get the implicit join path to the <code>oagi.namespace</code> table.
+     * Get the implicit join path to the <code>namespace</code> table.
      */
     public NamespacePath namespace() {
         if (_namespace == null)
@@ -289,8 +288,8 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient AppUserPath _moduleOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>module_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>module_owner_user_id_fk</code> key.
      */
     public AppUserPath moduleOwnerUserIdFk() {
         if (_moduleOwnerUserIdFk == null)
@@ -302,7 +301,7 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient ModulePath _module;
 
     /**
-     * Get the implicit join path to the <code>oagi.module</code> table.
+     * Get the implicit join path to the <code>module</code> table.
      */
     public ModulePath module() {
         if (_module == null)
@@ -315,7 +314,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_acc_manifest</code> table
+     * <code>module_acc_manifest</code> table
      */
     public ModuleAccManifestPath moduleAccManifest() {
         if (_moduleAccManifest == null)
@@ -328,7 +327,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_agency_id_list_manifest</code> table
+     * <code>module_agency_id_list_manifest</code> table
      */
     public ModuleAgencyIdListManifestPath moduleAgencyIdListManifest() {
         if (_moduleAgencyIdListManifest == null)
@@ -341,7 +340,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_asccp_manifest</code> table
+     * <code>module_asccp_manifest</code> table
      */
     public ModuleAsccpManifestPath moduleAsccpManifest() {
         if (_moduleAsccpManifest == null)
@@ -354,7 +353,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_bccp_manifest</code> table
+     * <code>module_bccp_manifest</code> table
      */
     public ModuleBccpManifestPath moduleBccpManifest() {
         if (_moduleBccpManifest == null)
@@ -367,7 +366,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_blob_content_manifest</code> table
+     * <code>module_blob_content_manifest</code> table
      */
     public ModuleBlobContentManifestPath moduleBlobContentManifest() {
         if (_moduleBlobContentManifest == null)
@@ -380,7 +379,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_code_list_manifest</code> table
+     * <code>module_code_list_manifest</code> table
      */
     public ModuleCodeListManifestPath moduleCodeListManifest() {
         if (_moduleCodeListManifest == null)
@@ -392,8 +391,8 @@ public class Module extends TableImpl<ModuleRecord> {
     private transient ModuleDtManifestPath _moduleDtManifest;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.module_dt_manifest</code> table
+     * Get the implicit to-many join path to the <code>module_dt_manifest</code>
+     * table
      */
     public ModuleDtManifestPath moduleDtManifest() {
         if (_moduleDtManifest == null)
@@ -406,7 +405,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_xbt_manifest</code> table
+     * <code>module_xbt_manifest</code> table
      */
     public ModuleXbtManifestPath moduleXbtManifest() {
         if (_moduleXbtManifest == null)
@@ -459,7 +458,7 @@ public class Module extends TableImpl<ModuleRecord> {
      */
     @Override
     public Module where(Condition condition) {
-        return new Module(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Module(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -526,7 +525,7 @@ public class Module extends TableImpl<ModuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Module whereExists(Select<?> select) {
+    public Module whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -534,7 +533,7 @@ public class Module extends TableImpl<ModuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Module whereNotExists(Select<?> select) {
+    public Module whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

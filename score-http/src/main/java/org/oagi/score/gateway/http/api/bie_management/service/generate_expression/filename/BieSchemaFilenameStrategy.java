@@ -19,6 +19,16 @@ public interface BieSchemaFilenameStrategy {
     String buildBaseFilename(ScoreUser requester,
                              TopLevelAsbiepSummaryRecord topLevelAsbiep);
 
+    /**
+     * Builds a base filename for a schema file shared by the schema files of the generation run,
+     * such as {@code CommonCodeList}. A BIE package prefixes it with the package name and version ID,
+     * as the schema files of the package are.
+     *
+     * @param commonName name of the shared file, without file extension
+     * @return base filename without file extension
+     */
+    String buildCommonFilename(String commonName);
+
     String resolveDuplicateFilename(String baseFilename,
                                     TopLevelAsbiepId topLevelAsbiepId,
                                     int occurrence,

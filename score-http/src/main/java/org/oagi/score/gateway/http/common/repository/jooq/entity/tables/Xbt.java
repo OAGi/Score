@@ -22,21 +22,21 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Indexes;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt.XbtPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.XbtRecord;
 
@@ -52,7 +52,7 @@ public class Xbt extends TableImpl<XbtRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.xbt</code>
+     * The reference instance of <code>xbt</code>
      */
     public static final Xbt XBT = new Xbt();
 
@@ -65,115 +65,114 @@ public class Xbt extends TableImpl<XbtRecord> {
     }
 
     /**
-     * The column <code>oagi.xbt.xbt_id</code>. Primary, internal database key.
+     * The column <code>xbt.xbt_id</code>. Primary, internal database key.
      */
-    public final TableField<XbtRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary, internal database key.");
+    public final TableField<XbtRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary, internal database key.");
 
     /**
-     * The column <code>oagi.xbt.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>xbt.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<XbtRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.xbt.name</code>. Human understandable name of the
+     * The column <code>xbt.name</code>. Human understandable name of the
      * built-in type.
      */
     public final TableField<XbtRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Human understandable name of the built-in type.");
 
     /**
-     * The column <code>oagi.xbt.builtIn_type</code>. Built-in type as it should
+     * The column <code>xbt.builtIn_type</code>. Built-in type as it should
      * appear in the XML schema including the namespace prefix. Namespace prefix
      * for the XML schema namespace is assumed to be 'xsd' and a default prefix
-     * for the OAGIS built-int type.
+     * for the OAGIS built-in type.
      */
-    public final TableField<XbtRecord, String> BUILTIN_TYPE = createField(DSL.name("builtIn_type"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-int type.");
+    public final TableField<XbtRecord, String> BUILTIN_TYPE = createField(DSL.name("builtIn_type"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be 'xsd' and a default prefix for the OAGIS built-in type.");
 
     /**
-     * The column <code>oagi.xbt.jbt_draft05_map</code>. Mapping from XML
-     * built-in datatype to JSON Schema Draft-05 type definition (JSON text).
+     * The column <code>xbt.jbt_draft05_map</code>. Mapping from XML built-in
+     * datatype to JSON Schema Draft-05 type definition (JSON text).
      */
     public final TableField<XbtRecord, String> JBT_DRAFT05_MAP = createField(DSL.name("jbt_draft05_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to JSON Schema Draft-05 type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.jbt_202012_map</code>. Mapping from XML
-     * built-in datatype to JSON Schema 2020-12 type definition (JSON text).
+     * The column <code>xbt.jbt_202012_map</code>. Mapping from XML built-in
+     * datatype to JSON Schema 2020-12 type definition (JSON text).
      */
     public final TableField<XbtRecord, String> JBT_202012_MAP = createField(DSL.name("jbt_202012_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to JSON Schema 2020-12 type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.openapi30_map</code>. Mapping from XML built-in
+     * The column <code>xbt.openapi30_map</code>. Mapping from XML built-in
      * datatype to OpenAPI 3.0.3 schema type definition (JSON text).
      */
     public final TableField<XbtRecord, String> OPENAPI30_MAP = createField(DSL.name("openapi30_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to OpenAPI 3.0.3 schema type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.openapi31_map</code>. Mapping from XML built-in
+     * The column <code>xbt.openapi31_map</code>. Mapping from XML built-in
      * datatype to OpenAPI 3.1.1 schema type definition (JSON text).
      */
     public final TableField<XbtRecord, String> OPENAPI31_MAP = createField(DSL.name("openapi31_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to OpenAPI 3.1.1 schema type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.avro_map</code>. Mapping from XML built-in
-     * datatype to Apache Avro schema type definition (JSON text).
+     * The column <code>xbt.avro_map</code>. Mapping from XML built-in datatype
+     * to Apache Avro schema type definition (JSON text).
      */
     public final TableField<XbtRecord, String> AVRO_MAP = createField(DSL.name("avro_map"), SQLDataType.VARCHAR(500).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Mapping from XML built-in datatype to Apache Avro schema type definition (JSON text).");
 
     /**
-     * The column <code>oagi.xbt.subtype_of_xbt_id</code>. Foreign key to the
-     * XBT table itself. It indicates a super type of this XSD built-in type.
+     * The column <code>xbt.subtype_of_xbt_id</code>. Foreign key to the XBT
+     * table itself. It indicates a super type of this XSD built-in type.
      */
     public final TableField<XbtRecord, ULong> SUBTYPE_OF_XBT_ID = createField(DSL.name("subtype_of_xbt_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.");
 
     /**
-     * The column <code>oagi.xbt.schema_definition</code>. Schema definition
-     * text for the built-in type when applicable.
+     * The column <code>xbt.schema_definition</code>. Schema definition text for
+     * the built-in type when applicable.
      */
     public final TableField<XbtRecord, String> SCHEMA_DEFINITION = createField(DSL.name("schema_definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Schema definition text for the built-in type when applicable.");
 
     /**
-     * The column <code>oagi.xbt.revision_doc</code>. Revision notes or
-     * documentation for this built-in type mapping.
+     * The column <code>xbt.revision_doc</code>. Revision notes or documentation
+     * for this built-in type mapping.
      */
     public final TableField<XbtRecord, String> REVISION_DOC = createField(DSL.name("revision_doc"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Revision notes or documentation for this built-in type mapping.");
 
     /**
-     * The column <code>oagi.xbt.state</code>. Record lifecycle state code.
+     * The column <code>xbt.state</code>. Record lifecycle state code.
      */
     public final TableField<XbtRecord, Integer> STATE = createField(DSL.name("state"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "Record lifecycle state code.");
 
     /**
-     * The column <code>oagi.xbt.created_by</code>. User ID that created this
-     * record (FK to app_user.app_user_id).
+     * The column <code>xbt.created_by</code>. User ID that created this record
+     * (FK to app_user.app_user_id).
      */
     public final TableField<XbtRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "User ID that created this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.owner_user_id</code>. Owner user ID for this
-     * record (FK to app_user.app_user_id).
+     * The column <code>xbt.owner_user_id</code>. Owner user ID for this record
+     * (FK to app_user.app_user_id).
      */
     public final TableField<XbtRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Owner user ID for this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.last_updated_by</code>. User ID that last
-     * updated this record (FK to app_user.app_user_id).
+     * The column <code>xbt.last_updated_by</code>. User ID that last updated
+     * this record (FK to app_user.app_user_id).
      */
     public final TableField<XbtRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "User ID that last updated this record (FK to app_user.app_user_id).");
 
     /**
-     * The column <code>oagi.xbt.creation_timestamp</code>. Timestamp when this
+     * The column <code>xbt.creation_timestamp</code>. Timestamp when this
      * record was created.
      */
     public final TableField<XbtRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
-     * The column <code>oagi.xbt.last_update_timestamp</code>. Timestamp when
-     * this record was last updated.
+     * The column <code>xbt.last_update_timestamp</code>. Timestamp when this
+     * record was last updated.
      */
     public final TableField<XbtRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
 
     /**
-     * The column <code>oagi.xbt.is_deprecated</code>. Deprecation flag (1
+     * The column <code>xbt.is_deprecated</code>. Deprecation flag (1
      * deprecated, 0 active).
      */
     public final TableField<XbtRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Deprecation flag (1 deprecated, 0 active).");
@@ -187,21 +186,21 @@ public class Xbt extends TableImpl<XbtRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.xbt</code> table reference
+     * Create an aliased <code>xbt</code> table reference
      */
     public Xbt(String alias) {
         this(DSL.name(alias), XBT);
     }
 
     /**
-     * Create an aliased <code>oagi.xbt</code> table reference
+     * Create an aliased <code>xbt</code> table reference
      */
     public Xbt(Name alias) {
         this(alias, XBT);
     }
 
     /**
-     * Create a <code>oagi.xbt</code> table reference
+     * Create a <code>xbt</code> table reference
      */
     public Xbt() {
         this(DSL.name("xbt"), null);
@@ -242,7 +241,7 @@ public class Xbt extends TableImpl<XbtRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -268,8 +267,8 @@ public class Xbt extends TableImpl<XbtRecord> {
     private transient AppUserPath _xbtCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>xbt_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>xbt_created_by_fk</code> key.
      */
     public AppUserPath xbtCreatedByFk() {
         if (_xbtCreatedByFk == null)
@@ -281,8 +280,8 @@ public class Xbt extends TableImpl<XbtRecord> {
     private transient AppUserPath _xbtLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>xbt_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>xbt_last_updated_by_fk</code> key.
      */
     public AppUserPath xbtLastUpdatedByFk() {
         if (_xbtLastUpdatedByFk == null)
@@ -294,8 +293,8 @@ public class Xbt extends TableImpl<XbtRecord> {
     private transient AppUserPath _xbtOwnerUserIdFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>xbt_owner_user_id_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>xbt_owner_user_id_fk</code> key.
      */
     public AppUserPath xbtOwnerUserIdFk() {
         if (_xbtOwnerUserIdFk == null)
@@ -307,7 +306,7 @@ public class Xbt extends TableImpl<XbtRecord> {
     private transient XbtPath _xbt;
 
     /**
-     * Get the implicit join path to the <code>oagi.xbt</code> table.
+     * Get the implicit join path to the <code>xbt</code> table.
      */
     public XbtPath xbt() {
         if (_xbt == null)
@@ -319,8 +318,7 @@ public class Xbt extends TableImpl<XbtRecord> {
     private transient XbtManifestPath _xbtManifest;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.xbt_manifest</code>
-     * table
+     * Get the implicit to-many join path to the <code>xbt_manifest</code> table
      */
     public XbtManifestPath xbtManifest() {
         if (_xbtManifest == null)
@@ -373,7 +371,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      */
     @Override
     public Xbt where(Condition condition) {
-        return new Xbt(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new Xbt(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -440,7 +438,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Xbt whereExists(Select<?> select) {
+    public Xbt whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -448,7 +446,7 @@ public class Xbt extends TableImpl<XbtRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public Xbt whereNotExists(Select<?> select) {
+    public Xbt whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

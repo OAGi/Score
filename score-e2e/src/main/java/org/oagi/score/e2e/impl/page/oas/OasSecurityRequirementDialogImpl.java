@@ -31,7 +31,8 @@ public class OasSecurityRequirementDialogImpl implements OasSecurityRequirementD
             + "//div[contains(concat(\" \", normalize-space(@class), \" \"), \" requirement-card \")]";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]");
+            By.xpath("(" + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]//span | "
+                    + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]");
     private static final By MODE_RADIO_GROUP_LOCATOR =
             By.xpath(BASE_XPATH + "//mat-radio-group[contains(@class, \"security-mode-group\")]");
     private static final By REQ_CARD_LOCATOR = By.xpath(REQ_CARD_XPATH);
@@ -40,9 +41,9 @@ public class OasSecurityRequirementDialogImpl implements OasSecurityRequirementD
     private static final By ADD_ALTERNATIVE_BUTTON_LOCATOR =
             By.xpath(BASE_XPATH + "//button[contains(., \"Add Alternative\")]");
     private static final By APPLY_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Apply\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Apply\"]]");
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Cancel\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Cancel\"]]");
 
     private final BasePageImpl parent;
 

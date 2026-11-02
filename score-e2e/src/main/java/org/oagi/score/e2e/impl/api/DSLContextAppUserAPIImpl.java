@@ -1,6 +1,7 @@
 package org.oagi.score.e2e.impl.api;
 
 import org.jooq.DSLContext;
+import org.jooq.Condition;
 import org.jooq.exception.DataAccessException;
 import org.jooq.types.ULong;
 import org.oagi.score.e2e.api.AppUserAPI;
@@ -9,10 +10,15 @@ import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.AppUserRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.DtScManifestRecord;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ReleaseRecord;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.SeqKeyRecord;
 import org.oagi.score.e2e.obj.AppUserObject;
 
 import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -140,15 +146,13 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
     public void deleteAppUserById(BigInteger appUserIdBigInteger) {
         ULong appUserId = ULong.valueOf(appUserIdBigInteger);
 
-        ReleaseRecord publishedRelease = dslContext.selectFrom(RELEASE)
-                .where(and(
-                        RELEASE.CREATED_BY.eq(appUserId),
-                        RELEASE.STATE.eq("Published")
-                ))
-                .orderBy(RELEASE.LAST_UPDATE_TIMESTAMP.desc())
-                .fetchAny();
-        if (publishedRelease != null) {
-            revertWorkingRelease(appUserId, publishedRelease);
+        // A user can leave several releases behind, and each one holds manifests of its own, so revert them all, the newest first.
+        List<ReleaseRecord> releases = dslContext.selectFrom(RELEASE)
+                .where(RELEASE.CREATED_BY.eq(appUserId))
+                .orderBy(RELEASE.RELEASE_ID.desc())
+                .fetch();
+        for (ReleaseRecord release : releases) {
+            revertWorkingRelease(appUserId, release);
         }
 
         int attempts = 0;
@@ -157,30 +161,32 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 dslContext.transaction(conf -> {
                     DSLContext txContext = conf.dsl();
                     txContext.execute("SET FOREIGN_KEY_CHECKS = 0");
+                    try {
+                        deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
+                        deleteBusinessTermByAppUserId(txContext, appUserId);
+                        deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
+                        deleteCoreComponentByAppUserId(txContext, appUserId);
+                        deleteCodeListByAppUserId(txContext, appUserId);
+                        deleteAgencyIDListListByAppUserId(txContext, appUserId);
+                        deleteBusinessContextByAppUserId(txContext, appUserId);
+                        deleteContextSchemeByAppUserId(txContext, appUserId);
+                        deleteContextCategoryByAppUserId(txContext, appUserId);
+                        deleteModuleSetReleaseByAppUserId(txContext, appUserId);
+                        deleteModuleSetByAppUserId(txContext, appUserId);
+                        deleteNamespaceByAppUserId(txContext, appUserId);
+                        deleteReleaseByAppUserId(txContext, appUserId);
 
-                    deleteOpenAPIDocumentByAppUserId(txContext, appUserId);
-                    deleteBusinessTermByAppUserId(txContext, appUserId);
-                    deleteBusinessInformationEntityByAppUserId(txContext, appUserId);
-                    deleteCoreComponentByAppUserId(txContext, appUserId);
-                    deleteCodeListByAppUserId(txContext, appUserId);
-                    deleteAgencyIDListListByAppUserId(txContext, appUserId);
-                    deleteBusinessContextByAppUserId(txContext, appUserId);
-                    deleteContextSchemeByAppUserId(txContext, appUserId);
-                    deleteContextCategoryByAppUserId(txContext, appUserId);
-                    deleteModuleSetReleaseByAppUserId(txContext, appUserId);
-                    deleteModuleSetByAppUserId(txContext, appUserId);
-                    deleteNamespaceByAppUserId(txContext, appUserId);
-                    deleteReleaseByAppUserId(txContext, appUserId);
-
-                    txContext.deleteFrom(APP_USER)
-                            .where(APP_USER.APP_USER_ID.eq(appUserId))
-                            .execute();
-
-                    txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+                        txContext.deleteFrom(APP_USER)
+                                .where(APP_USER.APP_USER_ID.eq(appUserId))
+                                .execute();
+                    } finally {
+                        // FOREIGN_KEY_CHECKS is session-scoped and is not restored by transaction rollback.
+                        txContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+                    }
                 });
                 return;
             } catch (DataAccessException e) {
-                if (!isDeadlock(e) || attempts >= DEADLOCK_RETRY_COUNT) {
+                if (!isRetryableTransactionConflict(e) || attempts >= DEADLOCK_RETRY_COUNT) {
                     throw e;
                 }
                 attempts++;
@@ -189,9 +195,12 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         }
     }
 
-    private boolean isDeadlock(DataAccessException e) {
+    private boolean isRetryableTransactionConflict(DataAccessException e) {
         Throwable cause = e;
         while (cause != null) {
+            if (cause instanceof SQLException sqlException && sqlException.getErrorCode() == 1020) {
+                return true;
+            }
             String message = cause.getMessage();
             if (message != null && message.contains("Deadlock found when trying to get lock")) {
                 return true;
@@ -568,6 +577,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .where(ASCC_MANIFEST.ASCC_ID.in(asccIdList))
                 .fetchInto(ULong.class);
 
+        restoreParentSeqKeyLinks(dslContext, SEQ_KEY.ASCC_MANIFEST_ID.in(asccManifestIdList));
         dslContext.update(ASCC_MANIFEST)
                 .setNull(ASCC_MANIFEST.SEQ_KEY_ID)
                 .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.in(asccManifestIdList))
@@ -600,6 +610,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .where(BCC_MANIFEST.BCC_ID.in(bccIdList))
                 .fetchInto(ULong.class);
 
+        restoreParentSeqKeyLinks(dslContext, SEQ_KEY.BCC_MANIFEST_ID.in(bccManifestIdList));
         dslContext.update(BCC_MANIFEST)
                 .setNull(BCC_MANIFEST.SEQ_KEY_ID)
                 .where(BCC_MANIFEST.BCC_MANIFEST_ID.in(bccManifestIdList))
@@ -613,6 +624,128 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         dslContext.deleteFrom(BCC)
                 .where(BCC.BCC_ID.in(bccIdList))
                 .execute();
+    }
+
+    /**
+     * Reconnects the sibling sequence chains before deleting user-owned ASCC/BCC records.
+     *
+     * A user extension ASCC/BCC can belong to a parent ACC owned by somebody else.  The
+     * sequence key therefore gets deleted here while its parent sequence keys remain.  When
+     * foreign-key checks are disabled during test cleanup, deleting the child without first
+     * bypassing it leaves the parent's next/previous link pointing to a missing row.
+     */
+    private void restoreParentSeqKeyLinks(DSLContext dslContext,
+                                          Condition targetCondition) {
+        List<ULong> targetSeqKeyIdList = dslContext.select(SEQ_KEY.SEQ_KEY_ID)
+                .from(SEQ_KEY)
+                .where(targetCondition)
+                .fetchInto(ULong.class);
+        if (targetSeqKeyIdList.isEmpty()) {
+            return;
+        }
+
+        List<ULong> fromAccManifestIdList = dslContext.selectDistinct(SEQ_KEY.FROM_ACC_MANIFEST_ID)
+                .from(SEQ_KEY)
+                .where(SEQ_KEY.SEQ_KEY_ID.in(targetSeqKeyIdList))
+                .fetchInto(ULong.class);
+        Map<ULong, SeqKeyRecord> sequenceKeyById = dslContext.selectFrom(SEQ_KEY)
+                .where(SEQ_KEY.FROM_ACC_MANIFEST_ID.in(fromAccManifestIdList))
+                .fetchMap(SEQ_KEY.SEQ_KEY_ID);
+        Set<ULong> targetSeqKeyIds = new HashSet<>(targetSeqKeyIdList);
+
+        for (ULong targetSeqKeyId : targetSeqKeyIdList) {
+            SeqKeyRecord target = sequenceKeyById.get(targetSeqKeyId);
+            if (target == null) {
+                continue;
+            }
+
+            ULong previous = findSurvivingPrevious(sequenceKeyById, targetSeqKeyIds, target);
+            ULong next = findSurvivingNext(sequenceKeyById, targetSeqKeyIds, target);
+
+            if (previous != null) {
+                setNextSeqKey(dslContext, previous, next);
+            }
+            if (next != null) {
+                setPreviousSeqKey(dslContext, next, previous);
+            }
+        }
+
+        // Remove the links from rows that are about to be deleted as well.  This keeps the
+        // cleanup valid even when the database has foreign-key checks enabled.
+        dslContext.update(SEQ_KEY)
+                .setNull(SEQ_KEY.PREV_SEQ_KEY_ID)
+                .setNull(SEQ_KEY.NEXT_SEQ_KEY_ID)
+                .where(SEQ_KEY.SEQ_KEY_ID.in(targetSeqKeyIdList))
+                .execute();
+    }
+
+    private ULong findSurvivingPrevious(Map<ULong, SeqKeyRecord> sequenceKeyById,
+                                        Set<ULong> targetSeqKeyIds,
+                                        SeqKeyRecord target) {
+        return findSurvivingNeighbor(sequenceKeyById, targetSeqKeyIds,
+                target.getPrevSeqKeyId(), false);
+    }
+
+    private ULong findSurvivingNext(Map<ULong, SeqKeyRecord> sequenceKeyById,
+                                    Set<ULong> targetSeqKeyIds,
+                                    SeqKeyRecord target) {
+        return findSurvivingNeighbor(sequenceKeyById, targetSeqKeyIds,
+                target.getNextSeqKeyId(), true);
+    }
+
+    static ULong findSurvivingNeighbor(Map<ULong, SeqKeyRecord> sequenceKeyById,
+                                       Set<ULong> targetSeqKeyIds,
+                                       ULong candidateId,
+                                       boolean next) {
+        Set<ULong> visited = new HashSet<>();
+        ULong candidate = candidateId;
+        while (candidate != null) {
+            if (!sequenceKeyById.containsKey(candidate)) {
+                return null;
+            }
+            if (!targetSeqKeyIds.contains(candidate)) {
+                return candidate;
+            }
+            if (!visited.add(candidate)) {
+                return null;
+            }
+            SeqKeyRecord candidateRecord = sequenceKeyById.get(candidate);
+            if (candidateRecord == null) {
+                return null;
+            }
+            candidate = next
+                    ? candidateRecord.getNextSeqKeyId()
+                    : candidateRecord.getPrevSeqKeyId();
+        }
+        return null;
+    }
+
+    private void setNextSeqKey(DSLContext dslContext, ULong seqKeyId, ULong nextSeqKeyId) {
+        if (nextSeqKeyId == null) {
+            dslContext.update(SEQ_KEY)
+                    .setNull(SEQ_KEY.NEXT_SEQ_KEY_ID)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .execute();
+        } else {
+            dslContext.update(SEQ_KEY)
+                    .set(SEQ_KEY.NEXT_SEQ_KEY_ID, nextSeqKeyId)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .execute();
+        }
+    }
+
+    private void setPreviousSeqKey(DSLContext dslContext, ULong seqKeyId, ULong previousSeqKeyId) {
+        if (previousSeqKeyId == null) {
+            dslContext.update(SEQ_KEY)
+                    .setNull(SEQ_KEY.PREV_SEQ_KEY_ID)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .execute();
+        } else {
+            dslContext.update(SEQ_KEY)
+                    .set(SEQ_KEY.PREV_SEQ_KEY_ID, previousSeqKeyId)
+                    .where(SEQ_KEY.SEQ_KEY_ID.eq(seqKeyId))
+                    .execute();
+        }
     }
 
     private void deleteACCByAppUserId(DSLContext dslContext, ULong appUserId) {
@@ -892,10 +1025,32 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         List<ULong> releaseIdList = dslContext.select(RELEASE.RELEASE_ID)
                 .from(RELEASE)
                 .where(RELEASE.CREATED_BY.eq(appUserId))
+                .orderBy(RELEASE.RELEASE_ID.desc())
                 .fetchInto(ULong.class);
-        if (releaseIdList != null && !releaseIdList.isEmpty()) {
+        for (ULong releaseId : releaseIdList) {
+            ReleaseRecord release = dslContext.selectFrom(RELEASE)
+                    .where(RELEASE.RELEASE_ID.eq(releaseId))
+                    .fetchOne();
+            // The neighbours must not keep pointing at the deleted release. The Working release only points back
+            // to the last published one, and the published one does not point forward to it.
+            boolean nextIsWorking = release.getNextReleaseId() != null && "Working".equals(dslContext
+                    .select(RELEASE.RELEASE_NUM)
+                    .from(RELEASE)
+                    .where(RELEASE.RELEASE_ID.eq(release.getNextReleaseId()))
+                    .fetchOneInto(String.class));
+            dslContext.update(RELEASE)
+                    .set(RELEASE.NEXT_RELEASE_ID, nextIsWorking ? null : release.getNextReleaseId())
+                    .where(RELEASE.NEXT_RELEASE_ID.eq(releaseId))
+                    .execute();
+            dslContext.update(RELEASE)
+                    .set(RELEASE.PREV_RELEASE_ID, release.getPrevReleaseId())
+                    .where(RELEASE.PREV_RELEASE_ID.eq(releaseId))
+                    .execute();
+            dslContext.deleteFrom(RELEASE_DEP)
+                    .where(RELEASE_DEP.RELEASE_ID.eq(releaseId))
+                    .execute();
             dslContext.deleteFrom(RELEASE)
-                    .where(RELEASE.RELEASE_ID.in(releaseIdList))
+                    .where(RELEASE.RELEASE_ID.eq(releaseId))
                     .execute();
         }
     }

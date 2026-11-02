@@ -405,6 +405,17 @@ public class JooqBccpQueryRepository extends JooqBaseRepository implements BccpQ
     }
 
     @Override
+    public List<BccpSummaryRecord> getBccpSummaryListByManifestIds(Collection<BccpManifestId> bccpManifestIdList) {
+        if (bccpManifestIdList == null || bccpManifestIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        var queryBuilder = new GetBccpSummaryQueryBuilder();
+        return queryBuilder.select()
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.in(valueOf(bccpManifestIdList)))
+                .fetch(queryBuilder.mapper());
+    }
+
+    @Override
     public List<BccpSummaryRecord> getBccpSummaryList(Collection<ReleaseId> releaseIdList) {
         var queryBuilder = new GetBccpSummaryQueryBuilder();
         return queryBuilder.select()

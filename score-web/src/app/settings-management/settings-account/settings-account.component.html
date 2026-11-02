@@ -1,61 +1,57 @@
-<div class="context-section">
-  @if (loading) {
-    <div class="loading-container">
-      <mat-spinner [diameter]="40"></mat-spinner>
-    </div>
-  }
-
+<score-base-page [loading]="loading" [showToolbar]="false">
   <div class="settings-layout">
-    <score-settings-menu active="Account"></score-settings-menu>
+    <score-settings-menu [active]="menuItem"></score-settings-menu>
     <div class="layout-main">
       <div class="context-section">
-        <mat-card class="p-0">
-          <mat-toolbar class="bg-white">
-            <span class="title">Personal Info</span>
-            <span class="flex-11-auto"></span>
-          </mat-toolbar>
-          <mat-card class="mb-2">
-            <mat-card-content class="mat-card-container">
-              <mat-form-field>
-                <mat-label>Email Address</mat-label>
-                <input matInput [formControl]="emailFormControl"/>
-                @if (emailFormControl.hasError('email')) {
-                  <mat-error>
-                    Please provide a valid email address
-                  </mat-error>
+        @if (section === 'personal-info') {
+          <mat-card class="p-0">
+            <mat-toolbar class="bg-white">
+              <span class="title">Personal Info</span>
+              <span class="flex-11-auto"></span>
+            </mat-toolbar>
+            <mat-card class="mb-2">
+              <mat-card-content class="mat-card-container">
+                <mat-form-field>
+                  <mat-label>Email Address</mat-label>
+                  <input matInput [formControl]="emailFormControl"/>
+                  @if (emailFormControl.hasError('email')) {
+                    <mat-error>
+                      Please provide a valid email address
+                    </mat-error>
+                  }
+                </mat-form-field>
+                @if (emailVerified !== undefined) {
+                  <div class="d-flex email-validation">
+                    @if (emailVerified) {
+                      <span class="verified">This email address has been verified.</span>
+                    }
+                    @if (!emailVerified) {
+                      <span class="unverified">This email address needs to be verified.</span>
+                    }
+                  </div>
                 }
-              </mat-form-field>
-              @if (emailVerified !== undefined) {
-                <div class="d-flex email-validation">
-                  @if (emailVerified) {
-                    <span class="verified">This email address has been verified.</span>
-                  }
-                  @if (!emailVerified) {
-                    <span class="unverified">This email address needs to be verified.</span>
-                  }
-                </div>
-              }
-            </mat-card-content>
+              </mat-card-content>
+            </mat-card>
           </mat-card>
-        </mat-card>
-        <div class="row action-group m-0">
-          <div class="col-12 actions-wrap ps-0">
-            <div class="actions">
-              <button mat-raised-button color="primary" class="btn-update-personal-info" (click)="updatePersonalInfo()"
-                [disabled]="isPersonInfoFormDisabled()">
-                Update
-              </button>
-              @if (emailVerified !== undefined && !emailVerified) {
-                <button mat-raised-button color="primary" (click)="resendEmailValidationRequest()"
-                  >
-                  Resend Validation Request
+          <div class="row action-group m-0">
+            <div class="col-12 actions-wrap ps-0">
+              <div class="actions">
+                <button mat-raised-button color="primary" class="btn-update-personal-info" (click)="updatePersonalInfo()"
+                  [disabled]="isPersonInfoFormDisabled()">
+                  Update
                 </button>
-              }
+                @if (emailVerified !== undefined && !emailVerified) {
+                  <button mat-raised-button color="primary" (click)="resendEmailValidationRequest()">
+                    Resend Validation Request
+                  </button>
+                }
+              </div>
             </div>
           </div>
-        </div>
 
-        @if (!hideChangePassword) {
+        }
+
+        @if (section === 'password' && !hideChangePassword) {
           <form #passwordForm="ngForm">
             <div class="p-0">
               <mat-toolbar class="bg-white">
@@ -114,7 +110,11 @@
             </div>
           </form>
         }
+
+        @if (section === 'passkeys' && showPasskeys) {
+          <score-settings-passkeys></score-settings-passkeys>
+        }
       </div>
     </div>
   </div>
-</div>
+</score-base-page>

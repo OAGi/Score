@@ -1,7 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BackwardCompatibility;
 
 import java.math.BigInteger;
@@ -26,7 +27,7 @@ public final class BieBackwardCompatibilityRules {
     private BieBackwardCompatibilityRules() {
     }
 
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    private static final ObjectMapper JSON_MAPPER = JsonMapper.builder().build();
 
     /**
      * XSD built-in types whose only constraining facet is whitespace (no pattern / enumeration): they accept ANY
@@ -58,8 +59,8 @@ public final class BieBackwardCompatibilityRules {
 
     /**
      * True when the array/scalar rendering crosses the JSON array vs bare-value boundary. XSD keeps the same element
-     * shape, so this is a JSON-only concern. Since Issue #1733 the JSON/OpenAPI generators decide array-ness from the
-     * based ASCC/BCC max cardinality, so callers pass the based component's max (current vs prior), not the BIE max.
+     * shape, so this is a JSON-only concern. The JSON/OpenAPI generators decide array-ness from the BIE's own max
+     * cardinality (an ASBIE or a BBIE, not the based ASCC/BCC), so callers pass the BIE's max (current vs prior).
      */
     public static boolean jsonArrayFlip(int newMax, int oldMax) {
         return isJsonArray(oldMax) != isJsonArray(newMax);

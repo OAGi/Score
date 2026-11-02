@@ -1,4 +1,5 @@
-import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
 import {SettingsApplicationSettingsService} from './domain/settings-application-settings.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -12,13 +13,24 @@ import {ApplicationSettingsInfo} from './domain/application-settings';
 import {MailService} from '../../common/score-mail.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
+export type ApplicationSettingsSection = 'features' | 'smtp' | 'filename-expressions' | 'web-page';
+
+const APPLICATION_SETTINGS_SECTIONS: Record<ApplicationSettingsSection, string> = {
+  'features': 'Application Features',
+  'smtp': 'SMTP Settings',
+  'filename-expressions': 'Filename Expressions',
+  'web-page': 'Web Page Settings'
+};
+
 @Component({
   standalone: false,
   selector: 'score-settings-application-settings',
   templateUrl: './settings-application-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./settings-application-settings.component.css']
 })
 export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
   private sanitizer = inject(DomSanitizer);
   private settingsService = inject(SettingsApplicationSettingsService);
@@ -31,7 +43,18 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
   applicationSettingsInfo: ApplicationSettingsInfo;
   webPageInfo: WebPageInfo;
 
-  title = 'Application settings';
+  /** Which of the application-settings pages is shown (see the routes). */
+  section: ApplicationSettingsSection = this.route.snapshot.data['section'] || 'features';
+
+  get sectionTitle(): string {
+    return APPLICATION_SETTINGS_SECTIONS[this.section];
+  }
+
+  /** The entry of the settings menu that belongs to the page. */
+  get menuItem(): string {
+    return 'ApplicationSettings:' + this.section;
+  }
+
   loading = false;
   bieSchemaSampleFilename = '';
   bieSchemaSampleDuplicateFilename = '';
@@ -39,6 +62,13 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
   biePackageSchemaSampleDuplicateFilename = '';
   bieSchemaFilenameExpressionError = '';
   biePackageSchemaFilenameExpressionError = '';
+  bieSchemaSamples: FilenameSampleState | null = null;
+  biePackageSchemaSamples: FilenameSampleState | null = null;
+  bieSchemaValidationMessage = '';
+  biePackageSchemaValidationMessage = '';
+  readonly commonSampleKeys = ['BIE ID', 'BIE Property Term', 'BIE Display Name', 'BIE Version',
+    'BIE DEN', 'BIE Status', 'BIE Remark'];
+  readonly packageSampleKeys = ['BIE Package Name', 'BIE Package Version ID', 'BIE Package Version Name'];
   private readonly destroy$ = new Subject<void>();
   private readonly bieSchemaPreview$ = new Subject<FilenameExpressionPreviewRequest>();
   private readonly biePackageSchemaPreview$ = new Subject<FilenameExpressionPreviewRequest>();
@@ -353,12 +383,88 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
 
   queueBieSchemaFilenamePreview() {
     this.setFilenameExpressionError('bie-schema', '');
+    this.bieSchemaValidationMessage = '';
     this.bieSchemaPreview$.next(this.getBieSchemaFilenamePreviewRequest());
   }
 
   queueBiePackageSchemaFilenamePreview() {
     this.setFilenameExpressionError('bie-package-schema', '');
+    this.biePackageSchemaValidationMessage = '';
     this.biePackageSchemaPreview$.next(this.getBiePackageSchemaFilenamePreviewRequest());
+  }
+
+  samplesOf(type: FilenameExpressionType): FilenameSampleState | null {
+    return type === 'bie-schema' ? this.bieSchemaSamples : this.biePackageSchemaSamples;
+  }
+
+  sampleKeysOf(type: FilenameExpressionType): string[] {
+    return type === 'bie-schema' ? this.commonSampleKeys : [...this.commonSampleKeys, ...this.packageSampleKeys];
+  }
+
+  queuePreview(type: FilenameExpressionType) {
+    if (type === 'bie-schema') {
+      this.queueBieSchemaFilenamePreview();
+    } else {
+      this.queueBiePackageSchemaFilenamePreview();
+    }
+  }
+
+  setSampleValue(type: FilenameExpressionType, key: string, value: string) {
+    this.samplesOf(type)!.values[key] = value;
+    this.queuePreview(type);
+  }
+
+  setSampleBusinessContextName(type: FilenameExpressionType, index: number, value: string) {
+    this.samplesOf(type)!.businessContextNames[index] = value;
+    this.queuePreview(type);
+  }
+
+  addSampleBusinessContextName(type: FilenameExpressionType) {
+    const samples = this.samplesOf(type)!;
+    samples.businessContextNames.push('Business Context ' + (samples.businessContextNames.length + 1));
+    this.queuePreview(type);
+  }
+
+  removeSampleBusinessContextName(type: FilenameExpressionType, index: number) {
+    this.samplesOf(type)!.businessContextNames.splice(index, 1);
+    this.queuePreview(type);
+  }
+
+  resetSamples(type: FilenameExpressionType) {
+    if (type === 'bie-schema') {
+      this.bieSchemaSamples = null;
+    } else {
+      this.biePackageSchemaSamples = null;
+    }
+    this.queuePreview(type);
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  validateExpression(type: FilenameExpressionType) {
+    const request = type === 'bie-schema'
+      ? this.getBieSchemaFilenamePreviewRequest() : this.getBiePackageSchemaFilenamePreviewRequest();
+    this.settingsService.validateFilenameExpression(type, request.expression, request.duplicateHandlerExpression)
+      .subscribe({
+        next: () => {
+          this.setFilenameExpressionError(type, '');
+          this.setValidationMessage(type, 'The expression is valid.');
+        },
+        error: error => {
+          this.setValidationMessage(type, '');
+          this.setFilenameExpressionError(type, this.getFilenameExpressionErrorMessage(error));
+        }
+      });
+  }
+
+  private setValidationMessage(type: FilenameExpressionType, message: string) {
+    if (type === 'bie-schema') {
+      this.bieSchemaValidationMessage = message;
+    } else {
+      this.biePackageSchemaValidationMessage = message;
+    }
   }
 
   private initializeFilenamePreviewStreams() {
@@ -368,7 +474,9 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
       switchMap(request => this.settingsService.previewFilenameExpression(
         'bie-schema',
         request.expression,
-        request.duplicateHandlerExpression
+        request.duplicateHandlerExpression,
+        request.sampleValues,
+        request.sampleBusinessContextNames
       ).pipe(
         catchError(error => {
           this.setFilenamePreview('bie-schema', '', '');
@@ -379,6 +487,12 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(preview => {
       this.setFilenamePreview('bie-schema', preview.sampleFilename, preview.sampleDuplicateFilename);
+      if (!this.bieSchemaSamples) {
+        this.bieSchemaSamples = {
+          values: {...preview.sampleValues},
+          businessContextNames: [...preview.sampleBusinessContextNames]
+        };
+      }
       this.setFilenameExpressionError('bie-schema', '');
     });
 
@@ -388,7 +502,9 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
       switchMap(request => this.settingsService.previewFilenameExpression(
         'bie-package-schema',
         request.expression,
-        request.duplicateHandlerExpression
+        request.duplicateHandlerExpression,
+        request.sampleValues,
+        request.sampleBusinessContextNames
       ).pipe(
         catchError(error => {
           this.setFilenamePreview('bie-package-schema', '', '');
@@ -399,6 +515,12 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(preview => {
       this.setFilenamePreview('bie-package-schema', preview.sampleFilename, preview.sampleDuplicateFilename);
+      if (!this.biePackageSchemaSamples) {
+        this.biePackageSchemaSamples = {
+          values: {...preview.sampleValues},
+          businessContextNames: [...preview.sampleBusinessContextNames]
+        };
+      }
       this.setFilenameExpressionError('bie-package-schema', '');
     });
   }
@@ -406,14 +528,18 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
   private getBieSchemaFilenamePreviewRequest(): FilenameExpressionPreviewRequest {
     return {
       expression: this.applicationSettingsInfo?.bieSchemaFilenameExpression || '',
-      duplicateHandlerExpression: this.applicationSettingsInfo?.bieSchemaFilenameDuplicateHandlerExpression || ''
+      duplicateHandlerExpression: this.applicationSettingsInfo?.bieSchemaFilenameDuplicateHandlerExpression || '',
+      sampleValues: this.bieSchemaSamples ? {...this.bieSchemaSamples.values} : undefined,
+      sampleBusinessContextNames: this.bieSchemaSamples ? [...this.bieSchemaSamples.businessContextNames] : undefined
     };
   }
 
   private getBiePackageSchemaFilenamePreviewRequest(): FilenameExpressionPreviewRequest {
     return {
       expression: this.applicationSettingsInfo?.biePackageSchemaFilenameExpression || '',
-      duplicateHandlerExpression: this.applicationSettingsInfo?.biePackageSchemaFilenameDuplicateHandlerExpression || ''
+      duplicateHandlerExpression: this.applicationSettingsInfo?.biePackageSchemaFilenameDuplicateHandlerExpression || '',
+      sampleValues: this.biePackageSchemaSamples ? {...this.biePackageSchemaSamples.values} : undefined,
+      sampleBusinessContextNames: this.biePackageSchemaSamples ? [...this.biePackageSchemaSamples.businessContextNames] : undefined
     };
   }
 
@@ -448,9 +574,18 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
 
 }
 
+type FilenameExpressionType = 'bie-schema' | 'bie-package-schema';
+
+interface FilenameSampleState {
+  values: Record<string, string>;
+  businessContextNames: string[];
+}
+
 interface FilenameExpressionPreviewRequest {
   expression: string;
   duplicateHandlerExpression: string;
+  sampleValues?: Record<string, string>;
+  sampleBusinessContextNames?: string[];
 }
 
 function isSameFilenameExpressionPreviewRequest(
@@ -458,5 +593,7 @@ function isSameFilenameExpressionPreviewRequest(
   current: FilenameExpressionPreviewRequest
 ): boolean {
   return previous.expression === current.expression
-    && previous.duplicateHandlerExpression === current.duplicateHandlerExpression;
+    && previous.duplicateHandlerExpression === current.duplicateHandlerExpression
+    && JSON.stringify(previous.sampleValues) === JSON.stringify(current.sampleValues)
+    && JSON.stringify(previous.sampleBusinessContextNames) === JSON.stringify(current.sampleBusinessContextNames);
 }

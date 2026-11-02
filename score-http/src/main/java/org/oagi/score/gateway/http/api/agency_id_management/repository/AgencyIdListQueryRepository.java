@@ -19,6 +19,15 @@ public interface AgencyIdListQueryRepository {
 
     // Summary
 
+    /** The agency identification lists with these manifest ids (each with its values). */
+    List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListByManifestIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds);
+
+    /** The release of each of these manifests; a manifest that does not exist is not in the map. */
+    java.util.Map<AgencyIdListManifestId, ReleaseId> getAgencyIdListReleaseIds(Collection<AgencyIdListManifestId> agencyIdListManifestIds);
+
+    /** The release of the agency identification list manifest, or null when there is none. */
+    ReleaseId getAgencyIdListReleaseId(AgencyIdListManifestId agencyIdListManifestId);
+
     AgencyIdListSummaryRecord getAgencyIdListSummary(
             AgencyIdListManifestId agencyIdListManifestId);
 
@@ -30,11 +39,25 @@ public interface AgencyIdListQueryRepository {
 
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
+    /**
+     * Returns Agency ID Lists explicitly linked to the DT, including their
+     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<AgencyIdListSummaryRecord> availableAgencyIdListByDtManifestId(
             DtManifestId dtManifestId, List<CcState> states);
 
+    /**
+     * Returns Agency ID Lists explicitly linked to the DT_SC, including their
+     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtScManifestId}
+     * before treating an empty result as an unrestricted release-wide lookup.
+     */
     List<AgencyIdListSummaryRecord> availableAgencyIdListByDtScManifestId(
             DtScManifestId dtScManifestId, List<CcState> states);
+
+    boolean hasAgencyIdListAvailabilityByDtManifestId(DtManifestId dtManifestId);
+
+    boolean hasAgencyIdListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
 
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListInStates(
             ReleaseId releaseId, List<CcState> states);

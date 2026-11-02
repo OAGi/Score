@@ -32,7 +32,8 @@ public class OasSecuritySchemeDialogImpl implements OasSecuritySchemeDialog {
     private static final String FLOW_CARD_XPATH = BASE_XPATH + "//div[contains(@class, \"oas-flow-card\")]";
 
     private static final By TITLE_LOCATOR =
-            By.xpath(BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]");
+            By.xpath("(" + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")]//span | "
+                    + BASE_XPATH + "//*[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]");
     private static final By TYPE_SELECT_LOCATOR =
             By.xpath(BASE_XPATH + "//mat-label[normalize-space(.) = \"Type\"]/ancestor::mat-form-field[1]//mat-select");
     private static final By SCHEME_NAME_FIELD_LOCATOR =
@@ -55,9 +56,9 @@ public class OasSecuritySchemeDialogImpl implements OasSecuritySchemeDialog {
             By.xpath(BASE_XPATH + "//span[normalize-space(.) = \"OAuth Flows\"]/following-sibling::button[1]");
     private static final By FLOW_CARD_LOCATOR = By.xpath(FLOW_CARD_XPATH);
     private static final By PRIMARY_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Add\" or normalize-space(.) = \"Save\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Add\" or normalize-space(.) = \"Save\"]]");
     private static final By CANCEL_BUTTON_LOCATOR =
-            By.xpath(BASE_XPATH + "//button[normalize-space(.) = \"Cancel\"]");
+            By.xpath(BASE_XPATH + "//button[.//span[normalize-space(.) = \"Cancel\"]]");
 
     private final BasePageImpl parent;
 

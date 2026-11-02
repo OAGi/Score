@@ -64,13 +64,13 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
         } catch (TimeoutException e) {
             return false;
         }
-        assert "Select ACC to set a base ACC".equals(getText(title.findElement(By.tagName("span"))));
+        assert "Select ACC to set a base ACC".equals(getText(title));
         return true;
     }
 
     @Override
     public WebElement getTitle() {
-        return visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]"));
+        return visibilityOfElementLocated(getDriver(), By.xpath("(//mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")]//span | //mat-dialog-container//div[contains(@class, \"mat-mdc-dialog-title\")][not(.//span)])[1]"));
     }
 
     @Override
@@ -257,6 +257,17 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
 
     @Override
     public ACCViewEditPage hitApplyButton(String accDen) {
+        selectAndApply(accDen);
+        waitFor(ofMillis(500L));
+
+        invisibilityOfLoadingContainerElement(getDriver());
+
+        assert "Updated".equals(getSnackBarMessage(getDriver()));
+        return parent;
+    }
+
+    @Override
+    public void selectAndApply(String accDen) {
         setDEN(accDen);
         hitSearchButton();
 
@@ -278,11 +289,5 @@ public class ACCSetBaseACCDialogImpl extends SearchBarPageImpl implements ACCSet
         });
 
         click(getApplyButton());
-        waitFor(ofMillis(500L));
-
-        invisibilityOfLoadingContainerElement(getDriver());
-
-        assert "Updated".equals(getSnackBarMessage(getDriver()));
-        return parent;
     }
 }

@@ -54,6 +54,9 @@ public class CcDocumentImpl implements CcDocument {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /** The order the tags of a component are listed in: by tag id, whatever order the database answered in. */
+    private static final Comparator<TagSummaryRecord> TAG_ORDER = Comparator.comparing(e -> e.tagId().value());
+
     private Map<AccManifestId, AccSummaryRecord> accMap;
     private Map<AccManifestId, List<AccSummaryRecord>> accMapByBasedAccManifestId;
     private Map<AsccManifestId, AsccSummaryRecord> asccMap;
@@ -389,28 +392,28 @@ public class CcDocumentImpl implements CcDocument {
     public List<TagSummaryRecord> getTagListByAccManifestId(AccManifestId accManifestId) {
         List<AccManifestTagSummaryRecord> accManifestTagList = tagMapByAccManifestId.getOrDefault(accManifestId, Collections.emptyList());
         return accManifestTagList.stream().map(e -> tagMap.get(e.tagId()))
-                .filter(e -> e != null).collect(Collectors.toList());
+                .filter(e -> e != null).sorted(TAG_ORDER).collect(Collectors.toList());
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByAsccpManifestId(AsccpManifestId asccpManifestId) {
         List<AsccpManifestTagSummaryRecord> asccpManifestTagList = tagMapByAsccpManifestId.getOrDefault(asccpManifestId, Collections.emptyList());
         return asccpManifestTagList.stream().map(e -> tagMap.get(e.tagId()))
-                .filter(e -> e != null).collect(Collectors.toList());
+                .filter(e -> e != null).sorted(TAG_ORDER).collect(Collectors.toList());
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByBccpManifestId(BccpManifestId bccpManifestId) {
         List<BccpManifestTagSummaryRecord> bccpManifestTagList = tagMapByBccpManifestId.getOrDefault(bccpManifestId, Collections.emptyList());
         return bccpManifestTagList.stream().map(e -> tagMap.get(e.tagId()))
-                .filter(e -> e != null).collect(Collectors.toList());
+                .filter(e -> e != null).sorted(TAG_ORDER).collect(Collectors.toList());
     }
 
     @Override
     public List<TagSummaryRecord> getTagListByDtManifestId(DtManifestId dtManifestId) {
         List<DtManifestTagSummaryRecord> dtManifestTagList = tagMapByDtManifestId.getOrDefault(dtManifestId, Collections.emptyList());
         return dtManifestTagList.stream().map(e -> tagMap.get(e.tagId()))
-                .filter(e -> e != null).collect(Collectors.toList());
+                .filter(e -> e != null).sorted(TAG_ORDER).collect(Collectors.toList());
     }
 
     @Override

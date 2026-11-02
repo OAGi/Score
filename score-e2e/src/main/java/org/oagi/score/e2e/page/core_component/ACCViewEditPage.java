@@ -313,6 +313,14 @@ public interface ACCViewEditPage extends Page {
     WebElement clickOnDropDownMenuByPath(String path);
 
     /**
+     * Ask for the validation of the ACC by clicking 'Validate' in the context menu of its root node. The results
+     * are shown in the Validation Results panel; when there is nothing to show, a snackbar says so.
+     *
+     * @param path the path of the root node
+     */
+    void validate(String path);
+
+    /**
      * Check the node whether it is in 'Deleted' or not.
      *
      * @param node node

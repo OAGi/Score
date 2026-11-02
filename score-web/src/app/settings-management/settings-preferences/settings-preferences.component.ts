@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AuthService} from '../../authentication/auth.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
@@ -10,6 +10,7 @@ import {SettingsPreferencesService} from './domain/settings-preferences.service'
   standalone: false,
   selector: 'score-settings-preferences',
   templateUrl: './settings-preferences.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./settings-preferences.component.css']
 })
 export class SettingsPreferencesComponent implements OnInit {

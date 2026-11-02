@@ -21,7 +21,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * Setter for <code>release.release_id</code>. RELEASE_ID must be an
      * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
      * interpreted to be released later than the other.
      */
@@ -30,7 +30,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release.release_id</code>. RELEASE_ID must be an
+     * Getter for <code>release.release_id</code>. RELEASE_ID must be an
      * incremental integer. RELEASE_ID that is more than another RELEASE_ID is
      * interpreted to be released later than the other.
      */
@@ -39,23 +39,23 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Setter for <code>oagi.release.library_id</code>. A foreign key pointed to
-     * a library of the current record.
+     * Setter for <code>release.library_id</code>. A foreign key pointed to a
+     * library of the current record.
      */
     public void setLibraryId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.release.library_id</code>. A foreign key pointed to
-     * a library of the current record.
+     * Getter for <code>release.library_id</code>. A foreign key pointed to a
+     * library of the current record.
      */
     public ULong getLibraryId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.release.guid</code>. A globally unique identifier
+     * Setter for <code>release.guid</code>. A globally unique identifier
      * (GUID).
      */
     public void setGuid(String value) {
@@ -63,7 +63,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release.guid</code>. A globally unique identifier
+     * Getter for <code>release.guid</code>. A globally unique identifier
      * (GUID).
      */
     public String getGuid() {
@@ -71,23 +71,23 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Setter for <code>oagi.release.release_num</code>. Release number such has
-     * 10.0, 10.1, etc. 
+     * Setter for <code>release.release_num</code>. Release number such as 10.0,
+     * 10.1, etc. 
      */
     public void setReleaseNum(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_num</code>. Release number such has
-     * 10.0, 10.1, etc. 
+     * Getter for <code>release.release_num</code>. Release number such as 10.0,
+     * 10.1, etc. 
      */
     public String getReleaseNum() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.release.release_note</code>. Description or note
+     * Setter for <code>release.release_note</code>. Description or note
      * associated with the release.
      */
     public void setReleaseNote(String value) {
@@ -95,7 +95,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release.release_note</code>. Description or note
+     * Getter for <code>release.release_note</code>. Description or note
      * associated with the release.
      */
     public String getReleaseNote() {
@@ -103,23 +103,23 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Setter for <code>oagi.release.release_license</code>. License associated
-     * with the release.
+     * Setter for <code>release.release_license</code>. License associated with
+     * the release.
      */
     public void setReleaseLicense(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.release.release_license</code>. License associated
-     * with the release.
+     * Getter for <code>release.release_license</code>. License associated with
+     * the release.
      */
     public String getReleaseLicense() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.release.namespace_id</code>. Foreign key to the
+     * Setter for <code>release.namespace_id</code>. Foreign key to the
      * NAMESPACE table. It identifies the namespace used with the release. It is
      * particularly useful for a library that uses a single namespace such like
      * the OAGIS 10.x. A library that uses multiple namespace but has a main
@@ -131,7 +131,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release.namespace_id</code>. Foreign key to the
+     * Getter for <code>release.namespace_id</code>. Foreign key to the
      * NAMESPACE table. It identifies the namespace used with the release. It is
      * particularly useful for a library that uses a single namespace such like
      * the OAGIS 10.x. A library that uses multiple namespace but has a main
@@ -143,23 +143,23 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Setter for <code>oagi.release.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Setter for <code>release.created_by</code>. Foreign key to the APP_USER
+     * table identifying the user who created the record.
      */
     public void setCreatedBy(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.release.created_by</code>. Foreign key to the
-     * APP_USER table identifying user who created the namespace.
+     * Getter for <code>release.created_by</code>. Foreign key to the APP_USER
+     * table identifying the user who created the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * Setter for <code>release.last_updated_by</code>. Foreign key to the
      * APP_USER table identifying the user who last updated the record.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -167,7 +167,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Getter for <code>oagi.release.last_updated_by</code>. Foreign key to the
+     * Getter for <code>release.last_updated_by</code>. Foreign key to the
      * APP_USER table identifying the user who last updated the record.
      */
     public ULong getLastUpdatedBy() {
@@ -175,80 +175,80 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
     }
 
     /**
-     * Setter for <code>oagi.release.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Setter for <code>release.creation_timestamp</code>. The timestamp when
+     * the record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.release.creation_timestamp</code>. The timestamp
-     * when the record was first created.
+     * Getter for <code>release.creation_timestamp</code>. The timestamp when
+     * the record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>oagi.release.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Setter for <code>release.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.release.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Getter for <code>release.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>oagi.release.state</code>. This indicates the revision
-     * life cycle state of the Release.
+     * Setter for <code>release.state</code>. This indicates the revision life
+     * cycle state of the Release.
      */
     public void setState(String value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>oagi.release.state</code>. This indicates the revision
-     * life cycle state of the Release.
+     * Getter for <code>release.state</code>. This indicates the revision life
+     * cycle state of the Release.
      */
     public String getState() {
         return (String) get(11);
     }
 
     /**
-     * Setter for <code>oagi.release.prev_release_id</code>. Foreign key
-     * referencing the previous release record.
+     * Setter for <code>release.prev_release_id</code>. Foreign key referencing
+     * the previous release record.
      */
     public void setPrevReleaseId(ULong value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.release.prev_release_id</code>. Foreign key
-     * referencing the previous release record.
+     * Getter for <code>release.prev_release_id</code>. Foreign key referencing
+     * the previous release record.
      */
     public ULong getPrevReleaseId() {
         return (ULong) get(12);
     }
 
     /**
-     * Setter for <code>oagi.release.next_release_id</code>. Foreign key
-     * referencing the next release record.
+     * Setter for <code>release.next_release_id</code>. Foreign key referencing
+     * the next release record.
      */
     public void setNextReleaseId(ULong value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.release.next_release_id</code>. Foreign key
-     * referencing the next release record.
+     * Getter for <code>release.next_release_id</code>. Foreign key referencing
+     * the next release record.
      */
     public ULong getNextReleaseId() {
         return (ULong) get(13);

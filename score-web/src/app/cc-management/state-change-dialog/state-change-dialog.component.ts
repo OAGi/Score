@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChildren, inject} from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, ViewChildren, inject, ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -89,7 +89,9 @@ const OCTICON_PATHS: { [name: string]: string } = {
   imports: [CommonModule, FormsModule, MatDialogModule,
     MatButtonModule, MatChipsModule, MatIconModule, MatSelectModule, MatTooltipModule, MarkdownComponent],
   providers: [LogService],
+  host: {'[class.has-issues]': '!issuesLoading && anyTargetHasIssues()'},
   templateUrl: './state-change-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./state-change-dialog.component.css'],
 })
 export class StateChangeDialogComponent implements OnInit {

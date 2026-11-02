@@ -59,3 +59,18 @@ tr.element-row:not(.expanded-row):active {
 .f12 {
   font-size: 12px;
 }
+
+/* The two BIEs of a reuse in the compact layout: the one that reuses, and, under it, the one that is reused. */
+.reuse-pair {
+  padding: 4px 0;
+}
+
+.reuse-arrow {
+  padding-left: 12px;
+  font-size: 12px;
+  color: #767676;
+}
+
+.reuse-arrow::before {
+  content: '\2193\00a0';
+}

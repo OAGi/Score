@@ -22,7 +22,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.github_issue_agency_id_list_manifest_id</code>.
+     * <code>github_issue_agency_id_list_manifest.github_issue_agency_id_list_manifest_id</code>.
      * Primary key column.
      */
     public void setGithubIssueAgencyIdListManifestId(ULong value) {
@@ -31,7 +31,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.github_issue_agency_id_list_manifest_id</code>.
+     * <code>github_issue_agency_id_list_manifest.github_issue_agency_id_list_manifest_id</code>.
      * Primary key column.
      */
     public ULong getGithubIssueAgencyIdListManifestId() {
@@ -40,7 +40,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.agency_id_list_manifest_id</code>.
+     * <code>github_issue_agency_id_list_manifest.agency_id_list_manifest_id</code>.
      * Foreign key to agency_id_list_manifest; the agency id list (in a given
      * release) linked to a GitHub issue.
      */
@@ -50,7 +50,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.agency_id_list_manifest_id</code>.
+     * <code>github_issue_agency_id_list_manifest.agency_id_list_manifest_id</code>.
      * Foreign key to agency_id_list_manifest; the agency id list (in a given
      * release) linked to a GitHub issue.
      */
@@ -60,7 +60,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.github_issue_id</code>.
+     * <code>github_issue_agency_id_list_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public void setGithubIssueId(ULong value) {
@@ -69,7 +69,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.github_issue_id</code>.
+     * <code>github_issue_agency_id_list_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public ULong getGithubIssueId() {
@@ -77,8 +77,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.created_by</code>.
+     * Setter for <code>github_issue_agency_id_list_manifest.created_by</code>.
      * Foreign key to app_user; who created the link.
      */
     public void setCreatedBy(ULong value) {
@@ -86,8 +85,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.created_by</code>.
+     * Getter for <code>github_issue_agency_id_list_manifest.created_by</code>.
      * Foreign key to app_user; who created the link.
      */
     public ULong getCreatedBy() {
@@ -96,7 +94,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.last_updated_by</code>.
+     * <code>github_issue_agency_id_list_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -105,7 +103,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.last_updated_by</code>.
+     * <code>github_issue_agency_id_list_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public ULong getLastUpdatedBy() {
@@ -114,7 +112,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.creation_timestamp</code>.
+     * <code>github_issue_agency_id_list_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -123,7 +121,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.creation_timestamp</code>.
+     * <code>github_issue_agency_id_list_manifest.creation_timestamp</code>.
      * Timestamp when this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -132,7 +130,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Setter for
-     * <code>oagi.github_issue_agency_id_list_manifest.last_update_timestamp</code>.
+     * <code>github_issue_agency_id_list_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -141,7 +139,7 @@ public class GithubIssueAgencyIdListManifestRecord extends UpdatableRecordImpl<G
 
     /**
      * Getter for
-     * <code>oagi.github_issue_agency_id_list_manifest.last_update_timestamp</code>.
+     * <code>github_issue_agency_id_list_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

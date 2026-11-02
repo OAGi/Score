@@ -5,6 +5,7 @@ import org.jooq.Record;
 import org.oagi.score.gateway.http.api.account_management.model.*;
 import org.oagi.score.gateway.http.api.account_management.repository.AccountQueryRepository;
 import org.oagi.score.gateway.http.api.account_management.repository.criteria.AccountListFilterCriteria;
+import org.oagi.score.gateway.http.api.account_management.repository.criteria.PendingListFilterCriteria;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.tenant_management.model.TenantId;
 import org.oagi.score.gateway.http.common.model.PageRequest;
@@ -14,6 +15,7 @@ import org.oagi.score.gateway.http.common.model.Sort;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -21,9 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
+import static org.oagi.score.gateway.http.common.util.DSLUtils.contains;
 import static org.springframework.util.StringUtils.hasLength;
 
 public class JooqAccountQueryRepository extends JooqBaseRepository implements AccountQueryRepository {
@@ -162,6 +166,10 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
 
                     case "status":
                         field = APP_USER.IS_ENABLED;
+                        break;
+
+                    case "appOauth2UserId":
+                        field = APP_OAUTH2_USER.APP_OAUTH2_USER_ID;
                         break;
 
                     default:
@@ -422,14 +430,16 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
     }
 
     @Override
-    public OAuth2UserRecord getOAuth2User(String sub) {
+    public OAuth2UserRecord getOAuth2User(String providerName, String sub) {
         if (!hasLength(sub)) {
             return null;
         }
 
         var queryBuilder = new GetOAuth2UserQueryBuilder();
         return queryBuilder.select()
-                .where(APP_OAUTH2_USER.SUB.eq(sub))
+                .where(and(
+                        APP_OAUTH2_USER.SUB.eq(sub),
+                        (providerName != null) ? OAUTH2_APP.PROVIDER_NAME.eq(providerName) : noCondition()))
                 .fetchOne(queryBuilder.mapper());
     }
 
@@ -479,6 +489,175 @@ public class JooqAccountQueryRepository extends JooqBaseRepository implements Ac
                         toDate(record.get(APP_OAUTH2_USER.CREATION_TIMESTAMP))
                 );
             };
+        }
+    }
+
+    @Override
+    public ResultAndCount<AppOauth2User> getPendingList(PendingListFilterCriteria filterCriteria, PageRequest pageRequest) {
+
+        var queryBuilder = new GetPendingListQueryBuilder();
+        var where = queryBuilder.select().where(
+                queryBuilder.conditions(filterCriteria));
+        int count = dslContext().fetchCount(where);
+        List<AppOauth2User> result = queryBuilder.fetch(where, pageRequest);
+        return new ResultAndCount<>(result, count);
+    }
+
+    @Override
+    public AppOauth2User getPending(OAuth2UserId appOauth2UserId) {
+        if (appOauth2UserId == null) {
+            return null;
+        }
+
+        var queryBuilder = new GetPendingListQueryBuilder();
+        return queryBuilder.select()
+                .where(APP_OAUTH2_USER.APP_OAUTH2_USER_ID.eq(valueOf(appOauth2UserId)))
+                .fetchOne(queryBuilder.mapper());
+    }
+
+    @Override
+    public AppOauth2User getPendingBySub(String providerName, String sub) {
+        if (!hasLength(sub)) {
+            return null;
+        }
+
+        var queryBuilder = new GetPendingListQueryBuilder();
+        return queryBuilder.select()
+                .where(and(
+                        APP_OAUTH2_USER.SUB.eq(sub),
+                        (providerName != null) ? OAUTH2_APP.PROVIDER_NAME.eq(providerName) : noCondition()))
+                .fetchOne(queryBuilder.mapper());
+    }
+
+    private class GetPendingListQueryBuilder {
+
+        SelectOnConditionStep<? extends Record> select() {
+            return dslContext().select(
+                            APP_OAUTH2_USER.APP_OAUTH2_USER_ID,
+                            APP_OAUTH2_USER.APP_USER_ID,
+                            APP_OAUTH2_USER.SUB,
+                            APP_OAUTH2_USER.EMAIL,
+                            APP_OAUTH2_USER.PHONE_NUMBER,
+                            APP_OAUTH2_USER.NAME,
+                            APP_OAUTH2_USER.NICKNAME,
+                            APP_OAUTH2_USER.PREFERRED_USERNAME,
+                            APP_OAUTH2_USER.CREATION_TIMESTAMP,
+                            OAUTH2_APP.PROVIDER_NAME)
+                    .from(APP_OAUTH2_USER)
+                    .join(OAUTH2_APP).on(APP_OAUTH2_USER.OAUTH2_APP_ID.eq(OAUTH2_APP.OAUTH2_APP_ID));
+        }
+
+        List<Condition> conditions(PendingListFilterCriteria filterCriteria) {
+            List<Condition> conditions = new ArrayList<>();
+
+            conditions.add(APP_OAUTH2_USER.APP_USER_ID.isNull());
+
+            if (hasLength(filterCriteria.preferredUsername())) {
+                conditions.addAll(contains(filterCriteria.preferredUsername(), APP_OAUTH2_USER.PREFERRED_USERNAME));
+            }
+            if (hasLength(filterCriteria.email())) {
+                conditions.addAll(contains(filterCriteria.email(), APP_OAUTH2_USER.EMAIL));
+            }
+            if (hasLength(filterCriteria.providerName())) {
+                conditions.addAll(contains(filterCriteria.providerName(), OAUTH2_APP.PROVIDER_NAME));
+            }
+            if (filterCriteria.createdTimestampRange() != null) {
+                if (filterCriteria.createdTimestampRange().after() != null) {
+                    conditions.add(APP_OAUTH2_USER.CREATION_TIMESTAMP.greaterOrEqual(
+                            new Timestamp(filterCriteria.createdTimestampRange().after().getTime()).toLocalDateTime()));
+                }
+                if (filterCriteria.createdTimestampRange().before() != null) {
+                    conditions.add(APP_OAUTH2_USER.CREATION_TIMESTAMP.lessThan(
+                            new Timestamp(filterCriteria.createdTimestampRange().before().getTime()).toLocalDateTime()));
+                }
+            }
+
+            return conditions;
+        }
+
+        List<SortField<?>> sortFields(PageRequest pageRequest) {
+            List<SortField<?>> sortFields = new ArrayList<>();
+
+            for (Sort sort : pageRequest.sorts()) {
+                Field field;
+                switch (sort.field()) {
+                    case "creationTimestamp":
+                        field = APP_OAUTH2_USER.CREATION_TIMESTAMP;
+                        break;
+
+                    case "name":
+                        field = APP_OAUTH2_USER.NAME;
+                        break;
+
+                    case "nickname":
+                        field = APP_OAUTH2_USER.NICKNAME;
+                        break;
+
+                    case "email":
+                        field = APP_OAUTH2_USER.EMAIL;
+                        break;
+
+                    case "providerName":
+                        field = OAUTH2_APP.PROVIDER_NAME;
+                        break;
+
+                    case "preferredUsername":
+                        field = APP_OAUTH2_USER.PREFERRED_USERNAME;
+                        break;
+
+                    default:
+                        continue;
+                }
+
+                if (sort.direction() == DESC) {
+                    sortFields.add(field.desc());
+                } else {
+                    sortFields.add(field.asc());
+                }
+            }
+
+            return sortFields;
+        }
+
+        RecordMapper<Record, AppOauth2User> mapper() {
+            return record -> {
+                AppOauth2User appOauth2User = new AppOauth2User();
+                appOauth2User.setAppOauth2UserId(
+                        new OAuth2UserId(record.get(APP_OAUTH2_USER.APP_OAUTH2_USER_ID).toBigInteger()));
+                if (record.get(APP_OAUTH2_USER.APP_USER_ID) != null) {
+                    appOauth2User.setAppUserId(
+                            new UserId(record.get(APP_OAUTH2_USER.APP_USER_ID).toBigInteger()));
+                }
+                appOauth2User.setProviderName(record.get(OAUTH2_APP.PROVIDER_NAME));
+                appOauth2User.setSub(record.get(APP_OAUTH2_USER.SUB));
+                appOauth2User.setName(record.get(APP_OAUTH2_USER.NAME));
+                appOauth2User.setEmail(record.get(APP_OAUTH2_USER.EMAIL));
+                appOauth2User.setNickname(record.get(APP_OAUTH2_USER.NICKNAME));
+                appOauth2User.setPreferredUsername(record.get(APP_OAUTH2_USER.PREFERRED_USERNAME));
+                appOauth2User.setPhoneNumber(record.get(APP_OAUTH2_USER.PHONE_NUMBER));
+                appOauth2User.setCreationTimestamp(toDate(record.get(APP_OAUTH2_USER.CREATION_TIMESTAMP)));
+                return appOauth2User;
+            };
+        }
+
+        List<AppOauth2User> fetch(SelectConditionStep<?> conditionStep, PageRequest pageRequest) {
+            var sortFields = sortFields(pageRequest);
+            SelectFinalStep<? extends Record> finalStep;
+            if (sortFields == null || sortFields.isEmpty()) {
+                if (pageRequest.isPagination()) {
+                    finalStep = conditionStep.limit(pageRequest.pageOffset(), pageRequest.pageSize());
+                } else {
+                    finalStep = conditionStep;
+                }
+            } else {
+                if (pageRequest.isPagination()) {
+                    finalStep = conditionStep.orderBy(sortFields)
+                            .limit(pageRequest.pageOffset(), pageRequest.pageSize());
+                } else {
+                    finalStep = conditionStep.orderBy(sortFields);
+                }
+            }
+            return finalStep.fetch(mapper());
         }
     }
 

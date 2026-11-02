@@ -28,6 +28,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BccpManifestRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.BccpRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.DtRecord;
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 
 import java.math.BigInteger;
@@ -94,7 +95,7 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
         bccpManifest.setBccpId(bccp.getBccpId());
         bccpManifest.setBdtManifestId(valueOf(dt.dtManifestId()));
         bccpManifest.setReleaseId(valueOf(releaseId));
-        String den = bccp.getPropertyTerm() + ". " + dt.den().replaceAll(". Type", "");
+        String den = DenUtils.bccpDen(bccp.getPropertyTerm(), dt.den());
         bccpManifest.setDen(den);
 
         return new BccpManifestId(
@@ -141,7 +142,7 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
 
             String qualifier = result.get(DT.QUALIFIER);
             String dataTypeTerm = result.get(DT.DATA_TYPE_TERM);
-            String den = propertyTerm + ". " + (((qualifier != null) ? (qualifier + "_ ") : "") + dataTypeTerm);
+            String den = DenUtils.bccpDen(propertyTerm, qualifier, dataTypeTerm);
             dslContext().update(BCCP_MANIFEST)
                     .set(BCCP_MANIFEST.DEN, den)
                     .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccp.bccpManifestId())))
@@ -149,21 +150,8 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
         }
 
         if (valueConstraint != null) {
-            if (valueConstraint.hasFixedValue() &&
-                    (bccp.valueConstraint() == null || compare(bccp.valueConstraint().fixedValue(), valueConstraint.fixedValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCCP.FIXED_VALUE, valueConstraint.fixedValue())
-                        .setNull(BCCP.DEFAULT_VALUE);
-            } else if (valueConstraint.hasDefaultValue() &&
-                    (bccp.valueConstraint() == null || compare(bccp.valueConstraint().defaultValue(), valueConstraint.defaultValue()) != 0)) {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .set(BCCP.DEFAULT_VALUE, valueConstraint.defaultValue())
-                        .setNull(BCCP.FIXED_VALUE);
-            } else {
-                moreStep = ((moreStep != null) ? moreStep : firstStep)
-                        .setNull(BCCP.DEFAULT_VALUE)
-                        .setNull(BCCP.FIXED_VALUE);
-            }
+            moreStep = ValueConstraintUpdates.apply(firstStep, moreStep, bccp.valueConstraint(), valueConstraint,
+                    BCCP.FIXED_VALUE, BCCP.DEFAULT_VALUE);
         }
 
         if (definition != null) {
@@ -240,7 +228,7 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
                 .where(BCCP.BCCP_ID.eq(valueOf(bccp.bccpId())))
                 .execute();
         if (numOfUpdatedRecords == 1) {
-            String den = bccp.propertyTerm() + ". " + (((dt.qualifier() != null) ? (dt.qualifier() + "_ ") : "") + dt.dataTypeTerm());
+            String den = DenUtils.bccpDen(bccp.propertyTerm(), dt.qualifier(), dt.dataTypeTerm());
             numOfUpdatedRecords = dslContext().update(BCCP_MANIFEST)
                     .set(BCCP_MANIFEST.BDT_MANIFEST_ID, valueOf(dt.dtManifestId()))
                     .set(BCCP_MANIFEST.DEN, den)

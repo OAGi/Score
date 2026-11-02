@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.rc {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.rc.rc-title-only {
+  align-items: center;
+}
+
+/* The badges, one above the other, in a column of their own. */
+.rc-side {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 88px;
+}
+
+.rc-side > mat-chip {
+  max-width: 100%;
+}
+
+/* A state: the colours are the application's (the global stylesheet, and what the application says of the state); the shape is this. */
+.rc-state {
+  display: inline-block;
+  padding: .30em 4px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* The container of the block: how much of the rest there is room for is a matter of its width. */
+.rc-body {
+  flex: 1 1 0;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+/* Title, subtitle and values on the left; the update on the right, at the foot of the block. */
+.rc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+}
+
+.rc-grid > * {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.rc-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rc-title.rc-title-muted,
+.rc-title.rc-title-muted a {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.rc-grid > .rc-title.rc-title-middle {
+  align-self: center;
+}
+
+.rc-title.rc-title-strong {
+  font-weight: 700;
+}
+
+.rc-subtitle {
+  overflow: hidden;
+  font-size: 11px;
+  color: #767676;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rc-meta {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0 14px;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 12px;
+  color: #545454;
+  white-space: nowrap;
+}
+
+/* A value is shown whole; the last of those shown is cut, with an ellipsis, when the line is full. Which are shown is the component's
+   (the width of the block, and the priority of each value). */
+.rc-meta > .rc-meta-item {
+  flex: 0 0 auto;
+}
+
+.rc-meta > .rc-meta-item.last {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-label {
+  margin-right: 0.35em;
+  color: #767676;
+}
+
+.rc-grid > .rc-updated {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1 / span var(--rc-text-rows, 2);
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: end;
+  font-size: 12px;
+  color: #545454;
+  white-space: nowrap;
+}
+
+/* A record with a creation and an update: the creation is under the values, in one line (it is the update that has the right), and of the
+   same look as the update (the same class). */
+.rc-grid > .rc-created {
+  display: block;
+  grid-column: 1;
+  grid-row: auto;
+  align-self: start;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-created > span + span {
+  margin-left: 0.35em;
+}
+
+/* What the screen puts inside the element as `actions` (e.g. the buttons of a row): at the right end, in the middle, as a row menu is; one
+   above the other, so that they do not take the width of the text. */
+.rc-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: stretch;
+  align-self: center;
+  gap: 4px;
+}
+
+.rc-actions:empty {
+  display: none;
+}
+
+/* What the screen puts inside the element (e.g. the controls of a row): under everything else, across the width. */
+.rc-grid > .rc-slot {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  margin-top: 6px;
+}
+
+.rc-grid > .rc-slot:empty {
+  display: none;
+}
+
+.rc-new {
+  border: 2px dotted rgb(220, 20, 60);
+  font-size: 11px;
+  border-radius: 8px;
+  padding: 0 8px;
+  display: inline-block;
+}
+
+.rc-title-badge {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+b {
+  margin-left: 0.25em;
+}
+
+.rc-title .rc-title-label {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.rc-label + b {
+  margin-left: 0;
+}
+
+/* No room for the update beside the values: one line under them. */
+@container (max-width: 339px) {
+  .rc-grid > .rc-updated {
+    display: block;
+    grid-column: 1 / -1;
+    grid-row: auto;
+    align-self: start;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rc-updated > span + span {
+    margin-left: 0.35em;
+  }
+}
+
+/* Not room even for that line: when and who, one above the other. */
+@container (max-width: 239px) {
+  .rc-grid > .rc-updated {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: visible;
+  }
+
+  .rc-updated > span + span {
+    margin-left: 0;
+  }
+}

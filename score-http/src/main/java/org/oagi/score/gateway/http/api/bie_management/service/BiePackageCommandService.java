@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.Production;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.WIP;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -64,9 +65,9 @@ public class BiePackageCommandService {
 
         return command(requester).create(
                 request.libraryId(),
-                hasLength(request.name()) ? request.name() : "New BIE Package",
-                hasLength(request.versionId()) ? request.versionId() : "v1.0",
-                hasLength(request.versionName()) ? request.versionName() : newVersionName(),
+                hasText(request.name()) ? request.name().trim() : "New BIE Package",
+                hasText(request.versionId()) ? request.versionId().trim() : "v1.0",
+                hasText(request.versionName()) ? request.versionName().trim() : newVersionName(),
                 request.description());
     }
 
@@ -74,25 +75,51 @@ public class BiePackageCommandService {
 
         UserId requesterId = requester.userId();
         if (request.state() != null) {
-            ensureBiePackageIsUpdatable(requester, request.biePackageId(), false);
+            BiePackageDetailsRecord biePackage =
+                    ensureBiePackageIsUpdatable(requester, request.biePackageId(), false);
+            if (!canMove(biePackage.state(), request.state())) {
+                throw new IllegalArgumentException("The BIE package in '" + biePackage.state() +
+                        "' state cannot move to '" + request.state() + "' state.");
+            }
 
             return command(requester).updateState(
                     request.biePackageId(), request.state());
         } else {
             ensureBiePackageIsUpdatable(requester, request.biePackageId(), true);
 
+            if (!hasText(request.name())) {
+                throw new IllegalArgumentException("The BIE package name cannot be empty.");
+            }
+            if (!hasText(request.versionId())) {
+                throw new IllegalArgumentException("The BIE package version ID cannot be empty.");
+            }
+            if (!hasText(request.versionName())) {
+                throw new IllegalArgumentException("The BIE package version name cannot be empty.");
+            }
+
             try {
                 return command(requester).update(
                         request.biePackageId(),
-                        request.name(),
-                        request.versionId(),
-                        request.versionName(),
+                        request.name().trim(),
+                        request.versionId().trim(),
+                        request.versionName().trim(),
                         request.description(),
                         request.revisionReason());
             } catch (DuplicateKeyException e) {
                 throw new IllegalArgumentException("A BIE package with the same name, version ID, and version name already exists.", e);
             }
         }
+    }
+
+    /** The moves the BIE Package page offers: WIP to QA, QA to WIP and QA to Production. */
+    private boolean canMove(BieState from, BieState to) {
+        if (from == WIP) {
+            return to == BieState.QA;
+        }
+        if (from == BieState.QA) {
+            return to == WIP || to == BieState.Production;
+        }
+        return false;
     }
 
     private BiePackageDetailsRecord ensureBiePackageIsUpdatable(
@@ -107,7 +134,8 @@ public class BiePackageCommandService {
             throw new DataAccessForbiddenException("Not allowed to update the BIE package in '" + biePackage.state() + "' state.");
         }
 
-        if (!biePackage.owner().userId().equals(requester.userId())) {
+        // An administrator can update a BIE package they do not own, as for a BIE (Issue #1576).
+        if (!requester.isAdministrator() && !biePackage.owner().userId().equals(requester.userId())) {
             throw new DataAccessForbiddenException("Only allowed to update the BIE package by the owner.");
         }
 

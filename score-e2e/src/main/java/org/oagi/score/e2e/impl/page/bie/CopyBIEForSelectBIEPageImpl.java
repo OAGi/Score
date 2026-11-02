@@ -43,9 +43,6 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
     private static final By STATE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"State\")]//ancestor::mat-form-field[1]//mat-select");
 
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
-
     private static final By COPY_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Copy\")]//ancestor::button[1]");
 
@@ -89,11 +86,9 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(searchedSelectField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
     }
@@ -106,11 +101,9 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
     @Override
     public void setOwner(String owner) {
         retry(() -> {
-            click(getOwnerSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-            click(searchedSelectField);
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), ownerSelect), owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
             escape(getDriver());
         });
     }
@@ -123,11 +116,9 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
     @Override
     public void setUpdater(String updater) {
         retry(() -> {
-            click(getUpdaterSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), updater);
-            WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + updater + "\")]"));
-            click(searchedSelectField);
+            WebElement updaterSelect = openMatSelect(getDriver(), UPDATER_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), updaterSelect), updater);
+            click(matSelectOption(getDriver(), updaterSelect, updater));
             escape(getDriver());
         });
     }
@@ -181,10 +172,8 @@ public class CopyBIEForSelectBIEPageImpl extends BaseSearchBarPageImpl implement
 
     @Override
     public void setState(String state) {
-        click(getStateSelectField());
-        WebElement optionField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
-        click(optionField);
+        WebElement stateSelect = openMatSelect(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+        click(matSelectOption(getDriver(), stateSelect, state));
         escape(getDriver());
     }
 

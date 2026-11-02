@@ -22,55 +22,55 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.business_term.business_term_id</code>. A internal,
-     * primary database key of an Business term.
+     * Setter for <code>business_term.business_term_id</code>. An internal,
+     * primary database key of a Business term.
      */
     public void setBusinessTermId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.business_term_id</code>. A internal,
-     * primary database key of an Business term.
+     * Getter for <code>business_term.business_term_id</code>. An internal,
+     * primary database key of a Business term.
      */
     public ULong getBusinessTermId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.business_term.guid</code>. A globally unique
-     * identifier (GUID).
+     * Setter for <code>business_term.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.guid</code>. A globally unique
-     * identifier (GUID).
+     * Getter for <code>business_term.guid</code>. A globally unique identifier
+     * (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.business_term.business_term</code>. A main name of
-     * the business term
+     * Setter for <code>business_term.business_term</code>. A main name of the
+     * business term
      */
     public void setBusinessTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.business_term</code>. A main name of
-     * the business term
+     * Getter for <code>business_term.business_term</code>. A main name of the
+     * business term
      */
     public String getBusinessTerm() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.business_term.definition</code>. Definition of the
+     * Setter for <code>business_term.definition</code>. Definition of the
      * business term.
      */
     public void setDefinition(String value) {
@@ -78,7 +78,7 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.business_term.definition</code>. Definition of the
+     * Getter for <code>business_term.definition</code>. Definition of the
      * business term.
      */
     public String getDefinition() {
@@ -86,25 +86,25 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.business_term.created_by</code>. A foreign key
-     * referring to the user who creates the business term. The creator of the
-     * business term is also its owner by default.
+     * Setter for <code>business_term.created_by</code>. A foreign key referring
+     * to the user who creates the business term. The creator of the business
+     * term is also its owner by default.
      */
     public void setCreatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.created_by</code>. A foreign key
-     * referring to the user who creates the business term. The creator of the
-     * business term is also its owner by default.
+     * Getter for <code>business_term.created_by</code>. A foreign key referring
+     * to the user who creates the business term. The creator of the business
+     * term is also its owner by default.
      */
     public ULong getCreatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.business_term.last_updated_by</code>. A foreign key
+     * Setter for <code>business_term.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the business term record. This
      * may be the user who is in the same group as the creator.
      */
@@ -113,7 +113,7 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.business_term.last_updated_by</code>. A foreign key
+     * Getter for <code>business_term.last_updated_by</code>. A foreign key
      * referring to the last user who has updated the business term record. This
      * may be the user who is in the same group as the creator.
      */
@@ -122,23 +122,23 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.business_term.creation_timestamp</code>. Timestamp
-     * when the business term record was first created.
+     * Setter for <code>business_term.creation_timestamp</code>. Timestamp when
+     * the business term record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.creation_timestamp</code>. Timestamp
-     * when the business term record was first created.
+     * Getter for <code>business_term.creation_timestamp</code>. Timestamp when
+     * the business term record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>oagi.business_term.last_update_timestamp</code>. The
+     * Setter for <code>business_term.last_update_timestamp</code>. The
      * timestamp when the business term was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -146,7 +146,7 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Getter for <code>oagi.business_term.last_update_timestamp</code>. The
+     * Getter for <code>business_term.last_update_timestamp</code>. The
      * timestamp when the business term was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
@@ -154,48 +154,48 @@ public class BusinessTermRecord extends UpdatableRecordImpl<BusinessTermRecord> 
     }
 
     /**
-     * Setter for <code>oagi.business_term.external_ref_uri</code>. TODO:
-     * Definition is missing.
+     * Setter for <code>business_term.external_ref_uri</code>. TODO: Definition
+     * is missing.
      */
     public void setExternalRefUri(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.external_ref_uri</code>. TODO:
-     * Definition is missing.
+     * Getter for <code>business_term.external_ref_uri</code>. TODO: Definition
+     * is missing.
      */
     public String getExternalRefUri() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>oagi.business_term.external_ref_id</code>. TODO:
-     * Definition is missing.
+     * Setter for <code>business_term.external_ref_id</code>. TODO: Definition
+     * is missing.
      */
     public void setExternalRefId(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.external_ref_id</code>. TODO:
-     * Definition is missing.
+     * Getter for <code>business_term.external_ref_id</code>. TODO: Definition
+     * is missing.
      */
     public String getExternalRefId() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>oagi.business_term.comment</code>. Comment of the
-     * business term.
+     * Setter for <code>business_term.comment</code>. Comment of the business
+     * term.
      */
     public void setComment(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.business_term.comment</code>. Comment of the
-     * business term.
+     * Getter for <code>business_term.comment</code>. Comment of the business
+     * term.
      */
     public String getComment() {
         return (String) get(10);

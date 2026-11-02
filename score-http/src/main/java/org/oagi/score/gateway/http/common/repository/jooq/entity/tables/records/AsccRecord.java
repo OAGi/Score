@@ -22,73 +22,71 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.ascc.ascc_id</code>. An internal, primary database
-     * key of an ASCC.
+     * Setter for <code>ascc.ascc_id</code>. An internal, primary database key
+     * of an ASCC.
      */
     public void setAsccId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.ascc_id</code>. An internal, primary database
-     * key of an ASCC.
+     * Getter for <code>ascc.ascc_id</code>. An internal, primary database key
+     * of an ASCC.
      */
     public ULong getAsccId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.ascc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>ascc.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>ascc.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.ascc.cardinality_min</code>. Minimum occurrence of
-     * the TO_ASCCP_ID. The valid values are non-negative integer.
+     * Setter for <code>ascc.cardinality_min</code>. Minimum occurrence of the
+     * TO_ASCCP_ID. The valid values are non-negative integer.
      */
     public void setCardinalityMin(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.cardinality_min</code>. Minimum occurrence of
-     * the TO_ASCCP_ID. The valid values are non-negative integer.
+     * Getter for <code>ascc.cardinality_min</code>. Minimum occurrence of the
+     * TO_ASCCP_ID. The valid values are non-negative integer.
      */
     public Integer getCardinalityMin() {
         return (Integer) get(2);
     }
 
     /**
-     * Setter for <code>oagi.ascc.cardinality_max</code>. Maximum cardinality of
-     * the TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1
-     * means unbounded. 0 means prohibited or not to use.
+     * Setter for <code>ascc.cardinality_max</code>. Maximum cardinality of the
+     * TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1 means
+     * unbounded. 0 means prohibited or not to use.
      */
     public void setCardinalityMax(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.cardinality_max</code>. Maximum cardinality of
-     * the TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1
-     * means unbounded. 0 means prohibited or not to use.
+     * Getter for <code>ascc.cardinality_max</code>. Maximum cardinality of the
+     * TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1 means
+     * unbounded. 0 means prohibited or not to use.
      */
     public Integer getCardinalityMax() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>oagi.ascc.seq_key</code>. @deprecated since 2.0.0. This
+     * Setter for <code>ascc.seq_key</code>. @deprecated since 2.0.0. This
      * indicates the order of the associations among other siblings. A valid
      * value is positive integer. The SEQ_KEY at the CC side is localized. In
      * other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs
@@ -99,7 +97,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.seq_key</code>. @deprecated since 2.0.0. This
+     * Getter for <code>ascc.seq_key</code>. @deprecated since 2.0.0. This
      * indicates the order of the associations among other siblings. A valid
      * value is positive integer. The SEQ_KEY at the CC side is localized. In
      * other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs
@@ -110,8 +108,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.from_acc_id</code>. FROM_ACC_ID is a foreign
-     * key pointing to an ACC record. It is basically pointing to a parent data
+     * Setter for <code>ascc.from_acc_id</code>. FROM_ACC_ID is a foreign key
+     * pointing to an ACC record. It is basically pointing to a parent data
      * element (type) of the TO_ASCCP_ID.
      */
     public void setFromAccId(ULong value) {
@@ -119,8 +117,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.from_acc_id</code>. FROM_ACC_ID is a foreign
-     * key pointing to an ACC record. It is basically pointing to a parent data
+     * Getter for <code>ascc.from_acc_id</code>. FROM_ACC_ID is a foreign key
+     * pointing to an ACC record. It is basically pointing to a parent data
      * element (type) of the TO_ASCCP_ID.
      */
     public ULong getFromAccId() {
@@ -128,25 +126,25 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign
-     * key to an ASCCP table record. It is basically pointing to a child data
-     * element of the FROM_ACC_ID. 
+     * Setter for <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
+     * an ASCCP table record. It is basically pointing to a child data element
+     * of the FROM_ACC_ID. 
      */
     public void setToAsccpId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign
-     * key to an ASCCP table record. It is basically pointing to a child data
-     * element of the FROM_ACC_ID. 
+     * Getter for <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
+     * an ASCCP table record. It is basically pointing to a child data element
+     * of the FROM_ACC_ID. 
      */
     public ULong getToAsccpId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.ascc.definition</code>. This is a documentation or
+     * Setter for <code>ascc.definition</code>. This is a documentation or
      * description of the ASCC. Since ASCC is business context independent, this
      * is a business context independent description of the ASCC. Since there
      * are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID
@@ -159,7 +157,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.definition</code>. This is a documentation or
+     * Getter for <code>ascc.definition</code>. This is a documentation or
      * description of the ASCC. Since ASCC is business context independent, this
      * is a business context independent description of the ASCC. Since there
      * are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID
@@ -172,24 +170,24 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>ascc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>ascc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>oagi.ascc.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Setter for <code>ascc.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
@@ -197,8 +195,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Getter for <code>ascc.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public Byte getIsDeprecated() {
@@ -206,7 +204,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.replacement_ascc_id</code>. This refers to a
+     * Setter for <code>ascc.replacement_ascc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public void setReplacementAsccId(ULong value) {
@@ -214,7 +212,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.replacement_ascc_id</code>. This refers to a
+     * Getter for <code>ascc.replacement_ascc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public ULong getReplacementAsccId() {
@@ -222,8 +220,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.created_by</code>. A foreign key to the
-     * APP_USER table referring to the user who creates the entity.
+     * Setter for <code>ascc.created_by</code>. A foreign key to the APP_USER
+     * table referring to the user who creates the entity.
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -234,8 +232,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.created_by</code>. A foreign key to the
-     * APP_USER table referring to the user who creates the entity.
+     * Getter for <code>ascc.created_by</code>. A foreign key to the APP_USER
+     * table referring to the user who creates the entity.
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -246,9 +244,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Setter for <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -258,9 +256,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Getter for <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -270,7 +268,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.last_updated_by</code>. A foreign key to the
+     * Setter for <code>ascc.last_updated_by</code>. A foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -281,7 +279,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.last_updated_by</code>. A foreign key to the
+     * Getter for <code>ascc.last_updated_by</code>. A foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -292,7 +290,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.creation_timestamp</code>. Timestamp when the
+     * Setter for <code>ascc.creation_timestamp</code>. Timestamp when the
      * revision of the ASCC was created. 
      * 
      * This never change for a revision.
@@ -302,7 +300,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.creation_timestamp</code>. Timestamp when the
+     * Getter for <code>ascc.creation_timestamp</code>. Timestamp when the
      * revision of the ASCC was created. 
      * 
      * This never change for a revision.
@@ -312,8 +310,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Setter for <code>ascc.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -324,8 +322,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Getter for <code>ascc.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -336,9 +334,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the BCC.
+     * Setter for <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCC.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -348,9 +346,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.ascc.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the BCC.
+     * Getter for <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCC.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -360,32 +358,32 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.ascc.prev_ascc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Setter for <code>ascc.prev_ascc_id</code>. A self-foreign key to indicate
+     * the previous history record.
      */
     public void setPrevAsccId(ULong value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.prev_ascc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Getter for <code>ascc.prev_ascc_id</code>. A self-foreign key to indicate
+     * the previous history record.
      */
     public ULong getPrevAsccId() {
         return (ULong) get(17);
     }
 
     /**
-     * Setter for <code>oagi.ascc.next_ascc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Setter for <code>ascc.next_ascc_id</code>. A self-foreign key to indicate
+     * the next history record.
      */
     public void setNextAsccId(ULong value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>oagi.ascc.next_ascc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Getter for <code>ascc.next_ascc_id</code>. A self-foreign key to indicate
+     * the next history record.
      */
     public ULong getNextAsccId() {
         return (ULong) get(18);

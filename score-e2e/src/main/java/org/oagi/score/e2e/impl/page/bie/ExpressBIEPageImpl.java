@@ -2,6 +2,7 @@ package org.oagi.score.e2e.impl.page.bie;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.avro.Schema;
 import org.json.JSONObject;
 import org.oagi.score.e2e.impl.page.BaseSearchBarPageImpl;
 import org.oagi.score.e2e.obj.BusinessContextObject;
@@ -19,6 +20,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.XMLConstants;
+import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -29,6 +32,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -45,8 +49,6 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             By.xpath("//*[contains(text(), \"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By UPDATER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(), \"Updater\")]//ancestor::div[1]/mat-select[1]");
-    private static final By DROPDOWN_SEARCH_FIELD_LOCATOR =
-            By.xpath("//input[@aria-label=\"dropdown search\"]");
     private static final By UPDATED_START_DATE_FIELD_LOCATOR =
             By.xpath("//input[contains(@placeholder, \"Updated start date\")]");
     private static final By UPDATED_END_DATE_FIELD_LOCATOR =
@@ -58,7 +60,7 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     private static final By JSON_SCHEMA_VERSION_SELECT_FIELD_LOCATOR =
             By.xpath("//mat-radio-button[@id = 'expr-JSON']/following-sibling::div[1]//mat-label[contains(text(), 'Version')]//ancestor::mat-form-field[1]//mat-select");
     private static final By OPEN_API_VERSION_SELECT_FIELD_LOCATOR =
-            By.xpath("//mat-radio-button[@id = 'expr-OPENAPI3']/following-sibling::div[1]//mat-label[contains(text(), 'Version')]//ancestor::mat-form-field[1]//mat-select");
+            By.xpath("//mat-radio-button[@id = 'expr-OPENAPI3']/following-sibling::div[contains(@class, 'generate-option')]//mat-label[contains(text(), 'Version')]//ancestor::mat-form-field[1]//mat-select");
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExpressBIEPageImpl(BasePage parent) {
@@ -120,11 +122,9 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     @Override
     public void setBranch(String branch) {
         retry(() -> {
-            click(getDriver(), getBranchSelectField());
-            sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), branch);
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[@class = \"cdk-overlay-container\"]//mat-option//span[text() = \"" + branch + "\"]"));
-            click(getDriver(), optionField);
+            WebElement branchSelect = openMatSelect(getDriver(), BRANCH_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), branchSelect), branch);
+            click(matSelectOption(getDriver(), branchSelect, branch));
             escape(getDriver());
         });
     }
@@ -137,10 +137,8 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     @Override
     public void setState(String state) {
         retry(() -> {
-            click(getStateSelectField());
-            WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//mat-option//span[contains(text(), \"" + state + "\")]"));
-            click(optionField);
+            WebElement stateSelect = openMatSelect(getDriver(), STATE_SELECT_FIELD_LOCATOR);
+            click(matSelectOption(getDriver(), stateSelect, state));
             escape(getDriver());
         });
     }
@@ -152,12 +150,12 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public void setOwner(String owner) {
-        click(getOwnerSelectField());
-        sendKeys(visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR), owner);
-        WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
-                By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
-        click(searchedSelectField);
-        escape(getDriver());
+        retry(() -> {
+            WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
+            sendKeys(matSelectSearchField(getDriver(), ownerSelect), owner);
+            click(matSelectOption(getDriver(), ownerSelect, owner));
+            escape(getDriver());
+        });
     }
 
     @Override
@@ -238,7 +236,10 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
         try {
             return waitForDownloadFile(ofMillis(60000L), startedAt, expectedFilenameMatcher, getValidator(format, compressed));
         } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException(e);
+            String errorMessage = getDriver().findElements(By.xpath("//simple-snack-bar/div")).stream()
+                    .findFirst().map(WebElement::getText).orElse(null);
+            String diagnostic = errorMessage == null ? "" : " Snackbar: " + errorMessage;
+            throw new IllegalStateException(format + " expression generation did not produce a valid download." + diagnostic, e);
         }
     }
 
@@ -253,6 +254,18 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
                 break;
             case YML:
                 validator = ymlValidator();
+                break;
+            case ODS:
+                validator = zipValidator(".ods");
+                break;
+            case XLSX:
+                validator = zipValidator(".xlsx");
+                break;
+            case FODS:
+                validator = xmlExtensionValidator(".fods");
+                break;
+            case AVRO:
+                validator = jsonExtensionValidator(".avsc");
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported expression format: " + format);
@@ -295,13 +308,7 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             }
 
             try {
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                Document document = documentBuilder.parse(file);
-                Element rootElement = document.getDocumentElement();
-                if (!"xsd:schema".equals(rootElement.getTagName())) {
-                    return false;
-                }
+                SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(file);
             } catch (Exception e) {
                 logger.trace("Can't parse " + file, e);
                 return false;
@@ -320,6 +327,14 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             try {
                 String str = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
                 JSONObject json = new JSONObject(str);
+                boolean jsonSchema = json.has("$schema") &&
+                        (json.has("type") || json.has("$defs") || json.has("definitions"));
+                boolean openApiDocument = json.optString("openapi").startsWith("3.") &&
+                        json.opt("info") instanceof JSONObject &&
+                        json.opt("paths") instanceof JSONObject;
+                if (!jsonSchema && !openApiDocument) {
+                    return false;
+                }
             } catch (Exception e) {
                 logger.trace("Can't parse " + file, e);
                 return false;
@@ -337,13 +352,78 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
             try {
                 String str = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                Map<String, Object> schema = new Yaml().load(str);
+                Object parsed = new Yaml().load(str);
+                if (!(parsed instanceof Map<?, ?> schema) ||
+                        !String.valueOf(schema.get("openapi")).startsWith("3.") ||
+                        !(schema.get("info") instanceof Map<?, ?>) ||
+                        !(schema.get("paths") instanceof Map<?, ?>)) {
+                    return false;
+                }
             } catch (Exception e) {
                 logger.trace("Can't parse " + file, e);
                 return false;
             }
 
             return true;
+        };
+    }
+
+    private Function<File, Boolean> jsonExtensionValidator(String extension) {
+        return file -> {
+            if (!file.getName().endsWith(extension)) return false;
+            try {
+                JSONObject schemaJson = new JSONObject(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+                Schema schema = new Schema.Parser().parse(schemaJson.toString());
+                return "record".equals(schema.getType().getName()) && !schema.getFields().isEmpty();
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
+        };
+    }
+
+    private Function<File, Boolean> xmlExtensionValidator(String extension) {
+        return file -> {
+            if (!file.getName().endsWith(extension)) return false;
+            try {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
+                return true;
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
+        };
+    }
+
+    private Function<File, Boolean> zipValidator(String extension) {
+        return file -> {
+            if (!file.getName().endsWith(extension)) return false;
+            try (ZipFile input = new ZipFile(file)) {
+                ZipEntry content = input.getEntry("content.xml");
+                ZipEntry mimeType = input.getEntry("mimetype");
+                if (content == null || mimeType == null) {
+                    return false;
+                }
+                String mimeTypeValue;
+                try (InputStream mimeTypeStream = input.getInputStream(mimeType)) {
+                    mimeTypeValue = new String(mimeTypeStream.readAllBytes(), StandardCharsets.UTF_8);
+                }
+                if (!"application/vnd.oasis.opendocument.spreadsheet".equals(mimeTypeValue)) {
+                    return false;
+                }
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+                Document document;
+                try (InputStream contentStream = input.getInputStream(content)) {
+                    document = factory.newDocumentBuilder().parse(contentStream);
+                }
+                Element root = document.getDocumentElement();
+                return "document-content".equals(root.getLocalName()) &&
+                        "urn:oasis:names:tc:opendocument:xmlns:office:1.0".equals(root.getNamespaceURI());
+            } catch (Exception e) {
+                logger.trace("Can't parse " + file, e);
+                return false;
+            }
         };
     }
 
@@ -395,7 +475,16 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
             timeout -= 1000L;
         } while (timeout > 0L);
 
-        throw new FileNotFoundException();
+        String candidates;
+        try (var files = Files.list(path)) {
+            candidates = files
+                    .filter(child -> child.toFile().lastModified() >= startedAt)
+                    .filter(child -> expectedFilenameMatcher == null || expectedFilenameMatcher.apply(child.toFile().getName()))
+                    .map(child -> child.getFileName().toString())
+                    .toList().toString();
+        }
+        throw new FileNotFoundException("No valid " + (expectedFilenameMatcher == null ? "" : "matching ") +
+                "download was found. Candidate files: " + candidates);
     }
 
     @Override
@@ -486,6 +575,17 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     @Override
     public void selectXMLSchemaExpression() {
         click(getXMLSchemaExpressionRadioButton().findElement(By.tagName("input")));
+    }
+
+    @Override
+    public void selectODFExpression(String format) {
+        click(getElementByID("expr-ODF").findElement(By.tagName("input")));
+        selectOption(visibilityOfElementLocated(getDriver(), OPEN_API_FORMAT_SELECT_FIELD_LOCATOR), format);
+    }
+
+    @Override
+    public void selectAvroExpression() {
+        click(getElementByID("expr-AVRO").findElement(By.tagName("input")));
     }
 
     @Override
@@ -604,7 +704,13 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
 
     @Override
     public OpenAPIExpressionOptions selectOpenAPIExpression() {
-        click(getOpenAPIExpressionRadioButton().findElement(By.tagName("input")));
+        WebElement radioButton = getOpenAPIExpressionRadioButton();
+        if (!radioButton.getAttribute("class").contains("mat-mdc-radio-checked")) {
+            click(radioButton.findElement(By.tagName("input")));
+        }
+        // The Version/Format controls are conditionally rendered from the selected radio value.
+        // Wait for Angular's @if block before exposing the options to callers.
+        visibilityOfElementLocated(getDriver(), OPEN_API_VERSION_SELECT_FIELD_LOCATOR);
         return new OpenAPIExpressionOptionsImpl();
     }
 

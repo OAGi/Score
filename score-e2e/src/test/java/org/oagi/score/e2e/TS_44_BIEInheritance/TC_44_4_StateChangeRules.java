@@ -11,6 +11,7 @@ import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.bie.EditBIEPage;
 import org.oagi.score.e2e.page.bie.ViewEditBIEPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -18,8 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.oagi.score.e2e.AssertionHelper.assertDisabled;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -29,6 +31,28 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
     private void thisAccountWillBeDeletedAfterTests(AppUserObject appUser) {
         this.randomAccounts.add(appUser);
+    }
+
+    private void assertTransitionBlockedByDependency(WebElement transitionButton, String targetState,
+                                                     String dependencyVersion) {
+        click(transitionButton);
+
+        WebElement validationSummary = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//*[contains(@class, 'validation-summary')]"));
+        assertTrue(getText(validationSummary).contains("cannot move to '" + targetState + "'"));
+
+        WebElement dependencyRow = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//tr[.//td//*[contains(normalize-space(.), \"" +
+                        dependencyVersion + "\")]]"));
+        WebElement dependencyCheckbox = dependencyRow.findElement(By.xpath("./td[1]//mat-checkbox"));
+        assertTrue(dependencyCheckbox.getAttribute("class").contains("mat-mdc-checkbox-disabled"));
+
+        WebElement updateButton = visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//button[.//span[normalize-space(.) = 'Update']]"));
+        assertFalse(updateButton.isEnabled());
+
+        click(visibilityOfElementLocated(getDriver(), By.xpath(
+                "//mat-dialog-container//button[.//span[normalize-space(.) = 'Cancel']]")));
     }
 
     @BeforeEach
@@ -75,6 +99,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         viewEditBIEPage.hitSearchButton();
 
         WebElement tr = viewEditBIEPage.getTableRecordByValue(asccp.getDen());
+        String baseBieVersion = getText(viewEditBIEPage.getColumnByName(tr, "version"));
         viewEditBIEPage.hitCreateInheritedBIE(tr);
 
         viewEditBIEPage.openPage();
@@ -89,7 +114,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         WebElement inheritedBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(inheritedBieTr);
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(inheritedBieTr);
-        assertDisabled(editBIEPage.getMoveToQAButton(false));
+        assertTransitionBlockedByDependency(editBIEPage.getMoveToQAButton(true), "QA", baseBieVersion);
     }
 
     @Test
@@ -157,6 +182,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         WebElement inheritedBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(inheritedBieTr);
+        String inheritedBieVersion = getText(viewEditBIEPage.getColumnByName(inheritedBieTr, "version"));
         editBIEPage = viewEditBIEPage.openEditBIEPage(inheritedBieTr);
         editBIEPage.moveToQA();
         assertEquals("State updated", getSnackBarMessage(getDriver()));
@@ -177,7 +203,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         baseBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(baseBieTr);
         editBIEPage = viewEditBIEPage.openEditBIEPage(baseBieTr);
-        assertDisabled(editBIEPage.getBackToWIPButton(false));
+        assertTransitionBlockedByDependency(editBIEPage.getBackToWIPButton(true), "WIP", inheritedBieVersion);
     }
 
     @Test
@@ -319,6 +345,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
 
         WebElement baseBieTr = viewEditBIEPage.getTableRecordAtIndex(1);
         assertNotNull(baseBieTr);
+        String baseBieVersion = getText(viewEditBIEPage.getColumnByName(baseBieTr, "version"));
         EditBIEPage editBIEPage = viewEditBIEPage.openEditBIEPage(baseBieTr);
         editBIEPage.moveToQA();
         assertEquals("State updated", getSnackBarMessage(getDriver()));
@@ -343,7 +370,7 @@ public class TC_44_4_StateChangeRules extends BaseTest {
         assertEquals("State updated", getSnackBarMessage(getDriver()));
 
         // Inherited BIE 'Move to Production'
-        assertDisabled(editBIEPage.getMoveToProductionButton(false));
+        assertTransitionBlockedByDependency(editBIEPage.getMoveToProductionButton(true), "Production", baseBieVersion);
     }
 
 

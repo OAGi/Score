@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.integration_management.github.repository
 import jakarta.annotation.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.Table;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
@@ -60,7 +61,7 @@ public class JooqGitHubIssueLinkCommandRepository extends JooqBaseRepository
                         .set(GITHUB_ISSUE.REPO_OWNER, repoOwner)
                         .set(GITHUB_ISSUE.REPO_NAME, repoName)
                         .set(GITHUB_ISSUE.ISSUE_NUMBER, issueNumber)
-                        .set(GITHUB_ISSUE.CACHED_METADATA, cachedMetadata)
+                        .set(GITHUB_ISSUE.CACHED_METADATA, JSON.jsonOrNull(cachedMetadata))
                         .set(GITHUB_ISSUE.CACHED_SYNCED_TIMESTAMP, synced)
                         .set(GITHUB_ISSUE.CREATION_TIMESTAMP, now)
                         .set(GITHUB_ISSUE.LAST_UPDATE_TIMESTAMP, now)
@@ -72,7 +73,7 @@ public class JooqGitHubIssueLinkCommandRepository extends JooqBaseRepository
     public boolean updateIssueCache(GitHubIssueId issueId, String cachedMetadata) {
         LocalDateTime now = LocalDateTime.now();
         return dslContext().update(GITHUB_ISSUE)
-                .set(GITHUB_ISSUE.CACHED_METADATA, cachedMetadata)
+                .set(GITHUB_ISSUE.CACHED_METADATA, JSON.jsonOrNull(cachedMetadata))
                 .set(GITHUB_ISSUE.CACHED_SYNCED_TIMESTAMP, now)
                 .set(GITHUB_ISSUE.LAST_UPDATE_TIMESTAMP, now)
                 .where(GITHUB_ISSUE.GITHUB_ISSUE_ID.eq(valueOf(issueId)))
@@ -83,7 +84,7 @@ public class JooqGitHubIssueLinkCommandRepository extends JooqBaseRepository
     public boolean updateIssueCache(String repoOwner, String repoName, int issueNumber, String cachedMetadata) {
         LocalDateTime now = LocalDateTime.now();
         return dslContext().update(GITHUB_ISSUE)
-                .set(GITHUB_ISSUE.CACHED_METADATA, cachedMetadata)
+                .set(GITHUB_ISSUE.CACHED_METADATA, JSON.jsonOrNull(cachedMetadata))
                 .set(GITHUB_ISSUE.CACHED_SYNCED_TIMESTAMP, now)
                 .set(GITHUB_ISSUE.LAST_UPDATE_TIMESTAMP, now)
                 .where(GITHUB_ISSUE.REPO_OWNER.eq(repoOwner))

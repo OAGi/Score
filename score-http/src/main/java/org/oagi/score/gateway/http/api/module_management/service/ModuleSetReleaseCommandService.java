@@ -10,10 +10,12 @@ import org.oagi.score.gateway.http.api.module_management.repository.ModuleSetRel
 import org.oagi.score.gateway.http.api.module_management.repository.ModuleSetReleaseQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -36,6 +38,8 @@ public class ModuleSetReleaseCommandService {
 
     public ModuleSetReleaseId create(ScoreUser requester, CreateModuleSetReleaseRequest request) {
 
+        requireDeveloper(requester);
+
         var command = command(requester);
 
         if (request.isDefault()) {
@@ -43,8 +47,10 @@ public class ModuleSetReleaseCommandService {
         }
 
         String moduleSetReleaseName = request.name();
-        if (!StringUtils.hasLength(moduleSetReleaseName)) {
+        if (!hasText(moduleSetReleaseName)) {
             moduleSetReleaseName = query(requester).getDefaultName(request.moduleSetId());
+        } else {
+            moduleSetReleaseName = moduleSetReleaseName.trim();
         }
 
         ModuleSetReleaseId moduleSetReleaseId = command.create(
@@ -61,6 +67,8 @@ public class ModuleSetReleaseCommandService {
 
     public boolean update(ScoreUser requester, UpdateModuleSetReleaseRequest request) {
 
+        requireDeveloper(requester);
+
         var query = query(requester);
         var command = command(requester);
 
@@ -72,8 +80,10 @@ public class ModuleSetReleaseCommandService {
         }
 
         String moduleSetReleaseName = request.name();
-        if (!StringUtils.hasLength(moduleSetReleaseName)) {
+        if (!hasText(moduleSetReleaseName)) {
             moduleSetReleaseName = query.getDefaultName(moduleSetRelease.moduleSet().moduleSetId());
+        } else {
+            moduleSetReleaseName = moduleSetReleaseName.trim();
         }
 
         String moduleSetReleaseDescription = request.description();
@@ -84,10 +94,14 @@ public class ModuleSetReleaseCommandService {
 
     public boolean discard(ScoreUser requester, ModuleSetReleaseId moduleSetReleaseId) {
 
+        requireDeveloper(requester);
+
         return command(requester).delete(moduleSetReleaseId);
     }
 
     public void assignCc(ScoreUser requester, AssignCCToModuleRequest assignCCToModuleRequest) {
+
+        requireDeveloper(requester);
 
         var command = moduleManifestCommand(requester);
 
@@ -126,6 +140,8 @@ public class ModuleSetReleaseCommandService {
     }
 
     public void unassignCc(ScoreUser requester, AssignCCToModuleRequest assignCCToModuleRequest) {
+
+        requireDeveloper(requester);
 
         var command = moduleManifestCommand(requester);
 

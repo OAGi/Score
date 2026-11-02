@@ -1,7 +1,7 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {faFlask} from '@fortawesome/free-solid-svg-icons';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -19,7 +19,10 @@ import {
   CcFlatNodeDataSource,
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {findPreviousAssociation} from '../domain/association-revision';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
   StateChangeDialogComponent,
@@ -48,6 +51,7 @@ import {
   Comment,
   Embedded,
   EntityType,
+  Element as ElementEntityType,
   EntityTypes,
   Extension,
   OAGIS10BODs,
@@ -57,14 +61,14 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
+import {initFilter, trim, UnboundedPipe} from '../../common/utility';
 import {RefactorDialogComponent} from '../refactor-dialog/refactor-dialog.component';
 import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
 import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -83,14 +87,20 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {ValidationService} from '../../validation/validation.service';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
   selector: 'score-acc-detail',
   templateUrl: './acc-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./acc-detail.component.css']
 })
-export class AccDetailComponent implements OnInit {
+export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -108,6 +118,8 @@ export class AccDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private stompService = inject(RxStompService);
   private clipboard = inject(Clipboard);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
   webPageInfo = inject(WebPageInfoService);
 
 
@@ -115,8 +127,6 @@ export class AccDetailComponent implements OnInit {
 
   faFlask = faFlask;
   title: string;
-  _innerHeight: number = window.innerHeight;
-  paddingPixel = 12;
   manifestId: number;
   type = 'ACC';
   isUpdating: boolean;
@@ -146,7 +156,7 @@ export class AccDetailComponent implements OnInit {
   /* End cardinality management */
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -156,31 +166,25 @@ export class AccDetailComponent implements OnInit {
   hasBasedAcc: boolean;
   initialExpandDepth = 10;
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
-  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
 
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
+  @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
+
+  get sidenav(): MatSidenav {
+    return this.sidenavPage.sidenav;
   }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<CcFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'CC-Settings-Hide-Cardinality'});
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
-
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows besides the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
 
   private redirectToCcList() {
     this.isUpdating = false;
@@ -188,6 +192,13 @@ export class AccDetailComponent implements OnInit {
       duration: 3000,
     });
     this.router.navigateByUrl('/core_component');
+  }
+
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -239,7 +250,8 @@ export class AccDetailComponent implements OnInit {
       this.isNameGenerating = false;
 
       // subscribe an event
-      this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -266,7 +278,7 @@ export class AccDetailComponent implements OnInit {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       this.workingRelease = accDetails.release.workingRelease;
 
@@ -277,6 +289,7 @@ export class AccDetailComponent implements OnInit {
         this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
       }
       this.rootNode.reset();
+      this.seedRootDetail(accDetails);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -305,6 +318,11 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
+  /* The root node has no parent relation, so its detail is built from the already fetched ACC without another request. */
+  private seedRootDetail(accDetails: AccDetails) {
+    this.rootNode.detail = new CcAccNodeInfo(this.rootNode as AccFlatNode, accDetails);
+  }
+
   goToPath(path: string) {
     let curNode = this.dataSource.data[0];
     let idx = 0;
@@ -322,7 +340,7 @@ export class AccDetailComponent implements OnInit {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
   receiveCommentEvent(evt) {
@@ -401,6 +419,7 @@ export class AccDetailComponent implements OnInit {
       this.service.getAccDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([rootNode, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
@@ -415,6 +434,7 @@ export class AccDetailComponent implements OnInit {
         this.hasBasedAcc = (this.rootNode.children[0] as CcFlatNode).type === 'ACC';
       }
       this.rootNode.reset();
+      this.seedRootDetail(rootNode);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -442,7 +462,7 @@ export class AccDetailComponent implements OnInit {
       this.originalName = undefined;
 
       // Recover the state of 'Hide Cardinality' property.
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -457,13 +477,7 @@ export class AccDetailComponent implements OnInit {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (this.rootNode) ? this.rootNode.state : '';
@@ -516,35 +530,26 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
+
+  private getPreviousAssociation(node?: CcFlatNode): AsccSummary | BccSummary | null {
+    node = node || this.selectedNode;
+    if (!node || !node.detail || !this.prevAccDetails || !this.prevAccDetails.associations) {
+      return null;
     }
 
-    this.dataSource.toggle(node);
+    if (node.type === 'ASCCP' && this.isAsccpDetail(node)) {
+      const ascc = this.asAsccpDetail(node).ascc;
+      return findPreviousAssociation('ASCC', ascc.manifestId, ascc.prevAsccManifestId, this.prevAccDetails.associations);
+    }
+    if (node.type === 'BCCP' && this.isBccpDetail(node)) {
+      const bcc = this.asBccpDetail(node).bcc;
+      return findPreviousAssociation('BCC', bcc.manifestId, bcc.prevBccManifestId, this.prevAccDetails.associations);
+    }
+    return null;
   }
 
   hasRevisionAssociation(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
-      return false;
-    }
-
-    node = node || this.selectedNode;
-
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return true;
-        }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return !!this.getPreviousAssociation(node);
   }
 
   isDeprecateAble(node?: CcFlatNode) {
@@ -557,32 +562,8 @@ export class AccDetailComponent implements OnInit {
       return false;
     }
 
-    // An association is deprecate-able only if it was carried over from the previous revision.
-    // A brand-new association appended during this amendment has no predecessor
-    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
-    // CC the base already references would match a prior association to the same target and
-    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
-    // association is considered, not just the first.
-    if (node.type === 'ASCCP') {
-      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return !(assoc as AsccSummary).deprecated;
-        }
-      }
-    } else if (node.type === 'BCCP') {
-      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return !(assoc as BccSummary).deprecated;
-        }
-      }
-    }
-    return false;
+    const previousAssociation = this.getPreviousAssociation(node);
+    return !!previousAssociation && !previousAssociation.deprecated;
   }
 
   getKey(node: CcFlatNode) {
@@ -918,6 +899,7 @@ export class AccDetailComponent implements OnInit {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
         state: this.rootNode.state,
@@ -935,28 +917,18 @@ export class AccDetailComponent implements OnInit {
         return;
       }
 
+      // what the association would break is asked first; when it would break nothing it is appended as it always was
       this.isUpdating = true;
-      this.service.verifyAppendAssociation(
-        this.rootNode.manifestId,
-        association.manifestId, association.type).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = ((pos === -1) ? 'Append' : 'Insert') + ' association';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-            .subscribe(result => {
-              if (!result) {
-                this.isUpdating = false;
-                return;
-              }
-
-              this._doAppendAssociation(association, pos);
-            });
-        } else {
-          this._doAppendAssociation(association, pos);
-        }
+      this.validationService.appendCheck(this.rootNode.manifestId, association.type, association.manifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doAppendAssociation(association, pos))) {
+            this.isUpdating = false;
+          } else {
+            this._doAppendAssociation(association, pos);
+          }
+        },
+        // not being able to ask is no reason to take the appending away
+        error: () => this._doAppendAssociation(association, pos)
       });
     });
   }
@@ -1051,6 +1023,7 @@ export class AccDetailComponent implements OnInit {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         action: 'set'
       },
@@ -1066,27 +1039,18 @@ export class AccDetailComponent implements OnInit {
         return;
       }
 
+      // what the base ACC would break is asked first; when it would break nothing it is set as it always was
       this.isUpdating = true;
-      this.service.verifySetBasedAcc(
-        this.rootNode.manifestId, basedAccManifestId).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = 'Set Based ACC';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-            .subscribe(result => {
-              if (!result) {
-                this.isUpdating = false;
-                return;
-              }
-
-              this._doSetBasedAcc(basedAccManifestId);
-            });
-        } else {
-          this._doSetBasedAcc(basedAccManifestId);
-        }
+      this.validationService.baseCheck(this.rootNode.manifestId, basedAccManifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doSetBasedAcc(basedAccManifestId))) {
+            this.isUpdating = false;
+          } else {
+            this._doSetBasedAcc(basedAccManifestId);
+          }
+        },
+        // not being able to ask is no reason to take the setting away
+        error: () => this._doSetBasedAcc(basedAccManifestId)
       });
     });
   }
@@ -1222,6 +1186,14 @@ export class AccDetailComponent implements OnInit {
         throw err;
       },
     });
+  }
+
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
+  }
+
+  get element(): HTMLElement {
+    return this.host.nativeElement;
   }
 
   updateState(state: string) {
@@ -1375,7 +1347,8 @@ export class AccDetailComponent implements OnInit {
       });
   }
 
-  isValidAttributeGroup(componentType: string): boolean {
+  /** An arrow function: the ACC panel calls it without the screen as `this`. */
+  isValidAttributeGroup = (componentType: string): boolean => {
     if (componentType !== AttributeGroup.value) {
       // If the type is not attribute group, it's okay to pass validation.
       return true;
@@ -1392,9 +1365,10 @@ export class AccDetailComponent implements OnInit {
       .filter(e => (e as BccpFlatNode).bccNode.entityType === 'Attribute')
       .length;
     return lenOfChildren === lenOfBccpEntityChildren;
-  }
+  };
 
-  componentTypeAble(componentType: string) {
+  /** An arrow function: the ACC panel calls it without the screen as `this`. */
+  componentTypeAble = (componentType: string): boolean => {
     if (this.userRoles.includes('developer')) {
       if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
         return false;
@@ -1405,7 +1379,7 @@ export class AccDetailComponent implements OnInit {
       }
     }
     return true;
-  }
+  };
 
   abstractAble(detail: CcAccNodeInfo) {
     if (this.prevAccDetails) {
@@ -1458,23 +1432,11 @@ export class AccDetailComponent implements OnInit {
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1549,23 +1511,11 @@ export class AccDetailComponent implements OnInit {
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1648,7 +1598,7 @@ export class AccDetailComponent implements OnInit {
       this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
 
-    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+    if (nodeDetail.bcc.entityType === ElementEntityType.value) {
       // Issue #1406
       if (!!nodeDetail.bcc.defaultValue || !!nodeDetail.bcc.fixedValue) {
         const dialogConfig = this.confirmDialogService.newConfig();
@@ -1772,7 +1722,10 @@ export class AccDetailComponent implements OnInit {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {
@@ -1961,69 +1914,17 @@ export class AccDetailComponent implements OnInit {
     });
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
+
+  readonly isDraggableNode = (node: CcFlatNode) => this.isDraggable(node);
+  readonly showDragHandleNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
@@ -2080,19 +1981,6 @@ export class AccDetailComponent implements OnInit {
         });
   }
 
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
-
   refactor(node: CcFlatNode): void {
     let parentAccManifestId;
     let targetManifestId;
@@ -2123,7 +2011,23 @@ export class AccDetailComponent implements OnInit {
         autoFocus: false
       });
 
-      dialogRef.afterClosed().subscribe(_ => {
+      dialogRef.afterClosed().subscribe(result => {
+        if (!result) {
+          // cancelled: nothing was moved, and the unsaved edits stay
+          return;
+        }
+        if (result.check) {
+          // the move would break something: it is made only if the user says so, and until then it is not made
+          this.validation.askAboutChange(result.check, () => {
+            this.isUpdating = true;
+            result.refactor().subscribe({
+              next: () => this.reload('Refactored'),
+              error: () => this.isUpdating = false,
+              complete: () => this.isUpdating = false
+            });
+          });
+          return;
+        }
         this.reload('Refactored');
       });
     }

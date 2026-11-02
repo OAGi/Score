@@ -75,7 +75,9 @@ The fields in the detail pane may be updated as follows.
 
 2.  *Namespace*. Select a non-standard namespace from the dropdown list.
     If the dropdown is empty, a `non-standard namespace needs to be
-    created <#create-a-namespace>`__ first.
+    created <#create-a-namespace>`__ first. A namespace is required to
+    update the code list or to change its state; deleting or restoring a
+    code list does not require one.
 
 3.  *Agency ID List* and *Agency ID*. These two fields represent an
     organization that owns and manages the code list. Select from the
@@ -84,7 +86,11 @@ The fields in the detail pane may be updated as follows.
     list) and then select the agency ID list value. The end user agency
     ID lists can be in any state while developer agency ID list are in
     Published state. All of them must belong to the same release with
-    the code list being edited.
+    the code list being edited. The two fields are optional as a pair:
+    either leave both empty or specify both. Once an agency ID list is
+    selected, the agency ID list value is required and its choices are
+    limited to the values of that list. Use the clear button in the
+    field to remove the selection.
 
 4.  *Version*. This field is a freeform text representing the version of
     the code list. The system will validate the combination of List ID,

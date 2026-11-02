@@ -26,8 +26,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.ConfigurationRecord;
 
 
@@ -40,7 +40,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.configuration</code>
+     * The reference instance of <code>configuration</code>
      */
     public static final Configuration CONFIGURATION = new Configuration();
 
@@ -53,26 +53,26 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     }
 
     /**
-     * The column <code>oagi.configuration.configuration_id</code>. Primary key
+     * The column <code>configuration.configuration_id</code>. Primary key
      * column.
      */
     public final TableField<ConfigurationRecord, ULong> CONFIGURATION_ID = createField(DSL.name("configuration_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.configuration.name</code>. The name of
-     * configuration property.
+     * The column <code>configuration.name</code>. The name of configuration
+     * property.
      */
     public final TableField<ConfigurationRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The name of configuration property.");
 
     /**
-     * The column <code>oagi.configuration.type</code>. The type of
-     * configuration property.
+     * The column <code>configuration.type</code>. The type of configuration
+     * property.
      */
     public final TableField<ConfigurationRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The type of configuration property.");
 
     /**
-     * The column <code>oagi.configuration.value</code>. The value of
-     * configuration property.
+     * The column <code>configuration.value</code>. The value of configuration
+     * property.
      */
     public final TableField<ConfigurationRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The value of configuration property.");
 
@@ -85,21 +85,21 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.configuration</code> table reference
+     * Create an aliased <code>configuration</code> table reference
      */
     public Configuration(String alias) {
         this(DSL.name(alias), CONFIGURATION);
     }
 
     /**
-     * Create an aliased <code>oagi.configuration</code> table reference
+     * Create an aliased <code>configuration</code> table reference
      */
     public Configuration(Name alias) {
         this(alias, CONFIGURATION);
     }
 
     /**
-     * Create a <code>oagi.configuration</code> table reference
+     * Create a <code>configuration</code> table reference
      */
     public Configuration() {
         this(DSL.name("configuration"), null);
@@ -107,7 +107,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override

@@ -1,5 +1,5 @@
 import {HttpParams} from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -15,6 +15,7 @@ import {PendingListService} from '../domain/pending-list.service';
   standalone: false,
   selector: 'score-account-detail',
   templateUrl: './pending-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pending-detail.component.css']
 })
 export class PendingDetailComponent implements OnInit {

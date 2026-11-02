@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import { Component, Injectable, OnInit, inject } from '@angular/core';
+import { Component, Injectable, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {map} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 import {AuthService} from '../../authentication/auth.service';
@@ -37,6 +37,7 @@ export class PendingActivate implements CanActivate {
   standalone: false,
   selector: 'score-pending',
   templateUrl: './pending.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pending.component.css']
 })
 export class PendingComponent implements OnInit {

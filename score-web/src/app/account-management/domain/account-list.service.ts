@@ -9,7 +9,6 @@ import {PendingAccount} from './pending-list';
 export class AccountListService implements OnInit {
   private http = inject(HttpClient);
 
-
   ngOnInit() {
   }
 
@@ -49,6 +48,11 @@ export class AccountListService implements OnInit {
     if (excludeRequester) {
       params = params.set('excludeRequester', 'true');
     }
+    return this.getAccountsListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getAccountsListPage(params: HttpParams): Observable<PageResponse<AccountListEntry>> {
     return this.http.get<PageResponse<AccountListEntry>>('/api/accounts', {params});
   }
 

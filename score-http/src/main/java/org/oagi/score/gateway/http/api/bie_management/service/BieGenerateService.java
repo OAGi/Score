@@ -1,14 +1,24 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
+import org.oagi.score.gateway.http.common.util.TempFiles;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
 import org.oagi.score.gateway.http.api.bie_management.repository.BieQueryRepository;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.avro.BieAvroGenerateExpression;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.BieSchemaFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.ExpressionBasedFilenameStrategy;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.BieJSONGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.Json202012Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.json.JsonDraft04Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.odf.BieODFSpreadsheetGenerationExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenAPIGenerateExpression;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi30Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi.BieOpenApi31Dialect;
+import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.xsd.BieXMLGenerateExpression;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
@@ -140,13 +150,16 @@ public class BieGenerateService {
                 return generateSchemaForAll(requester, topLevelAsbieps, option);
 
             case "EACH":
-                Map<TopLevelAsbiepId, File> files = generateSchemaForEach(requester, topLevelAsbieps, option);
+                EachSchemaResult result = generateSchemaForEach(requester, topLevelAsbieps, option);
+                List<File> files = result.allFiles();
                 if (files.size() == 1) {
-                    return files.values().iterator().next();
+                    return files.get(0);
                 }
 
                 try {
-                    return Zip.compression(files.values(), ScoreGuidUtils.randomGuid());
+                    File zip = Zip.compression(files, ScoreGuidUtils.randomGuid());
+                    files.forEach(TempFiles::deleteQuietly);
+                    return zip;
                 } catch (IOException e) {
                     throw new BieGenerateFailureException("Compression failure.", e);
                 }
@@ -198,13 +211,16 @@ public class BieGenerateService {
         ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbiepList, generationContext), option, requester);
 
         Map<TopLevelAsbiepId, File> referencedSchemaFiles = new LinkedHashMap<>();
+        SharedComponentRegistry sharedComponentRegistry = createSharedComponentRegistry(option, generationContext);
+        generationContext.setSharedComponentRegistry(sharedComponentRegistry);
         if (isSeparateFileReferencesForReusedSchemasEnabled(option) &&
                 !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
             // #1713: Generate reused schemas as standalone files first.
             Set<TopLevelAsbiepId> excludedFromReferencedFlow = new HashSet<>(selectedTopLevelAsbiepIdSet);
             excludedFromReferencedFlow.removeAll(selectedReferencedTopLevelAsbiepIdSet);
             referencedSchemaFiles.putAll(generateReferencedSchemasRecursively(
-                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow));
+                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow,
+                    sharedComponentRegistry));
         }
 
         for (TopLevelAsbiepSummaryRecord topLevelAsbiep : primaryTopLevelAsbieps) {
@@ -230,16 +246,20 @@ public class BieGenerateService {
             throw new BieGenerateFailureException("I/O operation failure.", e);
         }
 
-        if (referencedSchemaFiles.isEmpty()) {
+        List<File> commonFiles = generateSharedFiles(sharedComponentRegistry);
+        if (referencedSchemaFiles.isEmpty() && commonFiles.isEmpty()) {
             return schemaExpressionFile;
         }
 
         List<File> files = new ArrayList<>();
         files.add(schemaExpressionFile);
         files.addAll(referencedSchemaFiles.values());
+        files.addAll(commonFiles);
 
         try {
-            return Zip.compression(files, filename);
+            File zip = Zip.compression(files, filename);
+            files.forEach(TempFiles::deleteQuietly);
+            return zip;
         } catch (IOException e) {
             throw new BieGenerateFailureException("Compression failure.", e);
         }
@@ -302,12 +322,14 @@ public class BieGenerateService {
      * @param requester caller context
      * @param topLevelAsbieps selected top-level ASBIEPs
      * @param option generation options
-     * @return map from top-level ASBIEP ID to generated file
+     * @return the generated file of each top-level ASBIEP, and the common files they include
      * @throws BieGenerateFailureException when expression/file generation fails
      */
-    public Map<TopLevelAsbiepId, File> generateSchemaForEach(
+    public EachSchemaResult generateSchemaForEach(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) throws BieGenerateFailureException {
+        // The BIE Package export calls this method directly, so resolve the configured filename expressions here too.
+        applyConfiguredFilenameExpressions(requester, option);
         Map<TopLevelAsbiepId, File> targetFiles = new HashMap();
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbieps, option);
@@ -326,6 +348,8 @@ public class BieGenerateService {
             clearFilenameOverridesForSelectedReferencedSchemas(option, selectedReferencedTopLevelAsbiepIdSet);
         }
         ensureExpressionFilenames(collectTopLevelAsbieps(topLevelAsbieps, generationContext), option, requester);
+        SharedComponentRegistry sharedComponentRegistry = createSharedComponentRegistry(option, generationContext);
+        generationContext.setSharedComponentRegistry(sharedComponentRegistry);
 
         if (separateFileReferencesEnabled &&
                 !generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
@@ -337,7 +361,8 @@ public class BieGenerateService {
             Set<TopLevelAsbiepId> excludedFromReferencedFlow = new HashSet<>(selectedTopLevelAsbiepIdSet);
             excludedFromReferencedFlow.removeAll(selectedReferencedTopLevelAsbiepIdSet);
             Map<TopLevelAsbiepId, File> referencedFiles = generateReferencedSchemasRecursively(
-                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow);
+                    requester, generationContext.getRefTopLevelAsbiepSet(), option, excludedFromReferencedFlow,
+                    sharedComponentRegistry);
             targetFiles.putAll(referencedFiles);
         }
 
@@ -371,7 +396,62 @@ public class BieGenerateService {
             targetFiles.put(topLevelAsbiep.topLevelAsbiepId(), schemaExpressionFile);
         }
 
-        return targetFiles;
+        return new EachSchemaResult(targetFiles, generateSharedFiles(sharedComponentRegistry));
+    }
+
+    /**
+     * The files of {@link #generateSchemaForEach}.
+     *
+     * @param files       the file of each top-level ASBIEP
+     * @param commonFiles the files shared by {@code files}; they belong to no top-level ASBIEP
+     */
+    public record EachSchemaResult(Map<TopLevelAsbiepId, File> files, List<File> commonFiles) {
+
+        public List<File> allFiles() {
+            List<File> all = new ArrayList<>(files.values());
+            all.addAll(commonFiles);
+            return all;
+        }
+    }
+
+    /**
+     * Prepares what the files of one run share, when the files of the run are joined to each other. For XML Schema
+     * that is the global declarations (the XBTs with a schema definition, the code lists and the agency ID lists)
+     * that every file would otherwise repeat, and a set of files that declares the same global component twice is
+     * not a valid schema. An expression that has nothing to share leaves it alone.
+     *
+     * @return {@code null} when the files of the run are not joined to each other
+     */
+    private SharedComponentRegistry createSharedComponentRegistry(GenerateExpressionOption option, GenerationContext generationContext) {
+        if (!isSeparateFileReferencesForReusedSchemasEnabled(option)
+                || generationContext.getRefTopLevelAsbiepSet().isEmpty()) {
+            return null;
+        }
+
+        BieSchemaFilenameStrategy filenameStrategy = getFilenameStrategy(option);
+        Set<String> usedFilenames = new HashSet<>();
+        if (option.getFilenames() != null) {
+            option.getFilenames().values().forEach(e -> usedFilenames.add(e.toLowerCase()));
+        }
+        return new SharedComponentRegistry(sharedFileName -> {
+            String baseFilename = filenameStrategy.buildCommonFilename(sharedFileName);
+            String filename = baseFilename;
+            for (int i = 1; !usedFilenames.add(filename.toLowerCase()); i++) {
+                filename = baseFilename + "-" + i;
+            }
+            return filename;
+        });
+    }
+
+    private List<File> generateSharedFiles(SharedComponentRegistry sharedComponentRegistry) throws BieGenerateFailureException {
+        if (sharedComponentRegistry == null) {
+            return Collections.emptyList();
+        }
+        try {
+            return sharedComponentRegistry.asFiles();
+        } catch (IOException e) {
+            throw new BieGenerateFailureException("I/O operation failure.", e);
+        }
     }
 
     private Set<TopLevelAsbiepId> toTopLevelAsbiepIdSet(List<TopLevelAsbiepSummaryRecord> topLevelAsbieps) {
@@ -462,6 +542,7 @@ public class BieGenerateService {
      * @param option original generation option (used for expression selection and filename policy)
      * @param excludedTopLevelAsbiepIds optional set of top-level ASBIEP IDs to skip (for example,
      *                                  IDs already selected as primary generation targets)
+     * @param sharedComponentRegistry what the generated files share, or {@code null} for nothing
      * @return map of referenced top-level ASBIEP IDs to generated schema files
      * @throws BieGenerateFailureException when expression initialization or file generation fails
      */
@@ -469,7 +550,8 @@ public class BieGenerateService {
             ScoreUser requester,
             Set<TopLevelAsbiepSummaryRecord> initialReferences,
             GenerateExpressionOption option,
-            Set<TopLevelAsbiepId> excludedTopLevelAsbiepIds) throws BieGenerateFailureException {
+            Set<TopLevelAsbiepId> excludedTopLevelAsbiepIds,
+            SharedComponentRegistry sharedComponentRegistry) throws BieGenerateFailureException {
 
         Map<TopLevelAsbiepId, TopLevelAsbiepSummaryRecord> pending = new LinkedHashMap<>();
         Map<TopLevelAsbiepId, Set<TopLevelAsbiepId>> referredByTopLevelAsbiepIds = new LinkedHashMap<>();
@@ -497,6 +579,7 @@ public class BieGenerateService {
             BieGenerateExpression referencedGenerateExpression = createBieGenerateExpression(referencedOption);
             GenerationContext referencedGenerationContext = referencedGenerateExpression.generateContext(
                     requester, List.of(refTopLevelAsbiep), referencedOption);
+            referencedGenerationContext.setSharedComponentRegistry(sharedComponentRegistry);
             // #1713: Keep filename resolution consistent between referenced and target schemas.
             // Resolve once on the canonical option, then copy the result for referenced generation.
             List<TopLevelAsbiepSummaryRecord> filenameCandidates =
@@ -762,11 +845,11 @@ public class BieGenerateService {
                     case "DRAFT04":
                     case "DRAFT-05":
                     case "DRAFT05":
-                        generateExpression = applicationContext.getBean(BieJSONDraft04GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, JsonDraft04Dialect.INSTANCE);
                         break;
                     case "2020-12":
                     case "202012":
-                        generateExpression = applicationContext.getBean(BieJSON202012GenerateExpression.class);
+                        generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class, Json202012Dialect.INSTANCE);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown JSON expression version: " + expressionVersion);
@@ -775,13 +858,13 @@ public class BieGenerateService {
             case "OPENAPI3":
                 String openApiVersion = option.getExpressionVersion();
                 if (!StringUtils.hasLength(openApiVersion) || isOpenApi31Version(openApiVersion)) {
-                    generateExpression = applicationContext.getBean(BieOpenAPI31GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi31Dialect.INSTANCE);
                 } else {
-                    generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                    generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 }
                 break;
             case "OPENAPI30":
-                generateExpression = applicationContext.getBean(BieOpenAPI30GenerateExpression.class);
+                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class, BieOpenApi30Dialect.INSTANCE);
                 break;
             case "ODF":
                 generateExpression = applicationContext.getBean(BieODFSpreadsheetGenerationExpression.class);

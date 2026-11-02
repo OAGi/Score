@@ -77,7 +77,7 @@ public class JooqModuleQueryRepository extends JooqBaseRepository implements Mod
         var queryBuilder = new GetModuleSummaryQueryBuilder();
         return queryBuilder.select()
                 .where(and(
-                        MODULE.MODULE_ID.eq(valueOf(moduleId)),
+                        MODULE.PARENT_MODULE_ID.eq(valueOf(moduleId)),
                         MODULE.NAME.eq(name)
                 ))
                 .fetchOne(queryBuilder.mapper());

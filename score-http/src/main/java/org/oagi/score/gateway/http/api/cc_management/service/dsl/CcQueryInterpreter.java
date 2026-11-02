@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.cc_management.service.dsl;
 
 
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -148,7 +147,7 @@ public class CcQueryInterpreter {
             return Collections.emptyList();
         }
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseId);
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseId);
 
         List<AsccpDSLRecord> recordList = ccDocument.getAsccpList().stream()
                 .map(asccp -> new AsccpDSLRecord(ccDocument, asccp))

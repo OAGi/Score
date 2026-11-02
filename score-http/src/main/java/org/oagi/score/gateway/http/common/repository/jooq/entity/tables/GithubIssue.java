@@ -15,6 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.InverseForeignKey;
+import org.jooq.JSON;
 import org.jooq.Name;
 import org.jooq.Path;
 import org.jooq.PlainSQL;
@@ -22,10 +23,10 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -33,8 +34,8 @@ import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AccManifest.AccManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListManifest.AgencyIdListManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AsccpManifest.AsccpManifestPath;
@@ -60,7 +61,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.github_issue</code>
+     * The reference instance of <code>github_issue</code>
      */
     public static final GithubIssue GITHUB_ISSUE = new GithubIssue();
 
@@ -73,54 +74,52 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
     }
 
     /**
-     * The column <code>oagi.github_issue.github_issue_id</code>. Primary key
-     * column.
+     * The column <code>github_issue.github_issue_id</code>. Primary key column.
      */
-    public final TableField<GithubIssueRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
+    public final TableField<GithubIssueRecord, ULong> GITHUB_ISSUE_ID = createField(DSL.name("github_issue_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.github_issue.repo_owner</code>. GitHub repository
+     * The column <code>github_issue.repo_owner</code>. GitHub repository
      * owner/org, e.g. OAGi.
      */
     public final TableField<GithubIssueRecord, String> REPO_OWNER = createField(DSL.name("repo_owner"), SQLDataType.VARCHAR(100).nullable(false), this, "GitHub repository owner/org, e.g. OAGi.");
 
     /**
-     * The column <code>oagi.github_issue.repo_name</code>. GitHub repository
-     * name, e.g. Score.
+     * The column <code>github_issue.repo_name</code>. GitHub repository name,
+     * e.g. Score.
      */
     public final TableField<GithubIssueRecord, String> REPO_NAME = createField(DSL.name("repo_name"), SQLDataType.VARCHAR(100).nullable(false), this, "GitHub repository name, e.g. Score.");
 
     /**
-     * The column <code>oagi.github_issue.issue_number</code>. GitHub issue
-     * number within the repository.
+     * The column <code>github_issue.issue_number</code>. GitHub issue number
+     * within the repository.
      */
     public final TableField<GithubIssueRecord, Integer> ISSUE_NUMBER = createField(DSL.name("issue_number"), SQLDataType.INTEGER.nullable(false), this, "GitHub issue number within the repository.");
 
     /**
-     * The column <code>oagi.github_issue.cached_metadata</code>. Cached GitHub
-     * issue metadata as JSON: title, state, type, milestone {title,state},
-     * labels [{name,color,description}], assignees
-     * [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first
-     * synced. Project (Projects v2) is excluded (not available via the REST
-     * issue endpoint).
+     * The column <code>github_issue.cached_metadata</code>. Cached GitHub issue
+     * metadata as JSON: title, state, type, milestone {title,state}, labels
+     * [{name,color,description}], assignees [{login,html_url,avatar_url}],
+     * html_url, node_id, etc. NULL until first synced. Project (Projects v2) is
+     * excluded (not available via the REST issue endpoint).
      */
-    public final TableField<GithubIssueRecord, String> CACHED_METADATA = createField(DSL.name("cached_metadata"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Cached GitHub issue metadata as JSON: title, state, type, milestone {title,state}, labels [{name,color,description}], assignees [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first synced. Project (Projects v2) is excluded (not available via the REST issue endpoint).");
+    public final TableField<GithubIssueRecord, JSON> CACHED_METADATA = createField(DSL.name("cached_metadata"), SQLDataType.JSON.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.JSON)), this, "Cached GitHub issue metadata as JSON: title, state, type, milestone {title,state}, labels [{name,color,description}], assignees [{login,html_url,avatar_url}], html_url, node_id, etc. NULL until first synced. Project (Projects v2) is excluded (not available via the REST issue endpoint).");
 
     /**
-     * The column <code>oagi.github_issue.cached_synced_timestamp</code>. When
+     * The column <code>github_issue.cached_synced_timestamp</code>. When
      * cached_metadata was last refreshed from GitHub.
      */
     public final TableField<GithubIssueRecord, LocalDateTime> CACHED_SYNCED_TIMESTAMP = createField(DSL.name("cached_synced_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "When cached_metadata was last refreshed from GitHub.");
 
     /**
-     * The column <code>oagi.github_issue.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * The column <code>github_issue.creation_timestamp</code>. Timestamp when
+     * this record was created.
      */
     public final TableField<GithubIssueRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was created.");
 
     /**
-     * The column <code>oagi.github_issue.last_update_timestamp</code>.
-     * Timestamp when this record was last updated.
+     * The column <code>github_issue.last_update_timestamp</code>. Timestamp
+     * when this record was last updated.
      */
     public final TableField<GithubIssueRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when this record was last updated.");
 
@@ -133,21 +132,21 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue</code> table reference
+     * Create an aliased <code>github_issue</code> table reference
      */
     public GithubIssue(String alias) {
         this(DSL.name(alias), GITHUB_ISSUE);
     }
 
     /**
-     * Create an aliased <code>oagi.github_issue</code> table reference
+     * Create an aliased <code>github_issue</code> table reference
      */
     public GithubIssue(Name alias) {
         this(alias, GITHUB_ISSUE);
     }
 
     /**
-     * Create a <code>oagi.github_issue</code> table reference
+     * Create a <code>github_issue</code> table reference
      */
     public GithubIssue() {
         this(DSL.name("github_issue"), null);
@@ -188,7 +187,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -210,7 +209,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_acc_manifest</code> table
+     * <code>github_issue_acc_manifest</code> table
      */
     public GithubIssueAccManifestPath githubIssueAccManifest() {
         if (_githubIssueAccManifest == null)
@@ -223,7 +222,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_agency_id_list_manifest</code> table
+     * <code>github_issue_agency_id_list_manifest</code> table
      */
     public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifest() {
         if (_githubIssueAgencyIdListManifest == null)
@@ -236,7 +235,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_asccp_manifest</code> table
+     * <code>github_issue_asccp_manifest</code> table
      */
     public GithubIssueAsccpManifestPath githubIssueAsccpManifest() {
         if (_githubIssueAsccpManifest == null)
@@ -249,7 +248,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_bccp_manifest</code> table
+     * <code>github_issue_bccp_manifest</code> table
      */
     public GithubIssueBccpManifestPath githubIssueBccpManifest() {
         if (_githubIssueBccpManifest == null)
@@ -262,7 +261,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_code_list_manifest</code> table
+     * <code>github_issue_code_list_manifest</code> table
      */
     public GithubIssueCodeListManifestPath githubIssueCodeListManifest() {
         if (_githubIssueCodeListManifest == null)
@@ -275,7 +274,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_dt_manifest</code> table
+     * <code>github_issue_dt_manifest</code> table
      */
     public GithubIssueDtManifestPath githubIssueDtManifest() {
         if (_githubIssueDtManifest == null)
@@ -285,8 +284,8 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
     }
 
     /**
-     * Get the implicit many-to-many join path to the
-     * <code>oagi.acc_manifest</code> table
+     * Get the implicit many-to-many join path to the <code>acc_manifest</code>
+     * table
      */
     public AccManifestPath accManifest() {
         return githubIssueAccManifest().accManifest();
@@ -294,7 +293,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit many-to-many join path to the
-     * <code>oagi.agency_id_list_manifest</code> table
+     * <code>agency_id_list_manifest</code> table
      */
     public AgencyIdListManifestPath agencyIdListManifest() {
         return githubIssueAgencyIdListManifest().agencyIdListManifest();
@@ -302,15 +301,15 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit many-to-many join path to the
-     * <code>oagi.asccp_manifest</code> table
+     * <code>asccp_manifest</code> table
      */
     public AsccpManifestPath asccpManifest() {
         return githubIssueAsccpManifest().asccpManifest();
     }
 
     /**
-     * Get the implicit many-to-many join path to the
-     * <code>oagi.bccp_manifest</code> table
+     * Get the implicit many-to-many join path to the <code>bccp_manifest</code>
+     * table
      */
     public BccpManifestPath bccpManifest() {
         return githubIssueBccpManifest().bccpManifest();
@@ -318,15 +317,15 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
 
     /**
      * Get the implicit many-to-many join path to the
-     * <code>oagi.code_list_manifest</code> table
+     * <code>code_list_manifest</code> table
      */
     public CodeListManifestPath codeListManifest() {
         return githubIssueCodeListManifest().codeListManifest();
     }
 
     /**
-     * Get the implicit many-to-many join path to the
-     * <code>oagi.dt_manifest</code> table
+     * Get the implicit many-to-many join path to the <code>dt_manifest</code>
+     * table
      */
     public DtManifestPath dtManifest() {
         return githubIssueDtManifest().dtManifest();
@@ -383,7 +382,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
      */
     @Override
     public GithubIssue where(Condition condition) {
-        return new GithubIssue(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new GithubIssue(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -450,7 +449,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssue whereExists(Select<?> select) {
+    public GithubIssue whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -458,7 +457,7 @@ public class GithubIssue extends TableImpl<GithubIssueRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public GithubIssue whereNotExists(Select<?> select) {
+    public GithubIssue whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

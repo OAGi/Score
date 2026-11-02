@@ -9,37 +9,29 @@ function bt(id: number, used = false): BusinessTermListEntry {
   return entry;
 }
 
-function componentCtx(rows: BusinessTermListEntry[] = []): any {
-  const ctx: any = {
-    selection: new SelectionModel<number>(true, []),
-    dataSource: {data: rows},
-  };
-  const proto = AssignBusinessTermBtComponent.prototype;
-  ctx.isAllSelected = proto.isAllSelected;
-  ctx.masterToggle = proto.masterToggle;
-  ctx.select = proto.select;
-  ctx.toggle = proto.toggle;
-  ctx.isSelected = proto.isSelected;
-  ctx.isCreateDisabled = proto.isCreateDisabled;
-  return ctx;
-}
-
+/**
+ * The rows are chosen in the `score-table-view` (multi-select, every row can be chosen: `used` only protects the
+ * Business Term catalog row from discard, and does not prevent reuse in assignments); the screen keeps the ids of the terms
+ * and enables Create by what is chosen.
+ */
 describe('AssignBusinessTermBtComponent', () => {
   it('should be defined', () => {
     expect(AssignBusinessTermBtComponent).toBeTruthy();
   });
 
-  it('allows assignment selection for a used business term', () => {
-    const ctx = componentCtx();
-    ctx.toggle(bt(10, true));
-    expect(ctx.isSelected(bt(10, true))).toBe(true);
-    expect(ctx.isCreateDisabled()).toBe(false);
+  it('chooses a business term by its id, used or not', () => {
+    const selection = new SelectionModel<number>(true, []);
+    const rowKey = (AssignBusinessTermBtComponent.prototype as any).rowKey ?? ((row: BusinessTermListEntry) => row.businessTermId);
+    selection.select(rowKey(bt(10, true)));
+    selection.select(rowKey(bt(20, false)));
+    expect(selection.selected).toEqual([10, 20]);
   });
 
-  it('master toggle includes used business terms', () => {
-    const ctx = componentCtx([bt(10, true), bt(20, false)]);
-    ctx.masterToggle();
-    expect(ctx.selection.selected).toEqual([10, 20]);
-    expect(ctx.isAllSelected()).toBe(true);
+  it('enables Create only with a business term chosen', () => {
+    const ctx: any = {selection: new SelectionModel<number>(true, [])};
+    ctx.isCreateDisabled = AssignBusinessTermBtComponent.prototype.isCreateDisabled;
+    expect(ctx.isCreateDisabled()).toBe(true);
+    ctx.selection.select(10);
+    expect(ctx.isCreateDisabled()).toBe(false);
   });
 });

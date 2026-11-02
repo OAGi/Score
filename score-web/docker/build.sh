@@ -6,6 +6,9 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
 repo_root=$(CDPATH= cd -- "$project_dir/.." && pwd)
 
+# shellcheck source=../../docker/buildx.sh
+. "$repo_root/docker/buildx.sh"
+
 app_version=
 if [ -f "$project_dir/VERSION" ]; then
   app_version=$(tr -d '[:space:]' < "$project_dir/VERSION")
@@ -29,7 +32,6 @@ if [ -z "$node_version" ]; then
   node_version=22
 fi
 
-docker_platform=${DOCKER_DEFAULT_PLATFORM:-linux/amd64}
 image_name="oagi1docker/srt-web:$app_version"
 version_file="$project_dir/src/environments/version.ts"
 package_json="$project_dir/package.json"
@@ -108,17 +110,11 @@ cp -R "$project_dir/dist/score-web" "$script_dir/score-web"
 rm -rf "$script_dir/docs"
 cp -R "$repo_root/docs/user_guide/_build/html" "$script_dir/docs"
 
-echo "Building docker image $image_name..."
 (
   cd "$script_dir"
-  docker build --no-cache --platform "$docker_platform" -f Dockerfile -t "$image_name" .
+  buildx_build "$image_name" Dockerfile . --no-cache
 )
 
-if command -v trivy >/dev/null 2>&1; then
-  echo "Scanning vulnerabilities with Trivy (HIGH/CRITICAL, fixed only)..."
-  trivy image --format table --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$image_name"
-else
-  echo "Info: trivy is not installed. Install Trivy to scan vulnerabilities for $image_name."
-fi
+buildx_scan "$image_name" --format table --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed
 
 echo "Done."

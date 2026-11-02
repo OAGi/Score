@@ -1,6 +1,5 @@
 package org.oagi.score.gateway.http.common.model;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
@@ -28,28 +27,24 @@ class AccessPrivilegeTest {
     }
 
     @Test
-    @DisplayName("WIP: the owner can edit")
     void wipOwner_canEdit() {
         assertEquals(AccessPrivilege.CanEdit,
                 AccessPrivilege.toAccessPrivilege(user(OWNER, ScoreRole.DEVELOPER), OWNER, BieState.WIP));
     }
 
     @Test
-    @DisplayName("Issue #1312 — WIP: a non-owner may view read-only (was Prohibited)")
     void wipNonOwner_canView() {
         assertEquals(AccessPrivilege.CanView,
                 AccessPrivilege.toAccessPrivilege(user(OTHER, ScoreRole.DEVELOPER), OWNER, BieState.WIP));
     }
 
     @Test
-    @DisplayName("Issue #1312 — WIP: an end-user non-owner may also view read-only")
     void wipEndUserNonOwner_canView() {
         assertEquals(AccessPrivilege.CanView,
                 AccessPrivilege.toAccessPrivilege(user(OTHER, ScoreRole.END_USER), OWNER, BieState.WIP));
     }
 
     @Test
-    @DisplayName("QA: the owner can move; a non-owner can view")
     void qa_ownerMoves_nonOwnerViews() {
         assertEquals(AccessPrivilege.CanMove,
                 AccessPrivilege.toAccessPrivilege(user(OWNER, ScoreRole.DEVELOPER), OWNER, BieState.QA));
@@ -58,7 +53,6 @@ class AccessPrivilegeTest {
     }
 
     @Test
-    @DisplayName("Production is view-only for everyone")
     void production_canView() {
         assertEquals(AccessPrivilege.CanView,
                 AccessPrivilege.toAccessPrivilege(user(OWNER, ScoreRole.DEVELOPER), OWNER, BieState.Production));
@@ -67,14 +61,12 @@ class AccessPrivilegeTest {
     }
 
     @Test
-    @DisplayName("Initiating is Unprepared")
     void initiating_unprepared() {
         assertEquals(AccessPrivilege.Unprepared,
                 AccessPrivilege.toAccessPrivilege(user(OWNER, ScoreRole.DEVELOPER), OWNER, BieState.Initiating));
     }
 
     @Test
-    @DisplayName("Guard: the CcState overload (core components) still forbids a non-owner on WIP")
     void ccStateOverload_wipNonOwner_stillProhibited() {
         assertEquals(AccessPrivilege.Prohibited,
                 AccessPrivilege.toAccessPrivilege(

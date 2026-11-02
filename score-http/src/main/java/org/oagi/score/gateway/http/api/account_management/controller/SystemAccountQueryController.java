@@ -17,6 +17,8 @@ import org.oagi.score.gateway.http.api.tenant_management.service.TenantQueryServ
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.configuration.oauth2.ScoreClientRegistrationRepository;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyAuthenticationToken;
+import org.oagi.score.gateway.http.configuration.security.webauthn.PasskeyProperties;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -25,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -64,6 +67,9 @@ public class SystemAccountQueryController implements InitializingBean {
     private TenantQueryService tenantService;
 
     @Autowired
+    private PasskeyProperties passkeyProperties;
+
+    @Autowired
     private SessionService sessionService;
 
     @Override
@@ -95,14 +101,16 @@ public class SystemAccountQueryController implements InitializingBean {
                 throw new AuthenticationCredentialsNotFoundException("An authentication information was not found.");
             }
             resp.put("username", userDetails.getUsername());
-            resp.put("authentication", "basic");
+            resp.put("authentication", (authentication instanceof PasskeyAuthenticationToken) ? "passkey" : "basic");
             resp.put("roles", userDetails.getAuthorities().stream().map(e -> e.toString()).collect(Collectors.toList()));
             resp.put("enabled", accountDetails.enabled());
         } else if (principal instanceof OAuth2User) {
             OAuth2User oAuth2User = (OAuth2User) principal;
             String sub = oAuth2User.getAttribute("sub");
-            OAuth2UserRecord oAuth2UserRecord = accountQueryService.getOAuth2User(requester, sub);
-            AppOauth2User appOauth2User = pendingListService.getPendingBySub(sub);
+            String providerName = (authentication instanceof OAuth2AuthenticationToken oAuth2Token) ?
+                    oAuth2Token.getAuthorizedClientRegistrationId() : null;
+            OAuth2UserRecord oAuth2UserRecord = accountQueryService.getOAuth2User(requester, providerName, sub);
+            AppOauth2User appOauth2User = pendingListService.getPendingBySub(requester, providerName, sub);
 
             if (oAuth2UserRecord != null && oAuth2UserRecord.userId() != null) {
                 accountDetails = accountQueryService.getAccountDetails(requester, oAuth2UserRecord.userId());
@@ -149,6 +157,10 @@ public class SystemAccountQueryController implements InitializingBean {
 
         resp.put("browseStandardMode", ImmutableMap.builder()
                 .put("enabled", configService.isBrowseStandardModeEnabled(requester))
+                .build());
+
+        resp.put("passkey", ImmutableMap.builder()
+                .put("enabled", passkeyProperties.isEnabled())
                 .build());
 
         return resp;

@@ -1,0 +1,26 @@
+<div class="context-section">
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+  }
+  @if (showToolbar) {
+    <div class="ps-2 pe-2">
+      <mat-toolbar [class]="toolbarClass">
+        @if (title !== null) {
+          <span class="title">{{ title }}</span>
+        }
+        @if (subtitle) {
+          <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+        }
+        <ng-content select="[baseTitle]"></ng-content>
+        @if (spacer) {
+          <span class="flex-11-auto"></span>
+        }
+        <ng-content select="[baseActions]"></ng-content>
+      </mat-toolbar>
+    </div>
+  }
+
+  <ng-content></ng-content>
+</div>

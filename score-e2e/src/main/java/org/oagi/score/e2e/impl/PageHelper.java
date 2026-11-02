@@ -155,6 +155,15 @@ public abstract class PageHelper {
             case "textarea":
                 s = trim(element.getAttribute("value"));
                 break;
+            case "score-mat-select": {
+                // Exclude the clear button's mat-icon ligature ("cancel") from the selected value text.
+                java.util.List<WebElement> labels = element.findElements(By.cssSelector(".score-select-label"));
+                s = trim(labels.isEmpty() ? element.getText() : labels.get(0).getText());
+                if (isEmpty(s)) {
+                    s = trim(element.getText());
+                }
+                break;
+            }
             default:
                 s = trim(element.getText());
                 if (isEmpty(s)) {
@@ -169,16 +178,16 @@ public abstract class PageHelper {
 
     public static WebElement clear(WebElement element) {
         if (element != null) {
+            // A tree search box is disabled while it searches.
+            new FluentWait<>(element)
+                    .withTimeout(Duration.ofSeconds(60L))
+                    .pollingEvery(Duration.ofMillis(100L))
+                    .until(WebElement::isEnabled);
             element.clear();
             // ng-reflect-model attribute in some elements couldn't reflect this clear text.
             element.sendKeys(" ");
             element.sendKeys(Keys.BACK_SPACE);
             element.clear();
-            if (!StringUtils.isEmpty(element.getText())) {
-                waitFor(ofMillis(500L));
-                element.sendKeys(Keys.CONTROL + "a");
-                element.sendKeys(Keys.BACK_SPACE);
-            }
         }
         return element;
     }
@@ -220,7 +229,7 @@ public abstract class PageHelper {
                 }
                 element.click();
             } catch (ElementClickInterceptedException e) {
-                if ("mat-select".equals(tagName)) {
+                if ("mat-select".equals(tagName) || "score-mat-select".equals(tagName)) {
                     WebElement arrowWrapper = element.findElement(By.cssSelector("div > div.mat-mdc-select-arrow-wrapper"));
                     click(driver, arrowWrapper);
                 } else {
@@ -240,6 +249,153 @@ public abstract class PageHelper {
             waitFor(DEFAULT_WAIT_DURATION);
         }
         return element;
+    }
+
+    /**
+     * Opens a Material select and waits for its panel to be usable. The panel is rendered as a
+     * child of the select by newer Angular Material versions, or is linked through
+     * {@code aria-controls}. An expanded select without a visible owned panel is reopened on retry.
+     */
+    public static WebElement openMatSelect(WebDriver driver, By selectLocator) {
+        WebElement select = elementToBeClickable(driver, selectLocator);
+        boolean expanded = "true".equals(select.getAttribute("aria-expanded"));
+        boolean panelVisible = isMatSelectPanelVisible(driver, select);
+        if (expanded && !panelVisible) {
+            escape(driver);
+            defaultWait(driver).until(ExpectedConditions.attributeToBe(selectLocator, "aria-expanded", "false"));
+            select = elementToBeClickable(driver, selectLocator);
+            expanded = false;
+        }
+        if (!expanded) {
+            try {
+                click(driver, select.findElement(By.cssSelector(".mat-mdc-select-trigger")));
+            } catch (NoSuchElementException e) {
+                click(driver, select);
+            }
+        }
+        defaultWait(driver).until(ExpectedConditions.attributeToBe(selectLocator, "aria-expanded", "true"));
+        return select;
+    }
+
+    /**
+     * Returns the search field owned by the supplied Material select. Newer Material versions
+     * render it under the select or its controlled panel.
+     */
+    public static WebElement matSelectSearchField(WebDriver driver, WebElement select) {
+        return matSelectSearchField(defaultWait(driver), driver, select);
+    }
+
+    public static WebElement matSelectSearchField(Wait<WebDriver> wait, WebDriver driver, WebElement select) {
+        return wait.until(d -> {
+            WebElement localSearch = findVisibleElement(
+                    select.findElements(By.cssSelector("input[aria-label='dropdown search']")));
+            if (localSearch != null) {
+                return localSearch;
+            }
+            WebElement controlledSearch = findVisibleElement(findElementsInControlledPanel(d, select,
+                    By.cssSelector("input[aria-label='dropdown search']")));
+            if (controlledSearch != null) {
+                return controlledSearch;
+            }
+            return null;
+        });
+    }
+
+    /** Returns an option with the exact visible text from the supplied Material select's panel. */
+    public static WebElement matSelectOption(WebDriver driver, WebElement select, String optionText) {
+        return defaultWait(driver).until(d -> {
+            WebElement localOption = findMatchingOption(select.findElements(By.cssSelector("mat-option")), optionText);
+            if (localOption != null) {
+                return localOption;
+            }
+            WebElement controlledOption = findMatchingOption(
+                    findElementsInControlledPanel(d, select, By.cssSelector("mat-option")), optionText);
+            if (controlledOption != null) {
+                return controlledOption;
+            }
+            return null;
+        });
+    }
+
+    /** Returns an option whose visible text contains the supplied text from the select's panel. */
+    public static WebElement matSelectOptionContaining(WebDriver driver, WebElement select, String optionText) {
+        return defaultWait(driver).until(d -> {
+            WebElement localOption = findMatchingOption(select.findElements(By.cssSelector("mat-option")), optionText, false);
+            if (localOption != null) {
+                return localOption;
+            }
+            WebElement controlledOption = findMatchingOption(
+                    findElementsInControlledPanel(d, select, By.cssSelector("mat-option")), optionText, false);
+            if (controlledOption != null) {
+                return controlledOption;
+            }
+            return null;
+        });
+    }
+
+    private static boolean isMatSelectPanelVisible(WebDriver driver, WebElement select) {
+        if (hasControlledPanel(select)) {
+            return findControlledPanels(driver, select).stream().anyMatch(WebElement::isDisplayed);
+        }
+        return select.findElements(By.cssSelector(".cdk-overlay-pane")).stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    private static List<WebElement> findElementsInControlledPanel(WebDriver driver, WebElement select, By locator) {
+        List<WebElement> elements = new ArrayList<>();
+        for (WebElement panel : findControlledPanels(driver, select)) {
+            elements.addAll(panel.findElements(locator));
+        }
+        return elements;
+    }
+
+    private static List<WebElement> findControlledPanels(WebDriver driver, WebElement select) {
+        String controls = select.getAttribute("aria-controls");
+        if (controls == null || controls.isBlank()) {
+            return List.of();
+        }
+        return driver.findElements(By.id(controls));
+    }
+
+    private static boolean hasControlledPanel(WebElement select) {
+        String controls = select.getAttribute("aria-controls");
+        return controls != null && !controls.isBlank();
+    }
+
+    private static WebElement findVisibleElement(List<WebElement>... candidates) {
+        for (List<WebElement> elements : candidates) {
+            WebElement visibleElement = findVisibleElement(elements);
+            if (visibleElement != null) {
+                return visibleElement;
+            }
+        }
+        return null;
+    }
+
+    private static WebElement findVisibleElement(List<WebElement> elements) {
+        for (WebElement element : elements) {
+            if (element.isDisplayed()) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    private static WebElement findMatchingOption(List<WebElement> options, String optionText) {
+        return findMatchingOption(options, optionText, true);
+    }
+
+    private static WebElement findMatchingOption(List<WebElement> options, String optionText, boolean exactMatch) {
+        return options.stream()
+                .filter(WebElement::isDisplayed)
+                .filter(option -> exactMatch
+                        ? normalizeVisibleText(option.getText()).equals(optionText)
+                        : normalizeVisibleText(option.getText()).contains(optionText))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static String normalizeVisibleText(String value) {
+        return value == null ? "" : value.trim().replaceAll("\\s+", " ");
     }
 
     public static WebElement checkElement(WebDriver driver, WebElement element) {
@@ -276,12 +432,13 @@ public abstract class PageHelper {
      * @return the UI element of the snackbar
      */
     public static WebElement getSnackBar(WebDriver driver, String message) {
-        String xpathExpr = "//simple-snack-bar//div[contains(text(), \"" + message + "\")]";
+        String xpathExpr = "//mat-snack-bar-container//*[contains(text(), \"" + message + "\") or contains(., \"" + message + "\")] | " +
+                "//simple-snack-bar//*[contains(text(), \"" + message + "\") or contains(., \"" + message + "\")]";
         return visibilityOfElementLocated(driver, By.xpath(xpathExpr));
     }
 
     public static String getDialogTitle(WebDriver driver) {
-        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]/span";
+        String xpathExpr = "//mat-dialog-container//div[contains(@class, \"header\")]//span";
         WebElement snackBar = retry(() -> visibilityOfElementLocated(driver, By.xpath(xpathExpr)));
         return getText(snackBar);
     }
@@ -298,8 +455,49 @@ public abstract class PageHelper {
     }
 
     public static WebElement getDialogButtonByName(WebDriver driver, String buttonName) {
-        String xpathExpr = "//score-confirm-dialog//span[contains(text(), \"" + buttonName + "\")]//ancestor::button[1]";
+        String xpathExpr = "//score-confirm-dialog//button[contains(., \"" + buttonName + "\")]";
         return retry(() -> elementToBeClickable(driver, By.xpath(xpathExpr)));
+    }
+
+    /**
+     * The Validation Results panel asks "Cancel or Proceed anyway" when a refactor, an append or a base ACC would
+     * break something. Its buttons are not in a score-confirm-dialog.
+     */
+    private static final By VALIDATION_PANEL_LOCATOR = By.xpath("//score-validation-panel//div[contains(@class, \"validation-panel\")]");
+
+    public static WebElement getValidationProceedButton(WebDriver driver) {
+        return retry(() -> elementToBeClickable(driver, By.id("validation-proceed")));
+    }
+
+    public static WebElement getValidationCancelButton(WebDriver driver) {
+        return retry(() -> elementToBeClickable(driver, By.id("validation-cancel")));
+    }
+
+    /** Waits for the panel to ask, and returns the messages of the problems it lists. */
+    public static List<String> getValidationPanelMessages(WebDriver driver) {
+        retry(() -> visibilityOfElementLocated(driver, VALIDATION_PANEL_LOCATOR));
+        List<String> messages = new ArrayList<>();
+        for (WebElement message : driver.findElements(By.xpath(
+                "//score-validation-panel//div[contains(@class, \"violation\")]//span[contains(@class, \"message\")]"))) {
+            messages.add(getText(message));
+        }
+        return messages;
+    }
+
+    /** The subjects (the ACCs the problems are about) the panel lists, in the order of the problems. */
+    public static List<String> getValidationPanelSubjects(WebDriver driver) {
+        retry(() -> visibilityOfElementLocated(driver, VALIDATION_PANEL_LOCATOR));
+        List<String> subjects = new ArrayList<>();
+        for (WebElement subject : driver.findElements(By.xpath(
+                "//score-validation-panel//div[contains(@class, \"violation\")]//div[contains(@class, \"subject\")]"))) {
+            subjects.add(getText(subject));
+        }
+        return subjects;
+    }
+
+    /** Whether the panel asks to proceed with a change; false once nothing is asked, within a short wait. */
+    public static boolean isValidationDecisionDisplayed(WebDriver driver) {
+        return !driver.findElements(By.id("validation-proceed")).isEmpty();
     }
 
     public static void switchToNextTab(WebDriver driver) {

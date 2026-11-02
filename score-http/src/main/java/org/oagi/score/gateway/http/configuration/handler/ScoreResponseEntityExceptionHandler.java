@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -45,13 +44,14 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
     }
 
     private ResponseEntity<String> errorResponse(HttpStatus status, String message) {
-        MultiValueMap<String, String> headers = new HttpHeaders();
+        // Spring Framework 7: HttpHeaders no longer implements MultiValueMap (#1750).
+        HttpHeaders headers = new HttpHeaders();
         headers.set("X-Error-Message", toHeaderValue(message));
         return new ResponseEntity<>(message, headers, status);
     }
 
     private ResponseEntity<String> errorResponse(HttpStatus status, String message, String errorMessageId) {
-        MultiValueMap<String, String> headers = new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
         headers.set("X-Error-Message", toHeaderValue(message));
         if (errorMessageId != null) {
             headers.set("X-Error-Message-Id", errorMessageId);

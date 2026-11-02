@@ -1,0 +1,15 @@
+.tree-search-box {
+  align-items: center;
+}
+
+.tree-search-box .mat-form-field-wrapper {
+  padding: 0 !important;
+}
+
+.tree-search-box .mat-mdc-form-field {
+  font-size: 12px;
+}
+
+.tree-search-box .mat-icon {
+  cursor: pointer;
+}

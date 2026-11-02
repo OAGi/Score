@@ -33,9 +33,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Indexes;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppUser.AppUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AsbieBizterm.AsbieBiztermPath;
@@ -56,7 +56,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.asbie</code>
+     * The reference instance of <code>asbie</code>
      */
     public static final Asbie ASBIE = new Asbie();
 
@@ -69,48 +69,48 @@ public class Asbie extends TableImpl<AsbieRecord> {
     }
 
     /**
-     * The column <code>oagi.asbie.asbie_id</code>. A internal, primary database
-     * key of an ASBIE.
+     * The column <code>asbie.asbie_id</code>. A internal, primary database key
+     * of an ASBIE.
      */
     public final TableField<AsbieRecord, ULong> ASBIE_ID = createField(DSL.name("asbie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "A internal, primary database key of an ASBIE.");
 
     /**
-     * The column <code>oagi.asbie.guid</code>. A globally unique identifier
-     * (GUID).
+     * The column <code>asbie.guid</code>. A globally unique identifier (GUID).
      */
     public final TableField<AsbieRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.CHAR(32).nullable(false), this, "A globally unique identifier (GUID).");
 
     /**
-     * The column <code>oagi.asbie.based_ascc_manifest_id</code>. The
+     * The column <code>asbie.based_ascc_manifest_id</code>. The
      * BASED_ASCC_MANIFEST_ID column refers to the ASCC_MANIFEST record, which
      * this ASBIE contextualizes.
      */
     public final TableField<AsbieRecord, ULong> BASED_ASCC_MANIFEST_ID = createField(DSL.name("based_ascc_manifest_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The BASED_ASCC_MANIFEST_ID column refers to the ASCC_MANIFEST record, which this ASBIE contextualizes.");
 
     /**
-     * The column <code>oagi.asbie.path</code>.
+     * The column <code>asbie.path</code>. The path of this node within the
+     * component graph; used together with HASH_PATH to locate the node.
      */
-    public final TableField<AsbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<AsbieRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The path of this node within the component graph; used together with HASH_PATH to locate the node.");
 
     /**
-     * The column <code>oagi.asbie.hash_path</code>. hash_path generated from
-     * the path of the component graph using hash function, so that it is unique
-     * in the graph.
+     * The column <code>asbie.hash_path</code>. hash_path generated from the
+     * path of the component graph using hash function, so that it is unique in
+     * the graph.
      */
     public final TableField<AsbieRecord, String> HASH_PATH = createField(DSL.name("hash_path"), SQLDataType.VARCHAR(64).nullable(false), this, "hash_path generated from the path of the component graph using hash function, so that it is unique in the graph.");
 
     /**
-     * The column <code>oagi.asbie.from_abie_id</code>. A foreign key pointing
-     * to the ABIE table. FROM_ABIE_ID is basically  a parent data element
-     * (type) of the TO_ASBIEP_ID. FROM_ABIE_ID must be based on the FROM_ACC_ID
-     * in the BASED_ASCC_ID except when the FROM_ACC_ID refers to an
-     * SEMANTIC_GROUP ACC or USER_EXTENSION_GROUP ACC.
+     * The column <code>asbie.from_abie_id</code>. A foreign key pointing to the
+     * ABIE table. FROM_ABIE_ID is basically  a parent data element (type) of
+     * the TO_ASBIEP_ID. FROM_ABIE_ID must be based on the FROM_ACC_ID in the
+     * BASED_ASCC_ID except when the FROM_ACC_ID refers to an SEMANTIC_GROUP ACC
+     * or USER_EXTENSION_GROUP ACC.
      */
     public final TableField<AsbieRecord, ULong> FROM_ABIE_ID = createField(DSL.name("from_abie_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key pointing to the ABIE table. FROM_ABIE_ID is basically  a parent data element (type) of the TO_ASBIEP_ID. FROM_ABIE_ID must be based on the FROM_ACC_ID in the BASED_ASCC_ID except when the FROM_ACC_ID refers to an SEMANTIC_GROUP ACC or USER_EXTENSION_GROUP ACC.");
 
     /**
-     * The column <code>oagi.asbie.to_asbiep_id</code>. A foreign key to the
-     * ASBIEP table. TO_ASBIEP_ID is basically a child data element of the
+     * The column <code>asbie.to_asbiep_id</code>. A foreign key to the ASBIEP
+     * table. TO_ASBIEP_ID is basically a child data element of the
      * FROM_ABIE_ID. The TO_ASBIEP_ID must be based on the TO_ASCCP_ID in the
      * BASED_ASCC_ID. the ASBIEP is reused with the OWNER_TOP_LEVEL_ASBIEP is
      * different after joining ASBIE and ASBIEP tables
@@ -118,33 +118,33 @@ public class Asbie extends TableImpl<AsbieRecord> {
     public final TableField<AsbieRecord, ULong> TO_ASBIEP_ID = createField(DSL.name("to_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A foreign key to the ASBIEP table. TO_ASBIEP_ID is basically a child data element of the FROM_ABIE_ID. The TO_ASBIEP_ID must be based on the TO_ASCCP_ID in the BASED_ASCC_ID. the ASBIEP is reused with the OWNER_TOP_LEVEL_ASBIEP is different after joining ASBIE and ASBIEP tables");
 
     /**
-     * The column <code>oagi.asbie.definition</code>. Definition to override the
-     * ASCC definition. If NULL, it means that the definition should be derived
-     * from the based CC on the UI, expression generation, and any API.
+     * The column <code>asbie.definition</code>. Definition to override the ASCC
+     * definition. If NULL, it means that the definition should be derived from
+     * the based CC on the UI, expression generation, and any API.
      */
     public final TableField<AsbieRecord, String> DEFINITION = createField(DSL.name("definition"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC on the UI, expression generation, and any API.");
 
     /**
-     * The column <code>oagi.asbie.cardinality_min</code>. Minimum occurence
+     * The column <code>asbie.cardinality_min</code>. Minimum occurrence
      * constraint of the TO_ASBIEP_ID. A valid value is a non-negative integer.
      */
-    public final TableField<AsbieRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false), this, "Minimum occurence constraint of the TO_ASBIEP_ID. A valid value is a non-negative integer.");
+    public final TableField<AsbieRecord, Integer> CARDINALITY_MIN = createField(DSL.name("cardinality_min"), SQLDataType.INTEGER.nullable(false), this, "Minimum occurrence constraint of the TO_ASBIEP_ID. A valid value is a non-negative integer.");
 
     /**
-     * The column <code>oagi.asbie.cardinality_max</code>. Maximum occurrence
+     * The column <code>asbie.cardinality_max</code>. Maximum occurrence
      * constraint of the TO_ASBIEP_ID. A valid value is an integer from -1 and
      * up. Specifically, -1 means unbounded. 0 means prohibited or not to use.
      */
     public final TableField<AsbieRecord, Integer> CARDINALITY_MAX = createField(DSL.name("cardinality_max"), SQLDataType.INTEGER.nullable(false), this, "Maximum occurrence constraint of the TO_ASBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.");
 
     /**
-     * The column <code>oagi.asbie.is_nillable</code>. Indicate whether the
+     * The column <code>asbie.is_nillable</code>. Indicate whether the
      * TO_ASBIEP_ID is allowed to be null.
      */
     public final TableField<AsbieRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicate whether the TO_ASBIEP_ID is allowed to be null.");
 
     /**
-     * The column <code>oagi.asbie.remark</code>. This column allows the user to
+     * The column <code>asbie.remark</code>. This column allows the user to
      * specify very context-specific usage of the BIE. It is different from the
      * DEFINITION column in that the DEFINITION column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
@@ -157,57 +157,58 @@ public class Asbie extends TableImpl<AsbieRecord> {
     public final TableField<AsbieRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be \"Type of BOM should be recognized in the BOM/typeCode.\"");
 
     /**
-     * The column <code>oagi.asbie.created_by</code>. A foreign key referring to
-     * the user who creates the ASBIE. The creator of the ASBIE is also its
-     * owner by default. ASBIEs created as children of another ABIE have the
-     * same CREATED_BY.
+     * The column <code>asbie.created_by</code>. A foreign key referring to the
+     * user who creates the ASBIE. The creator of the ASBIE is also its owner by
+     * default. ASBIEs created as children of another ABIE have the same
+     * CREATED_BY.
      */
     public final TableField<AsbieRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who creates the ASBIE. The creator of the ASBIE is also its owner by default. ASBIEs created as children of another ABIE have the same CREATED_BY.");
 
     /**
-     * The column <code>oagi.asbie.last_updated_by</code>. A foreign key
-     * referring to the user who has last updated the ASBIE record. 
+     * The column <code>asbie.last_updated_by</code>. A foreign key referring to
+     * the user who has last updated the ASBIE record. 
      */
     public final TableField<AsbieRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who has last updated the ASBIE record. ");
 
     /**
-     * The column <code>oagi.asbie.creation_timestamp</code>. Timestamp when the
+     * The column <code>asbie.creation_timestamp</code>. Timestamp when the
      * ASBIE record was first created. ASBIEs created as children of another
      * ABIE have the same CREATION_TIMESTAMP.
      */
     public final TableField<AsbieRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the ASBIE record was first created. ASBIEs created as children of another ABIE have the same CREATION_TIMESTAMP.");
 
     /**
-     * The column <code>oagi.asbie.last_update_timestamp</code>. The timestamp
-     * when the ASBIE was last updated.
+     * The column <code>asbie.last_update_timestamp</code>. The timestamp when
+     * the ASBIE was last updated.
      */
     public final TableField<AsbieRecord, LocalDateTime> LAST_UPDATE_TIMESTAMP = createField(DSL.name("last_update_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "The timestamp when the ASBIE was last updated.");
 
     /**
-     * The column <code>oagi.asbie.seq_key</code>. This indicates the order of
-     * the associations among other siblings. The SEQ_KEY for BIEs is decimal in
-     * order to accomodate the removal of inheritance hierarchy and group. For
-     * example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2,
-     * 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have
-     * SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.
+     * The column <code>asbie.seq_key</code>. DEPRECATED. Instead, use `seq_key`
+     * table. This indicates the order of the associations among other siblings.
+     * The SEQ_KEY for BIEs is decimal in order to accommodate the removal of
+     * inheritance hierarchy and group. For example, children of the most
+     * abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of
+     * the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so
+     * on so forth.
      */
-    public final TableField<AsbieRecord, BigDecimal> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.");
+    public final TableField<AsbieRecord, BigDecimal> SEQ_KEY = createField(DSL.name("seq_key"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "DEPRECATED. Instead, use `seq_key` table. This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accommodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.");
 
     /**
-     * The column <code>oagi.asbie.is_used</code>. Flag to indicate whether the
+     * The column <code>asbie.is_used</code>. Flag to indicate whether the
      * field/component is used in the content model. It signifies whether the
      * field/component should be generated.
      */
     public final TableField<AsbieRecord, Byte> IS_USED = createField(DSL.name("is_used"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Flag to indicate whether the field/component is used in the content model. It signifies whether the field/component should be generated.");
 
     /**
-     * The column <code>oagi.asbie.is_deprecated</code>. Indicates whether the
-     * ASBIE is deprecated.
+     * The column <code>asbie.is_deprecated</code>. Indicates whether the ASBIE
+     * is deprecated.
      */
     public final TableField<AsbieRecord, Byte> IS_DEPRECATED = createField(DSL.name("is_deprecated"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the ASBIE is deprecated.");
 
     /**
-     * The column <code>oagi.asbie.owner_top_level_asbiep_id</code>. This is a
+     * The column <code>asbie.owner_top_level_asbiep_id</code>. This is a
      * foreign key to the top-level ASBIEP.
      */
     public final TableField<AsbieRecord, ULong> OWNER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("owner_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This is a foreign key to the top-level ASBIEP.");
@@ -221,21 +222,21 @@ public class Asbie extends TableImpl<AsbieRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.asbie</code> table reference
+     * Create an aliased <code>asbie</code> table reference
      */
     public Asbie(String alias) {
         this(DSL.name(alias), ASBIE);
     }
 
     /**
-     * Create an aliased <code>oagi.asbie</code> table reference
+     * Create an aliased <code>asbie</code> table reference
      */
     public Asbie(Name alias) {
         this(alias, ASBIE);
     }
 
     /**
-     * Create a <code>oagi.asbie</code> table reference
+     * Create a <code>asbie</code> table reference
      */
     public Asbie() {
         this(DSL.name("asbie"), null);
@@ -276,7 +277,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -302,7 +303,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AsccManifestPath _asccManifest;
 
     /**
-     * Get the implicit join path to the <code>oagi.ascc_manifest</code> table.
+     * Get the implicit join path to the <code>ascc_manifest</code> table.
      */
     public AsccManifestPath asccManifest() {
         if (_asccManifest == null)
@@ -314,8 +315,8 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AppUserPath _asbieCreatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asbie_created_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asbie_created_by_fk</code> key.
      */
     public AppUserPath asbieCreatedByFk() {
         if (_asbieCreatedByFk == null)
@@ -327,7 +328,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AbiePath _abie;
 
     /**
-     * Get the implicit join path to the <code>oagi.abie</code> table.
+     * Get the implicit join path to the <code>abie</code> table.
      */
     public AbiePath abie() {
         if (_abie == null)
@@ -339,8 +340,8 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AppUserPath _asbieLastUpdatedByFk;
 
     /**
-     * Get the implicit join path to the <code>oagi.app_user</code> table, via
-     * the <code>asbie_last_updated_by_fk</code> key.
+     * Get the implicit join path to the <code>app_user</code> table, via the
+     * <code>asbie_last_updated_by_fk</code> key.
      */
     public AppUserPath asbieLastUpdatedByFk() {
         if (_asbieLastUpdatedByFk == null)
@@ -352,8 +353,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.top_level_asbiep</code>
-     * table.
+     * Get the implicit join path to the <code>top_level_asbiep</code> table.
      */
     public TopLevelAsbiepPath topLevelAsbiep() {
         if (_topLevelAsbiep == null)
@@ -365,7 +365,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AsbiepPath _asbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbiep</code> table.
+     * Get the implicit join path to the <code>asbiep</code> table.
      */
     public AsbiepPath asbiep() {
         if (_asbiep == null)
@@ -377,7 +377,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient AsbieBiztermPath _asbieBizterm;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie_bizterm</code>
+     * Get the implicit to-many join path to the <code>asbie_bizterm</code>
      * table
      */
     public AsbieBiztermPath asbieBizterm() {
@@ -390,8 +390,8 @@ public class Asbie extends TableImpl<AsbieRecord> {
     private transient BieUsageRulePath _bieUsageRule;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_usage_rule</code> table
+     * Get the implicit to-many join path to the <code>bie_usage_rule</code>
+     * table
      */
     public BieUsageRulePath bieUsageRule() {
         if (_bieUsageRule == null)

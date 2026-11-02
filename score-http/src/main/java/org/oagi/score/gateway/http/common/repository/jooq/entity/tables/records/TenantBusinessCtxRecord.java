@@ -19,7 +19,7 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.tenant_business_ctx_id</code>.
+     * Setter for <code>tenant_business_ctx.tenant_business_ctx_id</code>.
      * Primary key column.
      */
     public void setTenantBusinessCtxId(ULong value) {
@@ -27,7 +27,7 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     }
 
     /**
-     * Getter for <code>oagi.tenant_business_ctx.tenant_business_ctx_id</code>.
+     * Getter for <code>tenant_business_ctx.tenant_business_ctx_id</code>.
      * Primary key column.
      */
     public ULong getTenantBusinessCtxId() {
@@ -35,30 +35,30 @@ public class TenantBusinessCtxRecord extends UpdatableRecordImpl<TenantBusinessC
     }
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.tenant_id</code>. Tenant role.
+     * Setter for <code>tenant_business_ctx.tenant_id</code>. Tenant role.
      */
     public void setTenantId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.tenant_business_ctx.tenant_id</code>. Tenant role.
+     * Getter for <code>tenant_business_ctx.tenant_id</code>. Tenant role.
      */
     public ULong getTenantId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * business context for the company.
+     * Setter for <code>tenant_business_ctx.biz_ctx_id</code>. Concrete business
+     * context for the company.
      */
     public void setBizCtxId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * business context for the company.
+     * Getter for <code>tenant_business_ctx.biz_ctx_id</code>. Concrete business
+     * context for the company.
      */
     public ULong getBizCtxId() {
         return (ULong) get(2);

@@ -6,7 +6,6 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummar
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BusinessInformationEntityRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -27,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -58,30 +58,30 @@ public class GraphService {
             case ACC:
                 AccManifestId accManifestId = (AccManifestId) request.manifestId();
                 AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
-                ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
+                ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getAcc(accManifestId));
+                node = ccGraphContext.toNode(acc);
                 break;
             case ASCCP:
                 AsccpManifestId asccpManifestId = (AsccpManifestId) request.manifestId();
                 AsccpSummaryRecord asccp = repositoryFactory.asccpQueryRepository(requester).getAsccpSummary(asccpManifestId);
-                ccDocument = new CcDocumentImpl(requester, repositoryFactory, asccp.release().releaseId());
+                ccDocument = repositoryFactory.ccDocumentFactory().create(requester, asccp.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getAsccp(asccpManifestId));
+                node = ccGraphContext.toNode(asccp);
                 break;
             case BCCP:
                 BccpManifestId bccpManifestId = (BccpManifestId) request.manifestId();
                 BccpSummaryRecord bccp = repositoryFactory.bccpQueryRepository(requester).getBccpSummary(bccpManifestId);
-                ccDocument = new CcDocumentImpl(requester, repositoryFactory, bccp.release().releaseId());
+                ccDocument = repositoryFactory.ccDocumentFactory().create(requester, bccp.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getBccp(bccpManifestId));
+                node = ccGraphContext.toNode(bccp);
                 break;
             case DT:
                 DtManifestId dtManifestId = (DtManifestId) request.manifestId();
                 DtSummaryRecord dt = repositoryFactory.dtQueryRepository(requester).getDtSummary(dtManifestId);
-                ccDocument = new CcDocumentImpl(requester, repositoryFactory, dt.release().releaseId());
+                ccDocument = repositoryFactory.ccDocumentFactory().create(requester, dt.release().releaseId());
                 ccGraphContext = new CoreComponentGraphContext(ccDocument);
-                node = ccGraphContext.toNode(ccDocument.getDt(dtManifestId));
+                node = ccGraphContext.toNode(dt);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -96,7 +96,7 @@ public class GraphService {
             throw new IllegalArgumentException();
         }
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, acc.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, acc.release().releaseId());
         CoreComponentGraphContext ccGraphContext = new CoreComponentGraphContext(ccDocument);
         return buildGraph(ccGraphContext, ccGraphContext.toNode(acc), false);
     }
@@ -108,7 +108,7 @@ public class GraphService {
             throw new IllegalArgumentException();
         }
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, asccp.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, asccp.release().releaseId());
         CoreComponentGraphContext ccGraphContext = new CoreComponentGraphContext(ccDocument);
         return buildGraph(ccGraphContext, ccGraphContext.toNode(asccp), excludeUEG);
     }
@@ -120,7 +120,7 @@ public class GraphService {
             throw new IllegalArgumentException();
         }
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, bccp.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, bccp.release().releaseId());
         CoreComponentGraphContext ccGraphContext = new CoreComponentGraphContext(ccDocument);
         return buildGraph(ccGraphContext, ccGraphContext.toNode(bccp), false);
     }
@@ -132,7 +132,7 @@ public class GraphService {
             throw new IllegalArgumentException();
         }
 
-        CcDocument ccDocument = new CcDocumentImpl(requester, repositoryFactory, dt.release().releaseId());
+        CcDocument ccDocument = repositoryFactory.ccDocumentFactory().create(requester, dt.release().releaseId());
         CoreComponentGraphContext ccGraphContext = new CoreComponentGraphContext(ccDocument);
         return buildGraph(ccGraphContext, ccGraphContext.toNode(dt), false);
     }
@@ -186,23 +186,31 @@ public class GraphService {
         manifestQueue.add(root);
 
         Graph graph = new Graph();
+        graphContext.prefetchGraph(root);
 
         while (!manifestQueue.isEmpty()) {
-            Node node = manifestQueue.poll();
-            if (!graph.addNode(node)) {
-                continue;
-            }
+            // The nodes of one level are visited in the order they were queued, as one by one would,
+            // but the context may load the children of the whole level at once.
+            List<Node> level = new ArrayList<>(manifestQueue);
+            manifestQueue.clear();
+            graphContext.prefetchChildren(level);
 
-            List<Node> children = graphContext.findChildren(node, excludeUEG);
-            if (children.isEmpty()) {
-                continue;
-            }
+            for (Node node : level) {
+                if (!graph.addNode(node)) {
+                    continue;
+                }
 
-            graph.addEdges(node, children);
-            if (Node.NodeType.DT == node.getType()) {
-                children.stream().forEach(e -> graph.addNode(e));
-            } else {
-                manifestQueue.addAll(children);
+                List<Node> children = graphContext.findChildren(node, excludeUEG);
+                if (children.isEmpty()) {
+                    continue;
+                }
+
+                graph.addEdges(node, children);
+                if (Node.NodeType.DT == node.getType()) {
+                    children.stream().forEach(e -> graph.addNode(e));
+                } else {
+                    manifestQueue.addAll(children);
+                }
             }
         }
 

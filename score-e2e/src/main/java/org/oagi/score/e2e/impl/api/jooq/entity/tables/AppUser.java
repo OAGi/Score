@@ -31,14 +31,15 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Abie.AbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Acc.AccPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AccManifestTag.AccManifestTagPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdList.AgencyIdListPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppOauth2User.AppOauth2UserPath;
+import org.oagi.score.e2e.impl.api.jooq.entity.tables.AppWebauthnUser.AppWebauthnUserPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbie.AsbiePath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Asbiep.AsbiepPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Ascc.AsccPath;
@@ -128,7 +129,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.app_user</code>
+     * The reference instance of <code>app_user</code>
      */
     public static final AppUser APP_USER = new AppUser();
 
@@ -141,64 +142,66 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     /**
-     * The column <code>oagi.app_user.app_user_id</code>. Primary key column.
+     * The column <code>app_user.app_user_id</code>. Primary key column.
      */
     public final TableField<AppUserRecord, ULong> APP_USER_ID = createField(DSL.name("app_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.app_user.login_id</code>. User Id of the user.
+     * The column <code>app_user.login_id</code>. User Id of the user.
      */
     public final TableField<AppUserRecord, String> LOGIN_ID = createField(DSL.name("login_id"), SQLDataType.VARCHAR(45).nullable(false), this, "User Id of the user.");
 
     /**
-     * The column <code>oagi.app_user.password</code>. Password to authenticate
-     * the user.
+     * The column <code>app_user.password</code>. Password to authenticate the
+     * user.
      */
     public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Password to authenticate the user.");
 
     /**
-     * The column <code>oagi.app_user.name</code>. Full name of the user.
+     * The column <code>app_user.name</code>. Full name of the user.
      */
     public final TableField<AppUserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Full name of the user.");
 
     /**
-     * The column <code>oagi.app_user.organization</code>. The company the user
+     * The column <code>app_user.organization</code>. The company the user
      * represents.
      */
     public final TableField<AppUserRecord, String> ORGANIZATION = createField(DSL.name("organization"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The company the user represents.");
 
     /**
-     * The column <code>oagi.app_user.email</code>. Email address.
+     * The column <code>app_user.email</code>. Email address.
      */
     public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Email address.");
 
     /**
-     * The column <code>oagi.app_user.email_verified</code>. The fact whether
-     * the email value is verified or not.
+     * The column <code>app_user.email_verified</code>. The fact whether the
+     * email value is verified or not.
      */
     public final TableField<AppUserRecord, Byte> EMAIL_VERIFIED = createField(DSL.name("email_verified"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "The fact whether the email value is verified or not.");
 
     /**
-     * The column <code>oagi.app_user.email_verified_timestamp</code>. The
-     * timestamp when the email address has verified.
+     * The column <code>app_user.email_verified_timestamp</code>. The timestamp
+     * when the email address has been verified.
      */
-    public final TableField<AppUserRecord, LocalDateTime> EMAIL_VERIFIED_TIMESTAMP = createField(DSL.name("email_verified_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "The timestamp when the email address has verified.");
+    public final TableField<AppUserRecord, LocalDateTime> EMAIL_VERIFIED_TIMESTAMP = createField(DSL.name("email_verified_timestamp"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "The timestamp when the email address has been verified.");
 
     /**
-     * The column <code>oagi.app_user.is_developer</code>.
+     * The column <code>app_user.is_developer</code>. Indicator whether the user
+     * has a developer role or not.
      */
-    public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "");
+    public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "Indicator whether the user has a developer role or not.");
 
     /**
-     * The column <code>oagi.app_user.is_admin</code>. Indicator whether the
-     * user has an admin role or not.
+     * The column <code>app_user.is_admin</code>. Indicator whether the user has
+     * an admin role or not.
      */
     public final TableField<AppUserRecord, Byte> IS_ADMIN = createField(DSL.name("is_admin"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicator whether the user has an admin role or not.");
 
     /**
-     * The column <code>oagi.app_user.is_enabled</code>.
+     * The column <code>app_user.is_enabled</code>. Indicator whether the user
+     * account is enabled or not.
      */
-    public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "");
+    public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("1"), SQLDataType.TINYINT)), this, "Indicator whether the user account is enabled or not.");
 
     private AppUser(Name alias, Table<AppUserRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -209,21 +212,21 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.app_user</code> table reference
+     * Create an aliased <code>app_user</code> table reference
      */
     public AppUser(String alias) {
         this(DSL.name(alias), APP_USER);
     }
 
     /**
-     * Create an aliased <code>oagi.app_user</code> table reference
+     * Create an aliased <code>app_user</code> table reference
      */
     public AppUser(Name alias) {
         this(alias, APP_USER);
     }
 
     /**
-     * Create a <code>oagi.app_user</code> table reference
+     * Create a <code>app_user</code> table reference
      */
     public AppUser() {
         this(DSL.name("app_user"), null);
@@ -264,7 +267,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -285,8 +288,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AbiePath _abieCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.abie</code> table,
-     * via the <code>abie_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>abie</code> table, via
+     * the <code>abie_created_by_fk</code> key
      */
     public AbiePath abieCreatedByFk() {
         if (_abieCreatedByFk == null)
@@ -298,8 +301,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AbiePath _abieLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.abie</code> table,
-     * via the <code>abie_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>abie</code> table, via
+     * the <code>abie_last_updated_by_fk</code> key
      */
     public AbiePath abieLastUpdatedByFk() {
         if (_abieLastUpdatedByFk == null)
@@ -311,8 +314,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AccPath _accCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
-     * via the <code>acc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>acc</code> table, via the
+     * <code>acc_created_by_fk</code> key
      */
     public AccPath accCreatedByFk() {
         if (_accCreatedByFk == null)
@@ -324,8 +327,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AccPath _accLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
-     * via the <code>acc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>acc</code> table, via the
+     * <code>acc_last_updated_by_fk</code> key
      */
     public AccPath accLastUpdatedByFk() {
         if (_accLastUpdatedByFk == null)
@@ -337,8 +340,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AccManifestTagPath _accManifestTag;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.acc_manifest_tag</code> table
+     * Get the implicit to-many join path to the <code>acc_manifest_tag</code>
+     * table
      */
     public AccManifestTagPath accManifestTag() {
         if (_accManifestTag == null)
@@ -350,8 +353,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AccPath _accOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.acc</code> table,
-     * via the <code>acc_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>acc</code> table, via the
+     * <code>acc_owner_user_id_fk</code> key
      */
     public AccPath accOwnerUserIdFk() {
         if (_accOwnerUserIdFk == null)
@@ -363,9 +366,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AgencyIdListPath _agencyIdListCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list</code> table, via the
-     * <code>agency_id_list_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>agency_id_list</code>
+     * table, via the <code>agency_id_list_created_by_fk</code> key
      */
     public AgencyIdListPath agencyIdListCreatedByFk() {
         if (_agencyIdListCreatedByFk == null)
@@ -377,9 +379,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AgencyIdListPath _agencyIdListLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list</code> table, via the
-     * <code>agency_id_list_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>agency_id_list</code>
+     * table, via the <code>agency_id_list_last_updated_by_fk</code> key
      */
     public AgencyIdListPath agencyIdListLastUpdatedByFk() {
         if (_agencyIdListLastUpdatedByFk == null)
@@ -391,9 +392,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AgencyIdListPath _agencyIdListOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list</code> table, via the
-     * <code>agency_id_list_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>agency_id_list</code>
+     * table, via the <code>agency_id_list_owner_user_id_fk</code> key
      */
     public AgencyIdListPath agencyIdListOwnerUserIdFk() {
         if (_agencyIdListOwnerUserIdFk == null)
@@ -406,7 +406,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value</code> table, via the
      * <code>agency_id_list_value_created_by_fk</code> key
      */
     public AgencyIdListValuePath agencyIdListValueCreatedByFk() {
@@ -420,7 +420,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value</code> table, via the
      * <code>agency_id_list_value_last_updated_by_fk</code> key
      */
     public AgencyIdListValuePath agencyIdListValueLastUpdatedByFk() {
@@ -434,7 +434,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.agency_id_list_value</code> table, via the
+     * <code>agency_id_list_value</code> table, via the
      * <code>agency_id_list_value_owner_user_id_fk</code> key
      */
     public AgencyIdListValuePath agencyIdListValueOwnerUserIdFk() {
@@ -447,8 +447,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AppOauth2UserPath _appOauth2User;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.app_oauth2_user</code> table
+     * Get the implicit to-many join path to the <code>app_oauth2_user</code>
+     * table
      */
     public AppOauth2UserPath appOauth2User() {
         if (_appOauth2User == null)
@@ -457,11 +457,24 @@ public class AppUser extends TableImpl<AppUserRecord> {
         return _appOauth2User;
     }
 
+    private transient AppWebauthnUserPath _appWebauthnUser;
+
+    /**
+     * Get the implicit to-many join path to the <code>app_webauthn_user</code>
+     * table
+     */
+    public AppWebauthnUserPath appWebauthnUser() {
+        if (_appWebauthnUser == null)
+            _appWebauthnUser = new AppWebauthnUserPath(this, null, Keys.APP_WEBAUTHN_USER_APP_USER_ID_FK.getInverseKey());
+
+        return _appWebauthnUser;
+    }
+
     private transient AsbiePath _asbieCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
-     * via the <code>asbie_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asbie</code> table, via
+     * the <code>asbie_created_by_fk</code> key
      */
     public AsbiePath asbieCreatedByFk() {
         if (_asbieCreatedByFk == null)
@@ -473,8 +486,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsbiePath _asbieLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbie</code> table,
-     * via the <code>asbie_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asbie</code> table, via
+     * the <code>asbie_last_updated_by_fk</code> key
      */
     public AsbiePath asbieLastUpdatedByFk() {
         if (_asbieLastUpdatedByFk == null)
@@ -486,8 +499,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsbiepPath _asbiepCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table,
-     * via the <code>asbiep_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asbiep</code> table, via
+     * the <code>asbiep_created_by_fk</code> key
      */
     public AsbiepPath asbiepCreatedByFk() {
         if (_asbiepCreatedByFk == null)
@@ -499,8 +512,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsbiepPath _asbiepLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asbiep</code> table,
-     * via the <code>asbiep_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asbiep</code> table, via
+     * the <code>asbiep_last_updated_by_fk</code> key
      */
     public AsbiepPath asbiepLastUpdatedByFk() {
         if (_asbiepLastUpdatedByFk == null)
@@ -512,8 +525,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccPath _asccCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>ascc</code> table, via
+     * the <code>ascc_created_by_fk</code> key
      */
     public AsccPath asccCreatedByFk() {
         if (_asccCreatedByFk == null)
@@ -525,8 +538,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccPath _asccLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>ascc</code> table, via
+     * the <code>ascc_last_updated_by_fk</code> key
      */
     public AsccPath asccLastUpdatedByFk() {
         if (_asccLastUpdatedByFk == null)
@@ -538,8 +551,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccPath _asccOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ascc</code> table,
-     * via the <code>ascc_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>ascc</code> table, via
+     * the <code>ascc_owner_user_id_fk</code> key
      */
     public AsccPath asccOwnerUserIdFk() {
         if (_asccOwnerUserIdFk == null)
@@ -551,8 +564,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccpPath _asccpCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
-     * via the <code>asccp_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asccp</code> table, via
+     * the <code>asccp_created_by_fk</code> key
      */
     public AsccpPath asccpCreatedByFk() {
         if (_asccpCreatedByFk == null)
@@ -564,8 +577,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccpPath _asccpLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
-     * via the <code>asccp_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>asccp</code> table, via
+     * the <code>asccp_last_updated_by_fk</code> key
      */
     public AsccpPath asccpLastUpdatedByFk() {
         if (_asccpLastUpdatedByFk == null)
@@ -577,8 +590,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccpManifestTagPath _asccpManifestTag;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.asccp_manifest_tag</code> table
+     * Get the implicit to-many join path to the <code>asccp_manifest_tag</code>
+     * table
      */
     public AsccpManifestTagPath asccpManifestTag() {
         if (_asccpManifestTag == null)
@@ -590,8 +603,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient AsccpPath _asccpOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.asccp</code> table,
-     * via the <code>asccp_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>asccp</code> table, via
+     * the <code>asccp_owner_user_id_fk</code> key
      */
     public AsccpPath asccpOwnerUserIdFk() {
         if (_asccpOwnerUserIdFk == null)
@@ -603,8 +616,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbiePath _bbieCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie</code> table,
-     * via the <code>bbie_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbie</code> table, via
+     * the <code>bbie_created_by_fk</code> key
      */
     public BbiePath bbieCreatedByFk() {
         if (_bbieCreatedByFk == null)
@@ -616,8 +629,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbiePath _bbieLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie</code> table,
-     * via the <code>bbie_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbie</code> table, via
+     * the <code>bbie_last_updated_by_fk</code> key
      */
     public BbiePath bbieLastUpdatedByFk() {
         if (_bbieLastUpdatedByFk == null)
@@ -629,8 +642,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbieScPath _bbieScCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code>
-     * table, via the <code>bbie_sc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbie_sc</code> table, via
+     * the <code>bbie_sc_created_by_fk</code> key
      */
     public BbieScPath bbieScCreatedByFk() {
         if (_bbieScCreatedByFk == null)
@@ -642,8 +655,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbieScPath _bbieScLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbie_sc</code>
-     * table, via the <code>bbie_sc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbie_sc</code> table, via
+     * the <code>bbie_sc_last_updated_by_fk</code> key
      */
     public BbieScPath bbieScLastUpdatedByFk() {
         if (_bbieScLastUpdatedByFk == null)
@@ -655,8 +668,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbiepPath _bbiepCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
-     * via the <code>bbiep_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbiep</code> table, via
+     * the <code>bbiep_created_by_fk</code> key
      */
     public BbiepPath bbiepCreatedByFk() {
         if (_bbiepCreatedByFk == null)
@@ -668,8 +681,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BbiepPath _bbiepLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bbiep</code> table,
-     * via the <code>bbiep_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bbiep</code> table, via
+     * the <code>bbiep_last_updated_by_fk</code> key
      */
     public BbiepPath bbiepLastUpdatedByFk() {
         if (_bbiepLastUpdatedByFk == null)
@@ -681,8 +694,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccPath _bccCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bcc</code> table, via the
+     * <code>bcc_created_by_fk</code> key
      */
     public BccPath bccCreatedByFk() {
         if (_bccCreatedByFk == null)
@@ -694,8 +707,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccPath _bccLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bcc</code> table, via the
+     * <code>bcc_last_updated_by_fk</code> key
      */
     public BccPath bccLastUpdatedByFk() {
         if (_bccLastUpdatedByFk == null)
@@ -707,8 +720,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccPath _bccOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bcc</code> table,
-     * via the <code>bcc_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>bcc</code> table, via the
+     * <code>bcc_owner_user_id_fk</code> key
      */
     public BccPath bccOwnerUserIdFk() {
         if (_bccOwnerUserIdFk == null)
@@ -720,8 +733,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccpPath _bccpCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
-     * via the <code>bccp_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bccp</code> table, via
+     * the <code>bccp_created_by_fk</code> key
      */
     public BccpPath bccpCreatedByFk() {
         if (_bccpCreatedByFk == null)
@@ -733,8 +746,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccpPath _bccpLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
-     * via the <code>bccp_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bccp</code> table, via
+     * the <code>bccp_last_updated_by_fk</code> key
      */
     public BccpPath bccpLastUpdatedByFk() {
         if (_bccpLastUpdatedByFk == null)
@@ -746,8 +759,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccpManifestTagPath _bccpManifestTag;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bccp_manifest_tag</code> table
+     * Get the implicit to-many join path to the <code>bccp_manifest_tag</code>
+     * table
      */
     public BccpManifestTagPath bccpManifestTag() {
         if (_bccpManifestTag == null)
@@ -759,8 +772,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BccpPath _bccpOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bccp</code> table,
-     * via the <code>bccp_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>bccp</code> table, via
+     * the <code>bccp_owner_user_id_fk</code> key
      */
     public BccpPath bccpOwnerUserIdFk() {
         if (_bccpOwnerUserIdFk == null)
@@ -772,8 +785,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BiePackagePath _biePackageCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
-     * table, via the <code>bie_package_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bie_package</code> table,
+     * via the <code>bie_package_created_by_fk</code> key
      */
     public BiePackagePath biePackageCreatedByFk() {
         if (_biePackageCreatedByFk == null)
@@ -785,8 +798,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BiePackagePath _biePackageLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
-     * table, via the <code>bie_package_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bie_package</code> table,
+     * via the <code>bie_package_last_updated_by_fk</code> key
      */
     public BiePackagePath biePackageLastUpdatedByFk() {
         if (_biePackageLastUpdatedByFk == null)
@@ -798,8 +811,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BiePackagePath _biePackageOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.bie_package</code>
-     * table, via the <code>bie_package_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>bie_package</code> table,
+     * via the <code>bie_package_owner_user_id_fk</code> key
      */
     public BiePackagePath biePackageOwnerUserIdFk() {
         if (_biePackageOwnerUserIdFk == null)
@@ -811,9 +824,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BieViewOrderPath _bieViewOrderCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_view_order</code> table, via the
-     * <code>bie_view_order_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bie_view_order</code>
+     * table, via the <code>bie_view_order_created_by_fk</code> key
      */
     public BieViewOrderPath bieViewOrderCreatedByFk() {
         if (_bieViewOrderCreatedByFk == null)
@@ -825,9 +837,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BieViewOrderPath _bieViewOrderLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_view_order</code> table, via the
-     * <code>bie_view_order_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>bie_view_order</code>
+     * table, via the <code>bie_view_order_last_updated_by_fk</code> key
      */
     public BieViewOrderPath bieViewOrderLastUpdatedByFk() {
         if (_bieViewOrderLastUpdatedByFk == null)
@@ -839,8 +850,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BizCtxPath _bizCtxCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.biz_ctx</code>
-     * table, via the <code>biz_ctx_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>biz_ctx</code> table, via
+     * the <code>biz_ctx_created_by_fk</code> key
      */
     public BizCtxPath bizCtxCreatedByFk() {
         if (_bizCtxCreatedByFk == null)
@@ -852,8 +863,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient BizCtxPath _bizCtxLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.biz_ctx</code>
-     * table, via the <code>biz_ctx_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>biz_ctx</code> table, via
+     * the <code>biz_ctx_last_updated_by_fk</code> key
      */
     public BizCtxPath bizCtxLastUpdatedByFk() {
         if (_bizCtxLastUpdatedByFk == null)
@@ -865,8 +876,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListPath _codeListCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.code_list</code>
-     * table, via the <code>code_list_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list</code> table,
+     * via the <code>code_list_created_by_fk</code> key
      */
     public CodeListPath codeListCreatedByFk() {
         if (_codeListCreatedByFk == null)
@@ -878,8 +889,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListPath _codeListLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.code_list</code>
-     * table, via the <code>code_list_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list</code> table,
+     * via the <code>code_list_last_updated_by_fk</code> key
      */
     public CodeListPath codeListLastUpdatedByFk() {
         if (_codeListLastUpdatedByFk == null)
@@ -891,8 +902,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListPath _codeListOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.code_list</code>
-     * table, via the <code>code_list_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list</code> table,
+     * via the <code>code_list_owner_user_id_fk</code> key
      */
     public CodeListPath codeListOwnerUserIdFk() {
         if (_codeListOwnerUserIdFk == null)
@@ -904,9 +915,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListValuePath _codeListValueCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.code_list_value</code> table, via the
-     * <code>code_list_value_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list_value</code>
+     * table, via the <code>code_list_value_created_by_fk</code> key
      */
     public CodeListValuePath codeListValueCreatedByFk() {
         if (_codeListValueCreatedByFk == null)
@@ -918,9 +928,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListValuePath _codeListValueLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.code_list_value</code> table, via the
-     * <code>code_list_value_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list_value</code>
+     * table, via the <code>code_list_value_last_updated_by_fk</code> key
      */
     public CodeListValuePath codeListValueLastUpdatedByFk() {
         if (_codeListValueLastUpdatedByFk == null)
@@ -932,9 +941,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CodeListValuePath _codeListValueOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.code_list_value</code> table, via the
-     * <code>code_list_value_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>code_list_value</code>
+     * table, via the <code>code_list_value_owner_user_id_fk</code> key
      */
     public CodeListValuePath codeListValueOwnerUserIdFk() {
         if (_codeListValueOwnerUserIdFk == null)
@@ -946,7 +954,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CommentPath _comment;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.comment</code> table
+     * Get the implicit to-many join path to the <code>comment</code> table
      */
     public CommentPath comment() {
         if (_comment == null)
@@ -958,7 +966,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CtxCategoryPath _ctxCategoryCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ctx_category</code>
+     * Get the implicit to-many join path to the <code>ctx_category</code>
      * table, via the <code>ctx_category_created_by_fk</code> key
      */
     public CtxCategoryPath ctxCategoryCreatedByFk() {
@@ -971,7 +979,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CtxCategoryPath _ctxCategoryLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ctx_category</code>
+     * Get the implicit to-many join path to the <code>ctx_category</code>
      * table, via the <code>ctx_category_last_updated_by_fk</code> key
      */
     public CtxCategoryPath ctxCategoryLastUpdatedByFk() {
@@ -984,8 +992,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CtxSchemePath _ctxSchemeCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
-     * table, via the <code>ctx_scheme_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>ctx_scheme</code> table,
+     * via the <code>ctx_scheme_created_by_fk</code> key
      */
     public CtxSchemePath ctxSchemeCreatedByFk() {
         if (_ctxSchemeCreatedByFk == null)
@@ -997,8 +1005,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient CtxSchemePath _ctxSchemeLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.ctx_scheme</code>
-     * table, via the <code>ctx_scheme_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>ctx_scheme</code> table,
+     * via the <code>ctx_scheme_last_updated_by_fk</code> key
      */
     public CtxSchemePath ctxSchemeLastUpdatedByFk() {
         if (_ctxSchemeLastUpdatedByFk == null)
@@ -1010,8 +1018,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtPath _dtCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
-     * the <code>dt_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>dt</code> table, via the
+     * <code>dt_created_by_fk</code> key
      */
     public DtPath dtCreatedByFk() {
         if (_dtCreatedByFk == null)
@@ -1023,8 +1031,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtPath _dtLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
-     * the <code>dt_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>dt</code> table, via the
+     * <code>dt_last_updated_by_fk</code> key
      */
     public DtPath dtLastUpdatedByFk() {
         if (_dtLastUpdatedByFk == null)
@@ -1036,8 +1044,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtManifestTagPath _dtManifestTag;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.dt_manifest_tag</code> table
+     * Get the implicit to-many join path to the <code>dt_manifest_tag</code>
+     * table
      */
     public DtManifestTagPath dtManifestTag() {
         if (_dtManifestTag == null)
@@ -1049,8 +1057,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtPath _dtOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt</code> table, via
-     * the <code>dt_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>dt</code> table, via the
+     * <code>dt_owner_user_id_fk</code> key
      */
     public DtPath dtOwnerUserIdFk() {
         if (_dtOwnerUserIdFk == null)
@@ -1062,8 +1070,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtScPath _dtScCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
-     * via the <code>dt_sc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>dt_sc</code> table, via
+     * the <code>dt_sc_created_by_fk</code> key
      */
     public DtScPath dtScCreatedByFk() {
         if (_dtScCreatedByFk == null)
@@ -1075,8 +1083,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtScPath _dtScLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
-     * via the <code>dt_sc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>dt_sc</code> table, via
+     * the <code>dt_sc_last_updated_by_fk</code> key
      */
     public DtScPath dtScLastUpdatedByFk() {
         if (_dtScLastUpdatedByFk == null)
@@ -1088,8 +1096,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient DtScPath _dtScOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_sc</code> table,
-     * via the <code>dt_sc_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>dt_sc</code> table, via
+     * the <code>dt_sc_owner_user_id_fk</code> key
      */
     public DtScPath dtScOwnerUserIdFk() {
         if (_dtScOwnerUserIdFk == null)
@@ -1101,8 +1109,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ExceptionPath _exception;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.exception</code>
-     * table
+     * Get the implicit to-many join path to the <code>exception</code> table
      */
     public ExceptionPath exception() {
         if (_exception == null)
@@ -1115,7 +1122,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest</code> table, via the
      * <code>github_issue_acc_manifest_created_by_fk</code> key
      */
     public GithubIssueAccManifestPath githubIssueAccManifestCreatedByFk() {
@@ -1129,7 +1136,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_acc_manifest</code> table, via the
+     * <code>github_issue_acc_manifest</code> table, via the
      * <code>github_issue_acc_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueAccManifestPath githubIssueAccManifestLastUpdatedByFk() {
@@ -1143,7 +1150,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest</code> table, via the
      * <code>github_issue_agency_id_list_manifest_created_by_fk</code> key
      */
     public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestCreatedByFk() {
@@ -1157,7 +1164,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_agency_id_list_manifest</code> table, via the
+     * <code>github_issue_agency_id_list_manifest</code> table, via the
      * <code>github_issue_agency_id_list_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueAgencyIdListManifestPath githubIssueAgencyIdListManifestLastUpdatedByFk() {
@@ -1171,7 +1178,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest</code> table, via the
      * <code>github_issue_asccp_manifest_created_by_fk</code> key
      */
     public GithubIssueAsccpManifestPath githubIssueAsccpManifestCreatedByFk() {
@@ -1185,7 +1192,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_asccp_manifest</code> table, via the
+     * <code>github_issue_asccp_manifest</code> table, via the
      * <code>github_issue_asccp_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueAsccpManifestPath githubIssueAsccpManifestLastUpdatedByFk() {
@@ -1199,7 +1206,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest</code> table, via the
      * <code>github_issue_bccp_manifest_created_by_fk</code> key
      */
     public GithubIssueBccpManifestPath githubIssueBccpManifestCreatedByFk() {
@@ -1213,7 +1220,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_bccp_manifest</code> table, via the
+     * <code>github_issue_bccp_manifest</code> table, via the
      * <code>github_issue_bccp_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueBccpManifestPath githubIssueBccpManifestLastUpdatedByFk() {
@@ -1227,7 +1234,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest</code> table, via the
      * <code>github_issue_code_list_manifest_created_by_fk</code> key
      */
     public GithubIssueCodeListManifestPath githubIssueCodeListManifestCreatedByFk() {
@@ -1241,7 +1248,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_code_list_manifest</code> table, via the
+     * <code>github_issue_code_list_manifest</code> table, via the
      * <code>github_issue_code_list_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueCodeListManifestPath githubIssueCodeListManifestLastUpdatedByFk() {
@@ -1255,7 +1262,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest</code> table, via the
      * <code>github_issue_dt_manifest_created_by_fk</code> key
      */
     public GithubIssueDtManifestPath githubIssueDtManifestCreatedByFk() {
@@ -1269,7 +1276,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.github_issue_dt_manifest</code> table, via the
+     * <code>github_issue_dt_manifest</code> table, via the
      * <code>github_issue_dt_manifest_last_updated_by_fk</code> key
      */
     public GithubIssueDtManifestPath githubIssueDtManifestLastUpdatedByFk() {
@@ -1282,8 +1289,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient LibraryPath _libraryCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.library</code>
-     * table, via the <code>library_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>library</code> table, via
+     * the <code>library_created_by_fk</code> key
      */
     public LibraryPath libraryCreatedByFk() {
         if (_libraryCreatedByFk == null)
@@ -1295,8 +1302,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient LibraryPath _libraryLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.library</code>
-     * table, via the <code>library_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>library</code> table, via
+     * the <code>library_last_updated_by_fk</code> key
      */
     public LibraryPath libraryLastUpdatedByFk() {
         if (_libraryLastUpdatedByFk == null)
@@ -1308,7 +1315,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient LogPath _log;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.log</code> table
+     * Get the implicit to-many join path to the <code>log</code> table
      */
     public LogPath log() {
         if (_log == null)
@@ -1320,8 +1327,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient MessagePath _messageRecipientIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.message</code>
-     * table, via the <code>message_recipient_id_fk</code> key
+     * Get the implicit to-many join path to the <code>message</code> table, via
+     * the <code>message_recipient_id_fk</code> key
      */
     public MessagePath messageRecipientIdFk() {
         if (_messageRecipientIdFk == null)
@@ -1333,8 +1340,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient MessagePath _messageSenderIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.message</code>
-     * table, via the <code>message_sender_id_fk</code> key
+     * Get the implicit to-many join path to the <code>message</code> table, via
+     * the <code>message_sender_id_fk</code> key
      */
     public MessagePath messageSenderIdFk() {
         if (_messageSenderIdFk == null)
@@ -1347,7 +1354,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_acc_manifest</code> table, via the
+     * <code>module_acc_manifest</code> table, via the
      * <code>module_acc_manifest_created_by_fk</code> key
      */
     public ModuleAccManifestPath moduleAccManifestCreatedByFk() {
@@ -1361,7 +1368,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_acc_manifest</code> table, via the
+     * <code>module_acc_manifest</code> table, via the
      * <code>module_acc_manifest_last_updated_by_fk</code> key
      */
     public ModuleAccManifestPath moduleAccManifestLastUpdatedByFk() {
@@ -1375,7 +1382,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_agency_id_list_manifest</code> table, via the
+     * <code>module_agency_id_list_manifest</code> table, via the
      * <code>module_agency_id_list_manifest_created_by_fk</code> key
      */
     public ModuleAgencyIdListManifestPath moduleAgencyIdListManifestCreatedByFk() {
@@ -1389,7 +1396,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_agency_id_list_manifest</code> table, via the
+     * <code>module_agency_id_list_manifest</code> table, via the
      * <code>module_agency_id_list_manifest_last_updated_by_fk</code> key
      */
     public ModuleAgencyIdListManifestPath moduleAgencyIdListManifestLastUpdatedByFk() {
@@ -1403,7 +1410,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_asccp_manifest</code> table, via the
+     * <code>module_asccp_manifest</code> table, via the
      * <code>module_asccp_manifest_created_by_fk</code> key
      */
     public ModuleAsccpManifestPath moduleAsccpManifestCreatedByFk() {
@@ -1417,7 +1424,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_asccp_manifest</code> table, via the
+     * <code>module_asccp_manifest</code> table, via the
      * <code>module_asccp_manifest_last_updated_by_fk</code> key
      */
     public ModuleAsccpManifestPath moduleAsccpManifestLastUpdatedByFk() {
@@ -1431,7 +1438,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_bccp_manifest</code> table, via the
+     * <code>module_bccp_manifest</code> table, via the
      * <code>module_bccp_manifest_created_by_fk</code> key
      */
     public ModuleBccpManifestPath moduleBccpManifestCreatedByFk() {
@@ -1445,7 +1452,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_bccp_manifest</code> table, via the
+     * <code>module_bccp_manifest</code> table, via the
      * <code>module_bccp_manifest_last_updated_by_fk</code> key
      */
     public ModuleBccpManifestPath moduleBccpManifestLastUpdatedByFk() {
@@ -1459,7 +1466,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_blob_content_manifest</code> table, via the
+     * <code>module_blob_content_manifest</code> table, via the
      * <code>module_blob_content_manifest_created_by_fk</code> key
      */
     public ModuleBlobContentManifestPath moduleBlobContentManifestCreatedByFk() {
@@ -1473,7 +1480,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_blob_content_manifest</code> table, via the
+     * <code>module_blob_content_manifest</code> table, via the
      * <code>module_blob_content_manifest_last_updated_by_fk</code> key
      */
     public ModuleBlobContentManifestPath moduleBlobContentManifestLastUpdatedByFk() {
@@ -1487,7 +1494,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_code_list_manifest</code> table, via the
+     * <code>module_code_list_manifest</code> table, via the
      * <code>module_code_list_manifest_created_by_fk</code> key
      */
     public ModuleCodeListManifestPath moduleCodeListManifestCreatedByFk() {
@@ -1501,7 +1508,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_code_list_manifest</code> table, via the
+     * <code>module_code_list_manifest</code> table, via the
      * <code>module_code_list_manifest_last_updated_by_fk</code> key
      */
     public ModuleCodeListManifestPath moduleCodeListManifestLastUpdatedByFk() {
@@ -1514,8 +1521,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModulePath _moduleCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module</code> table,
-     * via the <code>module_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module</code> table, via
+     * the <code>module_created_by_fk</code> key
      */
     public ModulePath moduleCreatedByFk() {
         if (_moduleCreatedByFk == null)
@@ -1527,9 +1534,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleDtManifestPath _moduleDtManifestCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.module_dt_manifest</code> table, via the
-     * <code>module_dt_manifest_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module_dt_manifest</code>
+     * table, via the <code>module_dt_manifest_created_by_fk</code> key
      */
     public ModuleDtManifestPath moduleDtManifestCreatedByFk() {
         if (_moduleDtManifestCreatedByFk == null)
@@ -1541,9 +1547,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleDtManifestPath _moduleDtManifestLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.module_dt_manifest</code> table, via the
-     * <code>module_dt_manifest_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module_dt_manifest</code>
+     * table, via the <code>module_dt_manifest_last_updated_by_fk</code> key
      */
     public ModuleDtManifestPath moduleDtManifestLastUpdatedByFk() {
         if (_moduleDtManifestLastUpdatedByFk == null)
@@ -1555,8 +1560,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModulePath _moduleLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module</code> table,
-     * via the <code>module_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module</code> table, via
+     * the <code>module_last_updated_by_fk</code> key
      */
     public ModulePath moduleLastUpdatedByFk() {
         if (_moduleLastUpdatedByFk == null)
@@ -1568,8 +1573,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModulePath _moduleOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module</code> table,
-     * via the <code>module_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>module</code> table, via
+     * the <code>module_owner_user_id_fk</code> key
      */
     public ModulePath moduleOwnerUserIdFk() {
         if (_moduleOwnerUserIdFk == null)
@@ -1581,8 +1586,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleSetPath _moduleSetCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module_set</code>
-     * table, via the <code>module_set_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module_set</code> table,
+     * via the <code>module_set_created_by_fk</code> key
      */
     public ModuleSetPath moduleSetCreatedByFk() {
         if (_moduleSetCreatedByFk == null)
@@ -1594,8 +1599,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleSetPath _moduleSetLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.module_set</code>
-     * table, via the <code>module_set_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module_set</code> table,
+     * via the <code>module_set_last_updated_by_fk</code> key
      */
     public ModuleSetPath moduleSetLastUpdatedByFk() {
         if (_moduleSetLastUpdatedByFk == null)
@@ -1607,9 +1612,9 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleSetReleasePath _moduleSetReleaseAssignmentCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.module_set_release</code> table, via the
-     * <code>module_set_release_assignment_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>module_set_release</code>
+     * table, via the <code>module_set_release_assignment_created_by_fk</code>
+     * key
      */
     public ModuleSetReleasePath moduleSetReleaseAssignmentCreatedByFk() {
         if (_moduleSetReleaseAssignmentCreatedByFk == null)
@@ -1621,8 +1626,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ModuleSetReleasePath _moduleSetReleaseAssignmentLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.module_set_release</code> table, via the
+     * Get the implicit to-many join path to the <code>module_set_release</code>
+     * table, via the
      * <code>module_set_release_assignment_last_updated_by_fk</code> key
      */
     public ModuleSetReleasePath moduleSetReleaseAssignmentLastUpdatedByFk() {
@@ -1636,7 +1641,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_xbt_manifest</code> table, via the
+     * <code>module_xbt_manifest</code> table, via the
      * <code>module_xbt_manifest_created_by_fk</code> key
      */
     public ModuleXbtManifestPath moduleXbtManifestCreatedByFk() {
@@ -1650,7 +1655,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.module_xbt_manifest</code> table, via the
+     * <code>module_xbt_manifest</code> table, via the
      * <code>module_xbt_manifest_last_updated_by_fk</code> key
      */
     public ModuleXbtManifestPath moduleXbtManifestLastUpdatedByFk() {
@@ -1663,8 +1668,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient NamespacePath _namespaceCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.namespace</code>
-     * table, via the <code>namespace_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>namespace</code> table,
+     * via the <code>namespace_created_by_fk</code> key
      */
     public NamespacePath namespaceCreatedByFk() {
         if (_namespaceCreatedByFk == null)
@@ -1676,8 +1681,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient NamespacePath _namespaceLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.namespace</code>
-     * table, via the <code>namespace_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>namespace</code> table,
+     * via the <code>namespace_last_updated_by_fk</code> key
      */
     public NamespacePath namespaceLastUpdatedByFk() {
         if (_namespaceLastUpdatedByFk == null)
@@ -1689,8 +1694,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient NamespacePath _namespaceOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.namespace</code>
-     * table, via the <code>namespace_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>namespace</code> table,
+     * via the <code>namespace_owner_user_id_fk</code> key
      */
     public NamespacePath namespaceOwnerUserIdFk() {
         if (_namespaceOwnerUserIdFk == null)
@@ -1702,8 +1707,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocPath _oasDocCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
-     * table, via the <code>oas_doc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc</code> table, via
+     * the <code>oas_doc_created_by_fk</code> key
      */
     public OasDocPath oasDocCreatedByFk() {
         if (_oasDocCreatedByFk == null)
@@ -1715,8 +1720,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocPath _oasDocLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
-     * table, via the <code>oas_doc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc</code> table, via
+     * the <code>oas_doc_last_updated_by_fk</code> key
      */
     public OasDocPath oasDocLastUpdatedByFk() {
         if (_oasDocLastUpdatedByFk == null)
@@ -1728,8 +1733,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocPath _oasDocOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_doc</code>
-     * table, via the <code>oas_doc_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc</code> table, via
+     * the <code>oas_doc_owner_user_id_fk</code> key
      */
     public OasDocPath oasDocOwnerUserIdFk() {
         if (_oasDocOwnerUserIdFk == null)
@@ -1741,9 +1746,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocSecurityPath _oasDocSecurityCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security</code> table, via the
-     * <code>oas_doc_security_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc_security</code>
+     * table, via the <code>oas_doc_security_created_by_fk</code> key
      */
     public OasDocSecurityPath oasDocSecurityCreatedByFk() {
         if (_oasDocSecurityCreatedByFk == null)
@@ -1755,9 +1759,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocSecurityPath _oasDocSecurityLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security</code> table, via the
-     * <code>oas_doc_security_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc_security</code>
+     * table, via the <code>oas_doc_security_last_updated_by_fk</code> key
      */
     public OasDocSecurityPath oasDocSecurityLastUpdatedByFk() {
         if (_oasDocSecurityLastUpdatedByFk == null)
@@ -1770,7 +1773,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope</code> table, via the
      * <code>oas_doc_security_scope_created_by_fk</code> key
      */
     public OasDocSecurityScopePath oasDocSecurityScopeCreatedByFk() {
@@ -1784,7 +1787,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_doc_security_scope</code> table, via the
+     * <code>oas_doc_security_scope</code> table, via the
      * <code>oas_doc_security_scope_last_updated_by_fk</code> key
      */
     public OasDocSecurityScopePath oasDocSecurityScopeLastUpdatedByFk() {
@@ -1797,8 +1800,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocTagPath _oasDocTagCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_doc_tag</code>
-     * table, via the <code>oas_doc_tag_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc_tag</code> table,
+     * via the <code>oas_doc_tag_created_by_fk</code> key
      */
     public OasDocTagPath oasDocTagCreatedByFk() {
         if (_oasDocTagCreatedByFk == null)
@@ -1810,8 +1813,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasDocTagPath _oasDocTagLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_doc_tag</code>
-     * table, via the <code>oas_doc_tag_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_doc_tag</code> table,
+     * via the <code>oas_doc_tag_last_updated_by_fk</code> key
      */
     public OasDocTagPath oasDocTagLastUpdatedByFk() {
         if (_oasDocTagLastUpdatedByFk == null)
@@ -1823,8 +1826,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasExamplePath _oasExampleCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_example</code>
-     * table, via the <code>oas_example_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_example</code> table,
+     * via the <code>oas_example_created_by_fk</code> key
      */
     public OasExamplePath oasExampleCreatedByFk() {
         if (_oasExampleCreatedByFk == null)
@@ -1836,8 +1839,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasExamplePath _oasExampleLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_example</code>
-     * table, via the <code>oas_example_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_example</code> table,
+     * via the <code>oas_example_last_updated_by_fk</code> key
      */
     public OasExamplePath oasExampleLastUpdatedByFk() {
         if (_oasExampleLastUpdatedByFk == null)
@@ -1849,9 +1852,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasExternalDocPath _oasExternalDocCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_external_doc</code> table, via the
-     * <code>oas_external_doc_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_external_doc</code>
+     * table, via the <code>oas_external_doc_created_by_fk</code> key
      */
     public OasExternalDocPath oasExternalDocCreatedByFk() {
         if (_oasExternalDocCreatedByFk == null)
@@ -1864,7 +1866,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_external_doc_doc</code> table, via the
+     * <code>oas_external_doc_doc</code> table, via the
      * <code>oas_external_doc_doc_created_by_fk</code> key
      */
     public OasExternalDocDocPath oasExternalDocDocCreatedByFk() {
@@ -1878,7 +1880,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_external_doc_doc</code> table, via the
+     * <code>oas_external_doc_doc</code> table, via the
      * <code>oas_external_doc_doc_last_updated_by_fk</code> key
      */
     public OasExternalDocDocPath oasExternalDocDocLastUpdatedByFk() {
@@ -1891,9 +1893,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasExternalDocPath _oasExternalDocLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_external_doc</code> table, via the
-     * <code>oas_external_doc_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_external_doc</code>
+     * table, via the <code>oas_external_doc_last_updated_by_fk</code> key
      */
     public OasExternalDocPath oasExternalDocLastUpdatedByFk() {
         if (_oasExternalDocLastUpdatedByFk == null)
@@ -1905,9 +1906,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasHttpHeaderPath _oasHttpHeaderCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_http_header</code> table, via the
-     * <code>oas_http_header_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_http_header</code>
+     * table, via the <code>oas_http_header_created_by_fk</code> key
      */
     public OasHttpHeaderPath oasHttpHeaderCreatedByFk() {
         if (_oasHttpHeaderCreatedByFk == null)
@@ -1919,9 +1919,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasHttpHeaderPath _oasHttpHeaderLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_http_header</code> table, via the
-     * <code>oas_http_header_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_http_header</code>
+     * table, via the <code>oas_http_header_last_updated_by_fk</code> key
      */
     public OasHttpHeaderPath oasHttpHeaderLastUpdatedByFk() {
         if (_oasHttpHeaderLastUpdatedByFk == null)
@@ -1933,9 +1932,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasHttpHeaderPath _oasHttpHeaderOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_http_header</code> table, via the
-     * <code>oas_http_header_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_http_header</code>
+     * table, via the <code>oas_http_header_owner_user_id_fk</code> key
      */
     public OasHttpHeaderPath oasHttpHeaderOwnerUserIdFk() {
         if (_oasHttpHeaderOwnerUserIdFk == null)
@@ -1947,9 +1945,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasMediaTypePath _oasMediaTypeCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_media_type</code> table, via the
-     * <code>oas_media_type_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_media_type</code>
+     * table, via the <code>oas_media_type_created_by_fk</code> key
      */
     public OasMediaTypePath oasMediaTypeCreatedByFk() {
         if (_oasMediaTypeCreatedByFk == null)
@@ -1961,9 +1958,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasMediaTypePath _oasMediaTypeLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_media_type</code> table, via the
-     * <code>oas_media_type_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_media_type</code>
+     * table, via the <code>oas_media_type_last_updated_by_fk</code> key
      */
     public OasMediaTypePath oasMediaTypeLastUpdatedByFk() {
         if (_oasMediaTypeLastUpdatedByFk == null)
@@ -1975,9 +1971,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasMediaTypePath _oasMediaTypeOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_media_type</code> table, via the
-     * <code>oas_media_type_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_media_type</code>
+     * table, via the <code>oas_media_type_owner_user_id_fk</code> key
      */
     public OasMediaTypePath oasMediaTypeOwnerUserIdFk() {
         if (_oasMediaTypeOwnerUserIdFk == null)
@@ -1989,9 +1984,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasMessageBodyPath _oasMessageBodyCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_message_body</code> table, via the
-     * <code>oas_message_body_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_message_body</code>
+     * table, via the <code>oas_message_body_created_by_fk</code> key
      */
     public OasMessageBodyPath oasMessageBodyCreatedByFk() {
         if (_oasMessageBodyCreatedByFk == null)
@@ -2003,9 +1997,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasMessageBodyPath _oasMessageBodyLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_message_body</code> table, via the
-     * <code>oas_message_body_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_message_body</code>
+     * table, via the <code>oas_message_body_last_updated_by_fk</code> key
      */
     public OasMessageBodyPath oasMessageBodyLastUpdatedByFk() {
         if (_oasMessageBodyLastUpdatedByFk == null)
@@ -2017,9 +2010,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOauthFlowPath _oasOauthFlowCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_flow</code> table, via the
-     * <code>oas_oauth_flow_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_oauth_flow</code>
+     * table, via the <code>oas_oauth_flow_created_by_fk</code> key
      */
     public OasOauthFlowPath oasOauthFlowCreatedByFk() {
         if (_oasOauthFlowCreatedByFk == null)
@@ -2031,9 +2023,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOauthFlowPath _oasOauthFlowLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_flow</code> table, via the
-     * <code>oas_oauth_flow_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_oauth_flow</code>
+     * table, via the <code>oas_oauth_flow_last_updated_by_fk</code> key
      */
     public OasOauthFlowPath oasOauthFlowLastUpdatedByFk() {
         if (_oasOauthFlowLastUpdatedByFk == null)
@@ -2045,9 +2036,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOauthScopePath _oasOauthScopeCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_scope</code> table, via the
-     * <code>oas_oauth_scope_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_oauth_scope</code>
+     * table, via the <code>oas_oauth_scope_created_by_fk</code> key
      */
     public OasOauthScopePath oasOauthScopeCreatedByFk() {
         if (_oasOauthScopeCreatedByFk == null)
@@ -2059,9 +2049,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOauthScopePath _oasOauthScopeLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_oauth_scope</code> table, via the
-     * <code>oas_oauth_scope_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_oauth_scope</code>
+     * table, via the <code>oas_oauth_scope_last_updated_by_fk</code> key
      */
     public OasOauthScopePath oasOauthScopeLastUpdatedByFk() {
         if (_oasOauthScopeLastUpdatedByFk == null)
@@ -2073,7 +2062,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOperationPath _oasOperationCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_operation</code>
+     * Get the implicit to-many join path to the <code>oas_operation</code>
      * table, via the <code>oas_operation_created_by_fk</code> key
      */
     public OasOperationPath oasOperationCreatedByFk() {
@@ -2086,7 +2075,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasOperationPath _oasOperationLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_operation</code>
+     * Get the implicit to-many join path to the <code>oas_operation</code>
      * table, via the <code>oas_operation_last_updated_by_fk</code> key
      */
     public OasOperationPath oasOperationLastUpdatedByFk() {
@@ -2100,7 +2089,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security</code> table, via the
      * <code>oas_operation_security_created_by_fk</code> key
      */
     public OasOperationSecurityPath oasOperationSecurityCreatedByFk() {
@@ -2114,7 +2103,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security</code> table, via the
+     * <code>oas_operation_security</code> table, via the
      * <code>oas_operation_security_last_updated_by_fk</code> key
      */
     public OasOperationSecurityPath oasOperationSecurityLastUpdatedByFk() {
@@ -2128,7 +2117,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope</code> table, via the
      * <code>oas_operation_security_scope_created_by_fk</code> key
      */
     public OasOperationSecurityScopePath oasOperationSecurityScopeCreatedByFk() {
@@ -2142,7 +2131,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_operation_security_scope</code> table, via the
+     * <code>oas_operation_security_scope</code> table, via the
      * <code>oas_operation_security_scope_last_updated_by_fk</code> key
      */
     public OasOperationSecurityScopePath oasOperationSecurityScopeLastUpdatedByFk() {
@@ -2155,7 +2144,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasParameterPath _oasParameterCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_parameter</code>
+     * Get the implicit to-many join path to the <code>oas_parameter</code>
      * table, via the <code>oas_parameter_created_by_fk</code> key
      */
     public OasParameterPath oasParameterCreatedByFk() {
@@ -2168,7 +2157,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasParameterPath _oasParameterLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_parameter</code>
+     * Get the implicit to-many join path to the <code>oas_parameter</code>
      * table, via the <code>oas_parameter_last_updated_by_fk</code> key
      */
     public OasParameterPath oasParameterLastUpdatedByFk() {
@@ -2181,9 +2170,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasParameterLinkPath _oasParameterLinkCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_parameter_link</code> table, via the
-     * <code>oas_parameter_link_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_parameter_link</code>
+     * table, via the <code>oas_parameter_link_created_by_fk</code> key
      */
     public OasParameterLinkPath oasParameterLinkCreatedByFk() {
         if (_oasParameterLinkCreatedByFk == null)
@@ -2195,9 +2183,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasParameterLinkPath _oasParameterLinkLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.oas_parameter_link</code> table, via the
-     * <code>oas_parameter_link_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_parameter_link</code>
+     * table, via the <code>oas_parameter_link_last_updated_by_fk</code> key
      */
     public OasParameterLinkPath oasParameterLinkLastUpdatedByFk() {
         if (_oasParameterLinkLastUpdatedByFk == null)
@@ -2209,8 +2196,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasRequestPath _oasRequestCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
-     * table, via the <code>oas_request_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_request</code> table,
+     * via the <code>oas_request_created_by_fk</code> key
      */
     public OasRequestPath oasRequestCreatedByFk() {
         if (_oasRequestCreatedByFk == null)
@@ -2222,8 +2209,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasRequestPath _oasRequestLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_request</code>
-     * table, via the <code>oas_request_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_request</code> table,
+     * via the <code>oas_request_last_updated_by_fk</code> key
      */
     public OasRequestPath oasRequestLastUpdatedByFk() {
         if (_oasRequestLastUpdatedByFk == null)
@@ -2236,7 +2223,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_request_parameter</code> table, via the
+     * <code>oas_request_parameter</code> table, via the
      * <code>oas_request_parameter_created_by_fk</code> key
      */
     public OasRequestParameterPath oasRequestParameterCreatedByFk() {
@@ -2250,7 +2237,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_request_parameter</code> table, via the
+     * <code>oas_request_parameter</code> table, via the
      * <code>oas_request_parameter_last_updated_by_fk</code> key
      */
     public OasRequestParameterPath oasRequestParameterLastUpdatedByFk() {
@@ -2263,7 +2250,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasResourcePath _oasResourceCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_resource</code>
+     * Get the implicit to-many join path to the <code>oas_resource</code>
      * table, via the <code>oas_resource_created_by_fk</code> key
      */
     public OasResourcePath oasResourceCreatedByFk() {
@@ -2276,7 +2263,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasResourcePath _oasResourceLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_resource</code>
+     * Get the implicit to-many join path to the <code>oas_resource</code>
      * table, via the <code>oas_resource_last_updated_by_fk</code> key
      */
     public OasResourcePath oasResourceLastUpdatedByFk() {
@@ -2289,7 +2276,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasResponsePath _oasResponseCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * Get the implicit to-many join path to the <code>oas_response</code>
      * table, via the <code>oas_response_created_by_fk</code> key
      */
     public OasResponsePath oasResponseCreatedByFk() {
@@ -2303,7 +2290,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_response_headers</code> table, via the
+     * <code>oas_response_headers</code> table, via the
      * <code>oas_response_headers_created_by_fk</code> key
      */
     public OasResponseHeadersPath oasResponseHeadersCreatedByFk() {
@@ -2317,7 +2304,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_response_headers</code> table, via the
+     * <code>oas_response_headers</code> table, via the
      * <code>oas_response_headers_last_updated_by_fk</code> key
      */
     public OasResponseHeadersPath oasResponseHeadersLastUpdatedByFk() {
@@ -2330,7 +2317,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasResponsePath _oasResponseLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_response</code>
+     * Get the implicit to-many join path to the <code>oas_response</code>
      * table, via the <code>oas_response_last_updated_by_fk</code> key
      */
     public OasResponsePath oasResponseLastUpdatedByFk() {
@@ -2344,7 +2331,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme</code> table, via the
      * <code>oas_security_scheme_created_by_fk</code> key
      */
     public OasSecuritySchemePath oasSecuritySchemeCreatedByFk() {
@@ -2358,7 +2345,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_security_scheme</code> table, via the
+     * <code>oas_security_scheme</code> table, via the
      * <code>oas_security_scheme_last_updated_by_fk</code> key
      */
     public OasSecuritySchemePath oasSecuritySchemeLastUpdatedByFk() {
@@ -2371,8 +2358,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasServerPath _oasServerCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
-     * table, via the <code>oas_server_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_server</code> table,
+     * via the <code>oas_server_created_by_fk</code> key
      */
     public OasServerPath oasServerCreatedByFk() {
         if (_oasServerCreatedByFk == null)
@@ -2384,8 +2371,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasServerPath _oasServerLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
-     * table, via the <code>oas_server_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_server</code> table,
+     * via the <code>oas_server_last_updated_by_fk</code> key
      */
     public OasServerPath oasServerLastUpdatedByFk() {
         if (_oasServerLastUpdatedByFk == null)
@@ -2397,8 +2384,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasServerPath _oasServerOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_server</code>
-     * table, via the <code>oas_server_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_server</code> table,
+     * via the <code>oas_server_owner_user_id_fk</code> key
      */
     public OasServerPath oasServerOwnerUserIdFk() {
         if (_oasServerOwnerUserIdFk == null)
@@ -2411,7 +2398,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_server_variable</code> table, via the
+     * <code>oas_server_variable</code> table, via the
      * <code>oas_server_variable_created_by_fk</code> key
      */
     public OasServerVariablePath oasServerVariableCreatedByFk() {
@@ -2425,7 +2412,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.oas_server_variable</code> table, via the
+     * <code>oas_server_variable</code> table, via the
      * <code>oas_server_variable_last_updated_by_fk</code> key
      */
     public OasServerVariablePath oasServerVariableLastUpdatedByFk() {
@@ -2438,8 +2425,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasTagPath _oasTagCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_tag</code>
-     * table, via the <code>oas_tag_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_tag</code> table, via
+     * the <code>oas_tag_created_by_fk</code> key
      */
     public OasTagPath oasTagCreatedByFk() {
         if (_oasTagCreatedByFk == null)
@@ -2451,8 +2438,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient OasTagPath _oasTagLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.oas_tag</code>
-     * table, via the <code>oas_tag_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>oas_tag</code> table, via
+     * the <code>oas_tag_last_updated_by_fk</code> key
      */
     public OasTagPath oasTagLastUpdatedByFk() {
         if (_oasTagLastUpdatedByFk == null)
@@ -2464,8 +2451,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ReleasePath _releaseCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.release</code>
-     * table, via the <code>release_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>release</code> table, via
+     * the <code>release_created_by_fk</code> key
      */
     public ReleasePath releaseCreatedByFk() {
         if (_releaseCreatedByFk == null)
@@ -2477,8 +2464,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient ReleasePath _releaseLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.release</code>
-     * table, via the <code>release_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>release</code> table, via
+     * the <code>release_last_updated_by_fk</code> key
      */
     public ReleasePath releaseLastUpdatedByFk() {
         if (_releaseLastUpdatedByFk == null)
@@ -2490,8 +2477,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient TagPath _tagCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.tag</code> table,
-     * via the <code>tag_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>tag</code> table, via the
+     * <code>tag_created_by_fk</code> key
      */
     public TagPath tagCreatedByFk() {
         if (_tagCreatedByFk == null)
@@ -2503,8 +2490,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient TagPath _tagLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.tag</code> table,
-     * via the <code>tag_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>tag</code> table, via the
+     * <code>tag_last_updated_by_fk</code> key
      */
     public TagPath tagLastUpdatedByFk() {
         if (_tagLastUpdatedByFk == null)
@@ -2516,9 +2503,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiepLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.top_level_asbiep</code> table, via the
-     * <code>top_level_asbiep_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>top_level_asbiep</code>
+     * table, via the <code>top_level_asbiep_last_updated_by_fk</code> key
      */
     public TopLevelAsbiepPath topLevelAsbiepLastUpdatedByFk() {
         if (_topLevelAsbiepLastUpdatedByFk == null)
@@ -2530,9 +2516,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient TopLevelAsbiepPath _topLevelAsbiepOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.top_level_asbiep</code> table, via the
-     * <code>top_level_asbiep_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>top_level_asbiep</code>
+     * table, via the <code>top_level_asbiep_owner_user_id_fk</code> key
      */
     public TopLevelAsbiepPath topLevelAsbiepOwnerUserIdFk() {
         if (_topLevelAsbiepOwnerUserIdFk == null)
@@ -2544,8 +2529,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient UserTenantPath _userTenant;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.user_tenant</code>
-     * table
+     * Get the implicit to-many join path to the <code>user_tenant</code> table
      */
     public UserTenantPath userTenant() {
         if (_userTenant == null)
@@ -2557,8 +2541,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient XbtPath _xbtCreatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
-     * via the <code>xbt_created_by_fk</code> key
+     * Get the implicit to-many join path to the <code>xbt</code> table, via the
+     * <code>xbt_created_by_fk</code> key
      */
     public XbtPath xbtCreatedByFk() {
         if (_xbtCreatedByFk == null)
@@ -2570,8 +2554,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient XbtPath _xbtLastUpdatedByFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
-     * via the <code>xbt_last_updated_by_fk</code> key
+     * Get the implicit to-many join path to the <code>xbt</code> table, via the
+     * <code>xbt_last_updated_by_fk</code> key
      */
     public XbtPath xbtLastUpdatedByFk() {
         if (_xbtLastUpdatedByFk == null)
@@ -2583,8 +2567,8 @@ public class AppUser extends TableImpl<AppUserRecord> {
     private transient XbtPath _xbtOwnerUserIdFk;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.xbt</code> table,
-     * via the <code>xbt_owner_user_id_fk</code> key
+     * Get the implicit to-many join path to the <code>xbt</code> table, via the
+     * <code>xbt_owner_user_id_fk</code> key
      */
     public XbtPath xbtOwnerUserIdFk() {
         if (_xbtOwnerUserIdFk == null)
@@ -2594,8 +2578,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     /**
-     * Get the implicit many-to-many join path to the <code>oagi.tenant</code>
-     * table
+     * Get the implicit many-to-many join path to the <code>tenant</code> table
      */
     public TenantPath tenant() {
         return userTenant().tenant();

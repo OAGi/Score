@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import static org.oagi.score.e2e.impl.PageHelper.getText;
+import static org.oagi.score.e2e.impl.PageHelper.retry;
 import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
 
 public class ReuseReportPageImpl extends BasePageImpl implements ReuseReportPage {
@@ -25,6 +26,22 @@ public class ReuseReportPageImpl extends BasePageImpl implements ReuseReportPage
         String url = getPageUrl();
         getDriver().get(url);
         assert "Reuse Report".equals(getText(getTitle()));
+    }
+
+    @Override
+    public boolean isOpened() {
+        return retry(() -> {
+            try {
+                if (!"Reuse Report".equals(getText(getTitle()))) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            String url = getPageUrl();
+            String currentUrl = getDriver().getCurrentUrl();
+            return currentUrl.startsWith(url);
+        });
     }
 
     @Override

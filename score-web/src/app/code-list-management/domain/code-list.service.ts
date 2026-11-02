@@ -73,6 +73,11 @@ export class CodeListService {
       params = params.set('namespaces', request.namespaces.map(e => '' + e).join(','));
     }
 
+    return this.getCodeListListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getCodeListListPage(params: HttpParams): Observable<PageResponse<CodeListListEntry>> {
     return this.http.get<PageResponse<CodeListListEntry>>('/api/code-lists', {params}).pipe(
         map((res: PageResponse<CodeListListEntry>) => ({
           ...res,
@@ -187,8 +192,10 @@ export class CodeListService {
     let params = new HttpParams()
       .set('releaseId', '' + codeList.release.releaseId)
       .set('listId', codeList.listId)
-      .set('agencyIdListValueManifestId', (!!codeList.agencyIdListValue) ? ('' + codeList.agencyIdListValue.agencyIdListValueManifestId) : '')
       .set('versionId', codeList.versionId);
+    if (codeList.agencyIdListValue?.agencyIdListValueManifestId) {
+      params = params.set('agencyIdListValueManifestId', '' + codeList.agencyIdListValue.agencyIdListValueManifestId);
+    }
     if (codeList.codeListManifestId) {
       params = params.set('codeListManifestId', '' + codeList.codeListManifestId);
     }

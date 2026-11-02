@@ -1,0 +1,197 @@
+package org.oagi.score.gateway.http.api.code_list_management.service;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListDetailsRecord;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
+import org.oagi.score.gateway.http.api.code_list_management.controller.payload.UpdateCodeListRequest;
+import org.oagi.score.gateway.http.api.code_list_management.controller.payload.UpdateCodeListValueRequest;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
+import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListCommandRepository;
+import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository;
+import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
+import org.oagi.score.gateway.http.common.model.Guid;
+import org.oagi.score.gateway.http.common.model.ScoreRole;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.math.BigInteger;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class CodeListCommandServiceNamespaceTest {
+
+    private final CodeListManifestId manifestId = new CodeListManifestId(BigInteger.ONE);
+    private final ScoreUser requester = new ScoreUser(new UserId(BigInteger.TEN), "tester", "Tester",
+            "tester@example.com", false, List.of(ScoreRole.END_USER));
+
+    private CodeListCommandService service;
+    private RepositoryFactory repositoryFactory;
+    private CodeListCommandRepository command;
+    private CodeListQueryRepository query;
+    private LogCommandRepository logCommand;
+
+    @BeforeEach
+    void setUp() {
+        service = new CodeListCommandService();
+        repositoryFactory = mock(RepositoryFactory.class);
+        command = mock(CodeListCommandRepository.class);
+        query = mock(CodeListQueryRepository.class);
+        logCommand = mock(LogCommandRepository.class);
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+        when(repositoryFactory.codeListCommandRepository(any())).thenReturn(command);
+        when(repositoryFactory.codeListQueryRepository(any())).thenReturn(query);
+        when(repositoryFactory.logCommandRepository(any())).thenReturn(logCommand);
+        when(query.getCodeListSummary(manifestId)).thenReturn(summaryWithoutNamespace());
+    }
+
+    @Test
+    void ordinary_state_change_requires_namespace() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateState(requester, manifestId, CcState.QA));
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_requires_namespace() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        UpdateCodeListRequest request = new UpdateCodeListRequest(manifestId,
+                "Custom code list", "1", "custom-list", null,
+                null, null, null, false, false, List.of());
+
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_blank_name_list_id_or_version() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        NamespaceId namespace = new NamespaceId(BigInteger.ONE);
+        for (String blank : new String[]{null, "", "   "}) {
+            for (UpdateCodeListRequest request : List.of(
+                    new UpdateCodeListRequest(manifestId, blank, "1", "list", null,
+                            null, null, namespace, false, false, List.of()),
+                    new UpdateCodeListRequest(manifestId, "Name", "1", blank, null,
+                            null, null, namespace, false, false, List.of()),
+                    new UpdateCodeListRequest(manifestId, "Name", blank, "list", null,
+                            null, null, namespace, false, false, List.of()))) {
+                assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+            }
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_saves_the_trimmed_name_list_id_and_version() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        NamespaceId namespace = new NamespaceId(BigInteger.ONE);
+        service.update(requester, new UpdateCodeListRequest(manifestId, "  Name ", " 1 ", " list ", null,
+                null, null, namespace, false, false, List.of()));
+        verify(command).update(manifestId, "Name", "1", "list", null, null, null, namespace, false, false);
+    }
+
+    @Test
+    void update_rejects_a_newly_added_deprecated_value() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        when(command.update(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(true);
+        when(query.getCodeListValueDetailsList(manifestId)).thenReturn(List.of());
+        UpdateCodeListValueRequest newValue = new UpdateCodeListValueRequest(
+                null, "C", "Meaning C", null, true, false, false);
+        UpdateCodeListRequest request = new UpdateCodeListRequest(manifestId,
+                "Custom code list", "1", "custom-list", null,
+                null, null, new NamespaceId(BigInteger.ONE), false, false, List.of(newValue));
+
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        verify(command, never()).createValue(any(), any(), any(), any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    void update_rejects_a_value_with_a_blank_code_or_meaning() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        for (String blank : new String[]{null, "", "   "}) {
+            for (UpdateCodeListValueRequest value : List.of(
+                    new UpdateCodeListValueRequest(null, blank, "Meaning", null, false, false, false),
+                    new UpdateCodeListValueRequest(null, "C", blank, null, false, false, false))) {
+                UpdateCodeListRequest request = new UpdateCodeListRequest(manifestId,
+                        "Custom code list", "1", "custom-list", null,
+                        null, null, new NamespaceId(BigInteger.ONE), false, false, List.of(value));
+                assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+            }
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_saves_the_trimmed_code_and_meaning_of_a_new_value() {
+        CodeListDetailsRecord details = mock(CodeListDetailsRecord.class);
+        when(details.state()).thenReturn(CcState.WIP);
+        when(details.owner()).thenReturn(owner());
+        when(details.release()).thenReturn(mock(ReleaseSummaryRecord.class));
+        when(query.getCodeListDetails(manifestId)).thenReturn(details);
+        when(command.update(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(true);
+        when(query.getCodeListValueDetailsList(manifestId)).thenReturn(List.of());
+        UpdateCodeListValueRequest value = new UpdateCodeListValueRequest(
+                null, " C ", " Meaning C ", null, false, false, false);
+        service.update(requester, new UpdateCodeListRequest(manifestId,
+                "Custom code list", "1", "custom-list", null,
+                null, null, new NamespaceId(BigInteger.ONE), false, false, List.of(value)));
+        verify(command).createValue(any(), any(), any(), eq("C"), eq("Meaning C"), any(), eq(false));
+    }
+
+    @Test
+    void delete_is_allowed_without_namespace() {
+        when(query.getAssignedBieSummaryList(manifestId)).thenReturn(List.of());
+        service.updateState(requester, manifestId, CcState.Deleted);
+        verify(command).updateState(manifestId, CcState.Deleted);
+    }
+
+    @Test
+    void restore_to_wip_is_allowed_without_namespace() {
+        when(query.getCodeListSummary(manifestId)).thenReturn(summaryWithoutNamespace(CcState.Deleted));
+        when(query.getAssignedBieSummaryList(manifestId)).thenReturn(List.of());
+        service.updateState(requester, manifestId, CcState.WIP);
+        verify(command).updateState(manifestId, CcState.WIP);
+    }
+
+    private CodeListSummaryRecord summaryWithoutNamespace() {
+        return summaryWithoutNamespace(CcState.WIP);
+    }
+
+    private CodeListSummaryRecord summaryWithoutNamespace(CcState state) {
+        return new CodeListSummaryRecord(manifestId, new CodeListId(BigInteger.ONE),
+                new Guid("0123456789abcdef0123456789abcdef"), "enum", null, null,
+                "Custom code list", "custom-list", "1", null, null,
+                false, state, owner(), null, null, List.of());
+    }
+
+    private UserSummaryRecord owner() {
+        return new UserSummaryRecord(requester.userId(), "tester", "Tester", List.of(ScoreRole.END_USER));
+    }
+}

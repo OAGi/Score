@@ -8,6 +8,7 @@ import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanAc
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
+import {SCORE_TABLE} from '../common/score-table';
 import {AccountListComponent} from './account-list/account-list.component';
 import {AccountListService} from './domain/account-list.service';
 import {AccountDetailComponent} from './account-detail/account-detail.component';
@@ -22,9 +23,11 @@ import {TransferOwnershipListComponent} from './take-ownership-list/transfer-own
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {ScoreCommonModule} from '../common/score-common.module';
+import {RecordCompactRowComponent} from '../common/record-compact-row';
+import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'account',
     component: AccountListComponent,
@@ -64,31 +67,31 @@ const routes: Routes = [
   {
     path: 'tenant',
     component: TenantListComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant'
   },
   {
     path: 'tenant/create',
     component: TenantCreateComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Create Tenant'
   },
   {
     path: 'tenant/:id',
     component: UpdateTenantComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant'
   },
   {
     path: 'tenant/bis-ctx/:id',
     component: TenantBusinessCtxDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant Business Context'
   },
   {
     path: 'tenant/users/:id',
     component: TenantUserDetailComponent,
-    canActivate: [(CanActivateAdmin && CanActivateTenantInstance)],
+    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
     title: 'Tenant Users'
   },
 ];
@@ -102,7 +105,10 @@ const routes: Routes = [
     CommonModule,
     SearchBarModule,
     ColumnSelectorModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    RecordCompactRowComponent,
+    ResponsiveButtonComponent,
+    ...SCORE_TABLE
   ],
   declarations: [
     AccountListComponent,

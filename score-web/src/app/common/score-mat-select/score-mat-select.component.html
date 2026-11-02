@@ -1,0 +1,76 @@
+<!-- Layout adapted from Angular Material MatSelect. -->
+<div
+  cdk-overlay-origin
+  class="mat-mdc-select-trigger"
+  (click)="open()"
+  #fallbackOverlayOrigin="cdkOverlayOrigin"
+  #trigger
+>
+  <div class="mat-mdc-select-value" [attr.id]="_valueId">
+    @if (empty) {
+      <span class="mat-mdc-select-placeholder mat-mdc-select-min-line">{{placeholder}}</span>
+    } @else {
+      <span class="score-select-value">
+        <span class="score-select-label">
+          @if (customTrigger) {
+            <ng-content select="mat-select-trigger"></ng-content>
+          } @else {
+            {{triggerValue}}
+          }
+        </span>
+        @if (clearable && !disabled) {
+          <button mat-icon-button type="button" class="score-select-clear"
+            [attr.aria-label]="clearLabel" [matTooltip]="clearLabel" [disabled]="disabled"
+            (keydown)="$event.stopPropagation()" (click)="clearSelection($event)">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        }
+      </span>
+    }
+  </div>
+
+  <div class="mat-mdc-select-arrow-wrapper">
+    <div class="mat-mdc-select-arrow">
+      <!-- Use an inline SVG, because it works better than a CSS triangle in high contrast mode. -->
+      <svg viewBox="0 0 24 24" width="24px" height="24px" focusable="false" aria-hidden="true">
+        <path d="M7 10l5 5 5-5z" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<ng-template
+  cdk-connected-overlay
+  cdkConnectedOverlayHasBackdrop
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  [cdkConnectedOverlayDisableClose]="true"
+  [cdkConnectedOverlayPanelClass]="_overlayPanelClass"
+  [cdkConnectedOverlayScrollStrategy]="_scrollStrategy"
+  [cdkConnectedOverlayOrigin]="_preferredOverlayOrigin || fallbackOverlayOrigin"
+  [cdkConnectedOverlayPositions]="_positions"
+  [cdkConnectedOverlayWidth]="_overlayWidth"
+  [cdkConnectedOverlayFlexibleDimensions]="true"
+  [cdkConnectedOverlayUsePopover]="_popoverLocation"
+  (detach)="close()"
+  (backdropClick)="close()"
+  (overlayKeydown)="_handleOverlayKeydown($event)">
+  <!-- `mat-undefined` is weird, but we were using it internally -->
+  <div
+    #panel
+    role="listbox"
+    tabindex="-1"
+    class="mat-mdc-select-panel mdc-menu-surface mdc-menu-surface--open"
+    [class]="panelClass"
+    [class.mat-select-panel-animations-enabled]="!_animationsDisabled"
+    [class.mat-primary]="_parentFormField?.color === 'primary'"
+    [class.mat-accent]="_parentFormField?.color === 'accent'"
+    [class.mat-warn]="_parentFormField?.color === 'warn'"
+    [class.mat-undefined]="!_parentFormField?.color"
+    [attr.id]="id + '-panel'"
+    [attr.aria-multiselectable]="multiple"
+    [attr.aria-label]="ariaLabel || null"
+    [attr.aria-labelledby]="_getPanelAriaLabelledby()"
+    (keydown)="_handleKeydown($event)">
+    <ng-content></ng-content>
+  </div>
+</ng-template>

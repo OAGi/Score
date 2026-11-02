@@ -1,178 +1,119 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit, viewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatTableDataSource} from '@angular/material/table';
 import {finalize} from 'rxjs/operators';
 import {MatchInfo} from '../domain/bie-uplift';
 import {BieUpliftService} from '../domain/bie-uplift.service';
-import {
-  PreferencesInfo,
-  TableColumnsInfo,
-  TableColumnsProperty
-} from '../../../settings-management/settings-preferences/domain/preferences';
-import {SettingsPreferencesService} from '../../../settings-management/settings-preferences/domain/settings-preferences.service';
-import {AuthService} from '../../../authentication/auth.service';
-import {forkJoin} from 'rxjs';
+import {createTableColumns, defineTable, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
+import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
 @Component({
   standalone: false,
   selector: 'score-report-dialog',
   templateUrl: './report-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./report-dialog.component.css']
 })
 export class ReportDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<ReportDialogComponent>>(MatDialogRef);
   service = inject(BieUpliftService);
-  private auth = inject(AuthService);
-  private preferencesService = inject(SettingsPreferencesService);
   data = inject(MAT_DIALOG_DATA);
 
 
-  dataSource = new MatTableDataSource<MatchInfo>();
 
-  get columns(): TableColumnsProperty[] {
-    if (!this.preferencesInfo) {
-      return [];
-    }
-    return this.preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage;
-  }
+  /** What the compact row shows of a line of the report: made once for a row. */
+  readonly compactRecord = memoizeRow((row: MatchInfo): CompactRecord => ({
+    badges: row.ccType ? [{text: row.ccType}] : [],
+    title: row.sourceDisplayPath,
+    subtitle: row.targetDisplayPath ? '\u2193 ' + row.targetDisplayPath : undefined,
+    meta: [
+      ...(row.match ? [{label: 'Match', value: '' + row.match}] : []),
+      ...(row.reuse ? [{label: 'Reuse', value: '' + row.reuse, priority: 1 as const}] : []),
+      ...(row.status ? [{label: 'Status', value: row.status}] : []),
+      ...(!row.valid && row.message ? [{label: 'Message', value: row.message, priority: 2 as const}] : []),
+      ...(row.context ? [{label: 'Context', value: row.context, priority: 3 as const}] : [])
+    ]
+  }));
 
-  set columns(columns: TableColumnsProperty[]) {
-    if (!this.preferencesInfo) {
-      return;
-    }
+  readonly columns = createTableColumns(defineTable({
+    storageKey: 'TableColumns-BieUpliftReportPage',
+    columns: [
+      {id: 'ccType', label: 'Type', width: 80, sortable: true},
+      {
+        id: 'displayPath', label: 'Path', width: 0, sortable: true,
+        header: `Source ${this.data.sourceReleaseNum} Path \u2192 Target ${this.data.targetReleaseNum} Path`
+      },
+      {id: 'context', label: 'Context Definition', width: '40%', sortable: true},
+      {id: 'match', label: 'Matched', width: '5%', sortable: true},
+      {id: 'reuse', label: 'Reused', width: '5%', sortable: true},
+      {id: 'validCode', label: 'Issue', width: '10%', sortable: true},
+    ],
+  }));
+  readonly view = viewChild.required<ScoreTableViewComponent<MatchInfo>>(ScoreTableViewComponent);
 
-    this.preferencesInfo.tableColumnsInfo.columnsOfBieUpliftReportPage = columns;
-    this.updateTableColumnsForBieUpliftReportPage();
-  }
-
-  updateTableColumnsForBieUpliftReportPage() {
-    this.preferencesService.updateTableColumnsForBieUpliftReportPage(this.auth.getUserToken(), this.preferencesInfo).subscribe(_ => {
-    });
-  }
-
-  onColumnsReset() {
-    const defaultTableColumnInfo = new TableColumnsInfo();
-    this.columns = defaultTableColumnInfo.columnsOfBieUpliftReportPage;
-  }
-
-  onColumnsChange(updatedColumns: { name: string; selected: boolean }[]) {
-    const updatedColumnsWithWidth = updatedColumns.map(column => ({
-      name: column.name,
-      selected: column.selected,
-      width: this.width(column.name)
-    }));
-
-    this.columns = updatedColumnsWithWidth;
-  }
-
-  onResizeWidth($event) {
-    switch ($event.name) {
-      default:
-        this.setWidth($event.name, $event.width);
-        break;
-    }
-  }
-
-  setWidth(name: string, width: number | string) {
-    const matched = this.columns.find(c => c.name === name);
-    if (matched) {
-      matched.width = width;
-      this.updateTableColumnsForBieUpliftReportPage();
-    }
-  }
-
-  width(name: string): number | string {
-    if (!this.preferencesInfo) {
-      return 0;
-    }
-    return this.columns.find(c => c.name === name)?.width;
-  }
-
-  get displayedColumns(): string[] {
-    let displayedColumns = [];
-    if (!this.preferencesInfo) {
-      return displayedColumns;
-    }
-    for (const column of this.columns) {
-      switch (column.name) {
-        case 'Type':
-          if (column.selected) {
-            displayedColumns.push('ccType');
-          }
-          break;
-        case 'Path':
-          if (column.selected) {
-            displayedColumns.push('displayPath');
-          }
-          break;
-        case 'Context Definition':
-          if (column.selected) {
-            displayedColumns.push('context');
-          }
-          break;
-        case 'Matched':
-          if (column.selected) {
-            displayedColumns.push('match');
-          }
-          break;
-        case 'Reused':
-          if (column.selected) {
-            displayedColumns.push('reuse');
-          }
-          break;
-        case 'Issue':
-          if (column.selected) {
-            displayedColumns.push('validCode');
-          }
-          break;
-      }
-    }
-    return displayedColumns;
-  }
-
+  /** The rows of the report that are shown (all, or the ones with issues). */
+  rows: MatchInfo[] = [];
+  readonly load = inMemoryLoad<MatchInfo>(() => this.rows, {
+    displayPath: row => row.sourceDisplayPath,
+    validCode: row => [row.status, row.message].filter(value => !!value).join(' ')
+  });
   hideSystemMatched = true;
   matches: MatchInfo[];
   matchMap: Map<string, MatchInfo>;
-  preferencesInfo: PreferencesInfo;
-  downloadHeader: string;
   loading = false;
 
   ngOnInit() {
     this.loading = true;
-    const {topLevelAsbiepId, releaseId, targetAsccpManifestId, sourceReleaseNum, targetReleaseNum} = this.data;
-    this.downloadHeader = `Source ${sourceReleaseNum} Path, Source Context Definition, Target ${targetReleaseNum} Path, Type, Matched, Reused, Issue\n`;
+    const {topLevelAsbiepId, releaseId, targetAsccpManifestId} = this.data;
     this.matchMap = new Map<string, MatchInfo>();
     this.matches = this.data.matches;
-    this.matches.forEach(m => this.matchMap.set(m.bieType + '-' + m.bieId, m));
+    this.matches.forEach(m => this.matchMap.set(this.validationKey(m), m));
 
-    forkJoin([
-      this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches),
-      this.preferencesService.load(this.auth.getUserToken())
-    ]).pipe(finalize(() => {
+    this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches).pipe(finalize(() => {
       this.loading = false;
-    })).subscribe(([resp, preferencesInfo]) => {
-      this.preferencesInfo = preferencesInfo;
+    })).subscribe(resp => {
 
       resp.validations.forEach(v => {
-        this.matchMap.get(v.bieType + '-' + v.bieId).valid = v.valid;
-        this.matchMap.get(v.bieType + '-' + v.bieId).message = v.message ? v.message : '';
+        const match = this.matchMap.get(this.validationKey(v));
+        if (!match) {
+          return;
+        }
+        match.valid = v.valid;
+        match.message = v.message ? v.message : '';
+        match.status = v.status ? v.status : '';
       });
-      this.dataSource.data = this.matches.filter(r => this.show(r));
+      this.setRows(this.matches.filter(r => this.show(r)));
+    }, () => {
+      this.matches.forEach(match => {
+        match.valid = false;
+        match.message = 'Unable to validate this mapping.';
+      });
+      this.setRows(this.matches);
     });
+  }
+
+  private validationKey(value: {bieType: string; bieId: number; sourcePath?: string}): string {
+    return value.bieType + '-' + (value.sourcePath || value.bieId);
   }
 
   show(row: MatchInfo): boolean {
     if (this.hideSystemMatched) {
-      if (row.message !== '') {
+      if (row.message !== '' || row.status !== '') {
         return true;
       }
-      return row.match === 'Unmatched' || !!(row.reuse) || row.valid === false;
+      // "Issues Only" hides clean system matches, but manual mappings are
+      // user decisions and must remain visible in the uplift report.
+      return row.match !== 'System' || !!(row.reuse) || row.valid === false;
     }
     return true;
   }
 
   onToggleHide() {
-    this.dataSource.data = this.matches.filter(r => this.show(r));
+    this.setRows(this.matches.filter(r => this.show(r)));
+  }
+
+  private setRows(rows: MatchInfo[]) {
+    this.rows = rows;
+    this.view()?.reload();
   }
 
   onClose(): void {
@@ -184,23 +125,36 @@ export class ReportDialogComponent implements OnInit {
   }
 
   onDownload(): void {
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += this.downloadHeader;
-    csvContent += this.dataSource.data.map(e => {
-      return [e.sourceDisplayPath, '"' + e.context + '"', e.targetDisplayPath, e.ccType, e.match, e.reuse, e.message].map(e => {
-        return (!!e) ? e : '""';
-      }).join(',');
-    }).join('\n');
-    // window.open(encodeURI(csvContent));
+    const csvContent = [this.toCsvRow([
+      `Source ${this.data.sourceReleaseNum} Path`,
+      'Source Context Definition',
+      `Target ${this.data.targetReleaseNum} Path`,
+      'Type', 'Matched', 'Reused', 'Issue'
+    ]), ...this.rows.map(e => {
+      const status = [e.status, e.message].filter(value => !!value).join(' ');
+      return this.toCsvRow([
+        e.sourceDisplayPath, e.context, e.targetDisplayPath,
+        e.ccType, e.match, e.reuse, status
+      ]);
+    })].join('\n');
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8'});
+    const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.style.visibility = 'hidden';
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', objectUrl);
 
     link.setAttribute('download', `UpliftReport-${this.data.name}-${this.data.guid}.csv`);
     document.body.appendChild(link); // Required for FF
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  private toCsvRow(values: unknown[]): string {
+    return values.map(value => {
+      const text = value === null || value === undefined ? '' : String(value);
+      return `"${text.replace(/"/g, '""')}"`;
+    }).join(',');
   }
 }

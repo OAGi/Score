@@ -1,7 +1,7 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import { Component, HostListener, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
 import {catchError, finalize, switchMap, take} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {NamespaceSummary} from '../../namespace-management/domain/namespace';
@@ -18,7 +18,12 @@ import {
   CcFlatNodeDataSource,
   CcFlatNodeDataSourceSearcher
 } from '../domain/cc-flat-tree';
+import {CcTreeViewportComponent} from '../cc-tree-viewport/cc-tree-viewport.component';
+import {ValidationService} from '../../validation/validation.service';
+import {CcTreeValidation, CcTreeValidationHost} from '../domain/cc-tree-validation';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {CcNodeService} from '../domain/core-component-node.service';
+import {findPreviousAssociation} from '../domain/association-revision';
 import {GithubIntegrationService, GithubStatus} from '../domain/github-integration.service';
 import {
   StateChangeDialogComponent,
@@ -47,6 +52,7 @@ import {
   Comment,
   Embedded,
   EntityType,
+  Element as ElementEntityType,
   EntityTypes,
   Extension,
   OAGIS10BODs,
@@ -56,12 +62,12 @@ import {
   Semantics,
   UserExtensionGroup
 } from '../domain/core-component-node';
-import {initFilter, loadBooleanProperty, saveBooleanProperty, trim, UnboundedPipe} from '../../common/utility';
+import {initFilter, trim, UnboundedPipe} from '../../common/utility';
 import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {AuthService} from '../../authentication/auth.service';
 import {CommentControl} from '../domain/comment-component';
-import {forkJoin, of, ReplaySubject} from 'rxjs';
+import {forkJoin, of, ReplaySubject, Subscription} from 'rxjs';
 import {Location} from '@angular/common';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {CcList} from '../cc-list/domain/cc-list';
@@ -71,7 +77,6 @@ import {FindUsagesDialogComponent} from '../find-usages-dialog/find-usages-dialo
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {Message} from '@stomp/stompjs';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {ShortTag, Tag} from '../../tag-management/domain/tag';
 import {TagService} from '../../tag-management/domain/tag.service';
 import {EditTagsDialogComponent} from '../../tag-management/edit-tags-dialog/edit-tags-dialog.component';
@@ -79,14 +84,18 @@ import {PreferencesInfo} from '../../settings-management/settings-preferences/do
 import {SettingsPreferencesService} from '../../settings-management/settings-preferences/domain/settings-preferences.service';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../common/app-title.strategy';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {ccNodeUrl} from '../domain/cc-node-url';
 
 @Component({
   standalone: false,
   selector: 'score-extension-detail',
   templateUrl: './extension-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./extension-detail.component.css']
 })
-export class ExtensionDetailComponent implements OnInit {
+export class ExtensionDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -104,13 +113,13 @@ export class ExtensionDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private stompService = inject(RxStompService);
   private clipboard = inject(Clipboard);
+  private validationService = inject(ValidationService);
+  private host = inject(ElementRef<HTMLElement>);
 
 
   protected readonly trim = trim;
 
   title: string;
-  _innerHeight: number = window.innerHeight;
-  paddingPixel = 12;
   manifestId: number;
   type = 'ACC';
   isUpdating: boolean;
@@ -132,7 +141,7 @@ export class ExtensionDetailComponent implements OnInit {
   /* End cardinality management */
 
   workingRelease = false;
-  namespaces: NamespaceSummary[];
+  namespaces: NamespaceSummary[] = [];
   tags: Tag[] = [];
   commentControl: CommentControl;
 
@@ -141,30 +150,31 @@ export class ExtensionDetailComponent implements OnInit {
 
   initialExpandDepth = 10;
 
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: CcFlatNode;
-  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(SidenavPageComponent, {static: true}) sidenavPage: SidenavPageComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
+  get sidenav(): MatSidenav {
+    return this.sidenavPage.sidenav;
   }
+  @ViewChild(CcTreeViewportComponent, {static: true}) treeViewport: CcTreeViewportComponent;
 
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
+  /** What this page knows about its last validation; it is not saved anywhere. */
+  validation = new CcTreeValidation(this, this.validationService, this.snackBar);
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'CC-Settings-Hide-Cardinality';
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<CcFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'CC-Settings-Hide-Cardinality'});
 
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
+  /** What the tree shows besides the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<CcFlatNode>[] = [...this.validation.decorators, this.cardinality];
+
+  /** The WebSocket topic of the component shown; replaced when another one is loaded and dropped when the page is left. */
+  private eventSubscription: Subscription;
+
+  ngOnDestroy() {
+    this.eventSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -209,7 +219,8 @@ export class ExtensionDetailComponent implements OnInit {
       setAppTitleIfPresent(this.titleService, accDetails.den, 'ACC');
 
       // subscribe an event
-      this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
+      this.eventSubscription?.unsubscribe();
+      this.eventSubscription = this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
         const data = JSON.parse(message.body);
         if (data.properties.actor !== this.currentUser) {
           let noti;
@@ -236,7 +247,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
       this.dataSource.init();
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       this.workingRelease = accDetails.release.workingRelease;
 
@@ -244,6 +255,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.rootNode.access = accDetails.access;
       this.rootNode.state = accDetails.state;
       this.rootNode.reset();
+      this.seedRootDetail(accDetails);
 
       // Issue #1254
       // Initial expanding by the query path
@@ -282,6 +294,11 @@ export class ExtensionDetailComponent implements OnInit {
     this.router.navigateByUrl('/core_component');
   }
 
+  /* The root node has no parent relation, so its detail is built from the already fetched ACC without another request. */
+  private seedRootDetail(accDetails: AccDetails) {
+    this.rootNode.detail = new CcAccNodeInfo(this.rootNode as AccFlatNode, accDetails);
+  }
+
   goToPath(path: string) {
     let curNode = this.dataSource.data[0];
     let idx = 0;
@@ -299,7 +316,15 @@ export class ExtensionDetailComponent implements OnInit {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
+  }
+
+  scrollToNode(node: CcFlatNode, offset: number) {
+    this.treeViewport.scrollToNode(node, offset);
+  }
+
+  get element(): HTMLElement {
+    return this.host.nativeElement;
   }
 
   receiveCommentEvent(evt) {
@@ -378,6 +403,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.service.getAccDetails(this.manifestId),
       this.service.getGraphNode(this.rootNode.type, this.manifestId)
     ]).subscribe(([rootNode, ccGraph]) => {
+      this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
       this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
@@ -389,6 +415,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.rootNode.access = rootNode.access;
       this.rootNode.state = rootNode.state;
       this.rootNode.reset();
+      this.seedRootDetail(rootNode);
 
       this.onClick(this.dataSource.data[0]);
 
@@ -412,7 +439,7 @@ export class ExtensionDetailComponent implements OnInit {
       }
 
       // Recover the state of 'Hide Cardinality' property.
-      this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+      this.cardinality.restore();
 
       if (snackMsg) {
         this.snackBar.open(snackMsg, '', {duration: 3000});
@@ -427,13 +454,7 @@ export class ExtensionDetailComponent implements OnInit {
   isExpandable = (node: CcFlatNode) => node.expandable;
   hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
-  onResize(event) {
-    this._innerHeight = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this._innerHeight - 180;
-  }
 
   get state(): string {
     return (this.rootNode) ? this.rootNode.state : '';
@@ -445,6 +466,23 @@ export class ExtensionDetailComponent implements OnInit {
 
   hasRevision() {
     return !!this.prevAccDetails;
+  }
+
+  private getPreviousAssociation(node?: CcFlatNode): AsccSummary | BccSummary | null {
+    node = node || this.selectedNode;
+    if (!node || !node.detail || !this.prevAccDetails || !this.prevAccDetails.associations) {
+      return null;
+    }
+
+    if (node.type === 'ASCCP' && this.isAsccpDetail(node)) {
+      const ascc = this.asAsccpDetail(node).ascc;
+      return findPreviousAssociation('ASCC', ascc.manifestId, ascc.prevAsccManifestId, this.prevAccDetails.associations);
+    }
+    if (node.type === 'BCCP' && this.isBccpDetail(node)) {
+      const bcc = this.asBccpDetail(node).bcc;
+      return findPreviousAssociation('BCC', bcc.manifestId, bcc.prevBccManifestId, this.prevAccDetails.associations);
+    }
+    return null;
   }
 
   isEditable() {
@@ -469,35 +507,9 @@ export class ExtensionDetailComponent implements OnInit {
     });
   }
 
-  toggle(node: CcFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   hasRevisionAssociation(node?: CcFlatNode) {
-    if (!this.prevAccDetails) {
-      return false;
-    }
-
-    node = node || this.selectedNode;
-
-    for (const assoc of this.prevAccDetails.associations) {
-      if (node.type === 'ASCCP' && 'toAsccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return true;
-        }
-      } else if (node.type === 'BCCP' && 'toBccpManifestId' in assoc) {
-        if (node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return !!this.getPreviousAssociation(node);
   }
 
   isDeprecateAble(node?: CcFlatNode) {
@@ -510,32 +522,8 @@ export class ExtensionDetailComponent implements OnInit {
       return false;
     }
 
-    // An association is deprecate-able only if it was carried over from the previous revision.
-    // A brand-new association appended during this amendment has no predecessor
-    // (prev*ManifestId == null) and must not be deprecate-able -- otherwise a fresh append to a
-    // CC the base already references would match a prior association to the same target and
-    // wrongly enable the checkbox. The trailing return stays outside the loop so every prior
-    // association is considered, not just the first.
-    if (node.type === 'ASCCP') {
-      if ((node.detail as CcAsccpNodeInfo).ascc.prevAsccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toAsccpManifestId' in assoc && node.manifestId === (assoc as AsccSummary).toAsccpManifestId) {
-          return !(assoc as AsccSummary).deprecated;
-        }
-      }
-    } else if (node.type === 'BCCP') {
-      if ((node.detail as CcBccpNodeInfo).bcc.prevBccManifestId == null) {
-        return false;
-      }
-      for (const assoc of this.prevAccDetails.associations) {
-        if ('toBccpManifestId' in assoc && node.manifestId === (assoc as BccSummary).toBccpManifestId) {
-          return !(assoc as BccSummary).deprecated;
-        }
-      }
-    }
-    return false;
+    const previousAssociation = this.getPreviousAssociation(node);
+    return !!previousAssociation && !previousAssociation.deprecated;
   }
 
   getKey(node: CcFlatNode) {
@@ -772,6 +760,7 @@ export class ExtensionDetailComponent implements OnInit {
       data: {
         libraryId: this.rootNode.libraryId,
         releaseId: this.rootNode.releaseId,
+        workingRelease: this.workingRelease,
         manifestId: this.rootNode.manifestId,
         componentType: this.asAccDetail(this.rootNode).oagisComponentType,
         state: this.rootNode.state,
@@ -790,27 +779,18 @@ export class ExtensionDetailComponent implements OnInit {
         return;
       }
 
-      this.service.verifyAppendAssociation(
-          this.rootNode.manifestId,
-          association.manifestId, association.type).subscribe(verifyRes => {
-        if (verifyRes.warn) {
-          const dialogConfig = this.confirmDialogService.newConfig();
-          dialogConfig.data.header = ((pos === -1) ? 'Append' : 'Insert') + ' association';
-          dialogConfig.data.content = [verifyRes.message, 'Do you still want to proceed?'];
-          dialogConfig.data.action = 'Proceed anyway';
-
-          this.confirmDialogService.open(dialogConfig).afterClosed()
-              .subscribe(result => {
-                if (!result) {
-                  this.isUpdating = false;
-                  return;
-                }
-
-                this._doAppendAssociation(association, pos);
-              });
-        } else {
-          this._doAppendAssociation(association, pos);
-        }
+      // what the association would break is asked first; when it would break nothing it is appended as it always was
+      this.isUpdating = true;
+      this.validationService.appendCheck(this.rootNode.manifestId, association.type, association.manifestId).subscribe({
+        next: change => {
+          if (this.validation.askAboutChange(change, () => this._doAppendAssociation(association, pos))) {
+            this.isUpdating = false;
+          } else {
+            this._doAppendAssociation(association, pos);
+          }
+        },
+        // not being able to ask is no reason to take the appending away
+        error: () => this._doAppendAssociation(association, pos)
       });
     });
   }
@@ -1121,27 +1101,15 @@ export class ExtensionDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1165,15 +1133,15 @@ export class ExtensionDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMin === 0) {
+      if (prevRevision.cardinality.min === 0) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
         if (Number(control.value) < 0) {
           return {min: 'Cardinality Min must be bigger than or equals to ' + 0};
         }
-        if (Number(control.value) > prevRevision.cardinalityMin) {
-          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinalityMin};
+        if (Number(control.value) > prevRevision.cardinality.min) {
+          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinality.min};
         }
         if (obj.cardinalityMax >= 0 && Number(control.value) > obj.cardinalityMax) {
           return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
@@ -1212,27 +1180,15 @@ export class ExtensionDetailComponent implements OnInit {
     }
 
     let obj;
-    let prevRevision = null;
+    let prevRevision: (AsccSummary | BccSummary) = null;
     if (this.isAsccpDetail(node)) {
       const detail = node.detail as CcAsccpNodeInfo;
       obj = detail.ascc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextAsccManifestId' in assoc &&
-            ((assoc as AsccSummary).nextAsccManifestId === detail.ascc.manifestId ||
-                ((assoc as AsccSummary).nextAsccManifestId == null &&
-                    (assoc as AsccSummary).asccManifestId === detail.ascc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as AsccSummary;
     } else if (this.isBccpDetail(node)) {
       const detail = node.detail as CcBccpNodeInfo;
       obj = detail.bcc;
-      if (this.prevAccDetails && this.prevAccDetails.associations) {
-        prevRevision = this.prevAccDetails.associations.filter(assoc =>
-            'nextBccManifestId' in assoc &&
-            ((assoc as BccSummary).nextBccManifestId === detail.bcc.manifestId ||
-                ((assoc as BccSummary).nextBccManifestId == null &&
-                    (assoc as BccSummary).bccManifestId === detail.bcc.manifestId)))[0];
-      }
+      prevRevision = this.getPreviousAssociation(node) as BccSummary;
     } else if (this.isDtScDetail(node)) {
       obj = node.detail;
     } else {
@@ -1259,7 +1215,7 @@ export class ExtensionDetailComponent implements OnInit {
 
     let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
     if (prevRevision) {
-      if (prevRevision.cardinalityMax === -1) {
+      if (prevRevision.cardinality.max === -1) {
         disabled = true;
       }
       validators.push((control: AbstractControl): ValidationErrors | null => {
@@ -1269,11 +1225,11 @@ export class ExtensionDetailComponent implements OnInit {
         if (controlValue === -1) {
           return null;
         }
-        if (prevRevision.cardinalityMax === -1) {
+        if (prevRevision.cardinality.max === -1) {
           return {max: 'Cardinality Max cannot be changed'};
         }
-        if (controlValue < prevRevision.cardinalityMax) {
-          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinalityMax};
+        if (controlValue < prevRevision.cardinality.max) {
+          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinality.max};
         }
         if (controlValue < obj.cardinalityMin) {
           return {min: 'Cardinality Max must be greater than ' + obj.cardinalityMin};
@@ -1314,7 +1270,7 @@ export class ExtensionDetailComponent implements OnInit {
     } else {
       this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
-    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+    if (nodeDetail.bcc.entityType === ElementEntityType.value) {
       // Issue #1406
       if (!!nodeDetail.bcc.defaultValue || !!nodeDetail.bcc.fixedValue) {
         const dialogConfig = this.confirmDialogService.newConfig();
@@ -1438,7 +1394,10 @@ export class ExtensionDetailComponent implements OnInit {
   }
 
   openCoreComponent(node: CcFlatNode) {
-    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+    const url = ccNodeUrl(node);
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   openHistory(node: CcFlatNode) {
@@ -1615,69 +1574,17 @@ export class ExtensionDetailComponent implements OnInit {
     });
   }
 
-  scrollToNode(node: CcFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
-  keyNavigation(node: CcFlatNode, $event: KeyboardEvent) {
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'c' || $event.key === 'C') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            this.openComments(node.type, node);
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
+  onTreeKey({node, event}: TreeViewportNodeKey<CcFlatNode>) {
+    if (event.key === 'c' || event.key === 'C') {
+      this.contextMenuItem = node;
+      this.openComments(node.type, node);
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
+
+  readonly isDraggableNode = (node: CcFlatNode) => this.isDraggable(node);
+  readonly showDragHandleNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
 
   cancelRevision(): void {
     const isDeveloper = this.userRoles.includes('developer');
@@ -1734,16 +1641,4 @@ export class ExtensionDetailComponent implements OnInit {
       });
   }
 
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
-  }
 }

@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.external.controller;
 
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.jooq.exception.IOException;
 import org.oagi.score.gateway.http.api.application_management.service.ApplicationConfigurationQueryService;
@@ -252,7 +253,7 @@ public class ExternalBieController {
                                                                 + "\"")
                                 .contentType(MediaType.parseMediaType(bieGenerateExpressionResult.contentType()))
                                 .contentLength(bieGenerateExpressionResult.file().length())
-                                .body(new InputStreamResource(new FileInputStream(bieGenerateExpressionResult.file())));
+                                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(bieGenerateExpressionResult.file())));
         }
 
         @GetMapping(value = "/ext/bie-packages/bies")

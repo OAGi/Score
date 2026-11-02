@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.or;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.model.SortDirection.ASC;
@@ -502,8 +503,7 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
 
             conditions.add(and(OAS_DOC.TITLE.eq(oasDoc.getTitle()),
                     OAS_DOC.OPEN_API_VERSION.eq(oasDoc.getOpenAPIVersion()),
-                    OAS_DOC.VERSION.eq(oasDoc.getVersion()),
-                    OAS_DOC.LICENSE_NAME.eq(oasDoc.getLicenseName())));
+                    nullSafeEq(OAS_DOC.VERSION, oasDoc.getVersion())));
 
             if (oasDoc.getOasDocId() != null) {
                 conditions.add(OAS_DOC.OAS_DOC_ID.ne(ULong.valueOf(oasDoc.getOasDocId())));
@@ -514,6 +514,16 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
                     .fetchOneInto(Integer.class) == 0;
         } else
             throw new ScoreDataAccessException("Wrong input data");
+    }
+
+    /**
+     * The optional Document Version holds NULL when left empty, which {@code = NULL} never matches; an
+     * empty value is therefore compared as NULL (or an empty string).
+     */
+    private Condition nullSafeEq(Field<String> field, String value) {
+        return StringUtils.hasLength(value)
+                ? field.eq(value)
+                : or(field.isNull(), field.eq(""));
     }
 
     @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})

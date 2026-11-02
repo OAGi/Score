@@ -1,7 +1,6 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, inject } from '@angular/core';
 
 @Directive({
-  standalone: false,
   selector: '[score-table-column-resize]'
 })
 export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
@@ -22,7 +21,7 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
 
   @Input() defaultWidth: number | string;
   @Input() resizable = true;
-  @Output() onResize: EventEmitter<{ name: string; width: number | string }> = new EventEmitter();
+  @Output() onResize: EventEmitter<{ name: string; width: number | string; columnId?: string }> = new EventEmitter();
 
   ngOnInit() {
     this.setInitialWidth();
@@ -183,7 +182,8 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
     document.removeEventListener('mouseup', this.onMouseUp);
     this.onResize.emit({
       name: this._title,
-      width: this._width
+      width: this._width,
+      columnId: this.columnIdOf(this.el.nativeElement)
     });
 
     // Emit resize event for the sibling element
@@ -191,7 +191,8 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
       const siblingWidth = this.sibling.offsetWidth;
       this.onResize.emit({
         name: this.siblingTitle,
-        width: siblingWidth
+        width: siblingWidth,
+        columnId: this.columnIdOf(this.sibling)
       });
     }
 
@@ -200,6 +201,12 @@ export class ScoreTableColumnResizeDirective implements OnInit, OnChanges {
       this._resizing = false;  // Reset resizing flag
     }, 0);
   };
+
+  /** The column id of a header cell: `cdk-column-<id>` is added by the column definition. */
+  private columnIdOf(element: HTMLElement): string | undefined {
+    const prefix = 'cdk-column-';
+    return Array.from(element.classList).find(c => c.startsWith(prefix))?.substring(prefix.length);
+  }
 
   private applyWidthToColumn(element: HTMLElement, width: number | string) {
     const targets = this.getColumnElements(element);

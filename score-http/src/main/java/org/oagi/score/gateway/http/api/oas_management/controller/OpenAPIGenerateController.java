@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.oas_management.controller;
 
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetAssignedOasTagRequest;
@@ -115,6 +116,6 @@ public class OpenAPIGenerateController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bieGenerateExpressionResult.filename() + "\"")
                 .contentType(MediaType.parseMediaType(bieGenerateExpressionResult.contentType()))
                 .contentLength(bieGenerateExpressionResult.file().length())
-                .body(new InputStreamResource(new FileInputStream(bieGenerateExpressionResult.file())));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(bieGenerateExpressionResult.file())));
     }
 }

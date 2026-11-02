@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BieListService} from '../bie-list/domain/bie-list.service';
@@ -9,6 +9,7 @@ import {PlantUmlService} from '../../common/plantuml-diagram/plantuml.service';
   standalone: false,
   selector: 'score-bie-diagram-dialog',
   templateUrl: './bie-diagram-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-diagram-dialog.component.css']
 })
 export class BieDiagramDialogComponent implements OnInit {

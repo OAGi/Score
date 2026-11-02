@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
@@ -35,7 +35,8 @@ import {
   BieFlatNodeDataSourceSearcher,
   ChangeListener
 } from '../domain/bie-flat-tree';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {BieTreeRowHost, BieTreeViewportComponent} from './bie-tree-viewport/bie-tree-viewport.component';
+import {TreeViewportNodeKey} from '../../common/tree-viewport/tree-viewport.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {AbstractControl, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators} from '@angular/forms';
 import {
@@ -59,7 +60,6 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/a
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../../common/score-rx-stomp';
-import {MatMenuTrigger} from '@angular/material/menu';
 import {ErrorStateMatcher} from '@angular/material/core';
 import {MatChipGrid} from '@angular/material/chips';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -95,15 +95,19 @@ import {
   OasDocConfirmMessageDialogComponent,
   OasDocConfirmMessageDialogResult
 } from '../openapi-doc/oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
+import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
+import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
+import {BieStatusDecorator} from '../domain/bie-tree-decorators';
 
 
 @Component({
   standalone: false,
   selector: 'score-bie-edit',
   templateUrl: './bie-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-edit.component.css']
 })
-export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
+export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, BieTreeRowHost {
   private service = inject(BieEditService);
   private ccNodeService = inject(CcNodeService);
   private bieViewOrderService = inject(BieViewOrderService);
@@ -134,12 +138,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   faRecycle = faRecycle;
   faSitemap = faSitemap;
   loading = false;
-  paddingPixel = 12;
 
   topLevelAsbiepId: number;
   rootNode: BieEditAbieNode;
 
-  innerY: number = window.innerHeight;
   dataSource: BieFlatNodeDataSource<BieFlatNode>;
   searcher: BieFlatNodeDataSourceSearcher<BieFlatNode>;
   // Issue #1638: view-parent ACC manifest ids whose sibling order has already been fetched, so each
@@ -190,8 +192,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   @HostListener('document:click', ['$event.target'])
-  onClickOutside(targetElement: HTMLElement): void {
-    const clickedInside = targetElement.closest('.mat-tree-node');
+  onClickOutside(targetElement: EventTarget | null): void {
+    const clickedInside = targetElement instanceof HTMLElement && targetElement.closest('.mat-tree-node');
     if (!clickedInside || !this.renamingNode) {
       this.stopChangingDisplayName();
     }
@@ -199,7 +201,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   // Listen for 'esc' key press within the input
   @HostListener('document:keydown.escape', ['$event'])
-  cancelEditing($event: KeyboardEvent): void {
+  cancelEditing($event: Event): void {
     if (this.renamingNode) {
       this.stopChangingDisplayName(true);
       $event.preventDefault();
@@ -253,18 +255,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
-  virtualScrollItemSize = 33;
+  @ViewChild(BieTreeViewportComponent, {static: true}) treeViewport: BieTreeViewportComponent;
 
-  get minBufferPx(): number {
-    return 10000 * this.virtualScrollItemSize;
-  }
-
-  get maxBufferPx(): number {
-    return 1000000 * this.virtualScrollItemSize;
-  }
-
-  @ViewChildren(MatMenuTrigger) menuTriggerList: QueryList<MatMenuTrigger>;
   contextMenuItem: BieFlatNode;
   @ViewChild('businessContextInput') businessContextInput: ElementRef<HTMLInputElement>;
   @ViewChild('matAutocomplete') matAutocomplete: MatAutocomplete;
@@ -272,17 +264,15 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   @ViewChildren('businessTermChipGrid', {read: ElementRef}) businessTermChipGridElements: QueryList<ElementRef<HTMLElement>>;
 
   preferencesInfo: PreferencesInfo;
-  HIDE_CARDINALITY_PROPERTY_KEY = 'BIE-Settings-Hide-Cardinality';
   HIDE_UNUSED_PROPERTY_KEY = 'BIE-Settings-Hide-Unused';
 
-  get hideCardinality(): boolean {
-    return this.dataSource.hideCardinality;
-  }
+  /** Shows the cardinality of the nodes, unless the user hides it. */
+  readonly cardinality = new CardinalityDecorator<BieFlatNode>(
+    {userToken: () => this.auth.getUserToken(), key: 'BIE-Settings-Hide-Cardinality'});
 
-  set hideCardinality(hideCardinality: boolean) {
-    this.dataSource.hideCardinality = hideCardinality;
-    saveBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, hideCardinality);
-  }
+  /** What the tree shows after the names of the nodes, in this order. */
+  readonly decorators: TreeNodeDecorator<BieFlatNode>[] = [this.cardinality,
+    new BieStatusDecorator((node, event) => this.openNewEditBieTab(node, event))];
 
   get hideUnused(): boolean {
     return this.dataSource.hideUnused;
@@ -356,7 +346,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
         this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
         this.dataSource.init();
-        this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+        this.cardinality.restore();
         this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
         // Issue #1254
@@ -435,16 +425,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
 
     this.onClick(curNode);
-    this.scrollToNode(curNode, 500);
+    this.treeViewport.scrollToNode(curNode, 500);
   }
 
-  onResize(event) {
-    this.innerY = window.innerHeight;
-  }
 
-  get innerHeight(): number {
-    return this.innerY - 200;
-  }
 
   initRootNode(rootNode) {
     this.rootNode = new BieEditAbieNode(rootNode);
@@ -476,14 +460,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
   }
 
-  toggle(node: BieFlatNode, $event?: MouseEvent) {
-    if (!!$event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-    }
-
-    this.dataSource.toggle(node);
-  }
 
   onClick(node: BieFlatNode, $event?: MouseEvent) {
     if (!!$event) {
@@ -546,12 +522,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     });
   }
 
-  scrollToNode(node: BieFlatNode, delay?: number) {
-    const index = this.searcher.getNodeIndex(node);
-    this.scrollTree(index, delay);
-    this.cursorNode = node;
-  }
-
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent($event: KeyboardEvent) {
     const target = $event.target as HTMLElement;
@@ -567,77 +537,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     }
   }
 
-  keyNavigation(node: BieFlatNode, $event: KeyboardEvent) {
-    // Skip if the target is an input, textarea, or contenteditable element
-    const target = $event.target as HTMLElement;
-    const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-    if (isInputField) {
-      return;
-    }
 
-    if ($event.key === 'ArrowDown') {
-      this.cursorNode = this.searcher.next(this.cursorNode);
-    } else if ($event.key === 'ArrowUp') {
-      this.cursorNode = this.searcher.prev(this.cursorNode);
-    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
-      this.dataSource.toggle(this.cursorNode);
-    } else if ($event.code === 'Space') {
+
+  onTreeKey({event}: TreeViewportNodeKey<BieFlatNode>) {
+    if (event.code === 'Space') {
       this.toggleTreeUsed(this.cursorNode);
-    } else if ($event.key === 'o' || $event.key === 'O') {
-      this.menuTriggerList.toArray().filter(e => !!e.menuData)
-          .filter(e => e.menuData.menuId === 'contextMenu' && e.menuData.hashPath === node.hashPath)
-          .forEach(trigger => {
-            this.contextMenuItem = node;
-            if (!trigger.menuOpen) {
-              trigger.openMenu();
-            }
-          });
-    } else if ($event.key === 'Enter') {
-      this.onClick(this.cursorNode);
-    } else {
-      return;
+      event.preventDefault();
+      event.stopPropagation();
     }
-    $event.preventDefault();
-    $event.stopPropagation();
-  }
-
-  scrollBreadcrumb(elementId: string) {
-    const breadcrumbs = document.getElementById(elementId);
-    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
-      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
-      breadcrumbs.classList.add('inner-box');
-    } else {
-      breadcrumbs.scrollLeft = 0;
-      breadcrumbs.classList.remove('inner-box');
-    }
-    return '';
-  }
-
-  scrollTree(index: number, delay?: number) {
-    if (index < 0) {
-      return;
-    }
-
-    if (delay) {
-      setTimeout(() => {
-        this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-      }, delay);
-    } else {
-      this.virtualScroll.scrollToOffset(index * this.virtualScrollItemSize, 'smooth');
-    }
-  }
-
-  search(inputKeyword, backward?: boolean, force?: boolean) {
-    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
-      this.scrollTree(index, 500);
-    });
-  }
-
-  move(val: number) {
-    this.searcher.go(val).subscribe(index => {
-      this.onClick(this.dataSource.data[index]);
-      this.scrollTree(index);
-    });
   }
 
   openNewEditBieTab(node: BieFlatNode, $event?: MouseEvent) {
@@ -650,6 +557,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   copyToDefinition(sourceStr: string, targetObj: object) {
+    // The template call sites keep the Angular 22 $safeNavigationMigration() wrapper on their
+    // `…definition?.content` arguments: v22 made template optional chaining yield `undefined`
+    // instead of `null`, and an `undefined` definition is dropped by JSON.stringify on the
+    // update payload rather than sent as an explicit null. The wrapper preserves `null`.
     // Issue #1312: "Copy to Context Definition" writes the selected node's (change-tracked) Context
     // Definition, so it must respect the same editability gate as that field. Without this a non-owner
     // viewing a WIP BIE read-only could mutate the definition (and enable Update) — see isReadOnlyWipViewer.
@@ -778,6 +689,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return false;
     }
     if (node.required && this.used(node)) {
+      return false;
+    }
+    if (node.cardinalityMax === 0) {
       return false;
     }
     return this.canEdit && !node.inherited && !node.locked && !node.isCycle;
@@ -1078,7 +992,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         }
 
         // Recover the state of 'Hide Cardinality' and 'Hide Unused' properties.
-        this.dataSource.hideCardinality = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_CARDINALITY_PROPERTY_KEY, false);
+        this.cardinality.restore();
         this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
 
         this.loading = false;
@@ -1378,8 +1292,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           return;
         } else {
           const asbiepNode = node as AsbiepFlatNode;
-          this.isUpdating = true;
           this.updateDetails(node.parents, () => {
+            this.isUpdating = true;
             this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
               .pipe(finalize(() => {
                 this.isUpdating = false;
@@ -1415,24 +1329,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     this.isUpdating = true;
     const nodeItem = node as AsbiepFlatNode;
-    this.service.createLocalAbieExtension(nodeItem).subscribe((resp: BieEditCreateExtensionResponse) => {
-      if (resp.canEdit) {
-        const commands = ['/core_component/extension/' + resp.extensionId];
-        this.router.navigate(commands);
-      } else {
-        if (resp.canView) {
-          this.openConfirmDialog('/core_component/extension/' + resp.extensionId);
+    this.service.createLocalAbieExtension(nodeItem)
+      .pipe(finalize(() => this.isUpdating = false))
+      .subscribe((resp: BieEditCreateExtensionResponse) => {
+        if (resp.canEdit) {
+          const commands = ['/core_component/extension/' + resp.extensionId];
+          this.router.navigate(commands);
         } else {
-          this.snackBar.open('Editing extension already exist.', '', {
-            duration: 3000,
-          });
+          if (resp.canView) {
+            this.openConfirmDialog('/core_component/extension/' + resp.extensionId);
+          } else {
+            this.snackBar.open('Editing extension already exist.', '', {
+              duration: 3000,
+            });
+          }
         }
-      }
-      this.isUpdating = false;
-    }, err => {
-      this.isUpdating = false;
-      this.openStateUpdateErrorDialog(err);
-    });
+      }, err => this.openStateUpdateErrorDialog(err));
   }
 
   private openStateUpdateErrorDialog(error: HttpErrorResponse): void {
@@ -1471,23 +1383,22 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
     this.isUpdating = true;
     const nodeItem = node as AsbiepFlatNode;
-    this.service.createGlobalAbieExtension(nodeItem).subscribe((resp: BieEditCreateExtensionResponse) => {
-      if (resp.canEdit) {
-        const commands = ['/core_component/extension/' + resp.extensionId];
-        this.router.navigate(commands);
-      } else {
-        if (resp.canView) {
-          this.openConfirmDialog('/core_component/extension/' + resp.extensionId);
+    this.service.createGlobalAbieExtension(nodeItem)
+      .pipe(finalize(() => this.isUpdating = false))
+      .subscribe((resp: BieEditCreateExtensionResponse) => {
+        if (resp.canEdit) {
+          const commands = ['/core_component/extension/' + resp.extensionId];
+          this.router.navigate(commands);
         } else {
-          this.snackBar.open('Editing extension already exist.', '', {
-            duration: 3000,
-          });
+          if (resp.canView) {
+            this.openConfirmDialog('/core_component/extension/' + resp.extensionId);
+          } else {
+            this.snackBar.open('Editing extension already exist.', '', {
+              duration: 3000,
+            });
+          }
         }
-      }
-      this.isUpdating = false;
-    }, err => {
-      this.isUpdating = false;
-    });
+      }, err => this.openStateUpdateErrorDialog(err));
   }
 
   enableChildren(node: BieFlatNode) {
@@ -1618,7 +1529,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
             return;
           }
 
-          this.isUpdating = true;
+          // updateDetails() skips saving while isUpdating is set, so the confirmation's flag is cleared first.
+          this.isUpdating = false;
 
           if (!abieNode.used) {
             this.toggleTreeUsed(abieNode);
@@ -1638,8 +1550,6 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     if (!this.canRemoveBaseBIE(node)) {
       return;
     }
-
-    this.isUpdating = true;
 
     const abieNode = (node as AbieFlatNode);
     if (!abieNode.used) {
@@ -1955,7 +1865,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     this.queueBusinessTermChipGridErrorStateSync();
   }
 
-  startTypeCodeEdit(assigned: AssignedBusinessTermListEntry, editable: boolean, event?: MouseEvent): void {
+  startTypeCodeEdit(assigned: AssignedBusinessTermListEntry, editable: boolean, event?: Event): void {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -3751,7 +3661,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
     return l;
   }
 
-  removeBusinessContext(businessContext: BusinessContext) {
+  removeBusinessContext(businessContext: BusinessContextSummary) {
     // Issue #1312: a non-owner viewing a WIP BIE read-only cannot change its business contexts.
     if (this.isReadOnlyWipViewer || this.businessContextUpdating || this.businessContexts.length <= 1) {
       return;

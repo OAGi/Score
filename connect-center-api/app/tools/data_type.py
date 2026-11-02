@@ -62,7 +62,8 @@ from app.services.app_user_service import AppUserService
 from app.services.data_type_service import DataTypeService
 from app.services.models.data_type import DataTypePrimitiveServiceRecord
 from app.services.release_service import ReleaseService
-from app.tools import _to_tool_error, get_tool_authenticated_user, tool_session
+from mcp.types import InputRequiredResult
+from app.tools import _to_tool_error, elicit_confirmation, get_tool_authenticated_user, tool_session
 from app.tools.models.data_type import (
     CreateDataTypeResponse,
     CreateDataTypeSupplementaryComponentResponse,
@@ -1643,10 +1644,12 @@ async def transfer_dt_ownership(
         if target_user.username and target_user.username != target_user.login_id:
             target_user_label = f"{target_user.login_id} ({target_user.username})"
 
-        elicit_result = await ctx.elicit(
+        elicit_result = await elicit_confirmation(
+            ctx,
             message=(f"Are you sure you want to transfer ownership of '{row.den}' to {target_user_label}?"),
-            response_type=None,
         )
+        if isinstance(elicit_result, InputRequiredResult):
+            return elicit_result
         match elicit_result:
             case AcceptedElicitation():
                 payload = await data_type_service.transfer_dt_ownership(

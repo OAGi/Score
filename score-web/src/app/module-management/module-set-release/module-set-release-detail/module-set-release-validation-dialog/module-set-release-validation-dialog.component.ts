@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {interval, mergeMap, Subject, takeUntil} from 'rxjs';
+import {interval, merge, Subject, switchMap, takeUntil} from 'rxjs';
 import {ModuleService} from '../../../domain/module.service';
 import {ModuleSetReleaseValidateResponse} from '../../../domain/module';
 import {Clipboard} from '@angular/cdk/clipboard';
@@ -11,6 +11,7 @@ import {HttpErrorResponse} from '@angular/common/http';
   standalone: false,
   selector: 'score-module-set-release-validation-dialog',
   templateUrl: './module-set-release-validation-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./module-set-release-validation-dialog.component.css']
 })
 export class ModuleSetReleaseValidationDialogComponent implements OnInit {
@@ -30,6 +31,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
     this.resp = new ModuleSetReleaseValidateResponse();
     this.resp.progress = 0;
     this.resp.length = 0;
+    this.resp.results = {} as any;
   }
 
   ngOnInit(): void {
@@ -40,8 +42,8 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
     ).subscribe(resp => {
       const closeTimer$ = new Subject<any>();
       interval(2000).pipe(
-        mergeMap(() => this.moduleService.progressValidation(this.data.moduleSetReleaseId, resp.requestId)),
-        takeUntil(closeTimer$),
+        switchMap(() => this.moduleService.progressValidation(this.data.moduleSetReleaseId, resp.requestId)),
+        takeUntil(merge(closeTimer$, this.dialogRef.afterClosed())),
       ).subscribe({
         next: (res) => {
           this.resp = res;
@@ -89,7 +91,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
     this.clipboard.copy(
       '# Invalid: ' + this.invalidKeys.length + '\n' +
       this.invalidKeys.map(e => '- ' + e + ': ' + this.value(e)).join('\n') +
-      '# Valid: ' + this.validKeys.length + '\n' +
+      '\n# Valid: ' + this.validKeys.length + '\n' +
       this.validKeys.map(e => '- ' + e + ': ' + this.value(e)).join('\n')
     );
     this.snackBar.open('Copied to clipboard', '', {

@@ -275,6 +275,110 @@ To do this:
 For faster search, supplementary components of the CCs, which repeat a lot, are excluded by default.
 The user can switch off this exclusion, but the search will be slower.
 
+Search with path expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The search box above a tree accepts more than keywords.
+It also accepts XPath-like path expressions, which find nodes by where they are in the tree and by their attributes.
+The same search box is used by the tree screens of the Core Component library (ACC, ASCCP, BCCP, BDT, and extension), the Model Browser, the BIE editor, and the two trees of BIE uplift.
+
+The search runs in the background, so the page stays usable while a large tree is searched.
+The search bar shows the number of matches and the number of nodes searched.
+Clicking a match expands the tree down to it and scrolls to it.
+Clearing the search removes the highlights.
+The search is not case-sensitive.
+
+Keywords and paths
+^^^^^^^^^^^^^^^^^^
+
+An expression with no ``[``, ``::``, ``//``, or ``..`` is read as before: the names between the ``/`` characters are matched in order, and a name may contain spaces (e.g., ``Release ID``).
+A name matches every node whose name *contains* the text, so ``Sender`` also finds *Sender Party* and *Message Sender*.
+In the table below, "a node named Sender" therefore means a node whose name contains "Sender".
+In the BIE editor and the BIE uplift trees, a path that starts with ``/`` is the exception: its names must equal the node names, apart from case.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 65
+
+   * - Expression
+     - Finds
+   * - ``Sender/Code``
+     - A node named Code directly under a node named Sender.
+   * - ``/Sender``
+     - A node named Sender at the root of the tree. A leading ``/`` anchors the search at the root.
+   * - ``//Code``
+     - A node named Code at any depth.
+   * - ``Sender//Code``
+     - A node named Code at any depth below a node named Sender.
+   * - ``*``
+     - Any node. ``Sender/*`` finds all children of a node named Sender.
+   * - ``Sender/..``
+     - The parent of a node named Sender. ``.`` means the node itself.
+   * - ``Sender/Code[2]``
+     - The second node named Code under a node named Sender. ``[position() = 2]`` and ``last()`` can also be used.
+   * - ``Sender/ancestor::Header``
+     - A node named Header above a node named Sender.
+   * - ``Sender/following-sibling::Code``
+     - A node named Code after a node named Sender, under the same parent.
+
+A step may be written with an explicit axis: ``child``, ``descendant``, ``descendant-or-self``, ``self``, ``parent``, ``ancestor``, ``ancestor-or-self``, ``following-sibling``, or ``preceding-sibling``.
+An expression cannot start with ``parent::``, ``ancestor::``, ``ancestor-or-self::``, or a sibling axis; put another step before it, or use it inside a condition (see below).
+
+Conditions on a node
+^^^^^^^^^^^^^^^^^^^^
+
+A step can be followed by a condition in square brackets.
+Conditions compare an attribute of the node with a value using ``=``, ``!=``, ``<``, ``<=``, ``>``, or ``>=``, and can be combined with ``and``, ``or``, and ``not``.
+A comparison with ``=`` is an exact match (apart from case), unlike a name in a path, which only has to be contained.
+For example:
+
+- ``Sender/Code[used = true]`` finds the nodes named Code under Sender that are used (BIE trees only).
+- ``*[contains(den, "id")]`` finds nodes whose ``den`` contains "id".
+  ``starts-with`` and ``ends-with`` work the same way, and ``text()`` is the text of the node as shown in the tree.
+- ``*[type = ACC and state = Published]`` finds published ACC nodes in a Core Component tree.
+- ``*[count(child::*) > 5]`` finds nodes that have more than five children.
+- ``*[ancestor::Sender]`` finds nodes that have a node named Sender above them.
+- ``*[child::Id]`` or ``*[./Id]`` finds nodes that have a child named Id.
+
+The attributes depend on the tree:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Attribute
+     - Meaning
+   * - ``type``
+     - The kind of node: ``ACC``, ``ASCCP``, ``BCCP``, ``DT``, or ``DT_SC`` in the Core Component trees; ``ABIE``, ``ASBIEP``, ``BBIEP``, or ``BBIE_SC`` in the Model Browser and the BIE trees.
+   * - ``object_class_term``, ``property_term``, ``den``, ``data_type_term``, ``representation_term``, ``qualifier``
+     - The terms of the component the node shows. A kind of component has only its own terms (e.g., ``object_class_term`` for an ACC), and a test on an attribute the node does not have is false.
+   * - ``component_type``, ``entity_type``, ``state``, ``guid``, ``deprecated``
+     - The component type of an ACC, the entity type (Element or Attribute) of a BCC, the state, the GUID, and whether the component is deprecated.
+   * - ``cardinality``, ``cardinality_min``, ``cardinality_max``
+     - How often the node may occur under its parent (see below).
+   * - ``definition``, ``association_definition``, ``component_definition``, ``type_definition``
+     - The definitions shown for the node. ``definition = ''`` finds nodes that have a definition field that is empty.
+   * - ``display_name``
+     - BIE trees: the display name set on an ASBIEP, BBIEP, or BBIE_SC.
+   * - ``used``, ``inherited``, ``reused``
+     - BIE trees: whether the node is used, inherited, or a reused BIE. Used alone (``[used]``), they test that the flag is true.
+
+A word after a comparison is read as text, so ``type = ACC`` needs no quotes.
+Put quotes around text that contains anything other than ASCII letters, digits, ``_`` and ``-``.
+A value of ``guid`` is always compared as text, even when it consists of digits only.
+Attribute names are written as listed here, e.g., ``display_name`` and not ``displayName``.
+
+To search by cardinality, use ``cardinality = 0..1``, or ``Optional``, ``Required``, or ``Prohibited``.
+Only ``=`` and ``!=`` can be used with ``cardinality``.
+``cardinality_min`` and ``cardinality_max`` are numbers, and an unbounded maximum is larger than any number, so ``cardinality_max < 10`` leaves unbounded nodes out.
+
+Suggestions and errors
+^^^^^^^^^^^^^^^^^^^^^^
+
+While you type, the search box suggests what can come next: attributes, functions, operators, values, and axes.
+Press Enter, or leave the field, to close the suggestions.
+If the expression is not valid, for example ``*[a/]``, the reason is shown under the search box and nothing is searched.
+
 Find the usages (a.k.a. Where Used) of a Core Component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

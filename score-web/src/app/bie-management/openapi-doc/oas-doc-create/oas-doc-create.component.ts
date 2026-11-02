@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {OasDoc} from '../domain/openapi-doc';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -14,6 +15,7 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
   standalone: false,
   selector: 'score-oas-doc-create',
   templateUrl: './oas-doc-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-create.component.css']
 })
 export class OasDocCreateComponent implements OnInit {
@@ -31,12 +33,10 @@ export class OasDocCreateComponent implements OnInit {
   subtitle = 'OpenAPI Document Metadata';
   oasDoc: OasDoc;
   disabled: boolean;
-  urlReg = '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?';
-  emailReg = '[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}';
-  contactUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
-  contactEmail = new FormControl('', [Validators.pattern(this.emailReg)]);
-  licenseUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
-  termServiceUrl = new FormControl('', [Validators.pattern(this.urlReg)]);
+  contactUrl = new FormControl('', [httpUrlValidator]);
+  contactEmail = new FormControl('', [optionalEmailValidator]);
+  licenseUrl = new FormControl('', [httpUrlValidator]);
+  termServiceUrl = new FormControl('', [httpUrlValidator]);
 
   ngOnInit(): void {
     this.disabled = false;
@@ -50,7 +50,9 @@ export class OasDocCreateComponent implements OnInit {
     return (this.disabled) ||
       (this.oasDoc.title === undefined || this.oasDoc.title === '') ||
       (this.oasDoc.openAPIVersion === undefined || this.oasDoc.openAPIVersion === '') ||
-      (this.oasDoc.version === undefined || this.oasDoc.version === '');
+      (this.oasDoc.version === undefined || this.oasDoc.version === '') ||
+      this.termServiceUrl.invalid || this.contactUrl.invalid ||
+      this.contactEmail.invalid || this.licenseUrl.invalid;
   }
 
   back() {
@@ -60,7 +62,9 @@ export class OasDocCreateComponent implements OnInit {
   openDialogOasDocCreate() {
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Invalid parameters';
-    dialogConfig.data.content = ['Another OpenAPI Doc with the same title, OpenAPI Version, Doc Version and License Name already exists!'];
+    dialogConfig.data.content = ['Another OpenAPI Doc with the same title, OpenAPI Version and Doc Version already exists!'];
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {
+    });
   }
 
   doCreate() {
@@ -73,25 +77,7 @@ export class OasDocCreateComponent implements OnInit {
   }
 
   create() {
-    this.checkUniqueness(this.oasDoc, (_) => {
-      this.checkOasDocTitle(this.oasDoc, (dummy) => {
-        this.doCreate();
-      });
-    });
-  }
-
-  createWithoutCheck() {
-    this.doCreate();
-  }
-
-  checkOasDocTitle(oasDoc: OasDoc, callbackFn?) {
-    this.openAPIService.checkUniqueness(oasDoc).subscribe(resp => {
-      if (!resp) {
-        this.openDialogOasDocCreate();
-        return;
-      }
-      return callbackFn && callbackFn();
-    });
+    this.checkUniqueness(this.oasDoc, () => this.doCreate());
   }
 
   checkUniqueness(oasDoc: OasDoc, callbackFn?) {

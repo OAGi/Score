@@ -1,7 +1,9 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.oagi.score.gateway.http.common.util.TempFiles;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.oagi.score.gateway.http.api.bie_management.model.BieListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
@@ -15,7 +17,6 @@ import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.Zip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -99,28 +100,29 @@ public class BiePackageQueryService {
         // #1711: Package export filenames always use package pattern metadata.
         option.setIncludeBusinessContextInFilename(true);
         option.setIncludeVersionInFilename(true);
+        // Filenames come only from the configured BIE Package Schema filename expression:
+        // a requested filename or Business Context selection must not override it.
         option.setFilenames(Collections.emptyMap());
+        option.setBizCtxIds(Collections.emptyMap());
         option.setBiePackage(biePackage);
 
-        Map<TopLevelAsbiepId, File> result =
+        BieGenerateService.EachSchemaResult generated =
                 bieGenerateService.generateSchemaForEach(requester, topLevelAsbiepList, option);
+        Map<TopLevelAsbiepId, File> result = generated.files();
         Map<TopLevelAsbiepId, String> generatedFilesByTopLevelAsbiepId = result.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getName()));
         BiePackageManifestResponse biePackageManifestResponse =
                 biePackageManifestService.getBiePackageManifest(
                         requester, biePackageId, pathDelimiter, generatedFilesByTopLevelAsbiepId, manifestVersion);
 
-        return makeGenerateBiePackageResponse(biePackage, result, biePackageManifestResponse);
+        return makeGenerateBiePackageResponse(biePackage, generated, biePackageManifestResponse);
     }
 
     public File writeBiePackageManifestResponseToTempFile(BiePackageManifestResponse response) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectMapper objectMapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
         // Create temp file
-        File tempFile = File.createTempFile(ScoreGuidUtils.randomGuid(), null);
-        tempFile = new File(tempFile.getParentFile(), "manifest.json");
-        tempFile.deleteOnExit();
+        File tempFile = TempFiles.newFile("manifest.json");
 
         // Write JSON to file using BufferedOutputStream for efficiency
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
@@ -132,10 +134,10 @@ public class BiePackageQueryService {
     }
 
     private BieGenerateExpressionResult makeGenerateBiePackageResponse(
-            BiePackageSummaryRecord biePackage, Map<TopLevelAsbiepId, File> result, BiePackageManifestResponse biePackageManifestResponse) throws IOException {
+            BiePackageSummaryRecord biePackage, BieGenerateService.EachSchemaResult generated, BiePackageManifestResponse biePackageManifestResponse) throws IOException {
 
         File manifestFile = writeBiePackageManifestResponseToTempFile(biePackageManifestResponse);
-        List<File> files = new ArrayList<>(result.values());
+        List<File> files = generated.allFiles();
         files.add(manifestFile);
 
         String filename = String.join("-", Arrays.asList(
@@ -149,6 +151,7 @@ public class BiePackageQueryService {
                 .collect(Collectors.toList()));
 
         File file = Zip.compression(files, filename);
+        files.forEach(TempFiles::deleteQuietly);
 
         String contentType = "application/zip";
         return new BieGenerateExpressionResult(file.getName(), contentType, file);

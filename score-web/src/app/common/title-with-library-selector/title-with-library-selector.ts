@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation, ChangeDetectionStrategy} from '@angular/core';
 import {LibrarySummary} from '../../library-management/domain/library';
 import {ColumnSelectorModule} from '../column-selector/column-selector.module';
 
@@ -11,6 +11,7 @@ import {ColumnSelectorModule} from '../column-selector/column-selector.module';
   imports: [
     ColumnSelectorModule
 ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class TitleWithLibrarySelector implements OnInit, OnChanges {

@@ -438,6 +438,30 @@ The developer can cancel the revision of the base ACC where an BCCP was moved. D
 #### Test Assertion #10.4.26
 The developer can cancel the revision of an ACC that had the base ACC as its based and also it had an association to the BCCP that the developer refactored (this association was deleted because of the refactoring). Doing so, connectCenter restores the association to the refactored BCCP.
 
+#### Test Assertion #10.4.27
+Before an ASCCP or a BCCP is appended or inserted (assertions [#1](#test-assertion-1041), [#2](#test-assertion-1042), [#4](#test-assertion-1044) and [#5](#test-assertion-1045)), connectCenter checks what the association would break and shows the result in the Validation Results panel, not in a confirmation dialog. The check lays the ACCs it reaches out as they are and as they would be afterwards, and reports only the problems that the change would add: the ACC itself, every ACC that has it as its base ACC, and the ACCs that contain it when it is a group. Today the problems are duplicate property terms.
+
+##### Test Assertion #10.4.27.a
+When the association would add a duplicate property term, the panel lists the problem (it names the property term) and asks "Make the change all the same?" with Cancel and Proceed anyway. Cancel closes the question and nothing is appended; the ACC keeps the associations it had. Proceed anyway goes on with the change; the rules of saving still apply, so the cases of assertions [#1.c](#test-assertion-1041c), #2 and #5 still end with the message of the server.
+##### Test Assertion #10.4.27.b
+When the association would break nothing, nothing is asked: no panel is shown and the association is appended as it always was.
+##### Test Assertion #10.4.27.c
+The check also reaches the ACCs that have the ACC as their base ACC. When the ACC itself is fine but an ACC that has it as its base ACC would have the property term twice, the panel lists the problem with that ACC as its subject, and Cancel appends nothing to the ACC.
+
+#### Test Assertion #10.4.28
+When the developer assigns a base ACC (assertion [#10](#test-assertion-10410)) and doing so would add a duplicate property term between the ACC (or the ACCs under it) and the base ACC hierarchy, the Validation Results panel lists the problem and asks Cancel or Proceed anyway before the base ACC is set. Cancel leaves the ACC without the base ACC. Proceed anyway goes on with the change; the rules of saving still apply (assertion [#10.f](#test-assertion-10410f)).
+
+#### Test Assertion #10.4.29
+When the developer refactors an ASCCP or a BCCP to a base ACC (assertions [#13](#test-assertion-10413) and [#20](#test-assertion-10420)) and the move would add a duplicate property term to the ACCs it reaches, the Validation Results panel lists the problem and asks Cancel or Proceed anyway after the Refactor button is pressed. The panel comes after the analysis of the dialog: what the analysis blocks is still blocked (assertions [#14](#test-assertion-10414) to [#16](#test-assertion-10416), [#21](#test-assertion-10421) and [#22](#test-assertion-10422)). The confirmation of a deprecated base ACC is not changed. The analysis only looks for the same BCCP or ASCCP, so a move that leaves another BCCP of the same property term in an ACC that has the base ACC as its base ACC passes it and is the case for the panel.
+
+##### Test Assertion #10.4.29.a
+The panel lists the problem (it names the property term) and the ACC that would have the term twice as its subject. Cancel moves nothing: the association stays under the ACC and does not appear under the base ACC.
+##### Test Assertion #10.4.29.b
+Proceed anyway makes the move: the association appears under the base ACC.
+
+#### Test Assertion #10.4.30
+The developer can ask for the validation of the ACC (Validate in the context menu of its root node). The Validation Results panel lists the problems it finds, here a property term that two of its properties have; no question is asked, since nothing is being changed. An ACC without a problem only gets a message that no issues were found and no panel is shown.
+
 ### Test Step Pre-condition:
 
 1. There are the following core components:
@@ -472,6 +496,11 @@ The developer can cancel the revision of an ACC that had the base ACC as its bas
 15. He refactors a BCCP to a valid base ACC and verifies the successful case. (Assertion [#20](#test-assertion-10420))
 16. He tries to refactor a BCCP to invalid base ACCs and verifies that Draft, Candidate, Published, Deleted, other-owner, duplicate-property-term, and group-hierarchy cases are handled correctly. (Assertions [#21.a](#test-assertion-10421a)-[#21.e](#test-assertion-10421e), [#22](#test-assertion-10422), [#23](#test-assertion-10423))
 17. He cancels the related revisions after BCCP refactoring and verifies the restoration behavior. (Assertions [#24](#test-assertion-10424)-[#26](#test-assertion-10426))
+18. He appends a BCCP that the ACC already has and verifies that the Validation Results panel lists the duplicate property term, that Cancel appends nothing, and that appending a BCCP that breaks nothing is not asked about. (Assertions [#27.a](#test-assertion-10427a)-[#27.b](#test-assertion-10427b))
+19. He appends a BCCP that an ACC based on the ACC already has and verifies that the panel names that ACC and that Cancel appends nothing. (Assertion [#27.c](#test-assertion-10427c))
+20. He assigns a base ACC that has a BCCP the ACC already has and verifies that the panel lists the duplicate property term and that Cancel leaves the ACC without the base ACC. (Assertion [#28](#test-assertion-10428))
+21. He refactors a BCCP to the base ACC while another ACC that has the base ACC as its base ACC has a BCCP of the same property term, and verifies that the panel names that ACC, that Cancel moves nothing, and that Proceed anyway moves the BCCP. (Assertions [#29.a](#test-assertion-10429a)-[#29.b](#test-assertion-10429b))
+22. He validates an ACC with a duplicate property term and an ACC without a problem, and verifies the panel and the message. (Assertion [#30](#test-assertion-10430))
 
 ## Test Case 10.5
 

@@ -23,7 +23,6 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcAssociation;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
-import org.oagi.score.gateway.http.api.cc_management.model.CcDocumentImpl;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType;
@@ -71,6 +70,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -265,16 +265,20 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     private Map<AbieId, AbieSummaryRecord> findAbieMap;
-    private Map<AbieId, List<BbieSummaryRecord>> findBbieByFromAbieIdAndUsedIsTrueMap;
-    private Map<BbieId, List<BbieScSummaryRecord>> findBbieScByBbieIdAndUsedIsTrueMap;
+    private Map<AbieId, List<BbieSummaryRecord>> findBbieByFromAbieIdMap;
+    private Map<BbieId, List<BbieScSummaryRecord>> findBbieScByBbieIdMap;
     private Map<AbieId, List<AsbieSummaryRecord>> findAsbieByFromAbieIdMap;
     private Map<AsbiepId, AsbiepSummaryRecord> findASBIEPMap;
     private Map<AbieId, AsbiepSummaryRecord> findAsbiepByRoleOfAbieIdMap;
     private Map<BbiepId, BbiepSummaryRecord> findBBIEPMap;
 
-    private Map<CodeListManifestId, CodeListSummaryRecord> findCodeListMap;
-    private Map<AgencyIdListManifestId, AgencyIdListSummaryRecord> findAgencyIdListMap;
-    private Map<AgencyIdListValueManifestId, AgencyIdListValueSummaryRecord> findAgencyIdListValueMap;
+    // The code lists and agency identification lists are read as the expression asks for them, not all of them (with the
+    // values of each, a few thousand lists and ninety thousand values) for every generation. A list that is not found is
+    // remembered too.
+    private final Map<CodeListManifestId, Optional<CodeListSummaryRecord>> codeListMap = new ConcurrentHashMap<>();
+    private final Map<AgencyIdListManifestId, Optional<AgencyIdListSummaryRecord>> agencyIdListMap = new ConcurrentHashMap<>();
+    private final Map<AgencyIdListValueManifestId, Optional<AgencyIdListValueSummaryRecord>> agencyIdListValueMap = new ConcurrentHashMap<>();
+    private List<AgencyIdListSummaryRecord> allAgencyIdLists;
 
     private Map<UserId, String> findUserNameMap;
     private Map<ReleaseId, ReleaseDetailsRecord> findReleaseMap;
@@ -300,7 +304,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
         Set<ReleaseId> releaseIdSet = topLevelAsbieps.stream().map(e -> e.release().releaseId()).collect(Collectors.toSet());
 
-        Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet = new HashSet();
+        Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet = new LinkedHashSet<>();
         topLevelAsbiepSet.addAll(topLevelAsbieps);
         refTopLevelAsbiepSet = findRefTopLevelAsbieps(topLevelAsbiepSet);
         topLevelAsbiepSet.addAll(refTopLevelAsbiepSet);
@@ -314,7 +318,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
     private Set<TopLevelAsbiepSummaryRecord> findRefTopLevelAsbieps(Set<TopLevelAsbiepSummaryRecord> topLevelAsbiepSet) {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
 
-        Set<TopLevelAsbiepSummaryRecord> refTopLevelAsbiepSet = new HashSet();
+        Set<TopLevelAsbiepSummaryRecord> refTopLevelAsbiepSet = new LinkedHashSet<>();
         refTopLevelAsbiepSet.addAll(topLevelAsbiepQuery.getRefTopLevelAsbiepSummaryList(
                 topLevelAsbiepSet.stream().map(e -> e.topLevelAsbiepId()).collect(Collectors.toSet())));
 
@@ -327,6 +331,20 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
     public Set<TopLevelAsbiepSummaryRecord> getRefTopLevelAsbiepSet() {
         return (refTopLevelAsbiepSet != null) ? refTopLevelAsbiepSet : Collections.emptySet();
+    }
+
+    /**
+     * What the files of the generation run share, or {@code null} when they share nothing.
+     * The host sets it, and an expression keeps in it what every file would repeat.
+     */
+    private SharedComponentRegistry sharedComponentRegistry;
+
+    public void setSharedComponentRegistry(SharedComponentRegistry sharedComponentRegistry) {
+        this.sharedComponentRegistry = sharedComponentRegistry;
+    }
+
+    public SharedComponentRegistry getSharedComponentRegistry() {
+        return sharedComponentRegistry;
     }
 
     /**
@@ -359,7 +377,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
             throw new IllegalArgumentException("'releaseIds' parameter must not be null.");
         }
 
-        this.ccDocument = new CcDocumentImpl(requester, repositoryFactory, releaseIds);
+        this.ccDocument = repositoryFactory.ccDocumentFactory().create(requester, releaseIds);
 
         List<AbieSummaryRecord> abieList = repositoryFactory.abieQueryRepository(requester)
                 .getAbieSummaryList(topLevelAsbiepIds);
@@ -368,14 +386,14 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
         List<BbieSummaryRecord> bbieList = repositoryFactory.bbieQueryRepository(requester)
                 .getBbieSummaryList(topLevelAsbiepIds);
-        findBbieByFromAbieIdAndUsedIsTrueMap = bbieList.stream()
-                .filter(e -> e.used())
+        // Keep both true and false rows. Inverse Mode uses absence of a row as the default,
+        // while an explicit false row must override that default during expression generation.
+        findBbieByFromAbieIdMap = bbieList.stream()
                 .collect(Collectors.groupingBy(e -> e.fromAbieId()));
 
         List<BbieScSummaryRecord> bbieScList = repositoryFactory.bbieScQueryRepository(requester)
                 .getBbieScSummaryList(topLevelAsbiepIds);
-        findBbieScByBbieIdAndUsedIsTrueMap = bbieScList.stream()
-                .filter(e -> e.used())
+        findBbieScByBbieIdMap = bbieScList.stream()
                 .collect(Collectors.groupingBy(e -> e.bbieId()));
 
         List<AsbieSummaryRecord> asbieList = repositoryFactory.asbieQueryRepository(requester)
@@ -394,15 +412,6 @@ public class GenerationContext implements InitializingBean, CcDocument {
                 .getBbiepSummaryList(topLevelAsbiepIds);
         findBBIEPMap = bbiepList.stream()
                 .collect(Collectors.toMap(e -> e.bbiepId(), Function.identity()));
-
-        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
-        findCodeListMap = codeListQuery.getCodeListSummaryList().stream()
-                .collect(Collectors.toMap(CodeListSummaryRecord::codeListManifestId, Function.identity()));
-        var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
-        findAgencyIdListMap = agencyIdListQuery.getAgencyIdListSummaryList().stream()
-                .collect(Collectors.toMap(AgencyIdListSummaryRecord::agencyIdListManifestId, Function.identity()));
-        findAgencyIdListValueMap = agencyIdListQuery.getAgencyIdListValueSummaryList().stream()
-                .collect(Collectors.toMap(AgencyIdListValueSummaryRecord::agencyIdListValueManifestId, Function.identity()));
 
         findUserNameMap = repositoryFactory.scoreUserQueryRepository().getScoreUsers().stream()
                 .collect(Collectors.toMap(e -> e.userId(), e -> e.username()));
@@ -457,16 +466,20 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     public List<CodeListValueSummaryRecord> findCodeListValueByCodeListManifestId(CodeListManifestId codeListManifestId) {
-        CodeListSummaryRecord codeList = findCodeListMap.get(findCodeListMap);
+        CodeListSummaryRecord codeList = getCodeList(codeListManifestId);
         return (codeList != null) ? codeList.valueList() : Collections.emptyList();
     }
 
     public AgencyIdListValueSummaryRecord findAgencyIdListValue(AgencyIdListValueManifestId agencyIdListValueManifestId) {
-        return (agencyIdListValueManifestId != null) ? findAgencyIdListValueMap.get(agencyIdListValueManifestId) : null;
+        if (agencyIdListValueManifestId == null) {
+            return null;
+        }
+        return agencyIdListValueMap.computeIfAbsent(agencyIdListValueManifestId, id -> Optional.ofNullable(
+                repositoryFactory.agencyIdListQueryRepository(requester).getAgencyIdListValueSummary(id))).orElse(null);
     }
 
     public List<AgencyIdListValueSummaryRecord> findAgencyIdListValueByAgencyIdListManifestId(AgencyIdListManifestId agencyIdListManifestId) {
-        AgencyIdListSummaryRecord agencyIdList = findAgencyIdListMap.get(agencyIdListManifestId);
+        AgencyIdListSummaryRecord agencyIdList = getAgencyIdList(agencyIdListManifestId);
         return (agencyIdList != null) ? agencyIdList.valueList() : Collections.emptyList();
     }
 
@@ -495,13 +508,13 @@ public class GenerationContext implements InitializingBean, CcDocument {
         }
 
         BbieId bbieId = bbie.bbieId();
-        List<BbieScSummaryRecord> storedBbieScSummaryRecords = findBbieScByBbieIdAndUsedIsTrueMap.containsKey(bbieId) ?
-                findBbieScByBbieIdAndUsedIsTrueMap.get(bbieId) :
+        List<BbieScSummaryRecord> storedBbieScSummaryRecords = findBbieScByBbieIdMap.containsKey(bbieId) ?
+                findBbieScByBbieIdMap.get(bbieId) :
                 Collections.emptyList();
 
         TopLevelAsbiepSummaryRecord topLevelAsbiep = this.topLevelAsbiepMap.get(bbie.ownerTopLevelAsbiepId());
         if (!topLevelAsbiep.inverseMode()) {
-            return storedBbieScSummaryRecords;
+            return storedBbieScSummaryRecords.stream().filter(e -> e.used()).collect(Collectors.toList());
         }
 
         Map<DtScManifestId, BbieScSummaryRecord> storedBbieScMap = storedBbieScSummaryRecords.stream()
@@ -539,7 +552,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
             }
         }
 
-        return bbieScList;
+        return bbieScList.stream().filter(e -> e.used()).collect(Collectors.toList());
     }
 
     private List<AsccSummaryRecord> findAsccListByAccManifestId(AccManifestId accManifestId) {
@@ -723,8 +736,8 @@ public class GenerationContext implements InitializingBean, CcDocument {
         List<AsbieSummaryRecord> storedASBIEs = findAsbieByFromAbieIdMap.containsKey(fromAbieId) ?
                 findAsbieByFromAbieIdMap.get(fromAbieId) :
                 Collections.emptyList();
-        List<BbieSummaryRecord> storedBBIEs = findBbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
-                findBbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
+        List<BbieSummaryRecord> storedBBIEs = findBbieByFromAbieIdMap.containsKey(fromAbieId) ?
+                findBbieByFromAbieIdMap.get(fromAbieId) :
                 Collections.emptyList();
 
         TopLevelAsbiepSummaryRecord topLevelAsbiep = this.topLevelAsbiepMap.get(abie.ownerTopLevelAsbiepId());
@@ -882,7 +895,18 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     public CodeListSummaryRecord getCodeList(CodeListManifestId codeListManifestId) {
-        return (codeListManifestId != null) ? findCodeListMap.get(codeListManifestId) : null;
+        if (codeListManifestId == null) {
+            return null;
+        }
+        return codeListMap.computeIfAbsent(codeListManifestId, id -> {
+            CodeListSummaryRecord codeList = ccDocument.getCodeList(id);
+            if (codeList == null) {
+                // not one of the releases of the document
+                codeList = repositoryFactory.codeListQueryRepository(requester)
+                        .getCodeListSummaryListByManifestIds(List.of(id)).stream().findFirst().orElse(null);
+            }
+            return Optional.ofNullable(codeList);
+        }).orElse(null);
     }
 
     public CodeListSummaryRecord getCodeList(BbieScSummaryRecord bbieSc) {
@@ -902,7 +926,18 @@ public class GenerationContext implements InitializingBean, CcDocument {
     }
 
     public AgencyIdListSummaryRecord getAgencyIdList(AgencyIdListManifestId agencyIdListManifestId) {
-        return (agencyIdListManifestId != null) ? findAgencyIdListMap.get(agencyIdListManifestId) : null;
+        if (agencyIdListManifestId == null) {
+            return null;
+        }
+        return agencyIdListMap.computeIfAbsent(agencyIdListManifestId, id -> {
+            AgencyIdListSummaryRecord agencyIdList = ccDocument.getAgencyIdList(id);
+            if (agencyIdList == null) {
+                // not one of the releases of the document
+                agencyIdList = repositoryFactory.agencyIdListQueryRepository(requester)
+                        .getAgencyIdListSummaryListByManifestIds(List.of(id)).stream().findFirst().orElse(null);
+            }
+            return Optional.ofNullable(agencyIdList);
+        }).orElse(null);
     }
 
     public AgencyIdListSummaryRecord getAgencyIdList(BbieSummaryRecord bbie) {
@@ -978,7 +1013,10 @@ public class GenerationContext implements InitializingBean, CcDocument {
             return null;
         }
 
-        for (AgencyIdListSummaryRecord agencyIdList : findAgencyIdListMap.values()) {
+        if (allAgencyIdLists == null) {
+            allAgencyIdLists = repositoryFactory.agencyIdListQueryRepository(requester).getAgencyIdListSummaryList();
+        }
+        for (AgencyIdListSummaryRecord agencyIdList : allAgencyIdLists) {
             if (schemeAgencyId.equals(agencyIdList.listId())) {
                 return agencyIdList;
             }

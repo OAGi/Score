@@ -1,0 +1,22 @@
+<textarea #field class="width-max"
+  [class.filename-expression-input-error]="invalid"
+  cdkTextareaAutosize
+  [cdkAutosizeMinRows]="minRows"
+  [cdkAutosizeMaxRows]="maxRows"
+  autocomplete="off" spellcheck="false"
+  [ngModel]="value"
+  (ngModelChange)="onValueChange($event)"
+  [matAutocomplete]="suggest" [matAutocompleteDisabled]="candidates.length === 0"
+  (input)="requestSuggestions()" (focus)="requestSuggestions()" (click)="requestSuggestions()"
+  (keyup.arrowleft)="requestSuggestions()" (keyup.arrowright)="requestSuggestions()"
+  (keydown.enter)="onEnter($event)"
+  (blur)="onBlur()"></textarea>
+<mat-autocomplete #suggest="matAutocomplete" class="tree-search-suggestions" [autoActiveFirstOption]="false"
+  (optionSelected)="onSelected($event)">
+  @for (c of candidates; track c.label) {
+    <mat-option [value]="c.expression" [title]="c.detail">
+      <span class="tree-search-suggestion-label">{{ c.label }}</span>
+      <span class="tree-search-suggestion-detail">{{ c.detail }}</span>
+    </mat-option>
+  }
+</mat-autocomplete>

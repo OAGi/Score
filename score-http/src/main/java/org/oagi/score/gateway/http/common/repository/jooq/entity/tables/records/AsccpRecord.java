@@ -21,122 +21,120 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.asccp.asccp_id</code>. An internal, primary
-     * database key of an ASCCP.
+     * Setter for <code>asccp.asccp_id</code>. An internal, primary database key
+     * of an ASCCP.
      */
     public void setAsccpId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.asccp_id</code>. An internal, primary
-     * database key of an ASCCP.
+     * Getter for <code>asccp.asccp_id</code>. An internal, primary database key
+     * of an ASCCP.
      */
     public ULong getAsccpId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.asccp.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>asccp.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>asccp.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.asccp.type</code>. The Type of the ASCCP. List:
-     * Default, Extension 
+     * Setter for <code>asccp.type</code>. The Type of the ASCCP. List: Default,
+     * Extension 
      */
     public void setType(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.type</code>. The Type of the ASCCP. List:
-     * Default, Extension 
+     * Getter for <code>asccp.type</code>. The Type of the ASCCP. List: Default,
+     * Extension 
      */
     public String getType() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.asccp.property_term</code>. The role (or property)
-     * the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used
-     * by another ACC. There must be only one ASCCP without a Property_Term for
-     * a particular ACC.
+     * Setter for <code>asccp.property_term</code>. The role (or property) the
+     * ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by
+     * another ACC. There must be only one ASCCP without a Property_Term for a
+     * particular ACC.
      */
     public void setPropertyTerm(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.property_term</code>. The role (or property)
-     * the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used
-     * by another ACC. There must be only one ASCCP without a Property_Term for
-     * a particular ACC.
+     * Getter for <code>asccp.property_term</code>. The role (or property) the
+     * ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by
+     * another ACC. There must be only one ASCCP without a Property_Term for a
+     * particular ACC.
      */
     public String getPropertyTerm() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.asccp.definition</code>. Description of the ASCCP.
+     * Setter for <code>asccp.definition</code>. Description of the ASCCP.
      */
     public void setDefinition(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.definition</code>. Description of the ASCCP.
+     * Getter for <code>asccp.definition</code>. Description of the ASCCP.
      */
     public String getDefinition() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oagi.asccp.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>asccp.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>asccp.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.asccp.role_of_acc_id</code>. The ACC from which
-     * this ASCCP is created (ASCCP applies role to the ACC).
+     * Setter for <code>asccp.role_of_acc_id</code>. The ACC from which this
+     * ASCCP is created (ASCCP applies role to the ACC).
      */
     public void setRoleOfAccId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.role_of_acc_id</code>. The ACC from which
-     * this ASCCP is created (ASCCP applies role to the ACC).
+     * Getter for <code>asccp.role_of_acc_id</code>. The ACC from which this
+     * ASCCP is created (ASCCP applies role to the ACC).
      */
     public ULong getRoleOfAccId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.asccp.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * Setter for <code>asccp.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -147,8 +145,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.created_by</code>. Foreign key to the
-     * APP_USER table referring to the user who creates the entity. 
+     * Getter for <code>asccp.created_by</code>. Foreign key to the APP_USER
+     * table referring to the user who creates the entity. 
      * 
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
@@ -159,9 +157,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Setter for <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -171,9 +169,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.
+     * Getter for <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.
      * 
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
@@ -183,7 +181,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.last_updated_by</code>. Foreign key to the
+     * Setter for <code>asccp.last_updated_by</code>. Foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -194,7 +192,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.last_updated_by</code>. Foreign key to the
+     * Getter for <code>asccp.last_updated_by</code>. Foreign key to the
      * APP_USER table referring to the last user who has updated the record. 
      * 
      * In the history record, this should always be the user who is editing the
@@ -205,7 +203,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.creation_timestamp</code>. Timestamp when the
+     * Setter for <code>asccp.creation_timestamp</code>. Timestamp when the
      * revision of the ASCCP was created. 
      * 
      * This never change for a revision.
@@ -215,7 +213,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.creation_timestamp</code>. Timestamp when the
+     * Getter for <code>asccp.creation_timestamp</code>. Timestamp when the
      * revision of the ASCCP was created. 
      * 
      * This never change for a revision.
@@ -225,8 +223,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Setter for <code>asccp.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -237,8 +235,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.
+     * Getter for <code>asccp.last_update_timestamp</code>. The timestamp when
+     * the record was last updated.
      * 
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
@@ -249,9 +247,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the ASCCP.
+     * Setter for <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCCP.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -261,9 +259,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the ASCCP.
+     * Getter for <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ASCCP.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -273,48 +271,46 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.namespace_id</code>. Foreign key to the
-     * Namespace table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Setter for <code>asccp.namespace_id</code>. Foreign key to the Namespace
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public void setNamespaceId(ULong value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.namespace_id</code>. Foreign key to the
-     * Namespace table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Getter for <code>asccp.namespace_id</code>. Foreign key to the Namespace
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public ULong getNamespaceId() {
         return (ULong) get(13);
     }
 
     /**
-     * Setter for <code>oagi.asccp.reusable_indicator</code>. This indicates
-     * whether the ASCCP can be used by more than one ASCC. This maps directly
-     * to the XML schema local element declaration.
+     * Setter for <code>asccp.reusable_indicator</code>. This indicates whether
+     * the ASCCP can be used by more than one ASCC. This maps directly to the
+     * XML schema local element declaration.
      */
     public void setReusableIndicator(Byte value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.reusable_indicator</code>. This indicates
-     * whether the ASCCP can be used by more than one ASCC. This maps directly
-     * to the XML schema local element declaration.
+     * Getter for <code>asccp.reusable_indicator</code>. This indicates whether
+     * the ASCCP can be used by more than one ASCC. This maps directly to the
+     * XML schema local element declaration.
      */
     public Byte getReusableIndicator() {
         return (Byte) get(14);
     }
 
     /**
-     * Setter for <code>oagi.asccp.is_deprecated</code>. Indicates whether the
-     * CC is deprecated and should not be reused (i.e., no new reference to this
+     * Setter for <code>asccp.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public void setIsDeprecated(Byte value) {
@@ -322,8 +318,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.is_deprecated</code>. Indicates whether the
-     * CC is deprecated and should not be reused (i.e., no new reference to this
+     * Getter for <code>asccp.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be created).
      */
     public Byte getIsDeprecated() {
@@ -331,7 +327,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.replacement_asccp_id</code>. This refers to a
+     * Setter for <code>asccp.replacement_asccp_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public void setReplacementAsccpId(ULong value) {
@@ -339,7 +335,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.replacement_asccp_id</code>. This refers to a
+     * Getter for <code>asccp.replacement_asccp_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public ULong getReplacementAsccpId() {
@@ -347,27 +343,27 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.is_nillable</code>. This is corresponding to
-     * the XML schema nillable flag. Although the nillable may not apply in
-     * certain cases of the ASCCP (e.g., when it corresponds to an XSD group),
-     * the value is default to false for simplification.
+     * Setter for <code>asccp.is_nillable</code>. This is corresponding to the
+     * XML schema nillable flag. Although the nillable may not apply in certain
+     * cases of the ASCCP (e.g., when it corresponds to an XSD group), the value
+     * is default to false for simplification.
      */
     public void setIsNillable(Byte value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.is_nillable</code>. This is corresponding to
-     * the XML schema nillable flag. Although the nillable may not apply in
-     * certain cases of the ASCCP (e.g., when it corresponds to an XSD group),
-     * the value is default to false for simplification.
+     * Getter for <code>asccp.is_nillable</code>. This is corresponding to the
+     * XML schema nillable flag. Although the nillable may not apply in certain
+     * cases of the ASCCP (e.g., when it corresponds to an XSD group), the value
+     * is default to false for simplification.
      */
     public Byte getIsNillable() {
         return (Byte) get(17);
     }
 
     /**
-     * Setter for <code>oagi.asccp.prev_asccp_id</code>. A self-foreign key to
+     * Setter for <code>asccp.prev_asccp_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
     public void setPrevAsccpId(ULong value) {
@@ -375,7 +371,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.prev_asccp_id</code>. A self-foreign key to
+     * Getter for <code>asccp.prev_asccp_id</code>. A self-foreign key to
      * indicate the previous history record.
      */
     public ULong getPrevAsccpId() {
@@ -383,7 +379,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.next_asccp_id</code>. A self-foreign key to
+     * Setter for <code>asccp.next_asccp_id</code>. A self-foreign key to
      * indicate the next history record.
      */
     public void setNextAsccpId(ULong value) {
@@ -391,7 +387,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Getter for <code>oagi.asccp.next_asccp_id</code>. A self-foreign key to
+     * Getter for <code>asccp.next_asccp_id</code>. A self-foreign key to
      * indicate the next history record.
      */
     public ULong getNextAsccpId() {

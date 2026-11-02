@@ -1,0 +1,26 @@
+/* The place that the button of the page had (a button of the toolbar does not give way: the title does). */
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-left: 0.5rem;
+}
+
+/* The `hidden` of the page (e.g. nothing selected): the display above would hide it from the stylesheet of the browser. */
+:host([hidden]) {
+  display: none;
+}
+
+.responsive-icon {
+  display: none;
+}
+
+/* A narrow screen: the icon, not the text. */
+@media (max-width: 600px) {
+  .responsive-text {
+    display: none;
+  }
+
+  .responsive-icon {
+    display: inline-flex;
+  }
+}

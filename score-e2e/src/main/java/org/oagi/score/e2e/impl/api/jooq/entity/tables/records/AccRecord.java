@@ -28,75 +28,73 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.acc.acc_id</code>. A internal, primary database key
-     * of an ACC.
+     * Setter for <code>acc.acc_id</code>. A internal, primary database key of
+     * an ACC.
      */
     public void setAccId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.acc_id</code>. A internal, primary database key
-     * of an ACC.
+     * Getter for <code>acc.acc_id</code>. A internal, primary database key of
+     * an ACC.
      */
     public ULong getAccId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.acc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Setter for <code>acc.guid</code>. A globally unique identifier (GUID).
      */
     public void setGuid(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.guid</code>. A globally unique identifier
-     * (GUID).
+     * Getter for <code>acc.guid</code>. A globally unique identifier (GUID).
      */
     public String getGuid() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.acc.type</code>. The Type of the ACC. List:
-     * Default, Extension, AllExtension.
+     * Setter for <code>acc.type</code>. The Type of the ACC. List: Default,
+     * Extension, AllExtension.
      */
     public void setType(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.type</code>. The Type of the ACC. List:
-     * Default, Extension, AllExtension.
+     * Getter for <code>acc.type</code>. The Type of the ACC. List: Default,
+     * Extension, AllExtension.
      */
     public String getType() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.acc.object_class_term</code>. Object class name of
-     * the ACC concept. For OAGIS, this is generally name of a type with the
-     * "Type" truncated from the end. Per CCS the name is space separated. "ID"
-     * is expanded to "Identifier".
+     * Setter for <code>acc.object_class_term</code>. Object class name of the
+     * ACC concept. For OAGIS, this is generally name of a type with the "Type"
+     * truncated from the end. Per CCS the name is space separated. "ID" is
+     * expanded to "Identifier".
      */
     public void setObjectClassTerm(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.object_class_term</code>. Object class name of
-     * the ACC concept. For OAGIS, this is generally name of a type with the
-     * "Type" truncated from the end. Per CCS the name is space separated. "ID"
-     * is expanded to "Identifier".
+     * Getter for <code>acc.object_class_term</code>. Object class name of the
+     * ACC concept. For OAGIS, this is generally name of a type with the "Type"
+     * truncated from the end. Per CCS the name is space separated. "ID" is
+     * expanded to "Identifier".
      */
     public String getObjectClassTerm() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>oagi.acc.definition</code>. This is a documentation or
+     * Setter for <code>acc.definition</code>. This is a documentation or
      * description of the ACC. Since ACC is business context independent, this
      * is a business context independent description of the ACC concept.
      */
@@ -105,7 +103,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.definition</code>. This is a documentation or
+     * Getter for <code>acc.definition</code>. This is a documentation or
      * description of the ACC. Since ACC is business context independent, this
      * is a business context independent description of the ACC concept.
      */
@@ -114,60 +112,60 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Setter for <code>acc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public void setDefinitionSource(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.definition_source</code>. This is typically a
-     * URL identifying the source of the DEFINITION column.
+     * Getter for <code>acc.definition_source</code>. This is typically a URL
+     * identifying the source of the DEFINITION column.
      */
     public String getDefinitionSource() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>oagi.acc.based_acc_id</code>. BASED_ACC_ID is a foreign
-     * key to the ACC table itself. It represents the ACC that is qualified by
-     * this ACC. In general CCS sense, a qualification can be a content
-     * extension or restriction, but the current scope supports only extension.
+     * Setter for <code>acc.based_acc_id</code>. BASED_ACC_ID is a foreign key
+     * to the ACC table itself. It represents the ACC that is qualified by this
+     * ACC. In general CCS sense, a qualification can be a content extension or
+     * restriction, but the current scope supports only extension.
      */
     public void setBasedAccId(ULong value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.based_acc_id</code>. BASED_ACC_ID is a foreign
-     * key to the ACC table itself. It represents the ACC that is qualified by
-     * this ACC. In general CCS sense, a qualification can be a content
-     * extension or restriction, but the current scope supports only extension.
+     * Getter for <code>acc.based_acc_id</code>. BASED_ACC_ID is a foreign key
+     * to the ACC table itself. It represents the ACC that is qualified by this
+     * ACC. In general CCS sense, a qualification can be a content extension or
+     * restriction, but the current scope supports only extension.
      */
     public ULong getBasedAccId() {
         return (ULong) get(6);
     }
 
     /**
-     * Setter for <code>oagi.acc.object_class_qualifier</code>. This column
-     * stores the qualifier of an ACC, particularly when it has a based ACC. 
+     * Setter for <code>acc.object_class_qualifier</code>. This column stores
+     * the qualifier of an ACC, particularly when it has a based ACC. 
      */
     public void setObjectClassQualifier(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.object_class_qualifier</code>. This column
-     * stores the qualifier of an ACC, particularly when it has a based ACC. 
+     * Getter for <code>acc.object_class_qualifier</code>. This column stores
+     * the qualifier of an ACC, particularly when it has a based ACC. 
      */
     public String getObjectClassQualifier() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>oagi.acc.oagis_component_type</code>. The value can be 0
-     * = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 =
+     * Setter for <code>acc.oagis_component_type</code>. The value can be 0 =
+     * BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 =
      * USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the
      * OBJECT_CLASS_TERM contains "Base" at the end. EXTENSION is assigned with
      * the OBJECT_CLASS_TERM contains "Extension" at the end. SEMANTIC_GROUP is
@@ -182,8 +180,8 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.oagis_component_type</code>. The value can be 0
-     * = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 =
+     * Getter for <code>acc.oagis_component_type</code>. The value can be 0 =
+     * BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 =
      * USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the
      * OBJECT_CLASS_TERM contains "Base" at the end. EXTENSION is assigned with
      * the OBJECT_CLASS_TERM contains "Extension" at the end. SEMANTIC_GROUP is
@@ -198,53 +196,49 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Setter for <code>acc.namespace_id</code>. Foreign key to the NAMESPACE
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public void setNamespaceId(ULong value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.namespace_id</code>. Foreign key to the
-     * NAMESPACE table. This is the namespace to which the entity belongs. This
-     * namespace column is primarily used in the case the component is a user's
-     * component because there is also a namespace assigned at the release
-     * level.
+     * Getter for <code>acc.namespace_id</code>. Foreign key to the NAMESPACE
+     * table. This is the namespace to which the entity belongs. This namespace
+     * column is primarily used in the case the component is a user's component
+     * because there is also a namespace assigned at the release level.
      */
     public ULong getNamespaceId() {
         return (ULong) get(9);
     }
 
     /**
-     * Setter for <code>oagi.acc.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity.\n\nThis column never
-     * change between the history and the current record for a given revision.
-     * The history record should have the same value as that of its current
-     * record.
+     * Setter for <code>acc.created_by</code>. Foreign key to the APP_USER table
+     * referring to the user who creates the entity.\n\nThis column never change
+     * between the history and the current record for a given revision. The
+     * history record should have the same value as that of its current record.
      */
     public void setCreatedBy(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity.\n\nThis column never
-     * change between the history and the current record for a given revision.
-     * The history record should have the same value as that of its current
-     * record.
+     * Getter for <code>acc.created_by</code>. Foreign key to the APP_USER table
+     * referring to the user who creates the entity.\n\nThis column never change
+     * between the history and the current record for a given revision. The
+     * history record should have the same value as that of its current record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(10);
     }
 
     /**
-     * Setter for <code>oagi.acc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.\n\nThe
+     * Setter for <code>acc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
      */
@@ -253,9 +247,9 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.owner_user_id</code>. Foreign key to the
-     * APP_USER table. This is the user who owns the entity, is allowed to edit
-     * the entity, and who can transfer the ownership to another user.\n\nThe
+     * Getter for <code>acc.owner_user_id</code>. Foreign key to the APP_USER
+     * table. This is the user who owns the entity, is allowed to edit the
+     * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership. 
      */
@@ -264,27 +258,27 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. \n\nIn
-     * the history record, this should always be the user who is editing the
-     * entity (perhaps except when the ownership has just been changed).
+     * Setter for <code>acc.last_updated_by</code>. Foreign key to the APP_USER
+     * table referring to the last user who updated the record. \n\nIn the
+     * history record, this should always be the user who is editing the entity
+     * (perhaps except when the ownership has just been changed).
      */
     public void setLastUpdatedBy(ULong value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. \n\nIn
-     * the history record, this should always be the user who is editing the
-     * entity (perhaps except when the ownership has just been changed).
+     * Getter for <code>acc.last_updated_by</code>. Foreign key to the APP_USER
+     * table referring to the last user who updated the record. \n\nIn the
+     * history record, this should always be the user who is editing the entity
+     * (perhaps except when the ownership has just been changed).
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(12);
     }
 
     /**
-     * Setter for <code>oagi.acc.creation_timestamp</code>. Timestamp when the
+     * Setter for <code>acc.creation_timestamp</code>. Timestamp when the
      * revision of the ACC was created. \n\nThis never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -292,7 +286,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.creation_timestamp</code>. Timestamp when the
+     * Getter for <code>acc.creation_timestamp</code>. Timestamp when the
      * revision of the ACC was created. \n\nThis never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -300,29 +294,29 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.\n\nThe value of this column in the
-     * latest history record should be the same as that of the current record.
-     * This column keeps the record of when the revision has occurred.
+     * Setter for <code>acc.last_update_timestamp</code>. The timestamp when the
+     * record was last updated.\n\nThe value of this column in the latest
+     * history record should be the same as that of the current record. This
+     * column keeps the record of when the revision has occurred.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.last_update_timestamp</code>. The timestamp
-     * when the record was last updated.\n\nThe value of this column in the
-     * latest history record should be the same as that of the current record.
-     * This column keeps the record of when the revision has occurred.
+     * Getter for <code>acc.last_update_timestamp</code>. The timestamp when the
+     * record was last updated.\n\nThe value of this column in the latest
+     * history record should be the same as that of the current record. This
+     * column keeps the record of when the revision has occurred.
      */
     public LocalDateTime getLastUpdateTimestamp() {
         return (LocalDateTime) get(14);
     }
 
     /**
-     * Setter for <code>oagi.acc.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the ACC.
+     * Setter for <code>acc.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ACC.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -332,9 +326,9 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.state</code>. Deleted, WIP, Draft, QA,
-     * Candidate, Production, Release Draft, Published. This the revision life
-     * cycle state of the ACC.
+     * Getter for <code>acc.state</code>. Deleted, WIP, Draft, QA, Candidate,
+     * Production, Release Draft, Published. This the revision life cycle state
+     * of the ACC.
      * 
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
@@ -344,8 +338,8 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Setter for <code>acc.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be allowed).
      */
     public void setIsDeprecated(Byte value) {
@@ -353,8 +347,8 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.is_deprecated</code>. Indicates whether the CC
-     * is deprecated and should not be reused (i.e., no new reference to this
+     * Getter for <code>acc.is_deprecated</code>. Indicates whether the CC is
+     * deprecated and should not be reused (i.e., no new reference to this
      * record should be allowed).
      */
     public Byte getIsDeprecated() {
@@ -362,7 +356,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.replacement_acc_id</code>. This refers to a
+     * Setter for <code>acc.replacement_acc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public void setReplacementAccId(ULong value) {
@@ -370,7 +364,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Getter for <code>oagi.acc.replacement_acc_id</code>. This refers to a
+     * Getter for <code>acc.replacement_acc_id</code>. This refers to a
      * replacement if the record is deprecated.
      */
     public ULong getReplacementAccId() {
@@ -378,54 +372,54 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
     }
 
     /**
-     * Setter for <code>oagi.acc.is_abstract</code>. This is the XML Schema
-     * abstract flag. Default is false. If it is true, the abstract flag will be
-     * set to true when generating a corresponding xsd:complexType. So although
-     * this flag may not apply to some ACCs such as those that are xsd:group. It
-     * is still have a false value.
+     * Setter for <code>acc.is_abstract</code>. This is the XML Schema abstract
+     * flag. Default is false. If it is true, the abstract flag will be set to
+     * true when generating a corresponding xsd:complexType. So although this
+     * flag may not apply to some ACCs such as those that are xsd:group. It is
+     * still have a false value.
      */
     public void setIsAbstract(Byte value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.is_abstract</code>. This is the XML Schema
-     * abstract flag. Default is false. If it is true, the abstract flag will be
-     * set to true when generating a corresponding xsd:complexType. So although
-     * this flag may not apply to some ACCs such as those that are xsd:group. It
-     * is still have a false value.
+     * Getter for <code>acc.is_abstract</code>. This is the XML Schema abstract
+     * flag. Default is false. If it is true, the abstract flag will be set to
+     * true when generating a corresponding xsd:complexType. So although this
+     * flag may not apply to some ACCs such as those that are xsd:group. It is
+     * still have a false value.
      */
     public Byte getIsAbstract() {
         return (Byte) get(18);
     }
 
     /**
-     * Setter for <code>oagi.acc.prev_acc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Setter for <code>acc.prev_acc_id</code>. A self-foreign key to indicate
+     * the previous history record.
      */
     public void setPrevAccId(ULong value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.prev_acc_id</code>. A self-foreign key to
-     * indicate the previous history record.
+     * Getter for <code>acc.prev_acc_id</code>. A self-foreign key to indicate
+     * the previous history record.
      */
     public ULong getPrevAccId() {
         return (ULong) get(19);
     }
 
     /**
-     * Setter for <code>oagi.acc.next_acc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Setter for <code>acc.next_acc_id</code>. A self-foreign key to indicate
+     * the next history record.
      */
     public void setNextAccId(ULong value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>oagi.acc.next_acc_id</code>. A self-foreign key to
-     * indicate the next history record.
+     * Getter for <code>acc.next_acc_id</code>. A self-foreign key to indicate
+     * the next history record.
      */
     public ULong getNextAccId() {
         return (ULong) get(20);

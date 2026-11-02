@@ -30,8 +30,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.e2e.impl.api.jooq.entity.DefaultSchema;
 import org.oagi.score.e2e.impl.api.jooq.entity.Keys;
-import org.oagi.score.e2e.impl.api.jooq.entity.Oagi;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.BizCtx.BizCtxPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.Tenant.TenantPath;
 import org.oagi.score.e2e.impl.api.jooq.entity.tables.records.TenantBusinessCtxRecord;
@@ -46,7 +46,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.tenant_business_ctx</code>
+     * The reference instance of <code>tenant_business_ctx</code>
      */
     public static final TenantBusinessCtx TENANT_BUSINESS_CTX = new TenantBusinessCtx();
 
@@ -59,19 +59,19 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     }
 
     /**
-     * The column <code>oagi.tenant_business_ctx.tenant_business_ctx_id</code>.
+     * The column <code>tenant_business_ctx.tenant_business_ctx_id</code>.
      * Primary key column.
      */
     public final TableField<TenantBusinessCtxRecord, ULong> TENANT_BUSINESS_CTX_ID = createField(DSL.name("tenant_business_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key column.");
 
     /**
-     * The column <code>oagi.tenant_business_ctx.tenant_id</code>. Tenant role.
+     * The column <code>tenant_business_ctx.tenant_id</code>. Tenant role.
      */
     public final TableField<TenantBusinessCtxRecord, ULong> TENANT_ID = createField(DSL.name("tenant_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Tenant role.");
 
     /**
-     * The column <code>oagi.tenant_business_ctx.biz_ctx_id</code>. Concrete
-     * business context for the company.
+     * The column <code>tenant_business_ctx.biz_ctx_id</code>. Concrete business
+     * context for the company.
      */
     public final TableField<TenantBusinessCtxRecord, ULong> BIZ_CTX_ID = createField(DSL.name("biz_ctx_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Concrete business context for the company.");
 
@@ -84,21 +84,21 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.tenant_business_ctx</code> table reference
+     * Create an aliased <code>tenant_business_ctx</code> table reference
      */
     public TenantBusinessCtx(String alias) {
         this(DSL.name(alias), TENANT_BUSINESS_CTX);
     }
 
     /**
-     * Create an aliased <code>oagi.tenant_business_ctx</code> table reference
+     * Create an aliased <code>tenant_business_ctx</code> table reference
      */
     public TenantBusinessCtx(Name alias) {
         this(alias, TENANT_BUSINESS_CTX);
     }
 
     /**
-     * Create a <code>oagi.tenant_business_ctx</code> table reference
+     * Create a <code>tenant_business_ctx</code> table reference
      */
     public TenantBusinessCtx() {
         this(DSL.name("tenant_business_ctx"), null);
@@ -139,7 +139,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     private transient BizCtxPath _bizCtx;
 
     /**
-     * Get the implicit join path to the <code>oagi.biz_ctx</code> table.
+     * Get the implicit join path to the <code>biz_ctx</code> table.
      */
     public BizCtxPath bizCtx() {
         if (_bizCtx == null)
@@ -177,7 +177,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     private transient TenantPath _tenant;
 
     /**
-     * Get the implicit join path to the <code>oagi.tenant</code> table.
+     * Get the implicit join path to the <code>tenant</code> table.
      */
     public TenantPath tenant() {
         if (_tenant == null)

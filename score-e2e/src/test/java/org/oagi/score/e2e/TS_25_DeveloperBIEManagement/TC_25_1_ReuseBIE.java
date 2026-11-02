@@ -3,6 +3,7 @@ package org.oagi.score.e2e.TS_25_DeveloperBIEManagement;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -54,6 +55,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_1")
     public void developer_can_reuse_a_bie_the_reused_bie_can_be_in_any_state_and_owned_by() {
         ASCCPObject devx_asccp, devx_asccp_for_devy;
         ACCObject acc, devx_acc, devx_acc_association;
@@ -99,10 +101,11 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + devx_asccp_for_devy.getPropertyTerm() + "/" + devx_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE_WIP);
         editBIEPage.getNodeByPath("/" + devx_asccp_for_devy.getPropertyTerm() + "/" + devx_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + devx_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + devx_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_2.a_and_TA_2.b")
     public void only_the_asbie_details_remain_on_the_detail_pane_of_the_node() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject acc, developer_acc, developer_acc_association;
@@ -146,7 +149,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
@@ -155,6 +158,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_3")
     public void reuse_target_node_can_only_be_asbie_asbiep_abie_node_but_not_any_bbie_bbiep_nor() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type, bccp_code_type;
@@ -231,6 +235,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_4")
     public void developer_can_click_on_the_bie_reuse_node_to_view_the_details_of_the_reused_bie() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
@@ -275,11 +280,11 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         String currentTab = getDriver().getWindowHandle();
         retry(() -> {
-            click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon[@mattooltip=\"Reused\"]")));
+            click(elementToBeClickable(getDriver(), By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")));
             defaultWait(getDriver()).until(numberOfWindowsToBe(2));
         });
         // Loop through until we find a new window handle
@@ -306,6 +311,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_5")
     public void on_the_detail_pane_of_a_reused_bie_node_business_term_context_definition_remark_version_owner() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
@@ -357,11 +363,12 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
         editBIEPage.openPage();
         reusedASCCPNode = editBIEPage.getNodeByPath(reusedAsccpPath);
-        asbiePanel = editBIEPage.getASBIEPanel(reusedASCCPNode);
-        assertEquals("aRemark", getText(asbiePanel.getRemarkField()));
+        EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(reusedASCCPNode);
+        assertEquals("aRemark", getText(reusedASBIEPanel.getRemarkField()));
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_6")
     public void developer_can_view_the_details_of_the_nodes_of_a_bie_reuse_node_but_it_cannot() {
         ASCCPObject developer_asccp, developer_asccp_for_usera;
         ACCObject developer_acc, developer_acc_association;
@@ -428,7 +435,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(developerBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + developer_asccp_for_usera.getPropertyTerm() + "/" + developer_asccp.getPropertyTerm());
         EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
@@ -442,6 +449,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_7")
     public void developer_can_copy_a_reusing_bie_that_has_a_bie_reuse_node_in_this_case_the() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type, bccp_code_type;
@@ -512,7 +520,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.openPage();
         WebElement BCCPNode = editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + bccp_indicator_type.getPropertyTerm());
@@ -521,6 +529,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_8")
     public void developer_can_view_all_the_reuses_of_all_bie_in_the_reuse_bie_report_page_when() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
@@ -586,9 +595,9 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -620,6 +629,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_9")
     public void developer_cannot_discard_a_reused_bie_that_he_owned_if_it_is_used_in_another_top() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
@@ -688,7 +698,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         tr = viewEditBIEPage.getTableRecordAtIndex(1);
         editBIEPage = viewEditBIEPage.openEditBIEPage(tr);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -721,6 +731,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_10")
     public void developer_can_move_a_reusing_bie_from_wip_state_to_qa_state_even_if_the_reused() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         BCCPObject bccp_indicator_type;
@@ -775,7 +786,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -796,6 +807,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_11")
     public void developer_can_move_a_reusing_bie_from_qa_state_to_production_state_even_if_the_reused() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -846,7 +858,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -890,6 +902,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_12")
     public void developer_can_move_a_reusing_bie_from_wip_state_to_qa_state_if_the_reused_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -940,7 +953,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -960,6 +973,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_13")
     public void developer_can_move_a_reusing_bie_from_qa_state_to_production_state_if_the_reused_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -1010,7 +1024,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -1034,6 +1048,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_14")
     public void developer_can_move_a_reused_bie_from_qa_state_to_wip_state_even_if_the_reusing() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -1084,7 +1099,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -1127,6 +1142,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_15")
     public void developer_can_move_a_reused_bie_from_qa_state_to_wip_state_if_the_reusing_bie() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -1176,7 +1192,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         viewEditBIEPage.openPage();
         viewEditBIEPage.setBranch(current_release);
@@ -1199,6 +1215,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_16")
     public void developer_can_see_the_details_of_a_reused_bie_node_that_he_does_not_own_and() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -1264,7 +1281,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         EditBIEPage.ReusedASBIEPanel reusedASBIEPanel = editBIEPage.getReusedASBIEPanel(asccpNode);
@@ -1290,6 +1307,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
 
     @Disabled("Blob-based Express BIE download is not reliably observable in the current browser automation path.")
     @Test
+    @DisplayName("TC_25_1_TA_17")
     public void developer_can_express_a_reusing_bie_that_reuses_a_bie_in_wip_state_and_owned_by() {
         ASCCPObject developer_asccp_root, developer_asccp_lv2;
         ACCObject developer_acc, developer_acc_lv2;
@@ -1355,7 +1373,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(reusedBIE);
         editBIEPage.getNodeByPath("/" + developer_asccp_root.getPropertyTerm() + "/" + developer_asccp_lv2.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + developer_asccp_lv2.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         homePage.openPage();
         bieMenu = homePage.getBIEMenu();
@@ -1374,6 +1392,7 @@ public class TC_25_1_ReuseBIE extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_18")
     public void developer_can_remove_reused_bie_references_at_any_level_even_if_theres_another_same_reused_bie() {
         ASCCPObject asccp, asccp_for_devx, asccp_lv2;
         BCCPObject bccp;
@@ -1431,13 +1450,13 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 2);
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.openPage();
         selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNodeAndLevel("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm(), 1);
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.clickOnDropDownMenuByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
@@ -1445,18 +1464,20 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         click(getDriver().findElement(By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]")));
 
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp_lv2.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
     }
 
     @Test
     @Disabled("Not yet automated - documented case 25.1.19 'Enable global schema for reused BIE references'. " +
             "Was an empty test body reporting false-positive coverage; disabled until the global-schema toggle is automated.")
+    @DisplayName("TC_25_1_TA_19")
     public void enable_the_global_schema_for_reused_bie_references_no_matter_it_has_nested_reused_bie_or() {
 
 
     }
 
     @Test
+    @DisplayName("TC_25_1_TA_20")
     public void retain_all_enabled_properties_under_the_reused_bie_hierarchy_when_the_user_clicks_the_retain() {
         ASCCPObject asccp, asccp_for_devx;
         ACCObject acc, acc_association;
@@ -1526,16 +1547,27 @@ public class TC_25_1_ReuseBIE extends BaseTest {
         SelectProfileBIEToReuseDialog selectProfileBIEToReuseDialog = editBIEPage.reuseBIEOnNode("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         selectProfileBIEToReuseDialog.selectBIEToReuse(devxBIE);
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(1, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.retainReusedBIEOnNode("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
-        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]//ancestor::div[1]/fa-icon")).size());
+        assertEquals(0, getDriver().findElements(By.xpath("//span[.=\"" + asccp.getPropertyTerm() + "\"]/following-sibling::score-tree-decorations//fa-icon")).size());
 
         editBIEPage.openPage();
         WebElement asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
         EditBIEPage.ASBIEPanel asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
         assertEquals("retained devxBIE remark", getText(asbiePanel.getRemarkField()));
+
+        assertEquals("retained devxBIE business term", getText(asbiePanel.getBusinessTermField()));
+
+        // The retained node is an ordinary node of the reusing BIE: editing it and saving keeps what was retained.
+        asbiePanel.setRemark("edited after retain");
+        editBIEPage.hitUpdateButton();
+        editBIEPage.openPage();
+        asccpNode = editBIEPage.getNodeByPath("/" + asccp_for_devx.getPropertyTerm() + "/" + asccp.getPropertyTerm());
+        asbiePanel = editBIEPage.getASBIEPanel(asccpNode);
+        assertEquals("edited after retain", getText(asbiePanel.getRemarkField()));
+        assertEquals("retained devxBIE business term", getText(asbiePanel.getBusinessTermField()));
     }
 
 

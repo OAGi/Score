@@ -19,9 +19,10 @@ import org.oagi.score.gateway.http.common.model.DateRangeCriteria;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.PageResponse;
-import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileSystemResource;
+import org.oagi.score.gateway.http.common.util.DeleteOnCloseFileInputStream;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -270,7 +271,7 @@ public class ReleaseQueryController {
     }
 
     @GetMapping(value = "/{releaseId:[\\d]+}/generate_migration_script")
-    public ResponseEntity<DeleteOnCloseFileSystemResource> generateMigrationScript(
+    public ResponseEntity<InputStreamResource> generateMigrationScript(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("releaseId") ReleaseId releaseId,
             @RequestParam(name = "includeViewOrder", required = false, defaultValue = "false") boolean includeViewOrder)
@@ -283,7 +284,7 @@ public class ReleaseQueryController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getFilename() + "\"")
                 .contentType(MediaType.parseMediaType("application/zip"))
                 .contentLength(response.getFile().length())
-                .body(new DeleteOnCloseFileSystemResource(response.getFile()));
+                .body(new InputStreamResource(new DeleteOnCloseFileInputStream(response.getFile())));
     }
 
     @GetMapping(value = "/{releaseId:[\\d]+}/plantuml")

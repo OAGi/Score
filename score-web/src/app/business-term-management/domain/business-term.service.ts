@@ -81,6 +81,11 @@ export class BusinessTermService {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
 
+    return this.getBusinessTermListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getBusinessTermListPage(params: HttpParams): Observable<PageResponse<BusinessTermListEntry>> {
     return this.http.get<PageResponse<BusinessTermListEntry>>('/api/business-terms', {params}).pipe(
         map((res: PageResponse<BusinessTermListEntry>) => ({
           ...res,
@@ -154,6 +159,11 @@ export class BusinessTermService {
     if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
+    return this.getAsbieBbieListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getAsbieBbieListPage(params: HttpParams): Observable<PageResponse<AsbieBbieListEntry>> {
     return this.http.get<PageResponse<AsbieBbieListEntry>>('/api/business-terms/asbie-bbie', {params}).pipe(
         map((res: PageResponse<AsbieBbieListEntry>) => ({
           ...res,
@@ -214,6 +224,11 @@ export class BusinessTermService {
       params = params.delete('bieTypes')
         .set('bieTypeList', request.filters.bieTypes.join(','));
     }
+    return this.getAssignedBusinessTermListPage(params);
+  }
+
+  /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
+  getAssignedBusinessTermListPage(params: HttpParams): Observable<PageResponse<AssignedBusinessTermListEntry>> {
     return this.http.get<PageResponse<AssignedBusinessTermListEntry>>('/api/business-terms/assign', {params}).pipe(
         map((res: PageResponse<AssignedBusinessTermListEntry>) => ({
           ...res,

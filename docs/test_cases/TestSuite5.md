@@ -1108,6 +1108,9 @@ The developer can generate an XML Schema expression of a single BIE while includ
 #### Test Assertion #5.6.47
 The developer can refresh the Express BIE page during OpenAPI generation setup and still select a Meta Header BIE for the POST Operation Template before generating the expression.
 
+#### Test Assertion #5.6.48
+For a BIE using a custom Code List, the developer can generate valid non-empty XML Schema, JSON Schema, OpenAPI, Open Document Spreadsheet, and Avro outputs. When the list is based on another list, XML Schema must retain its custom values and distinguish the derived list's restriction from the base list.
+
 ### Test Step Pre-condition:
 
 1. There are some BIEs created by users, namely BIEa, BIEb, BIEc, which are in Editing, Candidate and Published correspondingly. Additionally, there are some BIEs created by a developer, namely BIE0, BIE1, BIE2, which are in Editing, Candidate and Published correspondingly. The name of the BIE1 is “Receive Item”. Finally, there is a BIE, BIE3, created by a developer with multiple business contexts assigned.
@@ -1213,3 +1216,26 @@ The developer can refresh the Express BIE page during OpenAPI generation setup a
 96. Verify that the expression is successfully generated and that the filename includes the BIE version. (Assertion [#46](#test-assertion-5646))
 97. The developer begins OpenAPI generation for a BIE, selects a Meta Header for the POST Operation Template, refreshes the Express BIE page, reselects the same BIE and OpenAPI options, and verifies that the Meta Header can still be selected.
 98. Verify that the expression is successfully generated after refreshing the page. (Assertion [#47](#test-assertion-5647))
+99. For a BIE that uses a custom based Code List, generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro outputs in the single-BIE flow. Verify that each output is valid and non-empty, and that XML Schema includes the derived list's custom enumeration value. (Assertion [#48](#test-assertion-5648))
+
+## Test Case 5.7
+
+**OAGi developer generates a BIE Schema whose filename follows the configured filename expression**
+
+Pre-condition: The `BIE Schema Expression` of the Filename Expressions application setting can be changed and is restored after the test. The test runs alone, because the setting is global.
+
+### Test Assertion:
+
+#### Test Assertion #5.7.1
+When a developer generates a BIE Schema from the Express BIE page, the filename follows the `BIE Schema Expression` configured in the Filename Expressions application setting, not a name built by the page. With `{BIE Property Term:separator(' ')}`, a BIE whose property term is `Person Name` is generated as `Person Name.xsd`.
+
+### Test Step Pre-condition:
+
+1. The `BIE Schema Expression` is set to `{BIE Property Term:separator(' ')}`.
+2. A developer-owned BIE whose property term contains a space (`Person Name`) is available or is created during the test.
+
+### Test Step:
+
+1. The developer logs into the system and goes to the Express BIE page.
+2. The developer selects the BIE and generates an XML Schema expression.
+3. Verify that the generated file is named `Person Name.xsd`. (Assertion [#1](#test-assertion-571))

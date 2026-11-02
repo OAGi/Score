@@ -40,19 +40,22 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             By.xpath("//input[@aria-label=\"dropdown search\"]");
 
     private static final By BROWSE_STANDARD_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Browse Standard\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Browse Standard\")]");
+
+    private static final By ADMIN_MENU_LOCATOR =
+            By.xpath("//mat-toolbar-row//button[contains(., \"Admin\")]");
 
     private static final By CONTEXT_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Context\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Context\")]");
 
     private static final By CORE_COMPONENT_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Core Component\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Core Component\")]");
 
     private static final By MODULE_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Module\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Module\")]");
 
     private static final By LIBRARY_MENU_LOCATOR =
-            By.xpath("//mat-toolbar-row/button/span[contains(text(), \"Library\")]//ancestor::button[1]");
+            By.xpath("//mat-toolbar-row//button[contains(., \"Library\")]");
 
     private static final By NOTIFICATION_ICON_LOCATOR =
             By.xpath("//mat-toolbar-row//mat-icon[contains(@class, \"notIcon\")]");
@@ -162,6 +165,11 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
     }
 
     @Override
+    public boolean hasAdminMenu() {
+        return !getDriver().findElements(ADMIN_MENU_LOCATOR).isEmpty();
+    }
+
+    @Override
     public boolean hasContextMenu() {
         return !getDriver().findElements(CONTEXT_MENU_LOCATOR).isEmpty();
     }
@@ -222,7 +230,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
         retry(() -> {
             click(getDriver(), getLibrarySelectorField());
             WebElement optionField = visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//mat-radio-button" +
+                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//mat-radio-button" +
                             "//span[text() = \"" + library + "\"]//ancestor::mat-radio-button"));
             click(getDriver(), optionField);
             escape(getDriver());
@@ -391,6 +399,7 @@ public class HomePageImpl extends BasePageImpl implements HomePage {
             } catch (ElementClickInterceptedException e) {
                 getDriver().get(href);
             }
+            defaultWait(getDriver()).until(driver -> driver.getCurrentUrl().startsWith(href));
             invisibilityOfLoadingContainerElement(getDriver());
 
             EditBIEPage editBIEPage = new EditBIEPageImpl(this.parent, topLevelASBIEP);

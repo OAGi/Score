@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {A11yModule} from '@angular/cdk/a11y';
@@ -68,6 +68,7 @@ export interface SetWeightDialogData {
       </div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .ow-dialog { font-size: 13px; color: rgba(0, 0, 0, 0.87); min-width: 340px; }
     .ow-header {

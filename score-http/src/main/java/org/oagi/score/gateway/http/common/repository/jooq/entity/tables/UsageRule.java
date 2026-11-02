@@ -18,18 +18,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BieUsageRule.BieUsageRulePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtUsageRule.DtUsageRulePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.UsageRuleExpression.UsageRuleExpressionPath;
@@ -48,7 +49,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.usage_rule</code>
+     * The reference instance of <code>usage_rule</code>
      */
     public static final UsageRule USAGE_RULE = new UsageRule();
 
@@ -61,19 +62,19 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     }
 
     /**
-     * The column <code>oagi.usage_rule.usage_rule_id</code>. Primary key of the
+     * The column <code>usage_rule.usage_rule_id</code>. Primary key of the
      * usage rule.
      */
-    public final TableField<UsageRuleRecord, ULong> USAGE_RULE_ID = createField(DSL.name("usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key of the usage rule.");
+    public final TableField<UsageRuleRecord, ULong> USAGE_RULE_ID = createField(DSL.name("usage_rule_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key of the usage rule.");
 
     /**
-     * The column <code>oagi.usage_rule.name</code>. Short nmenomic name of the
-     * usage rule.
+     * The column <code>usage_rule.name</code>. Short mnemonic name of the usage
+     * rule.
      */
-    public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Short nmenomic name of the usage rule.");
+    public final TableField<UsageRuleRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Short mnemonic name of the usage rule.");
 
     /**
-     * The column <code>oagi.usage_rule.condition_type</code>. Condition type
+     * The column <code>usage_rule.condition_type</code>. Condition type
      * according to the CC specification. It is a value list column. 0 =
      * pre-condition, 1 = post-condition, 2 = invariant.
      */
@@ -88,21 +89,21 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.usage_rule</code> table reference
+     * Create an aliased <code>usage_rule</code> table reference
      */
     public UsageRule(String alias) {
         this(DSL.name(alias), USAGE_RULE);
     }
 
     /**
-     * Create an aliased <code>oagi.usage_rule</code> table reference
+     * Create an aliased <code>usage_rule</code> table reference
      */
     public UsageRule(Name alias) {
         this(alias, USAGE_RULE);
     }
 
     /**
-     * Create a <code>oagi.usage_rule</code> table reference
+     * Create a <code>usage_rule</code> table reference
      */
     public UsageRule() {
         this(DSL.name("usage_rule"), null);
@@ -143,7 +144,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -159,8 +160,8 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     private transient BieUsageRulePath _bieUsageRule;
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>oagi.bie_usage_rule</code> table
+     * Get the implicit to-many join path to the <code>bie_usage_rule</code>
+     * table
      */
     public BieUsageRulePath bieUsageRule() {
         if (_bieUsageRule == null)
@@ -172,7 +173,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     private transient DtUsageRulePath _dtUsageRule;
 
     /**
-     * Get the implicit to-many join path to the <code>oagi.dt_usage_rule</code>
+     * Get the implicit to-many join path to the <code>dt_usage_rule</code>
      * table
      */
     public DtUsageRulePath dtUsageRule() {
@@ -186,7 +187,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     /**
      * Get the implicit to-many join path to the
-     * <code>oagi.usage_rule_expression</code> table
+     * <code>usage_rule_expression</code> table
      */
     public UsageRuleExpressionPath usageRuleExpression() {
         if (_usageRuleExpression == null)
@@ -239,7 +240,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
      */
     @Override
     public UsageRule where(Condition condition) {
-        return new UsageRule(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new UsageRule(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -306,7 +307,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UsageRule whereExists(Select<?> select) {
+    public UsageRule whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -314,7 +315,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public UsageRule whereNotExists(Select<?> select) {
+    public UsageRule whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

@@ -22,7 +22,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
 
     /**
      * Setter for
-     * <code>oagi.github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
+     * <code>github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
      * Primary key column.
      */
     public void setGithubIssueAccManifestId(ULong value) {
@@ -31,7 +31,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
 
     /**
      * Getter for
-     * <code>oagi.github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
+     * <code>github_issue_acc_manifest.github_issue_acc_manifest_id</code>.
      * Primary key column.
      */
     public ULong getGithubIssueAccManifestId() {
@@ -39,7 +39,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Setter for <code>oagi.github_issue_acc_manifest.acc_manifest_id</code>.
+     * Setter for <code>github_issue_acc_manifest.acc_manifest_id</code>.
      * Foreign key to acc_manifest; the ACC (in a given release) linked to a
      * GitHub issue.
      */
@@ -48,7 +48,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Getter for <code>oagi.github_issue_acc_manifest.acc_manifest_id</code>.
+     * Getter for <code>github_issue_acc_manifest.acc_manifest_id</code>.
      * Foreign key to acc_manifest; the ACC (in a given release) linked to a
      * GitHub issue.
      */
@@ -57,7 +57,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Setter for <code>oagi.github_issue_acc_manifest.github_issue_id</code>.
+     * Setter for <code>github_issue_acc_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public void setGithubIssueId(ULong value) {
@@ -65,7 +65,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Getter for <code>oagi.github_issue_acc_manifest.github_issue_id</code>.
+     * Getter for <code>github_issue_acc_manifest.github_issue_id</code>.
      * Foreign key to github_issue; the linked GitHub issue.
      */
     public ULong getGithubIssueId() {
@@ -73,23 +73,23 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Setter for <code>oagi.github_issue_acc_manifest.created_by</code>.
-     * Foreign key to app_user; who created the link.
+     * Setter for <code>github_issue_acc_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.github_issue_acc_manifest.created_by</code>.
-     * Foreign key to app_user; who created the link.
+     * Getter for <code>github_issue_acc_manifest.created_by</code>. Foreign key
+     * to app_user; who created the link.
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.github_issue_acc_manifest.last_updated_by</code>.
+     * Setter for <code>github_issue_acc_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public void setLastUpdatedBy(ULong value) {
@@ -97,7 +97,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Getter for <code>oagi.github_issue_acc_manifest.last_updated_by</code>.
+     * Getter for <code>github_issue_acc_manifest.last_updated_by</code>.
      * Foreign key to app_user; who last updated the link.
      */
     public ULong getLastUpdatedBy() {
@@ -105,26 +105,23 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_acc_manifest.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * Setter for <code>github_issue_acc_manifest.creation_timestamp</code>.
+     * Timestamp when this record was created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_acc_manifest.creation_timestamp</code>. Timestamp
-     * when this record was created.
+     * Getter for <code>github_issue_acc_manifest.creation_timestamp</code>.
+     * Timestamp when this record was created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(5);
     }
 
     /**
-     * Setter for
-     * <code>oagi.github_issue_acc_manifest.last_update_timestamp</code>.
+     * Setter for <code>github_issue_acc_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -132,8 +129,7 @@ public class GithubIssueAccManifestRecord extends UpdatableRecordImpl<GithubIssu
     }
 
     /**
-     * Getter for
-     * <code>oagi.github_issue_acc_manifest.last_update_timestamp</code>.
+     * Getter for <code>github_issue_acc_manifest.last_update_timestamp</code>.
      * Timestamp when this record was last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

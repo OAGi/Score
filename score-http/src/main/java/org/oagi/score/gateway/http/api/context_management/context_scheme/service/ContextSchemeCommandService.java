@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.springframework.util.StringUtils.hasText;
+
 /**
  * Service class for managing context schemes.
  * This service includes methods for creating, updating, and discarding context schemes.
@@ -49,18 +51,21 @@ public class ContextSchemeCommandService {
      * @return The ID of the created context scheme.
      */
     public ContextSchemeId create(ScoreUser requester, CreateContextSchemeRequest request) {
+        if (!hasText(request.schemeName())) {
+            throw new IllegalArgumentException("Context scheme name cannot be empty.");
+        }
+        if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
+            throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
+        }
+
         // Server-side uniqueness enforcement (do not rely on the client-side pre-check alone).
         var query = query(requester);
         if (query.hasDuplicate(request.schemeId(), request.schemeAgencyId(), request.schemeVersionId())) {
             throw new IllegalArgumentException(
                     "Another context scheme with the triplet (schemeID, AgencyID, Version) already exists.");
         }
-        if (query.hasDuplicateName(request.schemeName(), request.schemeId(),
-                request.schemeAgencyId(), request.schemeVersionId())) {
-            throw new IllegalArgumentException(
-                    "Another context scheme with the same name and triplet (schemeID, AgencyID, Version) already exists.");
-        }
-
+        // A matching scheme ID and agency ID with a different name/version is a soft warning. The UI
+        // lets the user confirm "Create anyway", so it must not be enforced again by this endpoint.
         var command = command(requester);
 
         ContextSchemeId contextSchemeId = command.create(
@@ -88,6 +93,13 @@ public class ContextSchemeCommandService {
      * @param request   The request containing the updated context scheme details.
      */
     public void update(ScoreUser requester, UpdateContextSchemeRequest request) {
+        if (!hasText(request.schemeName())) {
+            throw new IllegalArgumentException("Context scheme name cannot be empty.");
+        }
+        if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
+            throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
+        }
+
         var query = query(requester);
 
         // Server-side uniqueness enforcement, excluding the scheme being edited (Issue #1744 class).
@@ -96,12 +108,8 @@ public class ContextSchemeCommandService {
             throw new IllegalArgumentException(
                     "Another context scheme with the triplet (schemeID, AgencyID, Version) already exists.");
         }
-        if (query.hasDuplicateNameExcludingCurrent(request.contextSchemeId(), request.schemeName(),
-                request.schemeId(), request.schemeAgencyId(), request.schemeVersionId())) {
-            throw new IllegalArgumentException(
-                    "Another context scheme with the same name and triplet (schemeID, AgencyID, Version) already exists.");
-        }
-
+        // Keep the name/agency warning overridable, just as for create. The request has no confirmation
+        // flag because the UI confirmation is the user's decision to submit this update.
         // Fetch existing values, then determine which ones the request removes.
         Map<ContextSchemeValueId, ContextSchemeValueDetailsRecord> existingValues = query
                 .getContextSchemeValueList(request.contextSchemeId())

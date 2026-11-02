@@ -18,6 +18,7 @@ import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
+import org.oagi.score.gateway.http.common.util.DenUtils;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
@@ -63,7 +64,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         DtRecord dt = new DtRecord();
         dt.setGuid(ScoreGuidUtils.randomGuid());
         dt.setDataTypeTerm(basedDt.dataTypeTerm());
-        if (basedDt.qualifier() != null) {
+        if (StringUtils.hasLength(basedDt.qualifier())) {
             dt.setQualifier_(basedDt.qualifier());
         }
 
@@ -101,7 +102,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         dtManifest.setDtId(valueOf(dtId));
         dtManifest.setBasedDtManifestId(valueOf(basedDt.dtManifestId()));
         dtManifest.setReleaseId(valueOf(releaseId));
-        dtManifest.setDen(((dt.getQualifier_() != null) ? (dt.getQualifier_() + "_ ") : "") + dt.getDataTypeTerm() + ". Type");
+        dtManifest.setDen(DenUtils.dtDen(dt.getQualifier_(), dt.getDataTypeTerm()));
         DtManifestId dtManifestId = new DtManifestId(
                 dslContext().insertInto(DT_MANIFEST)
                         .set(dtManifest)
@@ -420,12 +421,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         String newDen = null;
         if (qualifier != null && compare(dt.qualifier(), qualifier) != 0) {
             denChanged = true;
+            newDen = DenUtils.dtDen(qualifier, dt.dataTypeTerm());
             if (StringUtils.hasLength(qualifier)) {
-                newDen = qualifier + "_ " + dt.representationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .set(DT.QUALIFIER, qualifier);
             } else {
-                newDen = dt.representationTerm() + ". Type";
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
                         .setNull(DT.QUALIFIER);
             }
@@ -437,7 +437,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         }
         if (sixDigitId != null && compare(dt.sixDigitId(), sixDigitId) != 0) {
             if (hasLength(sixDigitId)) {
-                if (query.hasDuplicateSixDigitId(dtManifestId)) {
+                if (query.hasDuplicateSixDigitId(dtManifestId, sixDigitId)) {
                     throw new IllegalArgumentException("Six Digit Id '" + sixDigitId + "' already exist.");
                 }
                 moreStep = ((moreStep != null) ? moreStep : firstStep)
@@ -505,7 +505,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .where(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(valueOf(dtManifestId)))
                     .fetch()) {
 
-                String newBccpDen = bccp.get(BCCP.PROPERTY_TERM) + ". " + newDen.replaceAll(". Type", "");
+                String newBccpDen = DenUtils.bccpDen(bccp.get(BCCP.PROPERTY_TERM), newDen);
                 dslContext().update(BCCP_MANIFEST)
                         .set(BCCP_MANIFEST.DEN, newBccpDen)
                         .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
@@ -518,7 +518,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         .where(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(bccp.get(BCCP_MANIFEST.BCCP_MANIFEST_ID)))
                         .fetch()) {
 
-                    String newBccDen = bcc.get(ACC.OBJECT_CLASS_TERM) + ". " + newBccpDen;
+                    String newBccDen = DenUtils.bccDen(bcc.get(ACC.OBJECT_CLASS_TERM), newBccpDen);
                     dslContext().update(BCC_MANIFEST)
                             .set(BCC_MANIFEST.DEN, newBccDen)
                             .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(bcc.get(BCC_MANIFEST.BCC_MANIFEST_ID)))
@@ -686,23 +686,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                     .setNull(DT_SC.DEFINITION_SOURCE);
         }
         if (valueConstraint != null) {
-            if (valueConstraint.hasFixedValue()) {
-                if (valueConstraint.hasFixedValue() &&
-                        (dtSc.valueConstraint() == null || compare(dtSc.valueConstraint().fixedValue(), valueConstraint.fixedValue()) != 0)) {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .set(DT_SC.FIXED_VALUE, valueConstraint.fixedValue())
-                            .setNull(DT_SC.DEFAULT_VALUE);
-                } else if (valueConstraint.hasDefaultValue() &&
-                        (dtSc.valueConstraint() == null || compare(dtSc.valueConstraint().defaultValue(), valueConstraint.defaultValue()) != 0)) {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .set(DT_SC.DEFAULT_VALUE, valueConstraint.defaultValue())
-                            .setNull(DT_SC.FIXED_VALUE);
-                } else {
-                    moreStep = ((moreStep != null) ? moreStep : firstStep)
-                            .setNull(DT_SC.DEFAULT_VALUE)
-                            .setNull(DT_SC.FIXED_VALUE);
-                }
-            }
+            moreStep = ValueConstraintUpdates.apply(firstStep, moreStep, dtSc.valueConstraint(), valueConstraint,
+                    DT_SC.FIXED_VALUE, DT_SC.DEFAULT_VALUE);
         } else {
             moreStep = ((moreStep != null) ? moreStep : firstStep)
                     .setNull(DT_SC.DEFAULT_VALUE)

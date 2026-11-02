@@ -10,5 +10,14 @@
   ],
   "include": [
     "src/**/*.d.ts"
-  ]
+  ],
+  /*
+    "strictTemplates" is Angular 22's default; it is stated explicitly so that
+    switching it off would have to be a deliberate act rather than an inherited
+    default. Templates type-check clean under it as of issue #1749, which is
+    also where the defects it exposed were fixed.
+  */
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }

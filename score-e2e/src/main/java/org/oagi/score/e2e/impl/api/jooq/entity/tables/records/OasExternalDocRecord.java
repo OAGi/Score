@@ -21,89 +21,89 @@ public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oagi.oas_external_doc.oas_external_doc_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_external_doc.oas_external_doc_id</code>. The primary
+     * key of the record.
      */
     public void setOasExternalDocId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.oas_external_doc_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_external_doc.oas_external_doc_id</code>. The primary
+     * key of the record.
      */
     public ULong getOasExternalDocId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.url</code>. REQUIRED. The URL for
-     * the target documentation. Value MUST be in the format of a URL.
+     * Setter for <code>oas_external_doc.url</code>. REQUIRED. The URL for the
+     * target documentation. Value MUST be in the format of a URL.
      */
     public void setUrl(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.url</code>. REQUIRED. The URL for
-     * the target documentation. Value MUST be in the format of a URL.
+     * Getter for <code>oas_external_doc.url</code>. REQUIRED. The URL for the
+     * target documentation. Value MUST be in the format of a URL.
      */
     public String getUrl() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.description</code>. A short
-     * description of the target documentation. CommonMark syntax MAY be used
-     * for rich text representation.
+     * Setter for <code>oas_external_doc.description</code>. A short description
+     * of the target documentation. CommonMark syntax MAY be used for rich text
+     * representation.
      */
     public void setDescription(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.description</code>. A short
-     * description of the target documentation. CommonMark syntax MAY be used
-     * for rich text representation.
+     * Getter for <code>oas_external_doc.description</code>. A short description
+     * of the target documentation. CommonMark syntax MAY be used for rich text
+     * representation.
      */
     public String getDescription() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.created_by</code>. The user who
-     * creates the record.
+     * Setter for <code>oas_external_doc.created_by</code>. The user who creates
+     * the record.
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.created_by</code>. The user who
-     * creates the record.
+     * Getter for <code>oas_external_doc.created_by</code>. The user who creates
+     * the record.
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.last_updated_by</code>. The user
-     * who last updates the record.
+     * Setter for <code>oas_external_doc.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.last_updated_by</code>. The user
-     * who last updates the record.
+     * Getter for <code>oas_external_doc.last_updated_by</code>. The user who
+     * last updates the record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.creation_timestamp</code>. The
+     * Setter for <code>oas_external_doc.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -111,7 +111,7 @@ public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocReco
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.creation_timestamp</code>. The
+     * Getter for <code>oas_external_doc.creation_timestamp</code>. The
      * timestamp when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -119,7 +119,7 @@ public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocReco
     }
 
     /**
-     * Setter for <code>oagi.oas_external_doc.last_update_timestamp</code>. The
+     * Setter for <code>oas_external_doc.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
@@ -127,7 +127,7 @@ public class OasExternalDocRecord extends UpdatableRecordImpl<OasExternalDocReco
     }
 
     /**
-     * Getter for <code>oagi.oas_external_doc.last_update_timestamp</code>. The
+     * Getter for <code>oas_external_doc.last_update_timestamp</code>. The
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {

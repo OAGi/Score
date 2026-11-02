@@ -20,18 +20,19 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.Oagi;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Asbiep.AsbiepPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.AsbiepSupportDocRecord;
 
@@ -45,7 +46,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>oagi.asbiep_support_doc</code>
+     * The reference instance of <code>asbiep_support_doc</code>
      */
     public static final AsbiepSupportDoc ASBIEP_SUPPORT_DOC = new AsbiepSupportDoc();
 
@@ -58,25 +59,25 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
     }
 
     /**
-     * The column <code>oagi.asbiep_support_doc.asbiep_support_doc_id</code>.
-     * Primary key. Unique identifier for each supporting documentation.
+     * The column <code>asbiep_support_doc.asbiep_support_doc_id</code>. Primary
+     * key. Unique identifier for each supporting documentation.
      */
-    public final TableField<AsbiepSupportDocRecord, ULong> ASBIEP_SUPPORT_DOC_ID = createField(DSL.name("asbiep_support_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).identity(true), this, "Primary key. Unique identifier for each supporting documentation.");
+    public final TableField<AsbiepSupportDocRecord, ULong> ASBIEP_SUPPORT_DOC_ID = createField(DSL.name("asbiep_support_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "Primary key. Unique identifier for each supporting documentation.");
 
     /**
-     * The column <code>oagi.asbiep_support_doc.asbiep_id</code>. Foreign key.
+     * The column <code>asbiep_support_doc.asbiep_id</code>. Foreign key.
      * References the related ASBIEP record.
      */
     public final TableField<AsbiepSupportDocRecord, ULong> ASBIEP_ID = createField(DSL.name("asbiep_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key. References the related ASBIEP record.");
 
     /**
-     * The column <code>oagi.asbiep_support_doc.content</code>. The main body or
-     * text content of the supporting documentation.
+     * The column <code>asbiep_support_doc.content</code>. The main body or text
+     * content of the supporting documentation.
      */
     public final TableField<AsbiepSupportDocRecord, String> CONTENT = createField(DSL.name("content"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The main body or text content of the supporting documentation.");
 
     /**
-     * The column <code>oagi.asbiep_support_doc.description</code>. Optional
+     * The column <code>asbiep_support_doc.description</code>. Optional
      * description, summary, or metadata about the supporting documentation.
      */
     public final TableField<AsbiepSupportDocRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Optional description, summary, or metadata about the supporting documentation.");
@@ -90,21 +91,21 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
     }
 
     /**
-     * Create an aliased <code>oagi.asbiep_support_doc</code> table reference
+     * Create an aliased <code>asbiep_support_doc</code> table reference
      */
     public AsbiepSupportDoc(String alias) {
         this(DSL.name(alias), ASBIEP_SUPPORT_DOC);
     }
 
     /**
-     * Create an aliased <code>oagi.asbiep_support_doc</code> table reference
+     * Create an aliased <code>asbiep_support_doc</code> table reference
      */
     public AsbiepSupportDoc(Name alias) {
         this(alias, ASBIEP_SUPPORT_DOC);
     }
 
     /**
-     * Create a <code>oagi.asbiep_support_doc</code> table reference
+     * Create a <code>asbiep_support_doc</code> table reference
      */
     public AsbiepSupportDoc() {
         this(DSL.name("asbiep_support_doc"), null);
@@ -145,7 +146,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Oagi.OAGI;
+        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
     }
 
     @Override
@@ -166,7 +167,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
     private transient AsbiepPath _asbiep;
 
     /**
-     * Get the implicit join path to the <code>oagi.asbiep</code> table.
+     * Get the implicit join path to the <code>asbiep</code> table.
      */
     public AsbiepPath asbiep() {
         if (_asbiep == null)
@@ -219,7 +220,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
      */
     @Override
     public AsbiepSupportDoc where(Condition condition) {
-        return new AsbiepSupportDoc(getQualifiedName(), aliased() ? this : null, null, condition);
+        return new AsbiepSupportDoc(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
     }
 
     /**
@@ -286,7 +287,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsbiepSupportDoc whereExists(Select<?> select) {
+    public AsbiepSupportDoc whereExists(TableLike<?> select) {
         return where(DSL.exists(select));
     }
 
@@ -294,7 +295,7 @@ public class AsbiepSupportDoc extends TableImpl<AsbiepSupportDocRecord> {
      * Create an inline derived table from this table
      */
     @Override
-    public AsbiepSupportDoc whereNotExists(Select<?> select) {
+    public AsbiepSupportDoc whereNotExists(TableLike<?> select) {
         return where(DSL.notExists(select));
     }
 }

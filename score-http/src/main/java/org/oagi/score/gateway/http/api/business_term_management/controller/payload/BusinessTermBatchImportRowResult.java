@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.api.business_term_management.controller.payl
 
 /**
  * Per-row outcome of a batch import. {@code outcome} is one of {@code CREATED}, {@code UPDATED}
- * (upsert keyed by external reference URI), or {@code FAILED}; {@code message} carries the
+ * (upsert keyed by business term + external reference URI), or {@code FAILED}; {@code message} carries the
  * validation/error detail for failed rows.
  */
 public record BusinessTermBatchImportRowResult(

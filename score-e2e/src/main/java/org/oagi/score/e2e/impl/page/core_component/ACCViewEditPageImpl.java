@@ -34,6 +34,8 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             By.xpath("//mat-dialog-container//span[contains(text(), \"Amend\")]//ancestor::button");
     public static final By DELETE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Delete\")]//ancestor::button[1]");
+    private static final By CONTEXT_MENU_PANEL_LOCATOR =
+            By.cssSelector(".mat-mdc-menu-panel, .mat-menu-panel");
     public static final By RESTORE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Restore\")]//ancestor::button[1]");
     public static final By REVISE_BUTTON_LOCATOR =
@@ -133,7 +135,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     private static final By REMOVE_OPTION_LOCATOR =
             By.xpath("//span[contains(text(), \"Remove\")]//ancestor::button[1]");
     private static final By DELETE_OPTION_LOCATOR =
-            By.xpath("//div[contains(@class, \"cdk-overlay-container\")]//span[contains(text(),\"Delete\")]");
+            By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]//span[contains(text(),\"Delete\")]");
 
     private final ACCObject acc;
 
@@ -325,7 +327,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
     }
 
     public WebElement getContextMenuIcon(WebElement node) {
-        return node.findElement(By.xpath("//mat-icon[contains(text(), \"more_vert\")]"));
+        return node.findElement(By.xpath(".//mat-icon[contains(text(), \"more_vert\")]"));
     }
 
     @Override
@@ -336,8 +338,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         new Actions(getDriver()).sendKeys("O").perform();
         waitFor(ofMillis(1000L));
         try {
-            if (visibilityOfElementLocated(getDriver(),
-                    By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed()) {
+            if (getDriver().findElements(CONTEXT_MENU_PANEL_LOCATOR).stream().anyMatch(WebElement::isDisplayed)) {
                 return node;
             }
         } catch (WebDriverException ignore) {
@@ -347,8 +348,16 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         click(getDriver(), contextMenuIcon);
         waitFor(ofMillis(1000L));
         assert visibilityOfElementLocated(getDriver(),
-                By.xpath("//div[contains(@class, \"cdk-overlay-pane\")]")).isDisplayed();
+                CONTEXT_MENU_PANEL_LOCATOR).isDisplayed();
         return node;
+    }
+
+    @Override
+    public void validate(String path) {
+        retry(() -> {
+            clickOnDropDownMenuByPath(path);
+            click(elementToBeClickable(getDriver(), By.id("cc-validate")));
+        });
     }
 
     @Override
@@ -696,8 +705,10 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
             }
         });
         searchInput.sendKeys(Keys.ENTER);
-        searchInput.sendKeys("");
-        clear(searchInput);
+        // The tree search re-renders its input once the search ran, so the element held above can be detached.
+        clear(getSearchInputTextField());
+        // The keyboard shortcuts of the tree (such as "O" for its context menu) are ignored while the search input has the focus.
+        ((JavascriptExecutor) getDriver()).executeScript("if (document.activeElement) { document.activeElement.blur(); }");
 
         String[] nodes = path.split("/");
         String nodeName = nodes[nodes.length - 1];
@@ -706,7 +717,7 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private WebElement getNodeByName(String nodeName) {
         By nodeLocator = By.xpath(
-                "//*[text() = \"" + nodeName + "\"]//ancestor::div[contains(@class, \"mat-tree-node\")]");
+                "//div[contains(@class, \"mat-tree-node\")][.//*[normalize-space(.) = \"" + nodeName + "\" or contains(., \"" + nodeName + "\")]]");
         return visibilityOfElementLocated(getDriver(), nodeLocator);
     }
 
@@ -789,8 +800,33 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(accNode);
             waitFor(ofMillis(500L));
-            return new ACCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+            return new ACCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ACC\"]]");
         });
+    }
+
+    /**
+     * Association nodes render two detail panels (association and property). If the second one is
+     * missing the click did not select the node yet, so throw to let {@code retry} click it again.
+     */
+    private void awaitAssociationPanels(WebElement node) {
+        // The panels of the previously selected association stay until the clicked node becomes the cursor.
+        for (int i = 0; i < 10; i++) {
+            if (node.getAttribute("class").contains("tree-node-selected")) {
+                break;
+            }
+            waitFor(ofMillis(300L));
+        }
+        if (!node.getAttribute("class").contains("tree-node-selected")) {
+            throw new NoSuchElementException("The clicked node was not selected");
+        }
+        By propertyPanel = By.xpath("(//div[contains(@class, \"tree-detail-panel\")])[2]");
+        for (int i = 0; i < 10; i++) {
+            if (!getDriver().findElements(propertyPanel).isEmpty()) {
+                return;
+            }
+            waitFor(ofMillis(300L));
+        }
+        throw new NoSuchElementException("Association detail panels were not rendered");
     }
 
     @Override
@@ -798,15 +834,16 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(asccNode);
             waitFor(ofMillis(500L));
+            awaitAssociationPanels(asccNode);
             return new ASCCPanelContainer() {
                 @Override
                 public ASCCPanel getASCCPanel() {
-                    return new ASCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new ASCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCC\"]]");
                 }
 
                 @Override
                 public ASCCPPanel getASCCPPanel() {
-                    return new ASCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new ASCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"ASCCP\"]]");
                 }
             };
         });
@@ -817,15 +854,16 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
         return retry(() -> {
             click(bccNode);
             waitFor(ofMillis(500L));
+            awaitAssociationPanels(bccNode);
             return new BCCPanelContainer() {
                 @Override
                 public BCCPanel getBCCPanel() {
-                    return new BCCPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][1]");
+                    return new BCCPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCC\"]]");
                 }
 
                 @Override
                 public BCCPPanel getBCCPPanel() {
-                    return new BCCPPanelImpl("//div[contains(@class, \"cc-node-detail-panel\")][2]");
+                    return new BCCPPanelImpl("//div[contains(@class, \"tree-detail-panel\") and .//input[@value=\"BCCP\"]]");
                 }
             };
         });
@@ -848,17 +886,20 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
     private WebElement getInputFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]//input"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//input | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]//input | " +
+                baseXPath + "//input[contains(@placeholder, \"" + name + "\")]"));
     }
 
     private WebElement getSelectFieldByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::div[1]/mat-select"));
+                baseXPath + "//mat-label[contains(., \"" + name + "\")]//ancestor::mat-form-field[1]//mat-select | " +
+                baseXPath + "//*[self::mat-label or self::label or self::span][contains(., \"" + name + "\")]//ancestor::div[1]/mat-select"));
     }
 
     private WebElement getCheckboxByName(String baseXPath, String name) {
         return visibilityOfElementLocated(getDriver(), By.xpath(
-                baseXPath + "//*[contains(text(), \"" + name + "\")]//ancestor::mat-checkbox[1]"));
+                baseXPath + "//mat-checkbox[contains(., \"" + name + "\")]"));
     }
 
     private WebElement getTextAreaFieldByName(String baseXPath, String name) {
@@ -1308,7 +1349,9 @@ public class ACCViewEditPageImpl extends BasePageImpl implements ACCViewEditPage
 
         @Override
         public void setCardinalityMaxField(String cardinalityMax) {
-            sendKeys(getCardinalityMaxField(), cardinalityMax);
+            WebElement field = getCardinalityMaxField();
+            clear(field);
+            sendKeys(field, cardinalityMax);
         }
 
         @Override

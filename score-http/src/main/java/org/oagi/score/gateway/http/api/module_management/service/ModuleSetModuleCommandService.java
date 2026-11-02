@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import static org.oagi.score.gateway.http.api.module_management.model.ModuleType.DIRECTORY;
 import static org.oagi.score.gateway.http.api.module_management.model.ModuleType.FILE;
+import static org.oagi.score.gateway.http.api.module_management.service.ModuleManagementPermission.requireDeveloper;
 import static org.springframework.util.StringUtils.hasLength;
 
 @Service
@@ -42,6 +43,8 @@ public class ModuleSetModuleCommandService {
     }
 
     public ModuleId create(ScoreUser requester, CreateModuleSetModuleRequest request) {
+
+        requireDeveloper(requester);
 
         var query = query(requester);
 
@@ -68,6 +71,8 @@ public class ModuleSetModuleCommandService {
     }
 
     public boolean update(ScoreUser requester, UpdateModuleSetModuleRequest request) {
+
+        requireDeveloper(requester);
 
         var query = query(requester);
 
@@ -118,6 +123,8 @@ public class ModuleSetModuleCommandService {
 
     public boolean discard(ScoreUser requester, ModuleId moduleId, ModuleSetId moduleSetId) {
 
+        requireDeveloper(requester);
+
         ModuleSummaryRecord module = query(requester).getModule(moduleId);
         if (module == null) {
             throw new IllegalArgumentException("Cannot found a module record [moduleId=" + moduleId + "]");
@@ -143,15 +150,40 @@ public class ModuleSetModuleCommandService {
 
     public void copyModule(ScoreUser requester, CopyModuleSetModuleRequest request) {
 
+        requireDeveloper(requester);
+
         var query = query(requester);
 
         ModuleSummaryRecord targetModule = query.getModule(request.targetModuleId());
         ModuleSummaryRecord parentModule = query.getModule(request.parentModuleId());
 
-        if (query.hasDuplicateName(request.parentModuleId(), targetModule.name())) {
-            copyOverWriteModule(requester, targetModule, parentModule, request.copySubModules());
+        // Copying a directory into itself or into one of its sub-directories would copy the copies again and again.
+        for (ModuleSummaryRecord ancestor = parentModule; ancestor != null;
+             ancestor = (ancestor.parentModuleId() != null) ? query.getModule(ancestor.parentModuleId()) : null) {
+            if (ancestor.moduleId().equals(request.targetModuleId())) {
+                throw new IllegalArgumentException(copyIntoItselfMessage(targetModule, parentModule));
+            }
+        }
+
+        copyModule(requester, targetModule, parentModule, request.copySubModules());
+    }
+
+    private static String copyIntoItselfMessage(ModuleSummaryRecord targetModule, ModuleSummaryRecord parentModule) {
+        String parentName = (parentModule.name() == null || parentModule.name().isEmpty()) ? "the root directory" : "'" + parentModule.name() + "'";
+        String reason = targetModule.moduleId().equals(parentModule.moduleId())
+                ? "it cannot be copied into itself"
+                : "the destination " + parentName + " is inside it";
+        return "Cannot copy '" + targetModule.name() + "' into " + parentName + ": " + reason
+                + ". Choose a destination outside of the module being copied.";
+    }
+
+    private void copyModule(
+            ScoreUser requester, ModuleSummaryRecord targetModule, ModuleSummaryRecord parentModule, boolean copySubModules) {
+
+        if (query(requester).hasDuplicateName(parentModule.moduleId(), targetModule.name())) {
+            copyOverWriteModule(requester, targetModule, parentModule, copySubModules);
         } else {
-            copyInsertModule(requester, targetModule, parentModule, request.copySubModules());
+            copyInsertModule(requester, targetModule, parentModule, copySubModules);
         }
     }
 
@@ -177,22 +209,20 @@ public class ModuleSetModuleCommandService {
                         targetModule.namespaceId(), targetModule.versionNum(), ModuleType.DIRECTORY);
                 if (copySubModules) {
                     query.getChildren(targetModule.moduleId()).stream().forEach(child -> {
-                        copyInsertModule(requester, child, duplicated, copySubModules);
+                        copyModule(requester, child, duplicated, copySubModules);
                     });
                 }
             }
         } else {
             if (targetModule.type() == ModuleType.FILE) {
-                command.delete(duplicated.moduleId());
-                if (copySubModules) {
-                    copyInsertModule(requester, targetModule, parentModule, copySubModules);
-                }
+                discard(requester, duplicated);
+                copyInsertModule(requester, targetModule, parentModule, copySubModules);
             } else {
                 command.updateVersionNumAndNamespaceId(duplicated.moduleId(),
                         targetModule.namespaceId(), targetModule.versionNum());
                 if (copySubModules) {
                     query.getChildren(targetModule.moduleId()).stream().forEach(child -> {
-                        copyInsertModule(requester, child, duplicated, copySubModules);
+                        copyModule(requester, child, duplicated, copySubModules);
                     });
                 }
             }

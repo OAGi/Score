@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BusinessTermService} from '../domain/business-term.service';
@@ -11,6 +11,7 @@ import {BusinessTermDetails} from '../domain/business-term';
   standalone: false,
   selector: 'score-business-term-create',
   templateUrl: './business-term-create.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./business-term-create.component.css']
 })
 export class BusinessTermCreateComponent implements OnInit {
