@@ -80,6 +80,7 @@ import static org.oagi.score.gateway.http.common.model.ScoreRole.ADMINISTRATOR;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.ScoreDigestUtils.sha256;
+import org.oagi.score.gateway.http.common.util.StringUtils;
 import static org.oagi.score.gateway.http.common.util.StringUtils.hasLength;
 
 @Service
@@ -1706,8 +1707,8 @@ public class BieEditService implements InitializingBean {
 
         dslContext.update(TOP_LEVEL_ASBIEP)
                 .set(TOP_LEVEL_ASBIEP.IS_DEPRECATED, (byte) 1)
-                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, request.getReason())
-                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, request.getRemark())
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REASON, StringUtils.trimToNull(request.getReason()))
+                .set(TOP_LEVEL_ASBIEP.DEPRECATED_REMARK, StringUtils.trimToNull(request.getRemark()))
                 .set(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY, ULong.valueOf(requester.userId().value()))
                 .set(TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP, LocalDateTime.now())
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value())))

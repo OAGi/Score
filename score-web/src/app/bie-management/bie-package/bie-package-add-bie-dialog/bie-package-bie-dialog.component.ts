@@ -20,6 +20,26 @@ const BIE_PACKAGE_BIE_TABLE = defineTable({
     F.releaseIds],
 });
 
+/** What the dialog opens with. Each call is a fresh object: nothing is carried over between openings. */
+export interface BiePackageBieDialogData {
+  action: 'Add' | 'Replace';
+  biePackage: any;
+  webPageInfo: any;
+  den?: string;
+  excludeTopLevelAsbiepIds?: any[];
+}
+
+export function addDialogData(biePackage: any, webPageInfo: any): BiePackageBieDialogData {
+  return {action: 'Add', biePackage, webPageInfo};
+}
+
+export function replaceDialogData(biePackage: any, webPageInfo: any, selected: BieListEntry): BiePackageBieDialogData {
+  return {
+    action: 'Replace', biePackage, webPageInfo,
+    den: selected.den, excludeTopLevelAsbiepIds: [selected.topLevelAsbiepId]
+  };
+}
+
 @Component({
   standalone: false,
   selector: 'score-bie-package-bie-dialog',

@@ -13,7 +13,11 @@ import {WebPageInfoService} from '../../../basis/basis.service';
 import {BiePackageDetails} from '../domain/bie-package';
 import {BieListEntry} from '../../bie-list/domain/bie-list';
 import {BiePackageService} from '../domain/bie-package.service';
-import {BiePackageBieDialogComponent} from '../bie-package-add-bie-dialog/bie-package-bie-dialog.component';
+import {
+  addDialogData,
+  BiePackageBieDialogComponent,
+  replaceDialogData
+} from '../bie-package-add-bie-dialog/bie-package-bie-dialog.component';
 import {BIE_TABLE, bieLinkQuery} from '../../bie-list/domain/bie.table';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../../common/score-table';
 import {forkJoin, of} from 'rxjs';
@@ -169,10 +173,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.rows;
-    dialogConfig.data.action = 'Add';
-    dialogConfig.data.biePackage = this.biePackage;
-    dialogConfig.data.webPageInfo = this.webPageInfo;
+    dialogConfig.data = addDialogData(this.biePackage, this.webPageInfo);
     dialogConfig.width = '100%';
     dialogConfig.maxWidth = '100%';
     dialogConfig.height = '100%';
@@ -212,12 +213,7 @@ export class BiePackageDetailComponent implements OnInit {
 
     const dialogConfig = new MatDialogConfig();
 
-    dialogConfig.data = this.rows;
-    dialogConfig.data.action = 'Replace';
-    dialogConfig.data.den = selected.den;
-    dialogConfig.data.excludeTopLevelAsbiepIds = [selected.topLevelAsbiepId];
-    dialogConfig.data.biePackage = this.biePackage;
-    dialogConfig.data.webPageInfo = this.webPageInfo;
+    dialogConfig.data = replaceDialogData(this.biePackage, this.webPageInfo, selected);
     dialogConfig.width = '100%';
     dialogConfig.maxWidth = '100%';
     dialogConfig.height = '100%';
