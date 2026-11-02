@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.WIP;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.*;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional
@@ -80,6 +81,16 @@ public class AgencyIdListCommandService {
         }
         if (request.namespaceId() == null) {
             throw new IllegalArgumentException("Namespace is required.");
+        }
+        if (request.valueList() != null) {
+            for (var value : request.valueList()) {
+                if (!hasText(value.value())) {
+                    throw new IllegalArgumentException("Agency ID list value cannot be empty.");
+                }
+                if (!hasText(value.name())) {
+                    throw new IllegalArgumentException("Agency ID list value meaning cannot be empty.");
+                }
+            }
         }
 
         var command = command(requester);

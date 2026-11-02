@@ -79,8 +79,8 @@ export class AgencyIdListValueDialogComponent implements OnInit {
   }
 
   isDisabled() {
-    return (this.agencyIdListValue.value === undefined || this.agencyIdListValue.value === '') ||
-      (this.agencyIdListValue.name === undefined || this.agencyIdListValue.name === '') ||
+    return (this.agencyIdListValue.value === undefined || this.agencyIdListValue.value === null || this.agencyIdListValue.value.trim() === '') ||
+      (this.agencyIdListValue.name === undefined || this.agencyIdListValue.name === null || this.agencyIdListValue.name.trim() === '') ||
       !this.isDirty();
   }
 

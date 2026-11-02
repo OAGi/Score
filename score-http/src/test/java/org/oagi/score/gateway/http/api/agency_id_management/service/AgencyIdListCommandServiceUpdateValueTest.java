@@ -89,6 +89,24 @@ class AgencyIdListCommandServiceUpdateValueTest {
     }
 
     @Test
+    void update_rejects_a_value_or_meaning_without_text() {
+        when(query.getAgencyIdListValueDetailsList(manifestId)).thenReturn(List.of());
+
+        for (String blank : new String[]{null, "", "   "}) {
+            var blankValue = new UpdateAgencyIdListValueRequest(null, blank, "Name", null, false, false, false);
+            var blankName = new UpdateAgencyIdListValueRequest(null, "V", blank, null, false, false, false);
+            assertThrows(IllegalArgumentException.class,
+                    () -> service.update(requester, updateRequest(List.of(blankValue))));
+            assertThrows(IllegalArgumentException.class,
+                    () -> service.update(requester, updateRequest(List.of(blankName))));
+        }
+
+        verify(command, never()).createValue(any(), any(), any(), any(), any(), any(),
+                anyBoolean(), anyBoolean(), anyBoolean());
+        verify(command, never()).update(any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
     void update_applies_requested_flags_to_a_newly_added_value() {
         when(query.getAgencyIdListValueDetailsList(manifestId)).thenReturn(List.of());
 
