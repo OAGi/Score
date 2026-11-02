@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.configuration.websocket;
 
+import org.oagi.score.gateway.http.configuration.security.ScoreCorsConfigurationSource;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,10 +34,13 @@ public class WebSocketConfiguration
 
     @Override
     public void configureStompEndpoints(StompEndpointRegistry registry) {
-        // The same origin is always accepted; the other origins are the configured CORS origins.
+        // The origin is checked by WebSocketOriginInterceptor (the origin the request was addressed to, with http or
+        // https, and the configured CORS origins), so Spring's own check, which compares the scheme, lets all pass.
         registry.addEndpoint("/ws")
-                .addInterceptors(new HttpSessionHandshakeInterceptor())
-                .setAllowedOrigins(allowedOrigins.stream().filter(e -> !e.isBlank()).toArray(String[]::new));
+                .addInterceptors(new WebSocketOriginInterceptor(new ScoreCorsConfigurationSource(
+                        allowedOrigins.stream().filter(e -> !e.isBlank()).toList())),
+                        new HttpSessionHandshakeInterceptor())
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
