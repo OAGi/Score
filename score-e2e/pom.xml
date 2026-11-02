@@ -23,7 +23,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
-        <selenium.version>4.51.0</selenium.version>
+        <selenium.version>4.52.0</selenium.version>
         <junit.version>5.14.4</junit.version>
         <junit.platform.version>1.14.4</junit.platform.version>
         <junit4.version>4.13.2</junit4.version>
