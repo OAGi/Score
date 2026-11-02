@@ -22,9 +22,9 @@
               <mat-form-field>
                 <mat-label>Type</mat-label>
                 <mat-select [(ngModel)]="filter.type" multiple>
-                  @for (type of typeList; track type) {
-                    <mat-option [value]="type">
-                      <span>{{ type }}</span>
+                  @for (type of typeList; track type.value) {
+                    <mat-option [value]="type.value">
+                      <span>{{ type.label }}</span>
                     </mat-option>
                   }
                 </mat-select>
