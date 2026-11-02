@@ -51,6 +51,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -220,7 +221,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                         ABIE.ABIE_ID,
                         ABIE.GUID,
                         ABIE.PATH,
-                        ABIE.BASED_ACC_MANIFEST_ID
+                        ABIE.BASED_ACC_MANIFEST_ID,
+                        ABIE.BIZ_TERM
                 ).from(ABIE)
                 .where(ABIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId.value())))
                 .fetchInto(BieCreateFromExistingBieAbie.class);
@@ -265,6 +267,9 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                         BBIE.DEFINITION,
                         BBIE.EXAMPLE,
                         BBIE.REMARK,
+                        BBIE.FACET_MIN_LENGTH,
+                        BBIE.FACET_MAX_LENGTH,
+                        BBIE.FACET_PATTERN,
                         BBIE.SEQ_KEY,
                         BBIE.IS_USED.as("used")).from(BBIE)
                 .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId.value())))
@@ -280,7 +285,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                         ASBIEP.ROLE_OF_ABIE_ID,
                         ASBIEP.DEFINITION,
                         ASBIEP.REMARK,
-                        ASBIEP.BIZ_TERM).from(ASBIEP)
+                        ASBIEP.BIZ_TERM,
+                        ASBIEP.DISPLAY_NAME).from(ASBIEP)
                 .where(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId.value())))
                 .fetchInto(BieCreateFromExistingBieAsbiep.class);
     }
@@ -293,7 +299,8 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                         BBIEP.BASED_BCCP_MANIFEST_ID,
                         BBIEP.DEFINITION,
                         BBIEP.REMARK,
-                        BBIEP.BIZ_TERM).from(BBIEP)
+                        BBIEP.BIZ_TERM,
+                        BBIEP.DISPLAY_NAME).from(BBIEP)
                 .where(BBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId.value())))
                 .fetchInto(BieCreateFromExistingBieBbiep.class);
     }
@@ -315,7 +322,11 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                         BBIE_SC.DEFINITION,
                         BBIE_SC.EXAMPLE,
                         BBIE_SC.REMARK,
+                        BBIE_SC.FACET_MIN_LENGTH,
+                        BBIE_SC.FACET_MAX_LENGTH,
+                        BBIE_SC.FACET_PATTERN,
                         BBIE_SC.BIZ_TERM,
+                        BBIE_SC.DISPLAY_NAME,
                         BBIE_SC.IS_USED.as("used")).from(BBIE_SC)
                 .where(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(ownerTopLevelAsbiepId.value())))
                 .fetchInto(BieCreateFromExistingBieBbieSc.class);
@@ -328,6 +339,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private String guid;
         private String path;
         private AccManifestId basedAccManifestId;
+        private String bizTerm;
 
     }
 
@@ -371,6 +383,9 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private String definition;
         private String example;
         private String remark;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private double seqKey;
         private boolean used;
 
@@ -387,6 +402,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private String definition;
         private String remark;
         private String bizTerm;
+        private String displayName;
 
     }
 
@@ -400,6 +416,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private String definition;
         private String remark;
         private String bizTerm;
+        private String displayName;
 
     }
 
@@ -421,7 +438,11 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         private String definition;
         private String example;
         private String remark;
+        private BigInteger facetMinLength;
+        private BigInteger facetMaxLength;
+        private String facetPattern;
         private String bizTerm;
+        private String displayName;
         private boolean used;
 
     }
@@ -667,6 +688,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                             .set(ABIE.PATH, getPath(abie.getPath()))
                             .set(ABIE.HASH_PATH, getHashPath(abie.getPath()))
                             .set(ABIE.BASED_ACC_MANIFEST_ID, ULong.valueOf(abie.getBasedAccManifestId().value()))
+                            .set(ABIE.BIZ_TERM, abie.getBizTerm())
                             .set(ABIE.CREATED_BY, ULong.valueOf(userId.value()))
                             .set(ABIE.LAST_UPDATED_BY, ULong.valueOf(userId.value()))
                             .set(ABIE.CREATION_TIMESTAMP, timestamp)
@@ -689,6 +711,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                             .set(ASBIEP.DEFINITION, asbiep.getDefinition())
                             .set(ASBIEP.REMARK, asbiep.getRemark())
                             .set(ASBIEP.BIZ_TERM, asbiep.getBizTerm())
+                            .set(ASBIEP.DISPLAY_NAME, asbiep.getDisplayName())
                             .set(ASBIEP.CREATED_BY, ULong.valueOf(userId.value()))
                             .set(ASBIEP.LAST_UPDATED_BY, ULong.valueOf(userId.value()))
                             .set(ASBIEP.CREATION_TIMESTAMP, timestamp)
@@ -709,6 +732,7 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                             .set(BBIEP.DEFINITION, bbiep.getDefinition())
                             .set(BBIEP.REMARK, bbiep.getRemark())
                             .set(BBIEP.BIZ_TERM, bbiep.getBizTerm())
+                            .set(BBIEP.DISPLAY_NAME, bbiep.getDisplayName())
                             .set(BBIEP.CREATED_BY, ULong.valueOf(userId.value()))
                             .set(BBIEP.LAST_UPDATED_BY, ULong.valueOf(userId.value()))
                             .set(BBIEP.CREATION_TIMESTAMP, timestamp)
@@ -762,6 +786,9 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                             .set(BBIE.DEFINITION, bbie.getDefinition())
                             .set(BBIE.EXAMPLE, bbie.getExample())
                             .set(BBIE.REMARK, bbie.getRemark())
+                            .set(BBIE.FACET_MIN_LENGTH, (bbie.getFacetMinLength() != null) ? ULong.valueOf(bbie.getFacetMinLength()) : null)
+                            .set(BBIE.FACET_MAX_LENGTH, (bbie.getFacetMaxLength() != null) ? ULong.valueOf(bbie.getFacetMaxLength()) : null)
+                            .set(BBIE.FACET_PATTERN, bbie.getFacetPattern())
                             .set(BBIE.CARDINALITY_MIN, bbie.getCardinalityMin())
                             .set(BBIE.CARDINALITY_MAX, bbie.getCardinalityMax())
                             .set(BBIE.IS_NILLABLE, (byte) ((bbie.isNillable()) ? 1 : 0))
@@ -794,7 +821,11 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                             .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())
                             .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                             .set(BBIE_SC.REMARK, bbieSc.getRemark())
+                            .set(BBIE_SC.FACET_MIN_LENGTH, (bbieSc.getFacetMinLength() != null) ? ULong.valueOf(bbieSc.getFacetMinLength()) : null)
+                            .set(BBIE_SC.FACET_MAX_LENGTH, (bbieSc.getFacetMaxLength() != null) ? ULong.valueOf(bbieSc.getFacetMaxLength()) : null)
+                            .set(BBIE_SC.FACET_PATTERN, bbieSc.getFacetPattern())
                             .set(BBIE_SC.BIZ_TERM, bbieSc.getBizTerm())
+                            .set(BBIE_SC.DISPLAY_NAME, bbieSc.getDisplayName())
                             .set(BBIE_SC.CARDINALITY_MIN, bbieSc.getCardinalityMin())
                             .set(BBIE_SC.CARDINALITY_MAX, bbieSc.getCardinalityMax())
                             .set(BBIE_SC.IS_USED, (byte) ((bbieSc.isUsed()) ? 1 : 0))
