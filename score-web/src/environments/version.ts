@@ -1,1 +1,1 @@
-export const projectVersion = '3.6.0-dev';
+export const projectVersion = '3.6.0';
