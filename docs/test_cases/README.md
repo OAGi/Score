@@ -243,6 +243,7 @@
 - [Test Suite 46 - BIE Package Management](/docs/test_cases/TestSuite46.md)
 	- [Test Case 46.1 - Revision Reason Text](/docs/test_cases/TestSuite46.md#test-case-461)
 	- [Test Case 46.2 - Backward Compatibility Indicator](/docs/test_cases/TestSuite46.md#test-case-462)
+	- [Test Case 46.3 - BIE Package export names its schema files by the configured BIE Package Schema filename expression](/docs/test_cases/TestSuite46.md#test-case-463)
 - [Test Suite 47 - BIE Inverse Mode](/docs/test_cases/TestSuite47.md)
 	- [Test Case 47.1 - Admin management of BIE Inverse Mode availability](/docs/test_cases/TestSuite47.md#test-case-471)
 	- [Test Case 47.2 - Inverse Mode selection defaults, overrides, and persistence](/docs/test_cases/TestSuite47.md#test-case-472)

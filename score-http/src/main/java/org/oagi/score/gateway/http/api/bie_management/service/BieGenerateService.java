@@ -328,6 +328,8 @@ public class BieGenerateService {
     public EachSchemaResult generateSchemaForEach(
             ScoreUser requester,
             List<TopLevelAsbiepSummaryRecord> topLevelAsbieps, GenerateExpressionOption option) throws BieGenerateFailureException {
+        // The BIE Package export calls this method directly, so resolve the configured filename expressions here too.
+        applyConfiguredFilenameExpressions(requester, option);
         Map<TopLevelAsbiepId, File> targetFiles = new HashMap();
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
         GenerationContext generationContext = generateExpression.generateContext(requester, topLevelAsbieps, option);

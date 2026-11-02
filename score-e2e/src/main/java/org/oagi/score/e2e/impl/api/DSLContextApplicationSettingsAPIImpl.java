@@ -18,6 +18,7 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
 
     private static final String STRING_TYPE = "String";
     private static final String BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME = "score.bie.schema-filename-expression";
+    private static final String BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME = "score.bie.package-schema-filename-expression";
 
     private final DSLContext dslContext;
 
@@ -67,29 +68,48 @@ public class DSLContextApplicationSettingsAPIImpl implements ApplicationSettings
 
     @Override
     public String getBIESchemaFilenameExpression() {
-        return dslContext.select(CONFIGURATION.VALUE)
-                .from(CONFIGURATION)
-                .where(CONFIGURATION.NAME.eq(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME))
-                .fetchOptionalInto(String.class).orElse(null);
+        return getStringConfiguration(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME);
     }
 
     @Override
     public void setBIESchemaFilenameExpression(String expression) {
-        if (expression == null) {
+        setStringConfiguration(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME, expression);
+    }
+
+    @Override
+    public String getBIEPackageSchemaFilenameExpression() {
+        return getStringConfiguration(BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME);
+    }
+
+    @Override
+    public void setBIEPackageSchemaFilenameExpression(String expression) {
+        setStringConfiguration(BIE_PACKAGE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME, expression);
+    }
+
+    private String getStringConfiguration(String configurationName) {
+        return dslContext.select(CONFIGURATION.VALUE)
+                .from(CONFIGURATION)
+                .where(CONFIGURATION.NAME.eq(configurationName))
+                .fetchOptionalInto(String.class).orElse(null);
+    }
+
+    /** Store a String configuration; a {@code null} value removes it. */
+    private void setStringConfiguration(String configurationName, String value) {
+        if (value == null) {
             dslContext.deleteFrom(CONFIGURATION)
-                    .where(CONFIGURATION.NAME.eq(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME))
+                    .where(CONFIGURATION.NAME.eq(configurationName))
                     .execute();
             return;
         }
         int updated = dslContext.update(CONFIGURATION)
-                .set(CONFIGURATION.VALUE, expression)
-                .where(CONFIGURATION.NAME.eq(BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME))
+                .set(CONFIGURATION.VALUE, value)
+                .where(CONFIGURATION.NAME.eq(configurationName))
                 .execute();
         if (updated == 0) {
             dslContext.insertInto(CONFIGURATION)
-                    .set(CONFIGURATION.NAME, BIE_SCHEMA_FILENAME_EXPRESSION_CONFIG_NAME)
+                    .set(CONFIGURATION.NAME, configurationName)
                     .set(CONFIGURATION.TYPE, STRING_TYPE)
-                    .set(CONFIGURATION.VALUE, expression)
+                    .set(CONFIGURATION.VALUE, value)
                     .execute();
         }
     }

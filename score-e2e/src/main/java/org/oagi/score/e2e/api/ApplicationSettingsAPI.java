@@ -63,6 +63,16 @@ public interface ApplicationSettingsAPI {
      */
     void setBIESchemaFilenameExpression(String expression);
 
+    /** Return the BIE Package Schema filename expression, or {@code null} if none is stored. */
+    String getBIEPackageSchemaFilenameExpression();
+
+    /**
+     * Set the BIE Package Schema filename expression.
+     *
+     * @param expression the expression, or {@code null} to remove the stored value
+     */
+    void setBIEPackageSchemaFilenameExpression(String expression);
+
     /**
      * Remove every passkey (and the WebAuthn identity) of an account, so the account can be deleted.
      *
