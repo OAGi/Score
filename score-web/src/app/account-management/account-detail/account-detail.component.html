@@ -144,7 +144,7 @@
             Enable this account
           </button>
         }
-        @if (!account.enabled && canRemove) {
+        @if (!!account && !account.enabled && canRemove) {
           <button mat-raised-button style="color: #d1242f; font-weight: bold;"
             [matTooltip]="'The account can be removed if it has no data created or owned.'"
             (click)="removeAccount()">
