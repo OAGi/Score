@@ -86,4 +86,24 @@ class TagCommandServiceTest {
         service.update(developer, updateRequest);
         verify(command).update(tagId, "tag", "#000", "#fff", null);
     }
+
+    @Test
+    void createRejectsBlankName() {
+        for (String name : new String[]{null, "", "   ", "\t"}) {
+            assertThatThrownBy(() -> service.create(user(ScoreRole.DEVELOPER),
+                    new CreateTagRequest(name, "#000", "#fff", null)))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void updateRejectsBlankName() {
+        for (String name : new String[]{null, "", "   ", "\t"}) {
+            assertThatThrownBy(() -> service.update(user(ScoreRole.DEVELOPER),
+                    new UpdateTagRequest(tagId, name, "#000", "#fff", null)))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+        verifyNoInteractions(command);
+    }
 }
