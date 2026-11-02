@@ -1,5 +1,7 @@
 import {vi} from 'vitest';
 import {of} from 'rxjs';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {OasDocCreateComponent} from './oas-doc-create.component';
 
 /**
@@ -64,5 +66,43 @@ describe('OasDocCreateComponent.create duplicate check', () => {
     OasDocCreateComponent.prototype.openDialogOasDocCreate.call(c);
     expect(open).toHaveBeenCalledWith(dialogConfig);
     expect(dialogConfig.data.content[0]).not.toMatch(/license/i);
+  });
+});
+
+/**
+ * Create must stay disabled while any of the Terms of Service URL, Contact URL, Contact Email or
+ * License URL fields holds an invalid value.
+ */
+describe('OasDocCreateComponent.isDisabled with invalid URL / email fields', () => {
+  function ctx(): any {
+    return {
+      disabled: false,
+      oasDoc: {title: 't', openAPIVersion: '3.1', version: '1.0'},
+      contactUrl: new FormControl('', [httpUrlValidator]),
+      contactEmail: new FormControl('', [optionalEmailValidator]),
+      licenseUrl: new FormControl('', [httpUrlValidator]),
+      termServiceUrl: new FormControl('', [httpUrlValidator]),
+    };
+  }
+  const isDisabled = (c: any) => OasDocCreateComponent.prototype.isDisabled.call(c, c.oasDoc);
+
+  it('is enabled when all optional fields are empty or valid', () => {
+    const c = ctx();
+    expect(isDisabled(c)).toBe(false);
+    c.contactUrl.setValue('https://example.com/contact');
+    c.contactEmail.setValue('a@example.com');
+    expect(isDisabled(c)).toBe(false);
+  });
+
+  it.each(['contactUrl', 'licenseUrl', 'termServiceUrl'])('is disabled when %s is not a URL', (name) => {
+    const c = ctx();
+    c[name].setValue('not a url');
+    expect(isDisabled(c)).toBe(true);
+  });
+
+  it('is disabled when the contact email is invalid', () => {
+    const c = ctx();
+    c.contactEmail.setValue('nope');
+    expect(isDisabled(c)).toBe(true);
   });
 });

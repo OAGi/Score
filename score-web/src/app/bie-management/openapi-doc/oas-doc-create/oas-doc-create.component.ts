@@ -4,8 +4,8 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {FormControl, Validators} from '@angular/forms';
-import {httpUrlValidator} from '../oas-doc-url.validator';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {AuthService} from '../../../authentication/auth.service';
@@ -34,7 +34,7 @@ export class OasDocCreateComponent implements OnInit {
   oasDoc: OasDoc;
   disabled: boolean;
   contactUrl = new FormControl('', [httpUrlValidator]);
-  contactEmail = new FormControl('', [Validators.email]);
+  contactEmail = new FormControl('', [optionalEmailValidator]);
   licenseUrl = new FormControl('', [httpUrlValidator]);
   termServiceUrl = new FormControl('', [httpUrlValidator]);
 
@@ -50,7 +50,9 @@ export class OasDocCreateComponent implements OnInit {
     return (this.disabled) ||
       (this.oasDoc.title === undefined || this.oasDoc.title === '') ||
       (this.oasDoc.openAPIVersion === undefined || this.oasDoc.openAPIVersion === '') ||
-      (this.oasDoc.version === undefined || this.oasDoc.version === '');
+      (this.oasDoc.version === undefined || this.oasDoc.version === '') ||
+      this.termServiceUrl.invalid || this.contactUrl.invalid ||
+      this.contactEmail.invalid || this.licenseUrl.invalid;
   }
 
   back() {

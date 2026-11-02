@@ -1,9 +1,9 @@
-import {FormControl, Validators} from '@angular/forms';
-import {httpUrlValidator} from './oas-doc-url.validator';
+import {FormControl} from '@angular/forms';
+import {httpUrlValidator, optionalEmailValidator} from './oas-doc-url.validator';
 
 describe('OpenAPI document URL and email validation', () => {
   const urlError = (value: string | null) => httpUrlValidator(new FormControl(value));
-  const emailError = (value: string) => Validators.email(new FormControl(value));
+  const emailError = (value: string) => optionalEmailValidator(new FormControl(value));
 
   it.each([
     '', null,
@@ -20,7 +20,7 @@ describe('OpenAPI document URL and email validation', () => {
     expect(urlError(value)).toEqual({url: true});
   });
 
-  it.each(['', 'a+b@example.com', 'first.last@mail2.example.co.uk', 'A_B-c%d@Example.com'])('accepts the email %j', value => {
+  it.each(['', '   ', 'a+b@example.com', 'first.last@mail2.example.co.uk', 'A_B-c%d@Example.com'])('accepts the email %j', value => {
     expect(emailError(value)).toBeNull();
   });
 

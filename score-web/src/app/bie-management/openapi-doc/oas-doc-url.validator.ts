@@ -1,4 +1,4 @@
-import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {AbstractControl, ValidationErrors, Validators} from '@angular/forms';
 
 /** An empty value is valid; otherwise it must be an absolute http or https URL. */
 export function httpUrlValidator(control: AbstractControl): ValidationErrors | null {
@@ -12,4 +12,10 @@ export function httpUrlValidator(control: AbstractControl): ValidationErrors | n
   } catch {
     return {url: true};
   }
+}
+
+/** An empty or whitespace-only value is valid; otherwise it must be a valid email address. */
+export function optionalEmailValidator(control: AbstractControl): ValidationErrors | null {
+  const value = (control.value ?? '').toString().trim();
+  return value ? Validators.email({value} as AbstractControl) : null;
 }
