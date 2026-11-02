@@ -21,4 +21,19 @@ describe('HomepageComponent', () => {
     expect(column).toContain("key: 'ownerLoginIdList'");
     expect(column).not.toContain('[class.disabled]');
   });
+
+  it('opens the Core Component list of the users and states table on the Working release', () => {
+    const html = readFileSync(join(process.cwd(), 'src/app/basis/homepage/homepage.component.html'), 'utf8');
+    const start = html.indexOf('<ng-container matColumnDef="username">');
+    const end = html.indexOf('<tr mat-header-row', start);
+    const columns = html.substring(start, end);
+    expect(columns.match(/q: ccQ\(/g)?.length).toBe(5);
+    expect(columns).not.toMatch(/q: q\(/);
+
+    const self = {workingRelease: {releaseId: 7}, q: HomepageComponent.prototype.q};
+    const withRelease = HomepageComponent.prototype.ccQ.call(self, [{key: 'states', value: 'WIP'}]);
+    expect(atob(withRelease)).toBe('states=WIP&releaseId=7');
+    self.workingRelease = undefined;
+    expect(atob(HomepageComponent.prototype.ccQ.call(self, [{key: 'states', value: 'WIP'}]))).toBe('states=WIP');
+  });
 });
