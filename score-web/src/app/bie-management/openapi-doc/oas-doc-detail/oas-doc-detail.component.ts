@@ -807,6 +807,10 @@ export class OasDocDetailComponent implements OnInit {
       $event.preventDefault();
       $event.stopPropagation();
 
+      // Same gate as the Update button: nothing to save, or the document is not valid to save.
+      if (!this.isChanged() || this.isDisabled(this.oasDoc)) {
+        return;
+      }
       this.update();
     }
   }

@@ -540,3 +540,47 @@ describe('OasDocDetailComponent.update duplicate check (same check as Create)', 
     expect(dialogConfig.data.content[0]).not.toMatch(/license/i);
   });
 });
+
+describe('OasDocDetailComponent.handleKeyboardEvent Ctrl/Cmd+S', () => {
+  function saveCtx(changed: boolean, disabled: boolean): any {
+    const ctx: any = {
+      oasDoc: {},
+      isChanged: () => changed,
+      isDisabled: () => disabled,
+      update: vi.fn(),
+    };
+    ctx.handleKeyboardEvent = OasDocDetailComponent.prototype.handleKeyboardEvent;
+    return ctx;
+  }
+
+  function press(ctx: any, init: Partial<KeyboardEvent> = {key: 's', ctrlKey: true}) {
+    const event: any = {preventDefault: vi.fn(), stopPropagation: vi.fn(), ...init};
+    ctx.handleKeyboardEvent(event);
+    return event;
+  }
+
+  it('saves when the document is changed and the Update button would be enabled', () => {
+    const ctx = saveCtx(true, false);
+    press(ctx);
+    expect(ctx.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not save while the Update button is disabled (blank Title or Version, invalid security)', () => {
+    const ctx = saveCtx(true, true);
+    const event = press(ctx);
+    expect(ctx.update).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  it('does not save when nothing has changed', () => {
+    const ctx = saveCtx(false, false);
+    press(ctx);
+    expect(ctx.update).not.toHaveBeenCalled();
+  });
+
+  it('ignores other keys', () => {
+    const ctx = saveCtx(true, false);
+    press(ctx, {key: 'a', ctrlKey: true});
+    expect(ctx.update).not.toHaveBeenCalled();
+  });
+});
