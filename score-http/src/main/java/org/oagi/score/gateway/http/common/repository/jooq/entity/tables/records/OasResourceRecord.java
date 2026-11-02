@@ -56,30 +56,32 @@ public class OasResourceRecord extends UpdatableRecordImpl<OasResourceRecord> {
     }
 
     /**
-     * Setter for <code>oas_resource.path</code>. This will hold the BIE name by
-     * default.
+     * Setter for <code>oas_resource.path</code>. The OpenAPI path (resource
+     * name) for this resource; defaults to the BIE name.
      */
     public void setPath(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oas_resource.path</code>. This will hold the BIE name by
-     * default.
+     * Getter for <code>oas_resource.path</code>. The OpenAPI path (resource
+     * name) for this resource; defaults to the BIE name.
      */
     public String getPath() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>oas_resource.ref</code>.
+     * Setter for <code>oas_resource.ref</code>. An optional reference ($ref) to
+     * an externally defined Path Item Object for this resource.
      */
     public void setRef(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oas_resource.ref</code>.
+     * Getter for <code>oas_resource.ref</code>. An optional reference ($ref) to
+     * an externally defined Path Item Object for this resource.
      */
     public String getRef() {
         return (String) get(3);

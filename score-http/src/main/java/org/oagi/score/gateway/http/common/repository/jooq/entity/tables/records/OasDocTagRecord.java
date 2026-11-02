@@ -22,32 +22,32 @@ public class OasDocTagRecord extends UpdatableRecordImpl<OasDocTagRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oas_doc_tag.oas_doc_id</code>. The primary key of the
-     * record.
+     * Setter for <code>oas_doc_tag.oas_doc_id</code>. Foreign key to the
+     * OAS_DOC table.
      */
     public void setOasDocId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oas_doc_tag.oas_doc_id</code>. The primary key of the
-     * record.
+     * Getter for <code>oas_doc_tag.oas_doc_id</code>. Foreign key to the
+     * OAS_DOC table.
      */
     public ULong getOasDocId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oas_doc_tag.oas_tag_id</code>. The primary key of the
-     * record.
+     * Setter for <code>oas_doc_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
     public void setOasTagId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_doc_tag.oas_tag_id</code>. The primary key of the
-     * record.
+     * Getter for <code>oas_doc_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
     public ULong getOasTagId() {
         return (ULong) get(1);

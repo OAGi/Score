@@ -39,72 +39,84 @@ public class OasParameterLinkRecord extends UpdatableRecordImpl<OasParameterLink
     }
 
     /**
-     * Setter for <code>oas_parameter_link.oas_response_id</code>.
+     * Setter for <code>oas_parameter_link.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
     public void setOasResponseId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_parameter_link.oas_response_id</code>.
+     * Getter for <code>oas_parameter_link.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
     public ULong getOasResponseId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oas_parameter_link.oas_parameter_id</code>.
+     * Setter for <code>oas_parameter_link.oas_parameter_id</code>. Foreign key
+     * to the OAS_PARAMETER table.
      */
     public void setOasParameterId(ULong value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oas_parameter_link.oas_parameter_id</code>.
+     * Getter for <code>oas_parameter_link.oas_parameter_id</code>. Foreign key
+     * to the OAS_PARAMETER table.
      */
     public ULong getOasParameterId() {
         return (ULong) get(2);
     }
 
     /**
-     * Setter for <code>oas_parameter_link.oas_operation_id</code>.
+     * Setter for <code>oas_parameter_link.oas_operation_id</code>. Foreign key
+     * to the OAS_OPERATION table.
      */
     public void setOasOperationId(ULong value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>oas_parameter_link.oas_operation_id</code>.
+     * Getter for <code>oas_parameter_link.oas_operation_id</code>. Foreign key
+     * to the OAS_OPERATION table.
      */
     public ULong getOasOperationId() {
         return (ULong) get(3);
     }
 
     /**
-     * Setter for <code>oas_parameter_link.expression</code>. jsonPathSnip for
-     * example '$response.body#/purchaseOrderHeader.identifier'
+     * Setter for <code>oas_parameter_link.expression</code>. A runtime
+     * expression that provides the parameter value, for example
+     * '$response.body#/purchaseOrderHeader.identifier'.
      */
     public void setExpression(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oas_parameter_link.expression</code>. jsonPathSnip for
-     * example '$response.body#/purchaseOrderHeader.identifier'
+     * Getter for <code>oas_parameter_link.expression</code>. A runtime
+     * expression that provides the parameter value, for example
+     * '$response.body#/purchaseOrderHeader.identifier'.
      */
     public String getExpression() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>oas_parameter_link.description</code>.
+     * Setter for <code>oas_parameter_link.description</code>. A brief
+     * description of the parameter link. CommonMark syntax MAY be used for rich
+     * text representation.
      */
     public void setDescription(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oas_parameter_link.description</code>.
+     * Getter for <code>oas_parameter_link.description</code>. A brief
+     * description of the parameter link. CommonMark syntax MAY be used for rich
+     * text representation.
      */
     public String getDescription() {
         return (String) get(5);

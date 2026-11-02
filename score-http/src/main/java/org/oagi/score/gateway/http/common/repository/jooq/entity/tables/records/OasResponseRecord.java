@@ -40,28 +40,34 @@ public class OasResponseRecord extends UpdatableRecordImpl<OasResponseRecord> {
     }
 
     /**
-     * Setter for <code>oas_response.oas_operation_id</code>.
+     * Setter for <code>oas_response.oas_operation_id</code>. A reference of the
+     * operation record that owns this response.
      */
     public void setOasOperationId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_response.oas_operation_id</code>.
+     * Getter for <code>oas_response.oas_operation_id</code>. A reference of the
+     * operation record that owns this response.
      */
     public ULong getOasOperationId() {
         return (ULong) get(1);
     }
 
     /**
-     * Setter for <code>oas_response.http_status_code</code>.
+     * Setter for <code>oas_response.http_status_code</code>. The HTTP status
+     * code for this response (e.g. 200, 202, 204); used as the response key in
+     * the generated OpenAPI document.
      */
     public void setHttpStatusCode(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oas_response.http_status_code</code>.
+     * Getter for <code>oas_response.http_status_code</code>. The HTTP status
+     * code for this response (e.g. 200, 202, 204); used as the response key in
+     * the generated OpenAPI document.
      */
     public Integer getHttpStatusCode() {
         return (Integer) get(2);
@@ -86,84 +92,108 @@ public class OasResponseRecord extends UpdatableRecordImpl<OasResponseRecord> {
     }
 
     /**
-     * Setter for <code>oas_response.oas_message_body_id</code>.
+     * Setter for <code>oas_response.oas_message_body_id</code>. A reference of
+     * the message body record for this response.
      */
     public void setOasMessageBodyId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oas_response.oas_message_body_id</code>.
+     * Getter for <code>oas_response.oas_message_body_id</code>. A reference of
+     * the message body record for this response.
      */
     public ULong getOasMessageBodyId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oas_response.make_array_indicator</code>.
+     * Setter for <code>oas_response.make_array_indicator</code>. Indicates
+     * whether the response body is generated as an array (a list of the BIE)
+     * rather than a single object. Default is false (0).
      */
     public void setMakeArrayIndicator(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oas_response.make_array_indicator</code>.
+     * Getter for <code>oas_response.make_array_indicator</code>. Indicates
+     * whether the response body is generated as an array (a list of the BIE)
+     * rather than a single object. Default is false (0).
      */
     public Byte getMakeArrayIndicator() {
         return (Byte) get(5);
     }
 
     /**
-     * Setter for <code>oas_response.suppress_root_indicator</code>.
+     * Setter for <code>oas_response.suppress_root_indicator</code>. Indicates
+     * whether the root (wrapper) property of the response body BIE is
+     * suppressed in the generated schema. Default is false (0).
      */
     public void setSuppressRootIndicator(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oas_response.suppress_root_indicator</code>.
+     * Getter for <code>oas_response.suppress_root_indicator</code>. Indicates
+     * whether the root (wrapper) property of the response body BIE is
+     * suppressed in the generated schema. Default is false (0).
      */
     public Byte getSuppressRootIndicator() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>oas_response.meta_header_top_level_asbiep_id</code>.
+     * Setter for <code>oas_response.meta_header_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the meta header included
+     * in the response. NULL when no meta header is included.
      */
     public void setMetaHeaderTopLevelAsbiepId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oas_response.meta_header_top_level_asbiep_id</code>.
+     * Getter for <code>oas_response.meta_header_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the meta header included
+     * in the response. NULL when no meta header is included.
      */
     public ULong getMetaHeaderTopLevelAsbiepId() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oas_response.pagination_top_level_asbiep_id</code>.
+     * Setter for <code>oas_response.pagination_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the pagination
+     * information included in the response. NULL when no pagination is
+     * included.
      */
     public void setPaginationTopLevelAsbiepId(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oas_response.pagination_top_level_asbiep_id</code>.
+     * Getter for <code>oas_response.pagination_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the pagination
+     * information included in the response. NULL when no pagination is
+     * included.
      */
     public ULong getPaginationTopLevelAsbiepId() {
         return (ULong) get(8);
     }
 
     /**
-     * Setter for <code>oas_response.include_confirm_indicator</code>.
+     * Setter for <code>oas_response.include_confirm_indicator</code>. Indicates
+     * whether a confirmation message is included in the response body. Default
+     * is false (0).
      */
     public void setIncludeConfirmIndicator(Byte value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>oas_response.include_confirm_indicator</code>.
+     * Getter for <code>oas_response.include_confirm_indicator</code>. Indicates
+     * whether a confirmation message is included in the response body. Default
+     * is false (0).
      */
     public Byte getIncludeConfirmIndicator() {
         return (Byte) get(9);

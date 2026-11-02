@@ -195,7 +195,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
 
     /**
      * Setter for <code>oas_parameter.oas_http_header_id</code>. IF IN = Header,
-     * Then select form OAS_HTTP_HEADER table
+     * Then select from OAS_HTTP_HEADER table
      */
     public void setOasHttpHeaderId(ULong value) {
         set(9, value);
@@ -203,7 +203,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
 
     /**
      * Getter for <code>oas_parameter.oas_http_header_id</code>. IF IN = Header,
-     * Then select form OAS_HTTP_HEADER table
+     * Then select from OAS_HTTP_HEADER table
      */
     public ULong getOasHttpHeaderId() {
         return (ULong) get(9);

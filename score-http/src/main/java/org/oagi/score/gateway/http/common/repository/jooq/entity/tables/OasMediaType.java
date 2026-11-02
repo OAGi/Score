@@ -73,10 +73,11 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
     public final TableField<OasMediaTypeRecord, String> GUID = createField(DSL.name("guid"), SQLDataType.VARCHAR(41).nullable(false), this, "The GUID of the record.");
 
     /**
-     * The column <code>oas_media_type.description</code>. On POST, PUT, and
-     * PATCH, $ref is present
+     * The column <code>oas_media_type.description</code>. A short description
+     * of the media type. CommonMark syntax MAY be used for rich text
+     * representation.
      */
-    public final TableField<OasMediaTypeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "On POST, PUT, and PATCH, $ref is present");
+    public final TableField<OasMediaTypeRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A short description of the media type. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oas_media_type.owner_user_id</code>. The user who owns

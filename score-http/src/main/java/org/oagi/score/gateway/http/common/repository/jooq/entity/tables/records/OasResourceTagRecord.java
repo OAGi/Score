@@ -23,32 +23,32 @@ public class OasResourceTagRecord extends UpdatableRecordImpl<OasResourceTagReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oas_resource_tag.oas_operation_id</code>. The primary
-     * key of the record.
+     * Setter for <code>oas_resource_tag.oas_operation_id</code>. Foreign key to
+     * the OAS_OPERATION table.
      */
     public void setOasOperationId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oas_resource_tag.oas_operation_id</code>. The primary
-     * key of the record.
+     * Getter for <code>oas_resource_tag.oas_operation_id</code>. Foreign key to
+     * the OAS_OPERATION table.
      */
     public ULong getOasOperationId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oas_resource_tag.oas_tag_id</code>. The primary key of
-     * the record.
+     * Setter for <code>oas_resource_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
     public void setOasTagId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_resource_tag.oas_tag_id</code>. The primary key of
-     * the record.
+     * Getter for <code>oas_resource_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
     public ULong getOasTagId() {
         return (ULong) get(1);

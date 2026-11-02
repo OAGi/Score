@@ -22,32 +22,32 @@ public class OasResponseHeadersRecord extends UpdatableRecordImpl<OasResponseHea
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>oas_response_headers.oas_response_id</code>. The primary
-     * key of the record.
+     * Setter for <code>oas_response_headers.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
     public void setOasResponseId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>oas_response_headers.oas_response_id</code>. The primary
-     * key of the record.
+     * Getter for <code>oas_response_headers.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
     public ULong getOasResponseId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>oas_response_headers.oas_http_header_id</code>. The
-     * primary key of the record.
+     * Setter for <code>oas_response_headers.oas_http_header_id</code>. Foreign
+     * key to the OAS_HTTP_HEADER table.
      */
     public void setOasHttpHeaderId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_response_headers.oas_http_header_id</code>. The
-     * primary key of the record.
+     * Getter for <code>oas_response_headers.oas_http_header_id</code>. Foreign
+     * key to the OAS_HTTP_HEADER table.
      */
     public ULong getOasHttpHeaderId() {
         return (ULong) get(1);

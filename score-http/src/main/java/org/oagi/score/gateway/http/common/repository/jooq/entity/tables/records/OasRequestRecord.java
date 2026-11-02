@@ -41,14 +41,18 @@ public class OasRequestRecord extends UpdatableRecordImpl<OasRequestRecord> {
     }
 
     /**
-     * Setter for <code>oas_request.oas_operation_id</code>.
+     * Setter for <code>oas_request.oas_operation_id</code>. Foreign key to the
+     * OAS_OPERATION table; the operation whose request body this record
+     * defines.
      */
     public void setOasOperationId(ULong value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>oas_request.oas_operation_id</code>.
+     * Getter for <code>oas_request.oas_operation_id</code>. Foreign key to the
+     * OAS_OPERATION table; the operation whose request body this record
+     * defines.
      */
     public ULong getOasOperationId() {
         return (ULong) get(1);
@@ -89,70 +93,90 @@ public class OasRequestRecord extends UpdatableRecordImpl<OasRequestRecord> {
     }
 
     /**
-     * Setter for <code>oas_request.oas_message_body_id</code>.
+     * Setter for <code>oas_request.oas_message_body_id</code>. Foreign key to
+     * the OAS_MESSAGE_BODY table; the BIE-based message body carried by this
+     * request.
      */
     public void setOasMessageBodyId(ULong value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>oas_request.oas_message_body_id</code>.
+     * Getter for <code>oas_request.oas_message_body_id</code>. Foreign key to
+     * the OAS_MESSAGE_BODY table; the BIE-based message body carried by this
+     * request.
      */
     public ULong getOasMessageBodyId() {
         return (ULong) get(4);
     }
 
     /**
-     * Setter for <code>oas_request.make_array_indicator</code>.
+     * Setter for <code>oas_request.make_array_indicator</code>. If true, the
+     * request body is generated as an array of the referenced BIE rather than a
+     * single object. Defaults to false.
      */
     public void setMakeArrayIndicator(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>oas_request.make_array_indicator</code>.
+     * Getter for <code>oas_request.make_array_indicator</code>. If true, the
+     * request body is generated as an array of the referenced BIE rather than a
+     * single object. Defaults to false.
      */
     public Byte getMakeArrayIndicator() {
         return (Byte) get(5);
     }
 
     /**
-     * Setter for <code>oas_request.suppress_root_indicator</code>.
+     * Setter for <code>oas_request.suppress_root_indicator</code>. If true, the
+     * root (top-level) element of the referenced BIE is suppressed in the
+     * generated request body schema. Defaults to false.
      */
     public void setSuppressRootIndicator(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oas_request.suppress_root_indicator</code>.
+     * Getter for <code>oas_request.suppress_root_indicator</code>. If true, the
+     * root (top-level) element of the referenced BIE is suppressed in the
+     * generated request body schema. Defaults to false.
      */
     public Byte getSuppressRootIndicator() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>oas_request.meta_header_top_level_asbiep_id</code>.
+     * Setter for <code>oas_request.meta_header_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used as the meta header of the
+     * request message. NULL if no meta header is included.
      */
     public void setMetaHeaderTopLevelAsbiepId(ULong value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>oas_request.meta_header_top_level_asbiep_id</code>.
+     * Getter for <code>oas_request.meta_header_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used as the meta header of the
+     * request message. NULL if no meta header is included.
      */
     public ULong getMetaHeaderTopLevelAsbiepId() {
         return (ULong) get(7);
     }
 
     /**
-     * Setter for <code>oas_request.pagination_top_level_asbiep_id</code>.
+     * Setter for <code>oas_request.pagination_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used for pagination of the
+     * request message. NULL if no pagination is included.
      */
     public void setPaginationTopLevelAsbiepId(ULong value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>oas_request.pagination_top_level_asbiep_id</code>.
+     * Getter for <code>oas_request.pagination_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used for pagination of the
+     * request message. NULL if no pagination is included.
      */
     public ULong getPaginationTopLevelAsbiepId() {
         return (ULong) get(8);

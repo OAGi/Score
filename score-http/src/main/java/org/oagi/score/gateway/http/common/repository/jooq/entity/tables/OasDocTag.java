@@ -62,16 +62,16 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
     }
 
     /**
-     * The column <code>oas_doc_tag.oas_doc_id</code>. The primary key of the
-     * record.
+     * The column <code>oas_doc_tag.oas_doc_id</code>. Foreign key to the
+     * OAS_DOC table.
      */
-    public final TableField<OasDocTagRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasDocTagRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_DOC table.");
 
     /**
-     * The column <code>oas_doc_tag.oas_tag_id</code>. The primary key of the
-     * record.
+     * The column <code>oas_doc_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
-    public final TableField<OasDocTagRecord, ULong> OAS_TAG_ID = createField(DSL.name("oas_tag_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasDocTagRecord, ULong> OAS_TAG_ID = createField(DSL.name("oas_tag_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_TAG table.");
 
     /**
      * The column <code>oas_doc_tag.created_by</code>. The user who creates the

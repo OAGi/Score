@@ -14,7 +14,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordCh
 
 /**
  * Temporary log of the changes to the data core component records are made of,
- * read by the CC cache (RecordChangeWatchdog) to forget what changed; can be dropped
+ * read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped
  * with its triggers if CDC is introduced. Rows are deleted by the application
  * after 2 hours (retention policy, checked every 10 minutes) and the numbering
  * restarts from 1 once the table has stayed empty for 10 minutes. Rows are
@@ -156,12 +156,38 @@ public class RecordChangeLogRecord extends UpdatableRecordImpl<RecordChangeLogRe
     }
 
     /**
+     * Setter for <code>record_change_log.changed</code>. The columns of the row
+     * that an UPDATE changed, separated by commas (the triggers on the
+     * component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and
+     * DT_SC write them); an empty string when the UPDATE changed none of them.
+     * NULL when the row does not say (INSERT, DELETE, other tables): everything
+     * may have changed. The propagation of a change to the records that depend
+     * on it looks at it.
+     */
+    public void setChanged(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>record_change_log.changed</code>. The columns of the row
+     * that an UPDATE changed, separated by commas (the triggers on the
+     * component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and
+     * DT_SC write them); an empty string when the UPDATE changed none of them.
+     * NULL when the row does not say (INSERT, DELETE, other tables): everything
+     * may have changed. The propagation of a change to the records that depend
+     * on it looks at it.
+     */
+    public String getChanged() {
+        return (String) get(5);
+    }
+
+    /**
      * Setter for <code>record_change_log.creation_timestamp</code>. Timestamp
      * when this record is created. Rows older than two hours are deleted by the
      * application.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
@@ -170,7 +196,7 @@ public class RecordChangeLogRecord extends UpdatableRecordImpl<RecordChangeLogRe
      * application.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(5);
+        return (LocalDateTime) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -196,7 +222,7 @@ public class RecordChangeLogRecord extends UpdatableRecordImpl<RecordChangeLogRe
     /**
      * Create a detached, initialised RecordChangeLogRecord
      */
-    public RecordChangeLogRecord(ULong recordChangeLogId, String recordType, ULong recordId, ULong parentId, ULong releaseId, LocalDateTime creationTimestamp) {
+    public RecordChangeLogRecord(ULong recordChangeLogId, String recordType, ULong recordId, ULong parentId, ULong releaseId, String changed, LocalDateTime creationTimestamp) {
         super(RecordChangeLog.RECORD_CHANGE_LOG);
 
         setRecordChangeLogId(recordChangeLogId);
@@ -204,6 +230,7 @@ public class RecordChangeLogRecord extends UpdatableRecordImpl<RecordChangeLogRe
         setRecordId(recordId);
         setParentId(parentId);
         setReleaseId(releaseId);
+        setChanged(changed);
         setCreationTimestamp(creationTimestamp);
         resetTouchedOnNotNull();
     }

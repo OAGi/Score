@@ -62,16 +62,16 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
     }
 
     /**
-     * The column <code>oas_resource_tag.oas_operation_id</code>. The primary
-     * key of the record.
+     * The column <code>oas_resource_tag.oas_operation_id</code>. Foreign key to
+     * the OAS_OPERATION table.
      */
-    public final TableField<OasResourceTagRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasResourceTagRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_OPERATION table.");
 
     /**
-     * The column <code>oas_resource_tag.oas_tag_id</code>. The primary key of
-     * the record.
+     * The column <code>oas_resource_tag.oas_tag_id</code>. Foreign key to the
+     * OAS_TAG table.
      */
-    public final TableField<OasResourceTagRecord, ULong> OAS_TAG_ID = createField(DSL.name("oas_tag_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasResourceTagRecord, ULong> OAS_TAG_ID = createField(DSL.name("oas_tag_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_TAG table.");
 
     /**
      * The column <code>oas_resource_tag.created_by</code>. The user who creates

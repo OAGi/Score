@@ -77,15 +77,16 @@ public class OasResource extends TableImpl<OasResourceRecord> {
     public final TableField<OasResourceRecord, ULong> OAS_DOC_ID = createField(DSL.name("oas_doc_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the doc record.");
 
     /**
-     * The column <code>oas_resource.path</code>. This will hold the BIE name by
-     * default.
+     * The column <code>oas_resource.path</code>. The OpenAPI path (resource
+     * name) for this resource; defaults to the BIE name.
      */
-    public final TableField<OasResourceRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).nullable(false), this, "This will hold the BIE name by default.");
+    public final TableField<OasResourceRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).nullable(false), this, "The OpenAPI path (resource name) for this resource; defaults to the BIE name.");
 
     /**
-     * The column <code>oas_resource.ref</code>.
+     * The column <code>oas_resource.ref</code>. An optional reference ($ref) to
+     * an externally defined Path Item Object for this resource.
      */
-    public final TableField<OasResourceRecord, String> REF = createField(DSL.name("ref"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<OasResourceRecord, String> REF = createField(DSL.name("ref"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "An optional reference ($ref) to an externally defined Path Item Object for this resource.");
 
     /**
      * The column <code>oas_resource.created_by</code>. The user who creates the

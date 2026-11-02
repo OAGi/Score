@@ -135,9 +135,9 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
 
     /**
      * The column <code>oas_parameter.oas_http_header_id</code>. IF IN = Header,
-     * Then select form OAS_HTTP_HEADER table
+     * Then select from OAS_HTTP_HEADER table
      */
-    public final TableField<OasParameterRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "IF IN = Header, Then select form OAS_HTTP_HEADER table");
+    public final TableField<OasParameterRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "IF IN = Header, Then select from OAS_HTTP_HEADER table");
 
     /**
      * The column <code>oas_parameter.created_by</code>. The user who creates

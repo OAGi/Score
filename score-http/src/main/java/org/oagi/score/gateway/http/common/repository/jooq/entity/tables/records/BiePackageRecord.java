@@ -206,18 +206,20 @@ public class BiePackageRecord extends UpdatableRecordImpl<BiePackageRecord> {
     }
 
     /**
-     * Setter for <code>bie_package.owner_user_id</code>. Foreign key to the BIE
-     * package. This is the user who owns the entity, is allowed to edit the
-     * entity, and who can transfer the ownership to another user.
+     * Setter for <code>bie_package.owner_user_id</code>. A foreign key
+     * referring to the user who owns the BIE package. This is the user who owns
+     * the entity, is allowed to edit the entity, and who can transfer the
+     * ownership to another user.
      */
     public void setOwnerUserId(ULong value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>bie_package.owner_user_id</code>. Foreign key to the BIE
-     * package. This is the user who owns the entity, is allowed to edit the
-     * entity, and who can transfer the ownership to another user.
+     * Getter for <code>bie_package.owner_user_id</code>. A foreign key
+     * referring to the user who owns the BIE package. This is the user who owns
+     * the entity, is allowed to edit the entity, and who can transfer the
+     * ownership to another user.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(10);

@@ -71,30 +71,36 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
     public final TableField<OasParameterLinkRecord, ULong> OAS_PARAMETER_LINK_ID = createField(DSL.name("oas_parameter_link_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oas_parameter_link.oas_response_id</code>.
+     * The column <code>oas_parameter_link.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
-    public final TableField<OasParameterLinkRecord, ULong> OAS_RESPONSE_ID = createField(DSL.name("oas_response_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasParameterLinkRecord, ULong> OAS_RESPONSE_ID = createField(DSL.name("oas_response_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_RESPONSE table.");
 
     /**
-     * The column <code>oas_parameter_link.oas_parameter_id</code>.
+     * The column <code>oas_parameter_link.oas_parameter_id</code>. Foreign key
+     * to the OAS_PARAMETER table.
      */
-    public final TableField<OasParameterLinkRecord, ULong> OAS_PARAMETER_ID = createField(DSL.name("oas_parameter_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasParameterLinkRecord, ULong> OAS_PARAMETER_ID = createField(DSL.name("oas_parameter_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_PARAMETER table.");
 
     /**
-     * The column <code>oas_parameter_link.oas_operation_id</code>.
+     * The column <code>oas_parameter_link.oas_operation_id</code>. Foreign key
+     * to the OAS_OPERATION table.
      */
-    public final TableField<OasParameterLinkRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
+    public final TableField<OasParameterLinkRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key to the OAS_OPERATION table.");
 
     /**
-     * The column <code>oas_parameter_link.expression</code>. jsonPathSnip for
-     * example '$response.body#/purchaseOrderHeader.identifier'
+     * The column <code>oas_parameter_link.expression</code>. A runtime
+     * expression that provides the parameter value, for example
+     * '$response.body#/purchaseOrderHeader.identifier'.
      */
-    public final TableField<OasParameterLinkRecord, String> EXPRESSION = createField(DSL.name("expression"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "jsonPathSnip for example '$response.body#/purchaseOrderHeader.identifier'");
+    public final TableField<OasParameterLinkRecord, String> EXPRESSION = createField(DSL.name("expression"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A runtime expression that provides the parameter value, for example '$response.body#/purchaseOrderHeader.identifier'.");
 
     /**
-     * The column <code>oas_parameter_link.description</code>.
+     * The column <code>oas_parameter_link.description</code>. A brief
+     * description of the parameter link. CommonMark syntax MAY be used for rich
+     * text representation.
      */
-    public final TableField<OasParameterLinkRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<OasParameterLinkRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the parameter link. CommonMark syntax MAY be used for rich text representation.");
 
     /**
      * The column <code>oas_parameter_link.created_by</code>. The user who

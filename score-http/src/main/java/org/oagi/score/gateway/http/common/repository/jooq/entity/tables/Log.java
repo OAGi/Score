@@ -119,9 +119,10 @@ public class Log extends TableImpl<LogRecord> {
     public final TableField<LogRecord, String> REFERENCE = createField(DSL.name("reference"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "A reference to the record for which this log is created. Because the LOG table stores logs for various component types, it cannot use a foreign key; instead it stores the GUID of the referenced component.");
 
     /**
-     * The column <code>log.snapshot</code>.
+     * The column <code>log.snapshot</code>. A JSON serialization capturing the
+     * snapshot of the component's state at the time this log record is created.
      */
-    public final TableField<LogRecord, JSON> SNAPSHOT = createField(DSL.name("snapshot"), SQLDataType.JSON.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.JSON)), this, "");
+    public final TableField<LogRecord, JSON> SNAPSHOT = createField(DSL.name("snapshot"), SQLDataType.JSON.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.JSON)), this, "A JSON serialization capturing the snapshot of the component's state at the time this log record is created.");
 
     /**
      * The column <code>log.prev_log_id</code>. A self-reference to the previous

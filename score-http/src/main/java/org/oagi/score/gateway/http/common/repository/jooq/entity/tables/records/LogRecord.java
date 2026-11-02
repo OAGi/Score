@@ -135,14 +135,16 @@ public class LogRecord extends UpdatableRecordImpl<LogRecord> {
     }
 
     /**
-     * Setter for <code>log.snapshot</code>.
+     * Setter for <code>log.snapshot</code>. A JSON serialization capturing the
+     * snapshot of the component's state at the time this log record is created.
      */
     public void setSnapshot(JSON value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>log.snapshot</code>.
+     * Getter for <code>log.snapshot</code>. A JSON serialization capturing the
+     * snapshot of the component's state at the time this log record is created.
      */
     public JSON getSnapshot() {
         return (JSON) get(6);

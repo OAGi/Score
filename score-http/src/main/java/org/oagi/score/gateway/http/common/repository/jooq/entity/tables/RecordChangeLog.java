@@ -37,7 +37,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 
 /**
  * Temporary log of the changes to the data core component records are made of,
- * read by the CC cache (RecordChangeWatchdog) to forget what changed; can be dropped
+ * read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped
  * with its triggers if CDC is introduced. Rows are deleted by the application
  * after 2 hours (retention policy, checked every 10 minutes) and the numbering
  * restarts from 1 once the table has stayed empty for 10 minutes. Rows are
@@ -128,6 +128,17 @@ public class RecordChangeLog extends TableImpl<RecordChangeLogRecord> {
     public final TableField<RecordChangeLogRecord, ULong> RELEASE_ID = createField(DSL.name("release_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "The release of the changed record, when it is known. No foreign key: a release may be deleted while its rows are still here.");
 
     /**
+     * The column <code>record_change_log.changed</code>. The columns of the row
+     * that an UPDATE changed, separated by commas (the triggers on the
+     * component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and
+     * DT_SC write them); an empty string when the UPDATE changed none of them.
+     * NULL when the row does not say (INSERT, DELETE, other tables): everything
+     * may have changed. The propagation of a change to the records that depend
+     * on it looks at it.
+     */
+    public final TableField<RecordChangeLogRecord, String> CHANGED = createField(DSL.name("changed"), SQLDataType.VARCHAR(1000).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The columns of the row that an UPDATE changed, separated by commas (the triggers on the component and manifest tables of ACC, ASCCP, BCCP, DT, ASCC, BCC and DT_SC write them); an empty string when the UPDATE changed none of them. NULL when the row does not say (INSERT, DELETE, other tables): everything may have changed. The propagation of a change to the records that depend on it looks at it.");
+
+    /**
      * The column <code>record_change_log.creation_timestamp</code>. Timestamp
      * when this record is created. Rows older than two hours are deleted by the
      * application.
@@ -139,7 +150,7 @@ public class RecordChangeLog extends TableImpl<RecordChangeLogRecord> {
     }
 
     private RecordChangeLog(Name alias, Table<RecordChangeLogRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Temporary log of the changes to the data core component records are made of, read by the CC cache (RecordChangeWatchdog) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_record_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9) namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b) code_list_value_manifest, code_list_value, agency_id_list_value_manifest and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of the data type in the release of the changed row."), TableOptions.table(), where);
+        super(alias, null, aliased, parameters, DSL.comment("Temporary log of the changes to the data core component records are made of, read by the CC cache (CcCacheWatchdog) to forget what changed; can be dropped with its triggers if CDC is introduced. Rows are deleted by the application after 2 hours (retention policy, checked every 10 minutes) and the numbering restarts from 1 once the table has stayed empty for 10 minutes. Rows are written only by AFTER INSERT/UPDATE/DELETE triggers named <table>_record_change_<insert|update|delete>_trg, in the transaction of the change (a rollback removes them), whoever makes the change: (1) acc_manifest, ascc_manifest, bcc_manifest, asccp_manifest, bccp_manifest, dt_manifest, dt_sc_manifest on INSERT, UPDATE and DELETE: one row per changed manifest; (2) acc, ascc, bcc, asccp, bccp, dt, dt_sc on UPDATE and DELETE: one row for every manifest, in every release, that shows the changed row; (3) seq_key on INSERT, UPDATE, DELETE: one row of kind ACC for the ACC that owns the order; (4) acc_manifest_tag, asccp_manifest_tag, bccp_manifest_tag, dt_manifest_tag on INSERT and DELETE: one row for the tagged manifest; (5) tag, release, library on UPDATE and DELETE: one row of kind TAG, RELEASE, LIBRARY; (6) release_dep on INSERT, UPDATE, DELETE: one row of kind RELEASE_DEP; (7) app_user on UPDATE when login_id or is_developer changes: one row of kind USER; (8) xbt_manifest, code_list_manifest, agency_id_list_manifest on INSERT, UPDATE, DELETE and xbt, code_list, agency_id_list on UPDATE and DELETE: one row of kind XBT, CODE_LIST, AGENCY_ID_LIST per manifest; (9) namespace on UPDATE and DELETE: one row of kind NAMESPACE; (8b) code_list_value_manifest, code_list_value, agency_id_list_value_manifest and agency_id_list_value on INSERT, UPDATE, DELETE (the base tables on UPDATE, DELETE): one row of kind CODE_LIST or AGENCY_ID_LIST for every list manifest that shows the value; (10) dt_awd_pri and dt_sc_awd_pri on INSERT, UPDATE, DELETE: one row of kind DT or DT_SC for every manifest of the data type in the release of the changed row."), TableOptions.table(), where);
     }
 
     /**

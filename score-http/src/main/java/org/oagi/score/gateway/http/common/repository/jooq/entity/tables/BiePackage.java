@@ -138,11 +138,12 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
     public final TableField<BiePackageRecord, String> REVISION_REASON = createField(DSL.name("revision_reason"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Optional free-text reason describing the intent of this package revision (issue #1733). Captured at revision time and editable while the package is WIP; surfaced in the BIE package manifest. NULL for the initial (non-revised) package and for pre-existing rows.");
 
     /**
-     * The column <code>bie_package.owner_user_id</code>. Foreign key to the BIE
-     * package. This is the user who owns the entity, is allowed to edit the
-     * entity, and who can transfer the ownership to another user.
+     * The column <code>bie_package.owner_user_id</code>. A foreign key
+     * referring to the user who owns the BIE package. This is the user who owns
+     * the entity, is allowed to edit the entity, and who can transfer the
+     * ownership to another user.
      */
-    public final TableField<BiePackageRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the BIE package. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.");
+    public final TableField<BiePackageRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who owns the BIE package. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.");
 
     /**
      * The column <code>bie_package.created_by</code>. A foreign key referring

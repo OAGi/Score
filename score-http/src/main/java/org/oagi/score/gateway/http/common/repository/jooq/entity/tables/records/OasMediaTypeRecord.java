@@ -53,16 +53,18 @@ public class OasMediaTypeRecord extends UpdatableRecordImpl<OasMediaTypeRecord> 
     }
 
     /**
-     * Setter for <code>oas_media_type.description</code>. On POST, PUT, and
-     * PATCH, $ref is present
+     * Setter for <code>oas_media_type.description</code>. A short description
+     * of the media type. CommonMark syntax MAY be used for rich text
+     * representation.
      */
     public void setDescription(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oas_media_type.description</code>. On POST, PUT, and
-     * PATCH, $ref is present
+     * Getter for <code>oas_media_type.description</code>. A short description
+     * of the media type. CommonMark syntax MAY be used for rich text
+     * representation.
      */
     public String getDescription() {
         return (String) get(2);

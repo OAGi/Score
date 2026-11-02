@@ -1049,6 +1049,52 @@ BEGIN
 END;;
 DELIMITER ;
 
+-- ------------------------------------------------------------------
+-- Column comments missing from V3_5_2 (#1759)
+-- ------------------------------------------------------------------
+--
+-- V3_5_2 augmented the table comments and most column comments, but it left out the columns below, whose comments only
+-- reached schemas/*.ddl. MODIFY COLUMN restates each column definition unchanged and adds the comment, so running it
+-- again changes nothing.
+
+ALTER TABLE `bie_package` MODIFY COLUMN `owner_user_id` bigint(20) unsigned NOT NULL COMMENT 'A foreign key referring to the user who owns the BIE package. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.';
+ALTER TABLE `oas_doc_tag` MODIFY COLUMN `oas_doc_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_DOC table.';
+ALTER TABLE `oas_doc_tag` MODIFY COLUMN `oas_tag_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_TAG table.';
+ALTER TABLE `oas_media_type` MODIFY COLUMN `description` text DEFAULT NULL COMMENT 'A short description of the media type. CommonMark syntax MAY be used for rich text representation.';
+ALTER TABLE `oas_parameter` MODIFY COLUMN `oas_http_header_id` bigint(20) unsigned DEFAULT NULL COMMENT 'IF IN = Header, Then select from OAS_HTTP_HEADER table';
+ALTER TABLE `oas_parameter_link` MODIFY COLUMN `oas_response_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_RESPONSE table.';
+ALTER TABLE `oas_parameter_link` MODIFY COLUMN `oas_parameter_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_PARAMETER table.';
+ALTER TABLE `oas_parameter_link` MODIFY COLUMN `oas_operation_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the OAS_OPERATION table.';
+ALTER TABLE `oas_parameter_link` MODIFY COLUMN `expression` text DEFAULT NULL COMMENT 'A runtime expression that provides the parameter value, for example ''$response.body#/purchaseOrderHeader.identifier''.';
+ALTER TABLE `oas_parameter_link` MODIFY COLUMN `description` text DEFAULT NULL COMMENT 'A brief description of the parameter link. CommonMark syntax MAY be used for rich text representation.';
+ALTER TABLE `oas_request` MODIFY COLUMN `oas_operation_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_OPERATION table; the operation whose request body this record defines.';
+ALTER TABLE `oas_request` MODIFY COLUMN `oas_message_body_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_MESSAGE_BODY table; the BIE-based message body carried by this request.';
+ALTER TABLE `oas_request` MODIFY COLUMN `make_array_indicator` tinyint(1) DEFAULT 0 COMMENT 'If true, the request body is generated as an array of the referenced BIE rather than a single object. Defaults to false.';
+ALTER TABLE `oas_request` MODIFY COLUMN `suppress_root_indicator` tinyint(1) DEFAULT 0 COMMENT 'If true, the root (top-level) element of the referenced BIE is suppressed in the generated request body schema. Defaults to false.';
+ALTER TABLE `oas_request` MODIFY COLUMN `meta_header_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'A reference to the TOP_LEVEL_ASBIEP (BIE) used as the meta header of the request message. NULL if no meta header is included.';
+ALTER TABLE `oas_request` MODIFY COLUMN `pagination_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'A reference to the TOP_LEVEL_ASBIEP (BIE) used for pagination of the request message. NULL if no pagination is included.';
+ALTER TABLE `oas_resource` MODIFY COLUMN `path` text NOT NULL COMMENT 'The OpenAPI path (resource name) for this resource; defaults to the BIE name.';
+ALTER TABLE `oas_resource` MODIFY COLUMN `ref` text DEFAULT NULL COMMENT 'An optional reference ($ref) to an externally defined Path Item Object for this resource.';
+ALTER TABLE `oas_resource_tag` MODIFY COLUMN `oas_operation_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_OPERATION table.';
+ALTER TABLE `oas_resource_tag` MODIFY COLUMN `oas_tag_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_TAG table.';
+ALTER TABLE `oas_response` MODIFY COLUMN `oas_operation_id` bigint(20) unsigned NOT NULL COMMENT 'A reference of the operation record that owns this response.';
+ALTER TABLE `oas_response` MODIFY COLUMN `http_status_code` int(11) DEFAULT NULL COMMENT 'The HTTP status code for this response (e.g. 200, 202, 204); used as the response key in the generated OpenAPI document.';
+ALTER TABLE `oas_response` MODIFY COLUMN `oas_message_body_id` bigint(20) unsigned NOT NULL COMMENT 'A reference of the message body record for this response.';
+ALTER TABLE `oas_response` MODIFY COLUMN `make_array_indicator` tinyint(1) DEFAULT 0 COMMENT 'Indicates whether the response body is generated as an array (a list of the BIE) rather than a single object. Default is false (0).';
+ALTER TABLE `oas_response` MODIFY COLUMN `suppress_root_indicator` tinyint(1) DEFAULT 0 COMMENT 'Indicates whether the root (wrapper) property of the response body BIE is suppressed in the generated schema. Default is false (0).';
+ALTER TABLE `oas_response` MODIFY COLUMN `meta_header_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'A reference of the top-level ASBIEP record used as the meta header included in the response. NULL when no meta header is included.';
+ALTER TABLE `oas_response` MODIFY COLUMN `pagination_top_level_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'A reference of the top-level ASBIEP record used as the pagination information included in the response. NULL when no pagination is included.';
+ALTER TABLE `oas_response` MODIFY COLUMN `include_confirm_indicator` tinyint(1) DEFAULT 0 COMMENT 'Indicates whether a confirmation message is included in the response body. Default is false (0).';
+ALTER TABLE `oas_response_headers` MODIFY COLUMN `oas_response_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_RESPONSE table.';
+ALTER TABLE `oas_response_headers` MODIFY COLUMN `oas_http_header_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the OAS_HTTP_HEADER table.';
+ALTER TABLE `text_template` MODIFY COLUMN `text_template_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of a TEXT_TEMPLATE record.';
+ALTER TABLE `text_template` MODIFY COLUMN `name` varchar(100) NOT NULL DEFAULT '' COMMENT 'The name of the text template, used as the key to look up the template.';
+ALTER TABLE `text_template` MODIFY COLUMN `subject` varchar(200) DEFAULT NULL COMMENT 'A subject of the template (e.g. an email subject line).';
+ALTER TABLE `text_template` MODIFY COLUMN `content_type` varchar(100) DEFAULT 'text/plain' COMMENT 'A content type of the template body (e.g. text/plain, text/html).';
+ALTER TABLE `text_template` MODIFY COLUMN `template` longtext DEFAULT NULL COMMENT 'The template body text, with placeholders substituted at rendering time.';
+-- MODIFY COLUMN drops a column-level CHECK that the new definition does not repeat, so the one of log.snapshot is stated here.
+ALTER TABLE `log` MODIFY COLUMN `snapshot` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'A JSON serialization capturing the snapshot of the component''s state at the time this log record is created.' CHECK (json_valid(`snapshot`));
+
 -- When only a part of this script is run, the variable saved at the top of the script is not set (NULL).
 SET @OLD_FOREIGN_KEY_CHECKS = IFNULL(CAST(@OLD_FOREIGN_KEY_CHECKS AS SIGNED), 1);
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

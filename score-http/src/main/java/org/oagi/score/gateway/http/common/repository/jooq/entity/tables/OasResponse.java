@@ -75,14 +75,17 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     public final TableField<OasResponseRecord, ULong> OAS_RESPONSE_ID = createField(DSL.name("oas_response_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oas_response.oas_operation_id</code>.
+     * The column <code>oas_response.oas_operation_id</code>. A reference of the
+     * operation record that owns this response.
      */
-    public final TableField<OasResponseRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasResponseRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the operation record that owns this response.");
 
     /**
-     * The column <code>oas_response.http_status_code</code>.
+     * The column <code>oas_response.http_status_code</code>. The HTTP status
+     * code for this response (e.g. 200, 202, 204); used as the response key in
+     * the generated OpenAPI document.
      */
-    public final TableField<OasResponseRecord, Integer> HTTP_STATUS_CODE = createField(DSL.name("http_status_code"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+    public final TableField<OasResponseRecord, Integer> HTTP_STATUS_CODE = createField(DSL.name("http_status_code"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "The HTTP status code for this response (e.g. 200, 202, 204); used as the response key in the generated OpenAPI document.");
 
     /**
      * The column <code>oas_response.description</code>. A brief description of
@@ -92,34 +95,46 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     public final TableField<OasResponseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the response body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
-     * The column <code>oas_response.oas_message_body_id</code>.
+     * The column <code>oas_response.oas_message_body_id</code>. A reference of
+     * the message body record for this response.
      */
-    public final TableField<OasResponseRecord, ULong> OAS_MESSAGE_BODY_ID = createField(DSL.name("oas_message_body_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasResponseRecord, ULong> OAS_MESSAGE_BODY_ID = createField(DSL.name("oas_message_body_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the message body record for this response.");
 
     /**
-     * The column <code>oas_response.make_array_indicator</code>.
+     * The column <code>oas_response.make_array_indicator</code>. Indicates
+     * whether the response body is generated as an array (a list of the BIE)
+     * rather than a single object. Default is false (0).
      */
-    public final TableField<OasResponseRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the response body is generated as an array (a list of the BIE) rather than a single object. Default is false (0).");
 
     /**
-     * The column <code>oas_response.suppress_root_indicator</code>.
+     * The column <code>oas_response.suppress_root_indicator</code>. Indicates
+     * whether the root (wrapper) property of the response body BIE is
+     * suppressed in the generated schema. Default is false (0).
      */
-    public final TableField<OasResponseRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether the root (wrapper) property of the response body BIE is suppressed in the generated schema. Default is false (0).");
 
     /**
-     * The column <code>oas_response.meta_header_top_level_asbiep_id</code>.
+     * The column <code>oas_response.meta_header_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the meta header included
+     * in the response. NULL when no meta header is included.
      */
-    public final TableField<OasResponseRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
+    public final TableField<OasResponseRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the top-level ASBIEP record used as the meta header included in the response. NULL when no meta header is included.");
 
     /**
-     * The column <code>oas_response.pagination_top_level_asbiep_id</code>.
+     * The column <code>oas_response.pagination_top_level_asbiep_id</code>. A
+     * reference of the top-level ASBIEP record used as the pagination
+     * information included in the response. NULL when no pagination is
+     * included.
      */
-    public final TableField<OasResponseRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
+    public final TableField<OasResponseRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the top-level ASBIEP record used as the pagination information included in the response. NULL when no pagination is included.");
 
     /**
-     * The column <code>oas_response.include_confirm_indicator</code>.
+     * The column <code>oas_response.include_confirm_indicator</code>. Indicates
+     * whether a confirmation message is included in the response body. Default
+     * is false (0).
      */
-    public final TableField<OasResponseRecord, Byte> INCLUDE_CONFIRM_INDICATOR = createField(DSL.name("include_confirm_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<OasResponseRecord, Byte> INCLUDE_CONFIRM_INDICATOR = createField(DSL.name("include_confirm_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Indicates whether a confirmation message is included in the response body. Default is false (0).");
 
     /**
      * The column <code>oas_response.created_by</code>. The user who creates the

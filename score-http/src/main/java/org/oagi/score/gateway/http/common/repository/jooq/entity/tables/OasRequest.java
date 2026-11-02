@@ -75,9 +75,11 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     public final TableField<OasRequestRecord, ULong> OAS_REQUEST_ID = createField(DSL.name("oas_request_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "The primary key of the record.");
 
     /**
-     * The column <code>oas_request.oas_operation_id</code>.
+     * The column <code>oas_request.oas_operation_id</code>. Foreign key to the
+     * OAS_OPERATION table; the operation whose request body this record
+     * defines.
      */
-    public final TableField<OasRequestRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasRequestRecord, ULong> OAS_OPERATION_ID = createField(DSL.name("oas_operation_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_OPERATION table; the operation whose request body this record defines.");
 
     /**
      * The column <code>oas_request.description</code>. A brief description of
@@ -93,29 +95,39 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     public final TableField<OasRequestRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Determines if the request body is required in the request. Defaults to false.");
 
     /**
-     * The column <code>oas_request.oas_message_body_id</code>.
+     * The column <code>oas_request.oas_message_body_id</code>. Foreign key to
+     * the OAS_MESSAGE_BODY table; the BIE-based message body carried by this
+     * request.
      */
-    public final TableField<OasRequestRecord, ULong> OAS_MESSAGE_BODY_ID = createField(DSL.name("oas_message_body_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "");
+    public final TableField<OasRequestRecord, ULong> OAS_MESSAGE_BODY_ID = createField(DSL.name("oas_message_body_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_MESSAGE_BODY table; the BIE-based message body carried by this request.");
 
     /**
-     * The column <code>oas_request.make_array_indicator</code>.
+     * The column <code>oas_request.make_array_indicator</code>. If true, the
+     * request body is generated as an array of the referenced BIE rather than a
+     * single object. Defaults to false.
      */
-    public final TableField<OasRequestRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<OasRequestRecord, Byte> MAKE_ARRAY_INDICATOR = createField(DSL.name("make_array_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "If true, the request body is generated as an array of the referenced BIE rather than a single object. Defaults to false.");
 
     /**
-     * The column <code>oas_request.suppress_root_indicator</code>.
+     * The column <code>oas_request.suppress_root_indicator</code>. If true, the
+     * root (top-level) element of the referenced BIE is suppressed in the
+     * generated request body schema. Defaults to false.
      */
-    public final TableField<OasRequestRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "");
+    public final TableField<OasRequestRecord, Byte> SUPPRESS_ROOT_INDICATOR = createField(DSL.name("suppress_root_indicator"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "If true, the root (top-level) element of the referenced BIE is suppressed in the generated request body schema. Defaults to false.");
 
     /**
-     * The column <code>oas_request.meta_header_top_level_asbiep_id</code>.
+     * The column <code>oas_request.meta_header_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used as the meta header of the
+     * request message. NULL if no meta header is included.
      */
-    public final TableField<OasRequestRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
+    public final TableField<OasRequestRecord, ULong> META_HEADER_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("meta_header_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference to the TOP_LEVEL_ASBIEP (BIE) used as the meta header of the request message. NULL if no meta header is included.");
 
     /**
-     * The column <code>oas_request.pagination_top_level_asbiep_id</code>.
+     * The column <code>oas_request.pagination_top_level_asbiep_id</code>. A
+     * reference to the TOP_LEVEL_ASBIEP (BIE) used for pagination of the
+     * request message. NULL if no pagination is included.
      */
-    public final TableField<OasRequestRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "");
+    public final TableField<OasRequestRecord, ULong> PAGINATION_TOP_LEVEL_ASBIEP_ID = createField(DSL.name("pagination_top_level_asbiep_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference to the TOP_LEVEL_ASBIEP (BIE) used for pagination of the request message. NULL if no pagination is included.");
 
     /**
      * The column <code>oas_request.is_callback</code>. If is_callback == true,

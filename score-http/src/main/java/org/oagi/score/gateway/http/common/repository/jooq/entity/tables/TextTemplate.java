@@ -54,29 +54,34 @@ public class TextTemplate extends TableImpl<TextTemplateRecord> {
     }
 
     /**
-     * The column <code>text_template.text_template_id</code>.
+     * The column <code>text_template.text_template_id</code>. An internal,
+     * primary database key of a TEXT_TEMPLATE record.
      */
-    public final TableField<TextTemplateRecord, ULong> TEXT_TEMPLATE_ID = createField(DSL.name("text_template_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "");
+    public final TableField<TextTemplateRecord, ULong> TEXT_TEMPLATE_ID = createField(DSL.name("text_template_id"), SQLDataType.BIGINTUNSIGNED.nullable(false).generatedByDefaultAsIdentity(), this, "An internal, primary database key of a TEXT_TEMPLATE record.");
 
     /**
-     * The column <code>text_template.name</code>.
+     * The column <code>text_template.name</code>. The name of the text
+     * template, used as the key to look up the template.
      */
-    public final TableField<TextTemplateRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<TextTemplateRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "The name of the text template, used as the key to look up the template.");
 
     /**
-     * The column <code>text_template.subject</code>.
+     * The column <code>text_template.subject</code>. A subject of the template
+     * (e.g. an email subject line).
      */
-    public final TableField<TextTemplateRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<TextTemplateRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "A subject of the template (e.g. an email subject line).");
 
     /**
-     * The column <code>text_template.content_type</code>.
+     * The column <code>text_template.content_type</code>. A content type of the
+     * template body (e.g. text/plain, text/html).
      */
-    public final TableField<TextTemplateRecord, String> CONTENT_TYPE = createField(DSL.name("content_type"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("'text/plain'"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<TextTemplateRecord, String> CONTENT_TYPE = createField(DSL.name("content_type"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("'text/plain'"), SQLDataType.VARCHAR)), this, "A content type of the template body (e.g. text/plain, text/html).");
 
     /**
-     * The column <code>text_template.template</code>.
+     * The column <code>text_template.template</code>. The template body text,
+     * with placeholders substituted at rendering time.
      */
-    public final TableField<TextTemplateRecord, String> TEMPLATE = createField(DSL.name("template"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+    public final TableField<TextTemplateRecord, String> TEMPLATE = createField(DSL.name("template"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The template body text, with placeholders substituted at rendering time.");
 
     private TextTemplate(Name alias, Table<TextTemplateRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

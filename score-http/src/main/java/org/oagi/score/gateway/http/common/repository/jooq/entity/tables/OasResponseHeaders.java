@@ -62,16 +62,16 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
     }
 
     /**
-     * The column <code>oas_response_headers.oas_response_id</code>. The primary
-     * key of the record.
+     * The column <code>oas_response_headers.oas_response_id</code>. Foreign key
+     * to the OAS_RESPONSE table.
      */
-    public final TableField<OasResponseHeadersRecord, ULong> OAS_RESPONSE_ID = createField(DSL.name("oas_response_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasResponseHeadersRecord, ULong> OAS_RESPONSE_ID = createField(DSL.name("oas_response_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_RESPONSE table.");
 
     /**
-     * The column <code>oas_response_headers.oas_http_header_id</code>. The
-     * primary key of the record.
+     * The column <code>oas_response_headers.oas_http_header_id</code>. Foreign
+     * key to the OAS_HTTP_HEADER table.
      */
-    public final TableField<OasResponseHeadersRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "The primary key of the record.");
+    public final TableField<OasResponseHeadersRecord, ULong> OAS_HTTP_HEADER_ID = createField(DSL.name("oas_http_header_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the OAS_HTTP_HEADER table.");
 
     /**
      * The column <code>oas_response_headers.created_by</code>. The user who

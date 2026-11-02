@@ -21,70 +21,80 @@ public class TextTemplateRecord extends UpdatableRecordImpl<TextTemplateRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>text_template.text_template_id</code>.
+     * Setter for <code>text_template.text_template_id</code>. An internal,
+     * primary database key of a TEXT_TEMPLATE record.
      */
     public void setTextTemplateId(ULong value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>text_template.text_template_id</code>.
+     * Getter for <code>text_template.text_template_id</code>. An internal,
+     * primary database key of a TEXT_TEMPLATE record.
      */
     public ULong getTextTemplateId() {
         return (ULong) get(0);
     }
 
     /**
-     * Setter for <code>text_template.name</code>.
+     * Setter for <code>text_template.name</code>. The name of the text
+     * template, used as the key to look up the template.
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>text_template.name</code>.
+     * Getter for <code>text_template.name</code>. The name of the text
+     * template, used as the key to look up the template.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>text_template.subject</code>.
+     * Setter for <code>text_template.subject</code>. A subject of the template
+     * (e.g. an email subject line).
      */
     public void setSubject(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>text_template.subject</code>.
+     * Getter for <code>text_template.subject</code>. A subject of the template
+     * (e.g. an email subject line).
      */
     public String getSubject() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>text_template.content_type</code>.
+     * Setter for <code>text_template.content_type</code>. A content type of the
+     * template body (e.g. text/plain, text/html).
      */
     public void setContentType(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>text_template.content_type</code>.
+     * Getter for <code>text_template.content_type</code>. A content type of the
+     * template body (e.g. text/plain, text/html).
      */
     public String getContentType() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>text_template.template</code>.
+     * Setter for <code>text_template.template</code>. The template body text,
+     * with placeholders substituted at rendering time.
      */
     public void setTemplate(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>text_template.template</code>.
+     * Getter for <code>text_template.template</code>. The template body text,
+     * with placeholders substituted at rendering time.
      */
     public String getTemplate() {
         return (String) get(4);
