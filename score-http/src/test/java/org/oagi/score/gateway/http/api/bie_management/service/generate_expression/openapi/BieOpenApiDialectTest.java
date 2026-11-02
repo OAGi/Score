@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,12 +63,35 @@ class BieOpenApiDialectTest {
     }
 
     @Test
-    void nullable_v30_wrapsInOneOfWithNullableBranch() {
+    void nullable_v30_marksTypedSchemaNullable_withoutAnUnconstrainedOneOfBranch() {
         Map<String, Object> inner = schema("type", "string");
         Map<String, Object> result = V30.nullable(inner, true);
 
-        assertEquals(Arrays.asList(schema("nullable", true), inner), result.get("oneOf"));
-        assertSame(inner, V30.nullable(inner, false));
+        assertSame(inner, result);
+        assertEquals(schema("type", "string", "nullable", true), result);
+        assertFalse(result.containsKey("oneOf"));
+        assertEquals(schema("type", "string"), V30.nullable(schema("type", "string"), false));
+    }
+
+    @Test
+    void nullable_v30_listsNullInTheEnumOfAFixedValue() {
+        Map<String, Object> fixed = schema("type", "string");
+        V30.fixedValue(fixed, "A");
+        Map<String, Object> result = V30.nullable(fixed, true);
+
+        assertEquals(Arrays.asList("A", null), result.get("enum"));
+        assertEquals(Boolean.TRUE, result.get("nullable"));
+    }
+
+    @Test
+    void nullable_v30_wrapsATypelessSchemaInOneOfWithATypedNullBranch() {
+        Map<String, Object> ref = schema("$ref", "#/components/schemas/X");
+        Map<String, Object> result = V30.nullable(ref, true);
+
+        Map<String, Object> nullOnly = schema("type", "object", "nullable", true);
+        nullOnly.put("enum", Collections.singletonList(null));
+        assertEquals(Arrays.asList(nullOnly, ref), result.get("oneOf"));
+        assertSame(ref, V30.nullable(ref, false));
     }
 
     @Test

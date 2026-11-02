@@ -1,9 +1,10 @@
 package org.oagi.score.gateway.http.api.bie_management.service.generate_expression.openapi;
 
-import com.google.common.collect.ImmutableMap;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +33,26 @@ public class BieOpenApi30Dialect implements BieOpenApiDialect {
     @Override
     public Map<String, Object> nullable(Map<String, Object> schema, boolean isNillable) {
         if (isNillable) {
+            // In OpenAPI 3.0 'nullable' has an effect only next to an explicit 'type'.
+            if (schema.get("type") instanceof String) {
+                schema.put("nullable", true);
+                // An 'enum' (a fixed value) must list null itself to admit it.
+                if (schema.get("enum") instanceof List<?> values && !values.contains(null)) {
+                    List<Object> withNull = new ArrayList<>(values);
+                    withNull.add(null);
+                    schema.put("enum", withNull);
+                }
+                return schema;
+            }
+
+            // A $ref or an untyped schema: a typed alternative that admits only null, so that a
+            // non-null value matches exactly one alternative.
+            Map<String, Object> nullOnly = new LinkedHashMap<>();
+            nullOnly.put("type", "object");
+            nullOnly.put("nullable", true);
+            nullOnly.put("enum", Collections.singletonList(null));
             Map<String, Object> prop = new LinkedHashMap<>();
-            prop.put("oneOf", Arrays.asList(
-                    ImmutableMap.builder()
-                            .put("nullable", true)
-                            .build(),
-                    schema
-            ));
+            prop.put("oneOf", Arrays.asList(nullOnly, schema));
             return prop;
         }
         return schema;
