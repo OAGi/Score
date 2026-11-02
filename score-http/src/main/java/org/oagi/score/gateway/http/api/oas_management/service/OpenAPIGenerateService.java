@@ -102,6 +102,10 @@ public class OpenAPIGenerateService {
             TopLevelAsbiepSummaryRecord confirmRecord = topLevelAsbiepMap.get(confirmId);
             if (confirmRecord == null) {
                 confirmRecord = topLevelAsbiepQuery.getTopLevelAsbiepSummary(confirmId);
+                if (confirmRecord == null) {
+                    throw new IllegalArgumentException("The ConfirmMessage BIE '" + confirmId
+                            + "' of the error response no longer exists. Select another BIE in the error response settings.");
+                }
                 topLevelAsbieps.add(confirmRecord);
                 topLevelAsbiepMap.put(confirmId, confirmRecord);
             }

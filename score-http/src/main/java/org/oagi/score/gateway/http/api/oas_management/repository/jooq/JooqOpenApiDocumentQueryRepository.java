@@ -48,7 +48,8 @@ public class JooqOpenApiDocumentQueryRepository extends JooqBaseRepository imple
 
     @Override
     public boolean hasTopLevelAsbiepReference(TopLevelAsbiepId topLevelAsbiepId) {
-        return hasOasRequest(topLevelAsbiepId) || hasOasResponse(topLevelAsbiepId);
+        return hasOasRequest(topLevelAsbiepId) || hasOasResponse(topLevelAsbiepId)
+                || hasOasErrorConfirmMessage(topLevelAsbiepId);
     }
 
     private boolean hasOasRequest(TopLevelAsbiepId topLevelAsbiepId) {
@@ -64,6 +65,14 @@ public class JooqOpenApiDocumentQueryRepository extends JooqBaseRepository imple
                 .from(OAS_RESPONSE)
                 .join(OAS_MESSAGE_BODY).on(OAS_RESPONSE.OAS_MESSAGE_BODY_ID.eq(OAS_MESSAGE_BODY.OAS_MESSAGE_BODY_ID))
                 .where(OAS_MESSAGE_BODY.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
+                .fetchOptionalInto(Integer.class).orElse(0) > 0;
+    }
+
+    /** The ConfirmMessage BIE that an operation emits as its error response body (issue #1347). */
+    private boolean hasOasErrorConfirmMessage(TopLevelAsbiepId topLevelAsbiepId) {
+        return dslContext().selectCount()
+                .from(OAS_OPERATION)
+                .where(OAS_OPERATION.ERROR_CONFIRM_TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
                 .fetchOptionalInto(Integer.class).orElse(0) > 0;
     }
 
