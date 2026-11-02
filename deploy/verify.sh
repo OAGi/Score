@@ -5,7 +5,8 @@
 #   - running frontend/backend images are at the expected version
 #   - backend :8080 returns 401 (Spring Security is up)
 #   - Flyway head == expected version with success=1
-#   - STOMP-over-WebSocket upgrade (101) through the public wss endpoint (real-time push)
+#   - STOMP-over-WebSocket upgrade (101) through the public wss endpoint (real-time push), signed in
+#     when VERIFY_USER_<instance>/VERIFY_PASS_<instance> are set in deploy.env
 #
 # The db (srt-repo) image tag is reported but NOT asserted -- it legitimately lags under
 # a --no-db roll (schema is driven by the backend's runtime Flyway, not the image seed).
@@ -104,17 +105,38 @@ fi
 # --- STOMP (best-effort; non-fatal) -- upgrade to WebSocket through the public wss door.
 # 101 proves the host nginx routes /stomp to the backend (the piece that has regressed
 # before, and is not tracked in git). Real-time push (notifications, concurrent edit) needs it.
+# Since the WebSocket endpoint requires a Score session, the probe signs in first when
+# VERIFY_USER_<instance> / VERIFY_PASS_<instance> are set in deploy.env (e.g. VERIFY_USER_test);
+# without them the anonymous probe is expected to be refused with 401.
 echo "  -- STOMP wss://$HOST/stomp --"
+vu_var="VERIFY_USER_$INSTANCE"; vp_var="VERIFY_PASS_$INSTANCE"
+vu="${!vu_var:-}"; vp="${!vp_var:-}"
+cookie_args=()
+jar=""
+if [ -n "$vu" ] && [ -n "$vp" ]; then
+  jar="$(mktemp)"; trap 'rm -f "$jar"' EXIT
+  login=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -c "$jar" \
+    -H "Origin: https://$HOST" --data-urlencode "username=$vu" --data-urlencode "password=$vp" \
+    "https://$HOST/api/login" 2>/dev/null) || true
+  if [ "${login:-000}" = 200 ]; then
+    cookie_args=(-b "$jar")
+  else
+    warn "STOMP probe sign-in as '$vu' returned ${login:-000} (expected 200)."
+  fi
+fi
 # A successful upgrade returns 101 then holds the socket open, so curl hits --max-time and
 # exits non-zero AFTER printing "101" -- keep the captured code and don't let set -e abort.
-stomp=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
+stomp=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 ${cookie_args[@]+"${cookie_args[@]}"} \
+  -H "Origin: https://$HOST" \
   -H "Connection: Upgrade" -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Key: $(openssl rand -base64 16 2>/dev/null || echo dGVzdGtleTEyMzQ1Ng==)" \
   -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Protocol: v12.stomp" \
   "https://$HOST/stomp" 2>/dev/null) || true
 stomp="${stomp:-000}"
 if [ "$stomp" = 101 ]; then
-  printf '  \033[1;32m✓\033[0m STOMP wss upgrade: 101 (real-time push routed)\n'
+  printf '  \033[1;32m✓\033[0m STOMP wss upgrade: 101 (real-time push routed%s)\n' "$([ ${#cookie_args[@]} -gt 0 ] && echo ", signed in")"
+elif [ "$stomp" = 401 ] && [ ${#cookie_args[@]} -eq 0 ]; then
+  warn "STOMP wss upgrade refused with 401: the endpoint needs a session. Set VERIFY_USER_$INSTANCE / VERIFY_PASS_$INSTANCE in deploy.env to probe it signed in."
 else
   warn "STOMP wss upgrade returned $stomp (expected 101). Real-time push may be down (check host nginx /stomp location)."
 fi
