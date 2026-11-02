@@ -12,4 +12,13 @@ describe('HomepageComponent', () => {
     expect(html).not.toMatch(/core_component\/\{\{[^}]*'dt'/);
     expect(html).toContain("element.type.endsWith('DT') ? '/data_type'");
   });
+
+  it('does not disable the owner link of the Core Components by users table by the BIE branch', () => {
+    const html = readFileSync(join(process.cwd(), 'src/app/basis/homepage/homepage.component.html'), 'utf8');
+    const start = html.indexOf('<ng-container matColumnDef="username">');
+    const end = html.indexOf('</ng-container>', start);
+    const column = html.substring(start, end);
+    expect(column).toContain("key: 'ownerLoginIdList'");
+    expect(column).not.toContain('[class.disabled]');
+  });
 });
