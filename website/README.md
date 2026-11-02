@@ -23,7 +23,7 @@ website/
 
 Sources: the User Guide pages were converted from the Sphinx/reStructuredText guide in
 `../docs/user_guide`; the Getting Started / Architecture / Operations / Contributing / Reference
-pages were authored from the codebase and config of the **v3.5.2** release; the wiki content
+pages were authored from the codebase and config of the **v3.6.0** release (the 3.5.x snapshot from **v3.5.3**); the wiki content
 was rewritten for the current product.
 
 ## Local development
@@ -45,13 +45,26 @@ link or anchor fails the build.
 
 ## Versioning
 
-The site is **single-version**: the `docs/` tree documents the released **3.5.2** (the commit
-this branch is based on). There is no version dropdown and no `versioned_docs/` snapshots.
+The site has **one docs version per minor line**, labelled `X.Y`, and the navbar dropdown
+switches between them:
 
-If per-release snapshots are needed again later, Docusaurus versioning can be re-enabled by
-cutting a snapshot (`npm run docusaurus docs:version X.Y.Z`) and restoring the
-`docsVersionDropdown` navbar item. Keep the total under ~10 versions to control build time, and
-note that `07-reference/whats-new.md` is version-specific (hand-authored per version).
+| Version | Source | URL |
+|---|---|---|
+| **3.6** (latest) | `docs/` | `/Score/` |
+| **3.5** | `versioned_docs/version-3.5.x/` | `/Score/3.5/` |
+
+A **patch** release does not create a version: update the docs of its line in place (image tags,
+dependency versions, and the cumulative `07-reference/whats-new.md`). When a new **minor** line
+starts, snapshot the finished docs and begin the next line in `docs/`:
+
+```bash
+npm run docusaurus docs:version 3.6    # copies docs/ -> versioned_docs/version-3.6
+```
+
+then add the new label for `current` (with `path: ''`) and a `path: '3.6'` for the snapshot in
+`docusaurus.config.ts`. Keep the total under ~10 versions to control build time. Note that
+`07-reference/whats-new.md` is version-specific (hand-authored per version) — never regenerate it
+from another version's copy.
 
 ## Deployment to GitHub Pages
 

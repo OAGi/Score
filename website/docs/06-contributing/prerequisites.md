@@ -38,40 +38,42 @@ that match what you intend to work on.
 The core backend, built as a **WAR** with packages under
 `org.oagi.score.gateway.http.api.*`.
 
-- **Java 17+** — the project compiles with `maven.compiler.source`/`target` set
-  to `17` (see `score-http/pom.xml`). Spring Boot 3.x requires Java 17 as a
-  minimum.
-- **Spring Boot 3.5.x** — the Maven parent is
-  `spring-boot-starter-parent:3.5.15`. Familiarity with Spring MVC, Spring
-  Security (OAuth2 client + resource server), Spring Session, and Spring
-  WebSocket is useful.
-- **jOOQ 3.20.x** — the data-access layer uses jOOQ (not JPA/Hibernate).
+- **Java 21+** — the project compiles with `maven.compiler.release` set to
+  `21` (see `score-http/pom.xml`).
+- **Spring Boot 4.1.x** — the Maven parent is
+  `spring-boot-starter-parent:4.1.2` (Spring Framework 7, Spring Security 7,
+  Jackson 3, Jakarta EE 11). The WAR runs on **Tomcat 11** (Servlet 6.1).
+  Familiarity with Spring MVC, Spring Security (OAuth2 client + resource
+  server), Spring Session, and Spring WebSocket is useful.
+- **jOOQ 3.21.x** — the data-access layer uses jOOQ (not JPA/Hibernate).
   Generated entity classes live under
   `org.oagi.score.gateway.http.common.repository.jooq.entity`. Understanding
   type-safe SQL with jOOQ is essential for backend work.
-- **MySQL / MariaDB** — the JDBC URL targets MariaDB
-  (`org.mariadb.jdbc.Driver`), and schema migrations are managed with
-  **Flyway**. Comfort with relational schema design and SQL administration
+- **MariaDB** — the JDBC URL targets MariaDB
+  (`org.mariadb.jdbc.Driver`; MariaDB 11.x, 12.x and 13.x are supported), and
+  the schema is created and migrated with **Flyway**. Comfort with relational schema design and SQL administration
   pays off.
 - **Redis** — used for session storage and distributed coordination (via
-  Lettuce and Redisson, plus Spring Session).
+  Lettuce and Redisson, plus Spring Session). The core-component record
+  cache runs in the JVM (Caffeine) by default.
 - **Maven** — the build tool for this module.
 
-:::note[Spring AI / MCP]
-`score-http` also pulls in the Spring AI BOM and an MCP (Model Context Protocol)
-client starter. You only need to understand these if you're working in the
-AI-related areas of the backend.
+:::note[Spring AI]
+`score-http` also pulls in the Spring AI BOM (Spring AI 2.0.x) for the AI-assistant
+features. You only need to understand it if you're working in the AI-related areas of
+the backend. `score-http` does not use MCP; the MCP SDK is excluded from the build.
 :::
 
 ### `score-web` — frontend SPA
 
 The single-page web application.
 
-- **Angular ~21.2** — `score-web/package.json` pins `@angular/core` to
-  `~21.2.17`. (The published `score-web` version is `3.5.2`.) Component
+- **Angular ~22.2** — `score-web/package.json` pins `@angular/core` to
+  `~22.2.4`. (The published `score-web` version is `3.6.0`.) Component
   architecture, RxJS, and Angular Material are core to this module.
-- **TypeScript ~5.9** — all frontend code is TypeScript.
-- **Node.js 22.x** — the `engines` field requires Node `22.x`.
+- **TypeScript ~6.0** — all frontend code is TypeScript.
+- **Node.js 22.22.3+, 24.15+ or 26+** — the `engines` field accepts
+  `^22.22.3 || ^24.15.0 || >=26.0.0`.
 - **RxJS, Angular Material, Bootstrap** — the UI relies on reactive streams and
   the Material component set.
 - **Tooling** — ESLint for linting, Vitest for unit tests, and Playwright for

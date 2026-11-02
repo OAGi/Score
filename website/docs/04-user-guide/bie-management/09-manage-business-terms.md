@@ -40,6 +40,10 @@ To create a business term:
 connectCenter does not let you create or save a business term when another business term already has the same *Business Term* + *External Reference URI* pair — the save is rejected with an "Invalid parameters" dialog reading "Another business term with the same business term and external reference URI already exists!". Two business terms may share the same name as long as their *External Reference URI* values differ.
 :::
 
+:::note
+The *External Reference URI* is opened in a new browser tab from the business term pages only when it is an `http` or `https` URL. Any other value is kept as text and is not opened.
+:::
+
 ## Edit a Business Term
 
 To edit a business term:

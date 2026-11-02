@@ -251,7 +251,7 @@ To do so:
 
 2. Click the name of the tree node you want to change its detail.
 
-3. Click the "Used" checkbox, either on the tree or the detail pane, in order for this component to be used.
+3. Click the "Used" checkbox, either on the tree or the detail pane, in order for this component to be used. A node whose max cardinality is 0 cannot be selected.
 
 > **Tips**:
 
@@ -979,8 +979,11 @@ To uplift a BIE:
 4. The "Uplift BIE" page, subtitled "Verification", is returned displaying the source BIE tree on the left side and the target BIE tree on the right side.
    The target BIE represents how the source BIE will become the uplifted BIE.
    The source BIE tree shows only used nodes, while the target BIE tree shows all possible, used and unused, nodes. connectCenter automatically maps used nodes in the source BIE tree with nodes in the target BIE that share exactly the same underlying CCs based on CC GUIDs.
-   Automatically mapped nodes in the source BIE are displayed without a checkbox, and a banner reads "All contents are mapped." when nothing was left unmapped.
+   Automatically mapped nodes have a checked, read-only mapping checkbox in the source BIE tree, and a banner reads "All contents are mapped." when nothing was left unmapped.
    The user can click on a source BIE tree node to see how it is mapped in the target BIE tree.
+   A checkbox in the target BIE tree is enabled when the selected source node can legally be mapped to it; a system mapping may be overridden manually.
+   Root nodes and nodes covered by a selected reuse BIE have no independent mapping checkbox.
+   Repeated occurrences of the same reused BIE are handled independently, so each occurrence can be mapped and given its own reuse BIE.
    Each tree has its own search box, and a pager at the top-left steps through the source nodes.
    The following tasks are optional.
 
@@ -991,6 +994,9 @@ To uplift a BIE:
        The system then checks both checkboxes to indicate that the map has been performed.
        The user can review the map again by clicking on the source BIE node.
        The system will highlight the mapped node in the target BIE tree.
+       A child node can be mapped only under the mapped counterpart of its parent; removing a parent mapping disables the mapping of its descendants (extension nodes are the exception and may be relocated under a compatible target ancestor).
+       If the mapped nodes refer to different ACCs, DTs or DT_SCs, a "Mapping" confirmation dialog is displayed; click "Continue" to keep the mapping or "Cancel" to keep the previous one.
+       When a mapped descendant requires target ancestors that are not mapped, those ancestors are enabled in the uplifted BIE with their default values; no details of the source BIE are copied to them.
 
     2. Select a BIE for a BIE reuse node.
        If the source BIE has a BIE reuse node, which is marked with a recycling icon, and it has already been mapped, the system displays an exclamation icon (tooltip "Select BIE") next to the target BIE node.
@@ -1012,7 +1018,7 @@ To uplift a BIE:
     1. The "Uplift BIE Report" dialog opens, where the user can view or download the uplifting report.
        The report presents the details about mapped and unmapped nodes as well as reuse information.
        In addition, the report indicates that some BIE nodes may use a developer code list or end-user code list that needs to be manually input again when the uplifted BIE is opened\*\*.
-       The "View Issues Only" checkbox at the top — checked by default — limits the table to the rows that need more attention and manual work; uncheck it to see every row.
+       The "View Issues Only" checkbox at the top — checked by default — limits the table to the rows that need more attention and manual work: it hides the clean system mappings, while manual mappings, reuse rows and rows with validation issues remain visible. Uncheck it to see every row.
        Click the "Download" button to save the report as a comma-separated file, or "Cancel" to go back to the previous page.
 
        ![Uplift BIE Report dialog with the View Issues Only checkbox checked, one ASCCP row showing the combined source and target path, and the Cancel, Download and Uplift buttons](/img/user-guide/bie_uplift_report_dialog.png)
@@ -1033,7 +1039,7 @@ To uplift a BIE:
            Blank means the source path is not a BIE reuse node.
            "Selected" or "Not selected" means the source path is a BIE reuse node; "Not selected" means that the user did not assign a BIE to the mapped node in the target BIE.
 
-        6. The *Issue* column presents details about a specific issue.
+        6. The *Issue* column presents details about a specific issue, including value domain (code list, agency ID list and primitive) validation issues.
            The user should take care of the issue manually when editing the uplifted BIE.
 
 6. Click "Uplift".
@@ -1048,6 +1054,8 @@ To uplift a BIE:
    At this stage the user can make further changes to the BIE as described in [Restrict a BIE](#restrict-a-bie) or resolve the reported issues manually.
 
 **Important**
+
+\*Code lists and agency ID lists of the source BIE are carried over to the uplifted BIE only when a matching list is found in the target release (matched by its identity first, then by name, list ID and version) and is allowed on the target node. Otherwise the node falls back to its default primitive value, and the report shows the issue.
 
 \*The user's manual map may have a cardinality and/or domain value restriction conflict.
 For example, a cardinality conflict is present when a source node has 0..n but the target node has 1..n by default based on the corresponding CC.

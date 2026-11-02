@@ -6,6 +6,8 @@ sidebar_position: 0
 The connectCenter multi-tenant feature enables organizations to offer connectCenter-based BIE development services to multiple member groups, called tenants, on a single instance with visibility limited by tenant.
 The visibility is controlled by the business contexts associated with the BIE and the tenant: if a BIE has a business context that is associated with a tenant, then end users in that tenant can see the BIE.
 Users can also see BIEs whose business contexts do not belong to any tenant.
+An Admin is not restricted by tenants and sees the BIEs and the business contexts of every tenant.
+A business context that is associated with several tenants is listed only once.
 
 Multi-tenant management has three major functions, all available only to users with the Admin right and only while multi-tenant mode is enabled:
 

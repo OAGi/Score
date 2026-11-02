@@ -12,7 +12,7 @@ connectCenter stores all of its persistent application data — libraries, core 
 | Application database (`oagi` schema) | `db` service, named volume `db-volume` at `/var/lib/mysql` | **Yes — this is the source of truth** |
 | Redis cache / session store | `redis` service, named volume `redis-volume` at `/data` | Usually not — see below |
 
-The `db` service runs a MariaDB-based image (`oagi1docker/srt-repo:3.5.2`, built on `mariadb:11.8.6`). The connectCenter backend connects to it over JDBC using a MariaDB driver, against a database named `oagi` by default.
+The `db` service runs a MariaDB-based image (`oagi1docker/srt-repo:3.6.0`, built on `mariadb:11.8.9`). The connectCenter backend connects to it over JDBC using a MariaDB driver, against a database named `oagi` by default.
 
 :::tip[Redis is a cache, not the source of truth]
 The `redis` service (`redis:7.4`) is used for caching and session state. It can be rebuilt from the application database and from user re-authentication, so it normally does **not** need to be backed up. Restoring only the `db` data is sufficient to recover a connectCenter instance. Expect users to be logged out after a restore.

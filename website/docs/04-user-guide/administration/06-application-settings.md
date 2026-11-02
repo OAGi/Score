@@ -12,15 +12,16 @@ To open the page:
 
 2. Choose "Settings" from the drop-down list.
 
-3. Click "Application settings" on the left side of the page.
+3. In the settings menu on the left side of the page, click the page you need under "Application settings".
+   Clicking "Application settings" itself opens the "Features" page.
 
-The page consists of the sections "Application Features", "SMTP settings", "Filename Expressions", and "Web Page Settings".
+The "Application settings" menu is divided into four pages: "Features", "SMTP", "Filename Expressions", and "Web Page".
 
 ![Application settings page showing the Application Features toggles and the SMTP settings section, with the settings navigation on the left](/img/user-guide/settings_application_settings.png)
 
 ## Application Features
 
-The "Application Features" section lists the feature toggles "Multi-tenant mode", "Business term function", "BIE Inverse Mode", "Email-Based Workflows", and "Browse Standard mode".
+The "Features" page (section "Application Features") lists the feature toggles "Multi-tenant mode", "Business term function", "BIE Inverse Mode", "Email-Based Workflows", and "Browse Standard mode".
 Each feature has an "Enable" and a "Disable" button; the button matching the current state is greyed out, so the buttons also show whether the feature is currently on or off.
 
 Enabling or disabling a feature follows the same pattern:
@@ -68,7 +69,7 @@ See [Browser View Mode](../core-component-management/03-search-and-browse-cc-lib
 
 ## SMTP settings
 
-Administrators can configure the SMTP "Host", "Port", "Enable Auth", "Enable STARTTLS", "Enable SSL", "Auth Method", "Auth Username", and "Auth Password" settings in this section.
+Administrators can configure the SMTP "Host", "Port", "Enable Auth", "Enable STARTTLS", "Enable SSL", "Auth Method", "Auth Username", and "Auth Password" settings on the "SMTP" page under "Application settings".
 
 To update the SMTP settings:
 
@@ -144,7 +145,7 @@ To update the filename expressions:
 
 ## Web Page Settings
 
-In "Web Page Settings", administrators can change the brand logo on the navigation bar, the favicon of the webpage, the sign-in page statement, and the colors for component states, release states, and user roles.
+On the "Web Page" page under "Application settings", administrators can change the brand logo on the navigation bar, the favicon of the webpage, the sign-in page statement, and the colors for component states, release states, and user roles.
 
 ![Web Page Settings section with the Brand Logo, Favicon Link, and Sign-in Page Statement fields, their previews on the right, and the Component State Colors below](/img/user-guide/settings_web_page_settings.png)
 

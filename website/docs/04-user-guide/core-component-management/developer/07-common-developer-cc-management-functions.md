@@ -191,6 +191,10 @@ For instance, a deleted BCCP that is still used as a property of an ACC can only
 
 3. A confirmation dialog is displayed. Confirm or cancel the purge request.
 
+When several CCs are purged together, connectCenter purges them in an order that respects their dependencies.
+For example, a deleted ASCCP and the deleted ACC that is its role-of ACC can be purged in the same request, as can a deleted ACC and the BCCP used by its BCCs.
+The request is all-or-nothing: if any of the selected CCs cannot be purged (for example, because a CC that is not deleted still uses it), nothing is purged and the CCs that remain, with the reason for each, are reported.
+
 ## Tagging CCs
 
 The tagging feature in connectCenter allows users to label and categorize core components for better management.

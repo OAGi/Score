@@ -20,8 +20,8 @@ project configuration.
 
 | Tool | Version | Used by | Source of truth |
 |---|---|---|---|
-| JDK | **17+** | `score-http` | `score-http/pom.xml` (`maven.compiler.source` = 17, Spring Boot parent 3.5.15) |
-| Node.js | **22.x** | `score-web` | `score-web/package.json` (`engines.node`) |
+| JDK | **21+** | `score-http` | `score-http/pom.xml` (`maven.compiler.release` = 21, Spring Boot parent 4.1.2) |
+| Node.js | **22.22.3+ / 24.15+ / 26+** | `score-web` | `score-web/package.json` (`engines.node`) |
 | Docker (with Compose v2) | recent | database, Redis | `docker-compose.yml` |
 
 The backend's Maven build uses jOOQ with a MariaDB SQL dialect and the
@@ -45,7 +45,7 @@ not have to apply SQL by hand:
 
 ```bash
 # Database (MariaDB/MySQL-compatible, pre-seeded connectCenter repository)
-docker run --name srt-repo -d -p 3306:3306 oagi1docker/srt-repo:3.5.2
+docker run --name srt-repo -d -p 3306:3306 oagi1docker/srt-repo:3.6.0
 
 # Redis (session store + cache)
 docker run --name redis -d -p 6379:6379 redis:7.4
@@ -67,7 +67,7 @@ Use the modern **`docker compose`** (Compose v2 plugin) form rather than the leg
 
 ### 2. Run the backend (`score-http`)
 
-`score-http` is a Spring Boot 3.5.x application (built as a WAR) under the
+`score-http` is a Spring Boot 4.1.x application (built as a WAR) under the
 `org.oagi.score.gateway.http.*` packages. Run it with the Maven wrapper and the
 `dev` Spring profile.
 
@@ -120,9 +120,9 @@ DB_HOST=127.0.0.1 DB_PORT=3306 DB_USERNAME=oagi DB_PASSWORD=<your-db-password> .
 The backend manages its own schema with **Flyway** on startup
 (`spring.flyway.enabled` defaults to `true`). Migration scripts ship on the
 classpath under `score-http/src/main/resources/db/migration` (e.g.
-`V3_5_0__upgrade_from_3_4_2.sql`, `V3_5_1__upgrade_from_3_5_0.sql`). Flyway is
+`V3_5_0__upgrade_from_3_4_2.sql`, `V3_6_0__upgrade_from_3_5_2.sql`). Flyway is
 configured to baseline at version **3.4.0** (`FLYWAY_BASELINE_VERSION`), so a
-database seeded from `srt-repo:3.5.2` is brought up to the current schema
+database seeded from `srt-repo:3.6.0` is brought up to the current schema
 automatically when you start the backend.
 
 :::note[Two sets of SQL scripts]
@@ -143,7 +143,7 @@ that is an advanced step and requires a reachable `oagi` database.
 
 ### 3. Run the frontend (`score-web`)
 
-`score-web` is an Angular **21.2.x** single-page application (TypeScript). Install
+`score-web` is an Angular **22.2.x** single-page application (TypeScript). Install
 dependencies and start the Angular dev server.
 
 From the `score-web` directory:
@@ -208,8 +208,8 @@ version for contributors:
 
 | Module | Stack | What you change here |
 |---|---|---|
-| `score-http` | Java 17+, Spring Boot 3.5.x, jOOQ, Redis (WAR) | Backend REST API, business logic, schema export |
-| `score-web` | Angular 21.2.x, TypeScript | Frontend SPA |
+| `score-http` | Java 21+, Spring Boot 4.1.x, jOOQ, Redis (WAR) | Backend REST API, business logic, schema export |
+| `score-web` | Angular 22.2.x, TypeScript | Frontend SPA |
 | `score-external-api` | NestJS 11 (Node.js) | External REST API layer |
 | `connect-center-api` | Python FastAPI + FastMCP | Companion REST/MCP service |
 | `score-repo` | SQL | DB schema + migration scripts |
@@ -322,18 +322,18 @@ often affect more than one feature.
 There is no separate style guide checked into the repo; follow the conventions of
 the code you are editing.
 
-- **Backend (`score-http`)** — Java 17 source level (`maven.compiler.source = 17` in
+- **Backend (`score-http`)** — Java 21 source level (`maven.compiler.release = 21` in
   `score-http/pom.xml`). Uses Lombok, jOOQ-generated entities (under
   `org.oagi.score.gateway.http.common.repository.jooq.entity`), and Spring
   conventions. Do not hand-edit jOOQ-generated entity classes; regenerate them if
   the schema changes (codegen is skipped by default — see
   [Optional: regenerate jOOQ sources](#optional-regenerate-jooq-sources) above).
-- **Frontend (`score-web`)** — Angular 21.2.x / TypeScript. The project ships an
+- **Frontend (`score-web`)** — Angular 22.2.x / TypeScript. The project ships an
   ESLint config (`@angular-eslint`); run `npm run lint` and keep it clean before
   opening a PR.
 - **Database changes** — add a migration script to `score-repo/scripts` following
   the existing chain
-  (`2.4.0 -> 3.0.0 -> 3.1.0 -> 3.2.0 -> 3.3.0 -> 3.4.0 -> 3.4.1 -> 3.4.2 -> 3.5.0`).
+  (`2.4.0 -> 3.0.0 -> 3.1.0 -> 3.2.0 -> 3.3.0 -> 3.4.0 -> 3.4.1 -> 3.4.2 -> 3.5.0`; releases after 3.5.0 ship only as Flyway scripts under `score-http/src/main/resources/db/migration`).
   See the [Architecture Overview](./architecture.md#database-structure) for how the
   schema and migrations are organized.
 

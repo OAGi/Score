@@ -76,17 +76,24 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Documentation is the whole site; serve docs at the root.
           routeBasePath: '/',
-          editUrl: 'https://github.com/OAGi/Score/tree/develop/website',
+          editUrl: 'https://github.com/OAGi/Score/tree/gh-pages/website',
           showLastUpdateTime: true,
-          // docs/ documents the released 3.5.2 (the commit this branch is cut
-          // from); label it as such instead of the default "Next". When the next
-          // release is cut, snapshot the current docs with
-          //   npm run docusaurus docs:version 3.5.2
-          // then bump this label to the new release version.
+          // One docs version per MINOR line, labelled "X.Y" (a patch release
+          // updates the docs of its line in place).
+          //   docs/               -> 3.6, the latest line, served at the site root
+          //   versioned_docs/...  -> 3.5 snapshot (internal name 3.5.x), served under /3.5/
+          // When the next minor line is started, snapshot the finished docs with
+          //   npm run docusaurus docs:version 3.6
+          // then add the new label for `current` below and set its `path` to ''.
           lastVersion: 'current',
           versions: {
             current: {
-              label: '3.5.2',
+              label: '3.6',
+              path: '',
+            },
+            '3.5.x': {
+              label: '3.5',
+              path: '3.5',
             },
           },
         },
@@ -127,10 +134,18 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
-        {to: '/reference/whats-new', label: "What's New", position: 'left'},
         {
-          // Shows "3.5.2" now; becomes a real version picker once per-release
-          // snapshots exist (see the docs.versions comment above).
+          // A doc link (not a fixed path) so it follows the version selected
+          // in the dropdown: each version has its own What's New.
+          type: 'doc',
+          docId: 'reference/whats-new',
+          label: "What's New",
+          position: 'left',
+        },
+        {
+          // Switches between the 3.6 and 3.5 documentation (see the
+          // docs.versions comment above); stays on the same page when the
+          // target version has it.
           type: 'docsVersionDropdown',
           position: 'right',
         },

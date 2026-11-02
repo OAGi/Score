@@ -13,6 +13,11 @@ need anything on this page.
 
 This page only applies if you are migrating a **pre-3.5.0** schema up to 3.5.0,
 applying a migration step manually, or running with `FLYWAY_ENABLED=false`.
+
+Releases after 3.5.0 ship only as Flyway scripts (for example `V3_6_0__upgrade_from_3_5_2.sql`);
+the standalone `mig_*.sql` chain below ends at 3.5.0. Since 3.6.0 the backend can also create the
+schema in an **empty** MariaDB database by itself (`V3_4_0__baseline.sql`) — see
+[Using your own MariaDB](../02-getting-started/deployment.md#using-your-own-mariadb).
 :::
 
 connectCenter ships its database schema and seed data inside the
@@ -82,12 +87,12 @@ schema-migration chain and should not be run as upgrades:
 ## How and when initialization runs
 
 The `srt-repo` image is built from `score-repo/docker/Dockerfile`, which is
-based on `mariadb:11.8.6` (MariaDB, MySQL-compatible) and copies the
+based on `mariadb:11.8.9` (MariaDB, MySQL-compatible) and copies the
 `oagis.sql` seed dump (the current, fully-migrated schema plus seed content)
 into the MariaDB init hook (password values shown as placeholders):
 
 ```dockerfile
-FROM --platform=linux/amd64 mariadb:11.8.6
+FROM --platform=linux/amd64 mariadb:11.8.9
 ENV MYSQL_DATABASE=oagi
 ENV MYSQL_USER=oagi
 ENV MYSQL_PASSWORD=<your-db-password>
@@ -122,7 +127,7 @@ MariaDB port `3306` on the same host port and stores data in the `db-volume`:
 
 ```yaml
 db:
-  image: oagi1docker/srt-repo:3.5.2
+  image: oagi1docker/srt-repo:3.6.0
   ports:
     - 3306:3306
   volumes:

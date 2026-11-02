@@ -5,9 +5,9 @@ sidebar_position: 5
 
 ## Change password
 
-A user can change the password through the account settings page when the account uses local password-based sign-in.
-For accounts that sign in through SSO (see [Using Single Sign-On](./08-using-single-sign-on.md)), the "Change password" section is not shown.
-The same page also allows the user to update the email address in the "Personal Info" section; while the email address is unverified, a "Resend Validation Request" button is available there as well.
+A user can change the password on the "Password" page under "Account" in the settings when the account uses local password-based sign-in.
+For accounts that sign in through SSO (see [Using Single Sign-On](./08-using-single-sign-on.md)), the "Password" page is not shown.
+The "Personal Info" page under "Account" allows the user to update the email address; while the email address is unverified, a "Resend Validation Request" button is available there as well.
 Sending verification emails requires the "Email-Based Workflows" feature and valid SMTP settings (see [Application Settings](./06-application-settings.md)).
 
 To change the password:
@@ -16,7 +16,7 @@ To change the password:
 
 2. Choose "Settings" from the drop-down list.
 
-3. On the "Account" settings page, go to the "Change password" section and fill out the fields:
+3. In the settings menu on the left, click "Password" under "Account" and fill out the fields:
 
     1. "Old password", which is the current password.
 
@@ -26,7 +26,7 @@ To change the password:
 
    ![Account settings page with the Personal Info section on top and the Change password section with the Old password, New password, and Confirm new password fields below](/img/user-guide/settings_account_page.png)
 
-4. Click the "Update" button below the "Change password" section (the "Personal Info" section has its own "Update" button).
+4. Click the "Update" button below the fields (the "Personal Info" page has its own "Update" button).
    connectCenter shows an "Updated" message.
 
 :::note

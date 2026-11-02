@@ -145,7 +145,7 @@ To create a release draft:
 
 1. [Open the detail page of a release](#view-detail-of-a-release) that is in the Initialized state and click the "Create Draft" button. Alternatively, open the "Release" page by clicking "View/Edit Release" under the "Core Component" menu; then, click on the ellipsis in the last column of the desired initialized release and select "Create Draft".
 
-2. The "Release Assignment" page is open. The page has two panes left and right. The left, aka "Modified" pane, has all the CCs (recall that CCs also include code lists and the agency ID list) created/changed in the Working branch. The right, aka "Assigned" pane, contains CCs assigned to the release and is initially empty.
+2. The "Release Assignment" page is open. The page has two panes left and right. The left, aka "Modified" pane, has all the CCs (recall that CCs also include code lists and the agency ID list) created/changed in the Working branch. The right, aka "Assigned" pane, contains CCs assigned to the release and is initially empty. The *Type* filter of the page offers ACC, ASCCP, BCCP, Code List, Agency ID List, and DT, and a DT in the lists links to the Data Type page.
 
 3. Assign CCs to the release by selectively dragging CCs that are in the Candidate state from the left pane to the right pane. Alternatively, use the double-arrowhead icon (>>) on the top of the left pane to assign all CCs in the Candidate state. CCs on the right pane can also be dragged back to the left pane to unassign.
 

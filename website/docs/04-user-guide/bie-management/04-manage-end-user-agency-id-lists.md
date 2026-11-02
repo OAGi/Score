@@ -88,7 +88,7 @@ This section describes end user Agency ID List editing when its revision number 
 
     5. "Remark". A free form text (up to 225 characters) for any additional remark about the Agency ID List. "Remark" is optional.
 
-    6. "Namespace". Select an end user namespace from the dropdown list. See the [Non-standard Namespace Management](../core-component-management/end-user/01-non-standard-namespace-management.md) section to create an end user namespace if needed or how namespace may be used in connectCenter. "Namespace" is required.
+    6. "Namespace". Select an end user namespace from the dropdown list. See the [Non-standard Namespace Management](../core-component-management/end-user/01-non-standard-namespace-management.md) section to create an end user namespace if needed or how namespace may be used in connectCenter. "Namespace" is required, and the Agency ID List cannot be updated or moved to another state until a namespace is specified. Deleting or restoring an Agency ID List does not require a namespace.
 
     7. "Definition". Specify the description of the Agency ID List. "Definition" is optional, but the "Empty Definition" warning dialog is given upon update if none is specified; you may proceed with "Update Anyway".
 

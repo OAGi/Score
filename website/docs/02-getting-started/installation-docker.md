@@ -49,9 +49,9 @@ A standard connectCenter deployment runs four containers that the Compose file w
 
 | Service | Image | Role | Host → container port |
 |---|---|---|---|
-| `frontend` | `oagi1docker/srt-web:3.5.2` | Angular web UI (`score-web`) | `4200` → `4200` |
-| `backend` | `oagi1docker/srt-http-gateway:3.5.2` | REST API gateway (`score-http`, Spring Boot) | `8080` → `8080` |
-| `db` | `oagi1docker/srt-repo:3.5.2` | MySQL/MariaDB-compatible database with the schema preloaded (`score-repo`) | `3306` → `3306` |
+| `frontend` | `oagi1docker/srt-web:3.6.0` | Angular web UI (`score-web`) | `4200` → `4200` |
+| `backend` | `oagi1docker/srt-http-gateway:3.6.0` | REST API gateway (`score-http`, Spring Boot) | `8080` → `8080` |
+| `db` | `oagi1docker/srt-repo:3.6.0` | MySQL/MariaDB-compatible database with the schema preloaded (`score-repo`) | `3306` → `3306` |
 | `redis` | `redis:7.4` | Session store and cache | `6379` → `6379` |
 
 The `frontend` reaches the API through `GATEWAY_HOST`/`GATEWAY_PORT`, and the `backend`
@@ -65,7 +65,7 @@ Create a file named `docker-compose.yml` with the following content:
 version: "3.0"
 services:
   frontend:
-    image: oagi1docker/srt-web:3.5.2
+    image: oagi1docker/srt-web:3.6.0
     ports:
       - 4200:4200
     links:
@@ -77,7 +77,7 @@ services:
       - backend
 
   backend:
-    image: oagi1docker/srt-http-gateway:3.5.2
+    image: oagi1docker/srt-http-gateway:3.6.0
     ports:
       - 8080:8080
     links:
@@ -100,7 +100,7 @@ services:
           memory: 8192M
 
   db:
-    image: oagi1docker/srt-repo:3.5.2
+    image: oagi1docker/srt-repo:3.6.0
     ports:
       - 3306:3306
     volumes:
@@ -185,7 +185,7 @@ The additions to the core Compose file are shown below:
 
 ```yaml
   backend:
-    image: oagi1docker/srt-http-gateway:3.5.2
+    image: oagi1docker/srt-http-gateway:3.6.0
     # ...existing backend configuration...
     environment:
       - DB_HOST=db

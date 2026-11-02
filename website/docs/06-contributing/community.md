@@ -41,7 +41,7 @@ audience.
 
 - **Search before you post.** Check open and closed
   [issues](https://github.com/OAGi/Score/issues) for an existing answer.
-- **Be specific.** Include the connectCenter version (for example **3.5.2**), how
+- **Be specific.** Include the connectCenter version (for example **3.6.0**), how
   you deployed it, and the exact steps to reproduce. See the
   [Architecture Overview](./architecture.md)
   for module names and the [Deployment guide](../02-getting-started/deployment.md)
