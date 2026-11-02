@@ -111,7 +111,8 @@ export class LibraryDetailComponent {
     return (!this.library.name?.trim()) ||
         (!this.uriForm.valid) ||
         (!this.library.organization) ||
-        (!this.library.domain);
+        (!this.library.domain) ||
+        (!this.library.type?.trim());
   }
 
   back() {

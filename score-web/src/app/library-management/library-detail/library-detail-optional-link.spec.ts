@@ -6,7 +6,7 @@ describe('LibraryDetailComponent.isDisabled', () => {
   const link = (value: string | null) => new FormControl(value, Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
   const isDisabled = (library: Record<string, unknown>, uriForm: FormControl) =>
     LibraryDetailComponent.prototype.isDisabled.call({library, uriForm});
-  const library = {name: 'L', organization: 'O', domain: 'D'};
+  const library = {name: 'L', organization: 'O', domain: 'D', type: 'T'};
 
   it('is enabled for a library without a link', () => {
     expect(isDisabled({...library, link: null}, link(null))).toBe(false);
@@ -22,6 +22,12 @@ describe('LibraryDetailComponent.isDisabled', () => {
 
   it('is disabled when the name is missing', () => {
     expect(isDisabled({...library, name: '', link: null}, link(null))).toBe(true);
+  });
+
+  it('is disabled when the type is missing or blank', () => {
+    for (const type of [undefined, null, '', '   ']) {
+      expect(isDisabled({...library, type, link: null}, link(null))).toBe(true);
+    }
   });
 
   it('keeps the Link field optional in the template', async () => {

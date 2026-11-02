@@ -53,7 +53,8 @@ export class LibraryCreateComponent {
         (!this.linkForm.valid) ||
         (!this.namespaceUriForm.valid) ||
         (!this.library.organization) ||
-        (!this.library.domain);
+        (!this.library.domain) ||
+        (!this.library.type?.trim());
   }
 
   back() {

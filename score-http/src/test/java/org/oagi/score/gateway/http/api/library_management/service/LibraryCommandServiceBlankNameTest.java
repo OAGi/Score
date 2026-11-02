@@ -62,4 +62,15 @@ class LibraryCommandServiceBlankNameTest {
         verify(query).hasDuplicateNameExcludingCurrent(LIBRARY, "Name");
         verify(command).update(LIBRARY, "t", "Name", "org", null, null, "domain", null, null);
     }
+
+    @Test
+    void rejectsACreateOrUpdateWithABlankType() {
+        for (String type : new String[]{null, "", "   "}) {
+            assertThrows(IllegalArgumentException.class, () -> service.create(requester,
+                    new CreateLibraryRequest(type, "Name", "org", null, "domain", null, "urn:blank", null)));
+            assertThrows(IllegalArgumentException.class, () -> service.update(requester,
+                    new UpdateLibraryRequest(LIBRARY, type, "Name", "org", null, "domain", null, null, null)));
+        }
+        verifyNoInteractions(command);
+    }
 }

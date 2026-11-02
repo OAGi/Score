@@ -70,6 +70,9 @@ public class LibraryCommandService {
         if (!hasText(request.name())) {
             throw new IllegalArgumentException("Library name cannot be empty.");
         }
+        if (!hasText(request.type())) {
+            throw new IllegalArgumentException("Library type cannot be empty.");
+        }
         String name = request.name().trim();
 
         if (query(requester).hasDuplicateName(name)) {
@@ -80,7 +83,7 @@ public class LibraryCommandService {
         }
 
         LibraryId libraryId = command(requester).create(
-                request.type(), name, request.organization(), request.description(),
+                request.type().trim(), name, request.organization(), request.description(),
                 request.link(), request.domain(), null);
 
         NamespaceId namespaceId = repositoryFactory.namespaceCommandRepository(requester).create(
@@ -118,6 +121,9 @@ public class LibraryCommandService {
         if (!hasText(request.name())) {
             throw new IllegalArgumentException("Library name cannot be empty.");
         }
+        if (!hasText(request.type())) {
+            throw new IllegalArgumentException("Library type cannot be empty.");
+        }
         String name = request.name().trim();
         if (query.hasDuplicateNameExcludingCurrent(request.libraryId(), name)) {
             throw new IllegalArgumentException("The library name '" + name + "' already exists.");
@@ -125,7 +131,7 @@ public class LibraryCommandService {
 
         return command(requester).update(
                 request.libraryId(),
-                request.type(), name, request.organization(), request.description(),
+                request.type().trim(), name, request.organization(), request.description(),
                 request.link(), request.domain(), request.state(), request.isDefault());
     }
 
