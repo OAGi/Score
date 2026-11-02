@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.Revised;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
@@ -567,7 +568,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST.as("based_agency_id_list")).on(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.as("based_agency_id_list").AGENCY_ID_LIST_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -736,7 +737,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest")).on(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST.as("based_agency_id_list")).on(AGENCY_ID_LIST_MANIFEST.as("based_agency_id_list_manifest").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.as("based_agency_id_list").AGENCY_ID_LIST_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -1090,7 +1091,7 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
                     .leftJoin(LOG).on(AGENCY_ID_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
-                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_AGENCY_ID_LIST_MANIFEST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.eq(MODULE_AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_AGENCY_ID_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)

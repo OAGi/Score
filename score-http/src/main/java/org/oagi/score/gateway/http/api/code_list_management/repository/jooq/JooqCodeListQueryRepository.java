@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.*;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.Revised;
@@ -516,7 +517,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .leftJoin(CODE_LIST_MANIFEST.as("based_code_list_manifest")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
-                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(and(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -683,7 +684,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .leftJoin(CODE_LIST_MANIFEST.as("based_code_list_manifest")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_MANIFEST_ID))
                     .leftJoin(CODE_LIST.as("based_code_list")).on(CODE_LIST_MANIFEST.as("based_code_list_manifest").CODE_LIST_ID.eq(CODE_LIST.as("based_code_list").CODE_LIST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
-                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(and(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)
@@ -1027,7 +1028,7 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                     .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
                     .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
                     .leftJoin(LOG).on(CODE_LIST_MANIFEST.LOG_ID.eq(LOG.LOG_ID))
-                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                    .leftJoin(MODULE_CODE_LIST_MANIFEST).on(and(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(MODULE_CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID)))
                     .leftJoin(MODULE_SET_RELEASE).on(and(
                             MODULE_CODE_LIST_MANIFEST.MODULE_SET_RELEASE_ID.eq(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID),
                             MODULE_SET_RELEASE.IS_DEFAULT.eq((byte) 1)

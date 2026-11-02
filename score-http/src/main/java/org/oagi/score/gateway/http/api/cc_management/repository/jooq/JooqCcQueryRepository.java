@@ -54,6 +54,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
 import static org.apache.commons.lang3.StringUtils.stripToNull;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.cc_management.model.acc.OagisComponentType.*;
@@ -565,7 +566,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+                        .leftJoin(MODULE_ACC_MANIFEST).on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
@@ -801,7 +802,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+                        .leftJoin(MODULE_ACC_MANIFEST).on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
@@ -970,7 +971,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_ACC_MANIFEST).on(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID));
+                        .leftJoin(MODULE_ACC_MANIFEST).on(and(ACC_MANIFEST.ACC_MANIFEST_ID.eq(MODULE_ACC_MANIFEST.ACC_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_ACC_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
@@ -1149,7 +1150,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_ASCCP_MANIFEST).on(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID));
+                        .leftJoin(MODULE_ASCCP_MANIFEST).on(and(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(MODULE_ASCCP_MANIFEST.ASCCP_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_ASCCP_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
@@ -1337,7 +1338,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_BCCP_MANIFEST).on(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID));
+                        .leftJoin(MODULE_BCCP_MANIFEST).on(and(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(MODULE_BCCP_MANIFEST.BCCP_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_BCCP_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
@@ -1510,7 +1511,7 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
             }
             if (!forCount || hasLength(filterCriteria.module())) {
                 step = step
-                        .leftJoin(MODULE_DT_MANIFEST).on(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID));
+                        .leftJoin(MODULE_DT_MANIFEST).on(and(DT_MANIFEST.DT_MANIFEST_ID.eq(MODULE_DT_MANIFEST.DT_MANIFEST_ID), DefaultModuleSetRelease.isDefault(MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID)));
             }
             if (!forCount) {
                 step = step
