@@ -54,6 +54,9 @@ public class ContextSchemeCommandService {
         if (!hasText(request.schemeName())) {
             throw new IllegalArgumentException("Context scheme name cannot be empty.");
         }
+        if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
+            throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
+        }
 
         // Server-side uniqueness enforcement (do not rely on the client-side pre-check alone).
         var query = query(requester);
@@ -92,6 +95,9 @@ public class ContextSchemeCommandService {
     public void update(ScoreUser requester, UpdateContextSchemeRequest request) {
         if (!hasText(request.schemeName())) {
             throw new IllegalArgumentException("Context scheme name cannot be empty.");
+        }
+        if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
+            throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
         }
 
         var query = query(requester);

@@ -93,6 +93,40 @@ class ContextSchemeCommandServiceTest {
         verifyNoInteractions(command);
     }
 
+    // ----- blank identifiers -----
+
+    @Test
+    void create_rejects_a_blank_scheme_id_agency_id_or_version() {
+        for (String blank : new String[]{null, "", "   "}) {
+            var noSchemeId = new CreateContextSchemeRequest(CATEGORY_ID, null, blank, "Geopolitical",
+                    "desc", "OAGi", "1.0", List.of());
+            var noAgency = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "Geopolitical",
+                    "desc", blank, "1.0", List.of());
+            var noVersion = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "Geopolitical",
+                    "desc", "OAGi", blank, List.of());
+            for (var request : List.of(noSchemeId, noAgency, noVersion)) {
+                assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+            }
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_blank_scheme_id_agency_id_or_version() {
+        for (String blank : new String[]{null, "", "   "}) {
+            var noSchemeId = new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, blank, "Geopolitical",
+                    "desc", "OAGi", "1.0", List.of());
+            var noAgency = new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", "Geopolitical",
+                    "desc", blank, "1.0", List.of());
+            var noVersion = new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", "Geopolitical",
+                    "desc", "OAGi", blank, List.of());
+            for (var request : List.of(noSchemeId, noAgency, noVersion)) {
+                assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+            }
+        }
+        verifyNoInteractions(command);
+    }
+
     // ----- create: server-side uniqueness (B7) -----
 
     @Test

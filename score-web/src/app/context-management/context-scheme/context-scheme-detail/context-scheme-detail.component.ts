@@ -184,9 +184,9 @@ export class ContextSchemeDetailComponent implements OnInit {
     return (this.disabled) || (this.isUpdating) ||
       (contextScheme.contextCategoryId === undefined || contextScheme.contextCategoryId <= 0) ||
       (contextScheme.schemeName === undefined || contextScheme.schemeName.trim() === '') ||
-      (contextScheme.schemeId === undefined || contextScheme.schemeId === '') ||
-      (contextScheme.schemeAgencyId === undefined || contextScheme.schemeAgencyId === '') ||
-      (contextScheme.schemeVersionId === undefined || contextScheme.schemeVersionId === '');
+      (contextScheme.schemeId === undefined || contextScheme.schemeId.trim() === '') ||
+      (contextScheme.schemeAgencyId === undefined || contextScheme.schemeAgencyId.trim() === '') ||
+      (contextScheme.schemeVersionId === undefined || contextScheme.schemeVersionId.trim() === '');
   }
 
   openDialog(contextSchemeValue?: ContextSchemeValue) {
