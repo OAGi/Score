@@ -216,7 +216,7 @@ public class BiePackageManifestService {
         for (LibraryId libraryId : releaseMapByLibraryId.keySet()) {
             LibraryDetailsRecord libraryDetailsRecord = libraryQueryRepository.getLibraryDetails(libraryId);
             Collection<ReleaseSummaryRecord> releases = releaseMapByLibraryId.get(libraryId);
-            ReleaseSummaryRecord latestReleasesInCollection = findLatestReleasesIn(requester, libraryId, releases);
+            ReleaseSummaryRecord latestReleasesInCollection = findLatestReleasesIn(requester, releases);
             libraryCompatibilityCollection.add(new LibraryCompatibility(
                     libraryDetailsRecord.name(),
                     latestReleasesInCollection.releaseNum()
@@ -308,41 +308,57 @@ public class BiePackageManifestService {
         return businessContexts;
     }
 
+    /**
+     * Finds the latest release among {@code releases} by following {@code next} along the release chain.
+     * Only releases reachable from the given ones are read, so a release that is not part of the chain
+     * (e.g. an Initialized release, which has neither prev nor next) cannot affect the result.
+     * {@code release_id} is not used for ordering.
+     */
     private ReleaseSummaryRecord findLatestReleasesIn(ScoreUser requester,
-                                                      LibraryId libraryId,
                                                       Collection<ReleaseSummaryRecord> releases) {
         if (releases == null || releases.isEmpty()) {
             return null;
         }
 
         ReleaseQueryRepository releaseQueryRepository = repositoryFactory.releaseQueryRepository(requester);
-        List<ReleaseDetailsRecord> releaseDetailsRecords =
-                releaseQueryRepository.getReleaseSummaryList(libraryId).stream()
-                        .map(e -> releaseQueryRepository.getReleaseDetails(e.releaseId()))
-                        // A release whose details cannot be read (e.g. its updater was removed) is not a candidate.
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
-        Map<ReleaseId, ReleaseDetailsRecord> releaseInDatabaseMap = releaseDetailsRecords.stream()
-                .collect(Collectors.toMap(ReleaseDetailsRecord::releaseId, Function.identity()));
-        ReleaseDetailsRecord currentRelease = releaseDetailsRecords.stream()
-                .filter(e -> e.next() == null).findFirst().orElse(null);
-
         Map<ReleaseId, ReleaseSummaryRecord> releaseInCollectionMap = releases.stream()
-                .collect(Collectors.toMap(ReleaseSummaryRecord::releaseId, Function.identity()));
+                .collect(Collectors.toMap(ReleaseSummaryRecord::releaseId, Function.identity(), (a, b) -> a));
+        Map<ReleaseId, ReleaseDetailsRecord> detailsCache = new HashMap<>();
+        Set<ReleaseId> superseded = new HashSet<>();
+        Set<ReleaseId> chainEnds = new HashSet<>();
 
-        while (currentRelease != null) {
-            if (releaseInCollectionMap.containsKey(currentRelease.releaseId())) {
-                return releaseInCollectionMap.get(currentRelease.releaseId());
+        for (ReleaseSummaryRecord release : releaseInCollectionMap.values()) {
+            ReleaseId lastId = release.releaseId();
+            ReleaseDetailsRecord current = detailsOf(releaseQueryRepository, detailsCache, lastId);
+            while (current != null && current.next() != null) {
+                ReleaseId nextId = current.next().releaseId();
+                if (releaseInCollectionMap.containsKey(nextId)) {
+                    superseded.add(release.releaseId());
+                }
+                lastId = nextId;
+                current = detailsOf(releaseQueryRepository, detailsCache, nextId);
             }
-
-            if (currentRelease.prev() != null) {
-                currentRelease = releaseInDatabaseMap.get(currentRelease.prev().releaseId());
-            } else {
-                break;
-            }
+            chainEnds.add(lastId);
         }
 
-        throw new IllegalStateException("No latest release in the provided collection.");
+        // A single release chain per library is supported; which release is "latest" across chains is undefined.
+        List<ReleaseSummaryRecord> latest = releaseInCollectionMap.values().stream()
+                .filter(e -> !superseded.contains(e.releaseId()))
+                .collect(Collectors.toList());
+        if (chainEnds.size() > 1 || latest.size() != 1) {
+            throw new IllegalStateException(
+                    "The releases in the provided collection do not belong to a single release chain.");
+        }
+        return latest.get(0);
+    }
+
+    private ReleaseDetailsRecord detailsOf(ReleaseQueryRepository repository,
+                                           Map<ReleaseId, ReleaseDetailsRecord> cache,
+                                           ReleaseId releaseId) {
+        if (!cache.containsKey(releaseId)) {
+            cache.put(releaseId, repository.getReleaseDetails(releaseId));
+        }
+        return cache.get(releaseId);
     }
 
     private class BieTrackContext {

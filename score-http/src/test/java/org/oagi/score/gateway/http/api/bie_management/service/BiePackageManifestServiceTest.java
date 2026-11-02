@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,6 +60,7 @@ class BiePackageManifestServiceTest {
     private final BiePackageQueryRepository biePackageQueryRepository = mock(BiePackageQueryRepository.class);
     private final TopLevelAsbiepQueryRepository topLevelAsbiepQueryRepository = mock(TopLevelAsbiepQueryRepository.class);
     private final BieReadService bieReadService = mock(BieReadService.class);
+    private final ReleaseQueryRepository releaseQueryRepository = mock(ReleaseQueryRepository.class);
 
     private final BiePackageManifestService service = new BiePackageManifestService();
 
@@ -80,7 +82,6 @@ class BiePackageManifestServiceTest {
         when(libraryQueryRepository.getLibraryDetails(libraryId)).thenReturn(libraryDetails);
         when(repositoryFactory.libraryQueryRepository(any())).thenReturn(libraryQueryRepository);
 
-        ReleaseQueryRepository releaseQueryRepository = mock(ReleaseQueryRepository.class);
         ReleaseDetailsRecord releaseDetails = mock(ReleaseDetailsRecord.class);
         when(releaseDetails.releaseId()).thenReturn(releaseId);
         when(releaseQueryRepository.getReleaseSummaryList(libraryId)).thenReturn(List.of(release));
@@ -154,6 +155,74 @@ class BiePackageManifestServiceTest {
 
     private static BiePackageManifestEntry entryOf(BiePackageManifest manifest, TopLevelAsbiepSummaryRecord bie) {
         return manifest.bieList().stream().filter(e -> e.bie().uuid().equals(bie.guid())).findFirst().orElseThrow();
+    }
+
+    private ReleaseSummaryRecord releaseSummary(long id, String num) {
+        ReleaseId releaseId = new ReleaseId(BigInteger.valueOf(id));
+        ReleaseSummaryRecord summary = mock(ReleaseSummaryRecord.class);
+        when(summary.releaseId()).thenReturn(releaseId);
+        when(summary.releaseNum()).thenReturn(num);
+        return summary;
+    }
+
+    private void chain(ReleaseSummaryRecord from, ReleaseSummaryRecord next) {
+        ReleaseId fromId = from.releaseId();
+        ReleaseDetailsRecord details = mock(ReleaseDetailsRecord.class);
+        when(details.releaseId()).thenReturn(fromId);
+        when(details.next()).thenReturn(next);
+        when(releaseQueryRepository.getReleaseDetails(fromId)).thenReturn(details);
+    }
+
+    private TopLevelAsbiepSummaryRecord bieIn(ReleaseSummaryRecord in, long id, Guid asccpGuid) {
+        TopLevelAsbiepSummaryRecord record = bie(id, null, asccpGuid);
+        when(record.release()).thenReturn(in);
+        return record;
+    }
+
+    @Test
+    void the_latest_release_is_found_by_following_next_and_not_by_release_id() {
+        // The later release in the chain deliberately has the smaller release_id.
+        ReleaseSummaryRecord earlier = releaseSummary(9, "10.11");
+        ReleaseSummaryRecord later = releaseSummary(3, "10.12");
+        ReleaseSummaryRecord working = releaseSummary(4, "Working");
+        chain(earlier, later);
+        chain(later, working);
+        chain(working, null);
+
+        packageHolds(V1, bieIn(earlier, 11, ORDER), bieIn(later, 12, INVOICE));
+        BiePackageManifest manifest = manifestOf(pkg(V1, null, "1"), null);
+
+        assertThat(manifest.libraryCompatibility())
+                .extracting(LibraryCompatibility::minimumLibraryReleaseVersion).containsExactly("10.12");
+    }
+
+    @Test
+    void a_release_outside_the_release_chain_does_not_affect_the_latest_release() {
+        // An Initialized release has neither prev nor next, so it is not reachable from the chain.
+        ReleaseSummaryRecord initialized = releaseSummary(2, "Initialized");
+        chain(initialized, null);
+        when(releaseQueryRepository.getReleaseSummaryList(libraryId)).thenReturn(List.of(initialized, release));
+        when(release.releaseNum()).thenReturn("10.12");
+        chain(release, null);
+
+        packageHolds(V1, bie(11, null, ORDER));
+        BiePackageManifest manifest = manifestOf(pkg(V1, null, "1"), null);
+
+        assertThat(manifest.libraryCompatibility())
+                .extracting(LibraryCompatibility::minimumLibraryReleaseVersion).containsExactly("10.12");
+    }
+
+    @Test
+    void releases_on_different_release_chains_are_not_supported() {
+        ReleaseSummaryRecord onFirstChain = releaseSummary(5, "1.0");
+        ReleaseSummaryRecord onSecondChain = releaseSummary(6, "2.0");
+        chain(onFirstChain, null);
+        chain(onSecondChain, null);
+
+        packageHolds(V1, bieIn(onFirstChain, 11, ORDER), bieIn(onSecondChain, 12, INVOICE));
+
+        assertThatThrownBy(() -> manifestOf(pkg(V1, null, "1"), null))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
