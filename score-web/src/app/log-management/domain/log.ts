@@ -41,7 +41,7 @@ export class CcSnapshot {
   constructor(obj: any) {
     this.guid = obj.guid;
     this.component = obj.component;
-    this.den = getValueFromObj(obj, '_metadata->' + this.component + '->den' );
+    this.den = getValueFromObj(obj, '_metadata->' + this.component + 'Manifest->den');
     this.definition = obj.definition;
     this.definitionSource = obj.definitionSource;
     this.state = obj.state;
