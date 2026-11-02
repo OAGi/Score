@@ -395,6 +395,8 @@ export class SummaryCcInfo {
   numberOfMyCcByStates: Map<string, number>;
   ccByUsersAndStates: Map<string, Map<string, number>>;
   myRecentCCs: CcListEntry[] = [];
+  /** type (ACC, ASCCP, BCCP, BDT) -> username -> state -> count */
+  ccByTypesUsersAndStates: {[type: string]: {[username: string]: {[state: string]: number}}};
 }
 
 export class SummaryCcExt {
