@@ -99,6 +99,14 @@ public class CodeListCommandService {
         if (!hasText(request.versionId())) {
             throw new IllegalArgumentException("Code list version cannot be empty.");
         }
+        for (var value : request.valueList()) {
+            if (!hasText(value.value())) {
+                throw new IllegalArgumentException("Code list value code cannot be empty.");
+            }
+            if (!hasText(value.meaning())) {
+                throw new IllegalArgumentException("Code list value meaning cannot be empty.");
+            }
+        }
 
         var command = command(requester);
 
@@ -126,7 +134,7 @@ public class CodeListCommandService {
                 CodeListValueManifestId valueId = value.codeListValueManifestId();
                 if (existingValues.containsKey(valueId)) {
                     command.updateValue(valueId,
-                            value.value(), value.meaning(),
+                            value.value().trim(), value.meaning().trim(),
                             value.definition(),
                             value.deprecated()
                     );
@@ -139,7 +147,7 @@ public class CodeListCommandService {
                     command.createValue(codeListManifestId,
                             codeListDetails.codeListId(),
                             codeListDetails.release().releaseId(),
-                            value.value(), value.meaning(),
+                            value.value().trim(), value.meaning().trim(),
                             value.definition(),
                             Boolean.TRUE.equals(value.deprecated()));
                 }
