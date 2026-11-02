@@ -1471,10 +1471,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             if (codeList == null) {
                 AgencyIdListSummaryRecord agencyIdList = generationContext.getAgencyIdList(bbie.primitiveRestriction().agencyIdListManifestId());
                 if (agencyIdList != null) {
-                    if (option.isBieGuid()) {
-                        eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                    }
-
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
                     String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
@@ -1501,9 +1497,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     }
                 }
             } else {
-                if (option.isBieGuid()) {
-                    eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                }
                 generateCodeList(codeList, bbie);
 
                 if (bbieScList.isEmpty()) {
@@ -1521,10 +1514,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                 AgencyIdListSummaryRecord agencyIdList = generationContext.getAgencyIdList(bbie);
                 if (agencyIdList != null) {
                     eNode = createAttributeNodeForBBIE(bbie, parent);
-
-                    if (option.isBieGuid()) {
-                        eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                    }
 
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
@@ -1554,9 +1543,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
             } else {
                 eNode = createAttributeNodeForBBIE(bbie, parent);
 
-                if (option.isBieGuid()) {
-                    eNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                }
                 generateCodeList(codeList, bbie);
 
                 if (bbieScList.isEmpty()) {
@@ -1776,10 +1762,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     else
                         aNode = setBBIESCType2(bbieSc, dtSc, aNode);
                 } else {
-                    if (option.isBieGuid()) {
-                        aNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                    }
-
                     AgencyIdListValueSummaryRecord agencyIdListValue =
                             generationContext.findAgencyIdListValue(agencyIdList.agencyIdListValueManifestId());
                     String agencyListTypeName = getAgencyListTypeName(agencyIdList, agencyIdListValue);
@@ -1790,10 +1772,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
                     }
                 }
             } else {
-                if (option.isBieGuid()) {
-                    aNode.setAttribute("id", ID_ATTRIBUTE_PREFIX + ScoreGuidUtils.randomGuid());
-                }
-
                 generateCodeList(codeList, bbieSc);
 
                 AgencyIdListValueSummaryRecord agencyIdListValue = generationContext.findAgencyIdListValue(codeList.agencyIdListValueManifestId());
