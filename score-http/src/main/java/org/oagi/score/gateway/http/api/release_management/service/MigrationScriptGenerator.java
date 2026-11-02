@@ -329,6 +329,54 @@ public class MigrationScriptGenerator {
         writer.println("/*!40000 ALTER TABLE `" + tableName + "` ENABLE KEYS */;");
         writer.println("UNLOCK TABLES;");
         writer.println("");
+
+        if (includeTableStructure) {
+            dumpTriggers(writer, tableName);
+        }
+    }
+
+    /**
+     * `DROP TABLE` also drops the triggers of the table, so a table that is dumped with its structure must get
+     * its triggers back. They are written after `UNLOCK TABLES`: a trigger that writes to another table
+     * (e.g. `record_change_log`) is rejected by MariaDB (error 1442) while the table is under `LOCK TABLES`,
+     * and recreating them last keeps the dumped rows from firing them.
+     */
+    private void dumpTriggers(PrintWriter writer, String tableName) {
+        List<String> triggerNames = dslContext.resultQuery(
+                        "SELECT `trigger_name` FROM `information_schema`.`triggers` " +
+                                "WHERE `trigger_schema` = DATABASE() AND `event_object_table` = '" + tableName + "' " +
+                                "ORDER BY `trigger_name`")
+                .fetch(0, String.class);
+        if (triggerNames.isEmpty()) {
+            return;
+        }
+
+        writer.println("--");
+        writer.println("-- Triggers for table `" + tableName + "`");
+        writer.println("--");
+        writer.println("");
+        writer.println("DELIMITER ;;");
+        for (String triggerName : triggerNames) {
+            // SHOW CREATE TRIGGER columns: Trigger, sql_mode, SQL Original Statement, character_set_client,
+            // collation_connection, Database Collation, Created. A trigger runs with the sql_mode and the
+            // character set it was created with, so they are set around its CREATE like mysqldump does.
+            Record trigger = dslContext.resultQuery("SHOW CREATE TRIGGER `" + triggerName + "`").fetchOne();
+            String sqlMode = trigger.get(1, String.class);
+            String characterSetClient = trigger.get(3, String.class);
+            String collationConnection = trigger.get(4, String.class);
+            writer.println("DROP TRIGGER IF EXISTS `" + triggerName + "`;;");
+            writer.println("SET @saved_sql_mode = @@sql_mode, @saved_cs_client = @@character_set_client, " +
+                    "@saved_cs_results = @@character_set_results, @saved_col_connection = @@collation_connection;;");
+            writer.println("SET sql_mode = '" + wrap(sqlMode == null ? "" : sqlMode) + "', " +
+                    "character_set_client = '" + characterSetClient + "', " +
+                    "character_set_results = '" + characterSetClient + "', " +
+                    "collation_connection = '" + collationConnection + "';;");
+            writer.println(trigger.get(2, String.class) + ";;");
+            writer.println("SET sql_mode = @saved_sql_mode, character_set_client = @saved_cs_client, " +
+                    "character_set_results = @saved_cs_results, collation_connection = @saved_col_connection;;");
+        }
+        writer.println("DELIMITER ;");
+        writer.println("");
     }
 
     private String toString(Object val, String dataType) {
