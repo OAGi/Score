@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.repository.AccQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.DtQueryRepository;
 import org.oagi.score.gateway.http.api.graph.model.CoreComponentGraphContext;
 import org.oagi.score.gateway.http.api.graph.model.Node;
@@ -1343,10 +1344,27 @@ public class CcCommandService {
                     "The base ACC",
                     "the target ACC",
                     "a base ACC");
+            assertNoCircularBase(query, acc, basedAcc);
         }
 
         var command = repositoryFactory.accCommandRepository(requester);
         return command.updateBasedAccManifestId(accManifestId, basedAccManifestId);
+    }
+
+    /**
+     * Rejects a base ACC that is the ACC itself or that already inherits from the ACC,
+     * because the base chain would then become circular.
+     */
+    private void assertNoCircularBase(AccQueryRepository query, AccSummaryRecord acc, AccSummaryRecord basedAcc) {
+        Set<AccManifestId> visited = new HashSet<>();
+        AccSummaryRecord cur = basedAcc;
+        while (cur != null && visited.add(cur.accManifestId())) {
+            if (acc.accManifestId().equals(cur.accManifestId())) {
+                throw new IllegalArgumentException("The ACC '" + basedAcc.den() + "' cannot be the base of the ACC '"
+                        + acc.den() + "' because it would create a circular inheritance.");
+            }
+            cur = (cur.basedAccManifestId() != null) ? query.getAccSummary(cur.basedAccManifestId()) : null;
+        }
     }
 
     public boolean updateState(ScoreUser requester, AccManifestId accManifestId, CcState state) {

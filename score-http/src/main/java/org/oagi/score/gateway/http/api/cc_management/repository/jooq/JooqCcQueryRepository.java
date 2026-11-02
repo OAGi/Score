@@ -138,8 +138,13 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
 
         List<ULong> accManifestIdList = new ArrayList<>();
 
-        while (accManifestRecord.getBasedAccManifestId() != null) {
+        Set<ULong> visited = new HashSet<>();
+        visited.add(accManifestRecord.getAccManifestId());
+        while (accManifestRecord != null && accManifestRecord.getBasedAccManifestId() != null) {
             ULong cur = accManifestRecord.getBasedAccManifestId();
+            if (!visited.add(cur)) {
+                break;
+            }
             accManifestIdList.add(cur);
             accManifestRecord = accManifestRecordList.stream().filter(e -> e.getAccManifestId().equals(cur)).findFirst().orElse(null);
         }
