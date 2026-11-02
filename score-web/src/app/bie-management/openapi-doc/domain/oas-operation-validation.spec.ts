@@ -6,6 +6,7 @@ import {
   oasBodySlotKey,
   oasOperationIdKey,
   oasOperationKey,
+  oasResourcePathError,
   OasOperationRow,
   OasOperationValidator,
   operationIdVerbWord,
@@ -317,5 +318,37 @@ describe('OasOperationValidator body-slot uniqueness (#1492 Option 2)', () => {
     v.recompute([dup, row({resourceName: '/orders', verb: 'POST', messageBody: 'Request'}), ok]);
     expect(v.bodySlotErrorStateMatcher(dup).isErrorState(null as any, null as any)).toBe(true);
     expect(v.bodySlotErrorStateMatcher(ok).isErrorState(null as any, null as any)).toBe(false);
+  });
+});
+
+describe('oasResourcePathError', () => {
+  it('accepts valid paths, with and without path parameters', () => {
+    expect(oasResourcePathError('/orders')).toBe('');
+    expect(oasResourcePathError('/production-order/{id}/items/{itemId}')).toBe('');
+  });
+
+  it('leaves an empty path to the required check', () => {
+    expect(oasResourcePathError('')).toBe('');
+  });
+
+  it('rejects a path without a leading slash', () => {
+    expect(oasResourcePathError('orders')).not.toBe('');
+  });
+
+  it('rejects whitespace', () => {
+    expect(oasResourcePathError('/no leading  here')).not.toBe('');
+    expect(oasResourcePathError('/orders ')).not.toBe('');
+  });
+
+  it('rejects a query string or fragment', () => {
+    expect(oasResourcePathError('/orders?x=1')).not.toBe('');
+    expect(oasResourcePathError('/orders#frag')).not.toBe('');
+  });
+
+  it('rejects unbalanced or empty braces', () => {
+    expect(oasResourcePathError('/orders/{id')).not.toBe('');
+    expect(oasResourcePathError('/orders/id}')).not.toBe('');
+    expect(oasResourcePathError('/orders/{{id}}')).not.toBe('');
+    expect(oasResourcePathError('/orders/{}')).not.toBe('');
   });
 });

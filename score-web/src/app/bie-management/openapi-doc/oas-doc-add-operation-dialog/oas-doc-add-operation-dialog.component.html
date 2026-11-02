@@ -17,9 +17,13 @@
       <mat-form-field>
         <mat-label>Resource Name (Path)</mat-label>
         <input matInput placeholder="/production-order/{id}"
+          [errorStateMatcher]="resourceNameErrorStateMatcher"
           [(ngModel)]="operation.resourceName"
           (ngModelChange)="onResourceNameChange()">
         <mat-hint>Path segments wrapped in {{ '{' }}...{{ '}' }} become path parameters.</mat-hint>
+        @if (resourceNameError) {
+          <mat-error>{{ resourceNameError }}</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field>
