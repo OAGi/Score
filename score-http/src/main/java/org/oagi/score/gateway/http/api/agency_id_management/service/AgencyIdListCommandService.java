@@ -82,6 +82,15 @@ public class AgencyIdListCommandService {
         if (request.namespaceId() == null) {
             throw new IllegalArgumentException("Namespace is required.");
         }
+        if (!hasText(request.name())) {
+            throw new IllegalArgumentException("Agency ID list name cannot be empty.");
+        }
+        if (!hasText(request.listId())) {
+            throw new IllegalArgumentException("Agency ID list List ID cannot be empty.");
+        }
+        if (!hasText(request.versionId())) {
+            throw new IllegalArgumentException("Agency ID list version cannot be empty.");
+        }
         if (request.valueList() != null) {
             for (var value : request.valueList()) {
                 if (!hasText(value.value())) {
@@ -98,8 +107,8 @@ public class AgencyIdListCommandService {
         // Update the main agency ID list details
         boolean updated = command.update(
                 agencyIdListManifestId,
-                request.name(),
-                request.versionId(), request.listId(),
+                request.name().trim(),
+                request.versionId().trim(), request.listId().trim(),
                 request.agencyIdListValueManifestId(),
                 request.definition(), request.remark(),
                 request.namespaceId(),

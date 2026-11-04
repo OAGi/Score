@@ -439,7 +439,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    if (!this.agencyIdList.versionId) {
+    if (!this.agencyIdList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });
@@ -532,7 +532,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    if (!this.agencyIdList.versionId) {
+    if (!this.agencyIdList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });
