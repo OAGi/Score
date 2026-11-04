@@ -184,7 +184,7 @@ export class ModuleService {
       params = params.set('releaseId', request.releaseId);
     }
     if (request.isDefault) {
-      params = params.set('isDefault', request.isDefault);
+      params = params.set('default', request.isDefault);
     }
     return this.getModuleSetReleaseListPage(params);
   }
