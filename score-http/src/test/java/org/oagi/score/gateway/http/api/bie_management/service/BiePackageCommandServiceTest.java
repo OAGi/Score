@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateB
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -221,5 +222,53 @@ class BiePackageCommandServiceTest {
 
         assertThrows(DataAccessForbiddenException.class,
                 () -> service.update(anotherUser(ScoreRole.ADMINISTRATOR), aRequest("Name", "v1.0", "v1", "desc")));
+    }
+
+    private BiePackageSummaryRecord aSummary(BiePackageId id, BieState state, BiePackageId prev) {
+        return new BiePackageSummaryRecord(id, null, null, "Name", "v1.0", "v1", "desc",
+                null, null, state, null, prev);
+    }
+
+    @Test
+    void a_production_package_is_revised_once() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID))).thenReturn(List.of());
+        when(query.hasDuplicateVersion(any(), any())).thenReturn(false);
+
+        service.revise(requester, PACKAGE_ID);
+
+        verify(command).revise(eq(PACKAGE_ID), any());
+    }
+
+    @Test
+    void a_package_that_already_has_a_newer_revision_cannot_be_revised_again() {
+        BiePackageId revision = new BiePackageId(BigInteger.valueOf(6));
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID)))
+                .thenReturn(List.of(aSummary(revision, BieState.WIP, PACKAGE_ID)));
+
+        assertThrows(IllegalArgumentException.class, () -> service.revise(requester, PACKAGE_ID));
+        verify(command, never()).revise(any(), any());
+    }
+
+    @Test
+    void a_revision_chain_can_keep_growing_from_its_latest_production_package() {
+        BiePackageId second = new BiePackageId(BigInteger.valueOf(6));
+        BiePackageId third = new BiePackageId(BigInteger.valueOf(7));
+        when(query.hasDuplicateVersion(any(), any())).thenReturn(false);
+
+        // PACKAGE_ID (Production) -> second (WIP, then Production): the first is closed, the latest is open.
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID)))
+                .thenReturn(List.of(aSummary(second, BieState.Production, PACKAGE_ID)));
+        when(query.getBiePackageSummary(second)).thenReturn(aSummary(second, BieState.Production, PACKAGE_ID));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(second))).thenReturn(List.of());
+        when(command.revise(eq(second), any())).thenReturn(third);
+
+        assertThrows(IllegalArgumentException.class, () -> service.revise(requester, PACKAGE_ID));
+        service.revise(requester, second);
+
+        verify(command, never()).revise(eq(PACKAGE_ID), any());
+        verify(command).revise(eq(second), any());
     }
 }

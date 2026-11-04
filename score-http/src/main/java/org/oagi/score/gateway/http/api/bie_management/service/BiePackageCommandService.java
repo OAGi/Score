@@ -234,6 +234,9 @@ public class BiePackageCommandService {
         if (Production != biePackage.state()) {
             throw new IllegalArgumentException("Only the BIE package in 'Production' state can be revised.");
         }
+        if (!query.getBiePackagesReferencingAsPrevious(List.of(biePackageId)).isEmpty()) {
+            throw new IllegalArgumentException("This BIE package already has a newer revision.");
+        }
 
         String versionId = biePackage.versionId();
         while (true) {
