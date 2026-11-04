@@ -4,6 +4,7 @@ import jakarta.annotation.Nullable;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.BieAssociation;
+import org.oagi.score.gateway.http.api.bie_management.model.BieValueConstraintUpdates;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.Abie;
@@ -647,11 +648,7 @@ public class BiePackageManifestService {
         }
 
         // check 'value constraint'
-        if (hasLength(a.getFixedValue()) && !Objects.equals(a.getFixedValue(), b.getFixedValue())) {
-            changes.add("value constraint");
-        } else if (hasLength(a.getDefaultValue()) && !Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
-            changes.add("value constraint");
-        } else if (hasLength(b.getFixedValue()) || hasLength(b.getDefaultValue())) {
+        if (BieValueConstraintUpdates.changed(a.valueConstraint(), b.valueConstraint())) {
             changes.add("value constraint");
         }
 
@@ -704,11 +701,7 @@ public class BiePackageManifestService {
         }
 
         // check 'value constraint'
-        if (hasLength(a.getFixedValue()) && !Objects.equals(a.getFixedValue(), b.getFixedValue())) {
-            changes.add("value constraint");
-        } else if (hasLength(a.getDefaultValue()) && !Objects.equals(a.getDefaultValue(), b.getDefaultValue())) {
-            changes.add("value constraint");
-        } else if (hasLength(b.getFixedValue()) || hasLength(b.getDefaultValue())) {
+        if (BieValueConstraintUpdates.changed(a.valueConstraint(), b.valueConstraint())) {
             changes.add("value constraint");
         }
 

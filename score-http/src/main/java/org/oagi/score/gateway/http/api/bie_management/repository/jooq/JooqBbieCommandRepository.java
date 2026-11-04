@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.repository.jooq;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpsertBbieRequest;
+import org.oagi.score.gateway.http.api.bie_management.model.BieValueConstraintUpdates;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieNode;
@@ -268,7 +269,7 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
                 bbieRecord.setRemark(emptyToNull(bbie.getRemark()));
             }
 
-            BieValueConstraintUpdates.apply(bbie.getDefaultValue(), bbie.getFixedValue(),
+            BieValueConstraintUpdates.apply(bbie.valueConstraint(),
                     bbieRecord::setDefaultValue, bbieRecord::setFixedValue);
 
             if (!bbie.isEmptyPrimitive()) {

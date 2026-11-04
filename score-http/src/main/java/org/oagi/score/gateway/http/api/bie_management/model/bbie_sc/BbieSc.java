@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.model.bbie_sc;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieId;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
@@ -145,6 +146,10 @@ public class BbieSc extends Auditable {
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+    }
+
+    public ValueConstraint valueConstraint() {
+        return new ValueConstraint(defaultValue, fixedValue);
     }
 
     public BigInteger getFacetMinLength() {
