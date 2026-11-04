@@ -77,7 +77,12 @@ export class BieReportComponent implements OnInit {
 
         e.reusedState, e.reusedGuid, e.reusedPropertyTerm,
         e.reusedOwner, e.reusedVersion, e.reusedStatus, ])
-    ].map(e => e.join(',')).join('\n');
+    ].map(e => e.map(value => this.toCsvCell(value)).join(',')).join('\n');
+  }
+
+  private toCsvCell(value: unknown): string {
+    const text = value === null || value === undefined ? '' : String(value);
+    return `"${text.replace(/"/g, '""')}"`;
   }
 
   download() {
