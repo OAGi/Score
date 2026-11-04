@@ -289,22 +289,25 @@ export class HighlightSearch implements PipeTransform {
       return value;
     }
 
-    // Escape HTML special characters in value
-    const escapedValue = this.escapeHtml(value);
-
     if (!keyword) {
-      return escapedValue;
+      return this.escapeHtml(value);
     }
 
-    // Escape HTML special characters and special regex characters in the keyword
-    const escapedKeyword = this.escapeHtml(keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(escapedKeyword, 'gi');
+    // Match the keyword against the raw value, so it never hits the inside of an escaped entity
+    const re = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
 
-    // Replace matched keyword with <mark> tags
-    const highlightedValue = escapedValue.replace(
-      re,
-      match => `<mark${classes ? ` class="${classes.join(' ')}"` : ''}>${match}</mark>`
-    );
+    // Escape each piece of the value separately and wrap the matched keyword with <mark> tags
+    let highlightedValue = '';
+    let lastIndex = 0;
+    for (const match of value.matchAll(re)) {
+      if (match[0].length === 0) {
+        continue;
+      }
+      highlightedValue += this.escapeHtml(value.substring(lastIndex, match.index));
+      highlightedValue += `<mark${classes ? ` class="${classes.join(' ')}"` : ''}>${this.escapeHtml(match[0])}</mark>`;
+      lastIndex = match.index + match[0].length;
+    }
+    highlightedValue += this.escapeHtml(value.substring(lastIndex));
 
     // Return the sanitized HTML to Angular
     return this.sanitizer.bypassSecurityTrustHtml(highlightedValue);
