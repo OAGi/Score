@@ -243,7 +243,15 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
         avroObj.setNullable(isNillable || minVal == 0);
     }
 
+    // A code list or an agency ID list restricts a token, which Avro represents as a string.
+    private static final String CODE_VALUE_TYPE = "string";
+
     private String getType(BbieSummaryRecord bbie, GenerationContext generationContext) {
+        if (bbie.primitiveRestriction().codeListManifestId() != null
+                || bbie.primitiveRestriction().agencyIdListManifestId() != null) {
+            return CODE_VALUE_TYPE;
+        }
+
         XbtSummaryRecord xbt;
         if (bbie.primitiveRestriction().xbtManifestId() == null) {
             DtAwdPriSummaryRecord dtAwdPri =
@@ -295,6 +303,11 @@ public class BieAvroGenerateExpression implements BieGenerateExpression, Initial
     }
 
     private String getType(BbieScSummaryRecord bbieSc, GenerationContext generationContext) {
+        if (bbieSc.primitiveRestriction().codeListManifestId() != null
+                || bbieSc.primitiveRestriction().agencyIdListManifestId() != null) {
+            return CODE_VALUE_TYPE;
+        }
+
         XbtSummaryRecord xbt;
         if (bbieSc.primitiveRestriction().xbtManifestId() == null) {
             DtScAwdPriSummaryRecord dtScAwdPri =

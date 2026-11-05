@@ -58,8 +58,11 @@ public class Helper {
 
     public static XbtSummaryRecord getXbt(GenerationContext generationContext,
                                           DtAwdPriSummaryRecord dtAwdPri) {
-        XbtSummaryRecord xbt = generationContext.getXbt(dtAwdPri.xbtManifestId());
-        return xbt;
+        // The default is a code list or an agency ID list, not a primitive, so there is no xbt.
+        if (dtAwdPri == null || dtAwdPri.xbtManifestId() == null) {
+            return null;
+        }
+        return generationContext.getXbt(dtAwdPri.xbtManifestId());
     }
 
     public static String getCodeListTypeName(CodeListSummaryRecord codeList,

@@ -539,7 +539,8 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
 
         Map<String, Object> properties;
-        if (dtAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -556,7 +557,8 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
                 generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
 
         Map<String, Object> properties;
-        if (dtScAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtScAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {

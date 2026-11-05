@@ -306,7 +306,8 @@ public class BieOpenApiSchemaBuilder {
                 generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
 
         Map<String, Object> properties;
-        if (dtAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -322,7 +323,8 @@ public class BieOpenApiSchemaBuilder {
                 generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
 
         Map<String, Object> properties;
-        if (dtScAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtScAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -551,6 +553,10 @@ public class BieOpenApiSchemaBuilder {
     }
 
     Object emptyExample(XbtSummaryRecord xbt) {
+        if (xbt == null) {
+            // A code list or an agency ID list value is a string.
+            return "";
+        }
         Map<String, Object> properties = toProperties(xbt);
         Object type = properties.getOrDefault("type", "string");
         if ("boolean".equals(type)) {

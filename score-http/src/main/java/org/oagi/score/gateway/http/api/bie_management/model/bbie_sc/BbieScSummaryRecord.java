@@ -39,6 +39,12 @@ public record BbieScSummaryRecord(
         return guid();
     }
 
+    public BbieScSummaryRecord withPrimitiveRestriction(PrimitiveRestriction primitiveRestriction) {
+        return new BbieScSummaryRecord(bbieScId, guid, basedDtScManifestId, bbieId, path, hashPath,
+                cardinality, primitiveRestriction, valueConstraint, facet, definition, remark, bizTerm,
+                displayName, example, deprecated, used, state, ownerTopLevelAsbiepId, owner, created, lastUpdated);
+    }
+
     public static Builder builder(BbieScId bbieScId, DtScManifestId basedDtScManifestId,
                                   BbieId bbieId, BieState state, TopLevelAsbiepId ownerTopLevelAsbiepId,
                                   UserSummaryRecord owner, WhoAndWhen created, WhoAndWhen lastUpdated) {

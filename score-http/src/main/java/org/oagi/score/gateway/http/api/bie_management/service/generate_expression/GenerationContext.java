@@ -176,7 +176,7 @@ public class GenerationContext implements InitializingBean, CcDocument {
 
     @Override
     public XbtSummaryRecord getXbt(XbtManifestId xbtManifestId) {
-        return ccDocument.getXbt(xbtManifestId);
+        return (xbtManifestId != null) ? ccDocument.getXbt(xbtManifestId) : null;
     }
 
     @Override
@@ -385,14 +385,18 @@ public class GenerationContext implements InitializingBean, CcDocument {
                 .collect(Collectors.toMap(e -> e.abieId(), Function.identity()));
 
         List<BbieSummaryRecord> bbieList = repositoryFactory.bbieQueryRepository(requester)
-                .getBbieSummaryList(topLevelAsbiepIds);
+                .getBbieSummaryList(topLevelAsbiepIds).stream()
+                .map(this::resolveDefaultValueDomain)
+                .collect(Collectors.toList());
         // Keep both true and false rows. Inverse Mode uses absence of a row as the default,
         // while an explicit false row must override that default during expression generation.
         findBbieByFromAbieIdMap = bbieList.stream()
                 .collect(Collectors.groupingBy(e -> e.fromAbieId()));
 
         List<BbieScSummaryRecord> bbieScList = repositoryFactory.bbieScQueryRepository(requester)
-                .getBbieScSummaryList(topLevelAsbiepIds);
+                .getBbieScSummaryList(topLevelAsbiepIds).stream()
+                .map(this::resolveDefaultValueDomain)
+                .collect(Collectors.toList());
         findBbieScByBbieIdMap = bbieScList.stream()
                 .collect(Collectors.groupingBy(e -> e.bbieId()));
 
@@ -428,6 +432,35 @@ public class GenerationContext implements InitializingBean, CcDocument {
         var namespaceQuery = repositoryFactory.namespaceQueryRepository(requester);
         findNamespaceMap = namespaceQuery.getNamespaceSummaryList().stream()
                 .collect(Collectors.toMap(e -> e.namespaceId(), Function.identity()));
+    }
+
+    /**
+     * A BBIE without its own value domain falls back to the default of its Data Type. When that default is a
+     * code list or an agency ID list (not a primitive), it is carried onto the BBIE here so that every expression
+     * generator sees it the same way as an explicitly assigned one.
+     */
+    private BbieSummaryRecord resolveDefaultValueDomain(BbieSummaryRecord bbie) {
+        if (bbie.primitiveRestriction() != null && !bbie.primitiveRestriction().isEmpty()) {
+            return bbie;
+        }
+        DtAwdPriSummaryRecord dtAwdPri = findDtAwdPriByBbieAndDefaultIsTrue(bbie);
+        if (dtAwdPri == null) {
+            return bbie;
+        }
+        PrimitiveRestriction fallback = PrimitiveRestriction.fromDtAwdPri(dtAwdPri);
+        return fallback.isCodeListOrAgencyIdList() ? bbie.withPrimitiveRestriction(fallback) : bbie;
+    }
+
+    private BbieScSummaryRecord resolveDefaultValueDomain(BbieScSummaryRecord bbieSc) {
+        if (bbieSc.primitiveRestriction() != null && !bbieSc.primitiveRestriction().isEmpty()) {
+            return bbieSc;
+        }
+        DtScAwdPriSummaryRecord dtScAwdPri = findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
+        if (dtScAwdPri == null) {
+            return bbieSc;
+        }
+        PrimitiveRestriction fallback = PrimitiveRestriction.fromDtScAwdPri(dtScAwdPri);
+        return fallback.isCodeListOrAgencyIdList() ? bbieSc.withPrimitiveRestriction(fallback) : bbieSc;
     }
 
     private static BigInteger BASE_ID_FOR_DUMMIES = BigInteger.valueOf(100000000L);
