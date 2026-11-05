@@ -474,6 +474,9 @@ public class OpenAPIDocController {
         List<String> errorMessages = new ArrayList<>();
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(sessionService.asScoreUser(user));
         getBieForOasDocRequest.setOasDocId(oasDocId);
+        // all the operations of the document, not the first page
+        getBieForOasDocRequest.setPageIndex(-1);
+        getBieForOasDocRequest.setPageSize(-1);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(sessionService.asScoreUser(user), getBieForOasDocRequest);
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
@@ -519,6 +522,9 @@ public class OpenAPIDocController {
         List<String> errorMessages = new ArrayList<>();
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(sessionService.asScoreUser(user));
         getBieForOasDocRequest.setOasDocId(oasDocId);
+        // all the operations of the document, not the first page
+        getBieForOasDocRequest.setPageIndex(-1);
+        getBieForOasDocRequest.setPageSize(-1);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(
                 sessionService.asScoreUser(user), getBieForOasDocRequest);
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
