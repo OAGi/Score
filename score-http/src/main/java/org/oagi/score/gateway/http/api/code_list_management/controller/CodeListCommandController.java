@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.code_list_management.controller.payload.*
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.service.CodeListCommandService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -59,6 +60,23 @@ public class CodeListCommandController {
         codeListCommandService.updateState(
                 sessionService.asScoreUser(user), codeListManifestId, CcState.valueOf(toState),
                 request.get("comment"), request.get("projectFieldOptionOverride"));
+    }
+
+    @PatchMapping(value = "/state")
+    public void updateCodeListsState(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestBody UpdateCodeListStateRequest request) {
+
+        ScoreUser requester = sessionService.asScoreUser(user);
+        request.codeListManifestIds().forEach(codeListManifestId ->
+                codeListCommandService.updateState(requester, codeListManifestId, request.toState(),
+                        valueFor(request.comments(), codeListManifestId),
+                        valueFor(request.projectFieldOptionOverrides(), codeListManifestId)));
+    }
+
+    /** The value of one code list of a bulk state change, keyed {@code "code_list:<manifestId>"}. */
+    private static String valueFor(Map<String, String> values, CodeListManifestId codeListManifestId) {
+        return (values != null) ? values.get("code_list:" + codeListManifestId) : null;
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/revise")
@@ -149,6 +167,20 @@ public class CodeListCommandController {
         codeListCommandService.transferOwnership(sessionService.asScoreUser(user),
                 sessionService.getScoreUserByUsername(request.targetLoginId()),
                 codeListManifestId);
+    }
+
+    @Operation(summary = "Transfer ownership of code lists",
+            description = "Transfers ownership of the specified code lists to another user.")
+    @PatchMapping("/transfer")
+    public void transferOwnership(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+
+            @RequestBody TransferCodeListOwnershipListRequest request) {
+
+        ScoreUser requester = sessionService.asScoreUser(user);
+        ScoreUser targetUser = sessionService.getScoreUserByUsername(request.targetLoginId());
+        request.codeListManifestIds().forEach(codeListManifestId ->
+                codeListCommandService.transferOwnership(requester, targetUser, codeListManifestId));
     }
 
     @PostMapping(value = "/{codeListManifestId:[\\d]+}/uplift")

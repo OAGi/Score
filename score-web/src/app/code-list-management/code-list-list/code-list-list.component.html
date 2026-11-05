@@ -11,28 +11,46 @@
         <mat-icon>add</mat-icon>
       </button>
     }
-    @if (showDiscardBtn) {
-      <button mat-icon-button class="ms-2" matTooltip="Delete"
-        (click)="openDialogCodeListListDelete()">
-        <mat-icon>delete</mat-icon>
-      </button>
-    }
-    @if (showRestoreBtn) {
-      <button mat-icon-button class="ms-2" matTooltip="Purge"
-        (click)="openDialogCodeListListPurge()">
-        <mat-icon>delete_forever</mat-icon>
-      </button>
-    }
-    @if (showRestoreBtn) {
-      <button mat-icon-button class="ms-2" matTooltip="Restore"
-        (click)="openDialogCodeListListRestore()">
-        <mat-icon>restore_from_trash</mat-icon>
-      </button>
-    }
+    <button mat-icon-button class="ms-2" matTooltip="Move to Draft"
+      [hidden]="!canToolbarAction('Draft')" (click)="multipleUpdateState('Draft')">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Move to QA"
+      [hidden]="!canToolbarAction('QA')" (click)="multipleUpdateState('QA')">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Move to Candidate"
+      [hidden]="!canToolbarAction('Candidate')" (click)="multipleUpdateState('Candidate')">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Move to Production"
+      [hidden]="!canToolbarAction('Production')" (click)="multipleUpdateState('Production')">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Back to WIP"
+      [hidden]="!canToolbarAction('WIP')" (click)="multipleUpdateState('WIP')">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Delete"
+      [hidden]="!canToolbarAction('Delete')" (click)="openDialogCodeListListDelete()">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Purge"
+      [hidden]="!canToolbarAction('Purge')" (click)="openDialogCodeListListPurge()">
+      <mat-icon>delete_forever</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Restore"
+      [hidden]="!canToolbarAction('Restore')" (click)="openDialogCodeListListRestore()">
+      <mat-icon>restore_from_trash</mat-icon>
+    </button>
+    <button mat-icon-button class="ms-2" matTooltip="Transfer Ownership"
+      [hidden]="!canToolbarAction('Transfer')" (click)="openTransferDialogMultiple()">
+      <mat-icon>swap_horiz</mat-icon>
+    </button>
   </ng-container>
 
   <score-table-view emptyMessage="No Code List" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
-    [filterOptions]="filterOptions()" [selection]="selection" [rowSelectable]="rowSelectable" [busy]="busy()"
+    [filterOptions]="filterOptions()" [selection]="selection" [busy]="busy()"
     rowHover advancedSearchOffset="14.5rem">
 
     <div searchPrefix class="d-flex">

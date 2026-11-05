@@ -168,6 +168,30 @@ export class CodeListService {
     return this.update(codeList, state, comment, projectFieldOptionOverride);
   }
 
+  /** Moves several code lists to a state; the comments and the overrides are keyed 'code_list:<manifestId>'. */
+  updateStateOnList(codeLists: CodeListListEntry[], toState: string,
+                    comments?: { [key: string]: string },
+                    projectFieldOptionOverrides?: { [key: string]: string }): Observable<any> {
+    const body: any = {
+      toState,
+      codeListManifestIds: codeLists.map(e => e.codeListManifestId)
+    };
+    if (comments && Object.keys(comments).length > 0) {
+      body.comments = comments;
+    }
+    if (projectFieldOptionOverrides && Object.keys(projectFieldOptionOverrides).length > 0) {
+      body.projectFieldOptionOverrides = projectFieldOptionOverrides;
+    }
+    return this.http.patch<any>('/api/code-lists/state', body);
+  }
+
+  transferOwnershipOnList(codeLists: CodeListListEntry[], targetLoginId: string): Observable<any> {
+    return this.http.patch<any>('/api/code-lists/transfer', {
+      targetLoginId,
+      codeListManifestIds: codeLists.map(e => e.codeListManifestId)
+    });
+  }
+
   delete(...codeListManifestIds): Observable<any> {
     return this.http.patch<any>('/api/code-lists/mark-as-deleted', {
       codeListManifestIds
