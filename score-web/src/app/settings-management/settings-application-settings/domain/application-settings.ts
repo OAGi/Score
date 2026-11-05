@@ -14,5 +14,8 @@ export class SMTPSettingsInfo {
   startTlsEnable: boolean;
   authMethod: string;
   authUsername: string;
-  authPassword: string;
+  /** Sent only to change the password: omitted keeps it, an empty string clears it. Never returned. */
+  authPassword?: string;
+  /** Returned only: whether a password is stored. */
+  authPasswordSet?: boolean;
 }

@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameExpressionSuggester;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameExpressionValidationService;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.filename.FilenameSampleValues;
+import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.util.StringUtils;
@@ -161,10 +162,14 @@ public class ApplicationConfigurationQueryService {
     /**
      * Builds the application-settings response from persisted configuration values.
      *
-     * @param requester user requesting the settings
-     * @return aggregated application settings
+     * @param requester user requesting the settings; must be an administrator
+     * @return aggregated application settings, which tell whether an SMTP password is stored but not the password
      */
     public ApplicationSettingsInfo getApplicationSettingsInfo(ScoreUser requester) {
+        if (!requester.isAdministrator()) {
+            throw new AccessControlException(requester);
+        }
+
         ApplicationSettingsInfo applicationSettingsInfo = new ApplicationSettingsInfo();
 
         SMTPSettingsInfo smtpSettingsInfo = new SMTPSettingsInfo();
@@ -175,7 +180,7 @@ public class ApplicationConfigurationQueryService {
         smtpSettingsInfo.setStartTlsEnable(getBooleanProperty(requester, "score.mail.smtp.starttls.enable"));
         smtpSettingsInfo.setAuthMethod(getProperty(requester, "score.mail.smtp.auth.method"));
         smtpSettingsInfo.setAuthUsername(getProperty(requester, "score.mail.smtp.auth.username"));
-        smtpSettingsInfo.setAuthPassword(getProperty(requester, "score.mail.smtp.auth.password"));
+        smtpSettingsInfo.setAuthPasswordSet(StringUtils.hasLength(getProperty(requester, "score.mail.smtp.auth.password")));
         applicationSettingsInfo.setSmtpSettingsInfo(smtpSettingsInfo);
         applicationSettingsInfo.setBieSchemaFilenameExpression(getPropertyOrDefault(
                 requester,
