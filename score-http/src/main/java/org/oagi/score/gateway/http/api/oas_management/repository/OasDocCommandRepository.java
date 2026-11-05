@@ -6,6 +6,9 @@ import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.criteria.*;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 
+import java.util.Collection;
+import java.util.Set;
+
 public interface OasDocCommandRepository {
 
     CreateOasDocResponse createOasDoc(CreateOasDocRequest request) throws ScoreDataAccessException;
@@ -48,6 +51,14 @@ public interface OasDocCommandRepository {
 
     /** Issue #1492: the existing operation id for {@code (resourceId, verb)}, or null. */
     OasOperationId findOasOperationId(OasResourceId oasResourceId, String verb);
+
+    /**
+     * The given operationIds that an operation of the document, other than the excluded ones, already
+     * uses. The comparison is exact (case-sensitive): the OpenAPI specification says the operationId
+     * value is case-sensitive, while the column's collation ignores case, accents and trailing spaces.
+     */
+    Set<String> findOperationIdsInOasDoc(OasDocId oasDocId, Collection<String> operationIds,
+                                         Collection<OasOperationId> excludedOasOperationIds);
 
     OasTagId insertOasTag(InsertOasTagArguments arguments);
 

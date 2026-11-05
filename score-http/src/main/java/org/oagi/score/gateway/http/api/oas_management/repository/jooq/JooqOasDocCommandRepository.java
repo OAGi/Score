@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.common.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -480,6 +481,40 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .limit(1)
                 .fetchOne(OAS_OPERATION.OAS_OPERATION_ID);
         return (oasOperationId == null) ? null : new OasOperationId(oasOperationId.toBigInteger());
+    }
+
+    @Override
+    public Set<String> findOperationIdsInOasDoc(OasDocId oasDocId, Collection<String> operationIds,
+                                                Collection<OasOperationId> excludedOasOperationIds) {
+        if (oasDocId == null || operationIds == null || operationIds.isEmpty()) {
+            return Set.of();
+        }
+        var condition = OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                .and(OAS_OPERATION.OPERATION_ID.in(operationIds));
+        if (excludedOasOperationIds != null && !excludedOasOperationIds.isEmpty()) {
+            condition = condition.and(OAS_OPERATION.OAS_OPERATION_ID.notIn(
+                    excludedOasOperationIds.stream().map(id -> valueOf(id)).toList()));
+        }
+        // The column's collation (utf8mb3_general_ci) ignores case, accents and trailing spaces, so the
+        // query only narrows the candidates; the exact comparison is done here.
+        List<String> candidates = dslContext().select(OAS_OPERATION.OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(condition)
+                .fetch(OAS_OPERATION.OPERATION_ID);
+        return retainExactMatches(operationIds, candidates);
+    }
+
+    /** The requested operationIds that are present, character for character, among the candidates. */
+    static Set<String> retainExactMatches(Collection<String> requested, Collection<String> candidates) {
+        Set<String> candidateSet = new HashSet<>(candidates);
+        Set<String> result = new HashSet<>();
+        for (String operationId : requested) {
+            if (candidateSet.contains(operationId)) {
+                result.add(operationId);
+            }
+        }
+        return result;
     }
 
     @Override

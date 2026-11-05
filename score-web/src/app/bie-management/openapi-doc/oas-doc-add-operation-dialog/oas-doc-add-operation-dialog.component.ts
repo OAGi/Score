@@ -100,9 +100,9 @@ export class OasDocAddOperationDialogComponent {
     this.openAPIService.addOperationForOasDoc(this.operation).subscribe(_ => {
       this.snackBar.open('Operation added', '', {duration: 3000});
       this.dialogRef.close(true);
-    }, _ => {
+    }, err => {
       this.isWorking = false;
-      this.snackBar.open('Failed to add the operation.', '', {duration: 5000});
+      this.snackBar.open(err?.headers?.get('x-error-message') || 'Failed to add the operation.', '', {duration: 5000});
     });
   }
 }

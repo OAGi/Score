@@ -660,7 +660,7 @@ export class OasDocDetailComponent implements OnInit {
       request.bieForOasDocList = this.getChanged();
       this.loading = true;
       this.openAPIService.updateDetails(request).pipe(finalize(() => this.loading = false))
-        .subscribe(() => next());
+        .subscribe(() => next(), err => this.showUpdateError(err));
     };
     if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
       // A doc-level change (title/version/security) must be saved first (mirrors doUpdate), then details.
@@ -1124,6 +1124,13 @@ export class OasDocDetailComponent implements OnInit {
     return !this.isChanged();
   }
 
+  // Shows the server's refusal (X-Error-Message), e.g. an Operation ID that another operation uses.
+  private showUpdateError(err: any) {
+    this.snackBar.open(err?.headers?.get('x-error-message') || 'Failed to update the operations.', '', {
+      duration: 5000,
+    });
+  }
+
   updateDetails(callbackFn?) {
     if (this.updateDisabled) {
       if (callbackFn === undefined) {
@@ -1154,7 +1161,7 @@ export class OasDocDetailComponent implements OnInit {
           }
         }, _ => {
         });
-    });
+    }, err => this.showUpdateError(err));
     if (callbackFn === undefined) {
       this.snackBar.open('Updated', '', {
         duration: 3000,

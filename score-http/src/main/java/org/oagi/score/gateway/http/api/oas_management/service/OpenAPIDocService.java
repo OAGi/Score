@@ -211,6 +211,10 @@ public class OpenAPIDocService {
                 request.getDescriptionForOperation(), request.isDeprecatedForOperation());
         OasOperationId oasOperationId = shell.operationId();
 
+        if (!shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+            assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()));
+        }
+
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
@@ -295,6 +299,10 @@ public class OpenAPIDocService {
                 request.getOperationId(), request.getSummary(), request.getDescription(), false);
         OasOperationId oasOperationId = shell.operationId();
 
+        if (!shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+            assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()));
+        }
+
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
@@ -362,6 +370,48 @@ public class OpenAPIDocService {
                     "This operation (" + verbLabel + " " + path + ") already has a " + bodyType
                             + " body. An operation can have at most one Request and one Response body.");
         }
+    }
+
+    /**
+     * The operationId each submitted operation ends up with. An operation appears as up to two rows
+     * (Request and Response) that carry the same operationId.
+     */
+    private static Map<OasOperationId, String> submittedOperationIds(UpdateBieForOasDocRequest request) {
+        Map<OasOperationId, String> operationIds = new LinkedHashMap<>();
+        if (request.getBieForOasDocList() != null) {
+            for (BieForOasDoc row : request.getBieForOasDocList()) {
+                if (row != null && row.getOasOperationId() != null
+                        && row.getOperationId() != null && !row.getOperationId().isBlank()) {
+                    operationIds.putIfAbsent(row.getOasOperationId(), row.getOperationId());
+                }
+            }
+        }
+        return operationIds;
+    }
+
+    /**
+     * The operationId must be unique among all the operations of a document, and it is case-sensitive
+     * (OpenAPI specification). {@code operationIds} maps each operation being added or changed to the
+     * operationId it will have; it must not repeat one of them, nor one of an operation that is left
+     * as it is. Throws an {@link IllegalArgumentException} (mapped to HTTP 400) otherwise.
+     */
+    private void assertOperationIdsAvailable(OasDocCommandRepository command, OasDocId oasDocId,
+                                             Map<OasOperationId, String> operationIds) {
+        Set<String> seen = new HashSet<>();
+        for (String operationId : operationIds.values()) {
+            if (!seen.add(operationId)) {
+                throw operationIdInUse(operationId);
+            }
+        }
+        Set<String> used = command.findOperationIdsInOasDoc(oasDocId, seen, operationIds.keySet());
+        if (!used.isEmpty()) {
+            throw operationIdInUse(used.iterator().next());
+        }
+    }
+
+    private static IllegalArgumentException operationIdInUse(String operationId) {
+        return new IllegalArgumentException("The operation ID '" + operationId
+                + "' is already used by another operation of the document.");
     }
 
     /**
@@ -725,6 +775,8 @@ public class OpenAPIDocService {
                 }
             }
         }
+
+        assertOperationIdsAvailable(command(requester), request.getOasDocId(), submittedOperationIds(request));
 
         UpdateBieForOasDocResponse response =
                 bieForOasDocCommand(requester).updateBieForOasDoc(request);

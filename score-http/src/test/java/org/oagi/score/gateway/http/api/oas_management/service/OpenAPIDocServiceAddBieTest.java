@@ -7,6 +7,7 @@ import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddBieForOasDocResponse;
+import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddOperationForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
@@ -18,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -148,5 +150,40 @@ class OpenAPIDocServiceAddBieTest {
         assertTrue(ex.getMessage().contains("Response"), ex.getMessage());
 
         verify(command, never()).insertOasResponse(any());
+    }
+
+    private AddOperationForOasDocRequest addOperationRequest() {
+        AddOperationForOasDocRequest request = new AddOperationForOasDocRequest(requester);
+        request.setOasDocId(OAS_DOC_ID);
+        request.setPath("/orders");
+        request.setVerb("PATCH");
+        request.setOperationId("updateOrders");
+        request.setOasRequest(false);
+        return request;
+    }
+
+    @Test
+    void addOperationWithAnOperationIdOfAnotherOperationOfTheDocument_isRejected() {
+        when(command.findOasOperationId(any(), eq("PATCH"))).thenReturn(null);
+        when(command.operationHasBody(any(), anyBoolean())).thenReturn(false);
+        when(command.findOperationIdsInOasDoc(OAS_DOC_ID, Set.of("updateOrders"), Set.of(OPERATION_ID)))
+                .thenReturn(Set.of("updateOrders"));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.addOperationForOasDoc(requester, addOperationRequest()));
+        assertTrue(ex.getMessage().contains("updateOrders"), ex.getMessage());
+
+        verify(command, never()).insertOasResponse(any());
+    }
+
+    @Test
+    void addOperationWithAnUnusedOperationId_isAdded() {
+        when(command.findOasOperationId(any(), eq("PATCH"))).thenReturn(null);
+        when(command.operationHasBody(any(), anyBoolean())).thenReturn(false);
+        when(command.findOperationIdsInOasDoc(any(), any(), any())).thenReturn(Set.of());
+
+        AddBieForOasDocResponse response = service.addOperationForOasDoc(requester, addOperationRequest());
+
+        assertEquals(BigInteger.valueOf(500), response.getOasResponseId().value());
     }
 }
