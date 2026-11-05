@@ -204,6 +204,27 @@ public class CcCommandService {
         }
     }
 
+    /**
+     * A refactor moves an association into the destination ACC, which changes its content. An administrator can
+     * change the state of a core component but not its structure (that needs the ownership to be transferred
+     * first), so the destination must be a WIP ACC owned by the requester. Called before anything is discarded
+     * so a rejected request changes nothing.
+     */
+    private void assertAccRefactorDestination(ScoreUser requester, AccManifestId accManifestId) {
+        AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
+        if (acc == null) {
+            throw new IllegalArgumentException("Destination ACC does not exist.");
+        }
+        if (CcState.WIP != acc.state()) {
+            throw new IllegalArgumentException("The ACC '" + acc.den() + "' cannot be updated " +
+                    "because it is in the '" + acc.state() + "' state. "
+                    + "Only ACCs in the 'WIP' state can be updated.");
+        }
+        if (!acc.owner().userId().equals(requester.userId())) {
+            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        }
+    }
+
     public AsccManifestId createAscc(
             ScoreUser requester, AsccCreateRequest request) {
         if (requester != null && request != null) {
@@ -2885,6 +2906,8 @@ public class CcCommandService {
 
     public AsccManifestId refactorAscc(ScoreUser requester, AsccManifestId asccManifestId, AccManifestId accManifestId) {
 
+        assertAccRefactorDestination(requester, accManifestId);
+
         var accQuery = repositoryFactory.accQueryRepository(requester);
         AsccSummaryRecord targetAscc = accQuery.getAsccSummary(asccManifestId);
 
@@ -2904,6 +2927,8 @@ public class CcCommandService {
     }
 
     public BccManifestId refactorBcc(ScoreUser requester, BccManifestId bccManifestId, AccManifestId accManifestId) {
+
+        assertAccRefactorDestination(requester, accManifestId);
 
         var accQuery = repositoryFactory.accQueryRepository(requester);
         BccSummaryRecord targetBcc = accQuery.getBccSummary(bccManifestId);
