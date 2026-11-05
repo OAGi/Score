@@ -526,7 +526,8 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
     if (this.isAllSelected()) {
       this.selection().clear();
     } else {
-      this.selectableRows().forEach(row => this.select(row));
+      // One call, so `changed` is emitted once: a call per row would draw the whole table once per row.
+      this.selection().select(...this.selectableRows().filter(row => this.rowSelectable()(row)).map(row => this.rowKey()(row)));
     }
   }
 

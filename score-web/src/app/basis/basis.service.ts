@@ -14,6 +14,9 @@ export class WebPageInfoService {
 
   private fetching = false;
 
+  /** The page info that the stored text was last read as: a screen asks for it for every cell, and reading it (decoding and parsing the text) is not cheap. */
+  private cached?: { item: string; info: WebPageInfo };
+
   get webPageInfo(): WebPageInfo {
     let item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
     if (!item) {
@@ -32,7 +35,10 @@ export class WebPageInfoService {
       this.set(new WebPageInfo());
       item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
     }
-    return new WebPageInfo(JSON.parse(atob(item)));
+    if (this.cached?.item !== item) {
+      this.cached = {item, info: new WebPageInfo(JSON.parse(atob(item)))};
+    }
+    return this.cached.info;
   }
 
   set(webPageInfo: WebPageInfo) {
