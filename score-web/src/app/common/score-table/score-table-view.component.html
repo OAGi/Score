@@ -289,10 +289,10 @@
         <div class="no-data">{{ emptyMessage() }}</div>
       }
 
-      <mat-paginator
+      <score-paginator
         [pageSizeOptions]="pageSizeOptions()"
         (page)="onPage()"
-        showFirstLastButtons></mat-paginator>
+        showFirstLastButtons></score-paginator>
     </div>
   </div>
 </mat-card-content>

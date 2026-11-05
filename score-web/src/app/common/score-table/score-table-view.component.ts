@@ -31,6 +31,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataSource, SelectionModel} from '@angular/cdk/collections';
 import {MatPaginator} from '@angular/material/paginator';
+import {ScorePaginator} from '../score-paginator/score-paginator.component';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
@@ -86,7 +87,7 @@ import {TableDef, TableFilterDef, TableFilterOption} from './table-def';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     AsyncPipe, NgClass, NgTemplateOutlet, ScoreDefaultHeaderDirective, ScoreHeaderCellDirective, ScoreTableDirective, FormsModule, ReactiveFormsModule, MaterialModule, ColumnSelectorModule, SearchBarModule,
-    ScoreCommonModule, TranslatePipe
+    ScoreCommonModule, TranslatePipe, ScorePaginator
   ],
   providers: [{provide: ScoreTableViewRef, useExisting: forwardRef(() => ScoreTableViewComponent)}],
   styleUrl: './score-table-view.component.css',

@@ -1,0 +1,219 @@
+/* A copy of the styles of MatPaginator (Angular Material), which the component of this one does not take along, with those of the field
+   for a size of one's own. Take the changes of the styles of the Angular Material version in use to here when upgrading. */
+.mat-mdc-paginator {
+  display: block;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  color: var(--mat-paginator-container-text-color, var(--mat-sys-on-surface));
+  background-color: var(--mat-paginator-container-background-color, var(--mat-sys-surface));
+  font-family: var(--mat-paginator-container-text-font, var(--mat-sys-body-small-font));
+  line-height: var(--mat-paginator-container-text-line-height, var(--mat-sys-body-small-line-height));
+  font-size: var(--mat-paginator-container-text-size, var(--mat-sys-body-small-size));
+  font-weight: var(--mat-paginator-container-text-weight, var(--mat-sys-body-small-weight));
+  letter-spacing: var(--mat-paginator-container-text-tracking, var(--mat-sys-body-small-tracking));
+  --mat-form-field-container-height: var(--mat-paginator-form-field-container-height, 40px);
+  --mat-form-field-container-vertical-padding: var(--mat-paginator-form-field-container-vertical-padding, 8px);
+}
+.mat-mdc-paginator .mat-mdc-select-value {
+  font-size: var(--mat-paginator-select-trigger-text-size, var(--mat-sys-body-small-size));
+}
+.mat-mdc-paginator .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+.mat-mdc-paginator .mat-mdc-select {
+  line-height: 1.5;
+}
+
+.mat-mdc-paginator-outer-container {
+  display: flex;
+}
+
+.mat-mdc-paginator-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: var(--mat-paginator-container-size, 56px);
+}
+
+.mat-mdc-paginator-page-size {
+  display: flex;
+  align-items: baseline;
+  margin-right: 8px;
+}
+[dir=rtl] .mat-mdc-paginator-page-size {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.mat-mdc-paginator-page-size-label {
+  margin: 0 4px;
+}
+
+.mat-mdc-paginator-page-size-select {
+  margin: 0 4px;
+  width: var(--mat-paginator-page-size-select-width, 84px);
+}
+
+.mat-mdc-paginator-range-label {
+  margin: 0 32px 0 24px;
+}
+
+.mat-mdc-paginator-range-actions {
+  display: flex;
+  align-items: center;
+}
+
+.mat-mdc-paginator-icon {
+  display: inline-block;
+  width: 28px;
+  fill: var(--mat-paginator-enabled-icon-color, var(--mat-sys-on-surface-variant));
+}
+.mat-mdc-icon-button[aria-disabled] .mat-mdc-paginator-icon {
+  fill: var(--mat-paginator-disabled-icon-color, color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent));
+}
+[dir=rtl] .mat-mdc-paginator-icon {
+  transform: rotate(180deg);
+}
+
+@media (forced-colors: active) {
+  .mat-mdc-icon-button[aria-disabled] .mat-mdc-paginator-icon,
+  .mat-mdc-paginator-icon {
+    fill: currentColor;
+  }
+  .mat-mdc-paginator-range-actions .mat-mdc-icon-button {
+    outline: solid 1px;
+  }
+  .mat-mdc-paginator-range-actions .mat-mdc-icon-button[aria-disabled] {
+    color: GrayText;
+  }
+}
+.mat-mdc-paginator-touch-target {
+  display: var(--mat-paginator-touch-target-display, block);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--mat-paginator-page-size-select-width, 84px);
+  height: var(--mat-paginator-page-size-select-touch-target-height, 48px);
+  background-color: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+/* The last row of the list: the size of one's own. It is a row as the others (the classes of the option of Material), apart from them by a line. */
+.mat-mdc-option.mdc-list-item.score-paginator-custom-size {
+  border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+  /* The text that says what the row is for, and under it the number or the field: one above the other, so that the text never meets the
+     field whatever the size of the letters. */
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 4px;
+  padding-bottom: 6px;
+}
+
+/* The list ends with the row of the size of one's own, which takes the colour of the pointer over it to the edge of the list: no padding of the list below it. */
+.score-paginator-select-panel.mat-mdc-select-panel {
+  padding-bottom: 0;
+}
+
+/* The number and, over it, the field: the field is there when the pointer is over the number, or when it has the focus, or when there is no
+   number yet. The rest of the row, outside of this, takes the size when clicked. */
+.score-paginator-custom-size-value {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 4rem;
+  height: 32px;
+}
+
+/* The field is wider than the number it shows over, to the right (the row is as wide as the content of the list to there). */
+.score-paginator-custom-size-edit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: -3rem;
+  display: none;
+}
+
+.score-paginator-custom-size-value:hover .score-paginator-custom-size-edit,
+.score-paginator-custom-size-value:focus-within .score-paginator-custom-size-edit,
+.score-paginator-custom-size-empty .score-paginator-custom-size-edit {
+  display: block;
+}
+
+.score-paginator-custom-size-value:hover .score-paginator-custom-size-text,
+.score-paginator-custom-size-value:focus-within .score-paginator-custom-size-text,
+.score-paginator-custom-size-empty .score-paginator-custom-size-text {
+  visibility: hidden;
+}
+
+.score-paginator-custom-size-edit input {
+  width: 100%;
+  height: 100%;
+  padding: 0 26px 0 8px;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.3));
+  border-radius: 4px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.score-paginator-custom-size-edit input:focus {
+  outline: none;
+  border-color: var(--mat-sys-primary, #3f51b5);
+}
+
+/* The small text at the top left of the row (the box around the number and the field), which says what the row is for. */
+.score-paginator-custom-size-label {
+  display: block;
+  margin-left: -10px;
+  font-size: 8px;
+  line-height: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.54));
+}
+
+/* No buttons to step the number up and down. */
+.score-paginator-custom-size-edit input::-webkit-outer-spin-button,
+.score-paginator-custom-size-edit input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* The button that removes the kept size, in the field, at its right end. */
+.score-paginator-custom-size-remove {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  fill: currentColor;
+  cursor: pointer;
+}
+
+.score-paginator-custom-size-remove:hover,
+.score-paginator-custom-size-remove:focus-visible {
+  background: var(--mat-sys-surface-container-highest, rgba(0, 0, 0, 0.08));
+}
+
+.mat-mdc-option.score-paginator-custom-option {
+  display: none;
+}

@@ -66,7 +66,7 @@ table.compact tr.element-row ::ng-deep td.mat-mdc-cell:not(.compact-cell):not(.m
 /* A narrow screen: the paginator does not wrap (the label and the size, then the range and the buttons, on two lines): without the label of
    the size, which the select says well enough, they fit on one. */
 @media (max-width: 560px) {
-  mat-paginator ::ng-deep .mat-mdc-paginator-page-size-label {
+  score-paginator ::ng-deep .mat-mdc-paginator-page-size-label {
     display: none;
   }
 }

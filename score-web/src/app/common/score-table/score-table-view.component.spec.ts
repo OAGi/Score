@@ -262,7 +262,7 @@ describe('ScoreTableViewComponent', () => {
 
     expect(el.querySelector('.plain score-search-bar')).toBeTruthy();
     expect(el.querySelector('.plain score-column-selector')).toBeTruthy();
-    expect(el.querySelector('.plain mat-paginator')).toBeTruthy();
+    expect(el.querySelector('.plain score-paginator')).toBeTruthy();
     expect(Array.from(el.querySelectorAll('th')).map(t => t.textContent.trim())).toEqual(['Name', 'Custom size']);
     expect(el.querySelector('td b.n').textContent).toBe('a');
     expect(fixture.componentInstance.requests).toEqual(['pageIndex=0&pageSize=10&orderBy=%2Bname']);
