@@ -23,6 +23,7 @@ import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,10 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.notExists;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.selectOne;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc.ACC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bccp.BCCP;
@@ -60,6 +65,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         DtDetailsRecord basedDt = query.getDtDetails(basedDtManifestId);
         List<DtScDetailsRecord> basedDtScList = query.getDtScDetailsList(basedDt.dtManifestId());
+
+        assertAllowedPrimitivesOfDtAvailableInRelease(releaseId, basedDt.dtManifestId());
 
         DtRecord dt = new DtRecord();
         dt.setGuid(ScoreGuidUtils.randomGuid());
@@ -174,9 +181,9 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtId)),
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                DT_AWD_PRI.XBT_MANIFEST_ID,
-                                DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
-                                DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                                xbtManifestIdInRelease(releaseId, DT_AWD_PRI.XBT_MANIFEST_ID),
+                                codeListManifestIdInRelease(releaseId, DT_AWD_PRI.CODE_LIST_MANIFEST_ID),
+                                agencyIdListManifestIdInRelease(releaseId, DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_AWD_PRI)
                         .join(DT_MANIFEST).on(and(
@@ -201,9 +208,9 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtScId)),
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                DT_SC_AWD_PRI.XBT_MANIFEST_ID,
-                                DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
-                                DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                                xbtManifestIdInRelease(releaseId, DT_SC_AWD_PRI.XBT_MANIFEST_ID),
+                                codeListManifestIdInRelease(releaseId, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID),
+                                agencyIdListManifestIdInRelease(releaseId, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_AWD_PRI)
                         .join(DT_SC_MANIFEST).on(and(
@@ -212,6 +219,131 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         ))
                         .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(basedDtScManifestId))))
                 .execute();
+    }
+
+    /**
+     * The XBT, Code List and Agency ID List manifests that an allowed primitive (DT_AWD_PRI, DT_SC_AWD_PRI) points to
+     * belong to the release of the allowed primitive. A Data Type created from a base (or revised) in {@code releaseId}
+     * therefore points to the manifests of {@code releaseId}. A record that the base uses but that {@code releaseId} has
+     * no manifest of (for example a custom XBT, which a library has only if its own release has been given one) cannot be
+     * pointed to, so the operation fails with the reason, instead of leaving the allowed primitive pointing to a manifest
+     * of another release or dropping it.
+     * <p>
+     * Checks the allowed primitives of the Data Type and of its supplementary components.
+     */
+    private void assertAllowedPrimitivesOfDtAvailableInRelease(ReleaseId releaseId, DtManifestId baseDtManifestId) {
+        List<String> missing = new ArrayList<>();
+        collectMissing(missing, releaseId, "the Data Type",
+                DT_AWD_PRI.join(DT_MANIFEST).on(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID),
+                        DT_AWD_PRI.DT_ID.eq(DT_MANIFEST.DT_ID))),
+                DT_AWD_PRI.XBT_MANIFEST_ID, DT_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(baseDtManifestId)));
+        collectMissing(missing, releaseId, "a supplementary component",
+                DT_SC_AWD_PRI.join(DT_SC_MANIFEST).on(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID),
+                        DT_SC_AWD_PRI.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))),
+                DT_SC_AWD_PRI.XBT_MANIFEST_ID, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(baseDtManifestId)));
+        failIfAnyMissing(releaseId, "Data Type", missing);
+    }
+
+    /** Checks the allowed primitives of the supplementary component, as {@link #assertAllowedPrimitivesOfDtAvailableInRelease}. */
+    private void assertAllowedPrimitivesOfDtScAvailableInRelease(ReleaseId releaseId, DtScManifestId baseDtScManifestId) {
+        List<String> missing = new ArrayList<>();
+        collectMissing(missing, releaseId, "the supplementary component",
+                DT_SC_AWD_PRI.join(DT_SC_MANIFEST).on(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID),
+                        DT_SC_AWD_PRI.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))),
+                DT_SC_AWD_PRI.XBT_MANIFEST_ID, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(baseDtScManifestId)));
+        failIfAnyMissing(releaseId, "supplementary component", missing);
+    }
+
+    private void failIfAnyMissing(ReleaseId releaseId, String base, List<String> missing) {
+        if (missing.isEmpty()) {
+            return;
+        }
+
+        String releaseNum = dslContext().select(RELEASE.RELEASE_NUM).from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId))).fetchOptional()
+                .map(r -> r.get(RELEASE.RELEASE_NUM)).orElse(String.valueOf(releaseId));
+        throw new IllegalArgumentException("The allowed primitives of the base " + base
+                + " use records that release '" + releaseNum + "' has no manifest of: " + String.join(", ", missing)
+                + ". The allowed primitives of a Data Type or of a supplementary component have to point to manifests of"
+                + " the release they belong to, so make these records available in release '" + releaseNum + "' first.");
+    }
+
+    private void collectMissing(List<String> missing, ReleaseId releaseId, String owner, Table<?> allowedPrimitives,
+                                Field<ULong> xbtManifestId, Field<ULong> codeListManifestId,
+                                Field<ULong> agencyIdListManifestId, Condition ofBase) {
+        var baseXbt = XBT_MANIFEST.as("base_xbt");
+        var targetXbt = XBT_MANIFEST.as("target_xbt");
+        dslContext().selectDistinct(XBT.NAME, XBT.BUILTIN_TYPE)
+                .from(allowedPrimitives)
+                .join(baseXbt).on(baseXbt.XBT_MANIFEST_ID.eq(xbtManifestId))
+                .join(XBT).on(XBT.XBT_ID.eq(baseXbt.XBT_ID))
+                .where(and(ofBase, notExists(selectOne().from(targetXbt).where(and(
+                        targetXbt.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetXbt.XBT_ID.eq(baseXbt.XBT_ID))))))
+                .forEach(r -> missing.add("XBT '" + r.get(XBT.NAME) + "' (" + r.get(XBT.BUILTIN_TYPE)
+                        + ") allowed for " + owner));
+
+        var baseCodeList = CODE_LIST_MANIFEST.as("base_code_list");
+        var targetCodeList = CODE_LIST_MANIFEST.as("target_code_list");
+        dslContext().selectDistinct(CODE_LIST.NAME)
+                .from(allowedPrimitives)
+                .join(baseCodeList).on(baseCodeList.CODE_LIST_MANIFEST_ID.eq(codeListManifestId))
+                .join(CODE_LIST).on(CODE_LIST.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))
+                .where(and(ofBase, notExists(selectOne().from(targetCodeList).where(and(
+                        targetCodeList.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetCodeList.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))))))
+                .forEach(r -> missing.add("Code List '" + r.get(CODE_LIST.NAME) + "' allowed for " + owner));
+
+        var baseAgencyIdList = AGENCY_ID_LIST_MANIFEST.as("base_agency_id_list");
+        var targetAgencyIdList = AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list");
+        dslContext().selectDistinct(AGENCY_ID_LIST.NAME)
+                .from(allowedPrimitives)
+                .join(baseAgencyIdList).on(baseAgencyIdList.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))
+                .where(and(ofBase, notExists(selectOne().from(targetAgencyIdList).where(and(
+                        targetAgencyIdList.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetAgencyIdList.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))))))
+                .forEach(r -> missing.add("Agency ID List '" + r.get(AGENCY_ID_LIST.NAME) + "' allowed for " + owner));
+    }
+
+    /**
+     * The manifest of the same record in {@code releaseId}, for the manifest an allowed primitive of a base points to
+     * (see {@link #assertAllowedPrimitivesOfDtAvailableInRelease}, which fails when there is none).
+     */
+    private Field<ULong> xbtManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseXbtManifestId) {
+        return select(max(XBT_MANIFEST.as("in_release").XBT_MANIFEST_ID))
+                .from(XBT_MANIFEST.as("in_release"))
+                .join(XBT_MANIFEST.as("base")).on(
+                        XBT_MANIFEST.as("base").XBT_ID.eq(XBT_MANIFEST.as("in_release").XBT_ID))
+                .where(and(
+                        XBT_MANIFEST.as("base").XBT_MANIFEST_ID.eq(baseXbtManifestId),
+                        XBT_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
+    }
+
+    private Field<ULong> codeListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseCodeListManifestId) {
+        return select(max(CODE_LIST_MANIFEST.as("in_release").CODE_LIST_MANIFEST_ID))
+                .from(CODE_LIST_MANIFEST.as("in_release"))
+                .join(CODE_LIST_MANIFEST.as("base")).on(
+                        CODE_LIST_MANIFEST.as("base").CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("in_release").CODE_LIST_ID))
+                .where(and(
+                        CODE_LIST_MANIFEST.as("base").CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
+                        CODE_LIST_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
+    }
+
+    private Field<ULong> agencyIdListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseAgencyIdListManifestId) {
+        return select(max(AGENCY_ID_LIST_MANIFEST.as("in_release").AGENCY_ID_LIST_MANIFEST_ID))
+                .from(AGENCY_ID_LIST_MANIFEST.as("in_release"))
+                .join(AGENCY_ID_LIST_MANIFEST.as("base")).on(
+                        AGENCY_ID_LIST_MANIFEST.as("base").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("in_release").AGENCY_ID_LIST_ID))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.as("base").AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
+                        AGENCY_ID_LIST_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
     }
 
     @Override
@@ -355,6 +487,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
             throw new IllegalArgumentException("DT_SC record not found.");
         }
 
+        assertAllowedPrimitivesOfDtScAvailableInRelease(dt.release().releaseId(), basedDtSc.dtScManifestId());
+
         DtScRecord dtScRecord = new DtScRecord();
         dtScRecord.setGuid(basedDtSc.guid().value());
         dtScRecord.setObjectClassTerm(basedDtSc.objectClassTerm());
@@ -388,7 +522,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
                         .fetchOne().getDtScManifestId().toBigInteger());
 
-        copyDtScAwdPriFromBase(basedDtSc.release().releaseId(), dtScId, basedDtSc.dtScManifestId());
+        copyDtScAwdPriFromBase(dt.release().releaseId(), dtScId, basedDtSc.dtScManifestId());
 
         return dtScManifestId;
     }
@@ -854,6 +988,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         var query = repositoryFactory().dtQueryRepository(requester());
         DtDetailsRecord prevDt = query.getDtDetails(dtManifestId);
+
+        assertAllowedPrimitivesOfDtAvailableInRelease(prevDt.release().releaseId(), prevDt.dtManifestId());
 
         // creates new bdt for revised record.
         DtRecord nextDtRecord = dslContext().selectFrom(DT)
