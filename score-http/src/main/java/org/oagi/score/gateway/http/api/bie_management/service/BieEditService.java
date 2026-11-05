@@ -643,15 +643,36 @@ public class BieEditService implements InitializingBean {
         TopLevelAsbiepSummaryRecord baseTopLevelAsbiep =
                 topLevelAsbiepQuery.getTopLevelAsbiepSummary(request.getBaseTopLevelAsbiepId());
 
+        if (!topLevelAsbiep.release().releaseId().equals(baseTopLevelAsbiep.release().releaseId())) {
+            throw new IllegalArgumentException("The base BIE must belong to the same release as the BIE.");
+        }
+        if (!topLevelAsbiepQuery.getRootAsccpManifestId(topLevelAsbiep.topLevelAsbiepId())
+                .equals(topLevelAsbiepQuery.getRootAsccpManifestId(baseTopLevelAsbiep.topLevelAsbiepId()))) {
+            throw new IllegalArgumentException("The base BIE must be based on the same root ASCCP as the BIE.");
+        }
+        if (isBasedOn(baseTopLevelAsbiep.topLevelAsbiepId(), topLevelAsbiep.topLevelAsbiepId(),
+                id -> topLevelAsbiepQuery.getTopLevelAsbiepSummary(id).basedTopLevelAsbiepId())) {
+            throw new IllegalArgumentException("The base BIE must not be the BIE itself nor a BIE derived from it.");
+        }
+
         overrideInheritedBIE(requester, topLevelAsbiep, baseTopLevelAsbiep);
 
-        ULong topLevelAsbiepId = ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value());
-        ULong baseTopLevelAsbiepId = ULong.valueOf(baseTopLevelAsbiep.topLevelAsbiepId().value());
+        repositoryFactory.topLevelAsbiepCommandRepository(requester)
+                .updateBasedTopLevelAsbiepId(topLevelAsbiep.topLevelAsbiepId(), baseTopLevelAsbiep.topLevelAsbiepId());
+    }
 
-        dslContext.update(TOP_LEVEL_ASBIEP)
-                .set(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID, baseTopLevelAsbiepId)
-                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId))
-                .execute();
+    /**
+     * Whether the base chain that starts at the given BIE (itself included) reaches the target BIE.
+     */
+    static boolean isBasedOn(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId targetTopLevelAsbiepId,
+                             Function<TopLevelAsbiepId, TopLevelAsbiepId> basedTopLevelAsbiepIdOf) {
+        Set<TopLevelAsbiepId> visited = new HashSet<>();
+        for (TopLevelAsbiepId id = topLevelAsbiepId; id != null && visited.add(id); id = basedTopLevelAsbiepIdOf.apply(id)) {
+            if (id.equals(targetTopLevelAsbiepId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void overrideInheritedBIE(ScoreUser requester,
@@ -787,7 +808,7 @@ public class BieEditService implements InitializingBean {
                         if (asbiepId == null) {
                             asbiepId = baseAsbie.getToAsbiepId();
                         }
-                        if (!isInInheritance(asbiepId, prevToAsbiepId)) {
+                        if (!isInInheritance(requester, asbiepId, prevToAsbiepId)) {
                             inheritedAsbie.setToAsbiepId(asbiepId);
                         }
 
@@ -986,33 +1007,9 @@ public class BieEditService implements InitializingBean {
                 });
     }
 
-    private boolean isInInheritance(ULong baseAsbiepId, ULong asbiepId) {
-        List<Record2<ULong, ULong>> topLevelAsbiepIdToAsbiepIdList =
-                dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                                TOP_LEVEL_ASBIEP.ASBIEP_ID)
-                        .from(TOP_LEVEL_ASBIEP)
-                        .where(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(baseAsbiepId))
-                        .fetch();
-        Set<ULong> inheritance = new HashSet<>();
-        while (!topLevelAsbiepIdToAsbiepIdList.isEmpty()) {
-            inheritance.addAll(topLevelAsbiepIdToAsbiepIdList.stream()
-                    .map(e -> e.get(TOP_LEVEL_ASBIEP.ASBIEP_ID)).collect(Collectors.toList()));
-            if (inheritance.contains(asbiepId)) {
-                return true;
-            }
-
-            topLevelAsbiepIdToAsbiepIdList =
-                    dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                                    TOP_LEVEL_ASBIEP.ASBIEP_ID)
-                            .from(TOP_LEVEL_ASBIEP)
-                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(
-                                    topLevelAsbiepIdToAsbiepIdList.stream()
-                                            .map(e -> e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)).collect(Collectors.toList())
-                            ))
-                            .fetch();
-        }
-
-        return inheritance.contains(asbiepId);
+    private boolean isInInheritance(ScoreUser requester, ULong baseAsbiepId, ULong asbiepId) {
+        return repositoryFactory.topLevelAsbiepQueryRepository(requester).isInInheritance(
+                new AsbiepId(baseAsbiepId.toBigInteger()), new AsbiepId(asbiepId.toBigInteger()));
     }
 
     @Transactional
@@ -1117,7 +1114,7 @@ public class BieEditService implements InitializingBean {
                         .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
                         .fetchOneInto(ULong.class);
 
-        if (!nestedCall || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+        if (!nestedCall || !isInInheritance(requester, reuseAsbiepId, prevToAsbiepId)) {
             asbieRecord.setToAsbiepId(reuseAsbiepId);
         }
 

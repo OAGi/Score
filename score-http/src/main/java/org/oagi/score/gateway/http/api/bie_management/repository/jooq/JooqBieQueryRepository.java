@@ -84,6 +84,28 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
             this.filterCriteria = filterCriteria;
         }
 
+        /** The given BIEs and every BIE derived from them, however deep; a cycle that is stored does not make it endless. */
+        private List<ULong> withDerivedTopLevelAsbiepIds(Collection<TopLevelAsbiepId> topLevelAsbiepIds) {
+            List<ULong> result = topLevelAsbiepIds.stream()
+                    .map(e -> ULong.valueOf(e.value())).collect(Collectors.toList());
+            List<ULong> all = new ArrayList<>();
+            Set<ULong> visited = new HashSet<>();
+            while (!result.isEmpty()) {
+                result = result.stream()
+                        .filter(visited::add)
+                        .collect(Collectors.toList());
+                if (result.isEmpty()) {
+                    break;
+                }
+                all.addAll(result);
+                result = dslContext().select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                        .from(TOP_LEVEL_ASBIEP)
+                        .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(result))
+                        .fetchInto(ULong.class);
+            }
+            return all;
+        }
+
         SelectOnConditionStep<? extends org.jooq.Record> select() {
             List<Field<?>> fields = new ArrayList<>();
             fields.addAll(Arrays.asList(
@@ -213,29 +235,17 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
             }
 
             if (filterCriteria.basedTopLevelAsbiepIdList() != null && !filterCriteria.basedTopLevelAsbiepIdList().isEmpty()) {
-                List<ULong> result = filterCriteria.basedTopLevelAsbiepIdList().stream()
-                        .map(e -> ULong.valueOf(e.value())).collect(Collectors.toList());
-                List<ULong> allInheritedTopLevelAsbiepIds = new ArrayList<>();
-                Set<ULong> visited = new HashSet<>();
-                while (!result.isEmpty()) {
-                    result = result.stream()
-                            .filter(visited::add)
-                            .collect(Collectors.toList());
-                    if (result.isEmpty()) {
-                        break;
-                    }
-                    allInheritedTopLevelAsbiepIds.addAll(result);
-                    result = dslContext().select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
-                            .from(TOP_LEVEL_ASBIEP)
-                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(result))
-                            .fetchInto(ULong.class);
-                }
-
+                List<ULong> allInheritedTopLevelAsbiepIds = withDerivedTopLevelAsbiepIds(filterCriteria.basedTopLevelAsbiepIdList());
                 conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(allInheritedTopLevelAsbiepIds));
             }
 
             if (filterCriteria.excludeTopLevelAsbiepIdList() != null && !filterCriteria.excludeTopLevelAsbiepIdList().isEmpty()) {
                 conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.notIn(valueOf(filterCriteria.excludeTopLevelAsbiepIdList())));
+            }
+
+            if (filterCriteria.excludeDerivedFromTopLevelAsbiepIdList() != null && !filterCriteria.excludeDerivedFromTopLevelAsbiepIdList().isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.notIn(
+                        withDerivedTopLevelAsbiepIds(filterCriteria.excludeDerivedFromTopLevelAsbiepIdList())));
             }
 
             if (filterCriteria.states() != null && !filterCriteria.states().isEmpty()) {

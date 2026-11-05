@@ -65,6 +65,7 @@ public class BieQueryController {
             @RequestParam(name = "topLevelAsbiepIds", required = false) String topLevelAsbiepIds,
             @RequestParam(name = "basedTopLevelAsbiepIds", required = false) String basedTopLevelAsbiepIds,
             @RequestParam(name = "excludeTopLevelAsbiepIds", required = false) String excludeTopLevelAsbiepIds,
+            @RequestParam(name = "excludeDerivedFromTopLevelAsbiepIds", required = false) String excludeDerivedFromTopLevelAsbiepIds,
             @RequestParam(name = "excludePropertyTerms", required = false) String excludePropertyTerms,
             @RequestParam(name = "deprecated", required = false) String deprecated,
             @RequestParam(name = "ownedByDeveloper", required = false) String ownedByDeveloper,
@@ -136,6 +137,7 @@ public class BieQueryController {
                 separate(topLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
                 separate(basedTopLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
                 separate(excludeTopLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
+                separate(excludeDerivedFromTopLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
 
                 hasLength(deprecated) ? ("true".equalsIgnoreCase(deprecated) ? true : false) : null,
                 hasLength(ownedByDeveloper) ? ("true".equalsIgnoreCase(ownedByDeveloper) ? true : false) : null,

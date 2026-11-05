@@ -16,4 +16,6 @@ public interface TopLevelAsbiepCommandRepository {
 
     void updateAsbiepId(AsbiepId asbiepId, TopLevelAsbiepId topLevelAsbiepId);
 
+    void updateBasedTopLevelAsbiepId(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId basedTopLevelAsbiepId);
+
 }

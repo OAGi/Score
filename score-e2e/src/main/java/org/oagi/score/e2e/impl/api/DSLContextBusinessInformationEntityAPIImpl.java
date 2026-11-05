@@ -111,6 +111,15 @@ public class DSLContextBusinessInformationEntityAPIImpl implements BusinessInfor
                 .execute();
     }
 
+    @Override
+    public void updateBasedTopLevelASBIEP(TopLevelASBIEPObject topLevelASBIEP, TopLevelASBIEPObject baseTopLevelASBIEP) {
+        dslContext.update(TOP_LEVEL_ASBIEP)
+                .set(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID, ULong.valueOf(baseTopLevelASBIEP.getTopLevelAsbiepId()))
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelASBIEP.getTopLevelAsbiepId())))
+                .execute();
+        topLevelASBIEP.setBasedTopLevelAsbiepId(baseTopLevelASBIEP.getTopLevelAsbiepId());
+    }
+
     private TopLevelASBIEPObject topLevelASBIEPMapper(Record record) {
         TopLevelASBIEPObject topLevelASBIEPObject = new TopLevelASBIEPObject();
         topLevelASBIEPObject.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());

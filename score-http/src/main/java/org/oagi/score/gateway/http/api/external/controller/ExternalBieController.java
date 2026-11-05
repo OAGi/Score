@@ -138,6 +138,7 @@ public class ExternalBieController {
                                 separate(topLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
                                 separate(basedTopLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
                                 separate(excludeTopLevelAsbiepIds).map(e -> TopLevelAsbiepId.from(e)).collect(toSet()),
+                                null,
 
                                 hasLength(deprecated) ? ("true".equalsIgnoreCase(deprecated) ? true : false) : null,
                                 hasLength(ownedByDeveloper) ? ("true".equalsIgnoreCase(ownedByDeveloper) ? true : false)

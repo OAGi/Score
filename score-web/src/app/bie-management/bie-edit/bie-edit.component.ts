@@ -1491,6 +1491,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
         title: 'Select Base Profile BIE',
+        excludeDerived: true,
         asccpManifestId: abieNode.asccpNode.manifestId,
         den: abieNode.asccpNode.den,
         libraryId: this.rootNode.libraryId,

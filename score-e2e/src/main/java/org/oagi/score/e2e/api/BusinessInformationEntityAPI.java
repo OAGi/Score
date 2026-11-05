@@ -29,6 +29,11 @@ public interface BusinessInformationEntityAPI {
 
     void updateTopLevelASBIEP(TopLevelASBIEPObject topLevelASBIEP);
 
+    /**
+     * Makes the BIE derived from the base BIE without the checks of the server (test data only).
+     */
+    void updateBasedTopLevelASBIEP(TopLevelASBIEPObject topLevelASBIEP, TopLevelASBIEPObject baseTopLevelASBIEP);
+
     void deleteTopLevelASBIEPByTopLevelASBIEPId(TopLevelASBIEPObject topLevelAsbiep);
 
     /**

@@ -5,6 +5,9 @@ import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.SelectJoinStep;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.jooq.Record2;
+import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepId;
@@ -23,7 +26,9 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
@@ -47,6 +52,55 @@ public class JooqTopLevelAsbiepQueryRepository extends JooqBaseRepository implem
         return queryBuilder.select()
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
                 .fetchOne(queryBuilder.mapper());
+    }
+
+    @Override
+    public AsccpManifestId getRootAsccpManifestId(TopLevelAsbiepId topLevelAsbiepId) {
+        ULong asccpManifestId = dslContext().select(ASBIEP.BASED_ASCCP_MANIFEST_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIEP).on(ASBIEP.ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.ASBIEP_ID))
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
+                .fetchOne(ASBIEP.BASED_ASCCP_MANIFEST_ID);
+        return (asccpManifestId != null) ? new AsccpManifestId(asccpManifestId.toBigInteger()) : null;
+    }
+
+    @Override
+    public boolean isInInheritance(AsbiepId baseAsbiepId, AsbiepId asbiepId) {
+        List<Record2<ULong, ULong>> topLevelAsbiepIdToAsbiepIdList =
+                dslContext().select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                                TOP_LEVEL_ASBIEP.ASBIEP_ID)
+                        .from(TOP_LEVEL_ASBIEP)
+                        .where(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(valueOf(baseAsbiepId)))
+                        .fetch();
+        ULong target = valueOf(asbiepId);
+        Set<ULong> inheritance = new HashSet<>();
+        Set<ULong> visitedTopLevelAsbiepIds = new HashSet<>();
+        while (!topLevelAsbiepIdToAsbiepIdList.isEmpty()) {
+            // a BIE derived from itself must not make the walk endless
+            topLevelAsbiepIdToAsbiepIdList = topLevelAsbiepIdToAsbiepIdList.stream()
+                    .filter(e -> visitedTopLevelAsbiepIds.add(e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)))
+                    .collect(Collectors.toList());
+            if (topLevelAsbiepIdToAsbiepIdList.isEmpty()) {
+                break;
+            }
+            inheritance.addAll(topLevelAsbiepIdToAsbiepIdList.stream()
+                    .map(e -> e.get(TOP_LEVEL_ASBIEP.ASBIEP_ID)).collect(Collectors.toList()));
+            if (inheritance.contains(target)) {
+                return true;
+            }
+
+            topLevelAsbiepIdToAsbiepIdList =
+                    dslContext().select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                                    TOP_LEVEL_ASBIEP.ASBIEP_ID)
+                            .from(TOP_LEVEL_ASBIEP)
+                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(
+                                    topLevelAsbiepIdToAsbiepIdList.stream()
+                                            .map(e -> e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)).collect(Collectors.toList())
+                            ))
+                            .fetch();
+        }
+
+        return inheritance.contains(target);
     }
 
     @Override
