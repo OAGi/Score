@@ -502,7 +502,7 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             // it means that there is only one BIE with the corresponding Property Term.
             // In this case, 'Entry' is not appended at the end.
             if (schemaName.endsWith("List")) {
-                itemRefSchemaName = schemaName.substring(0, schemaName.indexOf("List"));
+                itemRefSchemaName = schemaName.substring(0, schemaName.length() - "List".length());
                 if (schemas.containsKey(itemRefSchemaName)) {
                     Map<String, Object> properties = (Map<String, Object>) schemas.get(itemRefSchemaName);
                     // If it's duplicated

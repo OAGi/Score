@@ -257,7 +257,7 @@ public class OpenAPIGenerateService {
                 for (OpenAPITemplateForVerbOption template : entry.getValue()) {
                     String key = entry.getKey();
                     if (key.endsWith("Entry")) {
-                        key = key.substring(0, key.indexOf("Entry")) + template.getMessageBodyType() + "Entry";
+                        key = key.substring(0, key.length() - "Entry".length()) + template.getMessageBodyType() + "Entry";
                     } else {
                         key = key + template.getMessageBodyType();
                     }
@@ -305,7 +305,7 @@ public class OpenAPIGenerateService {
 
                     String key = entry.getKey();
                     if (key.endsWith("Entry")) {
-                        key = key.substring(0, key.indexOf("Entry")) + suffix + "Entry";
+                        key = key.substring(0, key.length() - "Entry".length()) + suffix + "Entry";
                     } else {
                         key = key + suffix;
                     }
