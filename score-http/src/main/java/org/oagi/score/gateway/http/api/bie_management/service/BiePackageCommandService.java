@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -25,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -284,7 +288,34 @@ public class BiePackageCommandService {
 
         BiePackageDetailsRecord biePackage = ensureBiePackageIsUpdatable(requester, biePackageId, true);
 
+        if (prevTopLevelAsbiepId != null && topLevelAsbiepId != null &&
+            isInReplacementChain(topLevelAsbiepId, prevTopLevelAsbiepId,
+                    query(requester).getBieReplacementListInBiePackage(biePackage.biePackageId()))) {
+            throw new IllegalArgumentException(
+                    "The BIE to replace with is already in the replacement chain of the replaced BIE.");
+        }
+
         command(requester).replaceBieInBiePackage(biePackage.biePackageId(), prevTopLevelAsbiepId, topLevelAsbiepId);
+    }
+
+    /**
+     * Whether the BIE is the given replaced BIE or one that the replaced BIE has replaced (directly or through
+     * a chain). Replacing with such a BIE would make {@code prev_top_level_asbiep_id} cyclic.
+     */
+    static boolean isInReplacementChain(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId replacedTopLevelAsbiepId,
+                                        List<BieReplacementRecord> replacements) {
+        // replacing BIE -> the BIE it replaces
+        Map<TopLevelAsbiepId, TopLevelAsbiepId> replacedByReplacing = replacements.stream()
+                .collect(Collectors.toMap(
+                        BieReplacementRecord::topLevelAsbiepId, BieReplacementRecord::prevTopLevelAsbiepId));
+        Set<TopLevelAsbiepId> visited = new HashSet<>();
+        for (TopLevelAsbiepId id = replacedTopLevelAsbiepId; id != null && visited.add(id);
+             id = replacedByReplacing.get(id)) {
+            if (id.equals(topLevelAsbiepId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void deleteBieInBiePackage(

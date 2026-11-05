@@ -7,9 +7,11 @@ import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -222,6 +224,33 @@ class BiePackageCommandServiceTest {
 
         assertThrows(DataAccessForbiddenException.class,
                 () -> service.update(anotherUser(ScoreRole.ADMINISTRATOR), aRequest("Name", "v1.0", "v1", "desc")));
+    }
+
+    private static TopLevelAsbiepId tlaId(long value) {
+        return new TopLevelAsbiepId(BigInteger.valueOf(value));
+    }
+
+    @Test
+    void a_bie_that_was_replaced_cannot_replace_its_replacement() {
+        // A is replaced by B (B.prev = A): replacing B with A would make a cycle
+        when(query.getBieReplacementListInBiePackage(PACKAGE_ID))
+                .thenReturn(List.of(new BieReplacementRecord(tlaId(2), tlaId(1))));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(2), tlaId(1)));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(1), tlaId(1)));
+        verify(command, never()).replaceBieInBiePackage(any(), any(), any());
+    }
+
+    @Test
+    void a_bie_outside_the_replacement_chain_can_replace() {
+        when(query.getBieReplacementListInBiePackage(PACKAGE_ID))
+                .thenReturn(List.of(new BieReplacementRecord(tlaId(2), tlaId(1))));
+
+        service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(2), tlaId(3));
+
+        verify(command).replaceBieInBiePackage(PACKAGE_ID, tlaId(2), tlaId(3));
     }
 
     private BiePackageSummaryRecord aSummary(BiePackageId id, BieState state, BiePackageId prev) {

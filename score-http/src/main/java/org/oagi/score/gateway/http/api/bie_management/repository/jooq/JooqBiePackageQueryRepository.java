@@ -519,6 +519,20 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<BieReplacementRecord> getBieReplacementListInBiePackage(BiePackageId biePackageId) {
+        return dslContext().select(
+                        BIE_PACKAGE_TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                        BIE_PACKAGE_TOP_LEVEL_ASBIEP.PREV_TOP_LEVEL_ASBIEP_ID)
+                .from(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
+                .where(and(
+                        BIE_PACKAGE_TOP_LEVEL_ASBIEP.BIE_PACKAGE_ID.eq(valueOf(biePackageId)),
+                        BIE_PACKAGE_TOP_LEVEL_ASBIEP.PREV_TOP_LEVEL_ASBIEP_ID.isNotNull()))
+                .fetch(e -> new BieReplacementRecord(
+                        new TopLevelAsbiepId(e.value1().toBigInteger()),
+                        new TopLevelAsbiepId(e.value2().toBigInteger())));
+    }
+
     private Collection<BiePackageTopLevelAsbiepId> getBiePackageTopLevelAsbiepIdListInBiePackage(BiePackageId biePackageId) {
 
         CommonTableExpression<?> cte = name("hierarchy").fields(

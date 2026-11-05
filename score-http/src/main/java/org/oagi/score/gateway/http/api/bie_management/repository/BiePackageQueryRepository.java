@@ -6,6 +6,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePacka
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageListEntryRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.BieListInBiePackageFilterCriteria;
 import org.oagi.score.gateway.http.api.bie_management.repository.criteria.BiePackageListFilterCriteria;
 import org.oagi.score.gateway.http.common.model.PageRequest;
@@ -36,6 +37,11 @@ public interface BiePackageQueryRepository {
     BiePackageDetailsRecord getBiePackageDetails(BiePackageId biePackageId);
 
     List<TopLevelAsbiepId> getTopLevelAsbiepIdListInBiePackage(BiePackageId biePackageId);
+
+    /**
+     * Returns each BIE of the package that replaces another BIE, with the BIE it replaces.
+     */
+    List<BieReplacementRecord> getBieReplacementListInBiePackage(BiePackageId biePackageId);
 
     ResultAndCount<BieListEntryRecord> getBieListInBiePackage(
             BieListInBiePackageFilterCriteria filterCriteria, PageRequest pageRequest);
