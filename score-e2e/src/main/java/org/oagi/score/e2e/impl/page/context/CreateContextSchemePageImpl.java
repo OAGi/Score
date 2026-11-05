@@ -1,6 +1,8 @@
 package org.oagi.score.e2e.impl.page.context;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.ConfirmDialogImpl;
+import org.oagi.score.e2e.page.ConfirmDialog;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.obj.ContextSchemeObject;
 import org.oagi.score.e2e.obj.ContextSchemeValueObject;
@@ -271,5 +273,10 @@ public class CreateContextSchemePageImpl extends BasePageImpl implements CreateC
         }
         hitCreateButton();
         return this.parent;
+    }
+
+    @Override
+    public ConfirmDialog getConfirmDialog() {
+        return new ConfirmDialogImpl(getDriver());
     }
 }

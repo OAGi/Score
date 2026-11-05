@@ -4,6 +4,7 @@
       <mat-card-content>
         <mat-form-field>
           <mat-label>Value</mat-label>
+          <!-- SCHEMA-LENGTH(ctx_scheme): this maxlength is narrower than ctx_scheme_value.value (varchar(100)); loading a Code List follows it. Search SCHEMA-LENGTH(ctx_scheme) when changing it. -->
           <input matInput required [(ngModel)]="contextSchemeValue.value" maxlength="45">
         </mat-form-field>
 

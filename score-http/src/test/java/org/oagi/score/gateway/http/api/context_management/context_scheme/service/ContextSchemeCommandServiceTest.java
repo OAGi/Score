@@ -252,4 +252,203 @@ class ContextSchemeCommandServiceTest {
                 () -> service.discard(requester, List.of(SCHEME_ID)));
         verify(command, never()).delete(any());
     }
+
+    // ----- column lengths (#329) -----
+
+    @Test
+    void create_rejects_text_longer_than_the_columns() {
+        String over45 = "x".repeat(46);
+        var longId = new CreateContextSchemeRequest(CATEGORY_ID, null, over45, "N", "d", "OAGi", "1.0", List.of());
+        var longAgency = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", over45, "1.0", List.of());
+        var longVersion = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", over45, List.of());
+        var longName = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "x".repeat(256), "d", "OAGi", "1.0", List.of());
+        var longValue = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", "1.0",
+                List.of(new org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload
+                        .CreateContextSchemeValueRequest("v".repeat(101), "m")));
+        for (var request : List.of(longId, longAgency, longVersion, longName, longValue)) {
+            assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void create_accepts_text_at_the_column_limits() {
+        when(command.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(SCHEME_ID);
+        var request = new CreateContextSchemeRequest(CATEGORY_ID, null, "x".repeat(45), "n".repeat(255), "d",
+                "a".repeat(45), "v".repeat(45),
+                List.of(new org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload
+                        .CreateContextSchemeValueRequest("v".repeat(100), "m")));
+        assertEquals(SCHEME_ID, service.create(requester, request));
+    }
+
+    @Test
+    void update_rejects_a_value_longer_than_the_column() {
+        var request = updateRequest(List.of(new UpdateContextSchemeValueRequest(V1, "v".repeat(101), "m")));
+        var e = assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        assertTrue(e.getMessage().contains("100"));
+        verifyNoInteractions(command);
+    }
+
+    // ----- duplicate values (#329) -----
+
+    private static ContextSchemeValueDetailsRecord existingValue(ContextSchemeValueId id, String value) {
+        return new ContextSchemeValueDetailsRecord(id, SCHEME_ID, new Guid("0123456789abcdef0123456789abcdef"), value, "m", false);
+    }
+
+    private static org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload
+            .CreateContextSchemeValueRequest cv(String value) {
+        return new org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload
+                .CreateContextSchemeValueRequest(value, "m");
+    }
+
+    private CreateContextSchemeRequest createWithValues(String... values) {
+        return new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", "1.0",
+                java.util.Arrays.stream(values).map(ContextSchemeCommandServiceTest::cv).toList());
+    }
+
+    @Test
+    void create_rejects_a_value_given_twice() {
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> service.create(requester, createWithValues("US", "CA", "US")));
+        assertTrue(e.getMessage().contains("'US'"));
+        verifyNoInteractions(command);
+        verify(query, never()).hasDuplicate(any(), any(), any());
+    }
+
+    @Test
+    void create_rejects_a_value_given_twice_even_with_a_different_meaning() {
+        var request = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", "1.0",
+                List.of(cv("US"), new org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload
+                        .CreateContextSchemeValueRequest("US", "United States")));
+        assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void create_accepts_distinct_values_and_compares_them_exactly() {
+        when(command.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(SCHEME_ID);
+        // Like the screens, the comparison is exact: case and surrounding spaces make a different value.
+        assertEquals(SCHEME_ID, service.create(requester, createWithValues("US", "us", "US ", "CA")));
+        verify(command, times(4)).createValue(eq(SCHEME_ID), any(), any());
+    }
+
+    @Test
+    void create_accepts_no_values_and_a_single_value() {
+        when(command.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(SCHEME_ID);
+        assertEquals(SCHEME_ID, service.create(requester, createWithValues()));
+        assertEquals(SCHEME_ID, service.create(requester, createWithValues("US")));
+    }
+
+    @Test
+    void update_rejects_a_value_given_twice() {
+        var request = updateRequest(List.of(
+                new UpdateContextSchemeValueRequest(V1, "US", "a"),
+                new UpdateContextSchemeValueRequest(null, "US", "b")));
+        var e = assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        assertTrue(e.getMessage().contains("'US'"));
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_new_value_equal_to_a_kept_one() {
+        var request = updateRequest(List.of(
+                new UpdateContextSchemeValueRequest(V1, "US", "a"),
+                new UpdateContextSchemeValueRequest(V2, "US", "b")));
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_accepts_editing_a_value_in_place_and_distinct_values() {
+        when(query.getContextSchemeValueList(SCHEME_ID)).thenReturn(List.of(existingValue(V1, "US"), existingValue(V2, "CA")));
+        when(query.findUsedContextSchemeValueIds(any())).thenReturn(Set.of());
+        // V1 keeps its value and only its meaning changes: it is not a duplicate of itself (#1744 class).
+        service.update(requester, updateRequest(List.of(
+                new UpdateContextSchemeValueRequest(V1, "US", "United States of America"),
+                new UpdateContextSchemeValueRequest(V2, "CA", "Canada"))));
+        verify(command).updateValue(V1, "US", "United States of America");
+    }
+
+    @Test
+    void update_accepts_swapping_a_value_into_one_that_was_removed() {
+        when(query.getContextSchemeValueList(SCHEME_ID)).thenReturn(List.of(existingValue(V1, "US"), existingValue(V2, "CA")));
+        when(query.findUsedContextSchemeValueIds(any())).thenReturn(Set.of());
+        // The request is the final state: V2 is dropped and a new value takes its text.
+        service.update(requester, updateRequest(List.of(
+                new UpdateContextSchemeValueRequest(V1, "US", "a"),
+                new UpdateContextSchemeValueRequest(null, "CA", "again"))));
+        verify(command).createValue(SCHEME_ID, "CA", "again");
+    }
+
+    // ----- column lengths and duplicate values: the remaining cases (#329) -----
+
+    @Test
+    void update_rejects_text_longer_than_the_columns_and_names_the_field() {
+        String over45 = "x".repeat(46);
+        var cases = new java.util.LinkedHashMap<String, UpdateContextSchemeRequest>();
+        cases.put("Context scheme name", new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", "x".repeat(256),
+                "desc", "OAGi", "1.0", List.of()));
+        cases.put("Context scheme ID", new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, over45, "N",
+                "desc", "OAGi", "1.0", List.of()));
+        cases.put("Context scheme agency ID", new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", "N",
+                "desc", over45, "1.0", List.of()));
+        cases.put("Context scheme version", new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "GEO", "N",
+                "desc", "OAGi", over45, List.of()));
+        cases.forEach((field, request) -> {
+            var e = assertThrows(IllegalArgumentException.class, () -> service.update(requester, request), field);
+            assertTrue(e.getMessage().startsWith(field), e.getMessage());
+        });
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void create_names_the_agency_id_and_version_when_they_are_too_long() {
+        var longAgency = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "a".repeat(46), "1.0", List.of());
+        var longVersion = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", "v".repeat(46), List.of());
+        assertTrue(assertThrows(IllegalArgumentException.class, () -> service.create(requester, longAgency))
+                .getMessage().contains("agency ID"));
+        assertTrue(assertThrows(IllegalArgumentException.class, () -> service.create(requester, longVersion))
+                .getMessage().contains("version"));
+    }
+
+    @Test
+    void update_accepts_text_at_the_column_limits() {
+        when(query.getContextSchemeValueList(SCHEME_ID)).thenReturn(List.of());
+        when(query.findUsedContextSchemeValueIds(any())).thenReturn(Set.of());
+        service.update(requester, new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, "x".repeat(45), "n".repeat(255),
+                "desc", "a".repeat(45), "v".repeat(45),
+                List.of(new UpdateContextSchemeValueRequest(null, "v".repeat(100), "m"))));
+        verify(command).createValue(SCHEME_ID, "v".repeat(100), "m");
+    }
+
+    @Test
+    void a_value_over_the_column_is_named_in_the_message() {
+        var request = createWithValues("ok", "v".repeat(101));
+        var e = assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        assertTrue(e.getMessage().startsWith("Context scheme value 'vvv"), e.getMessage());
+    }
+
+    @Test
+    void null_and_empty_values_do_not_count_as_duplicates_of_each_other() {
+        when(command.create(any(), any(), any(), any(), any(), any(), any())).thenReturn(SCHEME_ID);
+        // A missing value is not a value given twice; the required-field checks of the screens decide on it.
+        var request = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "N", "d", "OAGi", "1.0",
+                java.util.Arrays.asList(cv(null), cv(null)));
+        assertEquals(SCHEME_ID, service.create(requester, request));
+    }
+
+    @Test
+    void two_empty_values_are_a_duplicate() {
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> service.create(requester, createWithValues("", "")));
+        assertTrue(e.getMessage().contains("already exists"));
+    }
+
+    @Test
+    void a_value_given_twice_is_rejected_before_the_triplet_uniqueness_is_checked() {
+        when(query.hasDuplicate(any(), any(), any())).thenReturn(true);
+        var e = assertThrows(IllegalArgumentException.class,
+                () -> service.create(requester, createWithValues("US", "US")));
+        assertTrue(e.getMessage().contains("'US'"));
+    }
 }

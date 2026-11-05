@@ -11,6 +11,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.ContextMenu;
 import org.oagi.score.e2e.obj.*;
+import org.oagi.score.e2e.page.ConfirmDialog;
 import org.oagi.score.e2e.page.HomePage;
 import org.oagi.score.e2e.page.context.*;
 import org.openqa.selenium.*;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1624,6 +1626,204 @@ public class TC_5_2_OAGISDevelopersAuthorizedManagementOfContextSchemes extends 
                     .until(ExpectedConditions.elementToBeClickable(checkboxOfFirstRecordLocator));
             assertChecked(checkboxOfFirstRecord);
         });
+    }
+
+    // ----- Code List values that the context scheme does not take (Issue #329) -----
+
+    private static final By CONTEXT_SCHEME_VALUE_CELLS_LOCATOR =
+            By.xpath("//table/tbody/tr/td[contains(@class, \"mat-column-value\")]");
+
+    private CodeListObject createPublishedCodeListWith(String versionId, String... valuesInOrder) {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        NamespaceObject namespace =
+                getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+        ReleaseObject latestRelease = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.5");
+        CodeListObject codeList =
+                getAPIFactory().getCodeListAPI().createRandomCodeList(appUser, namespace, latestRelease, "Published");
+        if (versionId != null) {
+            codeList.setVersionId(versionId);
+            getAPIFactory().getCodeListAPI().updateCodeList(codeList);
+        }
+        for (String value : valuesInOrder) {
+            getAPIFactory().getCodeListValueAPI().createCodeListValue(codeList, appUser, value, "meaning of " + value);
+        }
+        return codeList;
+    }
+
+    private static boolean isEmptyField(WebElement field) {
+        String text = getText(field);
+        return text == null || text.isEmpty();
+    }
+
+    private CreateContextSchemePage openCreateContextSchemePageAndSelect(CodeListObject codeList) {
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        CreateContextSchemePage createContextSchemePage = homePage.getContextMenu()
+                .openViewEditContextSchemeSubMenu()
+                .openCreateContextSchemePage();
+        createContextSchemePage.openLoadFromCodeListDialog()
+                .selectCodeListByCodeListNameAndBranch(codeList.getName(), "10.8.5");
+        return createContextSchemePage;
+    }
+
+    /** The values listed in the table of the context scheme, in the order they are shown. */
+    private List<String> valuesInTable() {
+        return getDriver().findElements(CONTEXT_SCHEME_VALUE_CELLS_LOCATOR).stream()
+                .map(e -> getText(e)).sorted().toList();
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_28")
+    public void developer_is_asked_to_trim_the_identifiers_of_a_code_list_that_exceed_the_length_a_context_scheme_takes() {
+        String longVersion = RandomStringUtils.secure().nextAlphanumeric(52);
+        CodeListObject codeList = createPublishedCodeListWith(longVersion, "a_" + RandomStringUtils.secure().nextAlphanumeric(5));
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+        ConfirmDialog confirmDialog = createContextSchemePage.getConfirmDialog();
+
+        assertEquals("Cannot load the code list", getText(confirmDialog.getTitle()));
+        assertTrue(confirmDialog.getMessage().contains("exceed 45 characters"));
+        assertEquals(1, confirmDialog.getListItems().size());
+        assertTrue(confirmDialog.getListItems().get(0).startsWith("Version (52 characters)"));
+        assertEquals(List.of("Trim and continue", "Cancel"), confirmDialog.getButtonLabels());
+
+        confirmDialog.clickButton("Trim and continue");
+
+        assertEquals(longVersion.substring(0, 45), getText(createContextSchemePage.getVersionField()));
+        assertEquals(codeList.getListId(), getText(createContextSchemePage.getSchemeIDField()));
+        AgencyIDListValueObject agencyIdListValue = getAPIFactory().getAgencyIDListValueAPI()
+                .getAgencyIDListValueByManifestId(codeList.getAgencyIdListValueManifestId());
+        assertEquals(agencyIdListValue.getValue(), getText(createContextSchemePage.getAgencyIDField()));
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_29")
+    public void developer_cancelling_the_trim_of_the_identifiers_loads_nothing() {
+        CodeListObject codeList = createPublishedCodeListWith(
+                RandomStringUtils.secure().nextAlphanumeric(52), "a_" + RandomStringUtils.secure().nextAlphanumeric(5));
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+        createContextSchemePage.getConfirmDialog().clickButton("Cancel");
+
+        assertTrue(isEmptyField(createContextSchemePage.getSchemeIDField()));
+        assertTrue(isEmptyField(createContextSchemePage.getAgencyIDField()));
+        assertTrue(isEmptyField(createContextSchemePage.getVersionField()));
+        assertTrue(getDriver().findElements(CONTEXT_SCHEME_VALUE_CELLS_LOCATOR).isEmpty());
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_30")
+    public void developer_is_asked_to_trim_the_long_values_of_a_code_list_and_the_repeated_and_empty_ones_are_left_out() {
+        String ok1 = "ok1_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        String ok2 = "ok2_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        String repeated = "dup_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        String longValue = RandomStringUtils.secure().nextAlphanumeric(60);
+        CodeListObject codeList = createPublishedCodeListWith(null, ok1, repeated, ok2, repeated, longValue, "");
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+        ConfirmDialog confirmDialog = createContextSchemePage.getConfirmDialog();
+
+        assertEquals("Some values cannot be loaded", getText(confirmDialog.getTitle()));
+        assertTrue(confirmDialog.getMessage().contains("3 value(s) cannot be entered"));
+        assertTrue(confirmDialog.getMessage().contains("longer than 45 characters"));
+        assertEquals(3, confirmDialog.getListItems().size());
+        assertTrue(confirmDialog.getListItems().contains(repeated + ": already exists"));
+        assertTrue(confirmDialog.getListItems().contains(longValue + ": 60 characters"));
+        assertTrue(confirmDialog.getListItems().contains("(empty value): cannot be empty"));
+        // Trimming or cancelling are the only ways on: there is no option to skip the values.
+        assertEquals(List.of("Trim and continue", "Cancel"), confirmDialog.getButtonLabels());
+
+        confirmDialog.clickButton("Trim and continue");
+
+        assertEquals(codeList.getListId(), getText(createContextSchemePage.getSchemeIDField()));
+        assertEquals(Stream.of(ok1, ok2, repeated, longValue.substring(0, 45)).sorted().toList(), valuesInTable());
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_31")
+    public void developer_cancelling_the_trim_of_the_values_loads_neither_the_values_nor_the_identifiers() {
+        CodeListObject codeList = createPublishedCodeListWith(
+                null, "ok_" + RandomStringUtils.secure().nextAlphanumeric(5), RandomStringUtils.secure().nextAlphanumeric(60));
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+        createContextSchemePage.getConfirmDialog().clickButton("Cancel");
+
+        assertTrue(isEmptyField(createContextSchemePage.getSchemeIDField()));
+        assertTrue(isEmptyField(createContextSchemePage.getVersionField()));
+        assertTrue(getDriver().findElements(CONTEXT_SCHEME_VALUE_CELLS_LOCATOR).isEmpty());
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_32")
+    public void developer_is_only_asked_to_continue_when_the_values_that_cannot_be_loaded_are_not_long() {
+        String ok = "ok_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        String repeated = "dup_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        CodeListObject codeList = createPublishedCodeListWith(null, ok, repeated, repeated, "");
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+        ConfirmDialog confirmDialog = createContextSchemePage.getConfirmDialog();
+
+        assertEquals("Some values cannot be loaded", getText(confirmDialog.getTitle()));
+        assertTrue(confirmDialog.getMessage().contains("(empty or already in the list)"));
+        assertFalse(confirmDialog.getMessage().contains("longer than"));
+        assertEquals(2, confirmDialog.getListItems().size());
+        assertEquals(List.of("Continue", "Cancel"), confirmDialog.getButtonLabels());
+
+        confirmDialog.clickButton("Continue");
+
+        assertEquals(Stream.of(ok, repeated).sorted().toList(), valuesInTable());
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_33")
+    public void developer_loading_a_code_list_that_fits_is_not_asked_anything() {
+        String ok1 = "ok1_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        String ok2 = "ok2_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        CodeListObject codeList = createPublishedCodeListWith(null, ok1, ok2);
+
+        CreateContextSchemePage createContextSchemePage = openCreateContextSchemePageAndSelect(codeList);
+
+        assertEquals(codeList.getListId(), getText(createContextSchemePage.getSchemeIDField()));
+        assertEquals(Stream.of(ok1, ok2).sorted().toList(), valuesInTable());
+        assertThrows(TimeoutException.class, () -> createContextSchemePage.getConfirmDialog().getTitle());
+    }
+
+    @Test
+    @DisplayName("TC_5_2_TA_34")
+    public void developer_is_asked_to_trim_what_a_code_list_loads_on_the_edit_page_as_well() {
+        ContextCategoryObject randomContextCategory =
+                getAPIFactory().getContextCategoryAPI().createRandomContextCategory(appUser);
+        ContextSchemeObject randomContextScheme =
+                getAPIFactory().getContextSchemeAPI().createRandomContextScheme(randomContextCategory, appUser);
+        getAPIFactory().getContextSchemeValueAPI().createRandomContextSchemeValue(randomContextScheme);
+        String longVersion = RandomStringUtils.secure().nextAlphanumeric(52);
+        String longValue = RandomStringUtils.secure().nextAlphanumeric(60);
+        String ok = "ok_" + RandomStringUtils.secure().nextAlphanumeric(5);
+        CodeListObject codeList = createPublishedCodeListWith(longVersion, ok, longValue);
+
+        HomePage homePage = loginPage().signIn(appUser.getLoginId(), appUser.getPassword());
+        EditContextSchemePage editContextSchemePage = homePage.getContextMenu()
+                .openViewEditContextSchemeSubMenu()
+                .openEditContextSchemePageByContextSchemeName(randomContextScheme.getSchemeName());
+        click(editContextSchemePage.getLoadFromCodeListButton());
+        editContextSchemePage.continueToLoadFromCodeListDialog()
+                .selectCodeListByCodeListNameAndBranch(codeList.getName(), "10.8.5");
+
+        // The identifiers come first.
+        ConfirmDialog identifiersDialog = editContextSchemePage.getConfirmDialog();
+        assertEquals("Cannot load the code list", getText(identifiersDialog.getTitle()));
+        assertEquals(List.of("Trim and continue", "Cancel"), identifiersDialog.getButtonLabels());
+        identifiersDialog.clickButton("Trim and continue");
+
+        // Then the values.
+        retry(() -> {
+            ConfirmDialog valuesDialog = editContextSchemePage.getConfirmDialog();
+            assertEquals("Some values cannot be loaded", getText(valuesDialog.getTitle()));
+            assertEquals(List.of("Trim and continue", "Cancel"), valuesDialog.getButtonLabels());
+            valuesDialog.clickButton("Trim and continue");
+        });
+
+        assertEquals(longVersion.substring(0, 45), getText(editContextSchemePage.getVersionField()));
+        assertEquals(Stream.of(ok, longValue.substring(0, 45)).sorted().toList(), valuesInTable());
     }
 
     @AfterEach

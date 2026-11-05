@@ -71,8 +71,18 @@ public class DSLContextCodeListValueAPIImpl implements CodeListValueAPI {
 
     @Override
     public CodeListValueObject createRandomCodeListValue(CodeListObject codeList, AppUserObject creator) {
-        CodeListValueObject codeListValue = CodeListValueObject.createRandomCodeListValue(codeList, creator);
+        return insertCodeListValue(codeList, CodeListValueObject.createRandomCodeListValue(codeList, creator));
+    }
 
+    @Override
+    public CodeListValueObject createCodeListValue(CodeListObject codeList, AppUserObject creator, String value, String meaning) {
+        CodeListValueObject codeListValue = CodeListValueObject.createRandomCodeListValue(codeList, creator);
+        codeListValue.setValue(value);
+        codeListValue.setMeaning(meaning);
+        return insertCodeListValue(codeList, codeListValue);
+    }
+
+    private CodeListValueObject insertCodeListValue(CodeListObject codeList, CodeListValueObject codeListValue) {
         CodeListValueRecord codeListValueRecord = new CodeListValueRecord();
         codeListValueRecord.setGuid(codeListValue.getGuid());
         codeListValueRecord.setCodeListId(ULong.valueOf(codeList.getCodeListId()));

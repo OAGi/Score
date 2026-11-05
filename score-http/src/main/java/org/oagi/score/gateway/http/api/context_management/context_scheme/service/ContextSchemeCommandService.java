@@ -32,6 +32,13 @@ import static org.springframework.util.StringUtils.hasText;
 @Transactional
 public class ContextSchemeCommandService {
 
+    // SCHEMA-LENGTH(ctx_scheme): the lengths of the columns ctx_scheme.scheme_name (255), scheme_id / scheme_agency_id /
+    // scheme_version_id (45) and ctx_scheme_value.value (100). The web screens limit what is typed (and loaded from a
+    // Code List) by their own maxlength: search SCHEMA-LENGTH(ctx_scheme) in score-web when these columns change.
+    private static final int SCHEME_NAME_MAX_LENGTH = 255;
+    private static final int SCHEME_IDENTIFIER_MAX_LENGTH = 45;
+    private static final int SCHEME_VALUE_MAX_LENGTH = 100;
+
     @Autowired
     private RepositoryFactory repositoryFactory;
 
@@ -41,6 +48,36 @@ public class ContextSchemeCommandService {
 
     private ContextSchemeQueryRepository query(ScoreUser requester) {
         return repositoryFactory.contextSchemeQueryRepository(requester);
+    }
+
+    /**
+     * Rejects text that does not fit the columns of the context scheme and a value that is given twice (the web
+     * screens check both, but a value loaded from a code list or sent to the API directly is not), with a message
+     * that names the field or the value.
+     */
+    private static void validateLengths(String schemeName, String schemeId, String schemeAgencyId,
+                                        String schemeVersionId, java.util.stream.Stream<String> values) {
+        requireMaxLength("Context scheme name", schemeName, SCHEME_NAME_MAX_LENGTH);
+        requireMaxLength("Context scheme ID", schemeId, SCHEME_IDENTIFIER_MAX_LENGTH);
+        requireMaxLength("Context scheme agency ID", schemeAgencyId, SCHEME_IDENTIFIER_MAX_LENGTH);
+        requireMaxLength("Context scheme version", schemeVersionId, SCHEME_IDENTIFIER_MAX_LENGTH);
+        List<String> valueList = values.toList();
+        valueList.forEach(value -> requireMaxLength("Context scheme value '" + value + "'", value, SCHEME_VALUE_MAX_LENGTH));
+
+        // The same rule as adding a value on the screens: a value is in the context scheme only once.
+        Set<String> seen = new java.util.HashSet<>();
+        for (String value : valueList) {
+            if (value != null && !seen.add(value)) {
+                throw new IllegalArgumentException("Context scheme value '" + value + "' already exists.");
+            }
+        }
+    }
+
+    private static void requireMaxLength(String field, String text, int maxLength) {
+        if (text != null && text.length() > maxLength) {
+            throw new IllegalArgumentException(field + " must not exceed " + maxLength
+                    + " characters (found " + text.length() + ").");
+        }
     }
 
     /**
@@ -57,6 +94,8 @@ public class ContextSchemeCommandService {
         if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
             throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
         }
+        validateLengths(request.schemeName(), request.schemeId(), request.schemeAgencyId(),
+                request.schemeVersionId(), request.contextSchemeValueList().stream().map(v -> v.value()));
 
         // Server-side uniqueness enforcement (do not rely on the client-side pre-check alone).
         var query = query(requester);
@@ -99,6 +138,8 @@ public class ContextSchemeCommandService {
         if (!hasText(request.schemeId()) || !hasText(request.schemeAgencyId()) || !hasText(request.schemeVersionId())) {
             throw new IllegalArgumentException("Context scheme ID, agency ID and version cannot be empty.");
         }
+        validateLengths(request.schemeName(), request.schemeId(), request.schemeAgencyId(),
+                request.schemeVersionId(), request.contextSchemeValueList().stream().map(v -> v.value()));
 
         var query = query(requester);
 

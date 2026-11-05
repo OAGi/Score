@@ -21,10 +21,11 @@ import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialo
 import {ContextCategoryService} from '../../context-category/domain/context-category.service';
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
-import {finalize} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
 import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
+import {resolveCodeListLoad} from '../domain/context-scheme-code-list-load';
 
 @Component({
   standalone: false,
@@ -454,13 +455,18 @@ export class ContextSchemeDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(CodelistListDialogComponent, codeListDialogConfig);
     dialogRef.afterClosed().subscribe((codeList: CodeListListEntry) => {
       if (codeList) {
-        this.codeListService.getCodeListDetails(codeList.codeListManifestId).subscribe((codeListDetails: CodeListDetails) => {
-          this.contextSchemeUpdateRequest.schemeId = codeListDetails.listId.toString();
-          this.contextSchemeUpdateRequest.schemeAgencyId = codeListDetails.agencyIdListValue.value.toString();
-          this.contextSchemeUpdateRequest.schemeVersionId = codeListDetails.versionId.toString();
-          this._updateDataSource([]);
-          this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeListDetails.valueList));
-        });
+        this.codeListService.getCodeListDetails(codeList.codeListManifestId).pipe(
+          switchMap((codeListDetails: CodeListDetails) => resolveCodeListLoad(this.confirmDialogService, codeListDetails)))
+          .subscribe(load => {
+            if (!load) {
+              return;
+            }
+            this.contextSchemeUpdateRequest.schemeId = load.schemeId;
+            this.contextSchemeUpdateRequest.schemeAgencyId = load.schemeAgencyId;
+            this.contextSchemeUpdateRequest.schemeVersionId = load.schemeVersionId;
+            this._updateDataSource([]);
+            this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(load.values));
+          });
       }
     });
   }

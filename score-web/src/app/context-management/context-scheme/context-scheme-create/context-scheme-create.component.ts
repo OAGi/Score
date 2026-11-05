@@ -19,6 +19,8 @@ import {ContextCategoryService} from '../../context-category/domain/context-cate
 import {ContextCategorySummary} from '../../context-category/domain/context-category';
 import {CodeListService} from '../../../code-list-management/domain/code-list.service';
 import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
+import {resolveCodeListLoad} from '../domain/context-scheme-code-list-load';
+import {switchMap} from 'rxjs/operators';
 
 @Component({
   standalone: false,
@@ -321,13 +323,18 @@ export class ContextSchemeCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(CodelistListDialogComponent, codeListdialogConfig);
     dialogRef.afterClosed().subscribe((codeList: CodeListListEntry) => {
       if (codeList) {
-        this.codeListService.getCodeListDetails(codeList.codeListManifestId).subscribe((codeListDetails: CodeListDetails) => {
-          this.contextSchemeCreateRequest.schemeId = codeListDetails.listId.toString();
-          this.contextSchemeCreateRequest.schemeAgencyId = codeListDetails.agencyIdListValue.value.toString();
-          this.contextSchemeCreateRequest.schemeVersionId = codeListDetails.versionId.toString();
-          this._updateDataSource([]);
-          this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(codeListDetails.valueList));
-        });
+        this.codeListService.getCodeListDetails(codeList.codeListManifestId).pipe(
+          switchMap((codeListDetails: CodeListDetails) => resolveCodeListLoad(this.confirmDialogService, codeListDetails)))
+          .subscribe(load => {
+            if (!load) {
+              return;
+            }
+            this.contextSchemeCreateRequest.schemeId = load.schemeId;
+            this.contextSchemeCreateRequest.schemeAgencyId = load.schemeAgencyId;
+            this.contextSchemeCreateRequest.schemeVersionId = load.schemeVersionId;
+            this._updateDataSource([]);
+            this._updateDataSource(this.convertCodeListValuesIntoContextSchemeValues(load.values));
+          });
       }
     });
   }

@@ -168,10 +168,32 @@ The developer can update an existing context scheme without changing its `Scheme
 #### Test Assertion #5.2.27
 The developer can edit an existing context scheme value in place — for example, changing only its `Meaning` while keeping the same `Value` — and the value is not incorrectly flagged as a duplicate of itself (Issue #1744 class). This is verified on both the New Context Scheme page and the Edit Context Scheme page.
 
+#### Test Assertion #5.2.28
+When the `List ID`, `Agency ID List Value`, or `Version` of the code list selected in `Load from Code List` is longer than 45 characters, which is the longest a context scheme takes, the developer is shown the `Cannot load the code list` dialog that names each of them with its length and asks whether to trim them to 45 characters. The dialog offers `Trim and continue` and `Cancel`, and `Trim and continue` loads the code list with those identifiers cut to 45 characters (Issue #329).
+
+#### Test Assertion #5.2.29
+When the developer cancels the `Cannot load the code list` dialog, nothing of the code list is loaded: the `Scheme ID`, `Agency ID`, and `Version` fields and the context scheme values are left as they were (Issue #329).
+
+#### Test Assertion #5.2.30
+When the code list selected in `Load from Code List` has values that cannot be entered in a context scheme — a value that is empty, longer than 45 characters, or already loaded — the developer is shown the `Some values cannot be loaded` dialog that lists each of them with the reason. The dialog offers `Trim and continue` and `Cancel` only, with no option to skip the values; `Trim and continue` loads the long values cut to 45 characters and leaves out the empty and repeated ones (Issue #329).
+
+#### Test Assertion #5.2.31
+When the developer cancels the `Some values cannot be loaded` dialog, neither the values nor the identifiers of the code list are loaded (Issue #329).
+
+#### Test Assertion #5.2.32
+When none of the values that cannot be entered in a context scheme is long (only empty or repeated values), the `Some values cannot be loaded` dialog does not mention the length and offers `Continue` and `Cancel`; `Continue` loads the other values and leaves out the empty and repeated ones (Issue #329).
+
+#### Test Assertion #5.2.33
+When everything in the selected code list fits, `Load from Code List` loads the identifiers and values without showing any dialog (Issue #329).
+
+#### Test Assertion #5.2.34
+The same dialogs are shown, in the order identifiers first and then values, when `Load from Code List` is used on the Edit Context Scheme page, and trimming applies to the identifiers and the values of the loaded code list there too (Issue #329).
+
 ### Test Step Pre-condition:
 
 1. The test creates developer, developer admin, end user, and end user admin accounts and their context schemes as needed.
 2. Referenced business contexts and code lists are created as needed for the discard, update, and load-from-code-list scenarios.
+3. For the code lists whose content does not fit a context scheme (Assertions [#28](#test-assertion-5228) to [#34](#test-assertion-5234)), the test creates a published code list in the latest release whose `Version` is 52 characters long and whose values include a 60-character value, a value that appears twice, and an empty value, as each scenario requires.
 
 ### Test Step:
 
@@ -200,6 +222,13 @@ The developer can edit an existing context scheme value in place — for example
 23. The developer searches the Context Scheme List using the exact `Name` of a saved context scheme and verifies that the correct matching row is returned reliably. (Assertion [#25](#test-assertion-5225))
 24. The developer opens an existing context scheme, keeps the same `Scheme ID`, `Agency ID`, and `Version`, adds a new context scheme value, updates the scheme, and verifies that the update succeeds without a self-duplicate uniqueness error. (Assertion [#26](#test-assertion-5226))
 25. On both the New Context Scheme page and the Edit Context Scheme page, the developer edits an existing context scheme value by changing only its `Meaning` (keeping the same `Value`), saves, and verifies that the edit is accepted without a "already exist" self-duplicate error. (Assertion [#27](#test-assertion-5227))
+26. On the New Context Scheme page, the developer selects a code list whose `Version` is longer than 45 characters in `Load from Code List`, verifies that the `Cannot load the code list` dialog names the `Version` with its length and offers `Trim and continue` and `Cancel`, chooses `Trim and continue`, and verifies that the `Version` is cut to 45 characters while the `Scheme ID`, `Agency ID`, and values are loaded as they are. (Assertion [#28](#test-assertion-5228))
+27. The developer repeats the selection, chooses `Cancel`, and verifies that the `Scheme ID`, `Agency ID`, and `Version` fields stay empty and no context scheme value is loaded. (Assertion [#29](#test-assertion-5229))
+28. The developer selects a code list that has a 60-character value, a value that appears twice, and an empty value, verifies that the `Some values cannot be loaded` dialog lists the three of them with their reasons and offers only `Trim and continue` and `Cancel`, chooses `Trim and continue`, and verifies that the loaded values are the fitting ones, the long value cut to 45 characters, and the repeated value once. (Assertion [#30](#test-assertion-5230))
+29. The developer repeats the selection, chooses `Cancel`, and verifies that no value and no identifier is loaded. (Assertion [#31](#test-assertion-5231))
+30. The developer selects a code list that has only a repeated value and an empty value besides the fitting ones, verifies that the dialog does not mention the length and offers `Continue` and `Cancel`, chooses `Continue`, and verifies that the other values are loaded with the repeated value once. (Assertion [#32](#test-assertion-5232))
+31. The developer selects a code list that fits and verifies that its identifiers and values are loaded without any dialog. (Assertion [#33](#test-assertion-5233))
+32. On the Edit Context Scheme page, the developer confirms the replacement of the existing values, selects a code list with a long `Version` and a long value, and verifies that the identifiers dialog and then the values dialog are shown, that `Trim and continue` in both loads the trimmed `Version` and values, and that the values of the scheme before the load are gone. (Assertion [#34](#test-assertion-5234))
 
 ## Test Case 5.3
 

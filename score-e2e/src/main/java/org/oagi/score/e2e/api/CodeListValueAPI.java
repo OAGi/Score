@@ -17,6 +17,18 @@ public interface CodeListValueAPI {
 
     CodeListValueObject createRandomCodeListValue(CodeListObject codeList, AppUserObject creator);
 
+    /**
+     * Create a code list value with the given text, which a random value does not give: a long, an empty or a
+     * repeated value. The other fields are random.
+     *
+     * @param codeList code list the value belongs to
+     * @param creator  creator of the value
+     * @param value    text of the value
+     * @param meaning  meaning of the value
+     * @return the created code list value
+     */
+    CodeListValueObject createCodeListValue(CodeListObject codeList, AppUserObject creator, String value, String meaning);
+
     CodeListValueObject createDerivedCodeListValue(CodeListValueObject baseCodeListValue,
                                                    CodeListObject codeList, AppUserObject creator);
 

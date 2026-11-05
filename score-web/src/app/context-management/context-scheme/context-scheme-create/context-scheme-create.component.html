@@ -27,6 +27,7 @@
       </button>
     </div>
 
+    <!-- SCHEMA-LENGTH(ctx_scheme): the maxlength below follow ctx_scheme.scheme_id / scheme_agency_id / scheme_version_id (varchar(45)); search SCHEMA-LENGTH(ctx_scheme) when changing them. -->
     <mat-form-field>
       <mat-label>Scheme ID</mat-label>
       <input matInput required [(ngModel)]="contextSchemeCreateRequest.schemeId" maxlength="45"/>
