@@ -10,13 +10,13 @@ import {AccountListService} from '../domain/account-list.service';
 import {AccountDetailComponent} from './account-detail.component';
 
 describe('AccountDetailComponent', () => {
-  function setup(getAccount: any) {
+  function setup(getAccount: any, signedInLoginId = 'admin') {
     TestBed.configureTestingModule({
       declarations: [AccountDetailComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: AccountListService, useValue: {getAccount: () => getAccount}},
-        {provide: AuthService, useValue: {isAdmin: () => true}},
+        {provide: AuthService, useValue: {isAdmin: () => true, getUserToken: () => ({username: signedInLoginId})}},
         {provide: ConfirmDialogService, useValue: {}},
         {provide: MatSnackBar, useValue: {open: () => undefined}},
         {provide: Router, useValue: {navigateByUrl: () => undefined}},
@@ -41,5 +41,17 @@ describe('AccountDetailComponent', () => {
     const fixture = setup(of({userId: 3, loginId: 'u', enabled: false, hasData: false}));
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Remove this account');
+  });
+
+  it('offers the new password fields for another account', () => {
+    const fixture = setup(of({userId: 3, loginId: 'u', enabled: true, hasData: true}));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-id="user.newPassword"]')).not.toBeNull();
+  });
+
+  it('hides the new password fields on the signed-in user\'s own account', () => {
+    const fixture = setup(of({userId: 3, loginId: 'admin', enabled: true, hasData: true}));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-id="user.newPassword"]')).toBeNull();
   });
 });

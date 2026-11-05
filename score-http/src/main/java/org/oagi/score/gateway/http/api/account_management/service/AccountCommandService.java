@@ -96,6 +96,11 @@ public class AccountCommandService {
             }
         }
 
+        // A password of one's own account must be changed through updatePassword, which verifies the old password.
+        if (requester.userId().equals(request.userId()) && hasLength(request.newPassword())) {
+            throw new DataAccessForbiddenException("The password of your own account can only be changed with the current password.");
+        }
+
         var command = repositoryFactory.accountCommandRepository(requester, passwordEncoder);
         Boolean admin = requester.isAdministrator() ? request.admin() : null;
         boolean updated = command.update(request.userId(),

@@ -41,7 +41,7 @@
           }
         </mat-card>
 
-        @if (account && (account.oAuth2UserId === 0 || !account.oAuth2UserId)) {
+        @if (account && (account.oAuth2UserId === 0 || !account.oAuth2UserId) && !isOwnAccount) {
           <mat-card class="mb-2">
             <mat-card-content class="mat-card-container">
               <mat-form-field>
