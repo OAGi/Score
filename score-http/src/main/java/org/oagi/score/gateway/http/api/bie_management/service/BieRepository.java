@@ -5,6 +5,7 @@ import org.jooq.tools.StringUtils;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
 import org.oagi.score.gateway.http.api.bie_management.model.asbiep.AsbiepId;
@@ -12,6 +13,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieScId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DefaultAwdPriRule;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
@@ -20,6 +22,8 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
+import org.oagi.score.gateway.http.common.model.Id;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
 import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
@@ -40,6 +44,9 @@ public class BieRepository {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private RepositoryFactory repositoryFactory;
 
     public TopLevelAsbiepId createTopLevelAsbiep(UserId userId, ReleaseId releaseId, BieState state) {
         return createTopLevelAsbiep(userId, releaseId, null, state, null, null);
@@ -183,12 +190,16 @@ public class BieRepository {
                 .where(BCCP.BCCP_ID.eq(bccRecord.getToBccpId()))
                 .fetchOneInto(BccpRecord.class);
 
+        PrimitiveRestriction primitiveRestriction = getDefaultPrimitiveRestriction(user, bdtManifestId);
+
         return dslContext.insertInto(BBIE)
                 .set(BBIE.GUID, ScoreGuidUtils.randomGuid())
                 .set(BBIE.FROM_ABIE_ID, ULong.valueOf(fromAbieId.value()))
                 .set(BBIE.TO_BBIEP_ID, ULong.valueOf(toBbiepId.value()))
                 .set(BBIE.BASED_BCC_MANIFEST_ID, ULong.valueOf(basedBccManifestId.value()))
-                .set(BBIE.XBT_MANIFEST_ID, ULong.valueOf(getDefaultXbtManifestIdByDtManifestId(bdtManifestId).value()))
+                .set(BBIE.XBT_MANIFEST_ID, valueOf(primitiveRestriction.xbtManifestId()))
+                .set(BBIE.CODE_LIST_MANIFEST_ID, valueOf(primitiveRestriction.codeListManifestId()))
+                .set(BBIE.AGENCY_ID_LIST_MANIFEST_ID, valueOf(primitiveRestriction.agencyIdListManifestId()))
                 .set(BBIE.CARDINALITY_MIN, bccRecord.getCardinalityMin())
                 .set(BBIE.CARDINALITY_MAX, bccRecord.getCardinalityMax())
                 .set(BBIE.IS_NILLABLE, bccRecord.getIsNillable())
@@ -205,40 +216,12 @@ public class BieRepository {
                 .returning().fetchOne();
     }
 
-    public XbtManifestId getDefaultXbtManifestIdByDtManifestId(DtManifestId bdtManifestId) {
-        String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
-                .from(DT)
-                .join(DT_MANIFEST).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId.value())))
-                .fetchOneInto(String.class);
-
-        /*
-         * Issue #808
-         */
-        List<Condition> conds = new ArrayList<>();
-        conds.add(DT_MANIFEST.DT_MANIFEST_ID.eq(ULong.valueOf(bdtManifestId.value())));
-        if ("Date Time".equals(bdtDataTypeTerm)) {
-            conds.add(XBT.NAME.eq("date time"));
-        } else if ("Date".equals(bdtDataTypeTerm)) {
-            conds.add(XBT.NAME.eq("date"));
-        } else if ("Time".equals(bdtDataTypeTerm)) {
-            conds.add(XBT.NAME.eq("time"));
-        } else {
-            conds.add(DT_AWD_PRI.IS_DEFAULT.eq((byte) 1));
-        }
-
-        SelectOnConditionStep<Record1<ULong>> step = dslContext.select(
-                        DT_AWD_PRI.XBT_MANIFEST_ID)
-                .from(DT_AWD_PRI)
-                .join(DT_MANIFEST).on(and(
-                        DT_AWD_PRI.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID),
-                        DT_AWD_PRI.DT_ID.eq(DT_MANIFEST.DT_ID)
-                ))
-                .join(DT).on(DT.DT_ID.eq(DT_MANIFEST.DT_ID))
-                .join(XBT_MANIFEST).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
-                .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID));
-        return step.where(conds)
-                .fetchOptionalInto(XbtManifestId.class).orElse(null);
+    /**
+     * The value domain a BBIE of the Data Type starts with (see {@link DefaultAwdPriRule}).
+     */
+    public PrimitiveRestriction getDefaultPrimitiveRestriction(ScoreUser requester, DtManifestId bdtManifestId) {
+        return PrimitiveRestriction.fromDtAwdPri(
+                repositoryFactory.dtQueryRepository(requester).getDefaultDtAwdPriSummary(bdtManifestId));
     }
 
     public BbieScId createBbieSc(ScoreUser user, BbieId bbieId, DtScManifestId dtScManifestId,
@@ -250,11 +233,15 @@ public class BieRepository {
                 .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId.value())))
                 .fetchOneInto(DtScRecord.class);
 
+        PrimitiveRestriction primitiveRestriction = getDefaultPrimitiveRestrictionOfSc(user, dtScManifestId);
+
         return new BbieScId(dslContext.insertInto(BBIE_SC)
                 .set(BBIE_SC.GUID, ScoreGuidUtils.randomGuid())
                 .set(BBIE_SC.BBIE_ID, ULong.valueOf(bbieId.value()))
                 .set(BBIE_SC.BASED_DT_SC_MANIFEST_ID, ULong.valueOf(dtScManifestId.value()))
-                .set(BBIE_SC.XBT_MANIFEST_ID, ULong.valueOf(getDefaultXbtManifestIdByDtScManifestId(dtScManifestId).value()))
+                .set(BBIE_SC.XBT_MANIFEST_ID, valueOf(primitiveRestriction.xbtManifestId()))
+                .set(BBIE_SC.CODE_LIST_MANIFEST_ID, valueOf(primitiveRestriction.codeListManifestId()))
+                .set(BBIE_SC.AGENCY_ID_LIST_MANIFEST_ID, valueOf(primitiveRestriction.agencyIdListManifestId()))
                 .set(BBIE_SC.CARDINALITY_MIN, dtScRecord.getCardinalityMin())
                 .set(BBIE_SC.CARDINALITY_MAX, dtScRecord.getCardinalityMax())
                 .set(BBIE_SC.IS_USED, (byte) (dtScRecord.getCardinalityMin() > 0 ? 1 : 0))
@@ -264,40 +251,12 @@ public class BieRepository {
                 .returning().fetchOne().getBbieScId().toBigInteger());
     }
 
-    public XbtManifestId getDefaultXbtManifestIdByDtScManifestId(DtScManifestId dtScManifestId) {
-        String bdtScRepresentationTerm = dslContext.select(DT_SC.REPRESENTATION_TERM)
-                .from(DT_SC)
-                .join(DT_SC_MANIFEST).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId.value())))
-                .fetchOneInto(String.class);
-
-        /*
-         * Issue #808
-         */
-        List<Condition> conds = new ArrayList<>();
-        conds.add(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(ULong.valueOf(dtScManifestId.value())));
-        if ("Date Time".equals(bdtScRepresentationTerm)) {
-            conds.add(XBT.NAME.eq("date time"));
-        } else if ("Date".equals(bdtScRepresentationTerm)) {
-            conds.add(XBT.NAME.eq("date"));
-        } else if ("Time".equals(bdtScRepresentationTerm)) {
-            conds.add(XBT.NAME.eq("time"));
-        } else {
-            conds.add(DT_SC_AWD_PRI.IS_DEFAULT.eq((byte) 1));
-        }
-
-        return dslContext.select(
-                        DT_SC_AWD_PRI.XBT_MANIFEST_ID)
-                .from(DT_SC_AWD_PRI)
-                .join(DT_SC_MANIFEST).on(and(
-                        DT_SC_AWD_PRI.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID),
-                        DT_SC_AWD_PRI.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID)
-                ))
-                .join(DT_SC).on(DT_SC.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))
-                .join(XBT_MANIFEST).on(DT_SC_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.XBT_MANIFEST_ID))
-                .join(XBT).on(XBT_MANIFEST.XBT_ID.eq(XBT.XBT_ID))
-                .where(conds)
-                .fetchOptionalInto(XbtManifestId.class).orElse(null);
+    /**
+     * The value domain a BBIE SC of the supplementary component starts with (see {@link DefaultAwdPriRule}).
+     */
+    public PrimitiveRestriction getDefaultPrimitiveRestrictionOfSc(ScoreUser requester, DtScManifestId dtScManifestId) {
+        return PrimitiveRestriction.fromDtScAwdPri(
+                repositoryFactory.dtQueryRepository(requester).getDefaultDtScAwdPriSummary(dtScManifestId));
     }
 
     public void updateState(TopLevelAsbiepId topLevelAsbiepId, BieState state) {
@@ -398,6 +357,11 @@ public class BieRepository {
         }
         displays.append("/").append(report.getReusedPropertyTerm());
         return displays.toString().replaceAll("\s?/\s?", "/");
+    }
+
+
+    private static ULong valueOf(Id id) {
+        return (id != null) ? ULong.valueOf(id.value()) : null;
     }
 
 }

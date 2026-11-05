@@ -691,25 +691,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     @Override
     public DtAwdPriSummaryRecord getDefaultDtAwdPriSummary(DtManifestId dtManifestId) {
         DtSummaryRecord dt = getDtSummary(dtManifestId);
-        String dtDataTypeTerm = dt.dataTypeTerm();
-
-        List<DtAwdPriSummaryRecord> dtAwdPriList = getDtAwdPriSummaryList(dtManifestId);
-
-        /*
-         * Issue #808
-         */
-        Stream<DtAwdPriSummaryRecord> stream;
-        if ("Date Time".equals(dtDataTypeTerm)) {
-            stream = dtAwdPriList.stream().filter(e -> "date time".equals(e.xbtName()));
-        } else if ("Date".equals(dtDataTypeTerm)) {
-            stream = dtAwdPriList.stream().filter(e -> "date".equals(e.xbtName()));
-        } else if ("Time".equals(dtDataTypeTerm)) {
-            stream = dtAwdPriList.stream().filter(e -> "time".equals(e.xbtName()));
-        } else {
-            stream = dtAwdPriList.stream().filter(e -> e.isDefault());
-        }
-
-        return stream.findFirst().orElse(null);
+        return DefaultAwdPriRule.select(dt.dataTypeTerm(), getDtAwdPriSummaryList(dtManifestId));
     }
 
     private List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(ReleaseId releaseId, DtId dtId) {
@@ -1285,25 +1267,7 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     @Override
     public DtScAwdPriSummaryRecord getDefaultDtScAwdPriSummary(DtScManifestId dtScManifestId) {
         DtScSummaryRecord dtSc = getDtScSummary(dtScManifestId);
-        String dtScRepresentationTerm = dtSc.representationTerm();
-
-        List<DtScAwdPriSummaryRecord> dtScAwdPriList = getDtScAwdPriSummaryList(dtScManifestId);
-
-        /*
-         * Issue #808
-         */
-        Stream<DtScAwdPriSummaryRecord> stream;
-        if ("Date Time".equals(dtScRepresentationTerm)) {
-            stream = dtScAwdPriList.stream().filter(e -> "date time".equals(e.xbtName()));
-        } else if ("Date".equals(dtScRepresentationTerm)) {
-            stream = dtScAwdPriList.stream().filter(e -> "date".equals(e.xbtName()));
-        } else if ("Time".equals(dtScRepresentationTerm)) {
-            stream = dtScAwdPriList.stream().filter(e -> "time".equals(e.xbtName()));
-        } else {
-            stream = dtScAwdPriList.stream().filter(e -> e.isDefault());
-        }
-
-        return stream.findFirst().orElse(null);
+        return DefaultAwdPriRule.selectForSc(dtSc.representationTerm(), getDtScAwdPriSummaryList(dtScManifestId));
     }
 
     private List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(ReleaseId releaseId, DtScId dtScId) {

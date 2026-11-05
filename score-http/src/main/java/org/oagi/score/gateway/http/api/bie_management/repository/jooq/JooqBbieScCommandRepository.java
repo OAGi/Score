@@ -140,14 +140,7 @@ public class JooqBbieScCommandRepository extends JooqBaseRepository implements B
             }
 
             if (bbieSc.isEmptyPrimitive()) {
-                List<DtScAwdPriSummaryRecord> dtScAwdPriList = dtQuery.getDtScAwdPriSummaryList(bbieSc.getBasedDtScManifestId());
-                dtScAwdPriList = dtScAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtScAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtScAwdPriSummaryRecord defaultDtScAwdPri = dtScAwdPriList.get(0);
+                DtScAwdPriSummaryRecord defaultDtScAwdPri = dtQuery.getDefaultDtScAwdPriSummary(bbieSc.getBasedDtScManifestId());
                 if (defaultDtScAwdPri.codeListManifestId() != null) {
                     bbieScRecord.setXbtManifestId(null);
                     bbieScRecord.setCodeListManifestId(valueOf(defaultDtScAwdPri.codeListManifestId()));

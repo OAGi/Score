@@ -49,6 +49,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.AccessPrivilege;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
 import org.oagi.score.gateway.http.common.util.Utility;
@@ -882,8 +883,11 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbiepNode.getBbieId() == null) {
-            XbtManifestId defaultXbtManifestId = repository.getDefaultXbtManifestIdByDtManifestId(detail.getBdtManifestId());
-            detail.setXbtManifestId(defaultXbtManifestId);
+            PrimitiveRestriction defaultPrimitiveRestriction =
+                    repository.getDefaultPrimitiveRestriction(requester, detail.getBdtManifestId());
+            detail.setXbtManifestId(defaultPrimitiveRestriction.xbtManifestId());
+            detail.setCodeListManifestId(defaultPrimitiveRestriction.codeListManifestId());
+            detail.setAgencyIdListManifestId(defaultPrimitiveRestriction.agencyIdListManifestId());
         }
 
         if (bbiepNode.getBccManifestId() != null) {
@@ -1036,8 +1040,11 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbieScNode.getBbieScId() == null) {
-            XbtManifestId defaultXbtManifestId = repository.getDefaultXbtManifestIdByDtScManifestId(bbieScNode.getDtScManifestId());
-            detail.setXbtManifestId(defaultXbtManifestId);
+            PrimitiveRestriction defaultPrimitiveRestriction =
+                    repository.getDefaultPrimitiveRestrictionOfSc(requester, bbieScNode.getDtScManifestId());
+            detail.setXbtManifestId(defaultPrimitiveRestriction.xbtManifestId());
+            detail.setCodeListManifestId(defaultPrimitiveRestriction.codeListManifestId());
+            detail.setAgencyIdListManifestId(defaultPrimitiveRestriction.agencyIdListManifestId());
         }
 
         if (bbieScNode.getDtScManifestId() != null) {

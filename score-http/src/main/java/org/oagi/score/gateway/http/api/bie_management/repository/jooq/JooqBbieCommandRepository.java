@@ -156,14 +156,7 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
                 BccpSummaryRecord bccpRecord = bccpQuery.getBccpSummary(bccRecord.toBccpManifestId());
 
                 var dtQuery = repositoryFactory().dtQueryRepository(requester());
-                List<DtAwdPriSummaryRecord> dtAwdPriList = dtQuery.getDtAwdPriSummaryList(bccpRecord.dtManifestId());
-                dtAwdPriList = dtAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtAwdPriSummaryRecord defaultBdtPriRestri = dtAwdPriList.get(0);
+                DtAwdPriSummaryRecord defaultBdtPriRestri = dtQuery.getDefaultDtAwdPriSummary(bccpRecord.dtManifestId());
                 if (defaultBdtPriRestri.codeListManifestId() != null) {
                     bbieRecord.setXbtManifestId(null);
                     bbieRecord.setCodeListManifestId(valueOf(defaultBdtPriRestri.codeListManifestId()));

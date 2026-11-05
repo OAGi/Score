@@ -79,11 +79,13 @@ class BieUpliftingAgencyIdListDomainTest {
             DtScSummaryRecord dtSc = mock(DtScSummaryRecord.class);
             when(dtSc.dtScManifestId()).thenReturn(id);
             when(document.getDtSc(id)).thenReturn(dtSc);
+            // A row of the allowed primitives holds one value domain: the default primitive, or an allowed list.
             DtScAwdPriSummaryRecord approved = mock(DtScAwdPriSummaryRecord.class);
             when(approved.agencyIdListManifestId()).thenReturn(allowedId);
-            when(approved.xbtManifestId()).thenReturn(defaultPrimitive);
-            when(approved.isDefault()).thenReturn(true);
-            when(document.getDtScAwdPriList(id)).thenReturn(List.of(approved));
+            DtScAwdPriSummaryRecord defaultRow = mock(DtScAwdPriSummaryRecord.class);
+            when(defaultRow.xbtManifestId()).thenReturn(defaultPrimitive);
+            when(defaultRow.isDefault()).thenReturn(true);
+            when(document.getDtScAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             BbieSc source = new BbieSc();
             source.setAgencyIdListManifestId(sourceList.agencyIdListManifestId());
             BbieSc target = new BbieSc();
@@ -98,11 +100,13 @@ class BieUpliftingAgencyIdListDomainTest {
             DtSummaryRecord dt = mock(DtSummaryRecord.class);
             when(dt.dtManifestId()).thenReturn(id);
             when(document.getDt(id)).thenReturn(dt);
+            // A row of the allowed primitives holds one value domain: the default primitive, or an allowed list.
             DtAwdPriSummaryRecord approved = mock(DtAwdPriSummaryRecord.class);
             when(approved.agencyIdListManifestId()).thenReturn(allowedId);
-            when(approved.xbtManifestId()).thenReturn(defaultPrimitive);
-            when(approved.isDefault()).thenReturn(true);
-            when(document.getDtAwdPriList(id)).thenReturn(List.of(approved));
+            DtAwdPriSummaryRecord defaultRow = mock(DtAwdPriSummaryRecord.class);
+            when(defaultRow.xbtManifestId()).thenReturn(defaultPrimitive);
+            when(defaultRow.isDefault()).thenReturn(true);
+            when(document.getDtAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             Bbie source = new Bbie();
             source.setAgencyIdListManifestId(sourceList.agencyIdListManifestId());
             Bbie target = new Bbie();

@@ -42,7 +42,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriDetailsRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
@@ -1569,14 +1569,7 @@ public class BieEditService implements InitializingBean {
                 var bccpQuery = repositoryFactory.bccpQueryRepository(requester);
                 BccpSummaryRecord bccpRecord = bccpQuery.getBccpSummary(bccRecord.toBccpManifestId());
 
-                List<DtAwdPriSummaryRecord> dtAwdPriList = dtQuery.getDtAwdPriSummaryList(bccpRecord.dtManifestId());
-                dtAwdPriList = dtAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtAwdPriSummaryRecord defaultDtAwdPri = dtAwdPriList.get(0);
+                DtAwdPriSummaryRecord defaultDtAwdPri = dtQuery.getDefaultDtAwdPriSummary(bccpRecord.dtManifestId());
                 if (defaultDtAwdPri.codeListManifestId() != null) {
                     bbieRecord.setXbtManifestId(null);
                     bbieRecord.setCodeListManifestId(ULong.valueOf(defaultDtAwdPri.codeListManifestId().value()));
@@ -1630,24 +1623,17 @@ public class BieEditService implements InitializingBean {
                 bbieScRecord.setCardinalityMin(dtScRecord.cardinality().min());
                 bbieScRecord.setCardinalityMax(dtScRecord.cardinality().max());
 
-                List<DtScAwdPriDetailsRecord> dtScAwdPriList = dtScRecord.dtScAwdPriList();
-                dtScAwdPriList = dtScAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtScAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtScAwdPriDetailsRecord defaultDtScAwdPri = dtScAwdPriList.get(0);
-                if (defaultDtScAwdPri.codeList() != null) {
+                DtScAwdPriSummaryRecord defaultDtScAwdPri = dtQuery.getDefaultDtScAwdPriSummary(dtScRecord.dtScManifestId());
+                if (defaultDtScAwdPri.codeListManifestId() != null) {
                     bbieScRecord.setXbtManifestId(null);
-                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultDtScAwdPri.codeList().codeListManifestId().value()));
+                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultDtScAwdPri.codeListManifestId().value()));
                     bbieScRecord.setAgencyIdListManifestId(null);
-                } else if (defaultDtScAwdPri.agencyIdList() != null) {
+                } else if (defaultDtScAwdPri.agencyIdListManifestId() != null) {
                     bbieScRecord.setXbtManifestId(null);
                     bbieScRecord.setCodeListManifestId(null);
-                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultDtScAwdPri.agencyIdList().agencyIdListManifestId().value()));
+                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultDtScAwdPri.agencyIdListManifestId().value()));
                 } else {
-                    bbieScRecord.setXbtManifestId(ULong.valueOf(defaultDtScAwdPri.xbt().xbtManifestId().value()));
+                    bbieScRecord.setXbtManifestId(ULong.valueOf(defaultDtScAwdPri.xbtManifestId().value()));
                     bbieScRecord.setCodeListManifestId(null);
                     bbieScRecord.setAgencyIdListManifestId(null);
                 }
