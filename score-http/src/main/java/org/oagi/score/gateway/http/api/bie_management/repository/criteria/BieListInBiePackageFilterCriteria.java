@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public record BieListInBiePackageFilterCriteria(
         BiePackageId biePackageId,
-        String den, String businessTerm, String version, String remark,
+        String den, String businessContext, String version, String remark,
         Collection<String> ownerLoginIdList,
         Collection<String> updaterLoginIdList,
         DateRangeCriteria lastUpdatedTimestampRange) {

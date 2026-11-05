@@ -220,8 +220,8 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
             if (hasLength(filterCriteria.den())) {
                 conditions.addAll(contains(filterCriteria.den(), ASCCP_MANIFEST.DEN));
             }
-            if (hasLength(filterCriteria.businessTerm())) {
-                conditions.addAll(contains(filterCriteria.businessTerm(), BIZ_CTX.NAME));
+            if (hasLength(filterCriteria.businessContext())) {
+                conditions.addAll(contains(filterCriteria.businessContext(), BIZ_CTX.NAME));
             }
             if (hasLength(filterCriteria.version())) {
                 conditions.addAll(contains(filterCriteria.version(), TOP_LEVEL_ASBIEP.VERSION));
@@ -690,6 +690,10 @@ public class JooqBiePackageQueryRepository extends JooqBaseRepository implements
             String den = filterCriteria.den();
             if (StringUtils.hasLength(den)) {
                 conditions.addAll(contains(den, ASCCP_MANIFEST.DEN, ASBIEP.DISPLAY_NAME));
+            }
+
+            if (StringUtils.hasLength(filterCriteria.businessContext())) {
+                conditions.addAll(contains(filterCriteria.businessContext(), BIZ_CTX.NAME));
             }
 
             if (StringUtils.hasLength(filterCriteria.version())) {
