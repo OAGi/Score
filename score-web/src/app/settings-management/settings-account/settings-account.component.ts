@@ -114,7 +114,7 @@ export class SettingsAccountComponent implements OnInit {
     this.loading = true;
 
     this.service.resendEmailValidationRequest({
-      email: this.emailFormControl.value
+      email: this.originalEmail
     }, {
       email_validation_link: window.location.href.replace(/\/settings\/account.*$/, '/settings/email_validation')
     }).subscribe(_ => {
