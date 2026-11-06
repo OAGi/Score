@@ -150,7 +150,7 @@ export function loadProperty(userToken: UserToken, key: string, defaultValue: st
 
   const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
   try {
-    return JSON.parse(atob(localStorage.getItem(itemKey))).value;
+    return JSON.parse(decodeUnicodeBase64(localStorage.getItem(itemKey))).value;
   } catch (ignore) {
     return defaultValue;
   }
@@ -161,7 +161,31 @@ export function saveProperty(userToken: UserToken, key: string, value: string) {
     return;
   }
   const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
-  localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
+  localStorage.setItem(itemKey, encodeUnicodeBase64(JSON.stringify({value})));
+}
+
+/**
+ * Base64-encodes the UTF-8 bytes of the text, because `btoa` throws for characters above U+00FF.
+ * For ASCII text the result is identical to `btoa`.
+ */
+export function encodeUnicodeBase64(text: string): string {
+  let binary = '';
+  new TextEncoder().encode(text).forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
+/**
+ * Decodes the text encoded by `encodeUnicodeBase64`. A value that is not valid UTF-8 was stored by the plain `btoa`
+ * (Latin-1) and is decoded as it is.
+ */
+export function decodeUnicodeBase64(encoded: string): string {
+  const binary = atob(encoded);
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+  try {
+    return new TextDecoder('utf-8', {fatal: true}).decode(bytes);
+  } catch (ignore) {
+    return binary;
+  }
 }
 
 export function loadLibrary(userToken: UserToken): number | undefined {
