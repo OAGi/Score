@@ -22,6 +22,7 @@ source "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/config.sh"
 INSTANCE="${1:?usage: deploy/verify.sh <instance> [version]}"
 VERSION="${2:-$(default_version)}"
 HOST="$(instance_host "$INSTANCE")" || exit 1
+normalize_images
 
 log "Verify '$INSTANCE' ($HOST) @ $VERSION"
 ensure_ssh "$HOST"
@@ -86,10 +87,11 @@ fw_ver="${flyway%%|*}"; fw_ok="${flyway##*|}"
 
 echo "  -- running images --"
 printf '     frontend(srt-web)=%s  backend(srt-http-gateway)=%s  db(srt-repo)=%s\n' "$img_web" "$img_http" "$img_repo"
-check "frontend image" "$img_web" "$VERSION"
-check "backend image" "$img_http" "$VERSION"
-# db(srt-repo) may legitimately lag under --no-db -- report only, do not fail.
-[ "$img_repo" = "$VERSION" ] || warn "db(srt-repo) is $img_repo, not $VERSION (expected if rolled with --no-db; cosmetic)."
+# Only assert the images that were part of this roll (IMAGES); the others are reported only.
+if has_image web;  then check "frontend image" "$img_web"  "$(tag_for web "$VERSION")"; fi
+if has_image http; then check "backend image"  "$img_http" "$(tag_for http "$VERSION")"; fi
+if has_image repo; then check "db image"       "$img_repo" "$(tag_for repo "$VERSION")"
+else warn "db(srt-repo) is $img_repo (not rolled; cosmetic -- schema is runtime-Flyway)."; fi
 check "backend :8080 (security up)" "$backend" "401"
 # Flyway: hard-assert the schema applied cleanly (success=1), but ONLY when we could read it.
 # The head *version* is the migration namespace (V3_5_x), independent of the app release tag
