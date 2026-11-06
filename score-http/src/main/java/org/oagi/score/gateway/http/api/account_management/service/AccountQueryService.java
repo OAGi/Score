@@ -39,10 +39,18 @@ public class AccountQueryService {
         try {
             accountDetails = getAccountDetails(requester, UserId.from(str));
         } catch (NumberFormatException e) {
-            var query = repositoryFactory.accountQueryRepository(requester);
-            accountDetails = query.getAccountDetailsByLoginId(str);
+            accountDetails = null;
+        }
+        if (accountDetails == null) {
+            // A login ID may consist only of digits, so fall back to it when no account has this user ID.
+            accountDetails = getAccountDetailsByLoginId(requester, str);
         }
         return accountDetails;
+    }
+
+    public AccountDetailsRecord getAccountDetailsByLoginId(ScoreUser requester, String loginId) {
+        var query = repositoryFactory.accountQueryRepository(requester);
+        return query.getAccountDetailsByLoginId(loginId);
     }
 
     public List<String> getAccountLoginIds(ScoreUser requester) {
