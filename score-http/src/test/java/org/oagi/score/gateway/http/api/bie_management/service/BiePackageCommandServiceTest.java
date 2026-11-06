@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.CopyBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
@@ -299,5 +300,43 @@ class BiePackageCommandServiceTest {
 
         verify(command, never()).revise(eq(PACKAGE_ID), any());
         verify(command).revise(eq(second), any());
+    }
+
+    private BiePackageSummaryRecord aSummary(BieState state, UserId ownerId) {
+        return new BiePackageSummaryRecord(PACKAGE_ID, null, null, "Name", "v1.0", "v1", "desc", null, null,
+                state, new UserSummaryRecord(ownerId, "someone", "Someone", List.of()), null);
+    }
+
+    private static final UserId ANOTHER_USER = new UserId(BigInteger.valueOf(43));
+
+    @Test
+    void copy_rejects_an_unknown_package() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(null);
+        assertThrows(org.oagi.score.gateway.http.common.model.NotFoundException.class,
+                () -> service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID))));
+        verify(command, never()).copy(any());
+    }
+
+    @Test
+    void copy_rejects_the_wip_package_of_another_user() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(BieState.WIP, ANOTHER_USER));
+        assertThrows(DataAccessForbiddenException.class, () -> service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID))));
+        verify(command, never()).copy(any());
+    }
+
+    @Test
+    void copy_allows_qa_and_production_of_another_user() {
+        for (BieState state : List.of(BieState.QA, BieState.Production)) {
+            when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(state, ANOTHER_USER));
+            service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID)));
+        }
+        verify(command, times(2)).copy(PACKAGE_ID);
+    }
+
+    @Test
+    void copy_allows_the_own_wip_package() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(BieState.WIP, requester.userId()));
+        service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID)));
+        verify(command).copy(PACKAGE_ID);
     }
 }

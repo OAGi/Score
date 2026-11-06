@@ -4,6 +4,7 @@ import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.CopyBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.CreateBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.DiscardBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBiePackageRequest;
@@ -15,6 +16,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePacka
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -146,7 +148,25 @@ public class BiePackageCommandService {
         return biePackage;
     }
 
-    public void copy(ScoreUser requester, Collection<BiePackageId> biePackageIdList) {
+    /**
+     * Copies BIE packages by the same rule as copying a BIE: a package can be copied when it is in QA or
+     * Production, or when the requester owns it. Another user's WIP package is not. Every package is
+     * checked before any is copied.
+     */
+    public void copy(ScoreUser requester, CopyBiePackageRequest request) {
+        Collection<BiePackageId> biePackageIdList = request.biePackageIdList();
+        for (BiePackageId biePackageId : biePackageIdList) {
+            BiePackageSummaryRecord source = query(requester).getBiePackageSummary(biePackageId);
+            if (source == null) {
+                throw new NotFoundException("The BIE package to copy does not exist.");
+            }
+            boolean copyable = source.state() == BieState.QA || source.state() == Production
+                    || requester.userId().equals(source.owner().userId());
+            if (!copyable) {
+                throw new DataAccessForbiddenException(
+                        "Not allowed to copy the BIE package in '" + source.state() + "' state owned by another user.");
+            }
+        }
         for (BiePackageId biePackageId : biePackageIdList) {
             command(requester).copy(biePackageId);
         }
