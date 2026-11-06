@@ -182,7 +182,7 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 BigInteger asccId = findCcIdByBie(bieToAssign);
                 if (asccId == null) {
                     // #1752 - M8: a nonexistent/invalid ASBIE id resolves to no CC -> clear 400.
-                    throw new IllegalArgumentException("No ASBIE found for id " + bieToAssign.getBieId() + ".");
+                    throw new IllegalArgumentException("No used ASBIE found for id " + bieToAssign.getBieId() + ".");
                 }
                 AsccBiztermRecord asccBiztermRecord = new AsccBiztermRecord();
                 asccBiztermRecord.setAsccId(ULong.valueOf(asccId));
@@ -239,7 +239,7 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                 BigInteger bccId = findCcIdByBie(bieToAssign);
                 if (bccId == null) {
                     // #1752 - M8: a nonexistent/invalid BBIE id resolves to no CC -> clear 400.
-                    throw new IllegalArgumentException("No BBIE found for id " + bieToAssign.getBieId() + ".");
+                    throw new IllegalArgumentException("No used BBIE found for id " + bieToAssign.getBieId() + ".");
                 }
                 BccBiztermRecord bccBiztermRecord = new BccBiztermRecord();
                 bccBiztermRecord.setBccId(ULong.valueOf(bccId));
@@ -370,6 +370,7 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                     .leftJoin(ASCC_MANIFEST)
                     .on(ASBIE.BASED_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.ASCC_MANIFEST_ID))
                     .where(ASBIE.ASBIE_ID.eq(ULong.valueOf(bieToAssign.getBieId())))
+                    .and(ASBIE.IS_USED.eq((byte) 1))
                     .fetchOneInto(BigInteger.class);
         } else if (bieToAssign.getBieType().equals("BBIE")) {
             return dslContext()
@@ -378,6 +379,7 @@ public class JooqBusinessTermCommandRepository extends JooqBaseRepository implem
                     .leftJoin(BCC_MANIFEST)
                     .on(BBIE.BASED_BCC_MANIFEST_ID.eq(BCC_MANIFEST.BCC_MANIFEST_ID))
                     .where(BBIE.BBIE_ID.eq(ULong.valueOf(bieToAssign.getBieId())))
+                    .and(BBIE.IS_USED.eq((byte) 1))
                     .fetchOneInto(BigInteger.class);
         } else throw new IllegalArgumentException("Wrong BIE type");
     }

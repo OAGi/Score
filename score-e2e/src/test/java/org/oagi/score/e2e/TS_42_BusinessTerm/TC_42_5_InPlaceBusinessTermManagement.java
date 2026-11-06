@@ -6,7 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jooq.CloseableDSLContext;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.jooq.types.ULong;
 import org.oagi.score.e2e.BaseTest;
+import org.oagi.score.e2e.impl.AuthenticatedApiClient;
 import org.oagi.score.e2e.condition.DisabledIfBusinessTermProperty;
 import org.oagi.score.e2e.obj.*;
 import org.oagi.score.e2e.page.HomePage;
@@ -18,11 +25,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.BBIE;
+import static org.oagi.score.e2e.impl.api.jooq.entity.Tables.BBIE_BIZTERM;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
 
@@ -474,9 +484,86 @@ public class TC_42_5_InPlaceBusinessTermManagement extends BaseTest {
                 "button.bt-add-btn")).size());
     }
 
+    /**
+     * #42.5.11 — Issue #346: a BBIE that is not used is not part of the BIE profile, so assigning a
+     * Business Term to it is rejected with a clean HTTP 400 and nothing is written; the same request
+     * succeeds once the BBIE is used.
+     */
+    @Test
+    @DisplayName("TC_42_5_11")
+    public void assigning_a_business_term_to_an_unused_bbie_is_rejected_with_a_clean_400() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject businessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP = generateBbieTopLevelASBIEP(developer, endUser, "WIP", businessContext);
+        BusinessTermObject randomBusinessTerm = getAPIFactory().getBusinessTermAPI().createRandomBusinessTerm(endUser);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = bbiePath(topLevelASBIEP);
+        saveBbieUsed(editBIEPage, path, true);
+        saveBbieUsed(editBIEPage, path, false); // saved, but not used
+        BigInteger bbieId = findBbieId(topLevelASBIEP);
+
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+        String assignUrl = "/api/business-terms/" + randomBusinessTerm.getBusinessTermId() + "/assign";
+        String assignBody = "{\"biesToAssign\":[{\"bieId\":" + bbieId + ",\"bieType\":\"BBIE\"}],"
+                + "\"primaryIndicator\":false,\"typeCode\":null}";
+
+        assertEquals(400, api.postJson(assignUrl, assignBody).statusCode());
+        assertEquals(0L, dsl().fetchCount(BBIE_BIZTERM, BBIE_BIZTERM.BBIE_ID.eq(ULong.valueOf(bbieId))),
+                "a rejected assignment must not write a row");
+
+        // Once the BBIE is used again the identical request is accepted.
+        saveBbieUsed(editBIEPage, path, true);
+        assertEquals(204, api.postJson(assignUrl, assignBody).statusCode());
+        assertEquals(1L, dsl().fetchCount(BBIE_BIZTERM, BBIE_BIZTERM.BBIE_ID.eq(ULong.valueOf(bbieId))));
+    }
+
+    /**
+     * #42.5.12 — Issue #346: the BBIE/ASBIE list offered for a Business Term assignment contains only
+     * used rows. The BBIE is absent while it is not used and listed once it is used.
+     */
+    @Test
+    @DisplayName("TC_42_5_12")
+    public void asbie_bbie_list_offers_only_used_rows() throws Exception {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+        AppUserObject endUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(endUser);
+        BusinessContextObject businessContext = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(developer);
+        TopLevelASBIEPObject topLevelASBIEP = generateBbieTopLevelASBIEP(developer, endUser, "WIP", businessContext);
+
+        HomePage homePage = loginPage().signIn(endUser.getLoginId(), endUser.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(topLevelASBIEP);
+        String path = bbiePath(topLevelASBIEP);
+        saveBbieUsed(editBIEPage, path, true);
+        saveBbieUsed(editBIEPage, path, false); // saved, but not used
+        BigInteger bbieId = findBbieId(topLevelASBIEP);
+
+        AuthenticatedApiClient api = new AuthenticatedApiClient(getDriver(), getConfig().getBaseUrl());
+        // The business context name is unique to this test, so the list holds only this BIE's rows.
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        String listUrl = "/api/business-terms/asbie-bbie?libraryId=" + library.getLibraryId()
+                + "&types=BBIE&businessContext="
+                + java.net.URLEncoder.encode(businessContext.getName(), java.nio.charset.StandardCharsets.UTF_8)
+                + "&pageIndex=0&pageSize=-1";
+
+        assertFalse(listedBieIds(api, listUrl).contains(bbieId), "an unused BBIE must not be offered");
+
+        saveBbieUsed(editBIEPage, path, true);
+        assertTrue(listedBieIds(api, listUrl).contains(bbieId), "a used BBIE must be offered");
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();
+        if (dsl != null) {
+            dsl.close();
+            dsl = null;
+        }
 
         // Delete random accounts
         this.randomAccounts.forEach(randomAccount -> {
@@ -519,5 +606,55 @@ public class TC_42_5_InPlaceBusinessTermManagement extends BaseTest {
             }
         }
         throw new NoSuchElementException("No chip with Type Code: " + typeCode);
+    }
+
+    private TopLevelASBIEPObject generateBbieTopLevelASBIEP(AppUserObject developer, AppUserObject endUser, String state,
+                                                            BusinessContextObject businessContext) {
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.8.3");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(library, "Source Activity. Source Activity", release.getReleaseNumber());
+        return getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Collections.singletonList(businessContext), asccp, endUser, state);
+    }
+
+    /** Sets the BBIE node's Used flag in the editor to {@code used} and saves, so the row is persisted. */
+    private void saveBbieUsed(EditBIEPage editBIEPage, String path, boolean used) {
+        EditBIEPage.BBIEPanel panel = editBIEPage.getBBIEPanel(editBIEPage.getNodeByPath(path));
+        if (panel.getUsedCheckbox().findElement(By.tagName("input")).isSelected() != used) {
+            panel.toggleUsed();
+        }
+        editBIEPage.hitUpdateButton();
+    }
+
+    private CloseableDSLContext dsl;
+
+    private DSLContext dsl() {
+        if (dsl == null) {
+            dsl = DSL.using(
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.url"),
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.username"),
+                    getConfig().getProperty("org.oagi.score.e2e.datasource.password"));
+        }
+        return dsl;
+    }
+
+    /** A BBIE row exists only for a node that was saved, so the one saved node is the top-level BIE's only row. */
+    private BigInteger findBbieId(TopLevelASBIEPObject topLevelASBIEP) {
+        List<ULong> ids = dsl().select(BBIE.BBIE_ID).from(BBIE)
+                .where(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelASBIEP.getTopLevelAsbiepId())))
+                .fetchInto(ULong.class);
+        assertEquals(1, ids.size(), "exactly the saved BBIE node must be persisted: " + ids);
+        return ids.get(0).toBigInteger();
+    }
+
+    private List<BigInteger> listedBieIds(AuthenticatedApiClient api, String url) throws Exception {
+        AuthenticatedApiClient.ApiResponse response = api.getJson(url);
+        assertEquals(200, response.statusCode(), response.body());
+        List<BigInteger> ids = new ArrayList<>();
+        for (JsonNode entry : new ObjectMapper().readTree(response.body()).get("list")) {
+            ids.add(entry.get("bieId").bigIntegerValue());
+        }
+        return ids;
     }
 }

@@ -427,12 +427,22 @@ are omitted.
 #### Test Assertion #42.5.10
 On the base (inherited) tab the chip field is read-only and non-interactive.
 
+#### Test Assertion #42.5.11
+A Business Term cannot be assigned to an ASBIE or BBIE that is not used (Issue #346): the assignment
+request is rejected with a clean HTTP 400, no assignment is written, and the same request is accepted
+once the node is used.
+
+#### Test Assertion #42.5.12
+The ASBIE/BBIE list offered for a Business Term assignment contains only used rows (Issue #346): a BBIE
+that is not used is not listed, and it is listed once the node is used.
+
 ### Test Step Pre-condition:
 1. Business Term is enabled in Application Settings in connectCenter.
 2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
 3. At least one BBIE node and one ASBIE node can be marked as used for in-place management.
 4. Multiple Business Terms are available so the test can verify multi-select assignment, Type Code, preferred, and preview behavior.
 5. BIE nodes in WIP, QA, and Production states are available so the test can confirm the absence of an edit-state gate.
+6. A BBIE node that has been saved and then un-checked (`Used` cleared) is available, with access to the `/api/business-terms` endpoints, for the unused-node assertions.
 
 ### Test Step:
 1. The end user signs in to connectCenter, opens a BIE detail page, and selects a used ASBIE or BBIE node.
@@ -455,3 +465,7 @@ On the base (inherited) tab the chip field is read-only and non-interactive.
 18. Verify that the preview card shows the term link that opens the Business Term along with the populated fields, and that empty fields are omitted. (Assertion [#9](#test-assertion-4259))
 19. The end user opens the base (inherited) tab of a BIE node and inspects the chip field.
 20. Verify that the chip field is read-only and non-interactive on the base tab. (Assertion [#10](#test-assertion-42510))
+21. The end user marks a BBIE node used and saves it, then clears `Used` and saves it again, and an authorized tester assigns a Business Term to that BBIE id via the API.
+22. Verify that the response is HTTP 400, that no assignment row was created, and that the same request succeeds and creates one assignment after the end user marks the BBIE used again. (Assertion [#11](#test-assertion-42511))
+23. The end user leaves the BBIE node saved but not used, and an authorized tester lists the ASBIEs and BBIEs available for assignment via the API, filtered to the BIE's business context.
+24. Verify that the BBIE is absent from the list while it is not used, and is listed once the end user marks it used again. (Assertion [#12](#test-assertion-42512))
