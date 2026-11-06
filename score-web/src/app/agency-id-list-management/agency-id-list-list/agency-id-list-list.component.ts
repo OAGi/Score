@@ -301,7 +301,7 @@ export class AgencyIdListListComponent {
     if (!item) {
       return false;
     }
-    return item.owner.username === this.currentUser && item.state === 'WIP';
+    return item.owner.loginId === this.currentUser && item.state === 'WIP';
   }
 
   openTransferDialog(item: AgencyIdListListEntry, event?: MouseEvent) {
