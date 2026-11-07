@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,18 @@ public class OasDocChangeApplier {
 
     /** The document and its operations are saved or checked by their own services; the entries here. */
     public OasDocChangeResult apply(ScoreUser requester, OasDocId oasDocId, OasDocChangeSet changeSet, boolean dryRun) {
-        assertOperationIdsGiven(changeSet.operationsOrEmpty());
+        List<OasDocChangeResult.DerivedOperation> derived = deriveNames(changeSet.operationsOrEmpty());
+        try {
+            return applyChanges(requester, oasDocId, changeSet, dryRun, derived);
+        } catch (OasDocViolationException e) {
+            throw e.withDerived(derived); // what was made of the names is what the user sees next to what is wrong
+        }
+    }
 
+    private OasDocChangeResult applyChanges(ScoreUser requester, OasDocId oasDocId, OasDocChangeSet changeSet, boolean dryRun,
+                                            List<OasDocChangeResult.DerivedOperation> derived) {
+        assertOperationIdsGiven(changeSet.operationsOrEmpty());
+        assertResourcePaths(changeSet.operationsOrEmpty());
         if (changeSet.document() != null) {
             UpdateOasDocRequest request = documentRequest(requester, oasDocId, changeSet.document());
             step(Scope.DOCUMENT, () -> oasDocService.updateOasDoc(requester, request));
@@ -61,12 +72,72 @@ public class OasDocChangeApplier {
         if (dryRun) {
             markRollbackOnly();
         }
-        return OasDocChangeResult.valid(headers);
+        return OasDocChangeResult.valid(headers, derived);
     }
 
     /** The transaction ends in a rollback whatever happens next. */
     protected void markRollbackOnly() {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+    }
+
+    /**
+     * Make what follows from the verb or the array indicator that the user changed ({@code touched}): the Operation ID, the
+     * Resource Name, and a Request body that a GET cannot have. The rows are changed as they are, so what is saved is what is
+     * answered. The other row of the operation, when it is sent too, is of the same operation and gets the same.
+     */
+    private static List<OasDocChangeResult.DerivedOperation> deriveNames(List<BieForOasDoc> operations) {
+        Map<String, OasDocChangeResult.DerivedOperation> derived = new LinkedHashMap<>();
+        for (BieForOasDoc row : operations) {
+            if (row == null || row.getTouched().isEmpty()) {
+                continue;
+            }
+            String sentMessageBody = row.getMessageBody();
+            boolean verbTouched = row.getTouched().contains("verb");
+            boolean arrayTouched = row.getTouched().contains("arrayIndicator");
+            if (verbTouched && "GET".equalsIgnoreCase(row.getVerb()) && "Request".equals(row.getMessageBody())) {
+                row.setMessageBody("Response"); // a GET has no request body
+            }
+            if (verbTouched || arrayTouched) {
+                row.setOperationId(OasOperationNaming.recomputeOperationId(
+                        row.getVerb(), row.getOperationId(), row.isArrayIndicator(), row.getPropertyTerm()));
+            }
+            if (arrayTouched) {
+                row.setResourceName(OasOperationNaming.applyResourceArrayMarker(
+                        row.getResourceName(), row.getPropertyTerm(), row.isArrayIndicator()));
+            }
+            for (BieForOasDoc twin : operations) {
+                if (twin != null && twin != row && twin.getOasOperationId() != null
+                        && twin.getOasOperationId().equals(row.getOasOperationId()) && twin.getTouched().isEmpty()) {
+                    String twinSent = twin.getMessageBody();
+                    twin.setOperationId(row.getOperationId());
+                    twin.setResourceName(row.getResourceName());
+                    derived.put(keyOf(twin.getOasOperationId(), twinSent), derivedOf(twin, twinSent));
+                }
+            }
+            derived.put(keyOf(row.getOasOperationId(), sentMessageBody), derivedOf(row, sentMessageBody));
+        }
+        return List.copyOf(derived.values());
+    }
+
+    private static String keyOf(OasOperationId oasOperationId, String messageBody) {
+        return (oasOperationId == null ? "" : oasOperationId.value()) + "|" + messageBody;
+    }
+
+    private static OasDocChangeResult.DerivedOperation derivedOf(BieForOasDoc row, String sentMessageBody) {
+        return new OasDocChangeResult.DerivedOperation(row.getOasOperationId() == null ? null : row.getOasOperationId().value(),
+                sentMessageBody, row.getOperationId(), row.getResourceName(), row.getMessageBody());
+    }
+
+    /** The Resource Name is a key of {@code paths} of the generated document, so it has to be a path. */
+    private static void assertResourcePaths(List<BieForOasDoc> operations) {
+        for (BieForOasDoc row : operations) {
+            String error = row == null ? null : OasOperationNaming.resourcePathError(row.getResourceName()).orElse(null);
+            if (error != null) {
+                throw new OasDocViolationException(new OasDocViolation(Scope.OPERATION,
+                        row.getOasOperationId() == null ? null : row.getOasOperationId().value(), row.getMessageBody(),
+                        "resourceName", error));
+            }
+        }
     }
 
     /** The Operation ID is the one thing of an operation that has to be given. */

@@ -1,22 +1,16 @@
-import {Component, inject, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {EMPTY, ReplaySubject, Subject} from 'rxjs';
+import {switchMap, tap} from 'rxjs/operators';
 import {OpenAPIService} from '../../openapi-doc/domain/openapi.service';
 import {AssignBieForOasDoc, BieForOasDoc, OasDoc, OasDocListRequest} from '../../openapi-doc/domain/openapi-doc';
-import {buildOperationId, buildResourcePath} from '../../openapi-doc/domain/oas-operation-validation';
+import {OasOperationCandidate, OasOperationProposal} from '../../openapi-doc/domain/oas-doc-change';
 import {initFilter} from '../../../common/utility';
 
 export interface BieOasDocAddDialogData {
   topLevelAsbiepId: number;
   propertyTerm: string;
-  // The BIE's first business context name — the backend builds the resource path from it (see resourcePath).
-  businessContextName: string;
-  // Issue #1492: the BIE's existing OpenAPI bindings (across all documents), so this dialog can pre-check —
-  // client-side, exactly as the OpenAPI Document editor's Add dialog does — that the chosen (Verb, Message
-  // Body) would not duplicate a body the BIE already has on the SELECTED document (the backend enforces it
-  // too, returning a 400).
-  existingBindings: BieForOasDoc[];
 }
 
 /**
@@ -33,7 +27,7 @@ export interface BieOasDocAddDialogData {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-oas-doc-add-dialog.component.css']
 })
-export class BieOasDocAddDialogComponent implements OnInit {
+export class BieOasDocAddDialogComponent implements OnInit, OnDestroy {
   private openAPIService = inject(OpenAPIService);
   dialogRef = inject(MatDialogRef<BieOasDocAddDialogComponent>);
   data: BieOasDocAddDialogData = inject(MAT_DIALOG_DATA);
@@ -63,48 +57,46 @@ export class BieOasDocAddDialogComponent implements OnInit {
     });
   }
 
-  // A request body is never valid for GET, so revert it to Response.
-  onVerbChange(): void {
-    if (this.messageBody === 'Request' && this.verb === 'GET') {
-      this.messageBody = 'Response';
-    }
+  /** What the server makes of the operation that adding makes, and whether it can be added: shown, not made here. */
+  proposal?: OasOperationProposal;
+  private readonly proposalRequests = new Subject<void>();
+  private proposalSubscription = this.proposalRequests.pipe(
+    tap(() => this.proposal = undefined), // not known until the server answers
+    switchMap(() => this.selectedOasDoc ? this.openAPIService.proposeOperation(this.selectedOasDoc.oasDocId, this.candidate()) : EMPTY)
+  ).subscribe(proposal => this.proposal = proposal);
+
+  /** What the user has said of the operation: the server makes the rest. */
+  candidate(): OasOperationCandidate {
+    return {
+      topLevelAsbiepId: this.data.topLevelAsbiepId, propertyTerm: this.data.propertyTerm,
+      verb: this.verb, messageBody: this.messageBody, arrayIndicator: this.arrayIndicator
+    };
+  }
+
+  /** The document, the verb, the message body or the array indicator was chosen: ask the server again. */
+  propose(): void {
+    this.proposalRequests.next();
+  }
+
+  ngOnDestroy(): void {
+    this.proposalSubscription.unsubscribe();
   }
 
   get operationId(): string {
-    return buildOperationId(this.verb, this.data.propertyTerm, this.arrayIndicator);
+    return this.proposal?.operationId ?? '';
   }
 
-  // The default Resource Name, derived exactly the way the backend does when adding a BIE to a document:
-  // /<business-context>/<document-version>/<property-term>[-list]  (all lowercased, spaces -> dashes).
-  // The document version segment is omitted only when the selected document has no version.
   get resourcePath(): string {
-    const version = this.selectedOasDoc && this.selectedOasDoc.version ? this.selectedOasDoc.version : '';
-    return buildResourcePath(this.data.businessContextName, version, this.data.propertyTerm, this.arrayIndicator);
+    return this.proposal?.resourceName ?? '';
   }
 
-  // Issue #1492: the (path, verb, bodyType) slot the chosen selection would occupy. The backend derives the
-  // path from the property term (+ array indicator), so the property term is the stable identity used for
-  // the client-side duplicate pre-check. Mirrors oas-doc-assign-dialog.bodySlotKeyForAdd.
-  private bodySlotKey(propertyTerm: string, verb: string, messageBody: string): string {
-    return `${(propertyTerm || '').trim().toLowerCase()}|${verb || ''}|${messageBody || ''}`;
-  }
-
-  // Issue #1492: true when the chosen (Verb, Message Body) would duplicate a body this BIE already has on
-  // the SELECTED document — the same client-side guard the OpenAPI Document editor's Add dialog applies.
-  // Surfaced inline and used to disable Add (the backend enforces it as well, returning a 400).
-  isDuplicateBodySlot(): boolean {
-    if (!this.selectedOasDoc || !this.verb || !this.messageBody) {
-      return false;
-    }
-    const key = this.bodySlotKey(this.data.propertyTerm, this.verb, this.messageBody);
-    return (this.data.existingBindings || []).some(b =>
-      b.oasDocId === this.selectedOasDoc.oasDocId && b.verb && b.messageBody &&
-      (this.bodySlotKey(b.propertyTerm, b.verb, b.messageBody) === key ||
-        (!!b.resourceName && this.bodySlotKey(b.resourceName, b.verb, b.messageBody) === key)));
+  /** What the server says is wrong with adding it: the endpoint has the body already, the Operation ID is used... */
+  get problems(): string[] {
+    return (this.proposal?.violations ?? []).map(violation => violation.message);
   }
 
   get isValid(): boolean {
-    return !!this.selectedOasDoc && !!this.verb && !!this.messageBody && !this.isDuplicateBodySlot();
+    return !!this.selectedOasDoc && !!this.verb && !!this.messageBody && !!this.proposal && this.proposal.violations.length === 0;
   }
 
   add(): void {
@@ -121,7 +113,6 @@ export class BieOasDocAddDialogComponent implements OnInit {
     payload.oasRequest = this.messageBody === 'Request';
     payload.arrayIndicator = this.arrayIndicator;
     payload.suppressRootIndicator = this.suppressRootIndicator;
-    payload.operationId = this.operationId;
     this.dialogRef.close(payload);
   }
 

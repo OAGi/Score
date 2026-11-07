@@ -26,7 +26,7 @@ public class OasDocChangeService {
         try {
             return applier.apply(requester, oasDocId, changeSet, true);
         } catch (OasDocViolationException e) {
-            return OasDocChangeResult.invalid(e.violations());
+            return OasDocChangeResult.invalid(e.violations(), e.derived());
         }
     }
 

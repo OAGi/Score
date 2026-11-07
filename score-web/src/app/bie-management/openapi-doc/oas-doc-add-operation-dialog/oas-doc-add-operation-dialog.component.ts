@@ -1,9 +1,11 @@
-import {Component, Inject, inject, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Inject, inject, OnDestroy, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
 import {AddOperationForOasDoc, OasDoc} from '../domain/openapi-doc';
-import {oasResourcePathError} from '../domain/oas-operation-validation';
+import {OasOperationProposal} from '../domain/oas-doc-change';
+import {of, Subject} from 'rxjs';
+import {debounceTime, switchMap} from 'rxjs/operators';
 
 /**
  * Issue #1730: Dialog to add an API operation (endpoint) that does NOT reference a BIE.
@@ -17,7 +19,7 @@ import {oasResourcePathError} from '../domain/oas-operation-validation';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-add-operation-dialog.component.css']
 })
-export class OasDocAddOperationDialogComponent {
+export class OasDocAddOperationDialogComponent implements OnDestroy {
   private dialogRef = inject(MatDialogRef<OasDocAddOperationDialogComponent>);
   private openAPIService = inject(OpenAPIService);
   private snackBar = inject(MatSnackBar);
@@ -37,54 +39,63 @@ export class OasDocAddOperationDialogComponent {
     this.operation.messageBody = 'Request';
   }
 
+  /** What the server makes of the operation (its Operation ID, when the user gave none), and whether it can be added. */
+  proposal?: OasOperationProposal;
+  private readonly proposalRequests = new Subject<void>();
+  private proposalSubscription = this.proposalRequests.pipe(
+    debounceTime(250),
+    switchMap(() => this.operation.resourceName ? this.openAPIService.proposeOperation(this.oasDoc.oasDocId, {
+      verb: this.operation.verb, messageBody: this.operation.messageBody, arrayIndicator: false,
+      resourceName: this.operation.resourceName,
+      operationId: this.operationIdTouched ? this.operation.operationId : undefined
+    }) : of(undefined))
+  ).subscribe(proposal => {
+    this.proposal = proposal;
+    if (proposal && !this.operationIdTouched) {
+      this.operation.operationId = proposal.operationId;
+    }
+  });
+
+  /** The verb, the path or the Operation ID was changed: ask the server again. */
+  propose() {
+    this.proposal = undefined; // not known until the server answers
+    this.proposalRequests.next();
+  }
+
   onVerbChange() {
-    this.autoFillOperationId();
+    this.propose();
   }
 
   onResourceNameChange() {
-    this.autoFillOperationId();
+    this.propose();
   }
 
-  autoFillOperationId() {
-    if (this.operationIdTouched) {
-      return;
-    }
-    this.operation.operationId = this.deriveOperationId(this.operation.verb, this.operation.resourceName);
+  onOperationIdChange() {
+    this.operationIdTouched = true;
+    this.propose();
   }
 
-  // Issue #1730: PATCH -> update..., DELETE -> delete..., using the last non-variable path segment,
-  // e.g. PATCH /production-order/{id} -> updateProductionOrder
-  deriveOperationId(verb: string, path: string): string {
-    if (!verb || !path) {
-      return '';
-    }
-    const segments = path.split('/')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('{'));
-    const last = segments.length > 0 ? segments[segments.length - 1] : '';
-    const resource = last.split(/[-_\s]+/)
-      .filter(p => p.length > 0)
-      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
-      .join('');
-    const action = {
-      DELETE: 'delete',
-      PATCH: 'update'
-    }[verb] || verb.toLowerCase();
-    return resource ? action + resource : '';
+  ngOnDestroy() {
+    this.proposalSubscription.unsubscribe();
   }
 
-  // The path is used verbatim as a key of `paths`, so it must be a valid OpenAPI path.
-  // Material only shows <mat-error> in an error state; this input has no validator, so drive it here.
+  // Material only shows <mat-error> in an error state; this input has no validator, so drive it from what the server says.
   resourceNameErrorStateMatcher = {isErrorState: (): boolean => !!this.resourceNameError};
 
+  /** Why the server says that the Resource Name is not one. */
   get resourceNameError(): string {
-    return oasResourcePathError(this.operation.resourceName);
+    return this.proposal?.violations.find(violation => violation.field === 'resourceName')?.message ?? '';
+  }
+
+  /** What else the server says is wrong with adding it (the endpoint has the body, the Operation ID is used...). */
+  get problems(): string[] {
+    return (this.proposal?.violations ?? []).filter(violation => violation.field !== 'resourceName').map(violation => violation.message);
   }
 
   get isValid(): boolean {
     return !!this.operation.verb
       && !!this.operation.resourceName
-      && !this.resourceNameError
+      && !!this.proposal && this.proposal.violations.length === 0
       && !!this.operation.operationId;
   }
 

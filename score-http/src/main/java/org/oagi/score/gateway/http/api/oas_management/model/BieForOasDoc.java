@@ -42,6 +42,12 @@ public class BieForOasDoc extends Auditable {
     private String verb;
     private String messageBody;
     private boolean arrayIndicator;
+
+    /**
+     * What the user changed of the operation since the server last answered, that the server makes the Operation ID and the
+     * Resource Name of: {@code verb} and {@code arrayIndicator}. Not a field of the operation; it is not saved.
+     */
+    private List<String> touched;
     private boolean suppressRootIndicator;
     private String resourceName;
     private String operationId;
@@ -224,6 +230,14 @@ public class BieForOasDoc extends Auditable {
 
     public void setMessageBody(String messageBody) {
         this.messageBody = messageBody;
+    }
+
+    public List<String> getTouched() {
+        return touched == null ? List.of() : touched;
+    }
+
+    public void setTouched(List<String> touched) {
+        this.touched = touched;
     }
 
     public boolean isArrayIndicator() {

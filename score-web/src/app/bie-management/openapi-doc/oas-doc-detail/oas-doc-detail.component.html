@@ -281,7 +281,7 @@
 
       <ng-template #arrayControl let-element>
       <mat-checkbox [(ngModel)]="element.arrayIndicator"
-                    (ngModelChange)="updateOperationIdForArray(element)"
+                    (ngModelChange)="touchArrayIndicator(element)"
                     [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
       </ng-template>
 
@@ -307,10 +307,10 @@
       <ng-template #resourceNameControl let-element>
       <mat-form-field>
         <input matInput [(ngModel)]="element.resourceName"
-               [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
+               [errorStateMatcher]="resourceNameErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
-        <mat-error>{{ violationOf(element, 'messageBody')?.message }}</mat-error>
+        <mat-error>{{ (violationOf(element, 'resourceName') || violationOf(element, 'messageBody'))?.message }}</mat-error>
       </mat-form-field>
       </ng-template>
 

@@ -455,8 +455,22 @@ export class BieForOasDoc {
     this.httpHeaders = obj && obj.httpHeaders || [];
   }
 
+  /**
+   * What the user changed of the operation since the server last answered, that the server makes the Operation ID and the
+   * Resource Name of: the verb and the array indicator. The page does not make them: it says what the user did.
+   */
+  touched: string[] = [];
+
+  touch(field: 'verb' | 'arrayIndicator'): void {
+    if (!this.touched.includes(field)) {
+      this.touched.push(field);
+    }
+  }
+
   get json(): any {
     return {
+      touched: this.touched,
+      propertyTerm: this.propertyTerm,
       oasDocId: this.oasDocId,
       topLevelAsbiepId: this.topLevelAsbiepId,
       oasResourceId: this.oasResourceId,

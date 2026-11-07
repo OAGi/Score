@@ -12,7 +12,7 @@ import {
   ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
-import {OasDocChangeResult, OasDocChangeSet} from './oas-doc-change';
+import {OasDocChangeResult, OasDocChangeSet, OasOperationCandidate, OasOperationProposal} from './oas-doc-change';
 import {PageRequest, PageResponse} from '../../../basis/basis';
 import {ReleaseSummary} from '../../../release-management/domain/release';
 
@@ -147,6 +147,12 @@ export class OpenAPIService {
 
   saveChanges(oasDocId: number, changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
     return this.http.put<OasDocChangeResult>('/api/oas_doc/' + oasDocId + '/changes', this.changeSetJson(changeSet));
+  }
+
+  // What the server makes of an operation that is about to be added (its Resource Name and Operation ID), and whether it
+  // can be added. Nothing is saved.
+  proposeOperation(oasDocId: number, candidate: OasOperationCandidate): Observable<OasOperationProposal> {
+    return this.http.post<OasOperationProposal>('/api/oas_doc/' + oasDocId + '/operations/propose', candidate);
   }
 
   private changeSetJson(changeSet: OasDocChangeSet): any {

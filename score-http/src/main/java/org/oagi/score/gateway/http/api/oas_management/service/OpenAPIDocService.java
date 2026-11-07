@@ -290,6 +290,9 @@ public class OpenAPIDocService {
         if (request.getVerb() == null) {
             throw new IllegalArgumentException("`verb` parameter must not be null.");
         }
+        OasOperationNaming.resourcePathError(request.getPath()).ifPresent(error -> {
+            throw new IllegalArgumentException(error);
+        });
 
         long millis = System.currentTimeMillis();
 

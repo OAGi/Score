@@ -99,33 +99,32 @@ describe('OasDocDetailComponent.hasIgnoredDeleteRequestBody (#1610 banner)', () 
 
 describe('OasDocDetailComponent.onChange verb handling (#1610)', () => {
   function verbCtx(): any {
-    const ctx: any = {updateOperationIdForVerb: vi.fn(), syncOperationParameters: vi.fn()};
+    const ctx: any = {};
     ctx.onChange = OasDocDetailComponent.prototype.onChange;
     return ctx;
   }
 
-  it('reverts a GET operation that still has a Request body back to Response', () => {
-    const ctx = verbCtx();
-    const source = {verb: 'GET', messageBody: 'Request'};
-    ctx.onChange('verb', source);
-    expect(source.messageBody).toBe('Response');
-    expect(ctx.updateOperationIdForVerb).toHaveBeenCalledWith(source);
+  const rowOf = (verb: string, messageBody: string): any => {
+    const row: any = {verb, messageBody, touched: [] as string[]};
+    row.touch = (field: string) => row.touched.push(field);
+    return row;
+  };
+
+  // The server makes what follows from the verb (the Operation ID, and that a GET has no Request body): the page says that
+  // the verb was changed, and does not change the row itself.
+  it('says that the verb was changed, and leaves the rest to the server', () => {
+    for (const [verb, messageBody] of [['GET', 'Request'], ['DELETE', 'Request'], ['POST', 'Request']]) {
+      const source = rowOf(verb, messageBody);
+      verbCtx().onChange('verb', source);
+      expect(source.touched).toEqual(['verb']);
+      expect(source.messageBody).toBe(messageBody);
+    }
   });
 
-  it('KEEPS a Request body on a DELETE operation (honored in 3.1, dropped-with-banner in 3.0.3)', () => {
-    const ctx = verbCtx();
-    const source = {verb: 'DELETE', messageBody: 'Request'};
-    ctx.onChange('verb', source);
-    expect(source.messageBody).toBe('Request');
-    expect(ctx.updateOperationIdForVerb).toHaveBeenCalledWith(source);
-  });
-
-  it('leaves a non-GET Request body untouched (e.g. POST) and still resyncs the operationId', () => {
-    const ctx = verbCtx();
-    const source = {verb: 'POST', messageBody: 'Request'};
-    ctx.onChange('verb', source);
-    expect(source.messageBody).toBe('Request');
-    expect(ctx.updateOperationIdForVerb).toHaveBeenCalledWith(source);
+  it('says nothing for another property', () => {
+    const source = rowOf('GET', 'Response');
+    verbCtx().onChange('tagName', source);
+    expect(source.touched).toEqual([]);
   });
 });
 
@@ -481,7 +480,7 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
     page.loadBieListForOasDoc = vi.fn();
     page.changeChecker = new OasDocChangeChecker({
       build: () => page.buildChangeSet(), check: cs => page.openAPIService.checkChanges(5, cs),
-      onResult: result => page.takeCheckResult(result), debounceMs: 10
+      onResult: (result, changeSet) => page.takeCheckResult(result, changeSet), debounceMs: 10
     });
     page.init(page.oasDoc);
     // what init() does not know: the checker has the answer of the server
@@ -607,8 +606,56 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
       page.buildChangeSet();
       page.oasDoc.title = 'two';
 
-      expect(page.takeCheckResult({valid: true, violations: [], httpHeaders: [header(1, 'late')]})).toBe(false);
+      expect(page.takeCheckResult({valid: true, violations: [], httpHeaders: [header(1, 'late')]}, {operations: [], headers: {upserts: [], removed: []}})).toBe(false);
       expect(page.oasDoc.httpHeaders).toEqual([]);
+    });
+  });
+
+  describe('what the server makes of the verb or the array indicator that the user changed', () => {
+    it('is the Operation ID, the Resource Name and the Message Body of the row, and the row is then not touched', () => {
+      const row = editedRow(7, 'Request');
+      row.touched = ['verb'];
+      const page = pageOf('valid', {rows: [row]});
+      const changeSet = {operations: [row], headers: {upserts: [], removed: []}};
+      page.checkedFingerprint = page.changeFingerprint();
+
+      page.takeCheckResult({valid: true, violations: [], httpHeaders: [], operations: [
+        {oasOperationId: 7, sentMessageBody: 'Request', operationId: 'queryOrder', resourceName: '/order', messageBody: 'Response'}]}, changeSet);
+
+      expect(row.operationId).toBe('queryOrder');
+      expect(row.resourceName).toBe('/order');
+      expect(row.messageBody).toBe('Response');
+      expect(row.touched).toEqual([]);
+    });
+
+    it('is shown when the change cannot be saved too, next to what is wrong, and the entries are left as they are', () => {
+      const row = editedRow(7, 'Response');
+      row.touched = ['arrayIndicator'];
+      const page = pageOf('valid', {rows: [row], httpHeaders: [header(7, 'kept')]});
+      page.checkedFingerprint = page.changeFingerprint();
+
+      page.takeCheckResult({valid: false, httpHeaders: [], violations: [{scope: 'OPERATION', message: 'used'}], operations: [
+        {oasOperationId: 7, sentMessageBody: 'Response', operationId: 'queryOrderList', resourceName: '/order-list', messageBody: 'Response'}]},
+        {operations: [row], headers: {upserts: [], removed: []}});
+
+      expect(row.operationId).toBe('queryOrderList');
+      expect(row.touched).toEqual([]);
+      expect(page.oasDoc.httpHeaders.map((h: any) => h.name)).toEqual(['kept']);
+    });
+
+    it('is asked for again when the user touches the array indicator, and not for the answer', () => {
+      vi.useFakeTimers();
+      try {
+        const row: any = editedRow(7, 'Response');
+        row.touch = (field: string) => row.touched.push(field);
+        row.touched = [];
+        const page = pageOf('idle', {rows: [row]});
+        page.touchArrayIndicator(row);
+
+        expect(row.touched).toEqual(['arrayIndicator']);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

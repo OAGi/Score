@@ -10,11 +10,6 @@ import {
   SimpleOasDoc,
   toMinorOpenApiVersion
 } from '../domain/openapi-doc';
-import {
-  applyResourceArrayMarker,
-  buildOperationId,
-  recomputeOperationId
-} from '../domain/oas-operation-validation';
 import {OasHttpHeaderDirection} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {directionLabel, locationOf, newHttpHeader} from '../domain/oas-doc-http-header-form';
@@ -30,7 +25,7 @@ import {
   withdrawPreset
 } from '../domain/oas-doc-http-header-preset';
 import {OasDocChangeChecker} from '../domain/oas-doc-change-checker';
-import {OasDocChangeResult, OasDocChangeSet, OasDocHeaderEdits, OasDocViolation} from '../domain/oas-doc-change';
+import {applyDerivedOperations, OasDocChangeResult, OasDocChangeSet, OasDocHeaderEdits, OasDocViolation} from '../domain/oas-doc-change';
 import {FormControl} from '@angular/forms';
 import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {Location} from '@angular/common';
@@ -186,7 +181,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   readonly changeChecker = new OasDocChangeChecker({
     build: () => this.buildChangeSet(),
     check: changeSet => this.openAPIService.checkChanges(this.oasDoc.oasDocId, changeSet),
-    onResult: result => this.takeCheckResult(result)
+    onResult: (result, changeSet) => this.takeCheckResult(result, changeSet)
   });
   /** What the page was when the server was last asked, and when the last change was seen. */
   private checkedFingerprint = '';
@@ -211,6 +206,11 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
 
   bodySlotErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
     return {isErrorState: () => !!this.violationOf(row, 'messageBody')};
+  }
+
+  /** The Resource Name is in error when it is not a path, and where it makes a second body of the endpoint. */
+  resourceNameErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
+    return {isErrorState: () => !!this.violationOf(row, 'resourceName') || !!this.violationOf(row, 'messageBody')};
   }
 
   /** Asks the server whenever the user has changed anything: of the document, of an operation of any page, or of the entries. */
@@ -255,17 +255,18 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
    * Takes the answer in: the entries of the page become what the server says they would be (those it registered for the
    * operations included). An answer to what the page was before the user changed it again is not taken.
    */
-  private takeCheckResult(result: OasDocChangeResult): boolean {
+  private takeCheckResult(result: OasDocChangeResult, changeSet: OasDocChangeSet): boolean {
     if (this.changeFingerprint() !== this.checkedFingerprint) {
       return false;
     }
+    applyDerivedOperations(result.operations, changeSet.operations); // whether or not it can be saved: it is what the user sees next to what is wrong
     if (result.valid) {
       this.oasDoc.httpHeaders = result.httpHeaders || [];
       sortHeaders(this.oasDoc);
       this.headerEdits.adopt(this.oasDoc.httpHeaders);
       linkHeadersToRows(this.oasDoc, this.rows);
-      this.lastFingerprint = this.changeFingerprint(); // the answer is not a change of the user's
     }
+    this.lastFingerprint = this.changeFingerprint(); // the answer is not a change of the user's
     return true;
   }
 
@@ -1006,12 +1007,8 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
     if (property === 'verb') {
-      // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
-      // in any version (Issue #1610): it is honored in OpenAPI 3.1 and dropped (with a banner) in 3.0.
-      if (source.messageBody === 'Request' && source.verb === 'GET') {
-        source.messageBody = 'Response';
-      }
-      this.updateOperationIdForVerb(source);
+      // The server makes the Operation ID of the new verb (and a GET has no Request body); the page says that the verb was changed.
+      source.touch('verb');
     }
   }
 
@@ -1242,26 +1239,9 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     });
   }
 
-  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Rebuilds from the
-  // BIE's property term (the immutable name source), so a name that itself ends in "List" is not
-  // mistaken for the array marker; for a bodyless operation (no property term, issue #1730) it falls
-  // back to swapping only the leading verb word of the manually entered id. The frontend owns the
-  // operationId; the backend stores it verbatim on save.
-  updateOperationIdForVerb(element: BieForOasDoc): void {
-    element.operationId = recomputeOperationId(
-      element.verb, element.operationId, element.arrayIndicator, element.propertyTerm);
-  }
-
-  // Issue #1732: when the Array Indicator toggles, rebuild the operationId's 'List' marker and the
-  // resource path's '-list' marker from the property term + the new indicator (the array checkbox is
-  // BIE-only, so a property term is always present here). Driving the marker from the boolean — not by
-  // inspecting the string — keeps the marker correct even for a term ending in "List" (e.g.
-  // "Price List" -> queryPriceListList / .../price-list-list). The frontend owns these; the backend
-  // stores them as-is.
-  updateOperationIdForArray(element: BieForOasDoc): void {
-    element.operationId = buildOperationId(element.verb, element.propertyTerm, element.arrayIndicator);
-    element.resourceName = applyResourceArrayMarker(
-      element.resourceName, element.propertyTerm, element.arrayIndicator);
+  /** The array indicator was changed: the server makes the Operation ID and the marker of the Resource Name of it. */
+  touchArrayIndicator(element: BieForOasDoc): void {
+    element.touch('arrayIndicator');
   }
 
   isEditable(): boolean {

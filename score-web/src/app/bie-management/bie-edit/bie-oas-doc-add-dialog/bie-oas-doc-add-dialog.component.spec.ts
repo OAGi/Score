@@ -1,84 +1,62 @@
 import {BieOasDocAddDialogComponent} from './bie-oas-doc-add-dialog.component';
 
 /**
- * Issue #1492 (parity with the OpenAPI Document editor's Add dialog): the BIE-root "Add to OpenAPI Document"
- * dialog pre-checks, client-side, that the chosen (Verb, Message Body) would not duplicate a body the BIE
- * already has on the SELECTED document, and disables Add when it would. The checks are pure functions of
- * `this`, so bind the prototype methods to a minimal data bag (no Angular wiring required).
+ * The BIE-root "Add to OpenAPI Document" dialog holds no rule about the operation it adds: what the Resource Name and the
+ * Operation ID are, and whether the endpoint can take it, are the server's, and Add is there when the server says it can.
+ * The getters only read `proposal`, so they are invoked against a hand-built `this` (no Angular TestBed).
  */
-type Binding = {oasDocId: number; propertyTerm?: string; resourceName?: string; verb: string; messageBody: string};
-
-function dialogCtx(opts: {
-  propertyTerm: string;
-  selectedDocId: number | null;
-  verb: string;
-  messageBody: string;
-  existing: Binding[];
-}): any {
-  const ctx: any = {
-    data: {propertyTerm: opts.propertyTerm, existingBindings: opts.existing},
-    selectedOasDoc: opts.selectedDocId == null ? undefined : {oasDocId: opts.selectedDocId},
-    verb: opts.verb,
-    messageBody: opts.messageBody,
-  };
-  ctx.bodySlotKey = (BieOasDocAddDialogComponent.prototype as any).bodySlotKey;
-  ctx.isDuplicateBodySlot = BieOasDocAddDialogComponent.prototype.isDuplicateBodySlot;
-  ctx.isValid = Object.getOwnPropertyDescriptor(BieOasDocAddDialogComponent.prototype, 'isValid').get;
+function dialogCtx(proposal: any, selected = true): any {
+  const ctx: any = {proposal, selectedOasDoc: selected ? {oasDocId: 5} : undefined, verb: 'GET', messageBody: 'Response'};
+  for (const accessor of ['operationId', 'resourcePath', 'problems', 'isValid']) {
+    Object.defineProperty(ctx, accessor, Object.getOwnPropertyDescriptor(BieOasDocAddDialogComponent.prototype, accessor)!);
+  }
   return ctx;
 }
 
-describe('BieOasDocAddDialogComponent.isDuplicateBodySlot (#1492 add-time guard)', () => {
-  const term = 'Purchase Order';
+const violation = (message: string) => ({scope: 'OPERATION', field: 'messageBody', message});
 
-  it('flags a (Verb, Message Body) already bound to the selected document', () => {
-    const ctx = dialogCtx({
-      propertyTerm: term, selectedDocId: 7, verb: 'GET', messageBody: 'Response',
-      existing: [{oasDocId: 7, propertyTerm: term, verb: 'GET', messageBody: 'Response'}],
-    });
-    expect(ctx.isDuplicateBodySlot()).toBe(true);
-    expect(ctx.isValid.call(ctx)).toBe(false);
+describe('BieOasDocAddDialogComponent shows what the server makes of the operation', () => {
+  it('shows the Resource Name and the Operation ID that the server answered', () => {
+    const ctx = dialogCtx({resourceName: '/bc/1.0/order', operationId: 'queryOrder', violations: []});
+
+    expect(ctx.resourcePath).toBe('/bc/1.0/order');
+    expect(ctx.operationId).toBe('queryOrder');
   });
 
-  it('does NOT flag the same (Verb, Message Body) on a DIFFERENT document', () => {
-    const ctx = dialogCtx({
-      propertyTerm: term, selectedDocId: 7, verb: 'GET', messageBody: 'Response',
-      existing: [{oasDocId: 99, propertyTerm: term, verb: 'GET', messageBody: 'Response'}],
-    });
-    expect(ctx.isDuplicateBodySlot()).toBe(false);
-    expect(ctx.isValid.call(ctx)).toBe(true);
+  it('shows nothing until the server has answered, and Add is not there', () => {
+    const ctx = dialogCtx(undefined);
+
+    expect(ctx.resourcePath).toBe('');
+    expect(ctx.operationId).toBe('');
+    expect(ctx.isValid).toBe(false);
   });
 
-  it('does NOT flag a different Message Body (Request vs Response) on the same (doc, verb)', () => {
-    const ctx = dialogCtx({
-      propertyTerm: term, selectedDocId: 7, verb: 'POST', messageBody: 'Request',
-      existing: [{oasDocId: 7, propertyTerm: term, verb: 'POST', messageBody: 'Response'}],
-    });
-    expect(ctx.isDuplicateBodySlot()).toBe(false);
-    expect(ctx.isValid.call(ctx)).toBe(true);
+  it('is valid when the server found nothing wrong', () => {
+    expect(dialogCtx({resourceName: '/a', operationId: 'queryA', violations: []}).isValid).toBe(true);
   });
 
-  it('does NOT flag a different Verb on the same (doc, Message Body)', () => {
-    const ctx = dialogCtx({
-      propertyTerm: term, selectedDocId: 7, verb: 'POST', messageBody: 'Response',
-      existing: [{oasDocId: 7, propertyTerm: term, verb: 'GET', messageBody: 'Response'}],
-    });
-    expect(ctx.isDuplicateBodySlot()).toBe(false);
+  it('is not valid, and says why, when the server found something wrong', () => {
+    const ctx = dialogCtx({resourceName: '/a', operationId: 'queryA', violations: [violation('This operation already has a Response body.')]});
+
+    expect(ctx.isValid).toBe(false);
+    expect(ctx.problems).toEqual(['This operation already has a Response body.']);
   });
 
-  it('is false (and Add stays gated on the other fields) when no document is selected yet', () => {
-    const ctx = dialogCtx({
-      propertyTerm: term, selectedDocId: null, verb: 'GET', messageBody: 'Response',
-      existing: [{oasDocId: 7, propertyTerm: term, verb: 'GET', messageBody: 'Response'}],
-    });
-    expect(ctx.isDuplicateBodySlot()).toBe(false);
-    expect(ctx.isValid.call(ctx)).toBe(false);
+  it('is not valid without a document', () => {
+    expect(dialogCtx({resourceName: '/a', operationId: 'queryA', violations: []}, false).isValid).toBe(false);
   });
+});
 
-  it('matches case-insensitively on the property term', () => {
-    const ctx = dialogCtx({
-      propertyTerm: 'purchase order', selectedDocId: 7, verb: 'GET', messageBody: 'Response',
-      existing: [{oasDocId: 7, propertyTerm: 'Purchase Order', verb: 'GET', messageBody: 'Response'}],
+describe('BieOasDocAddDialogComponent.candidate', () => {
+  it('says the BIE, the verb, the message body and the array indicator that are chosen, and nothing else', () => {
+    const component: any = Object.create(BieOasDocAddDialogComponent.prototype);
+    component.data = {topLevelAsbiepId: 9, propertyTerm: 'Order'};
+    component.verb = 'POST';
+    component.messageBody = 'Request';
+    component.arrayIndicator = true;
+
+    expect(component.candidate()).toEqual({
+      topLevelAsbiepId: 9, propertyTerm: 'Order', verb: 'POST', messageBody: 'Request', arrayIndicator: true
     });
-    expect(ctx.isDuplicateBodySlot()).toBe(true);
   });
 });

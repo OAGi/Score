@@ -536,8 +536,7 @@
                                     <mat-form-field>
                                       <mat-label>Message Body</mat-label>
                                       <mat-select [(ngModel)]="binding.messageBody" [panelWidth]="null"
-                                                  [disabled]="!isOasDocEditable()"
-                                                  (ngModelChange)="recomputeOasValidation()">
+                                                  [disabled]="!isOasDocEditable()">
                                         <mat-option value="Request" [disabled]="binding.verb === 'GET'">Request</mat-option>
                                         <mat-option value="Response">Response</mat-option>
                                       </mat-select>
@@ -546,20 +545,18 @@
                                       <mat-label>Resource Name</mat-label>
                                       <input matInput [(ngModel)]="binding.resourceName"
                                              [readonly]="!isOasDocEditable()"
-                                             (ngModelChange)="recomputeOasValidation()"
                                              [errorStateMatcher]="oasBodySlotErrorStateMatcher(binding)">
-                                      <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
+                                      <mat-error>{{ oasViolationMessage(binding, 'resourceName', 'messageBody') }}</mat-error>
                                     </mat-form-field>
                                     <mat-form-field>
                                       <mat-label>Operation ID</mat-label>
                                       <input matInput [(ngModel)]="binding.operationId"
                                              [readonly]="!isOasDocEditable()"
-                                             (ngModelChange)="recomputeOasValidation()"
                                              [errorStateMatcher]="oasOperationIdErrorStateMatcher(binding)">
                                       @if (!binding.operationId || !binding.operationId.trim()) {
                                         <mat-error>Operation ID is required.</mat-error>
                                       } @else {
-                                        <mat-error>Operation ID must be unique within the document.</mat-error>
+                                        <mat-error>{{ oasViolationMessage(binding, 'operationId') }}</mat-error>
                                       }
                                     </mat-form-field>
                                     <!-- Security is a real mat-form-field so its label and value line up with the
@@ -638,6 +635,14 @@
                             <div class="oas-doc-information-empty">This BIE is not used in any OpenAPI Document yet.</div>
                           }
                           @if (isOasDocEditable() && hasOasDocInformation()) {
+                            @if (oasChecker.status() === 'invalid') {
+                              <!-- What the server says is wrong with what the user changed of the bindings. -->
+                              <ul class="text-danger small mb-2">
+                                @for (violation of oasChecker.violations(); track $index) {
+                                  <li>{{ violation.message }}</li>
+                                }
+                              </ul>
+                            }
                             <div class="oas-doc-information-actions">
                               <button mat-flat-button color="primary" type="button"
                                       [disabled]="!hasOasChanges() || hasOasErrors()"

@@ -201,6 +201,100 @@ class OasDocChangeApplierTest {
         assertTrue(applier.apply(requester, DOC, changes(null, null, null), false).valid());
     }
 
+    private static BieForOasDoc named(long oasOperationId, String messageBody, String verb, boolean array, String operationId,
+                                      String resourceName, String propertyTerm, String... touched) {
+        BieForOasDoc row = new BieForOasDoc();
+        row.setOasOperationId(new OasOperationId(BigInteger.valueOf(oasOperationId)));
+        row.setMessageBody(messageBody);
+        row.setVerb(verb);
+        row.setArrayIndicator(array);
+        row.setOperationId(operationId);
+        row.setResourceName(resourceName);
+        row.setPropertyTerm(propertyTerm);
+        row.setTouched(List.of(touched));
+        return row;
+    }
+
+    @Test
+    void aVerbThatWasChanged_makesTheOperationIdAndMovesAGetRequestBodyToTheResponse() {
+        BieForOasDoc row = named(11, "Request", "GET", false, "createPurchaseOrder", "/po", "Purchase Order", "verb");
+
+        OasDocChangeResult result = applier.apply(requester, DOC, changes(null, List.of(row), null), true);
+
+        assertEquals("queryPurchaseOrder", row.getOperationId());
+        assertEquals("Response", row.getMessageBody());
+        assertEquals(List.of(new OasDocChangeResult.DerivedOperation(OP, "Request", "queryPurchaseOrder", "/po", "Response")),
+                result.operations());
+    }
+
+    @Test
+    void anArrayIndicatorThatWasChanged_makesTheOperationIdAndTheMarkerOfThePath() {
+        BieForOasDoc row = named(11, "Response", "GET", true, "queryPurchaseOrder", "/bc/1.0/purchase-order", "Purchase Order",
+                "arrayIndicator");
+
+        OasDocChangeResult result = applier.apply(requester, DOC, changes(null, List.of(row), null), true);
+
+        assertEquals("queryPurchaseOrderList", row.getOperationId());
+        assertEquals("/bc/1.0/purchase-order-list", row.getResourceName());
+        assertEquals("/bc/1.0/purchase-order-list", result.operations().get(0).resourceName());
+    }
+
+    @Test
+    void aPathThatEndsInAPathParameter_isNotMadeAgainFromTheBie() {
+        BieForOasDoc row = named(11, "Response", "GET", true, "queryContainer", "/containers/{id}", "Container", "arrayIndicator");
+
+        applier.apply(requester, DOC, changes(null, List.of(row), null), true);
+
+        assertEquals("/containers/{id}", row.getResourceName());
+    }
+
+    @Test
+    void whatTheUserDidNotChange_isNotMadeAgain() {
+        BieForOasDoc row = named(11, "Response", "GET", true, "myOwnName", "/my/own/path", "Purchase Order");
+
+        OasDocChangeResult result = applier.apply(requester, DOC, changes(null, List.of(row), null), true);
+
+        assertEquals("myOwnName", row.getOperationId());
+        assertEquals("/my/own/path", row.getResourceName());
+        assertTrue(result.operations().isEmpty());
+    }
+
+    @Test
+    void theOtherRowOfTheOperation_getsTheSameNames() {
+        BieForOasDoc request = named(11, "Request", "POST", false, "createOrder", "/orders", "Order");
+        BieForOasDoc response = named(11, "Response", "POST", true, "createOrder", "/orders", "Order", "arrayIndicator");
+
+        OasDocChangeResult result = applier.apply(requester, DOC, changes(null, List.of(request, response), null), true);
+
+        assertEquals("createOrderList", request.getOperationId());
+        assertEquals("/order-list", request.getResourceName());
+        assertEquals(2, result.operations().size());
+    }
+
+    @Test
+    void whatWasMadeOfTheNames_isAnsweredWhenTheChangeCannotBeSaved_forTheUserSeesItNextToWhatIsWrong() {
+        BieForOasDoc row = named(11, "Response", "GET", true, "queryPurchaseOrder", "/po", "Purchase Order", "arrayIndicator");
+        when(oasDocService.updateDetails(any(), any())).thenThrow(new OasDocViolationException(
+                OasDocViolation.ofOperation(OP, "operationId", "used")));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row), null), true));
+
+        assertEquals("queryPurchaseOrderList", e.derived().get(0).operationId());
+    }
+
+    @Test
+    void aResourceNameThatIsNotAPath_isAViolationOfTheRow() {
+        BieForOasDoc row = named(11, "Response", "GET", false, "queryOrder", "orders/{id", "Order");
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row), null), true));
+
+        assertEquals("resourceName", e.violations().get(0).field());
+        assertEquals(OP, e.violations().get(0).oasOperationId());
+        verifyNoInteractions(oasDocService);
+    }
+
     @Test
     void theFacade_turnsAViolationIntoAnAnswerForACheck_andPassesItOnForASave() {
         OasDocChangeService service = new OasDocChangeService();

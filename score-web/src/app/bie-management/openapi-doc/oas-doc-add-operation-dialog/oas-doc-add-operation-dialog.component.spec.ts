@@ -1,26 +1,49 @@
 import {OasDocAddOperationDialogComponent} from './oas-doc-add-operation-dialog.component';
 
 /**
- * The Add Operation dialog must not enable Add for a Resource Name (Path) that would
- * produce an invalid OpenAPI path. The getters only read `operation`, so they are invoked against a
- * hand-built `this` (no Angular TestBed).
+ * The Add Operation dialog holds no rule about the path or the Operation ID: Add is there when the server says that the
+ * operation can be added, and what it says is wrong is shown. The getters only read `operation` and `proposal`, so they are
+ * invoked against a hand-built `this` (no Angular TestBed).
  */
-function isValidFor(resourceName: string): boolean {
+function ctxOf(proposal: any, operation: any = {verb: 'DELETE', resourceName: '/orders/{id}', operationId: 'deleteOrder'}): any {
   const proto = OasDocAddOperationDialogComponent.prototype;
-  const ctx: any = {operation: {verb: 'DELETE', resourceName, operationId: 'deleteX'}};
-  Object.defineProperty(ctx, 'resourceNameError',
-    {get: Object.getOwnPropertyDescriptor(proto, 'resourceNameError')!.get});
-  return Object.getOwnPropertyDescriptor(proto, 'isValid')!.get!.call(ctx);
+  const ctx: any = {operation, proposal};
+  for (const accessor of ['resourceNameError', 'problems', 'isValid']) {
+    Object.defineProperty(ctx, accessor, Object.getOwnPropertyDescriptor(proto, accessor)!);
+  }
+  return ctx;
 }
 
+const violation = (field: string, message: string) => ({scope: 'OPERATION', field, message});
+
 describe('OasDocAddOperationDialogComponent.isValid', () => {
-  it('accepts a well-formed path', () => {
-    expect(isValidFor('/orders/{id}')).toBe(true);
+  it('is there when the server found nothing wrong', () => {
+    expect(ctxOf({resourceName: '/orders/{id}', operationId: 'deleteOrder', violations: []}).isValid).toBe(true);
   });
 
-  it('rejects a path without a leading slash, with spaces, or with a query/fragment', () => {
-    expect(isValidFor('no leading slash  here')).toBe(false);
-    expect(isValidFor('orders?x=1 #frag')).toBe(false);
-    expect(isValidFor('/orders?x=1')).toBe(false);
+  it('is not there until the server has answered', () => {
+    expect(ctxOf(undefined).isValid).toBe(false);
+  });
+
+  it('is not there for a Resource Name that the server says is not a path, and the dialog says why', () => {
+    const ctx = ctxOf({violations: [violation('resourceName', 'Path must start with "/".')]}, {verb: 'DELETE', resourceName: 'orders', operationId: 'deleteOrders'});
+
+    expect(ctx.isValid).toBe(false);
+    expect(ctx.resourceNameError).toBe('Path must start with "/".');
+    expect(ctx.problems).toEqual([]);
+  });
+
+  it('shows what else the server says is wrong, apart from the Resource Name', () => {
+    const ctx = ctxOf({violations: [violation('operationId', 'The operation ID is used.')]});
+
+    expect(ctx.isValid).toBe(false);
+    expect(ctx.problems).toEqual(['The operation ID is used.']);
+    expect(ctx.resourceNameError).toBe('');
+  });
+
+  it('is not there without a Resource Name or an Operation ID', () => {
+    const proposal = {violations: []};
+    expect(ctxOf(proposal, {verb: 'DELETE', resourceName: '', operationId: 'x'}).isValid).toBe(false);
+    expect(ctxOf(proposal, {verb: 'DELETE', resourceName: '/x', operationId: ''}).isValid).toBe(false);
   });
 });

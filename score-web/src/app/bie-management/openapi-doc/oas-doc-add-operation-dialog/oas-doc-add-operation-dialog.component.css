@@ -6,3 +6,10 @@
   color: rgba(0, 0, 0, 0.6);
   margin-bottom: 16px;
 }
+
+/* What the server says is wrong with adding the operation. */
+.oas-add-operation-problem {
+  color: #c62828;
+  font-size: 12px;
+  margin: -8px 0 8px;
+}

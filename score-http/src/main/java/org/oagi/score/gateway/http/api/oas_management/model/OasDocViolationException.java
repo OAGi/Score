@@ -19,7 +19,19 @@ public class OasDocViolationException extends IllegalArgumentException {
         this(List.of(violation));
     }
 
+    /** What was made of the names of the operations before the rule was broken. */
+    private transient List<OasDocChangeResult.DerivedOperation> derived = List.of();
+
     public List<OasDocViolation> violations() {
         return violations;
+    }
+
+    public List<OasDocChangeResult.DerivedOperation> derived() {
+        return derived;
+    }
+
+    public OasDocViolationException withDerived(List<OasDocChangeResult.DerivedOperation> derived) {
+        this.derived = derived;
+        return this;
     }
 }

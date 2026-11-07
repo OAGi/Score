@@ -39,11 +39,59 @@ export interface OasDocViolation {
   message: string;
 }
 
+/** What the server made of an operation whose verb or array indicator the user changed. */
+export interface OasDocDerivedOperation {
+  oasOperationId: number;
+  /** The Message Body the row had when it was sent: which row it is. */
+  sentMessageBody: string;
+  operationId: string;
+  resourceName: string;
+  /** The Message Body it has now (a GET has no Request body). */
+  messageBody: string;
+}
+
 export interface OasDocChangeResult {
   valid: boolean;
   violations: OasDocViolation[];
   /** What the entries of the document would be if the change set were saved (the registered ones included). */
   httpHeaders: OasDocHttpHeader[];
+  operations?: OasDocDerivedOperation[];
+}
+
+/** An operation that is about to be added to the document, as far as the user has said it. */
+export interface OasOperationCandidate {
+  topLevelAsbiepId?: number;
+  propertyTerm?: string;
+  verb: string;
+  messageBody: string;
+  arrayIndicator: boolean;
+  /** Only when the user gave one (an operation without a BIE); else the server makes it from the BIE. */
+  resourceName?: string;
+  operationId?: string;
+}
+
+/** What the server makes of the candidate, and what is wrong with adding it. */
+export interface OasOperationProposal {
+  resourceName: string;
+  operationId: string;
+  violations: OasDocViolation[];
+}
+
+/**
+ * The Operation ID, the Resource Name and the Message Body that the server made of the verb or the array indicator that the user
+ * changed are those of the rows; what was asked of the server is answered, so the rows are not touched any more.
+ */
+export function applyDerivedOperations(derivedOperations: OasDocDerivedOperation[] | undefined, rows: BieForOasDoc[]): void {
+  for (const derived of derivedOperations || []) {
+    const row = rows.find(candidate =>
+      candidate.oasOperationId === derived.oasOperationId && candidate.messageBody === derived.sentMessageBody);
+    if (row) {
+      row.operationId = derived.operationId;
+      row.resourceName = derived.resourceName;
+      row.messageBody = derived.messageBody;
+    }
+  }
+  rows.forEach(row => row.touched = []);
 }
 
 export function headerKeyOf(header: OasDocHttpHeader): OasDocHeaderKey {

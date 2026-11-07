@@ -9,6 +9,8 @@ import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.service.OasDocChangeService;
+import org.oagi.score.gateway.http.api.oas_management.service.OasOperationNaming;
+import org.oagi.score.gateway.http.api.oas_management.service.OasOperationProposer;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolationException;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -44,6 +46,9 @@ public class OpenAPIDocController {
 
     @Autowired
     private OasDocChangeService oasDocChangeService;
+
+    @Autowired
+    private OasOperationProposer oasOperationProposer;
 
     @Autowired
     private BusinessContextQueryService businessContextQueryService;
@@ -398,7 +403,6 @@ public class OpenAPIDocController {
         if (oasDocResponse != null) {
             oasDocVersion = oasDocResponse.getOasDoc().getVersion();
         }
-        String bieForOasDocPropertyTermWithDash = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "-");
         //get BusinessContext for the assigned BieForOasDoc
         assignBieForOasDoc.setBusinessContexts(
                 businessContextQueryService.getBusinessContextSummaryList(
@@ -406,25 +410,19 @@ public class OpenAPIDocController {
                         assignBieForOasDoc.getTopLevelAsbiepId(), request.getBusinessContext())
         );
 
-        String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).name().toLowerCase();
-        businessContextName = businessContextName.replace(' ', '-');
-
         boolean isArray = request.isMakeArrayIndicator();
-        if (oasDocVersion != null) {
-            resourceName = "/" + businessContextName + "/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
-                    bieForOasDocPropertyTermWithDash.toLowerCase());
-
-        } else {
-            resourceName = "/" + businessContextName + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
-                    bieForOasDocPropertyTermWithDash.toLowerCase());
-        }
+        resourceName = OasOperationNaming.buildResourcePath(assignBieForOasDoc.getBusinessContexts().get(0).name(),
+                oasDocVersion, assignBieForOasDoc.getPropertyTerm(), isArray);
         request.setPath(resourceName);
         request.setVerb(verbOption);
-        // Issue #1732: the frontend builds the operationId ('<verb><BIEName>[List]', no
-        // business-context prefix) and sends it; the backend just stores it. businessContextName
-        // above is still used to build the resource path. Guard: operationId is required (NOT NULL).
+        // Issue #1732: the operationId is '<verb><BIEName>[List]' (no business-context prefix). Guard: it is
+        // required (NOT NULL).
         String operationId = assignBieForOasDoc.getOperationId();
         if (operationId == null || operationId.isBlank()) {
+            // the client gave none: it is made from the verb and the BIE, as the Operation ID of a BIE that is added is
+            operationId = OasOperationNaming.buildOperationId(verbOption, assignBieForOasDoc.getPropertyTerm(), isArray);
+        }
+        if (operationId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         request.setOperationId(operationId);
@@ -692,6 +690,19 @@ public class OpenAPIDocController {
     }
 
     /**
+     * What the server makes of an operation that is about to be added to the document (its Resource Name and Operation ID, when
+     * the user gave none), and whether it can be added. Nothing is saved.
+     */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operations/propose", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public OasOperationProposal proposeOperation(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasOperationCandidate candidate) {
+        return oasOperationProposer.propose(sessionService.asScoreUser(user), oasDocId, candidate);
+    }
+
+    /**
      * Whether what the user has changed of the document can be saved, and what the document would have then (the request
      * parameters and response headers, those registered for the operations included). Nothing is saved.
      */
@@ -714,7 +725,7 @@ public class OpenAPIDocController {
         try {
             return ResponseEntity.ok(oasDocChangeService.save(sessionService.asScoreUser(user), oasDocId, changeSet));
         } catch (OasDocViolationException e) {
-            return ResponseEntity.badRequest().body(OasDocChangeResult.invalid(e.violations()));
+            return ResponseEntity.badRequest().body(OasDocChangeResult.invalid(e.violations(), e.derived()));
         }
     }
 
