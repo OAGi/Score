@@ -46,6 +46,19 @@ public interface OasDocCommandRepository {
      */
     boolean operationHasBody(OasOperationId oasOperationId, boolean isRequest);
 
+    /**
+     * Issue #1791: what of the operation decides the request parameters registered for it (see
+     * {@link #reconcileOperationParameters}). {@code null}, an operation not created yet, has none.
+     */
+    OasOperationParameterState captureOperationParameters(OasOperationId oasOperationId);
+
+    /**
+     * Issue #1791: make the request parameters of the operation follow what changed in it since {@code before}:
+     * {@code sinceLastDateTime} for a GET that returns an array, a path parameter for each name of its path.
+     */
+    void reconcileOperationParameters(OasOperationId oasOperationId, OasOperationParameterState before,
+                                      org.oagi.score.gateway.http.api.account_management.model.UserId userId);
+
     /** Issue #1492: the existing resource id for {@code (oasDocId, path)}, or null. */
     OasResourceId findOasResourceId(OasDocId oasDocId, String path);
 
@@ -59,6 +72,13 @@ public interface OasDocCommandRepository {
      */
     Set<String> findOperationIdsInOasDoc(OasDocId oasDocId, Collection<String> operationIds,
                                          Collection<OasOperationId> excludedOasOperationIds);
+
+    /**
+     * Every operation of the document on the given endpoint, i.e. whose resource has the given path and
+     * which has the given verb. A Request and a Response body of one endpoint can live in separate
+     * operation rows; they are one OpenAPI operation and so share an operationId.
+     */
+    Set<OasOperationId> findOasOperationIdsAtEndpoint(OasDocId oasDocId, String path, String verb);
 
     OasTagId insertOasTag(InsertOasTagArguments arguments);
 

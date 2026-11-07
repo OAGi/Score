@@ -79,6 +79,10 @@ class BieForOasDocUpdateChangeFlagTest {
             String s = ctx.sql().toLowerCase(Locale.ROOT);
             sql.add(s);
             boolean isSelect = s.startsWith("select");
+            // the request parameters the system registers for an operation (Issue #1791) read the document too: none here
+            if (isSelect && s.contains("`oas_doc`")) {
+                return empty();
+            }
             // Backtick-delimited tokens disambiguate the tables whose names are prefixes of others.
             if (isSelect && s.contains("`oas_resource_tag`")) {
                 return tagLinkExists ? oneResourceTag() : empty();

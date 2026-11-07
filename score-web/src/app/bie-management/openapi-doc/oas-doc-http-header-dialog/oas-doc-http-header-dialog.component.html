@@ -1,0 +1,179 @@
+<score-dialog-page title="{{ (isNew ? 'Add ' : 'Edit ') + directionLabel }}">
+  <div class="dialog-form">
+    @if (scopeLabel) {
+      <div class="header-scope">{{ scopeLabel }}</div>
+    }
+
+    <div class="form-columns">
+      <div class="form-column">
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <mat-label>In</mat-label>
+          <mat-select [(ngModel)]="location" [disabled]="!isRequest">
+            @for (item of locations; track item.value) {
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (errors.direction) {
+          <div class="field-error">{{ errors.direction }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="header.name" maxlength="200" placeholder="traceparent">
+        </mat-form-field>
+        @if (errors.name && (header.name || !isNew)) {
+          <div class="field-error">{{ errors.name }}</div>
+        }
+        @if (errors.duplicate) {
+          <div class="field-error">{{ errors.duplicate }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <mat-label>Description (optional)</mat-label>
+          <textarea matInput rows="6" [(ngModel)]="header.description"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row header-directions">
+      <div class="col-12">
+        <mat-checkbox [ngModel]="isPathParameter || header.required" (ngModelChange)="header.required = $event"
+                      [disabled]="isPathParameter">Required</mat-checkbox>
+        @if (isPathParameter) {
+          <div class="field-hint">
+            A path parameter is always required, and its name is a {{ '{' }}name{{ '}' }} of the resource path; where the
+            path has no such name, it is left out.
+          </div>
+        }
+      </div>
+    </div>
+
+      </div>
+
+      <div class="form-column">
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <mat-label>Serialization</mat-label>
+          <mat-select [ngModel]="serialization" (ngModelChange)="setSerialization($event)">
+            <mat-option value="schema">Schema</mat-option>
+            <mat-option value="content">Content (media type)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    @if (serialization === 'content') {
+      <div class="row">
+        <div class="col-12">
+          <mat-form-field class="w-100">
+            <mat-label>Media type</mat-label>
+            <input matInput [(ngModel)]="header.contentMediaType" maxlength="255" placeholder="text/plain"
+                   spellcheck="false">
+          </mat-form-field>
+          @if (errors.serialization) {
+            <div class="field-error">{{ errors.serialization }}</div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="row">
+        <div class="col-4">
+          <mat-form-field class="w-100">
+            <mat-label>Style</mat-label>
+            <mat-select [(ngModel)]="styleChoice">
+              @for (style of styles; track style) {
+                <mat-option [value]="style">{{ style }}{{ style === defaultStyleName ? ' (default)' : '' }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-4">
+          <mat-form-field class="w-100">
+            <mat-label>Explode</mat-label>
+            <mat-select [(ngModel)]="explodeChoice">
+              <mat-option value="true">true{{ defaultExplodeOfStyle ? ' (default)' : '' }}</mat-option>
+              <mat-option value="false">false{{ defaultExplodeOfStyle ? '' : ' (default)' }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        @if (isQueryParameter) {
+          <div class="col-4">
+            <mat-form-field class="w-100">
+              <mat-label>Allow reserved</mat-label>
+              <mat-select [(ngModel)]="allowReservedChoice">
+                <mat-option value="false">false (default)</mat-option>
+                <mat-option value="true">true</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        }
+        @if (errors.serialization) {
+          <div class="col-12 field-error">{{ errors.serialization }}</div>
+        }
+      </div>
+    }
+
+    <div class="row">
+      <div class="col-12 json-field">
+        <score-json-editor label="Schema (JSON)" [(ngModel)]="schemaText" [minLines]="6" [maxLines]="14"/>
+        @if (errors.schema) {
+          <div class="field-error">{{ errors.schema }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 json-field">
+        <score-json-editor label="Example (optional, JSON)" [(ngModel)]="exampleText" [minLines]="2" [maxLines]="8"
+                           placeholder='"an example of the value"'/>
+        @if (errors.example) {
+          <div class="field-error">{{ errors.example }}</div>
+        }
+        <div class="field-hint">It overrides the example of the schema. To give the schema an example, put it in the schema.</div>
+      </div>
+    </div>
+      </div>
+    </div>
+
+    @if (warnings.length) {
+      <div class="problems" role="alert">
+        <mat-icon>warning</mat-icon>
+        <div>
+          @for (warning of warnings; track warning) {
+            <div>{{ warning }}</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    <button mat-raised-button (click)="cancel()">
+      <mat-icon>close</mat-icon>
+      <span class="ps-2">Cancel</span>
+    </button>
+    <button mat-raised-button color="primary" [disabled]="!isValid" (click)="save()">
+      <mat-icon>{{ isNew ? 'add' : 'save' }}</mat-icon>
+      <span class="ps-2">{{ isNew ? 'Add' : 'Save' }}</span>
+    </button>
+    @if (!isNew) {
+      <span class="actions-spacer"></span>
+      <button mat-raised-button color="warn" (click)="delete()">
+        <mat-icon>delete</mat-icon>
+        <span class="ps-2">Delete</span>
+      </button>
+    }
+  </ng-container>
+</score-dialog-page>

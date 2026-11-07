@@ -112,7 +112,9 @@ export class OpenAPIService {
       contactEmail: oasDoc.contactEmail,
       licenseUrl: oasDoc.licenseUrl,
       securitySchemes: oasDoc.securitySchemes,
-      securityRequirements: oasDoc.securityRequirements
+      securityRequirements: oasDoc.securityRequirements,
+      // Issue #1791: undefined (not sent) keeps the HTTP headers of the document as they are; [] removes them.
+      httpHeaders: oasDoc.httpHeaders
     });
   }
 
@@ -130,7 +132,9 @@ export class OpenAPIService {
       contactEmail: oasDoc.contactEmail,
       licenseUrl: oasDoc.licenseUrl,
       securitySchemes: oasDoc.securitySchemes,
-      securityRequirements: oasDoc.securityRequirements
+      securityRequirements: oasDoc.securityRequirements,
+      // Issue #1791: undefined (not sent) keeps the HTTP headers of the document as they are; [] removes them.
+      httpHeaders: oasDoc.httpHeaders
     });
   }
 

@@ -86,6 +86,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest.ModuleXbtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace.NamespacePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc.OasDocPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader.OasDocHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope.OasDocSecurityScopePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag.OasDocTagPath;
@@ -1716,6 +1717,34 @@ public class AppUser extends TableImpl<AppUserRecord> {
             _oasDocCreatedByFk = new OasDocPath(this, null, Keys.OAS_DOC_CREATED_BY_FK.getInverseKey());
 
         return _oasDocCreatedByFk;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeaderCreatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table, via the
+     * <code>oas_doc_http_header_created_by_fk</code> key
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeaderCreatedByFk() {
+        if (_oasDocHttpHeaderCreatedByFk == null)
+            _oasDocHttpHeaderCreatedByFk = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_CREATED_BY_FK.getInverseKey());
+
+        return _oasDocHttpHeaderCreatedByFk;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeaderLastUpdatedByFk;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table, via the
+     * <code>oas_doc_http_header_last_updated_by_fk</code> key
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeaderLastUpdatedByFk() {
+        if (_oasDocHttpHeaderLastUpdatedByFk == null)
+            _oasDocHttpHeaderLastUpdatedByFk = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_LAST_UPDATED_BY_FK.getInverseKey());
+
+        return _oasDocHttpHeaderLastUpdatedByFk;
     }
 
     private transient OasDocPath _oasDocLastUpdatedByFk;

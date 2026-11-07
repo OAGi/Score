@@ -17,6 +17,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.generate_expressio
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.GenerationContext;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpSummaryRecord;
 import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthFlow;
+import org.oagi.score.gateway.http.api.oas_management.model.OasResourcePaths;
 import org.oagi.score.gateway.http.api.oas_management.model.OasOAuthScope;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirementScheme;
@@ -38,8 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.oagi.score.gateway.http.api.bie_management.service.generate_expression.Helper.*;
 import static org.oagi.score.gateway.http.api.oas_management.model.Operation.*;
@@ -54,8 +53,6 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, InitializingBean {
 
-    static final String VERSION_PATH_PARAMETER = "{version}";
-    private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^{}]+)}");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -130,6 +127,12 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         List<ErrorResponseSchemas.OperationErrorSpec> specs = ErrorResponseSchemas.buildSpecs(
                 option.getTemplates(), this::getResolvedResourceName, this::resolveConfirmSchemaName);
         ErrorResponseSchemas.injectErrorResponses(root, schemas, specs, dialect.allowsDeleteRequestBody());
+    }
+
+    @Override
+    public void generateHttpHeaders() {
+        HttpHeaderInjector.inject(root, option.getTemplates(), this::getResolvedResourceName,
+                option.getOasDoc() != null ? option.getOasDoc().getHttpHeaders() : null);
     }
 
     // Issue #1347: the components.schemas name of a ConfirmMessage BIE materialized via generate(TLA).
@@ -399,61 +402,8 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         return replacer.apply(basedAsccp.propertyTerm());
     }
 
-    private List<Map<String, Object>> buildParameters(Operation verb, boolean isArray, List<String> pathParameterNames) {
-        List<Map<String, Object>> parameters = new ArrayList<>();
-
-        if (verb == GET && isArray) {
-            parameters.add(ImmutableMap.<String, Object>builder()
-                    .put("name", "sinceLastDateTime")
-                    .put("in", "query")
-                    .put("description", "Returns resources that have been updated since the last time the endpoint has been called")
-                    .put("required", false)
-                    .put("schema", ImmutableMap.<String, Object>builder()
-                            .put("type", "string")
-                            .put("format", "date-time")
-                            .build())
-                    .build());
-        }
-
-        // Issue #1710: Generate one required path parameter for every token found in the resource path.
-        for (String pathParameterName : pathParameterNames) {
-            parameters.add(ImmutableMap.<String, Object>builder()
-                    .put("name", pathParameterName)
-                    .put("in", "path")
-                    .put("description", "")
-                    .put("required", true)
-                    .put("schema", ImmutableMap.<String, Object>builder()
-                            .put("type", "string")
-                            .build())
-                    .build());
-        }
-
-        return parameters;
-    }
-
-    private List<String> extractPathParameterNames(String resourceName) {
-        if (!StringUtils.hasLength(resourceName)) {
-            return Collections.emptyList();
-        }
-
-        // Issue #1710: Parse only valid `{...}` placeholders and ignore malformed fragments.
-        Set<String> pathParameterNames = new LinkedHashSet<>();
-        Matcher matcher = PATH_PARAMETER_PATTERN.matcher(resourceName);
-        while (matcher.find()) {
-            String candidate = matcher.group(1).trim();
-            if (StringUtils.hasLength(candidate)) {
-                pathParameterNames.add(candidate);
-            }
-        }
-
-        return new ArrayList<>(pathParameterNames);
-    }
-
     static String resolveResourceName(String resourceName, String documentVersion) {
-        if (!StringUtils.hasLength(resourceName) || !StringUtils.hasLength(documentVersion)) {
-            return resourceName;
-        }
-        return resourceName.replace(VERSION_PATH_PARAMETER, documentVersion);
+        return OasResourcePaths.resolve(resourceName, documentVersion);
     }
 
     private String getResolvedResourceName(OpenAPITemplateForVerbOption template) {
@@ -462,30 +412,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
         }
         String documentVersion = option != null && option.getOasDoc() != null ? option.getOasDoc().getVersion() : null;
         return resolveResourceName(template.getResourceName(), documentVersion);
-    }
-
-    /**
-     * Issue #1710:
-     * Ensures OpenAPI parameters are aligned with the current resource name by generating all path parameters
-     * declared as `{...}` placeholders, while omitting the `parameters` field when none are applicable.
-     */
-    private void ensurePathParameters(Map<String, Object> path,
-                                      Operation operation,
-                                      boolean isArray,
-                                      OpenAPITemplateForVerbOption template) {
-        List<String> pathParameterNames = extractPathParameterNames(getResolvedResourceName(template));
-        List<Map<String, Object>> parameters = buildParameters(operation, isArray, pathParameterNames);
-        if (parameters.isEmpty()) {
-            // Issue #1710: Omit `parameters` when nothing is generated.
-            path.remove("parameters");
-            return;
-        }
-
-        Object existingParameters = path.get("parameters");
-        if (existingParameters instanceof List && !((List<?>) existingParameters).isEmpty()) {
-            return;
-        }
-        path.put("parameters", parameters);
     }
 
     private void fillPropertiesForTemplate(String schemaName,
@@ -547,7 +473,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                             Map<String, Object> path,
                             AsbiepSummaryRecord asbiep) {
             if (path != null && path.size() > 0) {
-                ensurePathParameters(path, GET, template.isArrayForJsonExpression(), template);
             } else {
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
@@ -564,7 +489,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                ensurePathParameters(path, GET, isArray, template);
                 if (template.getMessageBodyType().equals("Response")) {
                     path.put("responses", ImmutableMap.<String, Object>builder()
                             .put("200", ImmutableMap.<String, Object>builder()
@@ -605,7 +529,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -651,7 +574,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -714,7 +636,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -760,7 +681,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -822,7 +742,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 boolean isArray = template.isArrayForJsonExpression();
                 String schemaName = template.getSchemaName();
                 boolean isSuppressRoot = template.isSuppressRootProperty();
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
@@ -868,7 +787,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                     path.put("tags", Arrays.asList(template.getTagName()));
                 }
                 path.put("operationId", template.getOperationId());
-                ensurePathParameters(path, getOperation(), isArray, template);
                 if (template.getMessageBodyType().equals("Request")) {
                     path.put("requestBody", ImmutableMap.<String, Object>builder()
                             .put("description", "")
@@ -952,7 +870,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
                 }
                 path.put("operationId", template.getOperationId());
             }
-            ensurePathParameters(path, getOperation(), isArray, template);
             if (scaffolded && requestBodyAllowed
                     && StringUtils.hasLength(template.getTagName()) && !path.containsKey("tags")) {
                 path.put("tags", Arrays.asList(template.getTagName()));
@@ -1159,7 +1076,6 @@ public class OpenAPIGenerateExpression implements BieGenerateOpenApiExpression, 
             }
             path.put("operationId", template.getOperationId());
         }
-        ensurePathParameters(path, template.getVerbOption(), template.isArrayForJsonExpression(), template);
 
         // A bodyless operation must still declare at least one (status-only) response.
         // The status code is taken from the message body when present (Response-type), otherwise

@@ -336,3 +336,86 @@
   align-items: center;
   gap: 6px;
 }
+
+/* Issue #1791: the HTTP headers of an operation: one chip each, and a + to add one. */
+.mat-column-requestParameters,
+.mat-column-responseHeaders {
+  min-width: 140px;
+}
+
+.oas-headers-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.oas-header-chip {
+  padding: 0 8px;
+  line-height: 20px;
+  border: 1px solid #c5cae9;
+  border-radius: 12px;
+  background: #e8eaf6;
+  color: #283593;
+  font-size: 12px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.oas-header-chip:hover {
+  background: #c5cae9;
+}
+
+.oas-header-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  --mdc-icon-button-state-layer-size: 28px;
+}
+
+.oas-header-add .mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  margin: 0;
+  display: block;
+}
+
+/* The rows of the document form that hold a label and buttons (Security Schemes, Parameters & Headers): the labels are as wide
+   as each other, and when the screen is small the buttons go to the next line instead of breaking their text. */
+.oas-doc-section-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-bottom: 8px;
+}
+
+.oas-doc-section-label {
+  flex: 0 0 160px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* The buttons of a row go together: side by side next to the label, and, when there is no room for both, below it. */
+.oas-doc-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.oas-doc-section-row button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.oas-doc-section-hint {
+  flex: 1 1 220px;
+  font-size: 12px;
+  color: #767676;
+}

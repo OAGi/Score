@@ -24,6 +24,14 @@ public interface BieGenerateOpenApiExpression {
      */
     void generateErrorResponses();
 
+    /**
+     * Issue #1791: the post-step that merges the HTTP headers of the document (request parameters and response
+     * headers) into every generated operation. Called after {@link #generateErrorResponses()}, so the headers
+     * reach the error responses too. A no-op when the document has none.
+     */
+    default void generateHttpHeaders() {
+    }
+
     File asFile(String filename) throws IOException;
 
 }

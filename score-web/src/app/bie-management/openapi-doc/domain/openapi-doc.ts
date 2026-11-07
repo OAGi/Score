@@ -150,6 +150,35 @@ export function toMinorOpenApiVersion(version: string): string {
   return (parts.length >= 2) ? parts[0] + '.' + parts[1] : version.trim();
 }
 
+// Issue #1791: an HTTP header of the document, generated either as a request parameter (in: header) or as a header of
+// every response of the operation: the two are separate entries, each with its own description, schema, example and
+// required. An operation of its own can be given (oasOperationId); without one it applies to the whole document.
+// A Schema Object: a JSON object. (OpenAPI 3.0 also allows a Reference Object, {"$ref": "#/components/schemas/X"}, in its
+// place; from 3.1 on, $ref is a keyword of the Schema Object.)
+export type OasHttpHeaderDirection = 'REQUEST' | 'RESPONSE';
+
+// The location of a request parameter: the `in` of the Parameter Object.
+export type OasParameterLocation = 'query' | 'header' | 'path' | 'cookie';
+
+export type OasSchemaObject = { [keyword: string]: any };
+
+export interface OasDocHttpHeader {
+  oasOperationId?: number;
+  name: string;
+  description?: string;
+  schema: OasSchemaObject;
+  example?: any; // the example of the Parameter / Header Object (not of its schema): any JSON value
+  direction: OasHttpHeaderDirection;
+  in?: OasParameterLocation; // of a request parameter only; a response header is always in a header
+  required: boolean;
+  // How the value is serialized: with a schema and a style (undefined = the default of the specification), or with
+  // `content`, a Media Type Object of this media type (then there is no style).
+  style?: string;
+  explode?: boolean;
+  allowReserved?: boolean; // a query parameter only
+  contentMediaType?: string;
+}
+
 export class OasDoc {
   oasDocId: number;
   guid: string;
@@ -169,6 +198,8 @@ export class OasDoc {
   // Issue #1729: the document's Security Schemes (empty = default OAuth2).
   securitySchemes: OasSecurityScheme[];
   securityRequirements: OasSecurityRequirement[];
+  // Issue #1791: the HTTP headers of the document.
+  httpHeaders: OasDocHttpHeader[];
   access: string;
   ownerUserId: string;
   lastUpdateTimestamp: Date;
@@ -366,6 +397,9 @@ export class BieForOasDoc {
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
   businessContexts: BusinessContext[] = [];
+  // Issue #1791: the HTTP headers of the operation of this row. They are the objects of OasDoc.httpHeaders (see
+  // linkHeadersToRows), so they are not a part of the change tracking or of json: the document is what is saved.
+  httpHeaders: OasDocHttpHeader[] = [];
   private _resourceName: string;
   private _operationId: string;
   private _tagName: string;
@@ -418,6 +452,7 @@ export class BieForOasDoc {
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
     this.businessContexts = obj && obj.businessContexts || [];
+    this.httpHeaders = obj && obj.httpHeaders || [];
   }
 
   get json(): any {

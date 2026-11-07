@@ -36,6 +36,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AgencyIdListValue.AgencyIdListValuePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader.OasDocHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameter.OasParameterPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponse.OasResponsePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasResponseHeaders.OasResponseHeadersPath;
@@ -92,16 +93,54 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
 
     /**
      * The column <code>oas_http_header.agency_id_list_value_id</code>. A
-     * reference of the agency id list value
+     * reference of the agency id list value. NULL when the header is not taken
+     * from a list of agency ID values.
      */
-    public final TableField<OasHttpHeaderRecord, ULong> AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A reference of the agency id list value");
+    public final TableField<OasHttpHeaderRecord, ULong> AGENCY_ID_LIST_VALUE_ID = createField(DSL.name("agency_id_list_value_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "A reference of the agency id list value. NULL when the header is not taken from a list of agency ID values.");
 
     /**
      * The column <code>oas_http_header.schema_type_reference</code>. REQUIRED.
-     * The schema defining the type used for the header using the reference
-     * string, $ref.
+     * The schema defining the type used for the header, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
-    public final TableField<OasHttpHeaderRecord, String> SCHEMA_TYPE_REFERENCE = createField(DSL.name("schema_type_reference"), SQLDataType.CLOB(65535).nullable(false), this, "REQUIRED. The schema defining the type used for the header using the reference string, $ref.");
+    public final TableField<OasHttpHeaderRecord, String> SCHEMA_TYPE_REFERENCE = createField(DSL.name("schema_type_reference"), SQLDataType.CLOB(65535).nullable(false), this, "REQUIRED. The schema defining the type used for the header, as a JSON object: a Schema Object (OpenAPI 3.0 also allows a Reference Object such as {\"$ref\": \"#/components/schemas/X\"}).");
+
+    /**
+     * The column <code>oas_http_header.example</code>. Example of the header's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public final TableField<OasHttpHeaderRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Example of the header's potential value, as a JSON literal. It overrides any example in the schema. NULL when there is none.");
+
+    /**
+     * The column <code>oas_http_header.required</code>. Determines whether this
+     * header is mandatory. The default value is false.
+     */
+    public final TableField<OasHttpHeaderRecord, Byte> REQUIRED = createField(DSL.name("required"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Determines whether this header is mandatory. The default value is false.");
+
+    /**
+     * The column <code>oas_http_header.style</code>. Describes how the header
+     * value will be serialized. The only style of a header is simple, which is
+     * the default; NULL for it. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public final TableField<OasHttpHeaderRecord, String> STYLE = createField(DSL.name("style"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Describes how the header value will be serialized. The only style of a header is simple, which is the default; NULL for it. Not used with CONTENT_MEDIA_TYPE.");
+
+    /**
+     * The column <code>oas_http_header.explode</code>. When true, header values
+     * of type array or object generate separate values for each value of the
+     * array or key-value pair of the map. NULL for the default, false. Not used
+     * with CONTENT_MEDIA_TYPE.
+     */
+    public final TableField<OasHttpHeaderRecord, Byte> EXPLODE = createField(DSL.name("explode"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "When true, header values of type array or object generate separate values for each value of the array or key-value pair of the map. NULL for the default, false. Not used with CONTENT_MEDIA_TYPE.");
+
+    /**
+     * The column <code>oas_http_header.content_media_type</code>. The media
+     * type of the content (for example text/plain) that serializes the header
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the header is serialized with a schema.
+     */
+    public final TableField<OasHttpHeaderRecord, String> CONTENT_MEDIA_TYPE = createField(DSL.name("content_media_type"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The media type of the content (for example text/plain) that serializes the header instead of a style: the schema and the example then belong to this Media Type Object. NULL when the header is serialized with a schema.");
 
     /**
      * The column <code>oas_http_header.owner_user_id</code>. The user who owns
@@ -265,6 +304,19 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
             _oasHttpHeaderOwnerUserIdFk = new AppUserPath(this, Keys.OAS_HTTP_HEADER_OWNER_USER_ID_FK, null);
 
         return _oasHttpHeaderOwnerUserIdFk;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeader;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeader() {
+        if (_oasDocHttpHeader == null)
+            _oasDocHttpHeader = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_OAS_HTTP_HEADER_ID_FK.getInverseKey());
+
+        return _oasDocHttpHeader;
     }
 
     private transient OasParameterPath _oasParameter;

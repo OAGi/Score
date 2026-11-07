@@ -1,0 +1,85 @@
+.dialog-form {
+  /* the columns follow the width of the dialog, which is wide on a wide screen and narrow on a narrow one */
+  container-type: inline-size;
+}
+
+.form-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 24px;
+}
+
+/* the form is in two columns where the dialog is wide enough for them: the value on the right, from its serialization */
+@container (min-width: 880px) {
+  .form-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  }
+}
+
+.form-column {
+  min-width: 0;
+}
+
+.header-scope {
+  font-size: 12px;
+  color: #767676;
+  margin-bottom: 16px;
+}
+
+.header-directions {
+  margin-bottom: 12px;
+}
+
+.field-error {
+  color: #d32f2f;
+  font-size: 12px;
+  margin: -12px 0 12px 4px;
+}
+
+.field-hint {
+  color: #767676;
+  font-size: 12px;
+  margin: -12px 0 8px 4px;
+}
+
+/* below a checkbox, not below a form field: it has no field to tuck up against */
+.header-directions .field-hint {
+  margin: 4px 0 0 0;
+}
+
+/* the editors of the schema and of the example: a space between them, and the message below an editor, not tucked under a field */
+.json-field {
+  padding-bottom: 16px;
+}
+
+.json-field .field-error,
+.json-field .field-hint {
+  margin: 4px 0 0 4px;
+}
+
+/* Delete is apart from the buttons that close the dialog, at the other end, so that it is not pressed by mistake. A spacer pushes
+   it there: the margin of a button beside a button is set by Angular Material, which a margin of its own would not win. */
+.actions-spacer {
+  flex: 1 1 auto;
+}
+
+/* What OpenAPI recommends against, at the foot of the form */
+.problems {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #fff4e5;
+  color: #8a4b00;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.problems .mat-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}

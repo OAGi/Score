@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.json-editor {
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.json-editor:hover {
+  border-color: rgba(0, 0, 0, 0.87);
+}
+
+.json-editor-focused {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 1px #1976d2;
+}
+
+.json-editor-disabled {
+  background: #f5f5f5;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.json-editor-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 4px 0 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.json-editor-spacer {
+  flex: 1;
+}
+
+.json-editor-status {
+  color: #2e7d32;
+}
+
+.json-editor-status-error {
+  color: #d32f2f;
+}
+
+.json-editor-bar > * {
+  line-height: 20px;
+}
+
+/* The buttons are the medium icon button of the app (mat-icon-button-sizes: 32px, with an icon of 19px), which centers the icon in
+   its box; the box is on the line of the text of the bar. */
+.json-editor-action {
+  flex: none;
+}
+
+.json-editor-host ::ng-deep .cm-editor {
+  font-size: 12px;
+  background: transparent;
+}
+
+.json-editor-host ::ng-deep .cm-editor.cm-focused {
+  outline: none;
+}
+
+.json-editor-host ::ng-deep .cm-content,
+.json-editor-host ::ng-deep .cm-gutters {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.json-editor-host ::ng-deep .cm-gutters {
+  background: #fafafa;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}

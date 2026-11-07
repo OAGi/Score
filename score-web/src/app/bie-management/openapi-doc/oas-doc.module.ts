@@ -10,6 +10,7 @@ import {OpenAPIService} from './domain/openapi.service';
 import {OasDocAssignDialogComponent} from './oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {OasDocAddOperationDialogComponent} from './oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
 import {OasDocSecuritySchemeDialogComponent} from './oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
+import {OasDocHttpHeaderDialogComponent} from './oas-doc-http-header-dialog/oas-doc-http-header-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from './oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {OasDocConfirmMessageDialogComponent} from './oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
@@ -23,6 +24,7 @@ import {BieCompactRowComponent} from '../bie-compact-row/bie-compact-row.compone
 import {SCORE_TABLE} from '../../common/score-table';
 import {RecordCompactRowComponent} from '../../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../../common/responsive-button';
+import {JsonEditorComponent} from '../../common/json-editor';
 
 
 const routes: Routes = [
@@ -75,6 +77,7 @@ const routes: Routes = [
     OasDocAssignDialogComponent,
     OasDocAddOperationDialogComponent,
     OasDocSecuritySchemeDialogComponent,
+    OasDocHttpHeaderDialogComponent,
     OasDocSecurityRequirementDialogComponent,
     OasDocConfirmMessageDialogComponent
   ],
@@ -93,6 +96,7 @@ const routes: Routes = [
     BieCompactRowComponent,
     RecordCompactRowComponent,
     ResponsiveButtonComponent,
+    JsonEditorComponent,
     ...SCORE_TABLE
   ],
   exports: [

@@ -106,21 +106,23 @@
              (apiKey | http | oauth2 with full OAuth Flows + scopes | openIdConnect). -->
         <div class="row">
           <div class="col-12">
-            <div class="d-flex align-items-center pb-2">
-              <span style="font-size: 14px; font-weight: 500;">Security Schemes</span>
-              <button mat-stroked-button class="ms-3" type="button" (click)="addSecurityScheme()">
-                <mat-icon>add</mat-icon>
-                Add Security Scheme
-              </button>
-              <button mat-stroked-button class="ms-2 oas-doc-security-btn" type="button"
-                      (click)="openDocumentSecurityDialog()"
-                      [disabled]="securitySchemes.length === 0 && (oasDoc.securityRequirements?.length || 0) === 0"
-                      matTooltip="Edit the document-level (global) security requirement">
-                <mat-icon>security</mat-icon>
-                <span class="oas-doc-security-label">Document Security: {{ documentSecuritySummary() }}</span>
-              </button>
+            <div class="oas-doc-section-row">
+              <span class="oas-doc-section-label">Security Schemes</span>
+              <div class="oas-doc-section-actions">
+                <button mat-stroked-button type="button" (click)="addSecurityScheme()">
+                  <mat-icon>add</mat-icon>
+                  Add Security Scheme
+                </button>
+                <button mat-stroked-button class="oas-doc-security-btn" type="button"
+                        (click)="openDocumentSecurityDialog()"
+                        [disabled]="securitySchemes.length === 0 && (oasDoc.securityRequirements?.length || 0) === 0"
+                        matTooltip="Edit the document-level (global) security requirement">
+                  <mat-icon>security</mat-icon>
+                  <span class="oas-doc-security-label">Document Security: {{ documentSecuritySummary() }}</span>
+                </button>
+              </div>
               @if (securitySchemes.length === 0) {
-                <span class="ms-3" style="font-size: 12px; color: #767676;">
+                <span class="oas-doc-section-hint">
                   No scheme configured — the default OAuth 2.0 scheme will be used.
                 </span>
               }
@@ -144,6 +146,30 @@
                   </div>
                 </mat-card>
               }
+            </div>
+          </div>
+        </div>
+        <!-- Issue #1791: the traceparent header (W3C Trace Context) of the operations that the document has now: a request
+             parameter and a response header. Enable fills the Request Parameters and Response Headers of the operations that lack it, Disable takes it
+             away from all; Update saves it. What is added later lacks it until Enable is used again. -->
+        <div class="row">
+          <div class="col-12">
+            <div class="oas-doc-section-row">
+              <span class="oas-doc-section-label">Parameters &amp; Headers</span>
+              <div class="oas-doc-section-actions">
+                <button mat-stroked-button type="button" (click)="enableTraceparent()"
+                        [disabled]="disabled || !canEnableTraceparent"
+                        matTooltip="Adds traceparent (W3C Trace Context) to every operation that does not have it: an optional request header parameter and a response header. Available while an operation lacks it.">
+                  <mat-icon>add</mat-icon>
+                  Enable traceparent
+                </button>
+                <button mat-stroked-button type="button" (click)="disableTraceparent()"
+                        [disabled]="disabled || !canDisableTraceparent"
+                        matTooltip="Removes traceparent, the request parameter and the response header, from every operation. Available while an operation has it.">
+                  <mat-icon>remove</mat-icon>
+                  Disable traceparent
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -262,6 +288,7 @@
       <mat-form-field>
         <input matInput [(ngModel)]="element.resourceName"
                (ngModelChange)="recomputeOasValidation()"
+               (change)="syncOperationParameters()"
                [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
@@ -286,6 +313,20 @@
       <mat-form-field>
         <input matInput [(ngModel)]="element.tagName">
       </mat-form-field>
+      </ng-template>
+
+      <!-- Issue #1791: the request parameters / response headers of the operation: a click on one edits or deletes it, the + adds one. -->
+      <ng-template #httpHeadersControl let-element let-direction="direction">
+        <div class="oas-headers-cell">
+          @for (header of headersOf(element.httpHeaders, direction); track header) {
+            <span class="oas-header-chip" (click)="editHttpHeader(element, header, $event)"
+                  [matTooltip]="header.oasOperationId ? 'Edit or delete this ' + (direction === 'REQUEST' ? 'request parameter' : 'response header') : 'Of the whole document: edit or delete it'">{{ header.name }}{{ locationLabel(header) }}</span>
+          }
+          <button mat-icon-button type="button" class="oas-header-add" (click)="addHttpHeader(element, direction, $event)"
+                  [matTooltip]="direction === 'REQUEST' ? 'Add an HTTP request parameter (in: header) to this operation' : 'Add an HTTP response header to this operation'">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </ng-template>
 
       <ng-template #securityControl let-element>
@@ -421,6 +462,18 @@
           </td>
         </ng-container>
 
+        <ng-container scoreColumnDef="requestParameters">
+          <td score-cell *scoreCellDef="let element">
+            <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'REQUEST'}"/>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="responseHeaders">
+          <td score-cell *scoreCellDef="let element">
+            <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'RESPONSE'}"/>
+          </td>
+        </ng-container>
+
         <ng-container scoreColumnDef="errorResponse">
           <td score-cell *scoreCellDef="let element">
             <ng-container *ngTemplateOutlet="errorResponseControl; context: {$implicit: element}"/>
@@ -453,6 +506,14 @@
                     <div class="compact-field">
                       <span class="compact-label">Security</span>
                       <ng-container *ngTemplateOutlet="securityControl; context: {$implicit: element}"/>
+                    </div>
+                    <div class="compact-field">
+                      <span class="compact-label">Request Parameters</span>
+                      <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'REQUEST'}"/>
+                    </div>
+                    <div class="compact-field">
+                      <span class="compact-label">Response Headers</span>
+                      <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'RESPONSE'}"/>
                     </div>
                     <div class="compact-field">
                       <span class="compact-label">Error Response</span>

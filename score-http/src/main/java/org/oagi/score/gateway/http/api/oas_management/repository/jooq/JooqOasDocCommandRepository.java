@@ -77,6 +77,7 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         // Issue #1729: persist the configured Security Schemes (if any).
         saveSecuritySchemes(oasDocId, request.getSecuritySchemes(), requesterId, timestamp);
         saveDocSecurityRequirements(oasDocId, request.getSecurityRequirements(), requesterId, timestamp);
+        OasDocHttpHeaderStore.save(dslContext(), oasDocId, request.getHttpHeaders(), requesterId, timestamp);
         return new CreateOasDocResponse(oasDocId.toBigInteger());
     }
 
@@ -95,6 +96,7 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         if (record == null) {
             throw new ScoreDataAccessException(new IllegalArgumentException());
         }
+        String versionBefore = record.getVersion();
         List<Field<?>> changedField = new ArrayList();
         if (!StringUtils.equals(request.getTitle(), record.getTitle())) {
             record.setTitle(request.getTitle());
@@ -151,6 +153,11 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         // Issue #1729: replace the document's Security Schemes (independent of the doc-field changes above).
         saveSecuritySchemes(record.getOasDocId(), request.getSecuritySchemes(), requesterId, timestamp);
         saveDocSecurityRequirements(record.getOasDocId(), request.getSecurityRequirements(), requesterId, timestamp);
+        OasDocHttpHeaderStore.save(dslContext(), record.getOasDocId(), request.getHttpHeaders(), requesterId, timestamp);
+        if (!StringUtils.equals(versionBefore, record.getVersion())) {
+            // Issue #1791: the {version} of a path is the version of the document, so its path parameters change with it.
+            reconcileOperationParametersForVersion(record.getOasDocId(), versionBefore, record.getVersion(), requesterId, timestamp);
+        }
         return new UpdateOasDocResponse(
                 record.getOasDocId().toBigInteger(),
                 !changedField.isEmpty());
@@ -165,6 +172,9 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         if (oasDocIdList == null || oasDocIdList.isEmpty()) {
             return new DeleteOasDocResponse(Collections.emptyList());
         }
+
+        // Issue #1791: the HTTP headers bound to the document or to its operations go first; they refer to both.
+        OasDocHttpHeaderStore.delete(dslContext(), OAS_DOC_HTTP_HEADER.OAS_DOC_ID.in(valueOf(oasDocIdList)));
 
         List<ULong> oasResourceIds = dslContext().select(OAS_RESOURCE.OAS_RESOURCE_ID)
                 .from(OAS_RESOURCE)
@@ -257,6 +267,19 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
 
         DeleteOasDocResponse response = new DeleteOasDocResponse(oasDocIdList);
         return response;
+    }
+
+    private void reconcileOperationParametersForVersion(ULong oasDocId, String versionBefore, String versionAfter,
+                                                        ULong requesterId, LocalDateTime timestamp) {
+        for (var operation : dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_OPERATION.VERB, OAS_RESOURCE.PATH)
+                .from(OAS_OPERATION).join(OAS_RESOURCE).on(OAS_RESOURCE.OAS_RESOURCE_ID.eq(OAS_OPERATION.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId)).fetch()) {
+            ULong oasOperationId = operation.get(OAS_OPERATION.OAS_OPERATION_ID);
+            OasOperationParameters.apply(dslContext(), oasDocId, oasOperationId,
+                    OasOperationParameters.capture(dslContext(), oasOperationId, operation.get(OAS_OPERATION.VERB), operation.get(OAS_RESOURCE.PATH), versionBefore),
+                    OasOperationParameters.capture(dslContext(), oasOperationId, operation.get(OAS_OPERATION.VERB), operation.get(OAS_RESOURCE.PATH), versionAfter),
+                    requesterId, timestamp);
+        }
     }
 
     private void deleteOasTagByOperationIdList(List<ULong> oasOperationIdList) {
@@ -441,6 +464,19 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
+    public OasOperationParameterState captureOperationParameters(OasOperationId oasOperationId) {
+        return oasOperationId == null ? OasOperationParameterState.NONE
+                : OasOperationParameters.capture(dslContext(), valueOf(oasOperationId));
+    }
+
+    @Override
+    public void reconcileOperationParameters(OasOperationId oasOperationId, OasOperationParameterState before,
+                                             org.oagi.score.gateway.http.api.account_management.model.UserId userId) {
+        OasOperationParameters.reconcile(dslContext(), valueOf(oasOperationId), before,
+                ULong.valueOf(userId.value()), LocalDateTime.now());
+    }
+
+    @Override
     public boolean operationHasBody(OasOperationId oasOperationId, boolean isRequest) {
         if (oasOperationId == null) {
             return false;
@@ -481,6 +517,22 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .limit(1)
                 .fetchOne(OAS_OPERATION.OAS_OPERATION_ID);
         return (oasOperationId == null) ? null : new OasOperationId(oasOperationId.toBigInteger());
+    }
+
+    @Override
+    public Set<OasOperationId> findOasOperationIdsAtEndpoint(OasDocId oasDocId, String path, String verb) {
+        if (oasDocId == null || path == null || verb == null) {
+            return Set.of();
+        }
+        return dslContext().select(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                        .and(OAS_RESOURCE.PATH.eq(path))
+                        .and(OAS_OPERATION.VERB.eq(verb)))
+                .fetch(OAS_OPERATION.OAS_OPERATION_ID).stream()
+                .map(id -> new OasOperationId(id.toBigInteger()))
+                .collect(java.util.stream.Collectors.toSet());
     }
 
     @Override

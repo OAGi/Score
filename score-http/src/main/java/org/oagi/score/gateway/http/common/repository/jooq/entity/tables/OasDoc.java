@@ -35,6 +35,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader.OasDocHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity.OasDocSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag.OasDocTagPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasExternalDoc.OasExternalDocPath;
@@ -293,6 +294,19 @@ public class OasDoc extends TableImpl<OasDocRecord> {
             _oasDocOwnerUserIdFk = new AppUserPath(this, Keys.OAS_DOC_OWNER_USER_ID_FK, null);
 
         return _oasDocOwnerUserIdFk;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeader;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeader() {
+        if (_oasDocHttpHeader == null)
+            _oasDocHttpHeader = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_OAS_DOC_ID_FK.getInverseKey());
+
+        return _oasDocHttpHeader;
     }
 
     private transient OasDocSecurityPath _oasDocSecurity;

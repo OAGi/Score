@@ -145,6 +145,8 @@ public class OpenAPIGenerateService {
         // Issue #1347: single idempotent post-step — merge the defaulted 4xx/5xx error responses
         // into every generated operation (after all templates are built, before serialization).
         generateExpression.generateErrorResponses();
+        // Issue #1791: then the HTTP headers of the document, so that they reach the error responses too.
+        generateExpression.generateHttpHeaders();
 
         File schemaExpressionFile;
         try {

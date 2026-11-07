@@ -35,6 +35,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader.OasDocHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasHttpHeader.OasHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasRequest.OasRequestPath;
@@ -112,10 +113,19 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
     public final TableField<OasParameterRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.");
 
     /**
-     * The column <code>oas_parameter.schema_type_reference</code>. A reference
-     * of the schema defining the type used for the parameter.
+     * The column <code>oas_parameter.schema_type_reference</code>. REQUIRED.
+     * The schema defining the type used for the parameter, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
-    public final TableField<OasParameterRecord, String> SCHEMA_TYPE_REFERENCE = createField(DSL.name("schema_type_reference"), SQLDataType.CLOB(65535).nullable(false), this, "A reference of the schema defining the type used for the parameter.");
+    public final TableField<OasParameterRecord, String> SCHEMA_TYPE_REFERENCE = createField(DSL.name("schema_type_reference"), SQLDataType.CLOB(65535).nullable(false), this, "REQUIRED. The schema defining the type used for the parameter, as a JSON object: a Schema Object (OpenAPI 3.0 also allows a Reference Object such as {\"$ref\": \"#/components/schemas/X\"}).");
+
+    /**
+     * The column <code>oas_parameter.example</code>. Example of the parameter's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public final TableField<OasParameterRecord, String> EXAMPLE = createField(DSL.name("example"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "Example of the parameter's potential value, as a JSON literal. It overrides any example in the schema. NULL when there is none.");
 
     /**
      * The column <code>oas_parameter.allow_reserved</code>. Determines whether
@@ -132,6 +142,32 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
      * value is false.
      */
     public final TableField<OasParameterRecord, Byte> DEPRECATED = createField(DSL.name("deprecated"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.TINYINT)), this, "Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. Default value is false.");
+
+    /**
+     * The column <code>oas_parameter.style</code>. Describes how the parameter
+     * value will be serialized depending on the type of the parameter value
+     * (matrix, label, simple, form, spaceDelimited, pipeDelimited or
+     * deepObject). NULL for the default of the location: form for query and
+     * cookie, simple for path and header. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public final TableField<OasParameterRecord, String> STYLE = createField(DSL.name("style"), SQLDataType.VARCHAR(20).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Describes how the parameter value will be serialized depending on the type of the parameter value (matrix, label, simple, form, spaceDelimited, pipeDelimited or deepObject). NULL for the default of the location: form for query and cookie, simple for path and header. Not used with CONTENT_MEDIA_TYPE.");
+
+    /**
+     * The column <code>oas_parameter.explode</code>. When true, parameter
+     * values of type array or object generate separate parameters for each
+     * value of the array or key-value pair of the map. NULL for the default of
+     * the style: true for form, false for all other styles. Not used with
+     * CONTENT_MEDIA_TYPE.
+     */
+    public final TableField<OasParameterRecord, Byte> EXPLODE = createField(DSL.name("explode"), SQLDataType.TINYINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.TINYINT)), this, "When true, parameter values of type array or object generate separate parameters for each value of the array or key-value pair of the map. NULL for the default of the style: true for form, false for all other styles. Not used with CONTENT_MEDIA_TYPE.");
+
+    /**
+     * The column <code>oas_parameter.content_media_type</code>. The media type
+     * of the content (for example text/plain) that serializes the parameter
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the parameter is serialized with a schema.
+     */
+    public final TableField<OasParameterRecord, String> CONTENT_MEDIA_TYPE = createField(DSL.name("content_media_type"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "The media type of the content (for example text/plain) that serializes the parameter instead of a style: the schema and the example then belong to this Media Type Object. NULL when the parameter is serialized with a schema.");
 
     /**
      * The column <code>oas_parameter.oas_http_header_id</code>. IF IN = Header,
@@ -281,6 +317,19 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
             _oasHttpHeader = new OasHttpHeaderPath(this, Keys.OAS_PARAMETER_OAS_HTTP_HEADER_ID_FK, null);
 
         return _oasHttpHeader;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeader;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeader() {
+        if (_oasDocHttpHeader == null)
+            _oasDocHttpHeader = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_OAS_PARAMETER_ID_FK.getInverseKey());
+
+        return _oasDocHttpHeader;
     }
 
     private transient OasParameterLinkPath _oasParameterLink;

@@ -7,6 +7,7 @@ import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasOperationParameterState;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
 import org.oagi.score.gateway.http.api.oas_management.model.OperationErrorResponseAssignment;
@@ -29,7 +30,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
@@ -82,6 +85,13 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     .computeIfAbsent(valueOf(submitted.getOasOperationId()), k -> new HashSet<>())
                     .add(submitted.getMessageBody());
         }
+
+        // Issue #1791: what the operations (and the other operations of the resources whose path may change) are before
+        // the update, so that the request parameters registered for them follow the change.
+        Map<ULong, OasOperationParameterState> parametersBefore = OasOperationParameters.captureAll(dslContext(),
+                submittedBodyTypesByOp.keySet(),
+                request.getBieForOasDocList().stream().map(BieForOasDoc::getOasResourceId).filter(Objects::nonNull)
+                        .map(id -> valueOf(id)).collect(Collectors.toCollection(LinkedHashSet::new)));
 
         // Per-entity "did anything change" accumulators. These mirror the previous per-field-list
         // emptiness checks used to build the response's `changed` flag: resource -> a path change,
@@ -138,6 +148,8 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                         timestamp);
             }
         }
+        parametersBefore.forEach((oasOperationId, before) -> OasOperationParameters.reconcile(dslContext(),
+                oasOperationId, before, valueOf(requesterId), timestamp));
         return new UpdateBieForOasDocResponse(oasDocId, resourceChanged || operationChanged
                 || requestChanged || responseChanged || tagChanged || securityChanged);
     }
@@ -675,6 +687,10 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         // Issue #1492: one operation owns at most one Request AND one Response. Removing a
         // body deletes ONLY that body (and its children); the operation/resource are removed ONLY when
         // they have no remaining child, so a surviving sibling body is never orphaned/FK-violated.
+        // Issue #1791: removing the array body of a GET changes its request parameters; one that is gone takes its own away.
+        Map<ULong, OasOperationParameterState> parametersBefore = OasOperationParameters.captureAll(dslContext(),
+                bieForOasDocList.stream().map(BieForOasDoc::getOasOperationId).filter(Objects::nonNull)
+                        .map(id -> valueOf(id)).collect(Collectors.toCollection(LinkedHashSet::new)), Set.of());
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
             ULong oasOperationId = valueOf(bieForOasDoc.getOasOperationId());
             if (oasOperationId == null) {
@@ -693,6 +709,10 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                 }
             }
         }
+
+        ULong requesterId = valueOf(request.getRequester().userId());
+        parametersBefore.forEach((oasOperationId, before) -> OasOperationParameters.reconcile(dslContext(),
+                oasOperationId, before, requesterId, LocalDateTime.now()));
 
         DeleteBieForOasDocResponse response = new DeleteBieForOasDocResponse(bieForOasDocList);
         return response;
@@ -783,6 +803,8 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         }
         // Operation-level security (scopes -> entries).
         deleteOperationSecurity(oasOperationId);
+        // Issue #1791: the HTTP headers bound to this operation alone.
+        OasDocHttpHeaderStore.delete(dslContext(), OAS_DOC_HTTP_HEADER.OAS_OPERATION_ID.eq(oasOperationId));
         // Nullable oas_parameter_link operation edge (its response edge was already cleared per body).
         dslContext().delete(OAS_PARAMETER_LINK).where(OAS_PARAMETER_LINK.OAS_OPERATION_ID.eq(oasOperationId)).execute();
 

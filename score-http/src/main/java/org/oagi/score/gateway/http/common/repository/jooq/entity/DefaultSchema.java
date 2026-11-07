@@ -96,6 +96,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag;
@@ -796,6 +797,13 @@ public class DefaultSchema extends SchemaImpl {
     public final OasDoc OAS_DOC = OasDoc.OAS_DOC;
 
     /**
+     * Binds an HTTP header of an OpenAPI document to the document, or to one of
+     * its operations: as a request parameter (OAS_PARAMETER) or as a header of
+     * every response (OAS_HTTP_HEADER).
+     */
+    public final OasDocHttpHeader OAS_DOC_HTTP_HEADER = OasDocHttpHeader.OAS_DOC_HTTP_HEADER;
+
+    /**
      * Root-level Security Requirement entry for an OpenAPI document.
      */
     public final OasDocSecurity OAS_DOC_SECURITY = OasDocSecurity.OAS_DOC_SECURITY;
@@ -1211,6 +1219,7 @@ public class DefaultSchema extends SchemaImpl {
             ModuleXbtManifest.MODULE_XBT_MANIFEST,
             Namespace.NAMESPACE,
             OasDoc.OAS_DOC,
+            OasDocHttpHeader.OAS_DOC_HTTP_HEADER,
             OasDocSecurity.OAS_DOC_SECURITY,
             OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE,
             OasDocTag.OAS_DOC_TAG,

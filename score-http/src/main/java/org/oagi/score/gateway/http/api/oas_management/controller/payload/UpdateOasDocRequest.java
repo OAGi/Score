@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.oas_management.controller.payload;
 
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequirement;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocHttpHeader;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityScheme;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.Request;
@@ -23,6 +24,8 @@ public class UpdateOasDocRequest extends Request {
     private String ownerUserId;
     // Issue #1729
     private List<OasSecurityScheme> securitySchemes;
+    // Issue #1791: null = leave the HTTP headers of the document as they are.
+    private List<OasDocHttpHeader> httpHeaders;
     private List<OasSecurityRequirement> securityRequirements;
 
     public UpdateOasDocRequest(ScoreUser requester) {
@@ -128,6 +131,14 @@ public class UpdateOasDocRequest extends Request {
 
     public void setOwnerUserId(String ownerUserId) {
         this.ownerUserId = ownerUserId;
+    }
+
+    public List<OasDocHttpHeader> getHttpHeaders() {
+        return httpHeaders;
+    }
+
+    public void setHttpHeaders(List<OasDocHttpHeader> httpHeaders) {
+        this.httpHeaders = httpHeaders;
     }
 
     public List<OasSecurityScheme> getSecuritySchemes() {

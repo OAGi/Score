@@ -1,10 +1,11 @@
 import {vi} from 'vitest';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from '../../../common/utility';
 import {FormControl} from '@angular/forms';
 import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
+import {linkHeadersToRows} from '../domain/oas-doc-http-header-preset';
 
 /**
  * Issue #1610 unit tests for the OpenAPI-document editor.
@@ -95,7 +96,7 @@ describe('OasDocDetailComponent.hasIgnoredDeleteRequestBody (#1610 banner)', () 
 
 describe('OasDocDetailComponent.onChange verb handling (#1610)', () => {
   function verbCtx(): any {
-    const ctx: any = {updateOperationIdForVerb: vi.fn()};
+    const ctx: any = {updateOperationIdForVerb: vi.fn(), syncOperationParameters: vi.fn()};
     ctx.onChange = OasDocDetailComponent.prototype.onChange;
     return ctx;
   }
@@ -471,6 +472,62 @@ describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Optio
   });
 });
 
+describe('OasDocDetailComponent.doUpdate saves the operations before the request parameters that follow them (#1791)', () => {
+  function ctxOf(detailsFail: boolean, schemesChanged: boolean): any {
+    const oasDoc: any = {oasDocId: 1, httpHeaders: [], securitySchemes: [], securityRequirements: []};
+    const svc: any = {
+      updateDetails: vi.fn(() => detailsFail ? throwError(() => ({status: 400})) : of(null)),
+      updateOasDoc: vi.fn(() => of(null)),
+      getOasDoc: vi.fn(() => of(null)),
+    };
+    const ctx: any = {
+      rows: [],
+      oasValidator: new OasOperationValidator(),
+      oasDoc,
+      // the document differs from what was loaded
+      hashCodeForOasDoc: 1,
+      savedSecurityHash: schemesChanged ? 1 : hashCode([oasDoc.securitySchemes, oasDoc.securityRequirements]),
+      openAPIService: svc,
+      snackBar: {open: vi.fn()},
+      loading: false,
+      isUpdating: false,
+      updateDisabled: false,
+      getChanged: () => [{operationId: 'a'}],
+      init: vi.fn(),
+      loadBieListForOasDoc: vi.fn(),
+      updateDetails: vi.fn(),
+      showUpdateError: vi.fn(),
+    };
+    ctx.recomputeOasValidation = OasDocDetailComponent.prototype.recomputeOasValidation;
+    ctx.securityChanged = OasDocDetailComponent.prototype['securityChanged'];
+    ctx.persistDetailsThenDocument = OasDocDetailComponent.prototype['persistDetailsThenDocument'];
+    ctx.doUpdate = OasDocDetailComponent.prototype.doUpdate;
+    return ctx;
+  }
+
+  it('saves the operations first, then the document', () => {
+    const ctx = ctxOf(false, false);
+    ctx.doUpdate();
+    const svc = ctx.openAPIService;
+    expect(svc.updateDetails.mock.invocationCallOrder[0]).toBeLessThan(svc.updateOasDoc.mock.invocationCallOrder[0]);
+  });
+
+  it('does not save the document when the operations are refused', () => {
+    const ctx = ctxOf(true, false);
+    ctx.doUpdate();
+    expect(ctx.openAPIService.updateOasDoc).not.toHaveBeenCalled();
+    expect(ctx.showUpdateError).toHaveBeenCalled();
+  });
+
+  it('saves the document first when its security schemes are changed, as the operations refer to them', () => {
+    const ctx = ctxOf(false, true);
+    ctx.doUpdate();
+    expect(ctx.openAPIService.updateOasDoc).toHaveBeenCalledTimes(1);
+    expect(ctx.openAPIService.updateDetails).not.toHaveBeenCalled();
+    expect(ctx.updateDetails).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('OasDocDetailComponent.generate guards unsaved changes (#1610)', () => {
   const sortPage = {sortActives: ['tagName'], sortDirections: ['asc']};
 
@@ -615,6 +672,435 @@ describe('OasDocDetailComponent.handleKeyboardEvent Ctrl/Cmd+S', () => {
       expect(isDisabledCtx({contactUrl: 'javascript:alert(1)'})).toBe(true);
       expect(isDisabledCtx({email: 'not-an-email'})).toBe(true);
       expect(isDisabledCtx({licenseUrl: 'ftp//bad url'})).toBe(true);
+    });
+  });
+});
+
+describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
+  const proto: any = OasDocDetailComponent.prototype;
+
+  /** A `this` with only the state init(), isChanged() and the Enable / Disable actions touch. */
+  function ctx(operationIdsOfTheDocument: number[], visibleRows: number[] = operationIdsOfTheDocument): any {
+    const requests: any[] = [];
+    const c: any = {
+      titleService: {setTitle: vi.fn()},
+      snackBar: {open: vi.fn()},
+      isUpdating: true,
+      hashCodeForOasDoc: 0,
+      operationIds: [],
+      rows: visibleRows.map(oasOperationId => ({oasOperationId, httpHeaders: []})),
+      requests,
+      openAPIService: {
+        getBieForOasDocPage: vi.fn((oasDocId: number, params: any) => {
+          requests.push({oasDocId, params});
+          // the two rows of one operation (a request and a response) are two rows with one operation id
+          return of({list: operationIdsOfTheDocument.flatMap(oasOperationId => [{oasOperationId}, {oasOperationId}])});
+        })
+      },
+    };
+    for (const method of ['getChanged', 'isChanged', 'init', 'showValidationErrors', 'refreshOperationIds',
+      'fetchOperationIds', 'enableTraceparent', 'disableTraceparent']) {
+      c[method] = proto[method];
+    }
+    for (const accessor of ['canEnableTraceparent', 'canDisableTraceparent']) {
+      Object.defineProperty(c, accessor, Object.getOwnPropertyDescriptor(proto, accessor) as PropertyDescriptor);
+    }
+    c.contactUrl = new FormControl('', [httpUrlValidator]);
+    c.contactEmail = new FormControl('', [optionalEmailValidator]);
+    c.licenseUrl = new FormControl('', [httpUrlValidator]);
+    c.termServiceUrl = new FormControl('', [httpUrlValidator]);
+    return c;
+  }
+
+  function loaded(c: any, httpHeaders?: any[]): any {
+    c.init({oasDocId: 5, title: 't', version: '1', openAPIVersion: '3.1', httpHeaders});
+    return c;
+  }
+
+  const names = (c: any) => c.oasDoc.httpHeaders.map((h: any) => h.name + '@' + h.oasOperationId + (h.direction === 'REQUEST' ? ':req' : ':res'));
+  const saved = (c: any) => JSON.parse(JSON.stringify(c.oasDoc.httpHeaders));
+
+  describe('what is offered', () => {
+    it('learns the operations of the document, of every page, when the document is loaded', () => {
+      const c = loaded(ctx([1, 2, 3, 4], [1, 2]));
+
+      expect(c.operationIds).toEqual([1, 2, 3, 4]);
+      expect(c.requests[0].oasDocId).toBe(5);
+      expect(c.requests[0].params.get('pageIndex')).toBe('-1');
+      expect(c.requests[0].params.get('pageSize')).toBe('-1');
+    });
+
+    it('offers Enable, not Disable, while no operation has the header', () => {
+      const c = loaded(ctx([1, 2]));
+      expect(c.canEnableTraceparent).toBe(true);
+      expect(c.canDisableTraceparent).toBe(false);
+    });
+
+    it('offers Enable and Disable while only some operations have it', () => {
+      const first = loaded(ctx([1, 2, 3]));
+      first.enableTraceparent();
+      const c = loaded(ctx([1, 2, 3, 4]), saved(first)); // a BIE was added since
+
+      expect(c.canEnableTraceparent).toBe(true);
+      expect(c.canDisableTraceparent).toBe(true);
+    });
+
+    it('offers Disable, not Enable, once every operation has it', () => {
+      const first = loaded(ctx([1, 2]));
+      first.enableTraceparent();
+      const c = loaded(ctx([1, 2]), saved(first));
+
+      expect(c.canEnableTraceparent).toBe(false);
+      expect(c.canDisableTraceparent).toBe(true);
+    });
+
+    it('offers neither Enable nor Disable for a document without operations and headers', () => {
+      const c = loaded(ctx([]));
+      expect(c.canEnableTraceparent).toBe(false);
+      expect(c.canDisableTraceparent).toBe(false);
+    });
+
+    it('treats a header of the whole document as every operation having it', () => {
+      const wide = [{name: 'traceparent', schema: {type: 'string'}, direction: 'REQUEST', required: false}, {name: 'traceparent', schema: {type: 'string'}, direction: 'RESPONSE', required: true}];
+      const c = loaded(ctx([1, 2]), wide);
+
+      expect(c.canEnableTraceparent).toBe(false);
+      expect(c.canDisableTraceparent).toBe(true);
+    });
+  });
+
+  describe('Enable', () => {
+    it('fills the headers of every operation, which is a change of the document that Update saves', () => {
+      const c = loaded(ctx([1, 2, 3]));
+      expect(c.isChanged()).toBe(false);
+
+      c.enableTraceparent();
+
+      expect(names(c)).toEqual(['traceparent@1:req', 'traceparent@1:res', 'traceparent@2:req', 'traceparent@2:res', 'traceparent@3:req', 'traceparent@3:res']);
+      expect(c.isChanged()).toBe(true);
+      expect(c.snackBar.open.mock.calls[0][0]).toContain('added (3 request parameters and 3 response headers)');
+    });
+
+    it('reaches the operations of every page, not only those the table shows', () => {
+      const c = loaded(ctx([1, 2, 3, 4], [1, 2]));
+      c.enableTraceparent();
+
+      expect(names(c)).toEqual(['traceparent@1:req', 'traceparent@1:res', 'traceparent@2:req', 'traceparent@2:res', 'traceparent@3:req', 'traceparent@3:res', 'traceparent@4:req', 'traceparent@4:res']);
+    });
+
+    it('shows the headers in the rows on the page, as the objects of the document', () => {
+      const c = loaded(ctx([1, 2], [1]));
+      c.enableTraceparent();
+
+      expect(c.rows[0].httpHeaders.length).toBe(2);
+      expect(c.rows[0].httpHeaders[0]).toBe(c.oasDoc.httpHeaders[0]);
+    });
+
+    it('adds only to the operations that lack it, and then no longer offers Enable', () => {
+      const first = loaded(ctx([1, 2]));
+      first.enableTraceparent();
+      const c = loaded(ctx([1, 2, 3]), saved(first));
+
+      c.enableTraceparent();
+
+      expect(names(c)).toEqual(['traceparent@1:req', 'traceparent@1:res', 'traceparent@2:req', 'traceparent@2:res', 'traceparent@3:req', 'traceparent@3:res']);
+      expect(c.isChanged()).toBe(true);
+      expect(c.snackBar.open.mock.calls[0][0]).toContain('added (1 request parameter and 1 response header)');
+      expect(c.canEnableTraceparent).toBe(false);
+    });
+
+    it('leaves the other headers of the document alone', () => {
+      const other = {name: 'x-request-id', oasOperationId: 1, schema: {type: 'string'}, direction: 'REQUEST', required: false};
+      const c = loaded(ctx([1, 2]), [other]);
+      c.enableTraceparent();
+
+      expect(names(c)).toEqual(['traceparent@1:req', 'traceparent@1:res', 'x-request-id@1:req', 'traceparent@2:req', 'traceparent@2:res']);
+    });
+
+    it('sends the headers of the document to the server as the request body', () => {
+      const c = loaded(ctx([1]));
+      c.enableTraceparent();
+      const sent = JSON.parse(JSON.stringify(c.oasDoc));
+
+      expect(sent.httpHeaders.length).toBe(2);
+      expect(sent.httpHeaders[0].oasOperationId).toBe(1);
+      expect(sent.httpHeaders.map((h: any) => [h.direction, h.required])).toEqual([['REQUEST', false], ['RESPONSE', true]]);
+      expect(typeof sent.httpHeaders[0].schema).toBe('object');
+    });
+  });
+
+  describe('Disable', () => {
+    function enabled(operationIds: number[], extra: any[] = []): any {
+      const first = loaded(ctx(operationIds), extra);
+      first.enableTraceparent();
+      return loaded(ctx(operationIds), saved(first));
+    }
+
+    it('takes the header away from every operation, which is a change of the document that Update saves', () => {
+      const c = enabled([1, 2, 3]);
+      expect(c.isChanged()).toBe(false);
+
+      c.disableTraceparent();
+
+      expect(c.oasDoc.httpHeaders).toEqual([]);
+      expect(c.isChanged()).toBe(true);
+      expect(c.snackBar.open.mock.calls[0][0]).toContain('removed (3 request parameters and 3 response headers)');
+    });
+
+    it('takes a header of the whole document away too, and leaves the other headers alone', () => {
+      const other = {name: 'x-request-id', oasOperationId: 1, schema: {type: 'string'}, direction: 'REQUEST', required: false};
+      const wide = [{name: 'traceparent', schema: {type: 'string'}, direction: 'REQUEST', required: false}, {name: 'traceparent', schema: {type: 'string'}, direction: 'RESPONSE', required: true}];
+      const c = loaded(ctx([1, 2]), [other, ...wide]);
+
+      c.disableTraceparent();
+
+      expect(names(c)).toEqual(['x-request-id@1:req']);
+    });
+
+    it('empties the headers of the rows, and then offers Enable and no longer Disable', () => {
+      const c = enabled([1, 2]);
+      expect(c.canDisableTraceparent).toBe(true);
+      c.disableTraceparent();
+
+      expect(c.rows.every((row: any) => row.httpHeaders.length === 0)).toBe(true);
+      expect(c.canEnableTraceparent).toBe(true);
+      expect(c.canDisableTraceparent).toBe(false);
+    });
+
+    it('does not touch the server: nothing is saved until Update', () => {
+      const c = enabled([1, 2]);
+      const calls = c.openAPIService.getBieForOasDocPage.mock.calls.length;
+      c.disableTraceparent();
+
+      // only the list of the operations is read, and that at load: Disable reads nothing, and writes nothing
+      expect(c.openAPIService.getBieForOasDocPage.mock.calls.length).toBe(calls);
+      expect(Object.keys(c.openAPIService)).toEqual(['getBieForOasDocPage']);
+    });
+  });
+
+  describe('Enable and Disable undo each other', () => {
+    it('Enable and then Disable is no change of a document without headers', () => {
+      const c = loaded(ctx([1, 2, 3]));
+      c.enableTraceparent();
+      expect(c.isChanged()).toBe(true);
+
+      c.disableTraceparent();
+      expect(c.isChanged()).toBe(false);
+    });
+
+    it('Disable and then Enable is no change of a document that has the headers', () => {
+      const first = loaded(ctx([3, 1, 2]));
+      first.enableTraceparent();
+      const c = loaded(ctx([3, 1, 2]), saved(first));
+
+      c.disableTraceparent();
+      expect(c.isChanged()).toBe(true);
+      c.enableTraceparent();
+      expect(c.isChanged()).toBe(false);
+    });
+
+    it('Disable and then Enable keeps the other headers where they were', () => {
+      const other = {name: 'x-request-id', oasOperationId: 2, schema: {type: 'string'}, direction: 'REQUEST', required: false};
+      const first = loaded(ctx([1, 2, 3]), [other]);
+      first.enableTraceparent();
+      const c = loaded(ctx([1, 2, 3]), saved(first));
+
+      c.disableTraceparent();
+      c.enableTraceparent();
+
+      expect(c.isChanged()).toBe(false);
+      expect(names(c)).toEqual(['traceparent@1:req', 'traceparent@1:res', 'traceparent@2:req', 'traceparent@2:res', 'x-request-id@2:req', 'traceparent@3:req', 'traceparent@3:res']);
+    });
+  });
+});
+
+describe('OasDocDetailComponent.init shows what keeps Update disabled', () => {
+  const proto: any = OasDocDetailComponent.prototype;
+
+  function ctx(): any {
+    const c: any = {
+      titleService: {setTitle: vi.fn()}, isUpdating: true, operationIds: [],
+      openAPIService: {getBieForOasDocPage: vi.fn(() => of({list: []}))},
+    };
+    c.init = proto.init;
+    c.refreshOperationIds = proto.refreshOperationIds;
+    c.fetchOperationIds = proto.fetchOperationIds;
+    c.showValidationErrors = proto.showValidationErrors;
+    c.contactUrl = new FormControl('', [httpUrlValidator]);
+    c.contactEmail = new FormControl('', [optionalEmailValidator]);
+    c.licenseUrl = new FormControl('', [httpUrlValidator]);
+    c.termServiceUrl = new FormControl('', [httpUrlValidator]);
+    return c;
+  }
+
+  it('touches the validated fields, so that an invalid value in the loaded document shows its error', () => {
+    const c = ctx();
+    c.termServiceUrl.setValue('Terms'); // a Terms of Service that is not a URL, as in a document of production data
+    expect(c.termServiceUrl.touched).toBe(false);
+
+    c.init({oasDocId: 5, title: 't', version: '1', openAPIVersion: '3.1', termsOfService: 'Terms'});
+
+    for (const control of [c.contactUrl, c.contactEmail, c.licenseUrl, c.termServiceUrl]) {
+      expect(control.touched).toBe(true);
+    }
+    expect(c.termServiceUrl.invalid && c.termServiceUrl.touched).toBe(true);
+    expect(c.termServiceUrl.hasError('url')).toBe(true);
+  });
+
+  it('does not change a value, nor the baseline: loading is not a change', () => {
+    const c = ctx();
+    c.termServiceUrl.setValue('Terms');
+    c.init({oasDocId: 5, title: 't', version: '1', openAPIVersion: '3.1', termsOfService: 'Terms'});
+
+    expect(c.termServiceUrl.value).toBe('Terms');
+    expect(c.oasDoc.termsOfService).toBe('Terms');
+    expect(c.hashCodeForOasDoc).toBe(hashCode(c.oasDoc));
+  });
+});
+
+describe('OasDocDetailComponent.locationLabel (#1791)', () => {
+  const label = (OasDocDetailComponent.prototype as any).locationLabel;
+  const base = {name: 'x', schema: {}, required: false};
+
+  it('names the location of a request parameter unless it is in a header', () => {
+    expect(label({...base, direction: 'REQUEST', in: 'query'})).toBe(' (query)');
+    expect(label({...base, direction: 'REQUEST', in: 'path'})).toBe(' (path)');
+    expect(label({...base, direction: 'REQUEST', in: 'cookie'})).toBe(' (cookie)');
+    expect(label({...base, direction: 'REQUEST', in: 'header'})).toBe('');
+    expect(label({...base, direction: 'REQUEST'})).toBe('');
+    expect(label({...base, direction: 'RESPONSE'})).toBe('');
+  });
+});
+
+describe('OasDocDetailComponent HTTP header dialog (#1791)', () => {
+  const proto: any = OasDocDetailComponent.prototype;
+
+  /** A `this` with the document, its rows, and a dialog that answers what it is told to. */
+  function ctx(answer: any, httpHeaders: any[] = []): any {
+    const opened: any[] = [];
+    const c: any = {
+      oasDoc: {oasDocId: 5, title: 't', httpHeaders},
+      rows: [{oasOperationId: 1, operationId: 'getA', httpHeaders: []}, {oasOperationId: 2, operationId: 'getB', httpHeaders: []}],
+      opened,
+      dialog: {
+        open: vi.fn((component: any, config: any) => {
+          opened.push(config.data);
+          return {afterClosed: () => of(answer)};
+        })
+      },
+    };
+    c.addHttpHeader = proto.addHttpHeader;
+    c.editHttpHeader = proto.editHttpHeader;
+    c.openHttpHeaderDialog = proto.openHttpHeaderDialog;
+    linkHeadersToRows(c.oasDoc, c.rows);
+    return c;
+  }
+
+  const header = (name: string, oasOperationId?: number, over: any = {}) => ({
+    name, oasOperationId, schema: {type: 'string'}, direction: 'REQUEST', required: false, ...over
+  });
+  const names = (c: any) => c.oasDoc.httpHeaders.map((h: any) => h.name + '@' + h.oasOperationId + (h.direction === 'REQUEST' ? ':req' : ':res'));
+
+  describe('adding with the + of a row', () => {
+    it('opens the dialog with a new header for the operation of the row', () => {
+      const c = ctx(undefined);
+      c.addHttpHeader(c.rows[1], 'REQUEST');
+
+      expect(c.opened[0].isNew).toBe(true);
+      expect(c.opened[0].header.oasOperationId).toBe(2);
+      expect(c.opened[0].header.name).toBe('');
+      expect(c.opened[0].header.direction).toBe('REQUEST');
+      expect(c.opened[0].scopeLabel).toContain('getB');
+    });
+
+    it('opens it for a parameter that is in the query at first', () => {
+      const c = ctx(undefined);
+      c.addHttpHeader(c.rows[0], 'REQUEST');
+      expect(c.opened[0].header.in).toBe('query');
+    });
+
+    it('opens it for a response header when the + of the Response Headers column is clicked', () => {
+      const c = ctx(undefined);
+      c.addHttpHeader(c.rows[0], 'RESPONSE');
+      expect(c.opened[0].header.direction).toBe('RESPONSE');
+    });
+
+    it('lets an operation that has no Request row, as a GET, get a request parameter', () => {
+      const c = ctx({action: 'save', header: header('traceparent', 1)});
+      c.addHttpHeader(c.rows[0], 'REQUEST');
+      expect(names(c)).toEqual(['traceparent@1:req']);
+    });
+
+    it('adds what the dialog returns to the document and to the rows of the operation', () => {
+      const c = ctx({action: 'save', header: header('x-request-id', 2)});
+      c.addHttpHeader(c.rows[1], 'REQUEST');
+
+      expect(names(c)).toEqual(['x-request-id@2:req']);
+      expect(c.rows[1].httpHeaders[0]).toBe(c.oasDoc.httpHeaders[0]);
+      expect(c.rows[0].httpHeaders).toEqual([]);
+    });
+
+    it('adds nothing when the dialog is cancelled', () => {
+      const c = ctx(undefined);
+      c.addHttpHeader(c.rows[0], 'REQUEST');
+      expect(c.oasDoc.httpHeaders).toEqual([]);
+    });
+
+    it('keeps the headers in one order', () => {
+      const c = ctx({action: 'save', header: header('a', 1)}, [header('b', 2), header('z', 1)]);
+      c.addHttpHeader(c.rows[0], 'REQUEST');
+      expect(names(c)).toEqual(['a@1:req', 'z@1:req', 'b@2:req']);
+    });
+  });
+
+  describe('editing with a click on a header', () => {
+    it('opens the dialog with a copy of the header, and the other headers to tell a clash', () => {
+      const traceparent = header('traceparent', 1);
+      const other = header('x-other', 1);
+      const c = ctx(undefined, [traceparent, other]);
+      c.editHttpHeader(c.rows[0], traceparent);
+
+      expect(c.opened[0].isNew).toBe(false);
+      expect(c.opened[0].header).toEqual(traceparent);
+      expect(c.opened[0].header).not.toBe(traceparent);
+      expect(c.opened[0].others).toEqual([other]);
+    });
+
+    it('changes the header in the document, which stays the same object, so the rows still show it', () => {
+      const traceparent = header('traceparent', 1);
+      const c = ctx({action: 'save', header: header('traceparent', 1, {required: true, description: 'changed'})}, [traceparent]);
+      c.editHttpHeader(c.rows[0], traceparent);
+
+      expect(c.oasDoc.httpHeaders[0]).toBe(traceparent);
+      expect(traceparent.required).toBe(true);
+      expect((traceparent as any).description).toBe('changed');
+      expect(c.rows[0].httpHeaders[0]).toBe(traceparent);
+    });
+
+    it('leaves the header as it is when the dialog is cancelled', () => {
+      const traceparent = header('traceparent', 1);
+      const c = ctx(undefined, [traceparent]);
+      c.editHttpHeader(c.rows[0], traceparent);
+      expect(traceparent).toEqual(header('traceparent', 1));
+    });
+
+    it('says so when the header is one of the whole document', () => {
+      const wide = header('traceparent');
+      const c = ctx(undefined, [wide]);
+      c.editHttpHeader(c.rows[0], wide);
+      expect(c.opened[0].scopeLabel).toContain('whole document');
+    });
+  });
+
+  describe('deleting from the dialog', () => {
+    it('takes the header out of the document and of the rows, and leaves the others', () => {
+      const traceparent = header('traceparent', 1);
+      const other = header('x-other', 1);
+      const c = ctx({action: 'delete'}, [traceparent, other]);
+      c.editHttpHeader(c.rows[0], traceparent);
+
+      expect(c.oasDoc.httpHeaders).toEqual([other]);
+      expect(c.rows[0].httpHeaders).toEqual([other]);
     });
   });
 });

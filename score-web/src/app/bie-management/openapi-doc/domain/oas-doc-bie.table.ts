@@ -13,6 +13,8 @@ export const OAS_DOC_BIE_TABLE = defineTable({
     {id: 'messageBody', label: 'Message Body', width: 120, sortable: true},
     {id: 'security', label: 'Security', width: 120},
     {id: 'errorResponse', label: 'Error Response', width: 180},
+    {id: 'requestParameters', label: 'Request Parameters', width: 140},
+    {id: 'responseHeaders', label: 'Response Headers', width: 140},
     {id: 'resourceName', label: 'Resource Name', width: '15%', sortable: true},
     {id: 'operationId', label: 'Operation ID', width: '15%', sortable: true},
     {id: 'tagName', label: 'Tag Name', width: '10%', sortable: true},

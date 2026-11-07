@@ -105,6 +105,7 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
             if (oasDoc != null) {
                 oasDoc.setSecuritySchemes(loadSecuritySchemes(oasDocId));
                 oasDoc.setSecurityRequirements(loadDocSecurityRequirements(oasDocId));
+                oasDoc.setHttpHeaders(OasDocHttpHeaderStore.load(dslContext(), valueOf(oasDocId)));
             }
         }
 

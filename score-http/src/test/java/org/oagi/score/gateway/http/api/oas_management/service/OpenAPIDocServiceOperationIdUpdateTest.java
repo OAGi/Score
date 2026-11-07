@@ -59,6 +59,14 @@ class OpenAPIDocServiceOperationIdUpdateTest {
                 .thenReturn(new UpdateBieForOasDocResponse(OAS_DOC_ID, true));
     }
 
+    private static BieForOasDoc row(OasOperationId oasOperationId, String operationId, String messageBody,
+                                    String resourceName, String verb) {
+        BieForOasDoc row = row(oasOperationId, operationId, messageBody);
+        row.setResourceName(resourceName);
+        row.setVerb(verb);
+        return row;
+    }
+
     private static BieForOasDoc row(OasOperationId oasOperationId, String operationId, String messageBody) {
         BieForOasDoc row = new BieForOasDoc();
         row.setOasOperationId(oasOperationId);
@@ -115,5 +123,33 @@ class OpenAPIDocServiceOperationIdUpdateTest {
                 row(OP_1, "b", "Response"), row(OP_2, "a", "Response")));
 
         verify(command).findOperationIdsInOasDoc(OAS_DOC_ID, Set.of("a", "b"), Set.of(OP_1, OP_2));
+    }
+
+    @Test
+    void requestAndResponseStoredAsTwoOperationsOfOneEndpoint_shareTheirOperationId() {
+        UpdateBieForOasDocResponse response = service.updateDetails(requester, request(
+                row(OP_1, "createOrder", "Request", "/orders", "POST"),
+                row(OP_2, "createOrder", "Response", "/orders", "POST")));
+
+        assertEquals(OAS_DOC_ID, response.getOasDocId());
+    }
+
+    @Test
+    void sameOperationIdOnTwoEndpoints_isRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateDetails(requester, request(
+                        row(OP_1, "createOrder", "Request", "/orders", "POST"),
+                        row(OP_2, "createOrder", "Response", "/orders", "PUT"))));
+        verify(bieForOasDocCommand, never()).updateBieForOasDoc(any());
+    }
+
+    @Test
+    void operationsOnTheEndpointThatAreNotSubmitted_areLeftOutOfTheLookup() {
+        OasOperationId twin = new OasOperationId(BigInteger.valueOf(13));
+        when(command.findOasOperationIdsAtEndpoint(OAS_DOC_ID, "/orders", "POST")).thenReturn(Set.of(OP_1, twin));
+
+        service.updateDetails(requester, request(row(OP_1, "createOrder", "Request", "/orders", "POST")));
+
+        verify(command).findOperationIdsInOasDoc(OAS_DOC_ID, Set.of("createOrder"), Set.of(OP_1, twin));
     }
 }

@@ -5,6 +5,7 @@ import {
   BieForOasDocDeleteRequest,
   BieForOasDocUpdateRequest,
   OasDoc,
+  OasDocHttpHeader,
   OasSecurityRequirement,
   OasSecurityScheme,
   SimpleOasDoc,
@@ -16,7 +17,26 @@ import {
   OasOperationValidator,
   recomputeOperationId
 } from '../domain/oas-operation-validation';
+import {OasHttpHeaderDirection} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
+import {directionLabel, locationOf, newHttpHeader} from '../domain/oas-doc-http-header-form';
+import {
+  adoptServerHeaders,
+  hasAnyPreset,
+  headersOf,
+  lacksPreset,
+  linkHeadersToRows,
+  offerPreset,
+  sortHeaders,
+  TRACEPARENT_PRESET,
+  withdrawPreset
+} from '../domain/oas-doc-http-header-preset';
+import {
+  dropStrayPathParameters,
+  OperationParameterState,
+  reconcileOperationParameters,
+  stateOfRows
+} from '../domain/oas-operation-parameters';
 import {FormControl} from '@angular/forms';
 import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {Location} from '@angular/common';
@@ -26,10 +46,11 @@ import {ErrorStateMatcher} from '@angular/material/core';
 import {forkJoin} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from '../../../common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
-import {finalize, tap} from 'rxjs/operators';
+import {finalize, map, tap} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
+import {OasDocHttpHeaderDialogComponent} from '../oas-doc-http-header-dialog/oas-doc-http-header-dialog.component';
 import {OasDocSecuritySchemeDialogComponent} from '../oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {
@@ -119,6 +140,13 @@ export class OasDocDetailComponent implements OnInit {
           return elm;
         });
         this.rows = resp.list;
+        // Issue #1791: the rows show the headers of the document.
+        if (dropStrayPathParameters(this.oasDoc, this.rows, this.oasDoc.version)) {
+          sortHeaders(this.oasDoc);
+        }
+        linkHeadersToRows(this.oasDoc, this.rows);
+        this.parameterStates.clear();
+        this.syncOperationParameters();
         this.rows.forEach((elm: BieForOasDoc) => {
           this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
           // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
@@ -230,14 +258,136 @@ export class OasDocDetailComponent implements OnInit {
     if (!oasDoc.securityRequirements) {
       oasDoc.securityRequirements = [];
     }
+    // Issue #1791: likewise for the HTTP headers.
+    if (!oasDoc.httpHeaders) {
+      oasDoc.httpHeaders = [];
+    }
     // Issue #1760: the version selector offers only the minor family (3.0 / 3.1). Fold any stored patch
     // value (including legacy 3.0.3 / 3.1.1) to its minor so the mat-select matches the loaded value and
     // the baseline hashCode reflects what is displayed (no spurious "changed" state).
     oasDoc.openAPIVersion = toMinorOpenApiVersion(oasDoc.openAPIVersion);
+    sortHeaders(oasDoc); // one order, so that enabling after disabling is no change
     this.hashCodeForOasDoc = hashCode(oasDoc);
+    this.savedHttpHeadersHash = hashCode(oasDoc.httpHeaders);
+    this.savedSecurityHash = hashCode([oasDoc.securitySchemes, oasDoc.securityRequirements]);
     this.oasDoc = oasDoc;
     setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
+    this.showValidationErrors();
+    this.refreshOperationIds();
+  }
+
+  // An invalid value that is already in the document (a Terms of Service that is not a URL, say) keeps Update disabled
+  // for every change. A field shows its error only once it is touched, so touch them: the reason is on the screen.
+  showValidationErrors() {
+    [this.contactUrl, this.contactEmail, this.licenseUrl, this.termServiceUrl].forEach(control => control.markAsTouched());
+  }
+
+  // Issue #1791: the traceparent header (a preset of the UI, the server knows no header by name) of the operations of the
+  // document. Enable gives every operation that has none a header of its own, Disable takes every one away. Either is a
+  // change of the document in the page: Update saves it. Enable is there while an operation lacks the header, Disable
+  // while any operation has it; a BIE that is added later lacks it until Enable is used again.
+  /** The operations of the document, of every page: the ones the table shows are only a page of them. */
+  operationIds: number[] = [];
+
+  private fetchOperationIds() {
+    const params = new HttpParams().set('access', 'CanView').set('pageIndex', '-1').set('pageSize', '-1')
+      .set('sortActives', '').set('sortDirections', '');
+    return this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params).pipe(
+      map(resp => [...new Set((resp.list || []).map(row => row.oasOperationId).filter(id => !!id))]));
+  }
+
+  refreshOperationIds() {
+    this.fetchOperationIds().subscribe(ids => this.operationIds = ids);
+  }
+
+  get canEnableTraceparent(): boolean {
+    return !!this.oasDoc && lacksPreset(this.oasDoc, TRACEPARENT_PRESET, this.operationIds);
+  }
+
+  get canDisableTraceparent(): boolean {
+    return !!this.oasDoc && hasAnyPreset(this.oasDoc, TRACEPARENT_PRESET);
+  }
+
+  enableTraceparent() {
+    this.fetchOperationIds().subscribe(operationIds => {
+      this.operationIds = operationIds;
+      const {added, requestParameters, responseHeaders} = offerPreset(this.oasDoc, TRACEPARENT_PRESET, operationIds);
+      linkHeadersToRows(this.oasDoc, this.rows);
+      this.snackBar.open(added.length === 0
+        ? 'Every operation has traceparent already.'
+        : 'traceparent is added (' + requestParameters + ' request parameter' + (requestParameters === 1 ? '' : 's')
+        + ' and ' + responseHeaders + ' response header' + (responseHeaders === 1 ? '' : 's') + ').', '', {duration: 4000});
+    });
+  }
+
+  disableTraceparent() {
+    const {removed, requestParameters, responseHeaders} = withdrawPreset(this.oasDoc, TRACEPARENT_PRESET);
+    linkHeadersToRows(this.oasDoc, this.rows);
+    this.snackBar.open(removed === 0
+      ? 'No operation has traceparent.'
+      : 'traceparent is removed (' + requestParameters + ' request parameter' + (requestParameters === 1 ? '' : 's')
+      + ' and ' + responseHeaders + ' response header' + (responseHeaders === 1 ? '' : 's') + ').', '', {duration: 4000});
+  }
+
+  headersOf = headersOf;
+
+  /** What follows the name of a parameter in the table: where it is, unless it is in a header, as most are. */
+  locationLabel(header: OasDocHttpHeader): string {
+    const location = locationOf(header);
+    return header.direction === 'REQUEST' && location !== 'header' ? ' (' + location + ')' : '';
+  }
+
+  // Issue #1791: the request parameters and the response headers of an operation are edited in a dialog, whatever they
+  // are: the + of a column of a row adds one of that direction to its operation (so a GET, which has no Request row,
+  // gets its request parameters here too), a click on one edits or deletes it. The dialog edits a copy; what it returns changes the document in
+  // the page (the objects of the rows are those of the document), and Update saves it.
+  addHttpHeader(row: BieForOasDoc, direction: OasHttpHeaderDirection, event?: Event) {
+    event?.stopPropagation();
+    this.openHttpHeaderDialog(row, undefined, direction);
+  }
+
+  editHttpHeader(row: BieForOasDoc, header: OasDocHttpHeader, event?: Event) {
+    event?.stopPropagation();
+    this.openHttpHeaderDialog(row, header, header.direction);
+  }
+
+  private openHttpHeaderDialog(row: BieForOasDoc, header: OasDocHttpHeader | undefined, direction: OasHttpHeaderDirection) {
+    const isNew = !header;
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      header: header ? JSON.parse(JSON.stringify(header)) : newHttpHeader(direction, row.oasOperationId),
+      isNew,
+      scopeLabel: header && !header.oasOperationId
+        ? 'This ' + directionLabel(direction).toLowerCase() + ' is one of the whole document: it applies to every operation.'
+        : 'Operation: ' + (row.operationId || row.oasOperationId),
+      others: (this.oasDoc.httpHeaders || []).filter(other => other !== header),
+      // the path as the generated document has it: the {version} of the path is the version of the document
+      resourcePath: this.oasDoc.version ? (row.resourceName || '').split('{version}').join(this.oasDoc.version) : row.resourceName,
+      openApiVersion: this.oasDoc.openAPIVersion
+    };
+    // wide for a wide screen, where the form is in two columns, and as narrow as it was for a narrow one
+    dialogConfig.width = window.innerWidth >= 1200 ? '1100px' : '720px';
+    dialogConfig.maxWidth = '95vw';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocHttpHeaderDialogComponent, dialogConfig).afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      this.oasDoc.httpHeaders = this.oasDoc.httpHeaders || [];
+      if (result.action === 'delete') {
+        this.oasDoc.httpHeaders = this.oasDoc.httpHeaders.filter(other => other !== header);
+      } else if (header) {
+        // the same object stays in the document, so that what shows it still shows it
+        Object.keys(header).forEach(key => delete (header as any)[key]);
+        Object.assign(header, result.header);
+      } else {
+        this.oasDoc.httpHeaders.push(result.header);
+      }
+      sortHeaders(this.oasDoc);
+      linkHeadersToRows(this.oasDoc, this.rows);
+    });
   }
 
   // Issue #1729: selectable security scheme types (OpenAPI 3.0).
@@ -745,6 +895,60 @@ export class OasDocDetailComponent implements OnInit {
 
   loadBieListForOasDoc() {
     this.view().reload();
+    this.refreshOperationIds();
+    this.refreshHttpHeaders();
+  }
+
+  // Issue #1791: what each operation was when the rows were loaded or last looked at; a change of its verb, of its array
+  // indicator or of the names in its path registers, renames or removes the request parameters that follow from it
+  // (sinceLastDateTime of a GET that returns an array, the path parameters), in the table at once. Update saves them.
+  private parameterStates = new Map<number, OperationParameterState>();
+
+  syncOperationParameters(): void {
+    const byOperation = new Map<number, BieForOasDoc[]>();
+    for (const row of this.rows) {
+      if (row.oasOperationId) {
+        byOperation.set(row.oasOperationId, [...(byOperation.get(row.oasOperationId) || []), row]);
+      }
+    }
+    let changed = false;
+    byOperation.forEach((rows, oasOperationId) => {
+      const after = stateOfRows(rows, this.oasDoc.version);
+      const before = this.parameterStates.get(oasOperationId);
+      this.parameterStates.set(oasOperationId, after);
+      if (before && JSON.stringify(before) !== JSON.stringify(after)) {
+        reconcileOperationParameters(this.oasDoc, oasOperationId, before, after);
+        changed = true;
+      }
+    });
+    if (changed) {
+      sortHeaders(this.oasDoc);
+      linkHeadersToRows(this.oasDoc, this.rows);
+    }
+  }
+
+  // Issue #1791: the server registers request parameters when the operations change (sinceLastDateTime of a GET that
+  // returns an array, the path parameters of a Resource Path), in the same step that changes the operation. The page
+  // takes them, or its next Update would save the headers it had before and take them away.
+  private savedHttpHeadersHash: any;
+  private savedSecurityHash: any;
+
+  private refreshHttpHeaders() {
+    this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+      if (!reloaded) {
+        return;
+      }
+      const pageHasChanges = hashCode(this.oasDoc.httpHeaders) !== this.savedHttpHeadersHash;
+      const docWasUnchanged = this.hashCodeForOasDoc === hashCode(this.oasDoc);
+      adoptServerHeaders(this.oasDoc, reloaded.httpHeaders || [], pageHasChanges);
+      linkHeadersToRows(this.oasDoc, this.rows);
+      if (!pageHasChanges) {
+        this.savedHttpHeadersHash = hashCode(this.oasDoc.httpHeaders);
+        if (docWasUnchanged) {
+          this.hashCodeForOasDoc = hashCode(this.oasDoc);
+        }
+      }
+    });
   }
 
   getChanged(): BieForOasDoc[] {
@@ -785,6 +989,7 @@ export class OasDocDetailComponent implements OnInit {
         source.messageBody = 'Response';
       }
       this.updateOperationIdForVerb(source);
+      this.syncOperationParameters();
     }
   }
 
@@ -877,7 +1082,12 @@ export class OasDocDetailComponent implements OnInit {
     const docChanged = this.hashCodeForOasDoc !== hashCode(this.oasDoc);
     const detailsChanged = this.getChanged().length > 0;
 
-    if (docChanged) {
+    if (docChanged && detailsChanged && !this.securityChanged()) {
+      // The request parameters of the document follow the operations (a path parameter of a Resource Path, say), so the
+      // operations are saved first: when they are refused, the parameters that follow them are not saved either, and the
+      // document does not end up with a parameter that its path does not have.
+      this.persistDetailsThenDocument();
+    } else if (docChanged) {
       // Persist the document (incl. its security schemes) FIRST, then the per-operation details.
       // updateDetails() resolves each operation Security Requirement's scheme name to its
       // oas_security_scheme_id from the database, so a renamed/added scheme must be committed before the
@@ -908,6 +1118,39 @@ export class OasDocDetailComponent implements OnInit {
       // No scheme change -> existing schemes are already persisted, so resolution is safe.
       this.updateDetails();
     }
+  }
+
+  // Whether the security schemes or requirements of the document are changed; the operations resolve them by the
+  // schemes that are saved, so then the document goes first.
+  private securityChanged(): boolean {
+    return hashCode([this.oasDoc.securitySchemes, this.oasDoc.securityRequirements]) !== this.savedSecurityHash;
+  }
+
+  private persistDetailsThenDocument() {
+    if (this.updateDisabled) {
+      return;
+    }
+    const request = new BieForOasDocUpdateRequest();
+    request.oasDocId = this.oasDoc.oasDocId;
+    request.bieForOasDocList = this.getChanged();
+    this.loading = true;
+    this.isUpdating = true;
+    this.openAPIService.updateDetails(request).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe(_ => {
+      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(() => {
+        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+          if (reloaded) {
+            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
+            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+          }
+          this.init(this.oasDoc);
+          this.loadBieListForOasDoc();
+          this.snackBar.open('Updated', '', {duration: 3000});
+        });
+      });
+    }, err => this.showUpdateError(err));
   }
 
   openDialogOasDocUpdate() {
@@ -1046,6 +1289,7 @@ export class OasDocDetailComponent implements OnInit {
     element.resourceName = applyResourceArrayMarker(
       element.resourceName, element.propertyTerm, element.arrayIndicator);
     this.recomputeOasValidation();
+    this.syncOperationParameters();
   }
 
   isEditable(): boolean {
@@ -1112,6 +1356,7 @@ export class OasDocDetailComponent implements OnInit {
             });
             this.selection.clear();
             this.view().reload();
+            this.refreshHttpHeaders();
           });
         }
       });
