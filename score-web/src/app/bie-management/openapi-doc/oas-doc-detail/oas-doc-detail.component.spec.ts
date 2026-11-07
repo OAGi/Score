@@ -356,7 +356,7 @@ describe('OasDocDetailComponent document-level "apply to all" error response (#1
       // the server has said that what is changed can be saved
       updateDisabled: false,
       changeChecker: {status: () => 'valid', violations: () => []},
-      buildChangeSet: () => ({operations: opts.changedRows || [], headers: {upserts: [], removed: []}}),
+      buildChangeSet: () => ({operations: (opts.changedRows || []).map(row => ({reset: () => {}, ...row})), headers: {upserts: [], removed: []}}),
       saveChanges: OasDocDetailComponent.prototype['saveChanges'],
       reloadAfterSave: (then: () => void) => then(),
       cannotSaveMessage: OasDocDetailComponent.prototype['cannotSaveMessage'],
@@ -488,9 +488,12 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
     return page;
   }
 
-  const editedRow = (oasOperationId: number, messageBody = 'Request'): any =>
-    ({oasOperationId, messageBody, operationId: 'op' + oasOperationId, isChanged: true, hashCode: 1,
-      json: {oasOperationId, messageBody}});
+  const editedRow = (oasOperationId: number, messageBody = 'Request'): any => {
+    const row: any = {oasOperationId, messageBody, operationId: 'op' + oasOperationId, isChanged: true, hashCode: 1,
+      json: {oasOperationId, messageBody}};
+    row.reset = () => row.isChanged = false;
+    return row;
+  };
 
   describe('Update', () => {
     it('is there only when something is changed and the server has said that it can be saved', () => {
@@ -542,8 +545,8 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
       expect(page.buildChangeSet().operations.map((r: any) => r.oasOperationId)).toEqual([1, 2, 3]);
     });
 
-    it('is nothing when nothing is changed', () => {
-      expect(pageOf().buildChangeSet()).toBeNull();
+    it('is empty when nothing is changed: the server judges the document as it is', () => {
+      expect(pageOf().buildChangeSet()).toEqual({document: undefined, operations: [], headers: {upserts: [], removed: []}});
     });
 
     it('says that the user deleted an entry that the server registered, so that it is not registered again', () => {
@@ -698,9 +701,21 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
       expect(page.oasDoc.securitySchemes).toEqual([{oasSecuritySchemeId: 3}]);
       expect(page.oasDoc.httpHeaders).toEqual([registered]);
       expect(page.isChanged()).toBe(false); // as saved
-      expect(page.changeChecker.status()).toBe('idle');
+      expect(page.changeChecker.status()).toBe('checking'); // the document as saved is judged again
       expect(page.loadBieListForOasDoc).toHaveBeenCalled();
       expect(page.snackBar.open).toHaveBeenCalledWith('Updated', '', expect.anything());
+    });
+
+    it('does not take the rows that were saved for unsaved, whatever the page reads next', () => {
+      const row = editedRow(1);
+      const page = pageOf('valid', {rows: [row]});
+      // the rows are read again after the save; until they are, they are the rows that were edited
+      page.loadBieListForOasDoc = vi.fn();
+
+      page.doUpdate();
+
+      expect(row.isChanged).toBe(false);
+      expect(page.isChanged()).toBe(false);
     });
 
     it('asks whether a BIE is reused across operations only when operations were saved', () => {
@@ -913,7 +928,7 @@ describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
     }
     c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
     c.headerEdits = new OasDocHeaderEdits();
-    c.changeChecker = {reset: vi.fn(), status: () => 'idle'};
+    c.changeChecker = {reset: vi.fn(), request: vi.fn(), status: () => 'idle'};
     c.contactUrl = new FormControl('', [httpUrlValidator]);
     c.contactEmail = new FormControl('', [optionalEmailValidator]);
     c.licenseUrl = new FormControl('', [httpUrlValidator]);
@@ -1139,7 +1154,7 @@ describe('OasDocDetailComponent.init shows what keeps Update disabled', () => {
     c.changeFingerprint = proto.changeFingerprint;
     c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
     c.headerEdits = new OasDocHeaderEdits();
-    c.changeChecker = {reset: vi.fn()};
+    c.changeChecker = {reset: vi.fn(), request: vi.fn()};
     c.contactUrl = new FormControl('', [httpUrlValidator]);
     c.contactEmail = new FormControl('', [optionalEmailValidator]);
     c.licenseUrl = new FormControl('', [httpUrlValidator]);

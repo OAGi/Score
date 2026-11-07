@@ -98,6 +98,9 @@ public interface OasDocCommandRepository {
      */
     Set<OasOperationId> findOperationsWithBodyAtEndpoint(OasDocId oasDocId, String path, String verb, boolean isRequest);
 
+    /** Every operation of the document as it is stored, with the bodies it owns. */
+    List<OasOperationEndpoint> findOperationEndpoints(OasDocId oasDocId);
+
     OasTagId insertOasTag(InsertOasTagArguments arguments);
 
     OasResourceTagId insertOasResourceTag(InsertOasResourceTagArguments arguments);

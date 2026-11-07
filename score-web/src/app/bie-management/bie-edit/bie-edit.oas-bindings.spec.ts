@@ -41,10 +41,10 @@ describe('BieEditComponent OpenAPI bindings (#1519)', () => {
       expect(answer!.operations!.length).toBe(1);
     });
 
-    it('has no change set when no binding is changed', () => {
+    it('has an empty change set when no binding is changed: the server judges the bindings as they are', () => {
       const c = panel([binding(1, 11, {isChanged: false})]);
 
-      expect(c.buildOasChangeSet()).toBeNull();
+      expect(c.buildOasChangeSet()).toEqual({operations: [], headers: {upserts: [], removed: []}});
     });
 
     it('does not take an answer to what the bindings were before the user changed them again', () => {

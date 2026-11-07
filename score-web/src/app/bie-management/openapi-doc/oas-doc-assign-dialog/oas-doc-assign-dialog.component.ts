@@ -1,7 +1,7 @@
 import {afterNextRender, ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {SelectionModel} from '@angular/cdk/collections';
-import {EMPTY, forkJoin, from, of, Subject} from 'rxjs';
+import {EMPTY, from, of, Subject} from 'rxjs';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {catchError, concatMap, debounceTime, finalize, map, switchMap} from 'rxjs/operators';
 import {AssignBieForOasDoc, BieForOasDoc, OasDoc} from '../domain/openapi-doc';
@@ -78,11 +78,11 @@ export class OasDocAssignDialogComponent implements OnInit, OnDestroy {
     switchMap(() => {
       const rows = this.selection.selected;
       this.proposals = {};
-      return rows.length === 0 ? EMPTY : forkJoin(rows.map(row => this.openAPIService.proposeOperation(this.oasDoc.oasDocId, {
+      return rows.length === 0 ? EMPTY : this.openAPIService.proposeOperations(this.oasDoc.oasDocId, rows.map(row => ({
         topLevelAsbiepId: row.topLevelAsbiepId, propertyTerm: row.propertyTerm,
         verb: this.verbSelection[row.topLevelAsbiepId], messageBody: this.messageBodySelection[row.topLevelAsbiepId],
         arrayIndicator: !!row.arrayIndicator
-      }).pipe(map(proposal => [row.topLevelAsbiepId, proposal] as [number, OasOperationProposal]))));
+      }))).pipe(map(proposals => rows.map((row, i) => [row.topLevelAsbiepId, proposals[i]] as [number, OasOperationProposal])));
     })
   ).subscribe(entries => entries.forEach(([id, proposal]) => this.proposals[id] = proposal));
 

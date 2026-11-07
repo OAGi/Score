@@ -300,7 +300,7 @@
       </mat-select>
       @if (isDuplicateBodySlot(element)) {
         <!-- Issue #1492 (Option 2): duplicate body on this (path, verb). -->
-        <div class="oas-body-slot-error-text">{{ violationOf(element, 'messageBody')?.message }}</div>
+        <div class="oas-body-slot-error-text">Duplicate {{ element.messageBody }} body on this endpoint.</div>
       }
       </ng-template>
 
@@ -310,7 +310,7 @@
                [errorStateMatcher]="resourceNameErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
-        <mat-error>{{ (violationOf(element, 'resourceName') || violationOf(element, 'messageBody'))?.message }}</mat-error>
+        <mat-error>{{ violationOf(element, 'resourceName')?.message || 'Each (Resource Name, Verb) can have only one Request and one Response body.' }}</mat-error>
       </mat-form-field>
       </ng-template>
 

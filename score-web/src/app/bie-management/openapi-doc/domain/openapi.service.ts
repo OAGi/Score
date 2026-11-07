@@ -155,6 +155,11 @@ export class OpenAPIService {
     return this.http.post<OasOperationProposal>('/api/oas_doc/' + oasDocId + '/operations/propose', candidate);
   }
 
+  // The same for operations that are added together: each is judged against the document and against the ones before it.
+  proposeOperations(oasDocId: number, candidates: OasOperationCandidate[]): Observable<OasOperationProposal[]> {
+    return this.http.post<OasOperationProposal[]>('/api/oas_doc/' + oasDocId + '/operations/propose-all', candidates);
+  }
+
   private changeSetJson(changeSet: OasDocChangeSet): any {
     const oasDoc = changeSet.document;
     return {

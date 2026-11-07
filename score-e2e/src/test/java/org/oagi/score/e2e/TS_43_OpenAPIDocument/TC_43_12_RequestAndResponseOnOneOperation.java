@@ -170,8 +170,9 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
 
         assertTrue(dialog.isDuplicateEndpointWarningDisplayed(),
                 "Adding a second Request body on one (path, verb) should warn that the endpoint already has one");
-        assertEquals("This endpoint already has a Request body.",
-                dialog.getRowMessageBodyError(dialog.getTableRecordByValue(fixture.bie.getDen())));
+        assertTrue(dialog.getRowMessageBodyError(dialog.getTableRecordByValue(fixture.bie.getDen()))
+                        .contains("already has a Request body"),
+                "The server says that the endpoint already has a Request body");
         assertThrows(TimeoutException.class, () -> dialog.getAddButton(true),
                 "The Add button is disabled while a selected row duplicates an existing body");
         dialog.close();
@@ -198,12 +199,11 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
         assertTrue(fixture.editPage.isRowDuplicateBodyWarningDisplayed(editedSecondRow),
                 "Editing a row into an existing (path, verb, body) slot should flag a duplicate body");
 
-        // Clicking Update is blocked: the dup-body snackbar is shown instead of "Updated", and no file is
-        // produced (the test reads the snackbar rather than a download).
-        fixture.editPage.clickUpdateButton();
-        assertEquals("Each (Resource Name, Verb) can have only one Request and one Response body.",
-                getSnackBarMessage(getDriver()),
-                "The update-time guard blocks the save with the duplicate-body message");
+        // The row says that it duplicates a body, and Update is not there until it is changed.
+        assertTrue(fixture.editPage.getRowMessageBodyError(editedSecondRow).contains("Duplicate Request body on this endpoint"),
+                "The row says that the endpoint already has that body");
+        assertThrows(TimeoutException.class, () -> fixture.editPage.getUpdateButton(true),
+                "Update is not there while a row duplicates a body");
     }
 
     @Test

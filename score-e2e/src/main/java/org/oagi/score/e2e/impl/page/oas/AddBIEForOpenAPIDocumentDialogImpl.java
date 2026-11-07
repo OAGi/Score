@@ -300,14 +300,18 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
     @Override
     public String getRowMessageBodyError(WebElement tableRecord) {
         // Issue #1492 (Option 2): the Message Body cell renders a mat-error. It can be either
-        // 'Message Body is required.' (no selection) or 'This endpoint already has a <...> body.' (the
-        // duplicate-body pre-check). Return only the duplicate-body message; otherwise an empty string.
-        WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
-        for (WebElement error : messageBodyCell.findElements(By.tagName("mat-error"))) {
-            String text = org.oagi.score.e2e.impl.PageHelper.getText(error);
-            if (text != null && text.contains("already has")) {
-                return text.trim();
+        // 'Message Body is required.' (no selection) or 'This endpoint already has a <...> body.' or
+        // 'Operation ID must be unique within the document.' (what the server says). Return only those messages; otherwise an empty string.
+        // The server says it, a moment after the choice: wait for it (up to five seconds).
+        for (int attempt = 0; attempt < 20; attempt++) {
+            WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
+            for (WebElement error : messageBodyCell.findElements(By.tagName("mat-error"))) {
+                String text = org.oagi.score.e2e.impl.PageHelper.getText(error);
+                if (text != null && (text.contains("already has") || text.contains("must be unique"))) {
+                    return text.trim();
+                }
             }
+            waitFor(ofMillis(250L));
         }
         return "";
     }
@@ -316,7 +320,14 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
     public boolean isDuplicateEndpointWarningDisplayed() {
         By dupErrorLocator = By.xpath(BASE_XPATH
                 + "//mat-error[contains(normalize-space(.), \"already has a\")]");
-        return !getDriver().findElements(dupErrorLocator).isEmpty();
+        // The server says it, a moment after the choice: wait for it (up to five seconds).
+        for (int attempt = 0; attempt < 20; attempt++) {
+            if (!getDriver().findElements(dupErrorLocator).isEmpty()) {
+                return true;
+            }
+            waitFor(ofMillis(250L));
+        }
+        return false;
     }
 
     @Override

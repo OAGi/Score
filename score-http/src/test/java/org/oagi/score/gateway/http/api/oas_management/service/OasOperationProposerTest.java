@@ -132,4 +132,39 @@ class OasOperationProposerTest {
 
         assertEquals(List.of("resourceName", "operationId"), proposal.violations().stream().map(OasDocViolation::field).toList());
     }
+
+    private static OasOperationCandidate operation(String resourceName, String operationId, String messageBody) {
+        return new OasOperationCandidate(null, null, "GET", messageBody, false, resourceName, operationId);
+    }
+
+    @Test
+    void anOperationIdThatTwoEndpointsOfTheSameAddWouldHave_isAViolationOfTheLaterOne() {
+        List<OasOperationProposal> proposals = proposer.proposeAll(requester, DOC,
+                List.of(operation("/a/orders", "queryOrder", "Response"), operation("/b/orders", "queryOrder", "Response")));
+
+        assertTrue(proposals.get(0).valid());
+        assertEquals(List.of("Operation ID must be unique within the document."),
+                proposals.get(1).violations().stream().map(OasDocViolation::message).toList());
+        assertEquals("operationId", proposals.get(1).violations().get(0).field());
+    }
+
+    @Test
+    void theRequestAndTheResponseOfOneEndpointOfTheSameAddMayShareAnOperationId() {
+        List<OasOperationProposal> proposals = proposer.proposeAll(requester, DOC, List.of(
+                new OasOperationCandidate(null, null, "POST", "Request", false, "/orders", "createOrder"),
+                new OasOperationCandidate(null, null, "POST", "Response", false, "/orders", "createOrder")));
+
+        assertTrue(proposals.get(0).valid());
+        assertTrue(proposals.get(1).valid());
+    }
+
+    @Test
+    void aSecondBodyOfOneEndpointOfTheSameAdd_isAViolationOfTheLaterOne() {
+        List<OasOperationProposal> proposals = proposer.proposeAll(requester, DOC,
+                List.of(operation("/orders", "queryOrder", "Response"), operation("/orders", "queryOrder", "Response")));
+
+        assertTrue(proposals.get(0).valid());
+        assertEquals(List.of("This endpoint already has a Response body."),
+                proposals.get(1).violations().stream().map(OasDocViolation::message).toList());
+    }
 }

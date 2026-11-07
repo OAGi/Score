@@ -90,6 +90,44 @@ class OasDocChangeApplierTest {
         return new OasDocChangeSet(document, operations, headers);
     }
 
+    private static OasOperationEndpoint stored(long oasOperationId, String path, String verb, String operationId, boolean request, boolean response) {
+        return new OasOperationEndpoint(BigInteger.valueOf(oasOperationId), path, verb, operationId, request, response);
+    }
+
+    @Test
+    void saysAnOperationIdOfTwoEndpointsOfTheDocumentAsItIsEvenWhenNothingIsChanged() {
+        when(command.findOperationEndpoints(any())).thenReturn(List.of(
+                stored(1, "/a", "GET", "getA", false, true), stored(2, "/b", "GET", "getA", false, true),
+                stored(3, "/c", "GET", "getC", false, true)));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, new OasDocChangeSet(null, null, null), true));
+
+        assertEquals(List.of(BigInteger.valueOf(1), BigInteger.valueOf(2)),
+                e.violations().stream().map(OasDocViolation::oasOperationId).toList());
+        assertTrue(e.violations().stream().allMatch(v -> "operationId".equals(v.field())));
+    }
+
+    @Test
+    void letsTheRequestAndTheResponseOfOneEndpointShareAnOperationId() {
+        when(command.findOperationEndpoints(any())).thenReturn(List.of(
+                stored(1, "/a", "POST", "createA", true, false), stored(2, "/a", "POST", "createA", false, true)));
+
+        assertDoesNotThrow(() -> applier.apply(requester, DOC, new OasDocChangeSet(null, null, null), true));
+    }
+
+    @Test
+    void saysASecondBodyOfAnEndpointOfTheDocumentAsItIs() {
+        when(command.findOperationEndpoints(any())).thenReturn(List.of(
+                stored(1, "/a", "POST", "createA", true, false), stored(2, "/a", "POST", "createA", true, false)));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, new OasDocChangeSet(null, null, null), true));
+
+        assertEquals(2, e.violations().size());
+        assertTrue(e.violations().stream().allMatch(v -> "messageBody".equals(v.field()) && "Request".equals(v.messageBody())));
+    }
+
     @Test
     void appliesTheDocumentThenTheOperationsThenTheEntries() {
         OasDoc document = new OasDoc();
@@ -157,7 +195,6 @@ class OasDocChangeApplierTest {
                 () -> applier.apply(requester, DOC, changes(null, List.of(row("getA")), null), true));
 
         assertEquals(List.of(where), e.violations());
-        verify(command, never()).applyHeaderChanges(any(), any());
     }
 
     @Test
@@ -171,13 +208,61 @@ class OasDocChangeApplierTest {
     }
 
     @Test
-    void anOperationWithoutAnOperationId_isRefusedBeforeAnythingIsSaved() {
+    void anOperationWithoutAnOperationId_isAViolationOfTheRow() {
         OasDocViolationException e = assertThrows(OasDocViolationException.class,
                 () -> applier.apply(requester, DOC, changes(new OasDoc(), List.of(row(" ")), null), false));
 
         assertEquals("operationId", e.violations().get(0).field());
         assertEquals(OP, e.violations().get(0).oasOperationId());
-        verifyNoInteractions(oasDocService);
+    }
+
+    @Test
+    void everyRowThatIsWrongIsSaidAtOnce() {
+        BieForOasDoc blank = named(11, "Response", "GET", false, " ", "/a", "A");
+        BieForOasDoc notAPath = named(12, "Response", "GET", false, "queryB", "b", "B");
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(new OasDoc(), List.of(blank, notAPath), null), true));
+
+        assertEquals(List.of("operationId", "resourceName"), e.violations().stream().map(OasDocViolation::field).toList());
+    }
+
+    @Test
+    void theViolationsOfTheRowsAndOfTheOperationsStepAreSaidTogether() {
+        BieForOasDoc notAPath = named(11, "Response", "GET", false, "queryA", "a", "A");
+        when(oasDocService.updateDetails(any(), any())).thenThrow(new OasDocViolationException(
+                OasDocViolation.ofOperation(OP, "operationId", "used")));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(notAPath), null), true));
+
+        assertEquals(List.of("resourceName", "operationId"), e.violations().stream().map(OasDocViolation::field).toList());
+    }
+
+    @Test
+    void whenTheDocumentCannotBeSaved_theStepsThatReferToItAreNotJudged() {
+        when(oasDocService.updateOasDoc(any(), any())).thenThrow(new IllegalArgumentException("The title is wrong."));
+        BieForOasDoc row = named(11, "Response", "GET", false, "queryA", "/a", "A");
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(new OasDoc(), List.of(row), null), true));
+
+        assertEquals(List.of(Scope.DOCUMENT), e.violations().stream().map(OasDocViolation::scope).toList());
+        verify(oasDocService, never()).updateDetails(any(), any());
+        verify(command, never()).applyHeaderChanges(any(), any());
+    }
+
+    @Test
+    void everyEntryThatIsWrongIsSaidAtOnce() {
+        OasDocHttpHeader first = pathParameter("tru");
+        OasDocHttpHeader second = pathParameter("also-not-in-the-path");
+        when(command.applyHeaderChanges(any(), any())).thenReturn(List.of(first, second));
+        when(command.findResolvedOperationPaths(any())).thenReturn(Map.of(new OasOperationId(OP), "/orders/{id}"));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, null, null), false));
+
+        assertEquals(2, e.violations().size());
     }
 
     @Test
@@ -292,7 +377,6 @@ class OasDocChangeApplierTest {
 
         assertEquals("resourceName", e.violations().get(0).field());
         assertEquals(OP, e.violations().get(0).oasOperationId());
-        verifyNoInteractions(oasDocService);
     }
 
     @Test

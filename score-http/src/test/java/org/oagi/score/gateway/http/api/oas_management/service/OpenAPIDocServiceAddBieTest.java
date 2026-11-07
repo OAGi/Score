@@ -171,7 +171,7 @@ class OpenAPIDocServiceAddBieTest {
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.addOperationForOasDoc(requester, addOperationRequest()));
-        assertTrue(ex.getMessage().contains("updateOrders"), ex.getMessage());
+        assertTrue(ex.getMessage().contains("Operation ID must be unique within the document."), ex.getMessage());
 
         verify(command, never()).insertOasResponse(any());
     }

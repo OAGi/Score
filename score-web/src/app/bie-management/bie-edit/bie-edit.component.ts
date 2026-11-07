@@ -3256,21 +3256,23 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   private resetOasChanges(): void {
     this.oasChecker.reset();
     this.oasLastFingerprint = this.oasFingerprint();
+    this.oasChecker.request(); // the bindings as they are, saved or not, are judged when they are shown
   }
 
-  private buildOasChangeSet(): OasDocChangeSet | null {
-    const changed = this.oasBindings.filter(b => b.isChanged);
-    if (changed.length === 0) {
-      return null;
-    }
+  /** What the user has changed of the bindings: nothing, when they are just shown (the server judges them as they are). */
+  private buildOasChangeSet(): OasDocChangeSet {
     this.oasCheckedFingerprint = this.oasFingerprint();
-    return {operations: changed, headers: {upserts: [], removed: []}};
+    return {operations: this.oasBindings.filter(b => b.isChanged), headers: {upserts: [], removed: []}};
   }
 
-  /** One check for each document that has a change: a binding is of one document. */
+  /** One check for each document that a binding is of, with the changes of the bindings of it. */
   private checkOasBindings(changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
     const byDocument = new Map<number, BieForOasDoc[]>();
+    this.oasBindings.forEach(b => byDocument.set(b.oasDocId, []));
     changeSet.operations.forEach(b => byDocument.set(b.oasDocId, [...(byDocument.get(b.oasDocId) || []), b]));
+    if (byDocument.size === 0) {
+      return of({valid: true, violations: [], httpHeaders: [], operations: []});
+    }
     return forkJoin([...byDocument].map(([oasDocId, operations]) =>
       this.openAPIService.checkChanges(oasDocId, {operations, headers: {upserts: [], removed: []}}))).pipe(
       map(results => ({

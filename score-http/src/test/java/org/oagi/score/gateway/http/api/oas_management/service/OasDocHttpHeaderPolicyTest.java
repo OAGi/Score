@@ -225,5 +225,20 @@ class OasDocHttpHeaderPolicyTest {
         e = assertThrows(IllegalArgumentException.class, () -> OasDocHttpHeaderPolicy.validate(List.of(sibling), "3.0"));
         assertTrue(e.getMessage().contains("schema: a Reference Object ($ref) cannot have other fields") && e.getMessage().contains("'description'"), e.getMessage());
     }
+
+    @Test
+    void violationsSaysEveryHeaderThatIsWrong_andValidateSaysTheFirst() {
+        OasDocHttpHeader noDirection = new OasDocHttpHeader();
+        noDirection.setName("a");
+        OasDocHttpHeader noSchema = new OasDocHttpHeader();
+        noSchema.setName("b");
+        noSchema.setDirection(OasDocHttpHeader.Direction.REQUEST);
+
+        var violations = OasDocHttpHeaderPolicy.violations(java.util.List.of(noDirection, noSchema), null);
+
+        assertEquals(2, violations.size());
+        assertEquals(violations.get(0).message(), assertThrows(IllegalArgumentException.class,
+                () -> OasDocHttpHeaderPolicy.validate(java.util.List.of(noDirection, noSchema))).getMessage());
+    }
 }
 

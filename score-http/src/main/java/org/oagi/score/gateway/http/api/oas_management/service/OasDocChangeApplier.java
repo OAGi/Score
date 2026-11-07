@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -49,25 +52,44 @@ public class OasDocChangeApplier {
 
     private OasDocChangeResult applyChanges(ScoreUser requester, OasDocId oasDocId, OasDocChangeSet changeSet, boolean dryRun,
                                             List<OasDocChangeResult.DerivedOperation> derived) {
-        assertOperationIdsGiven(changeSet.operationsOrEmpty());
-        assertResourcePaths(changeSet.operationsOrEmpty());
+        // Every rule that is broken is said at once. A step is judged as it would be saved, so when the document itself cannot be
+        // saved the steps that refer to it are not judged: what they would say is not about what the user did.
+        List<OasDocViolation> violations = new ArrayList<>(rowViolations(changeSet.operationsOrEmpty()));
+        boolean documentFailed = false;
         if (changeSet.document() != null) {
             UpdateOasDocRequest request = documentRequest(requester, oasDocId, changeSet.document());
-            step(Scope.DOCUMENT, () -> oasDocService.updateOasDoc(requester, request));
+            try {
+                step(Scope.DOCUMENT, () -> oasDocService.updateOasDoc(requester, request));
+            } catch (OasDocViolationException e) {
+                violations.addAll(e.violations());
+                documentFailed = true;
+            }
         }
-        if (!changeSet.operationsOrEmpty().isEmpty()) {
-            UpdateBieForOasDocRequest request = new UpdateBieForOasDocRequest(requester);
-            request.setOasDocId(oasDocId);
-            request.setBieForOasDocList(changeSet.operationsOrEmpty());
-            step(Scope.OPERATION, () -> oasDocService.updateDetails(requester, request));
+        List<OasDocHttpHeader> headers = List.of();
+        if (!documentFailed) {
+            boolean operationsFailed = false;
+            if (!changeSet.operationsOrEmpty().isEmpty()) {
+                UpdateBieForOasDocRequest request = new UpdateBieForOasDocRequest(requester);
+                request.setOasDocId(oasDocId);
+                request.setBieForOasDocList(changeSet.operationsOrEmpty());
+                try {
+                    step(Scope.OPERATION, () -> oasDocService.updateDetails(requester, request));
+                } catch (OasDocViolationException e) {
+                    violations.addAll(e.violations());
+                    operationsFailed = true;
+                }
+            }
+            OasDocCommandRepository command = repositoryFactory.oasDocCommandRepository(requester);
+            headers = command.applyHeaderChanges(oasDocId, changeSet.headersOrNone());
+            OasDoc saved = repositoryFactory.oasDocQueryRepository(requester)
+                    .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
+            violations.addAll(OasDocHttpHeaderPolicy.violations(headers, saved.getOpenAPIVersion()));
+            violations.addAll(pathParameterViolations(headers, command.findResolvedOperationPaths(oasDocId)));
+            if (!operationsFailed) {
+                violations.addAll(documentWideViolations(command.findOperationEndpoints(oasDocId)));
+            }
         }
-
-        OasDocCommandRepository command = repositoryFactory.oasDocCommandRepository(requester);
-        List<OasDocHttpHeader> headers = command.applyHeaderChanges(oasDocId, changeSet.headersOrNone());
-        OasDoc saved = repositoryFactory.oasDocQueryRepository(requester)
-                .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
-        step(Scope.HEADER, () -> OasDocHttpHeaderPolicy.validate(headers, saved.getOpenAPIVersion()));
-        assertPathParametersInPaths(headers, command.findResolvedOperationPaths(oasDocId));
+        assertAll(new ArrayList<>(new LinkedHashSet<>(violations)));
 
         if (dryRun) {
             markRollbackOnly();
@@ -128,26 +150,67 @@ public class OasDocChangeApplier {
                 sentMessageBody, row.getOperationId(), row.getResourceName(), row.getMessageBody());
     }
 
-    /** The Resource Name is a key of {@code paths} of the generated document, so it has to be a path. */
-    private static void assertResourcePaths(List<BieForOasDoc> operations) {
+    /**
+     * What is wrong with the rows as they are, before anything is saved: an Operation ID that is not given (it is the one thing of an
+     * operation that has to be), and a Resource Name that is not a path (a key of {@code paths} of the generated document). All of
+     * them, so that the user sees every row that is wrong at once.
+     */
+    private static List<OasDocViolation> rowViolations(List<BieForOasDoc> operations) {
+        List<OasDocViolation> violations = new ArrayList<>();
         for (BieForOasDoc row : operations) {
-            String error = row == null ? null : OasOperationNaming.resourcePathError(row.getResourceName()).orElse(null);
-            if (error != null) {
-                throw new OasDocViolationException(new OasDocViolation(Scope.OPERATION,
-                        row.getOasOperationId() == null ? null : row.getOasOperationId().value(), row.getMessageBody(),
-                        "resourceName", error));
+            if (row == null) {
+                continue;
             }
+            BigInteger oasOperationId = row.getOasOperationId() == null ? null : row.getOasOperationId().value();
+            if (row.getOperationId() == null || row.getOperationId().isBlank()) {
+                violations.add(new OasDocViolation(Scope.OPERATION, oasOperationId, row.getMessageBody(), "operationId",
+                        "The Operation ID is required."));
+            }
+            OasOperationNaming.resourcePathError(row.getResourceName()).ifPresent(error ->
+                    violations.add(new OasDocViolation(Scope.OPERATION, oasOperationId, row.getMessageBody(), "resourceName", error)));
         }
+        return violations;
     }
 
-    /** The Operation ID is the one thing of an operation that has to be given. */
-    private static void assertOperationIdsGiven(List<BieForOasDoc> operations) {
-        for (BieForOasDoc operation : operations) {
-            if (operation != null && (operation.getOperationId() == null || operation.getOperationId().isBlank())) {
-                throw new OasDocViolationException(new OasDocViolation(Scope.OPERATION,
-                        operation.getOasOperationId() == null ? null : operation.getOasOperationId().value(),
-                        operation.getMessageBody(), "operationId", "The Operation ID is required."));
+    /**
+     * What is wrong with the operations of the document as they are, whether the user has touched them or not: an Operation ID
+     * that operations of two endpoints have (the Request and the Response of one endpoint share theirs), and a second Request or
+     * Response body of an endpoint. The user sees them as soon as the document is opened.
+     */
+    private static List<OasDocViolation> documentWideViolations(List<OasOperationEndpoint> operations) {
+        List<OasDocViolation> violations = new ArrayList<>();
+        Map<String, List<OasOperationEndpoint>> byOperationId = new LinkedHashMap<>();
+        Map<String, List<OasOperationEndpoint>> byEndpoint = new LinkedHashMap<>();
+        for (OasOperationEndpoint operation : operations) {
+            if (operation.operationId() != null && !operation.operationId().isBlank()) {
+                byOperationId.computeIfAbsent(operation.operationId(), k -> new ArrayList<>()).add(operation); // exact: case-sensitive
             }
+            byEndpoint.computeIfAbsent(operation.path() + "|" + operation.verb(), k -> new ArrayList<>()).add(operation);
+        }
+        byOperationId.forEach((operationId, sharing) -> {
+            long endpoints = sharing.stream().map(o -> o.path() + "|" + o.verb()).distinct().count();
+            if (endpoints > 1) {
+                sharing.forEach(o -> violations.add(OasDocViolation.ofOperation(o.oasOperationId(), "operationId",
+                        "Operation ID must be unique within the document.")));
+            }
+        });
+        byEndpoint.values().forEach(atEndpoint -> {
+            for (boolean request : new boolean[]{true, false}) {
+                List<OasOperationEndpoint> withBody = atEndpoint.stream()
+                        .filter(o -> request ? o.hasRequestBody() : o.hasResponseBody()).toList();
+                if (withBody.size() > 1) {
+                    String body = request ? "Request" : "Response";
+                    withBody.forEach(o -> violations.add(new OasDocViolation(Scope.OPERATION, o.oasOperationId(), body, "messageBody",
+                            "This endpoint already has a " + body + " body.")));
+                }
+            }
+        });
+        return violations;
+    }
+
+    private static void assertAll(List<OasDocViolation> violations) {
+        if (!violations.isEmpty()) {
+            throw new OasDocViolationException(violations);
         }
     }
 
@@ -155,7 +218,8 @@ public class OasDocChangeApplier {
      * A path parameter given for an operation has to be a template expression of the path of that operation. (The generator
      * refuses the document otherwise, so it is better said here, where it is made.)
      */
-    private static void assertPathParametersInPaths(List<OasDocHttpHeader> headers, Map<OasOperationId, String> pathOfOperation) {
+    private static List<OasDocViolation> pathParameterViolations(List<OasDocHttpHeader> headers, Map<OasOperationId, String> pathOfOperation) {
+        List<OasDocViolation> violations = new ArrayList<>();
         for (OasDocHttpHeader header : headers) {
             if (header.getDirection() != OasDocHttpHeader.Direction.REQUEST || !"path".equals(header.getIn())
                     || header.getOasOperationId() == null) {
@@ -163,10 +227,11 @@ public class OasDocChangeApplier {
             }
             String path = pathOfOperation.get(new OasOperationId(header.getOasOperationId()));
             if (path != null && !OasResourcePaths.parameterNames(path).contains(header.getName())) {
-                throw new OasDocViolationException(new OasDocViolation(Scope.HEADER, header.getOasOperationId(), null, "name",
+                violations.add(new OasDocViolation(Scope.HEADER, header.getOasOperationId(), null, "name",
                         "The path parameter '" + header.getName() + "' is not in the path '" + path + "' of its operation."));
             }
         }
+        return violations;
     }
 
     private static UpdateOasDocRequest documentRequest(ScoreUser requester, OasDocId oasDocId, OasDoc document) {

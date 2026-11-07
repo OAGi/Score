@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.service;
 
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocHttpHeader;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolation;
 
 import org.oagi.score.gateway.http.api.oas_management.service.generate_openapi_expression.HttpHeaderObjects;
 
@@ -42,34 +43,52 @@ public final class OasDocHttpHeaderPolicy {
      * also checked, as it is generated, against the JSON Schema that the OpenAPI Initiative publishes for the version.
      */
     public static void validate(List<OasDocHttpHeader> headers, String openApiVersion) {
+        List<OasDocViolation> violations = violations(headers, openApiVersion);
+        if (!violations.isEmpty()) {
+            throw new IllegalArgumentException(violations.get(0).message());
+        }
+    }
+
+    /** Every rule that the headers break, each with the operation of the header it is about (as {@link #validate} says the first). */
+    public static List<OasDocViolation> violations(List<OasDocHttpHeader> headers, String openApiVersion) {
+        List<OasDocViolation> violations = new ArrayList<>();
         if (headers == null) {
-            return;
+            return violations;
         }
         Set<String> uses = new HashSet<>();
         for (OasDocHttpHeader header : headers) {
             if (header == null) {
                 continue;
             }
-            String name = header.getName() == null ? "" : header.getName().trim();
-            header.setName(name);
-            if (header.getDirection() == null) {
-                throw new IllegalArgumentException("The HTTP header '" + name
-                        + "' must be a request parameter or a response header.");
+            try {
+                check(header, openApiVersion, uses);
+            } catch (IllegalArgumentException e) {
+                violations.add(new OasDocViolation(OasDocViolation.Scope.HEADER, header.getOasOperationId(), null, "name", e.getMessage()));
             }
-            String in = validateLocation(header, name);
-            validateSerialization(header, name, in);
-            if (header.getSchema() == null) {
-                throw new IllegalArgumentException("The schema of the HTTP header '" + name + "' is required.");
-            }
+        }
+        return violations;
+    }
 
-            // a header name is case-insensitive, the name of a query parameter, a path parameter or a cookie is not
-            String key = "header".equals(in) ? name.toLowerCase() : name;
-            if (openApiVersion != null) {
-                validateAgainstSpecification(header, name, in, OasSpecValidator.Version.of(openApiVersion));
-            }
-            if (!uses.add(header.getOasOperationId() + " " + header.getDirection() + " " + in + " " + key)) {
-                throw new IllegalArgumentException("Duplicate HTTP header: '" + name + "'.");
-            }
+    private static void check(OasDocHttpHeader header, String openApiVersion, Set<String> uses) {
+        String name = header.getName() == null ? "" : header.getName().trim();
+        header.setName(name);
+        if (header.getDirection() == null) {
+            throw new IllegalArgumentException("The HTTP header '" + name
+                    + "' must be a request parameter or a response header.");
+        }
+        String in = validateLocation(header, name);
+        validateSerialization(header, name, in);
+        if (header.getSchema() == null) {
+            throw new IllegalArgumentException("The schema of the HTTP header '" + name + "' is required.");
+        }
+
+        // a header name is case-insensitive, the name of a query parameter, a path parameter or a cookie is not
+        String key = "header".equals(in) ? name.toLowerCase() : name;
+        if (openApiVersion != null) {
+            validateAgainstSpecification(header, name, in, OasSpecValidator.Version.of(openApiVersion));
+        }
+        if (!uses.add(header.getOasOperationId() + " " + header.getDirection() + " " + in + " " + key)) {
+            throw new IllegalArgumentException("Duplicate HTTP header: '" + name + "'.");
         }
     }
 

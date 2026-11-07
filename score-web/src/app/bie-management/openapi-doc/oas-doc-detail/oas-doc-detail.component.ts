@@ -237,11 +237,8 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     return hashCode({...oasDoc, httpHeaders: undefined});
   }
 
-  /** What the user has changed and has not saved, or `null` when nothing. */
-  private buildChangeSet(): OasDocChangeSet | null {
-    if (!this.isChanged()) {
-      return null;
-    }
+  /** What the user has changed and has not saved (nothing, when the document is just opened: the server judges the document as it is). */
+  private buildChangeSet(): OasDocChangeSet {
     this.headerEdits.observe(this.oasDoc.httpHeaders);
     this.checkedFingerprint = this.changeFingerprint();
     return {
@@ -260,7 +257,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
       return false;
     }
     applyDerivedOperations(result.operations, changeSet.operations); // whether or not it can be saved: it is what the user sees next to what is wrong
-    if (result.valid) {
+    if (result.valid && this.isChanged()) {
       this.oasDoc.httpHeaders = result.httpHeaders || [];
       sortHeaders(this.oasDoc);
       this.headerEdits.adopt(this.oasDoc.httpHeaders);
@@ -342,6 +339,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     this.headerEdits.reset(oasDoc.httpHeaders);
     this.changeChecker.reset();
     this.lastFingerprint = this.changeFingerprint();
+    this.changeChecker.request(); // what the document is, saved or not, is judged when it is opened
     setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
     this.showValidationErrors();
@@ -1113,7 +1111,12 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
       this.isUpdating = false;
       this.loading = false;
     })).subscribe({
-      next: () => this.reloadAfterSave(() => onSaved(changeSet)),
+      next: () => {
+        // What was saved is not a change any more, from now on: the rows are read again, and until they are, Generate and the
+        // like must not take them for unsaved.
+        changeSet.operations.forEach(operation => operation.reset());
+        this.reloadAfterSave(() => onSaved(changeSet));
+      },
       error: err => this.showRefusal(err)
     });
   }

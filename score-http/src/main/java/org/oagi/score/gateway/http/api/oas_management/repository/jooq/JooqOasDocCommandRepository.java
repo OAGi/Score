@@ -574,6 +574,22 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
+    public List<OasOperationEndpoint> findOperationEndpoints(OasDocId oasDocId) {
+        return dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_RESOURCE.PATH, OAS_OPERATION.VERB, OAS_OPERATION.OPERATION_ID,
+                        org.jooq.impl.DSL.field(org.jooq.impl.DSL.exists(org.jooq.impl.DSL.selectOne().from(OAS_REQUEST)
+                                .where(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID)))).as("has_request"),
+                        org.jooq.impl.DSL.field(org.jooq.impl.DSL.exists(org.jooq.impl.DSL.selectOne().from(OAS_RESPONSE)
+                                .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID)))).as("has_response"))
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .fetch(row -> new OasOperationEndpoint(row.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger(),
+                        row.get(OAS_RESOURCE.PATH), row.get(OAS_OPERATION.VERB), row.get(OAS_OPERATION.OPERATION_ID),
+                        Boolean.TRUE.equals(row.get("has_request", Boolean.class)),
+                        Boolean.TRUE.equals(row.get("has_response", Boolean.class))));
+    }
+
+    @Override
     public Set<String> findOperationIdsInOasDoc(OasDocId oasDocId, Collection<String> operationIds,
                                                 Collection<OasOperationId> excludedOasOperationIds) {
         if (oasDocId == null || operationIds == null || operationIds.isEmpty()) {

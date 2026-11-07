@@ -546,7 +546,7 @@
                                       <input matInput [(ngModel)]="binding.resourceName"
                                              [readonly]="!isOasDocEditable()"
                                              [errorStateMatcher]="oasBodySlotErrorStateMatcher(binding)">
-                                      <mat-error>{{ oasViolationMessage(binding, 'resourceName', 'messageBody') }}</mat-error>
+                                      <mat-error>{{ oasViolationMessage(binding, 'resourceName') || 'Each (Resource Name, Verb) can have only one Request and one Response body.' }}</mat-error>
                                     </mat-form-field>
                                     <mat-form-field>
                                       <mat-label>Operation ID</mat-label>

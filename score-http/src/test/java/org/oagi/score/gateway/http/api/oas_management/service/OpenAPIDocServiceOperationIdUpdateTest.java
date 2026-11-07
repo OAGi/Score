@@ -91,7 +91,7 @@ class OpenAPIDocServiceOperationIdUpdateTest {
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> service.updateDetails(requester, request(row(OP_1, "getOrder", "Response"))));
-        assertTrue(ex.getMessage().contains("getOrder"), ex.getMessage());
+        assertTrue(ex.getMessage().contains("Operation ID must be unique within the document."), ex.getMessage());
         verify(bieForOasDocCommand, never()).updateBieForOasDoc(any());
     }
 
@@ -187,5 +187,29 @@ class OpenAPIDocServiceOperationIdUpdateTest {
         service.updateDetails(requester, request(row(OP_1, "createOrder", "Request", "/orders", "POST")));
 
         verify(bieForOasDocCommand).updateBieForOasDoc(any());
+    }
+
+    @Test
+    void everyOperationIdThatIsUsedTwice_isSaidAtOnce() {
+        OasOperationId op3 = new OasOperationId(BigInteger.valueOf(13));
+        OasOperationId op4 = new OasOperationId(BigInteger.valueOf(14));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> service.updateDetails(requester, request(
+                        row(OP_1, "a", "Response", "/a", "GET"), row(OP_2, "a", "Response", "/b", "GET"),
+                        row(op3, "b", "Response", "/c", "GET"), row(op4, "b", "Response", "/d", "GET"))));
+
+        assertEquals(List.of(OP_1.value(), OP_2.value(), op3.value(), op4.value()),
+                e.violations().stream().map(OasDocViolation::oasOperationId).toList());
+    }
+
+    @Test
+    void aSecondBodyOnTheSameEndpointAmongTheRows_isRefusedAtTheSecondRow() {
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> service.updateDetails(requester, request(
+                        row(OP_1, "a", "Response", "/orders", "GET"), row(OP_2, "a", "Response", "/orders", "GET"))));
+
+        assertEquals(List.of(OP_2.value()), e.violations().stream().filter(v -> "messageBody".equals(v.field()))
+                .map(OasDocViolation::oasOperationId).toList());
     }
 }

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getText;
@@ -42,12 +43,11 @@ import static org.oagi.score.e2e.impl.PageHelper.visibilityOfElementLocated;
  * <p>
  * Two fixes are covered:
  * <ul>
- *   <li><b>Multi-select Add.</b> The "Add BIE" dialog previously de-duplicated a batch on
- *       {@code (propertyTerm, verb, messageBody)} only and ABORTED the whole Add on the first collision,
- *       so selecting two different BIEs that merely share a property term (e.g. two profiles of one ASCCP
- *       under different Business Contexts, both GET + Response) silently added nothing. The dialog must now
- *       add every selected BIE; the two distinct BIEs land on two distinct endpoints (their resource paths
- *       are derived from their different Business Contexts).</li>
+ *   <li><b>Multi-select Add.</b> Two BIEs that merely share a property term (e.g. two profiles of one ASCCP under
+ *       different Business Contexts, both GET + Response) land on two distinct endpoints (their resource paths are
+ *       derived from their different Business Contexts) but would have the same Operation ID, which the OpenAPI
+ *       specification wants unique among all operations of the API. The dialog asks the server about the BIEs as they
+ *       are chosen together, says it at the later one, and does not offer Add until that is resolved.</li>
  *   <li><b>Document uniqueness.</b> An OpenAPI document is unique on
  *       {@code (Title, OpenAPI Version, Document Version)}; the License Name is not part of the key. Creating a
  *       duplicate and editing one document's metadata to duplicate another are both blocked before any save
@@ -72,10 +72,9 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
 
     @Test
     @DisplayName("TC_43_13_1")
-    public void selecting_multiple_bies_adds_every_selected_bie() {
+    public void selecting_multiple_bies_says_an_operation_id_that_the_add_would_repeat() {
         // Two profiles of ONE ASCCP under two different Business Contexts share the same DEN / property term.
-        // Select BOTH in the Add BIE dialog, configure both as GET + Response (the exact (propertyTerm, verb,
-        // messageBody) collision that previously aborted the batch), and Add them in one click.
+        // Select BOTH in the Add BIE dialog and configure both as GET + Response.
         SameDenFixture fixture = newDocumentWithTwoSameDenBies();
         String den = fixture.bieA.getDen();
         assertEquals(den, fixture.bieB.getDen(),
@@ -95,12 +94,20 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         dialog.setVerb(secondRow, "GET");
         dialog.setMessageBody(secondRow, "Response");
 
+        // The two BIEs are of two endpoints (their Resource Names have their Business Contexts) and would have the same
+        // Operation ID: the OpenAPI specification wants an Operation ID unique among all the operations of the API. The
+        // server says so at the second BIE before anything is added, and Add is not there.
+        assertTrue(dialog.getRowMessageBodyError(secondRow).contains("Operation ID must be unique within the document"),
+                "The second BIE would make the Operation ID of the first one again on another endpoint");
+        assertEquals("", dialog.getRowMessageBodyError(firstRow), "The first BIE can be added");
+        dialog.getAddButton(false);
+
+        // Without the second BIE the first one is added, and Add is there again.
+        dialog.toggleSelect(secondRow);
         dialog.hitAddButton();
 
-        // Both selected BIEs are added: the grid now carries two rows for the shared DEN (one per Business
-        // Context). Under the old batch-abort defect this was zero.
-        assertEquals(2, rowsByDen(fixture.editPage, den).size(),
-                "Both selected BIEs (same property term, different Business Context) must be added in one Add");
+        assertEquals(1, rowsByDen(fixture.editPage, den).size(),
+                "Only the BIE that does not repeat the Operation ID is added");
     }
 
     @Test
@@ -149,18 +156,19 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         OpenAPIDocumentPage openAPIDocumentPage = bieMenu.openOpenAPIDocumentSubMenu();
         EditOpenAPIDocumentPage editPage = openAPIDocumentPage.openEditOpenAPIDocumentPage(target);
 
-        // Edit the target's metadata so its three-tuple equals the existing document's (License Name differs), then Update.
+        // Edit the target's metadata so its three-tuple equals the existing document's (License Name differs).
         editPage.setOpenAPIVersion(existing.getOpenApiVersion());
         editPage.setTitle(existing.getTitle());
         editPage.setDocumentVersion(existing.getVersion());
         editPage.setLicenseName(existing.getLicenseName() + " other");
-        editPage.clickUpdateButton();
 
-        // The duplicate update is blocked before any save (an "Invalid parameters" dialog explains the clash).
-        WebElement dialog = visibilityOfElementLocated(getDriver(), By.xpath("//mat-dialog-container"));
-        assertTrue(getText(dialog).contains("already exists"),
-                "Updating a document to duplicate another's unique tuple must be blocked, not saved (was: "
-                        + getText(dialog) + ")");
+        // The server says that the change cannot be saved, and Update is not there until it is changed: the duplicate is
+        // blocked before any save.
+        List<String> violations = editPage.getChangeViolations();
+        assertTrue(violations.stream().anyMatch(message -> message.contains("already exists")),
+                "Updating a document to duplicate another's unique tuple must be blocked, not saved (was: " + violations + ")");
+        assertThrows(org.openqa.selenium.TimeoutException.class, () -> editPage.getUpdateButton(true),
+                "Update is not there while the document duplicates another's unique tuple");
     }
 
     /* ------------------------------------------------------------------ helpers */

@@ -47,3 +47,31 @@ describe('OasDocAddOperationDialogComponent.isValid', () => {
     expect(ctxOf(proposal, {verb: 'DELETE', resourceName: '/x', operationId: ''}).isValid).toBe(false);
   });
 });
+
+describe('OasDocAddOperationDialogComponent.propose', () => {
+  function ctxOf(operationIdTouched: boolean): any {
+    const ctx: any = {
+      operation: {verb: 'DELETE', resourceName: '/item/{id}', operationId: 'deleteProductionOrder'},
+      operationIdTouched, proposal: {violations: []}, proposalRequests: {next: () => undefined}
+    };
+    ctx.propose = OasDocAddOperationDialogComponent.prototype.propose;
+    return ctx;
+  }
+
+  it('does not keep the Operation ID that the server made for what the user had before, until it answers', () => {
+    const ctx = ctxOf(false);
+
+    ctx.propose();
+
+    expect(ctx.operation.operationId).toBe('');
+    expect(ctx.proposal).toBeUndefined();
+  });
+
+  it('keeps the Operation ID that the user gave', () => {
+    const ctx = ctxOf(true);
+
+    ctx.propose();
+
+    expect(ctx.operation.operationId).toBe('deleteProductionOrder');
+  });
+});

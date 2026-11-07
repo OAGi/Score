@@ -59,6 +59,9 @@ export class OasDocAddOperationDialogComponent implements OnDestroy {
   /** The verb, the path or the Operation ID was changed: ask the server again. */
   propose() {
     this.proposal = undefined; // not known until the server answers
+    if (!this.operationIdTouched) {
+      this.operation.operationId = ''; // the Operation ID that the user did not give is the server's: not known either
+    }
     this.proposalRequests.next();
   }
 

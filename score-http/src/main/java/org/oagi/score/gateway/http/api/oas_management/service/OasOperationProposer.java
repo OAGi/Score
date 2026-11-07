@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,6 +34,27 @@ public class OasOperationProposer {
     private BusinessContextQueryService businessContextQueryService;
 
     public OasOperationProposal propose(ScoreUser requester, OasDocId oasDocId, OasOperationCandidate candidate) {
+        return proposeAll(requester, oasDocId, List.of(candidate)).get(0);
+    }
+
+    /**
+     * The proposals for operations that are added together: each is judged against the document and against the ones before it,
+     * so that two of them that would make the same Operation ID on two endpoints, or a second body of one endpoint, are said
+     * before any of them is added.
+     */
+    public List<OasOperationProposal> proposeAll(ScoreUser requester, OasDocId oasDocId, List<OasOperationCandidate> candidates) {
+        Map<String, String> endpointOfOperationId = new HashMap<>();
+        Set<String> bodySlots = new HashSet<>();
+        List<OasOperationProposal> proposals = new ArrayList<>();
+        for (OasOperationCandidate candidate : candidates) {
+            OasOperationProposal proposal = proposeOne(requester, oasDocId, candidate, endpointOfOperationId, bodySlots);
+            proposals.add(proposal);
+        }
+        return proposals;
+    }
+
+    private OasOperationProposal proposeOne(ScoreUser requester, OasDocId oasDocId, OasOperationCandidate candidate,
+                                            Map<String, String> endpointOfOperationId, Set<String> bodySlots) {
         OasDoc oasDoc = repositoryFactory.oasDocQueryRepository(requester)
                 .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
         String version = oasDoc == null ? null : oasDoc.getVersion();
@@ -60,13 +83,23 @@ public class OasOperationProposer {
             OasDocCommandRepository command = repositoryFactory.oasDocCommandRepository(requester);
             String verb = candidate.verb().trim().toUpperCase();
             if (!command.findOperationsWithBodyAtEndpoint(oasDocId, resourceName, verb, isRequest).isEmpty()) {
-                violations.add(violation("messageBody", "This operation (" + verb + " " + resourceName + ") already has a "
-                        + candidate.messageBody() + " body. An operation can have at most one Request and one Response body."));
+                violations.add(violation("messageBody", "This endpoint already has a " + candidate.messageBody() + " body."));
+            }
+            String endpoint = resourceName + "|" + verb;
+            if (bodySlots.contains(endpoint + "|" + candidate.messageBody())) {
+                violations.add(violation("messageBody", "This endpoint already has a " + candidate.messageBody() + " body."));
+            }
+            String earlier = endpointOfOperationId.get(operationId);
+            if (earlier != null && !earlier.equals(endpoint)) {
+                violations.add(violation("operationId", "Operation ID must be unique within the document."));
             }
             Set<OasOperationId> sameEndpoint = new HashSet<>(command.findOasOperationIdsAtEndpoint(oasDocId, resourceName, verb));
             if (!command.findOperationIdsInOasDoc(oasDocId, Set.of(operationId), sameEndpoint).isEmpty()) {
-                violations.add(violation("operationId", "The operation ID '" + operationId
-                        + "' is already used by another operation of the document."));
+                violations.add(violation("operationId", "Operation ID must be unique within the document."));
+            }
+            if (violations.isEmpty()) {
+                bodySlots.add(endpoint + "|" + candidate.messageBody());
+                endpointOfOperationId.putIfAbsent(operationId, endpoint);
             }
         }
         return new OasOperationProposal(resourceName, operationId, List.copyOf(violations));

@@ -120,7 +120,14 @@ public class AddOperationForOpenAPIDocumentDialogImpl implements AddOperationFor
 
     @Override
     public String getOperationId() {
-        return getOperationIdField().getAttribute("value");
+        // The Operation ID that the user did not give is made by the server, which answers a moment after the path or the verb
+        // was changed: wait for it (up to five seconds).
+        String value = getOperationIdField().getAttribute("value");
+        for (int attempt = 0; attempt < 20 && (value == null || value.isEmpty()); attempt++) {
+            waitFor(java.time.Duration.ofMillis(250L));
+            value = getOperationIdField().getAttribute("value");
+        }
+        return value == null ? "" : value;
     }
 
     @Override

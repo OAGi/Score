@@ -689,6 +689,16 @@ public class OpenAPIDocController {
         }
     }
 
+    /** The same for operations that are added together: each is judged against the document and against the ones before it. */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operations/propose-all", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<OasOperationProposal> proposeOperations(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody List<OasOperationCandidate> candidates) {
+        return oasOperationProposer.proposeAll(sessionService.asScoreUser(user), oasDocId, candidates);
+    }
+
     /**
      * What the server makes of an operation that is about to be added to the document (its Resource Name and Operation ID, when
      * the user gave none), and whether it can be added. Nothing is saved.
