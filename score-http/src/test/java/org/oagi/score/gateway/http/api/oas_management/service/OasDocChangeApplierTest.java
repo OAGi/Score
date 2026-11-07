@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateB
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateOasDocResponse;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolation.Scope;
+import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -36,7 +37,9 @@ class OasDocChangeApplierTest {
     private OasDocChangeApplier applier;
     private OpenAPIDocService oasDocService;
     private OasDocCommandRepository command;
+    private OasOperationProposer proposer;
     private ScoreUser requester;
+    private RepositoryFactory repositoryFactory;
     private int rollbacks;
 
     @BeforeEach
@@ -49,11 +52,13 @@ class OasDocChangeApplierTest {
             }
         };
         oasDocService = mock(OpenAPIDocService.class);
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+        repositoryFactory = mock(RepositoryFactory.class);
         command = mock(OasDocCommandRepository.class);
         OasDocQueryRepository query = mock(OasDocQueryRepository.class);
         ReflectionTestUtils.setField(applier, "repositoryFactory", repositoryFactory);
         ReflectionTestUtils.setField(applier, "oasDocService", oasDocService);
+        proposer = mock(OasOperationProposer.class);
+        ReflectionTestUtils.setField(applier, "proposer", proposer);
         requester = new ScoreUser(new UserId(BigInteger.valueOf(42)), "tester", "Tester",
                 "tester@example.com", true, List.of(ScoreRole.DEVELOPER));
         when(repositoryFactory.oasDocCommandRepository(any())).thenReturn(command);
@@ -128,6 +133,56 @@ class OasDocChangeApplierTest {
         assertTrue(e.violations().stream().allMatch(v -> "messageBody".equals(v.field()) && "Request".equals(v.messageBody())));
     }
 
+    private static OasOperationAddition added(String clientKey, String resourceName, String operationId, String messageBody) {
+        return new OasOperationAddition(clientKey, null, null, "POST", messageBody, false, true, resourceName, operationId, null, null, null, null);
+    }
+
+    private void namesAre(String resourceName, String operationId) {
+        when(proposer.names(any(), any(), any())).thenReturn(new OasOperationProposal(resourceName, operationId, List.of()));
+    }
+
+    @Test
+    void addsTheOperationsTheUserAddedAndAnswersTheNamesByTheirKeys() {
+        namesAre("/orders", "createOrder");
+
+        OasDocChangeResult result = applier.apply(requester, DOC, new OasDocChangeSet(null, null, null,
+                List.of(added("new-1", null, null, "Request")), null), true);
+
+        verify(oasDocService).addOperationForOasDoc(any(), argThat(r ->
+                r.getPath().equals("/orders") && r.getOperationId().equals("createOrder") && r.isOperationIdJudgedLater()));
+        assertEquals(List.of(new OasDocChangeResult.AddedOperation("new-1", "createOrder", "/orders", "Request")), result.added());
+        assertEquals(1, rollbacks);
+    }
+
+    @Test
+    void saysAnOperationIdOfTwoAddedOperationsAtBothOfThem() {
+        namesAre("/a", "queryOrder");
+        when(command.findOasResourceId(any(), any())).thenReturn(new OasResourceId(BigInteger.ONE), new OasResourceId(BigInteger.TWO));
+        when(command.findOasOperationId(any(), any())).thenReturn(new OasOperationId(BigInteger.valueOf(21)), new OasOperationId(BigInteger.valueOf(22)));
+        when(command.findOperationEndpoints(any())).thenReturn(List.of(
+                new OasOperationEndpoint(BigInteger.valueOf(21), "/a", "POST", "queryOrder", false, true),
+                new OasOperationEndpoint(BigInteger.valueOf(22), "/b", "POST", "queryOrder", false, true)));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class, () -> applier.apply(requester, DOC,
+                new OasDocChangeSet(null, null, null, List.of(added("k1", null, null, "Response"), added("k2", null, null, "Response")), null), true));
+
+        assertEquals(List.of("k1", "k2"), e.violations().stream().map(OasDocViolation::clientKey).toList());
+        assertTrue(e.violations().stream().allMatch(v -> "operationId".equals(v.field()) && v.oasOperationId() == null));
+    }
+
+    @Test
+    void deletesTheOperationsTheUserRemovedBeforeAddingTheOnesTheUserAdded() {
+        namesAre("/orders", "createOrder");
+
+        applier.apply(requester, DOC, new OasDocChangeSet(null, null, null,
+                List.of(added("k1", null, null, "Request")), List.of(row("getA"))), false);
+
+        InOrder order = inOrder(oasDocService);
+        order.verify(oasDocService).deleteBieForOasDoc(any(), any());
+        order.verify(oasDocService).addOperationForOasDoc(any(), any());
+        assertEquals(0, rollbacks);
+    }
+
     @Test
     void appliesTheDocumentThenTheOperationsThenTheEntries() {
         OasDoc document = new OasDoc();
@@ -172,6 +227,64 @@ class OasDocChangeApplierTest {
         assertTrue(result.valid());
         assertEquals(List.of(registered), result.httpHeaders());
         assertEquals(1, rollbacks);
+    }
+
+    @Test
+    void aChangeThatCannotBeSaved_isAnsweredWithTheEntriesTheDocumentWouldHave_forTheRegisteredOnesFollowTheOperationsAnyway() {
+        OasDocHttpHeader registered = pathParameter("ids");
+        when(command.applyHeaderChanges(any(), any())).thenReturn(List.of(registered));
+        when(command.findResolvedOperationPaths(any())).thenReturn(Map.of(new OasOperationId(OP), "/orders/{ids}"));
+        when(command.findOperationEndpoints(any())).thenReturn(List.of(
+                stored(1, "/a", "GET", "getA", false, true), stored(2, "/b", "GET", "getA", false, true)));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row("getA")), null), true));
+
+        assertEquals(List.of(registered), e.httpHeaders());
+        assertEquals(List.of(registered), OasDocChangeResult.invalid(e.violations(), e.derived(), e.added(), e.httpHeaders()).httpHeaders());
+    }
+
+    @Test
+    void anOperationRuleThatIsBroken_stillLetsARegisteredEntryFollowTheOperationInACheck_butNotInASave() {
+        BieForOasDocCommandRepository bieCommand = mock(BieForOasDocCommandRepository.class);
+        when(repositoryFactory.bieForOasDocCommandRepository(any())).thenReturn(bieCommand);
+        OasDocHttpHeader registered = pathParameter("ids");
+        when(command.applyHeaderChanges(any(), any())).thenReturn(List.of(registered));
+        when(oasDocService.updateDetails(any(), any()))
+                .thenThrow(new OasDocViolationException(OasDocViolation.ofOperation(OP, "operationId", "used")));
+
+        OasDocViolationException checked = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row("getA")), null), true));
+        verify(bieCommand).updateBieForOasDoc(any()); // the operations are written (and rolled back) so that the entries follow them
+        assertEquals(List.of(registered), checked.httpHeaders());
+
+        assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row("getA")), null), false));
+        verify(bieCommand, times(1)).updateBieForOasDoc(any()); // a save writes nothing of what is refused
+    }
+
+    @Test
+    void anOperationRuleThatIsBroken_isNotHiddenByOperationsThatCannotBeWrittenEither() {
+        BieForOasDocCommandRepository bieCommand = mock(BieForOasDocCommandRepository.class);
+        when(repositoryFactory.bieForOasDocCommandRepository(any())).thenReturn(bieCommand);
+        when(bieCommand.updateBieForOasDoc(any())).thenThrow(new IllegalStateException("two bodies"));
+        OasDocViolation where = OasDocViolation.ofOperation(OP, "operationId", "used");
+        when(oasDocService.updateDetails(any(), any())).thenThrow(new OasDocViolationException(where));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(null, List.of(row("getA")), null), true));
+
+        assertEquals(List.of(where), e.violations());
+    }
+
+    @Test
+    void aChangeThatStopsAtTheDocument_hasNoEntriesToAnswer() {
+        when(oasDocService.updateOasDoc(any(), any())).thenThrow(new IllegalArgumentException("The title is wrong."));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> applier.apply(requester, DOC, changes(new OasDoc(), List.of(row("getA")), null), true));
+
+        assertNull(e.httpHeaders()); // not "no entries": the page keeps its own
     }
 
     @Test

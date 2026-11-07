@@ -229,53 +229,43 @@ export class OasDocAssignDialogComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * The selected BIEs are made into rows of the document that the page holds; they are saved by Update (the page presses it when
+   * they can be saved). The Resource Name and the Operation ID are those that the server made (shown); the server makes them
+   * again when the page asks, so a change of the verb or the array indicator of the row follows.
+   */
   addBieForOasDoc() {
-    const selectedBieForOasDocs = this.selection.selected;
-    for (const bieForOasDoc of selectedBieForOasDocs) {
-      bieForOasDoc.verb = this.verbSelection[bieForOasDoc.topLevelAsbiepId];
-      bieForOasDoc.messageBody = this.messageBodySelection[bieForOasDoc.topLevelAsbiepId];
-    }
-
-    const toAdd: BieForOasDoc[] = selectedBieForOasDocs;
-
-    // Issue #1492 (Option 2): SERIALIZE the adds. Each Add find-or-creates the (path, verb) operation
-    // on the backend; firing the POSTs concurrently can race two find-or-creates into duplicate
-    // operations, and the old loop also closed the dialog on the first response. Run them one at a time
-    // (checkBIEReusedAcrossMultipleOperations then assignBieForOasDoc per BIE) and close only after all
-    // complete.
+    const rows: BieForOasDoc[] = [];
     this.loading = true;
-    let addedCount = 0;
-    from(toAdd).pipe(
+    from([...this.selection.selected]).pipe(
       concatMap(bieForOasDoc => this.openAPIService.checkBIEReusedAcrossMultipleOperations(bieForOasDoc, this.oasDoc).pipe(
-        concatMap(resp => {
+        map(resp => {
           if (resp.errorMessages && resp.errorMessages.length > 0) {
             this.snackBar.open(resp.errorMessages[0], '', {duration: 5000});
-            return EMPTY; // skip this BIE, continue the batch
+            return; // skip this BIE, continue the batch
           }
-          return this.openAPIService.assignBieForOasDoc(this.buildAssignPayload(bieForOasDoc)).pipe(
-            concatMap(_ => {
-              addedCount++;
-              return of(true);
-            }),
-            // The global interceptor surfaces the backend 400 (dup-body) message; swallow it here so the
-            // remaining adds still run and the dialog closes to reload whatever did succeed.
-            catchError(_ => EMPTY)
-          );
+          rows.push(this.draftOf(bieForOasDoc));
         }),
         catchError(_ => EMPTY)
       )),
       finalize(() => {
         this.loading = false;
-        if (addedCount > 0) {
-          this.snackBar.open('Added', '', {duration: 3000});
-        }
-        this.dialogRef.close({
-          result: {
-            status: 'OK'
-          }
-        });
+        this.dialogRef.close({result: {status: 'OK', rows}});
       })
     ).subscribe();
+  }
+
+  private draftOf(bieForOasDoc: BieForOasDoc): BieForOasDoc {
+    const id = bieForOasDoc.topLevelAsbiepId;
+    const draft = new BieForOasDoc(bieForOasDoc);
+    draft.verb = this.verbSelection[id];
+    draft.messageBody = this.messageBodySelection[id];
+    draft.arrayIndicator = !!bieForOasDoc.arrayIndicator;
+    draft.suppressRootIndicator = true; // as when a BIE is added (Issue #1492: Suppress Root is the default)
+    draft.tagName = bieForOasDoc.propertyTerm;
+    draft.resourceName = this.proposals[id]?.resourceName ?? '';
+    draft.operationId = this.proposals[id]?.operationId ?? '';
+    return draft;
   }
 
   // Builds the assign payload for one selected BIE (extracted so the serialized add pipeline can map

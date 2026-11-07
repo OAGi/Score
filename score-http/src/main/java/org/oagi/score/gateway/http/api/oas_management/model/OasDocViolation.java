@@ -10,8 +10,18 @@ import java.math.BigInteger;
  * @param messageBody    {@code Request} or {@code Response} of the row it is about, when it is about one
  * @param field          the field of the row or of the entry, when it is about one
  * @param message        what is wrong
+ * @param clientKey      the added row (one that has no id yet) it is about, when it is about one
  */
-public record OasDocViolation(Scope scope, BigInteger oasOperationId, String messageBody, String field, String message) {
+public record OasDocViolation(Scope scope, BigInteger oasOperationId, String messageBody, String field, String message,
+                              String clientKey) {
+
+    public OasDocViolation(Scope scope, BigInteger oasOperationId, String messageBody, String field, String message) {
+        this(scope, oasOperationId, messageBody, field, message, null);
+    }
+
+    public OasDocViolation forAddedRow(String clientKey) {
+        return new OasDocViolation(scope, null, messageBody, field, message, clientKey);
+    }
 
     public enum Scope {
         /** The fields of the document, its Security Schemes or its Security Requirements. */

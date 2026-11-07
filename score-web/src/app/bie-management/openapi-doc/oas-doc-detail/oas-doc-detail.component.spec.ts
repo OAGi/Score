@@ -1,9 +1,11 @@
-import {vi} from 'vitest';
+import {afterEach, beforeEach, vi} from 'vitest';
+import {signal} from '@angular/core';
 import {of, throwError} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {BieForOasDoc} from '../domain/openapi-doc';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from '../../../common/utility';
-import {EditedRows} from '../../../common/score-table';
 import {OasDocHeaderEdits} from '../domain/oas-doc-change';
 import {OasDocChangeChecker} from '../domain/oas-doc-change-checker';
 import {FormControl} from '@angular/forms';
@@ -460,7 +462,9 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
     page.oasDoc = {oasDocId: 5, title: 't', version: '1', openAPIVersion: '3.1', httpHeaders: options.httpHeaders || [],
       securitySchemes: [], securityRequirements: []};
     page.rows = options.rows || [];
-    page.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    page.removedRows = [];
+    page.ready = signal(true);
+    page.rowsFetching = signal(false);
     page.headerEdits = new OasDocHeaderEdits();
     page.openAPIService = {
       getBieForOasDocPage: vi.fn(() => of({list: [], length: 0})),
@@ -540,13 +544,13 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
 
     it('has the edited operations of every page, not only of the page that is shown', () => {
       const page = pageOf('valid', {rows: [editedRow(1), editedRow(2)]});
-      page.rows = page.edits.carry(page.rows, [editedRow(3)]); // the next page
+      page.rows = [...page.rows, editedRow(3)]; // the page holds the rows of every page
 
       expect(page.buildChangeSet().operations.map((r: any) => r.oasOperationId)).toEqual([1, 2, 3]);
     });
 
     it('is empty when nothing is changed: the server judges the document as it is', () => {
-      expect(pageOf().buildChangeSet()).toEqual({document: undefined, operations: [], headers: {upserts: [], removed: []}});
+      expect(pageOf().buildChangeSet()).toEqual({document: undefined, operations: [], headers: {upserts: [], removed: []}, added: [], removed: []});
     });
 
     it('says that the user deleted an entry that the server registered, so that it is not registered again', () => {
@@ -631,13 +635,13 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
       expect(row.touched).toEqual([]);
     });
 
-    it('is shown when the change cannot be saved too, next to what is wrong, and the entries are left as they are', () => {
+    it('is shown when the change cannot be saved too, next to what is wrong, and the entries are left as they are when the server made none', () => {
       const row = editedRow(7, 'Response');
       row.touched = ['arrayIndicator'];
       const page = pageOf('valid', {rows: [row], httpHeaders: [header(7, 'kept')]});
       page.checkedFingerprint = page.changeFingerprint();
 
-      page.takeCheckResult({valid: false, httpHeaders: [], violations: [{scope: 'OPERATION', message: 'used'}], operations: [
+      page.takeCheckResult({valid: false, httpHeaders: null, violations: [{scope: 'OPERATION', message: 'used'}], operations: [
         {oasOperationId: 7, sentMessageBody: 'Response', operationId: 'queryOrderList', resourceName: '/order-list', messageBody: 'Response'}]},
         {operations: [row], headers: {upserts: [], removed: []}});
 
@@ -659,6 +663,180 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
       } finally {
         vi.useRealTimers();
       }
+    });
+  });
+
+  describe('the request parameters that the server registers for an operation follow what the user changes of it', () => {
+    const SINCE = 'sinceLastDateTime';
+
+    /**
+     * What the server answers to a check, as far as the registered request parameters go (the rules are those of
+     * OasOperationParameters on the server, which has its own tests): the entries as saved, with sinceLastDateTime of an
+     * operation that is a GET returning an array, and a path parameter for each {name} of its path.
+     */
+    function serverOf(saved: { verb: string; array: boolean; path: string }, savedHeaders: any[]) {
+      const namesOf = (path: string) => (path.match(/\{([^}]+)\}/g) || []).map(name => name.slice(1, -1));
+      return (changeSet: any) => {
+        const operation = changeSet.operations[0];
+        let headers = [...savedHeaders];
+        if (operation) {
+          const had = saved.verb === 'GET' && saved.array;
+          const has = operation.verb === 'GET' && operation.arrayIndicator;
+          if (has && !had) {
+            headers.push(header(1, SINCE));
+          } else if (had && !has) {
+            headers = headers.filter(h => h.name !== SINCE);
+          }
+          const removed = namesOf(saved.path).filter(name => !namesOf(operation.resourceName).includes(name));
+          const added = namesOf(operation.resourceName).filter(name => !namesOf(saved.path).includes(name));
+          removed.forEach((from, i) => {
+            headers = i < added.length
+              ? headers.map(h => h.in === 'path' && h.name === from ? {...h, name: added[i]} : h)
+              : headers.filter(h => !(h.in === 'path' && h.name === from));
+          });
+          added.slice(removed.length).forEach(name => headers.push(header(1, name, {in: 'path', required: true})));
+        }
+        return of({valid: true, violations: [], httpHeaders: headers});
+      };
+    }
+
+    /** A page of one saved operation (a GET of `/orders/{id}`), whose server answers like the one above. */
+    function operationPage(saved: { verb: string; array: boolean; path: string }, savedHeaders: any[], operationIdUsed = false) {
+      const row = new BieForOasDoc({oasOperationId: 1, oasResourceId: 1, verb: saved.verb, arrayIndicator: saved.array,
+        resourceName: saved.path, operationId: 'getOrder', messageBody: 'Response'} as any);
+      row.reset();
+      const page = pageOf('idle', {rows: [row], httpHeaders: savedHeaders});
+      page.openAPIService.checkChanges = vi.fn((_id: number, changeSet: any) => {
+        const answer = serverOf(saved, savedHeaders)(changeSet);
+        // the server answers with the entries whether or not what is changed can be saved
+        return operationIdUsed ? answer.pipe(map(result => ({...result, valid: false,
+          violations: [{scope: 'OPERATION', oasOperationId: 1, field: 'operationId', message: 'Operation ID must be unique within the document.'}]}))) : answer;
+      });
+      linkHeadersToRows(page.oasDoc, page.rows);
+      page.ngDoCheck(); // what is loaded is not a change of the user's
+      return {page, row};
+    }
+
+    /** The user does something to the row, and the page asks the server, and takes the answer. */
+    function userDoes(page: any, change: () => void) {
+      change();
+      page.ngDoCheck();
+      vi.advanceTimersByTime(10);
+    }
+
+    const namesOfRow = (row: any) => row.httpHeaders.map((h: any) => h.in + ':' + h.name).sort();
+
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('sinceLastDateTime comes when a GET becomes an array, and goes when it stops being one', () => {
+      const {page, row} = operationPage({verb: 'GET', array: false, path: '/orders'}, []);
+
+      userDoes(page, () => { row.arrayIndicator = true; page.touchArrayIndicator(row); });
+      expect(namesOfRow(row)).toEqual(['query:' + SINCE]);
+      expect(page.oasDoc.httpHeaders.map((h: any) => h.name)).toEqual([SINCE]);
+
+      userDoes(page, () => { row.arrayIndicator = false; page.touchArrayIndicator(row); });
+      expect(namesOfRow(row)).toEqual([]); // the row is back to what it was saved as, and so is the entry
+      expect(page.oasDoc.httpHeaders).toEqual([]);
+    });
+
+    it('sinceLastDateTime goes when a GET that returns an array is another verb, and comes back with the GET', () => {
+      const saved = [header(1, SINCE)];
+      const {page, row} = operationPage({verb: 'GET', array: true, path: '/orders'}, saved);
+
+      userDoes(page, () => { row.verb = 'POST'; page.onChange('verb', row); });
+      expect(namesOfRow(row)).toEqual([]);
+
+      userDoes(page, () => { row.verb = 'GET'; page.onChange('verb', row); });
+      expect(namesOfRow(row)).toEqual(['query:' + SINCE]);
+    });
+
+    it('the path parameter follows the name that the user changes in the Resource Name, and goes back with it', () => {
+      const saved = [header(1, 'id', {in: 'path', required: true})];
+      const {page, row} = operationPage({verb: 'GET', array: false, path: '/orders/{id}'}, saved);
+
+      userDoes(page, () => { row.resourceName = '/orders/{ids}'; row.touch('resourceName'); });
+      expect(namesOfRow(row)).toEqual(['path:ids']);
+      expect(page.headerEdits.changes()).toEqual({upserts: [], removed: []}); // what the server made is not the user's change
+
+      userDoes(page, () => { row.resourceName = '/orders/{id}'; row.touch('resourceName'); });
+      expect(namesOfRow(row)).toEqual(['path:id']);
+    });
+
+    it('follows the array indicator even when the change cannot be saved (the Operation ID it makes is used by another operation)', () => {
+      const saved = [header(1, SINCE)];
+      const {page, row} = operationPage({verb: 'GET', array: true, path: '/orders'}, saved, true);
+
+      userDoes(page, () => { row.arrayIndicator = false; page.touchArrayIndicator(row); });
+
+      expect(page.changeChecker.status()).toBe('invalid');
+      expect(namesOfRow(row)).toEqual([]); // sinceLastDateTime is gone although Update is not there
+      expect(page.oasDoc.httpHeaders).toEqual([]);
+    });
+
+    it('leaves the entries as they are when the server answers without them', () => {
+      const saved = [header(1, SINCE)];
+      const {page, row} = operationPage({verb: 'GET', array: true, path: '/orders'}, saved);
+      page.openAPIService.checkChanges = vi.fn(() => of({valid: false, violations: [{scope: 'DOCUMENT', message: 'no'}], httpHeaders: null}));
+
+      userDoes(page, () => { row.arrayIndicator = false; page.touchArrayIndicator(row); });
+
+      expect(namesOfRow(row)).toEqual(['query:' + SINCE]);
+    });
+
+    it('is also what an Update saves: the page does not send back the entry that the server took away or renamed', () => {
+      const saved = [header(1, 'id', {in: 'path', required: true})];
+      const {page, row} = operationPage({verb: 'GET', array: false, path: '/orders/{id}'}, saved);
+
+      userDoes(page, () => { row.resourceName = '/orders/{ids}'; row.touch('resourceName'); });
+
+      expect(page.buildChangeSet().headers).toEqual({upserts: [], removed: []});
+    });
+  });
+
+  describe('the page is covered by a spinner while it loads or waits for the server', () => {
+    it('is busy while it saves, and while the server has not said whether what is changed can be saved', () => {
+      const page = pageOf('idle');
+      expect(page.isBusy).toBe(false);
+      page.loading = true;
+      expect(page.isBusy).toBe(true);
+      page.loading = false;
+      page.changeChecker.status.set('checking');
+      expect(page.isBusy).toBe(true);
+      for (const status of ['idle', 'valid', 'invalid', 'failed'] as const) {
+        page.changeChecker.status.set(status);
+        expect(page.isBusy).toBe(false);
+      }
+    });
+
+    it('is busy from the moment the page is opened: while the document and then its operations are read', () => {
+      const page = pageOf('idle');
+      page.ready.set(false); // the document has not come yet
+      expect(page.isBusy).toBe(true);
+      page.ready.set(true);
+      expect(page.isBusy).toBe(false);
+      page.rowsFetching.set(true); // the operations are being read
+      expect(page.isBusy).toBe(true);
+    });
+
+    it('is busy while the operations are read, and not after (also when the read fails)', () => {
+      const page = pageOf('idle');
+      page.oasDoc.oasDocId = 5;
+      const seen: boolean[] = [];
+      page.openAPIService.getBieForOasDocPage = vi.fn(() => of({list: []}));
+      page.fetchRows().subscribe(() => seen.push(page.isBusy));
+      expect(page.isBusy).toBe(false);
+      expect(seen).toEqual([true]);
+      page.openAPIService.getBieForOasDocPage = vi.fn(() => throwError(() => new Error('x')));
+      page.fetchRows().subscribe({error: () => {}});
+      expect(page.isBusy).toBe(false);
+    });
+
+    it('is not busy while a dialog is open (it would cover the dialog)', () => {
+      const page = pageOf('valid');
+      page.isUpdating = true;
+      expect(page.isBusy).toBe(false);
     });
   });
 
@@ -926,7 +1104,7 @@ describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
     for (const method of ['fieldsHash', 'changeFingerprint']) {
       c[method] = proto[method];
     }
-    c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    c.removedRows = [];
     c.headerEdits = new OasDocHeaderEdits();
     c.changeChecker = {reset: vi.fn(), request: vi.fn(), status: () => 'idle'};
     c.contactUrl = new FormControl('', [httpUrlValidator]);
@@ -1152,7 +1330,7 @@ describe('OasDocDetailComponent.init shows what keeps Update disabled', () => {
     c.showValidationErrors = proto.showValidationErrors;
     c.fieldsHash = proto.fieldsHash;
     c.changeFingerprint = proto.changeFingerprint;
-    c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    c.removedRows = [];
     c.headerEdits = new OasDocHeaderEdits();
     c.changeChecker = {reset: vi.fn(), request: vi.fn()};
     c.contactUrl = new FormControl('', [httpUrlValidator]);

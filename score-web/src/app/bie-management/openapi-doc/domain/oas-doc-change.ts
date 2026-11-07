@@ -13,6 +13,10 @@ export interface OasDocChangeSet {
   /** The operations (rows of the table) that were edited, of every page. */
   operations: BieForOasDoc[];
   headers: OasDocHeaderChanges;
+  /** The operations that the user added and has not saved (they have no id yet, and a `clientKey` instead). */
+  added?: BieForOasDoc[];
+  /** The operations that the user removed. */
+  removed?: BieForOasDoc[];
 }
 
 export interface OasDocHeaderChanges {
@@ -33,6 +37,8 @@ export interface OasDocHeaderKey {
 export interface OasDocViolation {
   scope: 'DOCUMENT' | 'OPERATION' | 'HEADER';
   oasOperationId?: number;
+  /** The row that the user added and has not saved, when the rule is broken by one. */
+  clientKey?: string;
   /** `Request` or `Response`, when the rule is broken by one of the two rows of an operation. */
   messageBody?: string;
   field?: string;
@@ -53,9 +59,21 @@ export interface OasDocDerivedOperation {
 export interface OasDocChangeResult {
   valid: boolean;
   violations: OasDocViolation[];
-  /** What the entries of the document would be if the change set were saved (the registered ones included). */
-  httpHeaders: OasDocHttpHeader[];
+  /**
+   * What the entries of the document would be if the change set were saved (the registered ones included), whether or not it can be;
+   * `null` when the server did not get as far as to make them.
+   */
+  httpHeaders: OasDocHttpHeader[] | null;
   operations?: OasDocDerivedOperation[];
+  /** What the server made of the operations that the user added, by the key of the page. */
+  added?: OasDocAddedOperation[];
+}
+
+export interface OasDocAddedOperation {
+  clientKey: string;
+  operationId: string;
+  resourceName: string;
+  messageBody: string;
 }
 
 /** An operation that is about to be added to the document, as far as the user has said it. */
@@ -81,7 +99,8 @@ export interface OasOperationProposal {
  * The Operation ID, the Resource Name and the Message Body that the server made of the verb or the array indicator that the user
  * changed are those of the rows; what was asked of the server is answered, so the rows are not touched any more.
  */
-export function applyDerivedOperations(derivedOperations: OasDocDerivedOperation[] | undefined, rows: BieForOasDoc[]): void {
+export function applyDerivedOperations(derivedOperations: OasDocDerivedOperation[] | undefined, rows: BieForOasDoc[],
+                                       addedOperations?: OasDocAddedOperation[]): void {
   for (const derived of derivedOperations || []) {
     const row = rows.find(candidate =>
       candidate.oasOperationId === derived.oasOperationId && candidate.messageBody === derived.sentMessageBody);
@@ -91,7 +110,15 @@ export function applyDerivedOperations(derivedOperations: OasDocDerivedOperation
       row.messageBody = derived.messageBody;
     }
   }
-  rows.forEach(row => row.touched = []);
+  for (const added of addedOperations || []) {
+    const row = rows.find(candidate => candidate.clientKey === added.clientKey);
+    if (row) {
+      row.operationId = added.operationId;
+      row.resourceName = added.resourceName;
+    }
+  }
+  // what the user gave of an added row stays his: the server does not make it again
+  rows.forEach(row => row.touched = row.isNew ? row.touched.filter(field => field === 'operationId' || field === 'resourceName') : []);
 }
 
 export function headerKeyOf(header: OasDocHttpHeader): OasDocHeaderKey {

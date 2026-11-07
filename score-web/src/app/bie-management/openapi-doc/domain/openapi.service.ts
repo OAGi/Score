@@ -179,7 +179,9 @@ export class OpenAPIService {
         securityRequirements: oasDoc.securityRequirements
       } : null,
       operations: changeSet.operations.map(operation => operation.json),
-      headers: changeSet.headers
+      headers: changeSet.headers,
+      added: (changeSet.added || []).map(row => row.additionJson),
+      removed: (changeSet.removed || []).map(row => row.json)
     };
   }
 

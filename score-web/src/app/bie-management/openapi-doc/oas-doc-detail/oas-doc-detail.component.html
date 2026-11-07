@@ -1,3 +1,8 @@
+@if (isBusy) {
+  <div class="oas-busy-overlay" role="progressbar" aria-busy="true" aria-label="Please wait">
+    <mat-spinner [diameter]="56"></mat-spinner>
+  </div>
+}
 <score-detail-page [showActions]="false">
   <ng-container ngProjectAs="[detailTitle]">
     <span class="title">{{ title }}</span>
@@ -6,9 +11,6 @@
     </button>
   </ng-container>
   <ng-container ngProjectAs="[detailToolbar]">
-    @if (changeChecker.status() === 'checking') {
-      <span class="oas-change-status">Checking...</span>
-    }
     <button mat-raised-button class="ms-2" color="primary" (click)="update()"
             [disabled]="updateDisabled || isDisabled(oasDoc)">
       Update
@@ -181,11 +183,6 @@
   </mat-card>
 
   <mat-card class="pt-0">
-    @if (loading) {
-      <div class="loading-container">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
-    }
     <mat-card-header class="align-items-baseline">
       <mat-toolbar class="bg-white p-0 oas-endpoint-toolbar" style="box-shadow: none;">
         <span class="title">Endpoint Details</span>
@@ -242,7 +239,7 @@
       <!-- What the server says is wrong with what the user has changed, wherever it is: a row of another page, the document,
            or an entry. The cells of the rows on this page show their own. -->
       @if (changeChecker.status() === 'invalid') {
-        <div class="oas-change-violations d-flex align-items-start">
+        <div class="oas-change-violations d-flex align-items-center">
           <mat-icon class="oas-change-violations-icon">error</mat-icon>
           <ul>
             @for (violation of changeChecker.violations(); track $index) {
@@ -306,7 +303,7 @@
 
       <ng-template #resourceNameControl let-element>
       <mat-form-field>
-        <input matInput [(ngModel)]="element.resourceName"
+        <input matInput [(ngModel)]="element.resourceName" (ngModelChange)="element.touch('resourceName')"
                [errorStateMatcher]="resourceNameErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
@@ -316,7 +313,7 @@
 
       <ng-template #operationIdControl let-element>
       <mat-form-field>
-        <input matInput [(ngModel)]="element.operationId"
+        <input matInput [(ngModel)]="element.operationId" (ngModelChange)="element.touch('operationId')"
                [errorStateMatcher]="operationIdErrorStateMatcher(element)">
         @if (!element.operationId || !element.operationId.trim()) {
           <mat-error>Operation ID is required.</mat-error>

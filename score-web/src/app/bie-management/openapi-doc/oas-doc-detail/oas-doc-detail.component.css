@@ -437,12 +437,24 @@
   padding-left: 16px;
 }
 
+/* the icon is centered on the messages as a block, and a message is as high as the icon so that one line sits at its middle */
+.oas-change-violations li {
+  line-height: 24px;
+}
+
 .oas-change-violations-icon {
+  flex: none;
   color: #c62828;
   margin-right: 8px;
 }
 
-.oas-change-status {
-  font-size: 13px;
-  opacity: 0.7;
+.oas-busy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999; /* above the page, below the dialogs (1000) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(97, 97, 97, 0.45);
+  cursor: wait;
 }

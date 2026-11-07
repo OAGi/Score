@@ -448,6 +448,7 @@ export class BieForOasDoc {
     this.tagName = obj && obj.tagName || '';
     this.oasOperationId = obj && obj.oasOperationId || 0;
     this.oasResourceId = obj && obj.oasResourceId || 0;
+    this.clientKey = obj && obj.clientKey || undefined;
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
@@ -461,7 +462,47 @@ export class BieForOasDoc {
    */
   touched: string[] = [];
 
-  touch(field: 'verb' | 'arrayIndicator'): void {
+  /**
+   * What the page calls a row that the user added and has not saved (it has no id yet), or `undefined` for a row of the document.
+   * The server answers by it, and says what is wrong with the row by it.
+   */
+  clientKey: string | undefined;
+  /** The summary and the description of an operation without a BIE that the user added. */
+  summary: string;
+  description: string;
+
+  get isNew(): boolean {
+    return !!this.clientKey;
+  }
+
+  /** The operation of the row that the page says it is, whether it is saved or not. */
+  get rowId(): string {
+    return this.clientKey ?? '' + this.oasOperationId;
+  }
+
+  /**
+   * What the server is told of a row that the user added. A name that the user did not give (the Resource Name and the Operation ID
+   * of a BIE) is the server's to make: it is not said, so that it is made again when the verb or the array indicator is changed.
+   */
+  get additionJson(): any {
+    return {
+      clientKey: this.clientKey,
+      topLevelAsbiepId: this.topLevelAsbiepId || null,
+      propertyTerm: this.propertyTerm,
+      verb: this.verb,
+      messageBody: this.messageBody,
+      arrayIndicator: this.arrayIndicator,
+      suppressRootIndicator: this.suppressRootIndicator,
+      resourceName: this.touched.includes('resourceName') ? this.resourceName : undefined,
+      operationId: this.touched.includes('operationId') ? this.operationId : undefined,
+      tagName: this.tagName,
+      httpStatusCode: this.httpStatusCode,
+      summary: this.summary,
+      description: this.description
+    };
+  }
+
+  touch(field: 'verb' | 'arrayIndicator' | 'operationId' | 'resourceName'): void {
     if (!this.touched.includes(field)) {
       this.touched.push(field);
     }
@@ -577,7 +618,7 @@ export class BieForOasDoc {
   }
 
   get isChanged(): boolean {
-    return this.$hashCode !== this.hashCode;
+    return this.isNew || this.$hashCode !== this.hashCode;
   }
 }
 

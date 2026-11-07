@@ -26,7 +26,7 @@ function compareValues(a: unknown, b: unknown): number {
 
 /**
  * The loader of a table whose rows the screen already has (no endpoint): sorts them by the sort of the parameters
- * (`orderBy`, or `sortActive`/`sortDirection`), keeps the ones that `matches` the parameters (the search) and cuts the page. Pass `score-table-view` the result and call its `reload()` when the rows change.
+ * (`orderBy`, `sortActives`/`sortDirections` of a multi-sort table, or `sortActive`/`sortDirection`), keeps the ones that `matches` the parameters (the search) and cuts the page. Pass `score-table-view` the result and call its `reload()` when the rows change.
  */
 export function inMemoryLoad<T>(rows: () => readonly T[], sortKeys: InMemorySortKeys<T> = {},
                                 matches: (row: T, params: HttpParams) => boolean = () => true):
@@ -38,6 +38,14 @@ export function inMemoryLoad<T>(rows: () => readonly T[], sortKeys: InMemorySort
       for (const s of orderBy.split(',')) {
         sorts.push({active: s.substring(1), desc: s.startsWith('-')});
       }
+    } else if (params.get('sortActives')) {
+      // a multi-sort table: comma separated, the first is the most significant
+      const directions = (params.get('sortDirections') ?? '').split(',');
+      params.get('sortActives').split(',').forEach((active, i) => {
+        if (active) {
+          sorts.push({active, desc: directions[i] === 'desc'});
+        }
+      });
     } else if (params.get('sortActive')) {
       sorts.push({active: params.get('sortActive'), desc: params.get('sortDirection') === 'desc'});
     }

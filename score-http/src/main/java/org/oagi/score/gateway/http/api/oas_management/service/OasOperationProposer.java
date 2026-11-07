@@ -39,22 +39,38 @@ public class OasOperationProposer {
 
     /**
      * The proposals for operations that are added together: each is judged against the document and against the ones before it,
-     * so that two of them that would make the same Operation ID on two endpoints, or a second body of one endpoint, are said
-     * before any of them is added.
+     * so that a second body of one endpoint is said before any of them is added. An Operation ID that another operation has is not
+     * said here: what is added is not saved before Update, and the whole change set is judged then.
      */
     public List<OasOperationProposal> proposeAll(ScoreUser requester, OasDocId oasDocId, List<OasOperationCandidate> candidates) {
-        Map<String, String> endpointOfOperationId = new HashMap<>();
         Set<String> bodySlots = new HashSet<>();
         List<OasOperationProposal> proposals = new ArrayList<>();
         for (OasOperationCandidate candidate : candidates) {
-            OasOperationProposal proposal = proposeOne(requester, oasDocId, candidate, endpointOfOperationId, bodySlots);
+            OasOperationProposal proposal = proposeOne(requester, oasDocId, candidate, bodySlots);
             proposals.add(proposal);
         }
         return proposals;
     }
 
+    /** The Resource Name and the Operation ID of an operation that is added, as the user gave them or as they are made; nothing is judged. */
+    public OasOperationProposal names(ScoreUser requester, OasDocId oasDocId, OasOperationCandidate candidate) {
+        OasDoc oasDoc = repositoryFactory.oasDocQueryRepository(requester)
+                .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
+        String version = oasDoc == null ? null : oasDoc.getVersion();
+        String resourceName = isGiven(candidate.resourceName()) ? candidate.resourceName().trim()
+                : deriveResourceName(requester, candidate, version);
+        return new OasOperationProposal(resourceName, operationIdOf(candidate, resourceName), List.of());
+    }
+
+    private static String operationIdOf(OasOperationCandidate candidate, String resourceName) {
+        return isGiven(candidate.operationId()) ? candidate.operationId().trim()
+                : isGiven(candidate.propertyTerm())
+                ? OasOperationNaming.buildOperationId(candidate.verb(), candidate.propertyTerm(), candidate.arrayIndicator())
+                : OasOperationNaming.operationIdFromPath(candidate.verb(), resourceName);
+    }
+
     private OasOperationProposal proposeOne(ScoreUser requester, OasDocId oasDocId, OasOperationCandidate candidate,
-                                            Map<String, String> endpointOfOperationId, Set<String> bodySlots) {
+                                            Set<String> bodySlots) {
         OasDoc oasDoc = repositoryFactory.oasDocQueryRepository(requester)
                 .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
         String version = oasDoc == null ? null : oasDoc.getVersion();
@@ -89,17 +105,8 @@ public class OasOperationProposer {
             if (bodySlots.contains(endpoint + "|" + candidate.messageBody())) {
                 violations.add(violation("messageBody", "This endpoint already has a " + candidate.messageBody() + " body."));
             }
-            String earlier = endpointOfOperationId.get(operationId);
-            if (earlier != null && !earlier.equals(endpoint)) {
-                violations.add(violation("operationId", "Operation ID must be unique within the document."));
-            }
-            Set<OasOperationId> sameEndpoint = new HashSet<>(command.findOasOperationIdsAtEndpoint(oasDocId, resourceName, verb));
-            if (!command.findOperationIdsInOasDoc(oasDocId, Set.of(operationId), sameEndpoint).isEmpty()) {
-                violations.add(violation("operationId", "Operation ID must be unique within the document."));
-            }
             if (violations.isEmpty()) {
                 bodySlots.add(endpoint + "|" + candidate.messageBody());
-                endpointOfOperationId.putIfAbsent(operationId, endpoint);
             }
         }
         return new OasOperationProposal(resourceName, operationId, List.copyOf(violations));

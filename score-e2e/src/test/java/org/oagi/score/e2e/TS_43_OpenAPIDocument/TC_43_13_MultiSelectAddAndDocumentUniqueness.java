@@ -24,6 +24,7 @@ import org.oagi.score.e2e.page.oas.CreateOpenAPIDocumentPage;
 import org.oagi.score.e2e.page.oas.EditOpenAPIDocumentPage;
 import org.oagi.score.e2e.page.oas.OpenAPIDocumentPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -95,19 +96,25 @@ public class TC_43_13_MultiSelectAddAndDocumentUniqueness extends BaseTest {
         dialog.setMessageBody(secondRow, "Response");
 
         // The two BIEs are of two endpoints (their Resource Names have their Business Contexts) and would have the same
-        // Operation ID: the OpenAPI specification wants an Operation ID unique among all the operations of the API. The
-        // server says so at the second BIE before anything is added, and Add is not there.
-        assertTrue(dialog.getRowMessageBodyError(secondRow).contains("Operation ID must be unique within the document"),
-                "The second BIE would make the Operation ID of the first one again on another endpoint");
-        assertEquals("", dialog.getRowMessageBodyError(firstRow), "The first BIE can be added");
-        dialog.getAddButton(false);
-
-        // Without the second BIE the first one is added, and Add is there again.
-        dialog.toggleSelect(secondRow);
+        // Operation ID. The OpenAPI specification wants an Operation ID unique among all the operations of the API, so the
+        // server cannot say that what was added can be saved: both are in the table, not saved, and both say it.
         dialog.hitAddButton();
 
-        assertEquals(1, rowsByDen(fixture.editPage, den).size(),
-                "Only the BIE that does not repeat the Operation ID is added");
+        List<WebElement> rows = rowsByDen(fixture.editPage, den);
+        assertEquals(2, rows.size(), "Both selected BIEs are added to the table");
+        for (WebElement row : rows) {
+            assertTrue(fixture.editPage.getRowOperationIdError(row).contains("Operation ID must be unique within the document"),
+                    "Both rows say that the Operation ID is repeated");
+        }
+        assertThrows(TimeoutException.class, () -> fixture.editPage.getUpdateButton(true),
+                "Update is not there while an Operation ID is repeated");
+
+        // The user gives the later one an Operation ID of its own: it can be saved.
+        fixture.editPage.setRowOperationId(rows.get(1), fixture.editPage.getRowOperationId(rows.get(1)) + "Other");
+        fixture.editPage.clickUpdateButton();
+        getDriver().navigate().refresh();
+
+        assertEquals(2, rowsByDen(fixture.editPage, den).size(), "Both BIEs are saved after the Operation ID is fixed");
     }
 
     @Test

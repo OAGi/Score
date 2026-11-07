@@ -32,10 +32,10 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {forkJoin} from 'rxjs';
+import {defer, forkJoin, of} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from '../../../common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
-import {finalize, map, tap} from 'rxjs/operators';
+import {finalize, map, switchMap, tap} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
@@ -47,7 +47,7 @@ import {
   OasDocConfirmMessageDialogResult
 } from '../oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {OAS_DOC_BIE_TABLE} from '../domain/oas-doc-bie.table';
-import {createTableColumns, EditedRows, ScoreTableViewComponent} from '../../../common/score-table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
@@ -60,6 +60,12 @@ import {Title} from '@angular/platform-browser';
 import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 import {ReleaseSummary} from '../../../release-management/domain/release';
 import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
+
+/**
+ * Adding or removing an operation is saved at once when the server says that it can be (as it always was). Set to `false` to leave
+ * saving it to the user: it is then saved by Update like any other change.
+ */
+const UPDATE_AFTER_ADD = true;
 
 @Component({
   standalone: false,
@@ -108,49 +114,66 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
 
   readonly columns = createTableColumns(OAS_DOC_BIE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BieForOasDoc>>(ScoreTableViewComponent);
-  selection = new SelectionModel<BieForOasDoc>(true, [], true, (a, b) => a.oasOperationId === b.oasOperationId && a.messageBody === b.messageBody);
+  selection = new SelectionModel<BieForOasDoc>(true, [], true, (a, b) => a.rowId === b.rowId && a.messageBody === b.messageBody);
   readonly rowKey = (row: BieForOasDoc) => row;
   businessContextSelection = {};
   /** The list waits for the document. */
   readonly ready = signal(false);
-  /** The operations of the page that the table shows (edited in place). */
+  /**
+   * Every operation of the document, those that the user added and has not saved included: the page holds them all and pages
+   * them itself, so that an edit is never out of sight and the server is told of all of them at once. Nothing the user does
+   * with them is saved before Update.
+   */
   rows: BieForOasDoc[] = [];
+  /** The operations that the user removed: they are deleted by Update. */
+  removedRows: BieForOasDoc[] = [];
   /** The number of operations of the document. */
   totalRows = 0;
-  /** The edited operations of the pages that were left: the server pages the table, and a page that is left would take its edits along. */
-  readonly edits = new EditedRows<BieForOasDoc>(
-    row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+  /** Whether every operation of the document is read from the server (again, after a save). */
+  private rowsLoaded = false;
+  /** The operations are being read from the server. */
+  private readonly rowsFetching = signal(false);
+  private rowKeySequence = 0;
   readonly rowClass = (row: BieForOasDoc) => ({'highlight': row.status === 'Duplication'});
-  readonly load = (params: HttpParams) => this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params.set('access', 'CanView')).pipe(
-    tap({
-      next: resp => {
-        this.totalRows = resp.length;
-        resp.list = resp.list.map((elm: BieForOasDoc) => {
-          elm = new BieForOasDoc(elm);
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
-          return elm;
-        });
-        // The page that was left keeps its edits (a sort, a search or the paginator shows the rows again).
-        resp.list = this.edits.carry(this.rows, resp.list);
-        this.rows = resp.list;
-        // Issue #1791: the rows show the headers of the document.
-        linkHeadersToRows(this.oasDoc, this.rows);
-        this.rows.forEach((elm: BieForOasDoc) => {
-          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
-          // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
-          // cancelled CONFIRM_MESSAGE choice to its last committed value.
-          this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
-        });
-      },
-      error: () => {
-        this.edits.remember(this.rows);
-        this.rows = [];
-        this.totalRows = 0;
-        this.businessContextSelection = {};
-      }
+  private readonly pageOfRows = inMemoryLoad<BieForOasDoc>(() => this.rows, {branch: row => row.releaseNum});
+  readonly load = (params: HttpParams) => defer(() => this.rowsLoaded ? of(true) : this.fetchRows().pipe(map(() => true))).pipe(
+    switchMap(() => this.pageOfRows(params)),
+    tap(resp => {
+      this.totalRows = this.rows.length;
+      linkHeadersToRows(this.oasDoc, this.rows);
     })
   );
+
+  /** Every operation of the document, read from the server in one request (the server pages only when it is asked to). */
+  private fetchRows() {
+    const params = new HttpParams().set('access', 'CanView').set('pageIndex', '-1').set('pageSize', '-1')
+      .set('sortActives', '').set('sortDirections', '');
+    this.rowsFetching.set(true);
+    return this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params).pipe(
+      finalize(() => this.rowsFetching.set(false)),
+      tap({
+        next: resp => {
+          const added = this.rows.filter(row => row.isNew); // not saved: they stay while the saved ones are read again
+          this.rows = [...(resp.list || []).map((elm: BieForOasDoc) => {
+            elm = new BieForOasDoc(elm);
+            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+            elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
+            this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
+            // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
+            // cancelled CONFIRM_MESSAGE choice to its last committed value.
+            this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
+            return elm;
+          }), ...added];
+          this.rowsLoaded = true;
+        },
+        error: () => {
+          this.rows = [];
+          this.totalRows = 0;
+          this.businessContextSelection = {};
+        }
+      })
+    );
+  }
   loading = false;
   isUpdating: boolean;
   option: BieExpressOption;
@@ -192,7 +215,8 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   /** What the server said is wrong with a cell of a row: the operation, and the Request or Response row when it says which. */
   violationOf(row: BieForOasDoc, field: string): OasDocViolation | undefined {
     return this.changeChecker.violations().find(violation => violation.scope === 'OPERATION'
-      && violation.oasOperationId === row.oasOperationId && violation.field === field
+      && (row.isNew ? violation.clientKey === row.clientKey : !violation.clientKey && violation.oasOperationId === row.oasOperationId)
+      && violation.field === field
       && (!violation.messageBody || violation.messageBody === row.messageBody));
   }
 
@@ -223,6 +247,54 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
       this.lastFingerprint = fingerprint;
       this.changeChecker.request();
     }
+    this.updateAfterAdd();
+  }
+
+  /**
+   * What the user adds or removes is not saved before Update. So that adding is as it always was (it is there at once), the page
+   * presses Update by itself when the server says that what was added can be saved; when it cannot, the rows stay in the page,
+   * with what is wrong where it is, and the user presses Update when it is fixed. Set {@code UPDATE_AFTER_ADD} to false to leave
+   * it to the user.
+   */
+  private updateAfterAdd(): void {
+    if (!this.updateAfterAddPending) {
+      return;
+    }
+    switch (this.changeChecker.status()) {
+      case 'valid':
+        this.updateAfterAddPending = false;
+        if (this.isChanged() && !this.isDisabled(this.oasDoc)) {
+          this.saveChanges(() => this.snackBar.open(this.updateAfterAddMessage, '', {duration: 3000}));
+        }
+        break;
+      case 'invalid':
+      case 'failed':
+        this.updateAfterAddPending = false;
+        this.snackBar.open('It cannot be saved as it is. Fix what is marked, then click Update.', '', {duration: 5000});
+        break;
+      default:
+        break; // the server has not answered yet
+    }
+  }
+
+  private updateAfterAddPending = false;
+  private updateAfterAddMessage = 'Added';
+
+  /** The user added or removed operations: they are in the page, and are saved by Update. */
+  private changedOperations(message: string): void {
+    this.updateAfterAddMessage = message;
+    this.updateAfterAddPending = UPDATE_AFTER_ADD;
+    this.view().reload();
+  }
+
+  /** The rows that a dialog made for the user: the page holds them until Update. */
+  private addRows(rows: BieForOasDoc[]): void {
+    rows.forEach(row => {
+      row.clientKey = 'new-' + (++this.rowKeySequence);
+      row.oasDocId = this.oasDoc.oasDocId;
+    });
+    this.rows = [...this.rows, ...rows];
+    this.changedOperations('Added');
   }
 
   ngOnDestroy(): void {
@@ -230,7 +302,8 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   }
 
   private changeFingerprint(): string {
-    return hashCode([this.oasDoc, this.edits.edited(this.rows).map(row => [row.oasOperationId, row.messageBody, row.hashCode])]);
+    return hashCode([this.oasDoc, this.rows.filter(row => row.isChanged).map(row => [row.rowId, row.messageBody, row.hashCode, row.touched]),
+      this.removedRows.map(row => [row.rowId, row.messageBody])]);
   }
 
   private fieldsHash(oasDoc: OasDoc): string {
@@ -244,7 +317,9 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     return {
       document: this.fieldsHash(this.oasDoc) !== this.savedFieldsHash ? this.oasDoc : undefined,
       operations: this.getChanged(),
-      headers: this.headerEdits.changes()
+      headers: this.headerEdits.changes(),
+      added: this.rows.filter(row => row.isNew),
+      removed: this.removedRows
     };
   }
 
@@ -256,9 +331,10 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     if (this.changeFingerprint() !== this.checkedFingerprint) {
       return false;
     }
-    applyDerivedOperations(result.operations, changeSet.operations); // whether or not it can be saved: it is what the user sees next to what is wrong
-    if (result.valid && this.isChanged()) {
-      this.oasDoc.httpHeaders = result.httpHeaders || [];
+    applyDerivedOperations(result.operations, [...changeSet.operations, ...(changeSet.added || [])], result.added); // whether or not it can be saved: it is what the user sees next to what is wrong
+    // the entries that follow the operations follow them whether or not the change can be saved; a server that did not make them (null) leaves the page's own
+    if (result.httpHeaders && this.isChanged()) {
+      this.oasDoc.httpHeaders = result.httpHeaders;
       sortHeaders(this.oasDoc);
       this.headerEdits.adopt(this.oasDoc.httpHeaders);
       linkHeadersToRows(this.oasDoc, this.rows);
@@ -944,7 +1020,10 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   }
 
   loadBieListForOasDoc() {
-    this.edits.clear(); // read again from the server: what was saved is there, and a row that is gone is not edited
+    // read again from the server: what was saved is there, and what the user added or removed was saved with it
+    this.rows = this.rows.filter(row => !row.isNew);
+    this.removedRows = [];
+    this.rowsLoaded = false;
     this.view().reload();
     this.refreshOperationIds();
     this.refreshHttpHeaders();
@@ -974,14 +1053,15 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   }
 
   getChanged(): BieForOasDoc[] {
-    return this.edits.edited(this.rows); // of every page
+    return this.rows.filter(row => row.isChanged && !row.isNew); // of every page
   }
 
   isChanged(): boolean {
     if (!this.oasDoc) {
       return false;
     }
-    return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0;
+    return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0
+      || this.rows.some(row => row.isNew) || this.removedRows.length > 0;
   }
 
   isDisabled(oasDoc1: OasDoc) {
@@ -1215,7 +1295,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
         return;
       }
 
-      this.loadBieListForOasDoc();
+      this.addRows(result.result?.rows || []);
     });
   }
 
@@ -1238,7 +1318,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
         return;
       }
 
-      this.loadBieListForOasDoc();
+      this.addRows(result.rows || []);
     });
   }
 
@@ -1292,10 +1372,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   }
 
   removeBieForOasDoc() {
-    const request = new BieForOasDocDeleteRequest();
     const nodes = this.selection.selected;
-    request.oasDocId = this.oasDoc.oasDocId;
-    request.bieForOasDocList = nodes;
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove selected BIE from the OpenAPI Doc?';
@@ -1305,20 +1382,25 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.openAPIService.removeBieForOasDoc(request).subscribe(_ => {
-            this.snackBar.open('Removed', '', {
-              duration: 3000,
-            });
-            this.selection.clear();
-            this.edits.clear();
-            this.view().reload();
-            this.refreshHttpHeaders();
-          });
+          // Not saved before Update: a row that was added is gone, a row of the document is deleted by Update.
+          this.removedRows = [...this.removedRows, ...nodes.filter(row => !row.isNew)];
+          this.rows = this.rows.filter(row => !nodes.includes(row));
+          this.selection.clear();
+          this.changedOperations('Removed');
         }
       });
   }
   get sizeOfChanges(): number {
-    return this.getChanged().length;
+    return this.getChanged().length + this.rows.filter(row => row.isNew).length + this.removedRows.length;
+  }
+
+  /**
+   * The page is busy while it loads (the document, before it is shown, and its operations) or saves, and while it waits for the
+   * server to say whether what the user changed can be saved: a spinner covers the page then, so that nothing else is changed in
+   * the meantime. It is there from the moment the page is opened, not from the moment the document has come.
+   */
+  get isBusy(): boolean {
+    return this.loading || !this.ready() || this.rowsFetching() || this.changeChecker.status() === 'checking';
   }
 
   /** Update is there when something is changed and the server has said that it can be saved. */

@@ -12,8 +12,23 @@ import java.util.List;
  *                   {@code null} when none of them was changed (its {@code httpHeaders} are not read: see {@code headers})
  * @param operations the operations (rows of the table) that were edited, of every page
  * @param headers    the request parameters and response headers that were added, changed or deleted
+ * @param added      the operations that were added in the page and have no id yet
+ * @param removed    the operations (rows of the table) that were deleted
  */
-public record OasDocChangeSet(OasDoc document, List<BieForOasDoc> operations, HeaderChanges headers) {
+public record OasDocChangeSet(OasDoc document, List<BieForOasDoc> operations, HeaderChanges headers,
+                              List<OasOperationAddition> added, List<BieForOasDoc> removed) {
+
+    public OasDocChangeSet(OasDoc document, List<BieForOasDoc> operations, HeaderChanges headers) {
+        this(document, operations, headers, null, null);
+    }
+
+    public List<OasOperationAddition> addedOrEmpty() {
+        return added == null ? List.of() : added;
+    }
+
+    public List<BieForOasDoc> removedOrEmpty() {
+        return removed == null ? List.of() : removed;
+    }
 
     /**
      * @param upserts the entries that were added or changed (an entry whose name or location was changed is a removal of the

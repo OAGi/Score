@@ -20,6 +20,17 @@ public class AddOperationForOasDocRequest extends Request {
     private String summary;
     private String description;
 
+    /** Set when the Operation ID is judged with the whole change set that adds the operation, not when it is added. */
+    private boolean operationIdJudgedLater;
+
+    public boolean isOperationIdJudgedLater() {
+        return operationIdJudgedLater;
+    }
+
+    public void setOperationIdJudgedLater(boolean operationIdJudgedLater) {
+        this.operationIdJudgedLater = operationIdJudgedLater;
+    }
+
     public AddOperationForOasDocRequest() {
     }
 

@@ -26,6 +26,29 @@ public class OasDocViolationException extends IllegalArgumentException {
         return violations;
     }
 
+    private transient List<OasDocChangeResult.AddedOperation> added = List.of();
+
+    public List<OasDocChangeResult.AddedOperation> added() {
+        return added;
+    }
+
+    public OasDocViolationException withAdded(List<OasDocChangeResult.AddedOperation> added) {
+        this.added = added;
+        return this;
+    }
+
+    /** The entries that the document would have, when the change was applied as far as to make them; {@code null} when it was not. */
+    private transient List<OasDocHttpHeader> httpHeaders;
+
+    public List<OasDocHttpHeader> httpHeaders() {
+        return httpHeaders;
+    }
+
+    public OasDocViolationException withHttpHeaders(List<OasDocHttpHeader> httpHeaders) {
+        this.httpHeaders = httpHeaders;
+        return this;
+    }
+
     public List<OasDocChangeResult.DerivedOperation> derived() {
         return derived;
     }

@@ -1,5 +1,8 @@
 package org.oagi.score.gateway.http.api.oas_management.service;
 
+import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddBieForOasDocRequest;
+import org.oagi.score.gateway.http.api.oas_management.controller.payload.AddOperationForOasDocRequest;
+import org.oagi.score.gateway.http.api.oas_management.controller.payload.DeleteBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateBieForOasDocRequest;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateOasDocRequest;
@@ -40,18 +43,24 @@ public class OasDocChangeApplier {
     @Autowired
     private OpenAPIDocService oasDocService;
 
+    @Autowired
+    private OasOperationProposer proposer;
+
     /** The document and its operations are saved or checked by their own services; the entries here. */
     public OasDocChangeResult apply(ScoreUser requester, OasDocId oasDocId, OasDocChangeSet changeSet, boolean dryRun) {
         List<OasDocChangeResult.DerivedOperation> derived = deriveNames(changeSet.operationsOrEmpty());
+        List<OasDocChangeResult.AddedOperation> added = new ArrayList<>();
         try {
-            return applyChanges(requester, oasDocId, changeSet, dryRun, derived);
+            return applyChanges(requester, oasDocId, changeSet, dryRun, derived, added);
         } catch (OasDocViolationException e) {
-            throw e.withDerived(derived); // what was made of the names is what the user sees next to what is wrong
+            // what was made of the names is what the user sees next to what is wrong
+            throw e.withDerived(derived).withAdded(List.copyOf(added));
         }
     }
 
     private OasDocChangeResult applyChanges(ScoreUser requester, OasDocId oasDocId, OasDocChangeSet changeSet, boolean dryRun,
-                                            List<OasDocChangeResult.DerivedOperation> derived) {
+                                            List<OasDocChangeResult.DerivedOperation> derived,
+                                            List<OasDocChangeResult.AddedOperation> added) {
         // Every rule that is broken is said at once. A step is judged as it would be saved, so when the document itself cannot be
         // saved the steps that refer to it are not judged: what they would say is not about what the user did.
         List<OasDocViolation> violations = new ArrayList<>(rowViolations(changeSet.operationsOrEmpty()));
@@ -66,7 +75,19 @@ public class OasDocChangeApplier {
             }
         }
         List<OasDocHttpHeader> headers = List.of();
+        Map<BigInteger, List<OasDocChangeResult.AddedOperation>> createdOperations = new LinkedHashMap<>();
         if (!documentFailed) {
+            if (!changeSet.removedOrEmpty().isEmpty()) {
+                DeleteBieForOasDocRequest request = new DeleteBieForOasDocRequest(requester);
+                request.setOasDocId(oasDocId);
+                request.setBieForOasDocList(changeSet.removedOrEmpty());
+                try {
+                    step(Scope.OPERATION, () -> oasDocService.deleteBieForOasDoc(requester, request));
+                } catch (OasDocViolationException e) {
+                    violations.addAll(e.violations());
+                }
+            }
+            violations.addAll(addOperations(requester, oasDocId, changeSet.addedOrEmpty(), added, createdOperations));
             boolean operationsFailed = false;
             if (!changeSet.operationsOrEmpty().isEmpty()) {
                 UpdateBieForOasDocRequest request = new UpdateBieForOasDocRequest(requester);
@@ -77,10 +98,16 @@ public class OasDocChangeApplier {
                 } catch (OasDocViolationException e) {
                     violations.addAll(e.violations());
                     operationsFailed = true;
+                    if (dryRun) {
+                        followOperations(requester, request);
+                    }
                 }
             }
             OasDocCommandRepository command = repositoryFactory.oasDocCommandRepository(requester);
             headers = command.applyHeaderChanges(oasDocId, changeSet.headersOrNone());
+            // the entries of an operation that this change set creates are the page's after it is saved: what it reads then has them
+            headers = headers.stream().filter(h -> h.getOasOperationId() == null
+                    || !createdOperations.containsKey(h.getOasOperationId())).toList();
             OasDoc saved = repositoryFactory.oasDocQueryRepository(requester)
                     .getOasDoc(new GetOasDocRequest(requester).withOasDocId(oasDocId)).getOasDoc();
             violations.addAll(OasDocHttpHeaderPolicy.violations(headers, saved.getOpenAPIVersion()));
@@ -89,12 +116,124 @@ public class OasDocChangeApplier {
                 violations.addAll(documentWideViolations(command.findOperationEndpoints(oasDocId)));
             }
         }
-        assertAll(new ArrayList<>(new LinkedHashSet<>(violations)));
+        try {
+            assertAll(new ArrayList<>(new LinkedHashSet<>(forAddedRows(violations, createdOperations))));
+        } catch (OasDocViolationException e) {
+            // the entries that follow the operations do so whether or not the change can be saved: the page shows them next to what is wrong
+            throw e.withHttpHeaders(documentFailed ? null : headers);
+        }
 
         if (dryRun) {
             markRollbackOnly();
         }
-        return OasDocChangeResult.valid(headers, derived);
+        return OasDocChangeResult.valid(headers, derived, List.copyOf(added));
+    }
+
+    /**
+     * The service refuses to write the operations when a rule is broken, and the entries that the system registers for them are made
+     * by that write. They follow the operations whether or not the change can be saved, and a check keeps nothing, so the operations
+     * are written here as they are, for the entries that the document would have; if they cannot be written either, the entries are
+     * left as they are.
+     */
+    private void followOperations(ScoreUser requester, UpdateBieForOasDocRequest request) {
+        try {
+            repositoryFactory.bieForOasDocCommandRepository(requester).updateBieForOasDoc(request);
+        } catch (RuntimeException e) {
+            // the entries are those of before
+        }
+    }
+
+    /**
+     * Adds the operations that the user added in the page, in the order of the page. Their Operation IDs are judged with the whole
+     * change set (see {@link #documentWideViolations}), so that every row that has one that another has is said, not only the later.
+     */
+    private List<OasDocViolation> addOperations(ScoreUser requester, OasDocId oasDocId, List<OasOperationAddition> additions,
+                                                List<OasDocChangeResult.AddedOperation> added,
+                                                Map<BigInteger, List<OasDocChangeResult.AddedOperation>> createdOperations) {
+        List<OasDocViolation> violations = new ArrayList<>();
+        OasDocCommandRepository command = repositoryFactory.oasDocCommandRepository(requester);
+        for (OasOperationAddition addition : additions) {
+            OasOperationProposal names = proposer.names(requester, oasDocId, addition.candidate());
+            OasDocChangeResult.AddedOperation addedOperation = new OasDocChangeResult.AddedOperation(addition.clientKey(),
+                    names.operationId(), names.resourceName(), addition.messageBody());
+            added.add(addedOperation);
+            List<OasDocViolation> rowViolations = new ArrayList<>();
+            OasOperationNaming.resourcePathError(names.resourceName()).ifPresent(error ->
+                    rowViolations.add(new OasDocViolation(Scope.OPERATION, null, addition.messageBody(), "resourceName", error)));
+            boolean operationIdCleared = addition.operationId() != null && addition.operationId().isBlank(); // given, and blank
+            if (operationIdCleared || names.operationId() == null || names.operationId().isBlank()) {
+                rowViolations.add(new OasDocViolation(Scope.OPERATION, null, addition.messageBody(), "operationId", "The Operation ID is required."));
+            }
+            if ("Request".equals(addition.messageBody()) && "GET".equalsIgnoreCase(addition.verb())) {
+                rowViolations.add(new OasDocViolation(Scope.OPERATION, null, addition.messageBody(), "messageBody", "A GET operation has no request body."));
+            }
+            if (rowViolations.isEmpty()) {
+                try {
+                    step(Scope.OPERATION, () -> addOne(requester, oasDocId, addition, names));
+                    OasResourceId resource = command.findOasResourceId(oasDocId, names.resourceName());
+                    OasOperationId created = resource == null ? null : command.findOasOperationId(resource, addition.verb().trim().toUpperCase());
+                    if (created != null) {
+                        createdOperations.computeIfAbsent(created.value(), k -> new ArrayList<>()).add(addedOperation);
+                    }
+                } catch (OasDocViolationException e) {
+                    e.violations().forEach(v -> rowViolations.add(new OasDocViolation(v.scope(), null,
+                            v.messageBody() != null ? v.messageBody() : addition.messageBody(), v.field() != null ? v.field() : "messageBody", v.message())));
+                }
+            }
+            rowViolations.forEach(v -> violations.add(v.forAddedRow(addition.clientKey())));
+        }
+        return violations;
+    }
+
+    private void addOne(ScoreUser requester, OasDocId oasDocId, OasOperationAddition addition, OasOperationProposal names) {
+        if (addition.hasBie()) {
+            AddBieForOasDocRequest request = new AddBieForOasDocRequest(requester);
+            request.setOasDocId(oasDocId);
+            request.setTopLevelAsbiepId(addition.topLevelAsbiepId());
+            request.setOasRequest("Request".equals(addition.messageBody()));
+            request.setPath(names.resourceName());
+            request.setVerb(addition.verb());
+            request.setOperationId(names.operationId());
+            request.setMakeArrayIndicator(addition.arrayIndicator());
+            request.setSuppressRootIndicator(addition.suppressRootIndicator());
+            request.setTagName(addition.tagName());
+            request.setDeprecatedForOperation(false);
+            request.setOperationIdJudgedLater(true);
+            oasDocService.addBieForOasDoc(requester, request);
+        } else {
+            AddOperationForOasDocRequest request = new AddOperationForOasDocRequest(requester);
+            request.setOasDocId(oasDocId);
+            request.setOasRequest("Request".equals(addition.messageBody()));
+            request.setPath(names.resourceName());
+            request.setVerb(addition.verb());
+            request.setOperationId(names.operationId());
+            request.setTagName(addition.tagName());
+            request.setHttpStatusCode(addition.httpStatusCode());
+            request.setSummary(addition.summary());
+            request.setDescription(addition.description());
+            request.setOperationIdJudgedLater(true);
+            oasDocService.addOperationForOasDoc(requester, request);
+        }
+    }
+
+    /**
+     * A violation of an operation that was created by this change set is about the row that the user added (the operation has no
+     * id for the page): it is said for each added row of the operation that it is about.
+     */
+    private static List<OasDocViolation> forAddedRows(List<OasDocViolation> violations,
+                                                      Map<BigInteger, List<OasDocChangeResult.AddedOperation>> createdOperations) {
+        List<OasDocViolation> result = new ArrayList<>();
+        for (OasDocViolation violation : violations) {
+            List<OasDocChangeResult.AddedOperation> rows = violation.oasOperationId() == null ? null
+                    : createdOperations.get(violation.oasOperationId());
+            if (rows == null) {
+                result.add(violation);
+                continue;
+            }
+            rows.stream().filter(row -> violation.messageBody() == null || violation.messageBody().equals(row.messageBody()))
+                    .forEach(row -> result.add(violation.forAddedRow(row.clientKey())));
+        }
+        return result;
     }
 
     /** The transaction ends in a rollback whatever happens next. */

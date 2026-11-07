@@ -342,6 +342,7 @@ public class AddBIEForOpenAPIDocumentDialogImpl implements AddBIEForOpenAPIDocum
     public void hitAddButton() {
         click(getDriver(), getAddButton(true));
         waitFor(ofMillis(500L));
+        org.oagi.score.e2e.impl.PageHelper.waitForAddToSettle(getDriver());
     }
 
     @Override

@@ -164,6 +164,7 @@ public class AddOperationForOpenAPIDocumentDialogImpl implements AddOperationFor
         // On success the dialog closes (the operation is added); wait for it to disappear.
         invisibilityOfElementLocated(getDriver(), TITLE_LOCATOR);
         waitFor(ofMillis(500L));
+        org.oagi.score.e2e.impl.PageHelper.waitForAddToSettle(getDriver());
     }
 
     @Override

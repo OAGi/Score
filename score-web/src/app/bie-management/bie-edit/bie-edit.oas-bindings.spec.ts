@@ -11,13 +11,15 @@ import {OasDocChangeResult} from '../openapi-doc/domain/oas-doc-change';
 describe('BieEditComponent OpenAPI bindings (#1519)', () => {
   const proto: any = BieEditComponent.prototype;
   const binding = (oasDocId: number, oasOperationId: number, extra: any = {}): any =>
-    ({oasDocId, oasOperationId, messageBody: 'Response', operationId: 'op' + oasOperationId, isChanged: true, hashCode: 1,
+    ({oasDocId, oasOperationId, messageBody: 'Response', operationId: 'op' + oasOperationId, isChanged: true, hashCode: 1, isNew: false,
+      rowId: '' + oasOperationId,
       touched: [] as string[], touch(field: string) { this.touched.push(field); }, ...extra});
   const result = (extra: Partial<OasDocChangeResult>): OasDocChangeResult => ({valid: true, violations: [], httpHeaders: [], ...extra});
 
   function panel(bindings: any[], status: string = 'valid', violations: any[] = []): any {
     const c: any = Object.create(proto);
     c.rootNode = {bieForOasDocList: bindings};
+    c.removedOasBindings = [];
     c.openAPIService = {checkChanges: vi.fn(() => of(result({})))};
     c.oasChecker = {status: () => status, violations: () => violations};
     return c;
@@ -25,13 +27,13 @@ describe('BieEditComponent OpenAPI bindings (#1519)', () => {
 
   describe('check', () => {
     it('asks the server once for each document that has a change, and puts the answers together', () => {
-      const c = panel([]);
+      const c = panel([binding(1, 11), binding(2, 21), binding(1, 12)]);
       c.openAPIService.checkChanges = vi.fn((oasDocId: number) => of(oasDocId === 2
         ? result({valid: false, violations: [{scope: 'OPERATION', oasOperationId: 21, message: 'used'}]})
         : result({operations: [{oasOperationId: 11, sentMessageBody: 'Response', operationId: 'x', resourceName: '/x', messageBody: 'Response'}]})));
       let answer: OasDocChangeResult | undefined;
 
-      c.checkOasBindings({operations: [binding(1, 11), binding(2, 21), binding(1, 12)], headers: {upserts: [], removed: []}})
+      c.checkOasBindings(c.buildOasChangeSet())
         .subscribe((r: OasDocChangeResult) => answer = r);
 
       expect(c.openAPIService.checkChanges).toHaveBeenCalledTimes(2);
@@ -44,7 +46,7 @@ describe('BieEditComponent OpenAPI bindings (#1519)', () => {
     it('has an empty change set when no binding is changed: the server judges the bindings as they are', () => {
       const c = panel([binding(1, 11, {isChanged: false})]);
 
-      expect(c.buildOasChangeSet()).toEqual({operations: [], headers: {upserts: [], removed: []}});
+      expect(c.buildOasChangeSet()).toEqual({operations: [], headers: {upserts: [], removed: []}, added: [], removed: []});
     });
 
     it('does not take an answer to what the bindings were before the user changed them again', () => {

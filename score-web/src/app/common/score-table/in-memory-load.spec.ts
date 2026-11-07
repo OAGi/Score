@@ -41,6 +41,19 @@ describe('inMemoryLoad', () => {
     expect(r.list.map(e => e.name)).toEqual(['d', 'c', 'a', 'b']);
   });
 
+  it('sorts by sortActives/sortDirections of a multi-sort table, the first being the most significant', () => {
+    const rows: Row[] = [{name: 'b', n: 1}, {name: 'a', n: 2}, {name: 'c', n: 1}, {name: 'd', n: 2}];
+    const load = inMemoryLoad<Row>(() => rows);
+    const params = {pageIndex: '0', pageSize: '10'};
+    expect(run(load, {...params, sortActives: 'n,name', sortDirections: 'asc,desc'}).list.map(e => e.name)).toEqual(['c', 'b', 'd', 'a']);
+    expect(run(load, {...params, sortActives: 'n,name', sortDirections: 'desc,asc'}).list.map(e => e.name)).toEqual(['a', 'd', 'b', 'c']);
+  });
+
+  it('keeps the order of the rows when no sort is given', () => {
+    expect(run(inMemoryLoad(() => ROWS), {pageIndex: '0', pageSize: '10', sortActives: '', sortDirections: ''}).list.map(e => e.name))
+      .toEqual(['b', 'a', 'c', 'd']);
+  });
+
   it('keeps the rows that match', () => {
     const load = inMemoryLoad<Row>(() => ROWS, {}, (row, params) => row.name === (params.get('search') ?? row.name));
     const r = run(load, {pageIndex: '0', pageSize: '10', search: 'a'});

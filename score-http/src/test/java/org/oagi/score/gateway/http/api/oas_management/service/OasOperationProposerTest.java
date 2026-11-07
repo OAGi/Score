@@ -109,15 +109,6 @@ class OasOperationProposerTest {
     }
 
     @Test
-    void anOperationIdOfAnotherEndpoint_isAViolation() {
-        when(command.findOperationIdsInOasDoc(any(), eq(Set.of("queryPurchaseOrder")), any())).thenReturn(Set.of("queryPurchaseOrder"));
-
-        OasOperationProposal proposal = proposer.propose(requester, DOC, bie("GET", "Response", false));
-
-        assertEquals("operationId", proposal.violations().get(0).field());
-    }
-
-    @Test
     void aResourceNameThatIsNotAPath_isAViolationOfItsField() {
         OasOperationProposal proposal = proposer.propose(requester, DOC,
                 new OasOperationCandidate(null, null, "GET", "Response", false, "orders", "getOrders"));
@@ -138,14 +129,13 @@ class OasOperationProposerTest {
     }
 
     @Test
-    void anOperationIdThatTwoEndpointsOfTheSameAddWouldHave_isAViolationOfTheLaterOne() {
-        List<OasOperationProposal> proposals = proposer.proposeAll(requester, DOC,
-                List.of(operation("/a/orders", "queryOrder", "Response"), operation("/b/orders", "queryOrder", "Response")));
+    void anOperationIdThatAnotherEndpointHasIsNotSaidHere_theWholeChangeSetIsJudgedByUpdate() {
+        when(command.findOperationIdsInOasDoc(any(), any(), any())).thenReturn(Set.of("queryPurchaseOrder"));
 
-        assertTrue(proposals.get(0).valid());
-        assertEquals(List.of("Operation ID must be unique within the document."),
-                proposals.get(1).violations().stream().map(OasDocViolation::message).toList());
-        assertEquals("operationId", proposals.get(1).violations().get(0).field());
+        OasOperationProposal proposal = proposer.propose(requester, DOC, bie("GET", "Response", false));
+
+        assertTrue(proposal.valid());
+        assertEquals("queryPurchaseOrder", proposal.operationId());
     }
 
     @Test

@@ -4,7 +4,7 @@ import {FormControl} from '@angular/forms';
 import {EMPTY, ReplaySubject, Subject} from 'rxjs';
 import {switchMap, tap} from 'rxjs/operators';
 import {OpenAPIService} from '../../openapi-doc/domain/openapi.service';
-import {AssignBieForOasDoc, BieForOasDoc, OasDoc, OasDocListRequest} from '../../openapi-doc/domain/openapi-doc';
+import {BieForOasDoc, OasDoc, OasDocListRequest} from '../../openapi-doc/domain/openapi-doc';
 import {OasOperationCandidate, OasOperationProposal} from '../../openapi-doc/domain/oas-doc-change';
 import {initFilter} from '../../../common/utility';
 
@@ -103,17 +103,21 @@ export class BieOasDocAddDialogComponent implements OnInit, OnDestroy {
     if (!this.isValid) {
       return;
     }
-    const payload = new AssignBieForOasDoc();
-    payload.oasDocId = this.selectedOasDoc.oasDocId;
-    payload.topLevelAsbiepId = this.data.topLevelAsbiepId;
-    payload.propertyTerm = this.data.propertyTerm;
-    payload.tagName = this.data.propertyTerm;
-    payload.verb = this.verb;
-    payload.messageBody = this.messageBody;
-    payload.oasRequest = this.messageBody === 'Request';
-    payload.arrayIndicator = this.arrayIndicator;
-    payload.suppressRootIndicator = this.suppressRootIndicator;
-    this.dialogRef.close(payload);
+    const row = new BieForOasDoc();
+    row.oasDocId = this.selectedOasDoc.oasDocId;
+    row.oasDocTitle = this.selectedOasDoc.title;
+    row.oasDocVersion = this.selectedOasDoc.version;
+    row.openAPIVersion = this.selectedOasDoc.openAPIVersion;
+    row.topLevelAsbiepId = this.data.topLevelAsbiepId;
+    row.propertyTerm = this.data.propertyTerm;
+    row.tagName = this.data.propertyTerm;
+    row.verb = this.verb;
+    row.messageBody = this.messageBody;
+    row.arrayIndicator = this.arrayIndicator;
+    row.suppressRootIndicator = this.suppressRootIndicator;
+    row.resourceName = this.proposal.resourceName;
+    row.operationId = this.proposal.operationId;
+    this.dialogRef.close(row);
   }
 
   cancel(): void {

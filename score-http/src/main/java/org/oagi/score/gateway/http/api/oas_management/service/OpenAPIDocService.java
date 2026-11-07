@@ -216,7 +216,7 @@ public class OpenAPIDocService {
                 request.getDescriptionForOperation(), request.isDeprecatedForOperation());
         OasOperationId oasOperationId = shell.operationId();
 
-        if (!shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+        if (!request.isOperationIdJudgedLater() && !shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
             assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()),
                     endpointOf(oasOperationId, request.getPath(), request.getVerb()));
         }
@@ -314,7 +314,7 @@ public class OpenAPIDocService {
                 request.getOperationId(), request.getSummary(), request.getDescription(), false);
         OasOperationId oasOperationId = shell.operationId();
 
-        if (!shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+        if (!request.isOperationIdJudgedLater() && !shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
             assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()),
                     endpointOf(oasOperationId, request.getPath(), request.getVerb()));
         }

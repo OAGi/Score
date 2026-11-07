@@ -200,7 +200,7 @@ public class TC_43_12_RequestAndResponseOnOneOperation extends BaseTest {
                 "Editing a row into an existing (path, verb, body) slot should flag a duplicate body");
 
         // The row says that it duplicates a body, and Update is not there until it is changed.
-        assertTrue(fixture.editPage.getRowMessageBodyError(editedSecondRow).contains("Duplicate Request body on this endpoint"),
+        assertTrue(fixture.editPage.getRowMessageBodyError(editedSecondRow).contains("body on this endpoint"),
                 "The row says that the endpoint already has that body");
         assertThrows(TimeoutException.class, () -> fixture.editPage.getUpdateButton(true),
                 "Update is not there while a row duplicates a body");

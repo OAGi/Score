@@ -111,96 +111,68 @@ describe('OasDocAssignDialogComponent shows what the server says of the selectio
   });
 });
 
-describe('OasDocAssignDialogComponent.addBieForOasDoc serialized adds (#1492 Option 2)', () => {
+describe('OasDocAssignDialogComponent.addBieForOasDoc hands the selected BIEs back as rows of the document (#1791)', () => {
   function bie(key: number, propertyTerm: string): any {
     return {topLevelAsbiepId: key, propertyTerm, arrayIndicator: false, suppressRootIndicator: false};
   }
 
-  // Builds a context whose openAPIService records the ORDER of assign POSTs, so we can assert the adds
-  // were serialized (one completes before the next starts) and the dialog closed exactly once at the end.
-  function batchCtx(selected: any[], verbs: any, bodies: any): any {
-    const order: string[] = [];
+  // The dialog saves nothing: the page holds the rows until Update.
+  function batchCtx(selected: any[], verbs: any, bodies: any, proposals: any = {}): any {
     const ctx: any = {
       verbSelection: verbs,
       messageBodySelection: bodies,
+      proposals,
       selection: {selected},
       oasDoc: {oasDocId: 7},
-      assignBieForOasDoc: {},
       snackBar: {open: vi.fn()},
       dialogRef: {close: vi.fn()},
       loading: false,
-      _order: order,
       openAPIService: {
         checkBIEReusedAcrossMultipleOperations: vi.fn().mockReturnValue(of({errorMessages: []})),
-        assignBieForOasDoc: vi.fn().mockImplementation((payload: any) => {
-          order.push('assign:' + payload.propertyTerm);
-          return of({});
-        }),
+        assignBieForOasDoc: vi.fn(),
       },
     };
-    ctx.buildAssignPayload = (OasDocAssignDialogComponent.prototype as any).buildAssignPayload;
+    ctx.draftOf = (OasDocAssignDialogComponent.prototype as any).draftOf;
     ctx.addBieForOasDoc = OasDocAssignDialogComponent.prototype.addBieForOasDoc;
     return ctx;
   }
 
-  it('POSTs each selected BIE and closes the dialog once after ALL complete', () => {
-    const a = bie(1, 'Alpha');
-    const b = bie(2, 'Beta');
-    const ctx = batchCtx([a, b], {1: 'POST', 2: 'PUT'}, {1: 'Request', 2: 'Request'});
+  const closedRows = (ctx: any): any[] => ctx.dialogRef.close.mock.calls[0][0].result.rows;
+
+  it('closes once with a row for each selected BIE, and saves nothing', () => {
+    const ctx = batchCtx([bie(1, 'Alpha'), bie(2, 'Beta')], {1: 'POST', 2: 'PUT'}, {1: 'Request', 2: 'Request'},
+      {1: {resourceName: '/a', operationId: 'createAlpha'}, 2: {resourceName: '/b', operationId: 'replaceBeta'}});
     ctx.addBieForOasDoc();
 
-    // With synchronous `of(...)` sources, concatMap runs them in order to completion before finalize.
-    expect(ctx.openAPIService.assignBieForOasDoc).toHaveBeenCalledTimes(2);
-    expect(ctx._order).toEqual(['assign:Alpha', 'assign:Beta']);
+    expect(ctx.openAPIService.assignBieForOasDoc).not.toHaveBeenCalled();
     expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
-    expect(ctx.snackBar.open).toHaveBeenCalledWith('Added', '', {duration: 3000});
+    expect(closedRows(ctx).map((r: any) => [r.verb, r.messageBody, r.resourceName, r.operationId]))
+      .toEqual([['POST', 'Request', '/a', 'createAlpha'], ['PUT', 'Request', '/b', 'replaceBeta']]);
     expect(ctx.loading).toBe(false);
   });
 
-  it('ADDS both selections that share a property term but are distinct BIEs (different Business Contexts)', () => {
-    // Issue #1492 multi-add fix: two profiles of one ASCCP under different Business Contexts share a DEN /
-    // property term but resolve to different resource paths (the backend derives the path from the Business
-    // Context), so BOTH must be added. (Previously the batch was de-duplicated on the shared property term
-    // and silently added nothing.)
-    const a = bie(1, 'Alpha');
-    const a2 = bie(2, 'Alpha');
-    const ctx = batchCtx([a, a2], {1: 'POST', 2: 'POST'}, {1: 'Request', 2: 'Request'});
+  it('hands back both selections that share a property term but are distinct BIEs (different Business Contexts)', () => {
+    const ctx = batchCtx([bie(1, 'Alpha'), bie(2, 'Alpha')], {1: 'POST', 2: 'POST'}, {1: 'Request', 2: 'Request'});
     ctx.addBieForOasDoc();
 
-    expect(ctx.openAPIService.assignBieForOasDoc).toHaveBeenCalledTimes(2);
-    expect(ctx._order).toEqual(['assign:Alpha', 'assign:Alpha']);
-    expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
-    expect(ctx.snackBar.open).toHaveBeenCalledWith('Added', '', {duration: 3000});
+    expect(closedRows(ctx).map((r: any) => r.topLevelAsbiepId)).toEqual([1, 2]);
   });
 
-  it('skips a BIE flagged by checkBIEReusedAcrossMultipleOperations but still adds the others', () => {
-    const a = bie(1, 'Alpha');
-    const b = bie(2, 'Beta');
-    const ctx = batchCtx([a, b], {1: 'POST', 2: 'PUT'}, {1: 'Request', 2: 'Request'});
+  it('skips a BIE flagged by checkBIEReusedAcrossMultipleOperations but still hands back the others', () => {
+    const ctx = batchCtx([bie(1, 'Alpha'), bie(2, 'Beta')], {1: 'POST', 2: 'PUT'}, {1: 'Request', 2: 'Request'});
     ctx.openAPIService.checkBIEReusedAcrossMultipleOperations = vi.fn().mockImplementation((bieArg: any) =>
       bieArg.propertyTerm === 'Alpha' ? of({errorMessages: ['reused!']}) : of({errorMessages: []}));
     ctx.addBieForOasDoc();
 
-    expect(ctx.openAPIService.assignBieForOasDoc).toHaveBeenCalledTimes(1);
-    expect(ctx._order).toEqual(['assign:Beta']);
+    expect(closedRows(ctx).map((r: any) => r.propertyTerm)).toEqual(['Beta']);
     expect(ctx.snackBar.open).toHaveBeenCalledWith('reused!', '', {duration: 5000});
-    expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
   });
 
-  it('continues past a backend assign error (e.g. 400 dup) and still closes the dialog', () => {
-    const a = bie(1, 'Alpha');
-    const b = bie(2, 'Beta');
-    const ctx = batchCtx([a, b], {1: 'POST', 2: 'PUT'}, {1: 'Request', 2: 'Request'});
-    ctx.openAPIService.assignBieForOasDoc = vi.fn().mockImplementation((payload: any) => {
-      ctx._order.push('assign:' + payload.propertyTerm);
-      return payload.propertyTerm === 'Alpha' ? throwError(() => ({status: 400})) : of({});
-    });
+  it('makes the row a root-suppressed one that is tagged by its property term, as a BIE that is added', () => {
+    const ctx = batchCtx([bie(1, 'Alpha')], {1: 'GET'}, {1: 'Response'});
     ctx.addBieForOasDoc();
 
-    // Alpha errors (swallowed by catchError), Beta still runs; dialog closes once.
-    expect(ctx._order).toEqual(['assign:Alpha', 'assign:Beta']);
-    expect(ctx.dialogRef.close).toHaveBeenCalledTimes(1);
-    // Only Beta succeeded, so "Added" is shown (addedCount > 0).
-    expect(ctx.snackBar.open).toHaveBeenCalledWith('Added', '', {duration: 3000});
+    expect(closedRows(ctx)[0].suppressRootIndicator).toBe(true);
+    expect(closedRows(ctx)[0].tagName).toBe('Alpha');
   });
 });

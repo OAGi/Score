@@ -1,8 +1,7 @@
 import {Component, Inject, inject, OnDestroy, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {OpenAPIService} from '../domain/openapi.service';
-import {AddOperationForOasDoc, OasDoc} from '../domain/openapi-doc';
+import {AddOperationForOasDoc, BieForOasDoc, OasDoc} from '../domain/openapi-doc';
 import {OasOperationProposal} from '../domain/oas-doc-change';
 import {of, Subject} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
@@ -22,7 +21,6 @@ import {debounceTime, switchMap} from 'rxjs/operators';
 export class OasDocAddOperationDialogComponent implements OnDestroy {
   private dialogRef = inject(MatDialogRef<OasDocAddOperationDialogComponent>);
   private openAPIService = inject(OpenAPIService);
-  private snackBar = inject(MatSnackBar);
 
   oasDoc: OasDoc;
   operation: AddOperationForOasDoc = new AddOperationForOasDoc();
@@ -106,17 +104,24 @@ export class OasDocAddOperationDialogComponent implements OnDestroy {
     this.dialogRef.close(false);
   }
 
+  /** The operation is made into a row of the document that the page holds; it is saved by Update (the page presses it when it can be saved). */
   add() {
     if (!this.isValid || this.isWorking) {
       return;
     }
-    this.isWorking = true;
-    this.openAPIService.addOperationForOasDoc(this.operation).subscribe(_ => {
-      this.snackBar.open('Operation added', '', {duration: 3000});
-      this.dialogRef.close(true);
-    }, err => {
-      this.isWorking = false;
-      this.snackBar.open(err?.headers?.get('x-error-message') || 'Failed to add the operation.', '', {duration: 5000});
-    });
+    const row = new BieForOasDoc();
+    row.oasDocId = this.oasDoc.oasDocId;
+    row.verb = this.operation.verb;
+    row.messageBody = this.operation.messageBody;
+    row.resourceName = this.operation.resourceName;
+    row.operationId = this.operation.operationId;
+    row.tagName = this.operation.tagName || '';
+    row.httpStatusCode = this.operation.httpStatusCode;
+    row.summary = this.operation.summary;
+    row.description = this.operation.description;
+    // an operation without a BIE has no name to make: what the user gave is what the server is told
+    row.touch('resourceName');
+    row.touch('operationId');
+    this.dialogRef.close({rows: [row]});
   }
 }

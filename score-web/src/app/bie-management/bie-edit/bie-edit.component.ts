@@ -98,6 +98,12 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 import {BieStatusDecorator} from '../domain/bie-tree-decorators';
 
 
+/**
+ * Adding or removing a binding is saved at once when the server says that it can be (as it always was). Set to `false` to leave saving
+ * it to the user: it is then saved by Update like any other change.
+ */
+const UPDATE_OAS_AFTER_ADD = true;
+
 @Component({
   standalone: false,
   selector: 'score-bie-edit',
@@ -3233,7 +3239,8 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   private oasLastFingerprint = '';
 
   private oasFingerprint(): string {
-    return hashCode(this.oasBindings.filter(b => b.isChanged).map(b => [b.oasOperationId, b.messageBody, b.hashCode]));
+    return hashCode([this.oasBindings.filter(b => b.isChanged).map(b => [b.rowId, b.messageBody, b.hashCode, b.touched]),
+      this.removedOasBindings.map(b => [b.rowId, b.messageBody])]);
   }
 
   /** Asks the server whenever the user has changed a binding. */
@@ -3246,6 +3253,38 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       this.oasLastFingerprint = fingerprint;
       this.oasChecker.request();
     }
+    this.updateOasAfterAdd();
+  }
+
+  /** The bindings that the user removed: they are removed by Update, as what is added is added by it. */
+  removedOasBindings: BieForOasDoc[] = [];
+  private oasUpdateAfterAddPending = false;
+  /** What is said when the page presses Update by itself, in place of what Update says. */
+  private oasUpdateMessage: string | undefined;
+  private oasKeySequence = 0;
+
+  /**
+   * Adding or removing a binding is not saved before Update. So that it is as it always was (it is there at once), Update is pressed
+   * by the page when the server says that what was added or removed can be saved; when it cannot, the rows stay in the panel with what
+   * is wrong where it is. Set {@code UPDATE_OAS_AFTER_ADD} to false to leave it to the user.
+   */
+  private updateOasAfterAdd(): void {
+    if (!this.oasUpdateAfterAddPending) {
+      return;
+    }
+    switch (this.oasChecker.status()) {
+      case 'valid':
+        this.oasUpdateAfterAddPending = false;
+        this.updateOasDocInformation();
+        break;
+      case 'invalid':
+      case 'failed':
+        this.oasUpdateAfterAddPending = false;
+        this.snackBar.open('It cannot be saved as it is. Fix what is marked, then click Update.', '', {duration: 5000});
+        break;
+      default:
+        break;
+    }
   }
 
   ngOnDestroy(): void {
@@ -3254,6 +3293,7 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
 
   /** The bindings are loaded or saved: there is nothing changed, and nothing to wait for. */
   private resetOasChanges(): void {
+    this.removedOasBindings = [];
     this.oasChecker.reset();
     this.oasLastFingerprint = this.oasFingerprint();
     this.oasChecker.request(); // the bindings as they are, saved or not, are judged when they are shown
@@ -3262,24 +3302,38 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   /** What the user has changed of the bindings: nothing, when they are just shown (the server judges them as they are). */
   private buildOasChangeSet(): OasDocChangeSet {
     this.oasCheckedFingerprint = this.oasFingerprint();
-    return {operations: this.oasBindings.filter(b => b.isChanged), headers: {upserts: [], removed: []}};
+    return {
+      operations: this.oasBindings.filter(b => b.isChanged && !b.isNew), headers: {upserts: [], removed: []},
+      added: this.oasBindings.filter(b => b.isNew), removed: this.removedOasBindings
+    };
+  }
+
+  /** The change set of one document: a binding is of one document. */
+  private oasChangeSetOf(oasDocId: number): OasDocChangeSet {
+    return {
+      operations: this.oasBindings.filter(b => b.oasDocId === oasDocId && b.isChanged && !b.isNew), headers: {upserts: [], removed: []},
+      added: this.oasBindings.filter(b => b.oasDocId === oasDocId && b.isNew),
+      removed: this.removedOasBindings.filter(b => b.oasDocId === oasDocId)
+    };
+  }
+
+  private oasDocIds(): number[] {
+    return [...new Set([...this.oasBindings, ...this.removedOasBindings].map(b => b.oasDocId))];
   }
 
   /** One check for each document that a binding is of, with the changes of the bindings of it. */
   private checkOasBindings(changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
-    const byDocument = new Map<number, BieForOasDoc[]>();
-    this.oasBindings.forEach(b => byDocument.set(b.oasDocId, []));
-    changeSet.operations.forEach(b => byDocument.set(b.oasDocId, [...(byDocument.get(b.oasDocId) || []), b]));
-    if (byDocument.size === 0) {
+    const oasDocIds = this.oasDocIds();
+    if (oasDocIds.length === 0) {
       return of({valid: true, violations: [], httpHeaders: [], operations: []});
     }
-    return forkJoin([...byDocument].map(([oasDocId, operations]) =>
-      this.openAPIService.checkChanges(oasDocId, {operations, headers: {upserts: [], removed: []}}))).pipe(
+    return forkJoin(oasDocIds.map(oasDocId => this.openAPIService.checkChanges(oasDocId, this.oasChangeSetOf(oasDocId)))).pipe(
       map(results => ({
         valid: results.every(result => result.valid),
         violations: results.flatMap(result => result.violations || []),
         httpHeaders: [],
-        operations: results.flatMap(result => result.operations || [])
+        operations: results.flatMap(result => result.operations || []),
+        added: results.flatMap(result => result.added || [])
       })));
   }
 
@@ -3287,7 +3341,7 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
     if (this.oasFingerprint() !== this.oasCheckedFingerprint) {
       return false; // the user changed it again: another question is on its way
     }
-    applyDerivedOperations(result.operations, changeSet.operations);
+    applyDerivedOperations(result.operations, [...changeSet.operations, ...(changeSet.added || [])], result.added);
     this.oasLastFingerprint = this.oasFingerprint(); // the answer is not a change of the user's
     return true;
   }
@@ -3295,7 +3349,8 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   /** What the server said is wrong with a cell of a binding. */
   private oasViolationOf(b: BieForOasDoc, field: string): OasDocViolation | undefined {
     return this.oasChecker.violations().find(violation => violation.scope === 'OPERATION'
-      && violation.oasOperationId === b.oasOperationId && violation.field === field
+      && (b.isNew ? violation.clientKey === b.clientKey : !violation.clientKey && violation.oasOperationId === b.oasOperationId)
+      && violation.field === field
       && (!violation.messageBody || violation.messageBody === b.messageBody));
   }
 
@@ -3330,7 +3385,7 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   }
 
   hasOasChanges(): boolean {
-    return this.oasBindings.some(b => b.isChanged);
+    return this.oasBindings.some(b => b.isChanged) || this.removedOasBindings.length > 0;
   }
 
   /** Update is not there while an Operation ID is blank, or until the server has said that what is changed can be saved. */
@@ -3371,21 +3426,13 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       if (!result) {
         return;
       }
-      const request = new BieForOasDocDeleteRequest();
-      request.oasDocId = b.oasDocId;
-      request.bieForOasDocList = [b];
-      this.loading = true;
-      this.openAPIService.removeBieForOasDoc(request).pipe(finalize(() => this.loading = false)).subscribe({
-        next: () => {
-          this.snackBar.open('Removed from OpenAPI Document.', '', {duration: 3000});
-          this.reloadOasBindings();
-        },
-        error: (err: HttpErrorResponse) => {
-          const message = (err && err.error && err.error.message)
-            ? err.error.message : 'Failed to remove from OpenAPI Document.';
-          this.snackBar.open(message, '', {duration: 5000});
-        }
-      });
+      // Not saved before Update: a binding that was added is gone, a binding of the document is removed by Update.
+      if (!b.isNew) {
+        this.removedOasBindings = [...this.removedOasBindings, b];
+      }
+      this.rootNode.bieForOasDocList = this.oasBindings.filter(binding => binding !== b);
+      this.oasUpdateMessage = 'Removed from OpenAPI Document.';
+      this.oasUpdateAfterAddPending = UPDATE_OAS_AFTER_ADD;
     });
   }
 
@@ -3401,7 +3448,10 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       return;
     }
     const bindings = this.oasBindings;
-    const changedDocIds = Array.from(new Set(bindings.filter(b => b.isChanged).map(b => b.oasDocId)));
+    const changedDocIds = this.oasDocIds().filter(oasDocId => {
+      const changeSet = this.oasChangeSetOf(oasDocId);
+      return changeSet.operations.length + changeSet.added.length + changeSet.removed.length > 0;
+    });
     if (changedDocIds.length === 0) {
       return;
     }
@@ -3409,13 +3459,9 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
     // A document that fails keeps its in-memory edits (so the user can correct and retry just that one)
     // while documents that did persist are marked clean; the panel only fully reloads when all succeeded.
     const requests = changedDocIds.map(oasDocId => {
-      const request = new BieForOasDocUpdateRequest();
-      request.oasDocId = oasDocId;
-      // Send only the changed rows of this document, exactly as the OpenAPI Document editor does (so an
-      // unchanged operation's per-op security/error response is never needlessly re-persisted). Cross-row
-      // the server checks them (hasOasErrors).
-      request.bieForOasDocList = bindings.filter(b => b.oasDocId === oasDocId && b.isChanged);
-      return this.openAPIService.saveChanges(oasDocId, {operations: request.bieForOasDocList, headers: {upserts: [], removed: []}}).pipe(
+      // Send only what was changed of this document, exactly as the OpenAPI Document editor does (so an unchanged operation's
+      // per-op security/error response is never needlessly re-persisted). The server checks them again as it saves.
+      return this.openAPIService.saveChanges(oasDocId, this.oasChangeSetOf(oasDocId)).pipe(
         map(() => ({oasDocId, ok: true, error: null as HttpErrorResponse})),
         catchError((error: HttpErrorResponse) => of({oasDocId, ok: false, error}))
       );
@@ -3424,7 +3470,8 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
     forkJoin(requests).pipe(finalize(() => this.loading = false)).subscribe(resultsByDoc => {
       const failures = resultsByDoc.filter(r => !r.ok);
       if (failures.length === 0) {
-        this.snackBar.open('Updated OpenAPI Document information.', '', {duration: 3000});
+        this.snackBar.open(this.oasUpdateMessage ?? 'Updated OpenAPI Document information.', '', {duration: 3000});
+        this.oasUpdateMessage = undefined;
         this.reloadOasBindings();
         return;
       }
@@ -3451,22 +3498,15 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       propertyTerm: this.rootNode.name
     };
     this.dialog.open(BieOasDocAddDialogComponent, dialogConfig).afterClosed()
-      .subscribe((payload: AssignBieForOasDoc) => {
-        if (!payload) {
+      .subscribe((row: BieForOasDoc) => {
+        if (!row) {
           return;
         }
-        this.loading = true;
-        this.openAPIService.assignBieForOasDoc(payload).pipe(finalize(() => this.loading = false)).subscribe({
-          next: () => {
-            this.snackBar.open('Added to OpenAPI Document.', '', {duration: 3000});
-            this.reloadOasBindings();
-          },
-          error: (err: HttpErrorResponse) => {
-            const message = (err && err.error && err.error.message)
-              ? err.error.message : 'Failed to add to OpenAPI Document.';
-            this.snackBar.open(message, '', {duration: 5000});
-          }
-        });
+        // Not saved before Update: the binding is in the panel, and Update is pressed when the server says that it can be saved.
+        row.clientKey = 'new-' + (++this.oasKeySequence);
+        this.rootNode.bieForOasDocList = [...this.oasBindings, row];
+        this.oasUpdateMessage = 'Added to OpenAPI Document.';
+        this.oasUpdateAfterAddPending = UPDATE_OAS_AFTER_ADD;
       });
   }
 
