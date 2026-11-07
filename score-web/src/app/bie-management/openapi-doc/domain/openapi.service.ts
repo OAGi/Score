@@ -12,6 +12,7 @@ import {
   ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
+import {OasDocChangeResult, OasDocChangeSet} from './oas-doc-change';
 import {PageRequest, PageResponse} from '../../../basis/basis';
 import {ReleaseSummary} from '../../../release-management/domain/release';
 
@@ -136,6 +137,39 @@ export class OpenAPIService {
       // Issue #1791: undefined (not sent) keeps the HTTP headers of the document as they are; [] removes them.
       httpHeaders: oasDoc.httpHeaders
     });
+  }
+
+  // What the user has changed of the document, as a whole: the server checks whether it can be saved, and saves it. The check
+  // keeps nothing; a save is all of it or nothing, and a refusal (400) has the same answer as a check, with what is wrong.
+  checkChanges(oasDocId: number, changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
+    return this.http.post<OasDocChangeResult>('/api/oas_doc/' + oasDocId + '/changes/check', this.changeSetJson(changeSet));
+  }
+
+  saveChanges(oasDocId: number, changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
+    return this.http.put<OasDocChangeResult>('/api/oas_doc/' + oasDocId + '/changes', this.changeSetJson(changeSet));
+  }
+
+  private changeSetJson(changeSet: OasDocChangeSet): any {
+    const oasDoc = changeSet.document;
+    return {
+      document: oasDoc ? {
+        oasDocId: oasDoc.oasDocId,
+        title: oasDoc.title,
+        openAPIVersion: oasDoc.openAPIVersion,
+        version: oasDoc.version,
+        licenseName: oasDoc.licenseName,
+        description: oasDoc.description,
+        termsOfService: oasDoc.termsOfService,
+        contactName: oasDoc.contactName,
+        contactUrl: oasDoc.contactUrl,
+        contactEmail: oasDoc.contactEmail,
+        licenseUrl: oasDoc.licenseUrl,
+        securitySchemes: oasDoc.securitySchemes,
+        securityRequirements: oasDoc.securityRequirements
+      } : null,
+      operations: changeSet.operations.map(operation => operation.json),
+      headers: changeSet.headers
+    };
   }
 
   checkUniqueness(oasDoc: OasDoc): Observable<any> {

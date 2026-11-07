@@ -7,6 +7,8 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateB
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.UpdateBieForOasDocResponse;
 import org.oagi.score.gateway.http.api.oas_management.model.BieForOasDoc;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocId;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolation;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolationException;
 import org.oagi.score.gateway.http.api.oas_management.model.OasOperationId;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
@@ -151,5 +153,39 @@ class OpenAPIDocServiceOperationIdUpdateTest {
         service.updateDetails(requester, request(row(OP_1, "createOrder", "Request", "/orders", "POST")));
 
         verify(command).findOperationIdsInOasDoc(OAS_DOC_ID, Set.of("createOrder"), Set.of(OP_1, twin));
+    }
+
+    @Test
+    void anOperationIdOnTwoEndpoints_saysWhichOperationsHaveIt() {
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> service.updateDetails(requester, request(
+                        row(OP_1, "createOrder", "Request", "/orders", "POST"),
+                        row(OP_2, "createOrder", "Response", "/orders", "PUT"))));
+
+        assertEquals(List.of(OP_1.value(), OP_2.value()),
+                e.violations().stream().map(OasDocViolation::oasOperationId).toList());
+        assertTrue(e.violations().stream().allMatch(v -> "operationId".equals(v.field())));
+    }
+
+    @Test
+    void aBodyThatAnOperationOfAnotherPageAlreadyHas_isRefusedAtTheRow() {
+        OasOperationId otherPage = new OasOperationId(BigInteger.valueOf(99));
+        when(command.findOperationsWithBodyAtEndpoint(OAS_DOC_ID, "/orders", "POST", true)).thenReturn(Set.of(otherPage));
+
+        OasDocViolationException e = assertThrows(OasDocViolationException.class,
+                () -> service.updateDetails(requester, request(row(OP_1, "createOrder", "Request", "/orders", "POST"))));
+
+        assertEquals(OP_1.value(), e.violations().get(0).oasOperationId());
+        assertEquals("messageBody", e.violations().get(0).field());
+        verify(bieForOasDocCommand, never()).updateBieForOasDoc(any());
+    }
+
+    @Test
+    void theBodyOfTheOperationThatIsBeingChanged_isNotAConflict() {
+        when(command.findOperationsWithBodyAtEndpoint(OAS_DOC_ID, "/orders", "POST", true)).thenReturn(Set.of(OP_1));
+
+        service.updateDetails(requester, request(row(OP_1, "createOrder", "Request", "/orders", "POST")));
+
+        verify(bieForOasDocCommand).updateBieForOasDoc(any());
     }
 }

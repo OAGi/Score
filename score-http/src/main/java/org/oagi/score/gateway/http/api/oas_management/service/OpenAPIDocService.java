@@ -454,7 +454,7 @@ public class OpenAPIDocService {
             Object identity = (endpoint != null) ? endpoint : entry.getKey();
             Object previous = endpointOfOperationId.putIfAbsent(entry.getValue(), identity);
             if (previous != null && !previous.equals(identity)) {
-                throw operationIdInUse(entry.getValue());
+                throw operationIdInUse(entry.getValue(), targetsOf(operationIds, entry.getValue()));
             }
             seen.add(entry.getValue());
         }
@@ -466,13 +466,52 @@ public class OpenAPIDocService {
         }
         Set<String> used = command.findOperationIdsInOasDoc(oasDocId, seen, excluded);
         if (!used.isEmpty()) {
-            throw operationIdInUse(used.iterator().next());
+            String operationId = used.iterator().next();
+            throw operationIdInUse(operationId, targetsOf(operationIds, operationId));
         }
     }
 
-    private static IllegalArgumentException operationIdInUse(String operationId) {
-        return new IllegalArgumentException("The operation ID '" + operationId
-                + "' is already used by another operation of the document.");
+    /** The operations being added or changed that have the operationId. */
+    private static List<OasOperationId> targetsOf(Map<OasOperationId, String> operationIds, String operationId) {
+        return operationIds.entrySet().stream().filter(e -> operationId.equals(e.getValue())).map(Map.Entry::getKey).toList();
+    }
+
+    /** The violation says which operations have the operationId, so that the client shows it there. */
+    private static OasDocViolationException operationIdInUse(String operationId, List<OasOperationId> targets) {
+        String message = "The operation ID '" + operationId + "' is already used by another operation of the document.";
+        if (targets.isEmpty()) {
+            return new OasDocViolationException(OasDocViolation.of(OasDocViolation.Scope.OPERATION, message));
+        }
+        return new OasDocViolationException(targets.stream()
+                .map(target -> OasDocViolation.ofOperation(target.value(), "operationId", message)).toList());
+    }
+
+    /**
+     * An operation (a verb on a path) has at most one Request body and one Response body. The rows being changed are
+     * checked against each other where they are saved; this is the check against the operations of the document that
+     * are left as they are, which may be on another page of the client.
+     */
+    private void assertBodySlotsAvailable(OasDocCommandRepository command, OasDocId oasDocId, UpdateBieForOasDocRequest request) {
+        Set<OasOperationId> submitted = new HashSet<>(submittedOperationIds(request).keySet());
+        if (request.getBieForOasDocList() == null) {
+            return;
+        }
+        for (BieForOasDoc row : request.getBieForOasDocList()) {
+            Endpoint endpoint = (row == null) ? null : Endpoint.of(row.getResourceName(), row.getVerb());
+            boolean isRequest = row != null && "Request".equals(row.getMessageBody());
+            if (endpoint == null || !(isRequest || "Response".equals(row.getMessageBody()))) {
+                continue;
+            }
+            Set<OasOperationId> others = new HashSet<>(command.findOperationsWithBodyAtEndpoint(
+                    oasDocId, endpoint.path(), endpoint.verb(), isRequest));
+            others.removeAll(submitted);
+            if (!others.isEmpty()) {
+                throw new OasDocViolationException(new OasDocViolation(OasDocViolation.Scope.OPERATION,
+                        row.getOasOperationId() == null ? null : row.getOasOperationId().value(), row.getMessageBody(),
+                        "messageBody", "This operation (" + endpoint.verb() + " " + endpoint.path() + ") already has a "
+                        + row.getMessageBody() + " body. An operation can have at most one Request and one Response body."));
+            }
+        }
     }
 
     /**
@@ -839,6 +878,7 @@ public class OpenAPIDocService {
 
         assertOperationIdsAvailable(command(requester), request.getOasDocId(), submittedOperationIds(request),
                 submittedEndpoints(request));
+        assertBodySlotsAvailable(command(requester), request.getOasDocId(), request);
 
         UpdateBieForOasDocResponse response =
                 bieForOasDocCommand(requester).updateBieForOasDoc(request);

@@ -8,6 +8,8 @@ import org.oagi.score.gateway.http.api.context_management.business_context.servi
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
+import org.oagi.score.gateway.http.api.oas_management.service.OasDocChangeService;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolationException;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.*;
@@ -39,6 +41,9 @@ public class OpenAPIDocController {
 
     @Autowired
     private OpenAPIDocService oasDocService;
+
+    @Autowired
+    private OasDocChangeService oasDocChangeService;
 
     @Autowired
     private BusinessContextQueryService businessContextQueryService;
@@ -683,6 +688,33 @@ public class OpenAPIDocController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Whether what the user has changed of the document can be saved, and what the document would have then (the request
+     * parameters and response headers, those registered for the operations included). Nothing is saved.
+     */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/changes/check", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public OasDocChangeResult checkChanges(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasDocChangeSet changeSet) {
+        return oasDocChangeService.check(sessionService.asScoreUser(user), oasDocId, changeSet);
+    }
+
+    /** Saves what the user has changed of the document, all of it or nothing. The rules are those of the check. */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/changes", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OasDocChangeResult> saveChanges(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasDocChangeSet changeSet) {
+        try {
+            return ResponseEntity.ok(oasDocChangeService.save(sessionService.asScoreUser(user), oasDocId, changeSet));
+        } catch (OasDocViolationException e) {
+            return ResponseEntity.badRequest().body(OasDocChangeResult.invalid(e.violations()));
         }
     }
 

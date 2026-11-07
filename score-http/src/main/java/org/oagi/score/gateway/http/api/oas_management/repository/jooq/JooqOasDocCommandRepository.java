@@ -477,6 +477,25 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
+    public List<OasDocHttpHeader> applyHeaderChanges(OasDocId oasDocId, OasDocChangeSet.HeaderChanges changes) {
+        return OasDocHttpHeaderStore.applyChanges(dslContext(), valueOf(oasDocId), changes.upsertsOrEmpty(),
+                changes.removedOrEmpty(), ULong.valueOf(requester().userId().value()), LocalDateTime.now());
+    }
+
+    @Override
+    public Map<OasOperationId, String> findResolvedOperationPaths(OasDocId oasDocId) {
+        String documentVersion = dslContext().select(OAS_DOC.VERSION).from(OAS_DOC)
+                .where(OAS_DOC.OAS_DOC_ID.eq(valueOf(oasDocId))).fetchOne(OAS_DOC.VERSION);
+        Map<OasOperationId, String> paths = new java.util.LinkedHashMap<>();
+        dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_RESOURCE.PATH).from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_RESOURCE.OAS_RESOURCE_ID.eq(OAS_OPERATION.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .fetch().forEach(row -> paths.put(new OasOperationId(row.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger()),
+                        OasResourcePaths.resolve(row.get(OAS_RESOURCE.PATH), documentVersion)));
+        return paths;
+    }
+
+    @Override
     public boolean operationHasBody(OasOperationId oasOperationId, boolean isRequest) {
         if (oasOperationId == null) {
             return false;
@@ -530,6 +549,25 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
                         .and(OAS_RESOURCE.PATH.eq(path))
                         .and(OAS_OPERATION.VERB.eq(verb)))
+                .fetch(OAS_OPERATION.OAS_OPERATION_ID).stream()
+                .map(id -> new OasOperationId(id.toBigInteger()))
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
+    public Set<OasOperationId> findOperationsWithBodyAtEndpoint(OasDocId oasDocId, String path, String verb, boolean isRequest) {
+        if (oasDocId == null || path == null || verb == null) {
+            return Set.of();
+        }
+        var body = isRequest ? OAS_REQUEST.OAS_OPERATION_ID : OAS_RESPONSE.OAS_OPERATION_ID;
+        return dslContext().selectDistinct(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                        .and(OAS_RESOURCE.PATH.eq(path))
+                        .and(OAS_OPERATION.VERB.eq(verb))
+                        .and(OAS_OPERATION.OAS_OPERATION_ID.in(
+                                dslContext().select(body).from(isRequest ? OAS_REQUEST : OAS_RESPONSE))))
                 .fetch(OAS_OPERATION.OAS_OPERATION_ID).stream()
                 .map(id -> new OasOperationId(id.toBigInteger()))
                 .collect(java.util.stream.Collectors.toSet());

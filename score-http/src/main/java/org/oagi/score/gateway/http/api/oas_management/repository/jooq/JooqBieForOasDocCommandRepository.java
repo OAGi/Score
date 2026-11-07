@@ -433,9 +433,13 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
             String pathVerb = resourceName + "|" + verb;
             String bodySlot = pathVerb + "|" + messageBody;
             if (!seenBodySlots.add(bodySlot)) {
-                throw new IllegalArgumentException(
-                        "This operation (" + verb.toUpperCase() + " " + resourceName + ") already has a "
-                                + messageBody + " body. An operation can have at most one Request and one Response body.");
+                throw new org.oagi.score.gateway.http.api.oas_management.model.OasDocViolationException(
+                        new org.oagi.score.gateway.http.api.oas_management.model.OasDocViolation(
+                                org.oagi.score.gateway.http.api.oas_management.model.OasDocViolation.Scope.OPERATION,
+                                bieForOasDoc.getOasOperationId() == null ? null : bieForOasDoc.getOasOperationId().value(),
+                                messageBody, "messageBody",
+                                "This operation (" + verb.toUpperCase() + " " + resourceName + ") already has a "
+                                        + messageBody + " body. An operation can have at most one Request and one Response body."));
             }
         }
     }

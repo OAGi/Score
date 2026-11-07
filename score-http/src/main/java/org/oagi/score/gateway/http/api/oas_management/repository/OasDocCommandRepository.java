@@ -7,6 +7,8 @@ import org.oagi.score.gateway.http.api.oas_management.repository.criteria.*;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface OasDocCommandRepository {
@@ -59,6 +61,16 @@ public interface OasDocCommandRepository {
     void reconcileOperationParameters(OasOperationId oasOperationId, OasOperationParameterState before,
                                       org.oagi.score.gateway.http.api.account_management.model.UserId userId);
 
+    /**
+     * Apply what the user added, changed and deleted of the request parameters and response headers of the document; the
+     * entries that the system registered for the operations are those that are there when this is called. Returns the
+     * request parameters and response headers that the document has then.
+     */
+    List<OasDocHttpHeader> applyHeaderChanges(OasDocId oasDocId, OasDocChangeSet.HeaderChanges changes);
+
+    /** The path of each operation of the document, with the {@code {version}} of the path as the version of the document. */
+    Map<OasOperationId, String> findResolvedOperationPaths(OasDocId oasDocId);
+
     /** Issue #1492: the existing resource id for {@code (oasDocId, path)}, or null. */
     OasResourceId findOasResourceId(OasDocId oasDocId, String path);
 
@@ -79,6 +91,12 @@ public interface OasDocCommandRepository {
      * operation rows; they are one OpenAPI operation and so share an operationId.
      */
     Set<OasOperationId> findOasOperationIdsAtEndpoint(OasDocId oasDocId, String path, String verb);
+
+    /**
+     * The operations of the document that own a Request body ({@code isRequest}) or a Response body on the endpoint, i.e. whose
+     * resource has the given path and which have the given verb.
+     */
+    Set<OasOperationId> findOperationsWithBodyAtEndpoint(OasDocId oasDocId, String path, String verb, boolean isRequest);
 
     OasTagId insertOasTag(InsertOasTagArguments arguments);
 

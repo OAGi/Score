@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.oas_management.repository.jooq;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocChangeSet;
 import org.oagi.score.gateway.http.api.oas_management.model.OasDocHttpHeader;
 import org.oagi.score.gateway.http.api.oas_management.model.OasJson;
 import org.oagi.score.gateway.http.api.oas_management.model.OasSchema;
@@ -44,6 +45,53 @@ final class OasDocHttpHeaderStore {
             }
             insert(dslContext, oasDocId, header, requesterId, timestamp);
         }
+    }
+
+    /**
+     * Apply what was changed in the headers of the document (see {@link #merge}). Returns the headers the document has then.
+     */
+    static List<OasDocHttpHeader> applyChanges(DSLContext dslContext, ULong oasDocId,
+                                               List<OasDocHttpHeader> upserts, List<OasDocChangeSet.HeaderKey> removed,
+                                               ULong requesterId, LocalDateTime timestamp) {
+        List<OasDocHttpHeader> current = load(dslContext, oasDocId);
+        if (upserts.isEmpty() && removed.isEmpty()) {
+            return current;
+        }
+        save(dslContext, oasDocId, merge(current, upserts, removed), requesterId, timestamp);
+        return load(dslContext, oasDocId);
+    }
+
+    /**
+     * The headers that are left when the removed ones are taken out and the upserted ones put in: an upserted header takes
+     * the place of the one with its key, or is added at the end.
+     */
+    static List<OasDocHttpHeader> merge(List<OasDocHttpHeader> current, List<OasDocHttpHeader> upserts,
+                                        List<OasDocChangeSet.HeaderKey> removed) {
+        Set<OasDocChangeSet.HeaderKey> removedKeys = new LinkedHashSet<>(removed);
+        List<OasDocHttpHeader> result = new ArrayList<>();
+        for (OasDocHttpHeader header : current) {
+            if (!removedKeys.contains(OasDocChangeSet.HeaderKey.of(header))) {
+                result.add(header);
+            }
+        }
+        for (OasDocHttpHeader upsert : upserts) {
+            if (upsert == null || upsert.getDirection() == null) {
+                continue;
+            }
+            OasDocChangeSet.HeaderKey key = OasDocChangeSet.HeaderKey.of(upsert);
+            int at = -1;
+            for (int i = 0; i < result.size() && at < 0; i++) {
+                if (OasDocChangeSet.HeaderKey.of(result.get(i)).equals(key)) {
+                    at = i;
+                }
+            }
+            if (at >= 0) {
+                result.set(at, upsert);
+            } else {
+                result.add(upsert);
+            }
+        }
+        return result;
     }
 
     /** Add one header to the document, or to its operation when the header has one. */

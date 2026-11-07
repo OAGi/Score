@@ -3,6 +3,9 @@ import {of, throwError} from 'rxjs';
 import {OasDocDetailComponent} from './oas-doc-detail.component';
 import {OasOperationValidator} from '../domain/oas-operation-validation';
 import {hashCode} from '../../../common/utility';
+import {EditedRows} from '../../../common/score-table';
+import {OasDocHeaderEdits} from '../domain/oas-doc-change';
+import {OasDocChangeChecker} from '../domain/oas-doc-change-checker';
 import {FormControl} from '@angular/forms';
 import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {linkHeadersToRows} from '../domain/oas-doc-http-header-preset';
@@ -335,8 +338,7 @@ describe('OasDocDetailComponent document-level "apply to all" error response (#1
                    opts: {dialogResult?: any; changed?: boolean; changedRows?: any[]; releases?: any[]} = {}): any {
     const svc: any = {
       applyErrorResponseBodyTypeToAll: vi.fn(() => of(null)),
-      updateDetails: vi.fn(() => of(null)),
-      updateOasDoc: vi.fn(() => of(null)),
+      saveChanges: vi.fn(() => of({valid: true, violations: [], httpHeaders: []})),
       getOasDoc: vi.fn(() => of(null)),
     };
     const oasDoc = {oasDocId: 7};
@@ -352,10 +354,13 @@ describe('OasDocDetailComponent document-level "apply to all" error response (#1
       dialog: {open: vi.fn(() => ({afterClosed: () => of(opts.dialogResult)}))},
       isChanged: () => !!opts.changed,
       getChanged: () => (opts.changed ? (opts.changedRows || []) : []),
-      recomputeOasValidation: vi.fn(),
-      oasValidator: {duplicateBodySlots: new Set()},
-      // no doc-level change -> persist takes the details-only branch
-      hashCodeForOasDoc: hashCode(oasDoc),
+      // the server has said that what is changed can be saved
+      updateDisabled: false,
+      changeChecker: {status: () => 'valid', violations: () => []},
+      buildChangeSet: () => ({operations: opts.changedRows || [], headers: {upserts: [], removed: []}}),
+      saveChanges: OasDocDetailComponent.prototype['saveChanges'],
+      reloadAfterSave: (then: () => void) => then(),
+      cannotSaveMessage: OasDocDetailComponent.prototype['cannotSaveMessage'],
       loadBieListForOasDoc: vi.fn(),
       fetchAllOasDocReleasesThen: vi.fn((done: (releases: any[]) => void) => done(opts.releases || [])),
       bulkBodyTypeLabel: OasDocDetailComponent.prototype['bulkBodyTypeLabel'],
@@ -418,113 +423,264 @@ describe('OasDocDetailComponent document-level "apply to all" error response (#1
     expect(ctx.loadBieListForOasDoc).toHaveBeenCalled();
   });
 
-  it('persists unsaved inline edits BEFORE the bulk apply', () => {
+  it('saves the change set BEFORE the bulk apply', () => {
     const ctx = bulkCtx('PROBLEM_DETAILS', [{oasOperationId: 1, releaseId: 5, errorResponseBodyType: 'NONE'}],
       {changed: true, changedRows: [{operationId: 'queryThing'}]});
     ctx.applyErrorResponseBodyTypeToAll();
-    // details saved first, then the bulk apply, then reload
-    expect(ctx.openAPIService.updateDetails).toHaveBeenCalledTimes(1);
+    expect(ctx.openAPIService.saveChanges).toHaveBeenCalledTimes(1);
     expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll).toHaveBeenCalledTimes(1);
-    const saveOrder = ctx.openAPIService.updateDetails.mock.invocationCallOrder[0];
+    const saveOrder = ctx.openAPIService.saveChanges.mock.invocationCallOrder[0];
     const bulkOrder = ctx.openAPIService.applyErrorResponseBodyTypeToAll.mock.invocationCallOrder[0];
     expect(saveOrder).toBeLessThan(bulkOrder);
   });
-});
 
-describe('OasDocDetailComponent.doUpdate gates duplicate body slots (#1492 Option 2)', () => {
-  function updateCtx(rows: any[], changed: any[]): any {
-    const oasDoc = {oasDocId: 1};
-    const ctx: any = {
-      rows,
-      // The duplicate-body gate now lives in the shared validator (delegated to by recomputeOasValidation).
-      oasValidator: new OasOperationValidator(),
-      // Match the baseline so docChanged is false; with no changed rows, doUpdate returns after the gate.
-      hashCodeForOasDoc: hashCode(oasDoc),
-      oasDoc,
-      snackBar: {open: vi.fn()},
-      getChanged: () => changed,
-      updateDetails: vi.fn(),
-    };
-    ctx.recomputeOasValidation = OasDocDetailComponent.prototype.recomputeOasValidation;
-    ctx.doUpdate = OasDocDetailComponent.prototype.doUpdate;
-    return ctx;
-  }
+  it('does not apply while the server has not said that what is changed can be saved', () => {
+    const ctx = bulkCtx('PROBLEM_DETAILS', [{oasOperationId: 1, releaseId: 5, errorResponseBodyType: 'NONE'}],
+      {changed: true, changedRows: [{operationId: 'queryThing'}]});
+    ctx.updateDisabled = true;
+    ctx.changeChecker = {status: () => 'invalid', violations: () => [{message: 'The Operation ID is used.'}]};
 
-  it('blocks the update with a snackBar when a duplicate body slot exists', () => {
-    const dup = {resourceName: '/orders', verb: 'POST', messageBody: 'Request', operationId: 'createOrder'};
-    const dup2 = {resourceName: '/orders', verb: 'POST', messageBody: 'Request', operationId: 'createOrder2'};
-    const ctx = updateCtx([dup, dup2], [dup, dup2]);
-    ctx.doUpdate();
-    expect(ctx.snackBar.open).toHaveBeenCalledTimes(1);
-    expect(ctx.snackBar.open.mock.calls[0][0]).toContain('only one Request and one Response body');
-    expect(ctx.updateDetails).not.toHaveBeenCalled();
-  });
+    ctx.applyErrorResponseBodyTypeToAll();
 
-  it('does not block when there are no duplicate body slots', () => {
-    const req = {resourceName: '/orders', verb: 'POST', messageBody: 'Request', operationId: 'createOrder'};
-    const resp = {resourceName: '/orders', verb: 'POST', messageBody: 'Response', operationId: 'queryOrder'};
-    // No doc change and no detail change => doUpdate does nothing, but it must NOT hit the dup snackBar.
-    const ctx = updateCtx([req, resp], []);
-    ctx.doUpdate();
-    const dupCalls = ctx.snackBar.open.mock.calls.filter(
-      (c: any[]) => typeof c[0] === 'string' && c[0].includes('only one Request and one Response body'));
-    expect(dupCalls.length).toBe(0);
+    expect(ctx.openAPIService.saveChanges).not.toHaveBeenCalled();
+    expect(ctx.openAPIService.applyErrorResponseBodyTypeToAll).not.toHaveBeenCalled();
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('The Operation ID is used.', '', expect.anything());
   });
 });
 
-describe('OasDocDetailComponent.doUpdate saves the operations before the request parameters that follow them (#1791)', () => {
-  function ctxOf(detailsFail: boolean, schemesChanged: boolean): any {
-    const oasDoc: any = {oasDocId: 1, httpHeaders: [], securitySchemes: [], securityRequirements: []};
-    const svc: any = {
-      updateDetails: vi.fn(() => detailsFail ? throwError(() => ({status: 400})) : of(null)),
-      updateOasDoc: vi.fn(() => of(null)),
-      getOasDoc: vi.fn(() => of(null)),
+describe('OasDocDetailComponent asks the server what the user has changed, and saves it once the server has said that it can be saved', () => {
+  const proto: any = OasDocDetailComponent.prototype;
+  const header = (oasOperationId: number, name: string, extra: any = {}): any =>
+    ({oasOperationId, name, in: 'query', direction: 'REQUEST', required: false, schema: {type: 'string'}, ...extra});
+
+  /** The component without its constructor: the real methods, and only the state they work on. */
+  function pageOf(status: 'idle' | 'checking' | 'valid' | 'invalid' | 'failed' = 'valid', options: {
+    rows?: any[]; saveChanges?: () => any; getOasDoc?: () => any; httpHeaders?: any[]
+  } = {}): any {
+    const page: any = Object.create(proto);
+    page.oasDoc = {oasDocId: 5, title: 't', version: '1', openAPIVersion: '3.1', httpHeaders: options.httpHeaders || [],
+      securitySchemes: [], securityRequirements: []};
+    page.rows = options.rows || [];
+    page.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    page.headerEdits = new OasDocHeaderEdits();
+    page.openAPIService = {
+      getBieForOasDocPage: vi.fn(() => of({list: [], length: 0})),
+      checkChanges: vi.fn(() => of({valid: true, violations: [], httpHeaders: []})),
+      saveChanges: vi.fn(options.saveChanges || (() => of({valid: true, violations: [], httpHeaders: []}))),
+      getOasDoc: vi.fn(options.getOasDoc || (() => of({securitySchemes: [], securityRequirements: [], httpHeaders: []}))),
+      checkBIEReusedAcrossOperationsAfterUpdate: vi.fn(() => of({errorMessages: []})),
     };
-    const ctx: any = {
-      rows: [],
-      oasValidator: new OasOperationValidator(),
-      oasDoc,
-      // the document differs from what was loaded
-      hashCodeForOasDoc: 1,
-      savedSecurityHash: schemesChanged ? 1 : hashCode([oasDoc.securitySchemes, oasDoc.securityRequirements]),
-      openAPIService: svc,
-      snackBar: {open: vi.fn()},
-      loading: false,
-      isUpdating: false,
-      updateDisabled: false,
-      getChanged: () => [{operationId: 'a'}],
-      init: vi.fn(),
-      loadBieListForOasDoc: vi.fn(),
-      updateDetails: vi.fn(),
-      showUpdateError: vi.fn(),
-    };
-    ctx.recomputeOasValidation = OasDocDetailComponent.prototype.recomputeOasValidation;
-    ctx.securityChanged = OasDocDetailComponent.prototype['securityChanged'];
-    ctx.persistDetailsThenDocument = OasDocDetailComponent.prototype['persistDetailsThenDocument'];
-    ctx.doUpdate = OasDocDetailComponent.prototype.doUpdate;
-    return ctx;
+    page.snackBar = {open: vi.fn()};
+    page.loading = false;
+    page.isUpdating = false;
+    page.titleService = {setTitle: vi.fn()};
+    page.contactUrl = new FormControl('');
+    page.contactEmail = new FormControl('');
+    page.licenseUrl = new FormControl('');
+    page.termServiceUrl = new FormControl('');
+    page.loadBieListForOasDoc = vi.fn();
+    page.changeChecker = new OasDocChangeChecker({
+      build: () => page.buildChangeSet(), check: cs => page.openAPIService.checkChanges(5, cs),
+      onResult: result => page.takeCheckResult(result), debounceMs: 10
+    });
+    page.init(page.oasDoc);
+    // what init() does not know: the checker has the answer of the server
+    page.changeChecker.status.set(status);
+    return page;
   }
 
-  it('saves the operations first, then the document', () => {
-    const ctx = ctxOf(false, false);
-    ctx.doUpdate();
-    const svc = ctx.openAPIService;
-    expect(svc.updateDetails.mock.invocationCallOrder[0]).toBeLessThan(svc.updateOasDoc.mock.invocationCallOrder[0]);
+  const editedRow = (oasOperationId: number, messageBody = 'Request'): any =>
+    ({oasOperationId, messageBody, operationId: 'op' + oasOperationId, isChanged: true, hashCode: 1,
+      json: {oasOperationId, messageBody}});
+
+  describe('Update', () => {
+    it('is there only when something is changed and the server has said that it can be saved', () => {
+      const page = pageOf('valid');
+      expect(page.updateDisabled).toBe(true); // nothing is changed
+
+      page.oasDoc.title = 'another';
+      expect(page.updateDisabled).toBe(false);
+      for (const status of ['checking', 'invalid', 'failed', 'idle'] as const) {
+        page.changeChecker.status.set(status);
+        expect(page.updateDisabled).toBe(true);
+      }
+    });
+
+    it('does not save while it is not there', () => {
+      const page = pageOf('checking');
+      page.oasDoc.title = 'another';
+
+      page.doUpdate();
+
+      expect(page.openAPIService.saveChanges).not.toHaveBeenCalled();
+    });
   });
 
-  it('does not save the document when the operations are refused', () => {
-    const ctx = ctxOf(true, false);
-    ctx.doUpdate();
-    expect(ctx.openAPIService.updateOasDoc).not.toHaveBeenCalled();
-    expect(ctx.showUpdateError).toHaveBeenCalled();
+  describe('the change set', () => {
+    it('has the document only when its fields are changed, and the entries as changes', () => {
+      const page = pageOf();
+      page.oasDoc.httpHeaders = [header(1, 'a')];
+      page.headerEdits.reset([]);
+      page.oasDoc.httpHeaders.push(header(1, 'b'));
+
+      const changeSet = page.buildChangeSet();
+
+      expect(changeSet.document).toBeUndefined();
+      expect(changeSet.headers.upserts.map((h: any) => h.name)).toEqual(['a', 'b']);
+    });
+
+    it('has the document when a field of it is changed', () => {
+      const page = pageOf();
+      page.oasDoc.title = 'another';
+
+      expect(page.buildChangeSet().document).toBe(page.oasDoc);
+    });
+
+    it('has the edited operations of every page, not only of the page that is shown', () => {
+      const page = pageOf('valid', {rows: [editedRow(1), editedRow(2)]});
+      page.rows = page.edits.carry(page.rows, [editedRow(3)]); // the next page
+
+      expect(page.buildChangeSet().operations.map((r: any) => r.oasOperationId)).toEqual([1, 2, 3]);
+    });
+
+    it('is nothing when nothing is changed', () => {
+      expect(pageOf().buildChangeSet()).toBeNull();
+    });
+
+    it('says that the user deleted an entry that the server registered, so that it is not registered again', () => {
+      const page = pageOf('valid', {rows: [editedRow(1)]}); // an operation was changed, which is what registers the entry
+      const registered = header(1, 'sinceLastDateTime');
+      page.oasDoc.httpHeaders = [registered];
+      page.headerEdits.adopt([registered]); // the server's answer to a check
+
+      page.oasDoc.httpHeaders = []; // the user deleted it
+      const changeSet = page.buildChangeSet();
+
+      expect(changeSet.headers.removed.map((k: any) => k.name)).toEqual(['sinceLastDateTime']);
+    });
   });
 
-  it('saves the document first when its security schemes are changed, as the operations refer to them', () => {
-    const ctx = ctxOf(false, true);
-    ctx.doUpdate();
-    expect(ctx.openAPIService.updateOasDoc).toHaveBeenCalledTimes(1);
-    expect(ctx.openAPIService.updateDetails).not.toHaveBeenCalled();
-    expect(ctx.updateDetails).toHaveBeenCalledTimes(1);
+  describe('when the user changes something', () => {
+    it('asks the server once for a change, and not again for the answer', () => {
+      vi.useFakeTimers();
+      try {
+        const page = pageOf('idle');
+        page.oasDoc.title = 'another';
+        page.ngDoCheck();
+        page.ngDoCheck(); // the same change
+        vi.advanceTimersByTime(10);
+
+        expect(page.openAPIService.checkChanges).toHaveBeenCalledTimes(1);
+        page.ngDoCheck();
+        vi.advanceTimersByTime(10);
+        expect(page.openAPIService.checkChanges).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('takes the entries that the server registered in as what the page shows, and not as the user\'s change', () => {
+      vi.useFakeTimers();
+      try {
+        const registered = header(1, 'id', {in: 'path', required: true});
+        const page = pageOf('idle', {rows: [{oasOperationId: 1, httpHeaders: []}]});
+        page.openAPIService.checkChanges = vi.fn(() => of({valid: true, violations: [], httpHeaders: [registered]}));
+        page.oasDoc.title = 'another';
+
+        page.ngDoCheck();
+        vi.advanceTimersByTime(10);
+
+        expect(page.oasDoc.httpHeaders).toEqual([registered]);
+        expect(page.rows[0].httpHeaders).toEqual([registered]);
+        expect(page.headerEdits.changes()).toEqual({upserts: [], removed: []});
+        page.ngDoCheck();
+        vi.advanceTimersByTime(10);
+        expect(page.openAPIService.checkChanges).toHaveBeenCalledTimes(1); // the answer is not a change
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not take an answer to what the page was before the user changed it again', () => {
+      const page = pageOf();
+      page.oasDoc.title = 'one';
+      page.buildChangeSet();
+      page.oasDoc.title = 'two';
+
+      expect(page.takeCheckResult({valid: true, violations: [], httpHeaders: [header(1, 'late')]})).toBe(false);
+      expect(page.oasDoc.httpHeaders).toEqual([]);
+    });
+  });
+
+  describe('what the server says is wrong', () => {
+    const violation = (extra: any): any => ({scope: 'OPERATION', message: 'wrong', ...extra});
+
+    it('is shown at the cell of the operation, and of its Request or Response row when it says which', () => {
+      const page = pageOf('invalid');
+      page.changeChecker.violations.set([
+        violation({oasOperationId: 7, field: 'operationId'}),
+        violation({oasOperationId: 8, messageBody: 'Request', field: 'messageBody'})]);
+
+      expect(page.violationOf({oasOperationId: 7, messageBody: 'Response'}, 'operationId')).toBeTruthy();
+      expect(page.violationOf({oasOperationId: 7, messageBody: 'Response'}, 'messageBody')).toBeUndefined();
+      expect(page.isDuplicateBodySlot({oasOperationId: 8, messageBody: 'Request'})).toBe(true);
+      expect(page.isDuplicateBodySlot({oasOperationId: 8, messageBody: 'Response'})).toBe(false);
+      expect(page.isDuplicateBodySlot({oasOperationId: 9, messageBody: 'Request'})).toBe(false);
+    });
+
+    it('marks an Operation ID that is blank, or that the server refused, as an error', () => {
+      const page = pageOf('invalid');
+      page.changeChecker.violations.set([violation({oasOperationId: 7, field: 'operationId'})]);
+      const isError = (row: any) => page.operationIdErrorStateMatcher(row).isErrorState();
+
+      expect(isError({oasOperationId: 7, operationId: 'a'})).toBe(true);
+      expect(isError({oasOperationId: 8, operationId: ' '})).toBe(true);
+      expect(isError({oasOperationId: 8, operationId: 'a'})).toBe(false);
+    });
+  });
+
+  describe('saving', () => {
+    it('saves the change set, then loads the document as saved, and says so', () => {
+      const registered = header(1, 'id', {in: 'path'});
+      const page = pageOf('valid', {getOasDoc: () => of({securitySchemes: [{oasSecuritySchemeId: 3}], securityRequirements: [], httpHeaders: [registered]})});
+      page.oasDoc.title = 'another';
+
+      page.doUpdate();
+
+      expect(page.openAPIService.saveChanges).toHaveBeenCalledWith(5, expect.objectContaining({document: page.oasDoc}));
+      expect(page.oasDoc.securitySchemes).toEqual([{oasSecuritySchemeId: 3}]);
+      expect(page.oasDoc.httpHeaders).toEqual([registered]);
+      expect(page.isChanged()).toBe(false); // as saved
+      expect(page.changeChecker.status()).toBe('idle');
+      expect(page.loadBieListForOasDoc).toHaveBeenCalled();
+      expect(page.snackBar.open).toHaveBeenCalledWith('Updated', '', expect.anything());
+    });
+
+    it('asks whether a BIE is reused across operations only when operations were saved', () => {
+      const withOperations = pageOf('valid', {rows: [editedRow(1)]});
+      withOperations.doUpdate();
+      expect(withOperations.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate).toHaveBeenCalledTimes(1);
+
+      const documentOnly = pageOf('valid');
+      documentOnly.oasDoc.title = 'another';
+      documentOnly.doUpdate();
+      expect(documentOnly.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate).not.toHaveBeenCalled();
+    });
+
+    it('shows where it is wrong when the server refuses, and keeps what the user changed', () => {
+      const violations = [{scope: 'OPERATION', oasOperationId: 7, field: 'operationId', message: 'The operation ID is used.'}];
+      const page = pageOf('valid', {saveChanges: () => throwError(() => ({status: 400, error: {valid: false, violations}}))});
+      page.oasDoc.title = 'another';
+
+      page.doUpdate();
+
+      expect(page.changeChecker.status()).toBe('invalid');
+      expect(page.changeChecker.violations()).toEqual(violations);
+      expect(page.snackBar.open).toHaveBeenCalledWith('The operation ID is used.', '', expect.anything());
+      expect(page.openAPIService.getOasDoc).not.toHaveBeenCalled();
+      expect(page.oasDoc.title).toBe('another');
+      expect(page.loading).toBe(false);
+    });
   });
 });
 
@@ -705,6 +861,12 @@ describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
     for (const accessor of ['canEnableTraceparent', 'canDisableTraceparent']) {
       Object.defineProperty(c, accessor, Object.getOwnPropertyDescriptor(proto, accessor) as PropertyDescriptor);
     }
+    for (const method of ['fieldsHash', 'changeFingerprint']) {
+      c[method] = proto[method];
+    }
+    c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    c.headerEdits = new OasDocHeaderEdits();
+    c.changeChecker = {reset: vi.fn(), status: () => 'idle'};
     c.contactUrl = new FormControl('', [httpUrlValidator]);
     c.contactEmail = new FormControl('', [optionalEmailValidator]);
     c.licenseUrl = new FormControl('', [httpUrlValidator]);
@@ -919,13 +1081,18 @@ describe('OasDocDetailComponent.init shows what keeps Update disabled', () => {
 
   function ctx(): any {
     const c: any = {
-      titleService: {setTitle: vi.fn()}, isUpdating: true, operationIds: [],
+      titleService: {setTitle: vi.fn()}, isUpdating: true, operationIds: [], rows: [],
       openAPIService: {getBieForOasDocPage: vi.fn(() => of({list: []}))},
     };
     c.init = proto.init;
     c.refreshOperationIds = proto.refreshOperationIds;
     c.fetchOperationIds = proto.fetchOperationIds;
     c.showValidationErrors = proto.showValidationErrors;
+    c.fieldsHash = proto.fieldsHash;
+    c.changeFingerprint = proto.changeFingerprint;
+    c.edits = new EditedRows<any>(row => row.oasOperationId + '|' + row.messageBody, row => row.isChanged);
+    c.headerEdits = new OasDocHeaderEdits();
+    c.changeChecker = {reset: vi.fn()};
     c.contactUrl = new FormControl('', [httpUrlValidator]);
     c.contactEmail = new FormControl('', [optionalEmailValidator]);
     c.licenseUrl = new FormControl('', [httpUrlValidator]);

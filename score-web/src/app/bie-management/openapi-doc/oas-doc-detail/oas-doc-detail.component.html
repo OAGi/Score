@@ -6,8 +6,11 @@
     </button>
   </ng-container>
   <ng-container ngProjectAs="[detailToolbar]">
+    @if (changeChecker.status() === 'checking') {
+      <span class="oas-change-status">Checking...</span>
+    }
     <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-            [disabled]="!isChanged() || isDisabled(oasDoc)">
+            [disabled]="updateDisabled || isDisabled(oasDoc)">
       Update
     </button>
   </ng-container>
@@ -236,6 +239,24 @@
     <mat-card-content class="mat-card-container">
       <!-- Issue #1610 / #1760: a DELETE request body is honored only from OpenAPI 3.1. When the document
            targets 3.0, warn that the body on any DELETE operation is ignored during generation. -->
+      <!-- What the server says is wrong with what the user has changed, wherever it is: a row of another page, the document,
+           or an entry. The cells of the rows on this page show their own. -->
+      @if (changeChecker.status() === 'invalid') {
+        <div class="oas-change-violations d-flex align-items-start">
+          <mat-icon class="oas-change-violations-icon">error</mat-icon>
+          <ul>
+            @for (violation of changeChecker.violations(); track $index) {
+              <li>{{ violation.message }}</li>
+            }
+          </ul>
+        </div>
+      }
+      @if (changeChecker.status() === 'failed') {
+        <div class="oas-change-violations d-flex align-items-center">
+          <mat-icon class="oas-change-violations-icon">error</mat-icon>
+          <span>The changes could not be checked, so they cannot be saved now. Change something to try again.</span>
+        </div>
+      }
       @if (hasIgnoredDeleteRequestBody()) {
         <div class="oas-delete-body-warning d-flex align-items-center">
           <mat-icon class="oas-delete-body-warning-icon">warning</mat-icon>
@@ -271,7 +292,6 @@
 
       <ng-template #messageBodyControl let-element>
       <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId"
-                  (ngModelChange)="recomputeOasValidation()"
                   [class.oas-body-slot-error]="isDuplicateBodySlot(element)">
         <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0
              it is dropped from the generated document (see the banner above the table). -->
@@ -280,31 +300,28 @@
       </mat-select>
       @if (isDuplicateBodySlot(element)) {
         <!-- Issue #1492 (Option 2): duplicate body on this (path, verb). -->
-        <div class="oas-body-slot-error-text">Duplicate {{ element.messageBody }} body on this endpoint.</div>
+        <div class="oas-body-slot-error-text">{{ violationOf(element, 'messageBody')?.message }}</div>
       }
       </ng-template>
 
       <ng-template #resourceNameControl let-element>
       <mat-form-field>
         <input matInput [(ngModel)]="element.resourceName"
-               (ngModelChange)="recomputeOasValidation()"
-               (change)="syncOperationParameters()"
                [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
-        <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
+        <mat-error>{{ violationOf(element, 'messageBody')?.message }}</mat-error>
       </mat-form-field>
       </ng-template>
 
       <ng-template #operationIdControl let-element>
       <mat-form-field>
         <input matInput [(ngModel)]="element.operationId"
-               (ngModelChange)="recomputeOasValidation()"
                [errorStateMatcher]="operationIdErrorStateMatcher(element)">
         @if (!element.operationId || !element.operationId.trim()) {
           <mat-error>Operation ID is required.</mat-error>
         } @else {
-          <mat-error>Operation ID must be unique within the document.</mat-error>
+          <mat-error>{{ violationOf(element, 'operationId')?.message }}</mat-error>
         }
       </mat-form-field>
       </ng-template>
