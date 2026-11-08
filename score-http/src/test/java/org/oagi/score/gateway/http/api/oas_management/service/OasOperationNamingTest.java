@@ -69,7 +69,7 @@ class OasOperationNamingTest {
 
     @Test
     void buildsAPathWithTheVersionOnlyWhenTheDocumentHasOne() {
-        assertEquals("/my-company/1.0/purchase-order", buildResourcePath("My Company", "1.0", "Purchase Order", false));
+        assertEquals("/my-company/{version}/purchase-order", buildResourcePath("My Company", "1.0", "Purchase Order", false)); // the placeholder, not the version (Issue #1715)
         assertEquals("/my-company/price-list-list", buildResourcePath("My Company", "", "Price List", true));
         assertEquals("/my-company/price-list-list", buildResourcePath("My Company", null, "Price List", true));
     }

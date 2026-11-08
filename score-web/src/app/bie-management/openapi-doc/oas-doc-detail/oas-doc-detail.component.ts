@@ -220,6 +220,39 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
       && (!violation.messageBody || violation.messageBody === row.messageBody));
   }
 
+  /**
+   * What the violations say, each with the operation it is about (the operations of every page, not only the one that is shown),
+   * so that the same message of two operations can be told apart. A rule of the document, or of an entry that no operation
+   * has, has no operation to name. The same message of the same operation is said once.
+   */
+  violationLines(): { operation?: string; message: string }[] {
+    const seen = new Set<string>();
+    const lines: { operation?: string; message: string }[] = [];
+    for (const violation of this.changeChecker.violations()) {
+      const operation = this.violationOperation(violation);
+      const key = (operation ?? '') + '\n' + violation.message;
+      if (!seen.has(key)) {
+        seen.add(key);
+        lines.push({operation, message: violation.message});
+      }
+    }
+    return lines;
+  }
+
+  /** The operation that a violation is about, as the user sees it in the table: the verb, the Resource Name and the Message Body. */
+  private violationOperation(violation: OasDocViolation): string | undefined {
+    if (violation.scope === 'DOCUMENT' || (!violation.clientKey && !violation.oasOperationId)) {
+      return undefined;
+    }
+    const row = this.rows.find(candidate => (violation.clientKey ? candidate.clientKey === violation.clientKey
+        : !candidate.isNew && candidate.oasOperationId === violation.oasOperationId)
+      && (!violation.messageBody || candidate.messageBody === violation.messageBody));
+    if (!row) {
+      return undefined;
+    }
+    return [row.verb, row.resourceName, row.messageBody ? '(' + row.messageBody + ')' : ''].filter(part => !!part).join(' ');
+  }
+
   isDuplicateBodySlot(row: BieForOasDoc): boolean {
     return !!this.violationOf(row, 'messageBody');
   }

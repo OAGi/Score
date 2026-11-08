@@ -1,5 +1,7 @@
 package org.oagi.score.gateway.http.api.oas_management.service;
 
+import org.oagi.score.gateway.http.api.oas_management.model.OasResourcePaths;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -110,11 +112,16 @@ public final class OasOperationNaming {
         return isArray ? term + "-list" : term;
     }
 
-    /** {@code /<business context>/<version>/<leaf>}; without the version segment when the document has none. */
-    public static String buildResourcePath(String businessContextName, String version, String propertyTerm, boolean isArray) {
+    /**
+     * {@code /<business context>/{version}/<leaf>}; without the version segment when the document has no version. The segment is the
+     * placeholder {@code {version}}, not the version: the generator puts the version of the document in its place (Issue #1715), so
+     * the Resource Name stays right when the version of the document changes.
+     */
+    public static String buildResourcePath(String businessContextName, String documentVersion, String propertyTerm, boolean isArray) {
         String context = (businessContextName == null ? "" : businessContextName).toLowerCase(Locale.ROOT).replace(' ', '-');
         String leaf = resourcePathLeaf(propertyTerm, isArray);
-        return (version == null || version.isEmpty()) ? "/" + context + "/" + leaf : "/" + context + "/" + version + "/" + leaf;
+        return (documentVersion == null || documentVersion.isEmpty()) ? "/" + context + "/" + leaf
+                : "/" + context + "/" + OasResourcePaths.VERSION_PATH_PARAMETER + "/" + leaf;
     }
 
     /**

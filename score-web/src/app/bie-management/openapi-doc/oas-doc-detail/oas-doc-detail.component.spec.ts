@@ -840,6 +840,36 @@ describe('OasDocDetailComponent asks the server what the user has changed, and s
     });
   });
 
+  describe('the rules that are broken are said with the operation that breaks them', () => {
+    const operationRow = (oasOperationId: number, messageBody: string, resourceName: string, extra: any = {}): any =>
+      ({oasOperationId, messageBody, verb: 'GET', resourceName, isNew: false, ...extra});
+    const used = (extra: any): any => ({scope: 'OPERATION', field: 'operationId', message: 'Operation ID must be unique within the document.', ...extra});
+
+    it('names the verb, the Resource Name and the Message Body of each operation, so that the same message of two can be told apart', () => {
+      const page = pageOf('invalid', {rows: [operationRow(1, 'Response', '/a/{version}/x'), operationRow(2, 'Response', '/a/{version}/y')]});
+      page.changeChecker.violations.set([used({oasOperationId: 1, messageBody: 'Response'}), used({oasOperationId: 2, messageBody: 'Response'})]);
+
+      expect(page.violationLines()).toEqual([
+        {operation: 'GET /a/{version}/x (Response)', message: 'Operation ID must be unique within the document.'},
+        {operation: 'GET /a/{version}/y (Response)', message: 'Operation ID must be unique within the document.'}]);
+    });
+
+    it('names a row that was added and not saved by its key, and says the same message of the same operation once', () => {
+      const added = operationRow(0, 'Response', '/a/new', {isNew: true, clientKey: 'new-1'});
+      const page = pageOf('invalid', {rows: [operationRow(0, 'Response', '/a/old'), added]});
+      page.changeChecker.violations.set([used({clientKey: 'new-1'}), used({clientKey: 'new-1'})]);
+
+      expect(page.violationLines().map((line: any) => line.operation)).toEqual(['GET /a/new (Response)']);
+    });
+
+    it('names no operation for a rule of the document, or for an operation that the page does not hold', () => {
+      const page = pageOf('invalid', {rows: [operationRow(1, 'Response', '/a')]});
+      page.changeChecker.violations.set([{scope: 'DOCUMENT', message: 'The title is wrong.'}, used({oasOperationId: 9})]);
+
+      expect(page.violationLines().map((line: any) => line.operation)).toEqual([undefined, undefined]);
+    });
+  });
+
   describe('what the server says is wrong', () => {
     const violation = (extra: any): any => ({scope: 'OPERATION', message: 'wrong', ...extra});
 

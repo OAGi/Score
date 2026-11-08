@@ -442,6 +442,15 @@
   line-height: 24px;
 }
 
+.oas-change-violation-operation {
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.oas-change-violation-operation::after {
+  content: ':';
+}
+
 .oas-change-violations-icon {
   flex: none;
   color: #c62828;

@@ -32,6 +32,7 @@ class OasOperationProposerTest {
     private static final TopLevelAsbiepId BIE = new TopLevelAsbiepId(BigInteger.valueOf(5));
 
     private OasOperationProposer proposer;
+    private OasDoc doc;
     private OasDocCommandRepository command;
     private ScoreUser requester;
 
@@ -48,7 +49,7 @@ class OasOperationProposerTest {
                 "tester@example.com", true, List.of(ScoreRole.DEVELOPER));
         when(repositoryFactory.oasDocCommandRepository(any())).thenReturn(command);
         when(repositoryFactory.oasDocQueryRepository(any())).thenReturn(query);
-        OasDoc doc = new OasDoc();
+        doc = new OasDoc();
         doc.setVersion("1.0");
         when(query.getOasDoc(any())).thenReturn(new GetOasDocResponse(doc));
         BusinessContextSummaryRecord context = mock(BusinessContextSummaryRecord.class);
@@ -63,11 +64,39 @@ class OasOperationProposerTest {
         return new OasOperationCandidate(BIE, "Purchase Order", verb, messageBody, array, null, null);
     }
 
+    /**
+     * The Resource Name has the placeholder {@code {version}} where the version of the document is: the generator puts the version in
+     * its place (Issue #1715), so the name does not change with the version, and the generated path is what it always was.
+     */
+    @Test
+    void theResourceNameHasThePlaceholderForTheVersionOfTheDocument_andNeverTheVersion() {
+        for (String version : List.of("1.0", "V3", "v3.0", "2.5-beta")) {
+            doc.setVersion(version);
+
+            String name = proposer.propose(requester, DOC, bie("GET", "Response", false)).resourceName();
+            String named = proposer.names(requester, DOC, bie("GET", "Response", false)).resourceName();
+
+            assertEquals("/my-company/{version}/purchase-order", name, version);
+            assertEquals(name, named, "an operation that is added is named as a proposed one is");
+            assertEquals("/my-company/" + version + "/purchase-order", OasResourcePaths.resolve(name, version), version);
+        }
+    }
+
+    @Test
+    void theResourceNameHasNoVersionSegmentWhenTheDocumentHasNoVersion() {
+        for (String version : new String[]{null, ""}) {
+            doc.setVersion(version);
+
+            assertEquals("/my-company/price-list", proposer.names(requester, DOC, new OasOperationCandidate(BIE, "Price List",
+                    "GET", "Response", false, null, null)).resourceName());
+        }
+    }
+
     @Test
     void makesTheResourceNameAndTheOperationIdOfABie() {
         OasOperationProposal proposal = proposer.propose(requester, DOC, bie("GET", "Response", true));
 
-        assertEquals("/my-company/1.0/purchase-order-list", proposal.resourceName());
+        assertEquals("/my-company/{version}/purchase-order-list", proposal.resourceName());
         assertEquals("queryPurchaseOrderList", proposal.operationId());
         assertTrue(proposal.valid());
     }
@@ -99,7 +128,7 @@ class OasOperationProposerTest {
 
     @Test
     void aBodyTheEndpointAlreadyHas_isAViolation() {
-        when(command.findOperationsWithBodyAtEndpoint(any(), eq("/my-company/1.0/purchase-order"), eq("GET"), eq(false)))
+        when(command.findOperationsWithBodyAtEndpoint(any(), eq("/my-company/{version}/purchase-order"), eq("GET"), eq(false)))
                 .thenReturn(Set.of(new OasOperationId(BigInteger.TEN)));
 
         OasOperationProposal proposal = proposer.propose(requester, DOC, bie("GET", "Response", false));

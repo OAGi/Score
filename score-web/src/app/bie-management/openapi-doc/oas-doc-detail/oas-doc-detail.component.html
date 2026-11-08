@@ -242,8 +242,13 @@
         <div class="oas-change-violations d-flex align-items-center">
           <mat-icon class="oas-change-violations-icon">error</mat-icon>
           <ul>
-            @for (violation of changeChecker.violations(); track $index) {
-              <li>{{ violation.message }}</li>
+            @for (line of violationLines(); track $index) {
+              <li>
+                @if (line.operation) {
+                  <span class="oas-change-violation-operation">{{ line.operation }}</span>
+                }
+                {{ line.message }}
+              </li>
             }
           </ul>
         </div>
