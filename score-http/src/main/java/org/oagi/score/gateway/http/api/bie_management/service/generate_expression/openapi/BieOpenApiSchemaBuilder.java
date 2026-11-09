@@ -547,9 +547,16 @@ public class BieOpenApiSchemaBuilder {
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Object exampleValue(XbtSummaryRecord xbt, String exampleText) {
+    // The date and time formats of the XBTs reject an empty string, so an empty example is omitted instead.
+    private static final Set<String> NO_EMPTY_EXAMPLE_FORMATS = Set.of("date-time", "date", "time");
+
+    Object exampleValue(XbtSummaryRecord xbt, String exampleText) {
         // Issue #1405
-        return StringUtils.hasLength(exampleText) ? exampleText : emptyExample(xbt);
+        String format = xbt == null ? null : (String) toProperties(xbt).get("format");
+        if (!StringUtils.hasLength(exampleText)) {
+            return format != null && NO_EMPTY_EXAMPLE_FORMATS.contains(format) ? BieOpenApiDialect.NO_EXAMPLE : emptyExample(xbt);
+        }
+        return exampleText;
     }
 
     Object emptyExample(XbtSummaryRecord xbt) {

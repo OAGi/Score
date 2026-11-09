@@ -46,6 +46,9 @@ public interface BieOpenApiDialect {
     /** Expresses a single fixed value. */
     void fixedValue(Map<String, Object> schema, String fixedValue);
 
+    /** Marker for "write no example keyword". */
+    Object NO_EXAMPLE = new Object();
+
     /** Puts the example under the version's keyword. */
     void example(Map<String, Object> schema, Object example);
 
@@ -105,6 +108,8 @@ public interface BieOpenApiDialect {
                 schema.put("default", valueConstraint.defaultValue());
             }
         }
-        example(schema, example);
+        if (example != NO_EXAMPLE) {
+            example(schema, example);
+        }
     }
 }
