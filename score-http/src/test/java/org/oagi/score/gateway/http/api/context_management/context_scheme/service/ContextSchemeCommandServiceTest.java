@@ -127,6 +127,30 @@ class ContextSchemeCommandServiceTest {
         verifyNoInteractions(command);
     }
 
+    // ----- surrounding spaces -----
+
+    @Test
+    void create_checks_and_saves_the_identifiers_without_the_surrounding_spaces() {
+        var request = new CreateContextSchemeRequest(CATEGORY_ID, null, " GEO ", " Geopolitical ",
+                "desc", " OAGi ", " 1.0 ", List.of());
+        when(query.hasDuplicate("GEO", "OAGi", "1.0")).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        verify(query).hasDuplicate("GEO", "OAGi", "1.0");
+        verify(command, never()).create(any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void update_checks_and_saves_the_identifiers_without_the_surrounding_spaces() {
+        var request = new UpdateContextSchemeRequest(SCHEME_ID, CATEGORY_ID, null, " GEO ", " Geopolitical ",
+                "desc", " OAGi ", " 1.0 ", List.of());
+        when(query.hasDuplicateExcludingCurrent(SCHEME_ID, "GEO", "OAGi", "1.0")).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
+        verify(query).hasDuplicateExcludingCurrent(SCHEME_ID, "GEO", "OAGi", "1.0");
+        verify(command, never()).update(any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
     // ----- create: server-side uniqueness (B7) -----
 
     @Test
