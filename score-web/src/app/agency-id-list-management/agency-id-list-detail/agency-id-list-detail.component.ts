@@ -97,7 +97,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
 
   /** The values that the table lists. */
   values: AgencyIdListValueDetails[] = [];
-  readonly load = inMemoryLoad<AgencyIdListValueDetails>(() => this.values, {
+  readonly load = inMemoryLoad(AGENCY_ID_LIST_VALUE_TABLE, (): AgencyIdListValueDetails[] => this.values, {
     definition: row => row.definition?.content,
     definitionSource: row => row.definition?.source
   }, (row, params) => agencyIdListValueMatches(row, params.get('search')));

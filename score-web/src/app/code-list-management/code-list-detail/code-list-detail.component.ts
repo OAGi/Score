@@ -111,7 +111,7 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
 
   /** The values that the table lists. */
   values: CodeListValueDetails[] = [];
-  readonly load = inMemoryLoad<CodeListValueDetails>(() => this.values, {
+  readonly load = inMemoryLoad(CODE_LIST_VALUE_TABLE, (): CodeListValueDetails[] => this.values, {
     definition: row => row.definition?.content,
     definitionSource: row => row.definition?.source
   }, (row, params) => codeListValueMatches(row, params.get('search')));

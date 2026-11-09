@@ -81,7 +81,7 @@ export class ContextSchemeDetailComponent implements OnInit {
 
   /** The values that the table lists. */
   values: ContextSchemeValue[] = [];
-  readonly load = inMemoryLoad<ContextSchemeValue>(() => this.values, {},
+  readonly load = inMemoryLoad(CONTEXT_SCHEME_VALUE_TABLE, (): ContextSchemeValue[] => this.values, {},
     (row, params) => contextSchemeValueMatches(row, params.get('search')));
   readonly allRows = () => this.values;
   readonly rowKey = (row: ContextSchemeValue) => row.guid;

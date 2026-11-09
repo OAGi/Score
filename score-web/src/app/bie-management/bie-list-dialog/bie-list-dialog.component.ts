@@ -42,7 +42,7 @@ export class BieListDialogComponent implements OnInit {
   readonly view = viewChild.required<ScoreTableViewComponent<ReuseReport>>(ScoreTableViewComponent);
   /** The BIEs that reuse the BIE. */
   rows: ReuseReport[] = [];
-  readonly load = inMemoryLoad<ReuseReport>(() => this.rows);
+  readonly load = inMemoryLoad(BIE_REUSE_REPORT_TABLE, () => this.rows);
   /** The reused BIE is the one of the dialog unless the dialog says to show it. */
   hiddenColumns: string[] = REUSED_COLUMNS;
   loading = false;

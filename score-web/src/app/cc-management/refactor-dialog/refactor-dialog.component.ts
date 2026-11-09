@@ -60,7 +60,7 @@ export class RefactorDialogComponent implements OnInit {
   readonly baseView = viewChild.required<ScoreTableViewComponent<CcListEntry>>('baseView');
   /** The ACCs that the component can be moved to. */
   rows: CcListEntry[] = [];
-  readonly load = inMemoryLoad<CcListEntry>(() => this.rows, {
+  readonly load = inMemoryLoad(REFACTOR_ACC_TABLE, (): CcListEntry[] => this.rows, {
     revision: row => row.log?.revisionNum,
     owner: row => row.owner?.loginId,
     lastUpdateTimestamp: row => row.lastUpdated?.when
@@ -70,7 +70,8 @@ export class RefactorDialogComponent implements OnInit {
   readonly issueColumns = createTableColumns(REFACTOR_ISSUE_TABLE);
   readonly issueView = viewChild.required<ScoreTableViewComponent<IssuedCc>>('issueView');
   issueRows: IssuedCc[] = [];
-  readonly issueLoad = inMemoryLoad<IssuedCc>(() => this.issueRows, {
+  readonly issueLoad = inMemoryLoad(REFACTOR_ISSUE_TABLE, (): IssuedCc[] => this.issueRows, {
+    type: () => 'ACC', // the cell shows ACC for every row
     reason: row => (row.reasons || []).join(' ')
   });
 

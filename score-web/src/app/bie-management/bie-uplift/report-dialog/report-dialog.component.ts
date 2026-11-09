@@ -52,7 +52,7 @@ export class ReportDialogComponent implements OnInit {
 
   /** The rows of the report that are shown (all, or the ones with issues). */
   rows: MatchInfo[] = [];
-  readonly load = inMemoryLoad<MatchInfo>(() => this.rows, {
+  readonly load = inMemoryLoad(this.columns.def, (): MatchInfo[] => this.rows, {
     displayPath: row => row.sourceDisplayPath,
     validCode: row => [row.status, row.message].filter(value => !!value).join(' ')
   });

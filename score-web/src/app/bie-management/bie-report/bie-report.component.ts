@@ -40,7 +40,7 @@ export class BieReportComponent implements OnInit {
 
   /** The report: the BIEs that reuse BIEs. */
   rows: ReuseReport[] = [];
-  readonly load = inMemoryLoad<ReuseReport>(() => this.rows);
+  readonly load = inMemoryLoad(BIE_REUSE_REPORT_TABLE, () => this.rows);
   loading = false;
 
   ngOnInit() {

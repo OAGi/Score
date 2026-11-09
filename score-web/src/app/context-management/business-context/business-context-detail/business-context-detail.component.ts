@@ -61,7 +61,7 @@ export class BusinessContextDetailComponent implements OnInit {
 
   /** The values that the table lists. */
   values: BusinessContextValue[] = [];
-  readonly load = inMemoryLoad<BusinessContextValue>(() => this.values);
+  readonly load = inMemoryLoad(BUSINESS_CONTEXT_VALUE_TABLE, (): BusinessContextValue[] => this.values);
   readonly allRows = () => this.values;
   readonly rowKey = (row: BusinessContextValue) => row.guid;
 

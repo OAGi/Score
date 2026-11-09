@@ -145,7 +145,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   private readonly rowsFetching = signal(false);
   private rowKeySequence = 0;
   readonly rowClass = (row: BieForOasDoc) => ({'highlight': row.status === 'Duplication'});
-  private readonly pageOfRows = inMemoryLoad<BieForOasDoc>(() => this.rows, {branch: row => row.releaseNum});
+  private readonly pageOfRows = inMemoryLoad(this.columns.def, () => this.rows, {branch: row => row.releaseNum});
   readonly load = (params: HttpParams) => defer(() => this.rowsLoaded ? of(true) : this.fetchRows().pipe(map(() => true))).pipe(
     switchMap(() => this.pageOfRows(params)),
     tap(resp => {
