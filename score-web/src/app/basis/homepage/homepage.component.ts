@@ -392,6 +392,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.numberOfCCsByUsersAndStates.paginator = this.numberOfCCsByUsersAndStatesPaginator;
+    this.numberOfCCsByUsersAndStates.filterPredicate = ((data: UserStatesItem, filter: string) => {
+      return Array.from(filter.split(',')).includes(data.username);
+    });
+    this.numberOfCCsByUsersAndStates.sort = this.numberOfCCsByUsersAndStatesSort;
+
+    this.myRecentCCs.sort = this.myRecentCCsSort;
+
     this.numberOfBiesByUsersAndStates.paginator = this.numberOfBiesByUsersAndStatesPaginator;
     this.numberOfBiesByUsersAndStates.filterPredicate = ((data: UserStatesItem, filter: string) => {
       return Array.from(filter.split(',')).includes(data.username);
