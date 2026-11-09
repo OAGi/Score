@@ -13,6 +13,7 @@ import {
   contentChild,
   contentChildren,
   inject,
+  NgZone,
   Injector,
   input,
   output,
@@ -101,6 +102,7 @@ import {TableDef, TableFilterDef, TableFilterOption} from './table-def';
 })
 export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentInit {
   private readonly injector = inject(Injector);
+  private readonly ngZone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
@@ -250,8 +252,10 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
       });
       onCleanup(() => subscription?.unsubscribe());
     });
-    // The table is in an `@if`, so its sort is known only after the first render.
-    afterNextRender(() => this.start());
+    // The table is in an `@if`, so its sort is known only after the first render. After-render hooks run outside the Angular zone:
+    // what is started there (the request, and so the rows with their links) would be in the root zone, and a click on a row link would
+    // then start the navigation, and so create the next screen, outside the zone, where nothing a click changes is drawn.
+    afterNextRender(() => this.ngZone.run(() => this.start()));
     // The width of the table decides between the columns and the compact row.
     afterNextRender(() => {
       const wrapper = this.tableWrapper()?.nativeElement;
