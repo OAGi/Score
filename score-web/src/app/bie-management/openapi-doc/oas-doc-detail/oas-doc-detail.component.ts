@@ -68,6 +68,15 @@ import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
  */
 const UPDATE_AFTER_ADD = true;
 
+/**
+ * The fields of a document that no rule of the server is about (it only keeps them; the form of a URL or an e-mail address is the
+ * page's own check). A change of one of them is no reason to ask the server whether the change can be saved, so they are left out
+ * of what tells the page that the user has changed something the server has to judge. Update is judged when it is pressed anyway.
+ */
+const INFORMATIONAL_FIELDS: ReadonlySet<string> = new Set([
+  'contactName', 'contactUrl', 'contactEmail', 'licenseName', 'licenseUrl', 'termsOfService', 'description'
+]);
+
 @Component({
   standalone: false,
   selector: 'score-oas-doc-detail',
@@ -336,7 +345,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   }
 
   private changeFingerprint(): string {
-    return hashCode([this.oasDoc, this.rows.filter(row => row.isChanged).map(row => [row.rowId, row.messageBody, row.hashCode, row.touched]),
+    return hashCode([Object.entries(this.oasDoc).filter(([name]) => !INFORMATIONAL_FIELDS.has(name)), this.rows.filter(row => row.isChanged).map(row => [row.rowId, row.messageBody, row.hashCode, row.touched]),
       this.removedRows.map(row => [row.rowId, row.messageBody])]);
   }
 
@@ -445,6 +454,11 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
     this.hashCodeForOasDoc = hashCode(oasDoc);
     this.savedHttpHeadersHash = hashCode(oasDoc.httpHeaders);
     this.oasDoc = oasDoc;
+    // The fields that are checked are controls: the document's value goes in here, and the control's goes back to the document on input.
+    this.contactUrl.setValue(oasDoc.contactUrl, {emitEvent: false});
+    this.contactEmail.setValue(oasDoc.contactEmail, {emitEvent: false});
+    this.licenseUrl.setValue(oasDoc.licenseUrl, {emitEvent: false});
+    this.termServiceUrl.setValue(oasDoc.termsOfService, {emitEvent: false});
     this.savedFieldsHash = this.fieldsHash(oasDoc);
     this.headerEdits.reset(oasDoc.httpHeaders);
     this.changeChecker.reset();
