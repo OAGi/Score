@@ -125,6 +125,9 @@ The developer can validate all the schemas in a Module Set Release.
 #### Test Assertion #21.2.8
 The developer can copy the release-module-set validation result to the clipboard after validation completes.
 
+#### Test Assertion #21.2.9
+When the developer creates a Release Module Set, or updates the name of one, and another Release Module Set of the same Release has exactly the same name, the system warns the developer that there is another same Release Module Set and asks to confirm, and the developer can cancel. A name that merely contains the name of another Release Module Set, or that no other Release Module Set of the Release has, is not the same name and raises no warning.
+
 ### Test Step Pre-condition:
 1. Developer and end-user accounts needed for release-module-set scenarios are available in connectCenter.
 2. Existing module sets and releases are available so defaulting, export, validation, and draft-release integration flows can be exercised.
@@ -135,6 +138,7 @@ The developer can copy the release-module-set validation result to the clipboard
 3. Export a release module set and verify that the exported file is generated. Then verify that an end user can open the release module set but cannot update it. (Assertions [#21.2.4](#test-assertion-2124), [#21.2.5](#test-assertion-2125))
 4. Verify the draft-release integration scenarios covered by the suite: a draft release can be assigned to a release module set, moving the release back to Initialized discards the CC assignments, the release cannot be discarded while a release module set depends on it, and moving the release to Draft again recreates the assignment context. (Assertion [#21.2.6](#test-assertion-2126))
 5. Validate all schemas in the release module set, verify that the validation dialog opens, and verify that the validation result can be copied to the clipboard after completion. (Assertions [#21.2.7](#test-assertion-2127), [#21.2.8](#test-assertion-2128))
+6. Create two release module sets of a release, where the name of the more recently updated one only contains the name of the other. Verify that no warning is shown for either. Then try to create one with the exact name of an existing one, and rename the more recent one to that exact name; verify that the "There is another same module set release" warning is shown for each and can be cancelled. Finally, rename it to a name that no other release module set has, and verify that it is saved without a warning. (Assertion [#21.2.9](#test-assertion-2129))
 ## Test Case 21.3
 
 **Manage CC-Module Assignment**

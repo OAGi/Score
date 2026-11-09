@@ -37,6 +37,7 @@ import org.oagi.score.gateway.http.api.module_management.repository.ModuleQueryR
 import org.oagi.score.gateway.http.api.module_management.repository.ModuleSetQueryRepository;
 import org.oagi.score.gateway.http.api.module_management.repository.ModuleSetReleaseQueryRepository;
 import org.oagi.score.gateway.http.api.module_management.repository.criteria.ModuleSetReleaseListFilterCriteria;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.PageRequest;
 import org.oagi.score.gateway.http.common.model.ResultAndCount;
@@ -130,6 +131,14 @@ public class ModuleSetReleaseQueryService implements InitializingBean {
             ScoreUser requester, ModuleSetReleaseListFilterCriteria filterCriteria, PageRequest pageRequest) {
 
         return moduleSetReleaseQuery(requester).getModuleSetReleaseList(filterCriteria, pageRequest);
+    }
+
+    public boolean hasSameNameModuleSetRelease(
+            ScoreUser requester, ReleaseId releaseId, ModuleSetReleaseId moduleSetReleaseId,
+            String moduleSetReleaseName) {
+
+        return moduleSetReleaseQuery(requester).hasSameNameModuleSetRelease(
+                releaseId, moduleSetReleaseId, moduleSetReleaseName);
     }
 
     public ValidateModuleSetReleaseResponse validateModuleSetRelease(

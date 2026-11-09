@@ -183,20 +183,20 @@ export class ModuleSetReleaseCreateComponent implements OnInit {
   }
 
   doCreateModuleSetRelease() {
-    const request = new ModuleSetReleaseListRequest();
-    request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-    request.library = this.request.library;
-    request.releaseId = this.moduleSetRelease.releaseId;
-    request.filters.name = this.moduleSetRelease.moduleSetReleaseName;
-    this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
-      if (resp.length > 0 &&
-        resp.list[0].name === this.moduleSetRelease.moduleSetReleaseName) {
+    const name = this.moduleSetRelease.moduleSetReleaseName;
+    if (!name) {
+      this._doCreateModuleSetRelease();
+      return;
+    }
+    this.moduleService.checkNameUniqueness(this.moduleSetRelease.releaseId, undefined, name).subscribe(hasSameName => {
+      if (hasSameName) {
 
+        const releaseNum = this.releaseList.find(e => e.releaseId === this.moduleSetRelease.releaseId)?.releaseNum;
         const dialogConfig = this.confirmDialogService.newConfig();
         dialogConfig.data.header = 'Create module set release?';
         dialogConfig.data.content = [
-          'There is another same module set release, \'' + resp.list[0].name + '\' for \'' +
-          resp.list[0].releaseNum + '\' branch.',
+          'There is another same module set release, \'' + name + '\' for \'' +
+          releaseNum + '\' branch.',
           'Are you sure you want to create this module set release?',
         ];
         dialogConfig.data.action = 'Create';

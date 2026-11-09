@@ -39,6 +39,17 @@ public interface ModuleSetReleaseQueryRepository {
 
     boolean exists(ModuleSetId moduleSetId);
 
+    /**
+     * Determines whether another module set release of the release has the same name.
+     *
+     * @param releaseId            the release of the module set release.
+     * @param moduleSetReleaseId   the module set release to leave out (the one being updated), or {@code null}.
+     * @param moduleSetReleaseName the name to look for, compared after trimming.
+     * @return {@code true} if there is such a module set release, otherwise {@code false}.
+     */
+    boolean hasSameNameModuleSetRelease(ReleaseId releaseId, ModuleSetReleaseId moduleSetReleaseId,
+                                        String moduleSetReleaseName);
+
     String getDefaultName(ModuleSetId moduleSetId);
 
     List<ModuleAccRecord> getModuleAccList(ModuleSetReleaseId moduleSetReleaseId);

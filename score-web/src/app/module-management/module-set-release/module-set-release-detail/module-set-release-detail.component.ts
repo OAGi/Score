@@ -248,21 +248,16 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
   }
 
   doUpdateModuleSetRelease() {
-    const request = new ModuleSetReleaseListRequest();
-    request.page = new PageRequest('lastUpdateTimestamp', 'desc', 0, 10);
-    request.library.libraryId = this.moduleSetRelease.library.libraryId;
-    request.releaseId = this.moduleSetRelease.release.releaseId;
-    request.filters.name = this.moduleSetRelease.name;
-    this.moduleService.getModuleSetReleaseList(request).subscribe(resp => {
-      const results = resp.list.filter(e => this.moduleSetRelease.moduleSetReleaseId !== e.moduleSetReleaseId);
-      if (results.length > 0 &&
-        results[0].name === this.moduleSetRelease.name) {
+    this.moduleService.checkNameUniqueness(
+      this.moduleSetRelease.release.releaseId, this.moduleSetRelease.moduleSetReleaseId, this.moduleSetRelease.name
+    ).subscribe(hasSameName => {
+      if (hasSameName) {
 
         const dialogConfig = this.confirmDialogService.newConfig();
         dialogConfig.data.header = 'Update module set release?';
         dialogConfig.data.content = [
-          'There is another same module set release, \'' + results[0].name + '\' for \'' +
-          results[0].releaseNum + '\' branch.',
+          'There is another same module set release, \'' + this.moduleSetRelease.name + '\' for \'' +
+          this.moduleSetRelease.release.releaseNum + '\' branch.',
           'Are you sure you want to update this module set release?',
         ];
         dialogConfig.data.action = 'Update';

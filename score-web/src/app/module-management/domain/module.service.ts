@@ -189,6 +189,17 @@ export class ModuleService {
     return this.getModuleSetReleaseListPage(params);
   }
 
+  /** Whether another module set release of the release (not `moduleSetReleaseId`) has the same name. */
+  checkNameUniqueness(releaseId: number, moduleSetReleaseId: number | undefined, name: string): Observable<boolean> {
+    let params = new HttpParams()
+        .set('releaseId', '' + releaseId)
+        .set('moduleSetReleaseName', name);
+    if (moduleSetReleaseId) {
+      params = params.set('moduleSetReleaseId', '' + moduleSetReleaseId);
+    }
+    return this.http.get<boolean>('/api/module-set-releases/check-name-uniqueness', {params});
+  }
+
   /** A page of the list, for the parameters that the endpoint takes (`score-table-view` builds them). */
   getModuleSetReleaseListPage(params: HttpParams): Observable<PageResponse<ModuleSetReleaseListEntry>> {
     return this.http.get<PageResponse<ModuleSetReleaseListEntry>>('/api/module-set-releases', {params}).pipe(
