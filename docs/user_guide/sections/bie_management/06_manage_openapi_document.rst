@@ -377,8 +377,10 @@ row:
    For the BIE *Item Instance*, for example, the GET operation is ``queryItemInstance`` and the POST
    operation is ``createItemInstance``.
 
-2. When you change the *Verb*, the verb word in the *Operation ID* is updated automatically while the
-   BIE-name part is kept (so any name you typed yourself is preserved).
+2. When you change the *Verb*, the *Operation ID* is updated automatically. For an operation that
+   references a BIE, it is rebuilt from the BIE name, so a name you typed yourself is replaced. For an
+   operation without a BIE, only the leading verb word is swapped and the rest of the name you typed
+   is kept.
 
 3. When the *Array Indicator* is checked, a ``List`` suffix is added to the *Operation ID* (for
    example ``queryItemInstanceList``); unchecking it removes the suffix.
@@ -387,11 +389,15 @@ row:
 
 The *Operation ID* is required and must be unique within the document:
 
-1. If the *Operation ID* is left empty, the cell shows "Operation ID is required." and clicking the
-   "Update" button is blocked; a notification reading "Operation ID is required." also appears.
+1. If the *Operation ID* is left empty, the cell shows an "Operation ID is required." error.
 
 2. If two operations in the same document have the same *Operation ID*, the affected cells show
    "Operation ID must be unique within the document."
+
+While a rule is broken, the "Update" button stays disabled. The server checks the whole document,
+including the operations on other pages of the *Endpoint Details* table, and a list of every broken rule
+is shown above the table. Each entry names the *Verb*, *Resource Name* and *Message Body* of the
+operation that breaks it. Fix the marked operations; "Update" becomes available again once nothing is broken.
 
 
 Remove BIEs from an OpenAPI Document
