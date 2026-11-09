@@ -115,7 +115,16 @@ export class ReleaseListComponent implements OnInit {
 
   onLibraryChange(library?: LibrarySummary) {
     this.libraryChoice.choose(library);
-    this.updateExtraParams();
+    if (!library?.libraryId) {
+      this.updateExtraParams();
+      return;
+    }
+    // The namespaces of the previous library are not offered, and a chosen one is not sent with the new library.
+    this.namespaceService.getNamespaceSummaries(library.libraryId).subscribe(namespaces => {
+      this.view().setFilter('namespaces', []);
+      this.filterOptions.set({namespaces: namespaces.map(e => ({value: '' + e.namespaceId, label: e.uri}))});
+      this.updateExtraParams();
+    });
   }
 
   isSelectable(row: ReleaseListEntry) {
