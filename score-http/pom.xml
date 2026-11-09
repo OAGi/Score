@@ -66,14 +66,14 @@
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
         <cglib.version>3.3.0</cglib.version>
-        <aspectj.version>1.9.26</aspectj.version>
+        <aspectj.version>1.9.27</aspectj.version>
         <!-- lettuce/netty versions are managed by the Spring Boot 4 BOM (pins removed for #1750). -->
         <redisson.version>4.8.0</redisson.version>
         <lombok.version>1.18.48</lombok.version>
         <mariadb-client.version>3.5.11</mariadb-client.version>
         <log4j.version>2.26.1</log4j.version>
         <jOOQ.version>3.21.9</jOOQ.version>
-        <guava.version>33.7.2-jre</guava.version>
+        <guava.version>33.8.0-jre</guava.version>
         <gson.version>2.15.0</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
         <commons-io.version>2.22.0</commons-io.version>
