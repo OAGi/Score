@@ -1,5 +1,6 @@
 import {OasDoc, OasDocHttpHeader} from './openapi-doc';
 import {
+  adaptPresetSchemas,
   adoptServerHeaders,
   hasAnyPreset,
   headerKey,
@@ -9,6 +10,7 @@ import {
   linkHeadersToRows,
   offerPreset,
   OasDocHttpHeaderRow,
+  schemaForVersion,
   sortHeaders,
   TRACEPARENT_PRESET,
   withdrawPreset
@@ -312,6 +314,69 @@ describe('OasDoc HTTP header presets (#1791)', () => {
       const oasDoc = doc([since(1)]);
       adoptServerHeaders(oasDoc, [since(1)], true);
       expect(oasDoc.httpHeaders.length).toBe(1);
+    });
+  });
+  describe('the form of the schema example by OpenAPI version', () => {
+    const sample = '00-4bf92f3577b34da6a3ce929d0e0e4736-a1b2c3d4e5f60718-01';
+
+    it('is the example of 3.0 when offered to a 3.0 document, and the examples of 3.1 to a 3.1 document', () => {
+      const oas30 = doc();
+      offerPreset(oas30, TRACEPARENT_PRESET, [1], false);
+      const oas31 = doc();
+      offerPreset(oas31, TRACEPARENT_PRESET, [1], true);
+      for (const header of oas30.httpHeaders) {
+        expect(header.schema['example']).toBeDefined();
+        expect(header.schema['examples']).toBeUndefined();
+      }
+      for (const header of oas31.httpHeaders) {
+        expect(header.schema['example']).toBeUndefined();
+        expect(header.schema['examples']).toEqual([TRACEPARENT_PRESET.headers.find(h => h.direction === header.direction)!.schema.example]);
+      }
+      // the preset itself is not changed by what was offered
+      expect(TRACEPARENT_PRESET.headers.every(h => h.schema.example && !h.schema.examples)).toBe(true);
+    });
+
+    it('is changed back and forth with the version, for the headers of the preset only', () => {
+      const oasDoc = doc([other, ...both(1)]);
+      const otherSchema = {type: 'string', example: 'abc'};
+      oasDoc.httpHeaders[0] = {...other, schema: otherSchema};
+      const before = JSON.parse(JSON.stringify(oasDoc.httpHeaders.slice(1)));
+
+      adaptPresetSchemas(oasDoc, TRACEPARENT_PRESET, true);
+      expect(oasDoc.httpHeaders.slice(1).every(h => !('example' in h.schema) && Array.isArray(h.schema['examples']))).toBe(true);
+      expect(oasDoc.httpHeaders[0].schema).toEqual(otherSchema);
+
+      adaptPresetSchemas(oasDoc, TRACEPARENT_PRESET, false);
+      expect(oasDoc.httpHeaders.slice(1)).toEqual(before);
+    });
+
+    it('leaves a schema that has no example, and a header the document has no preset of', () => {
+      const plain = {type: 'string'};
+      expect(schemaForVersion(plain, true)).toBe(plain);
+      expect(schemaForVersion(plain, false)).toBe(plain);
+      expect(() => adaptPresetSchemas(doc(), TRACEPARENT_PRESET, true)).not.toThrow();
+    });
+
+    it('keeps the examples the schema has when it has both', () => {
+      expect(schemaForVersion({type: 'string', example: 'a', examples: ['b']}, true)).toEqual({type: 'string', examples: ['b']});
+      expect(schemaForVersion({type: 'string', example: 'a', examples: ['b']}, false)).toEqual({type: 'string', example: 'a'});
+      expect(schemaForVersion({type: 'string', example: sample}, true)).toEqual({type: 'string', examples: [sample]});
+    });
+  });
+
+  describe('the pattern of traceparent', () => {
+    const pattern = new RegExp(TRACEPARENT_PRESET.headers[0].schema.pattern);
+
+    it('accepts a valid traceparent', () => {
+      expect(pattern.test('00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01')).toBe(true);
+    });
+
+    it('rejects what W3C Trace Context forbids', () => {
+      expect(pattern.test('ff-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01')).toBe(false);
+      expect(pattern.test('00-00000000000000000000000000000000-00f067aa0ba902b7-01')).toBe(false);
+      expect(pattern.test('00-4bf92f3577b34da6a3ce929d0e0e4736-0000000000000000-01')).toBe(false);
+      expect(pattern.test('00-4BF92F3577B34DA6A3CE929D0E0E4736-00f067aa0ba902b7-01')).toBe(false);
+      expect(pattern.test('00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7')).toBe(false);
     });
   });
 });

@@ -1125,7 +1125,7 @@ describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
       },
     };
     for (const method of ['getChanged', 'isChanged', 'init', 'showValidationErrors', 'refreshOperationIds',
-      'fetchOperationIds', 'enableTraceparent', 'disableTraceparent']) {
+      'fetchOperationIds', 'enableTraceparent', 'disableTraceparent', 'isOpenApi31', 'onOpenApiVersionChange']) {
       c[method] = proto[method];
     }
     for (const accessor of ['canEnableTraceparent', 'canDisableTraceparent']) {
@@ -1151,6 +1151,31 @@ describe('OasDocDetailComponent Enable / Disable traceparent (#1791)', () => {
 
   const names = (c: any) => c.oasDoc.httpHeaders.map((h: any) => h.name + '@' + h.oasOperationId + (h.direction === 'REQUEST' ? ':req' : ':res'));
   const saved = (c: any) => JSON.parse(JSON.stringify(c.oasDoc.httpHeaders));
+
+  describe('the form of the schema example follows the OpenAPI version', () => {
+    const schemas = (c: any) => c.oasDoc.httpHeaders.map((h: any) => h.schema);
+
+    it('writes the examples of 3.1 when enabled in a 3.1 document, and the example of 3.0 once the version is 3.0', () => {
+      const c = loaded(ctx([1, 2]));
+      c.enableTraceparent();
+      expect(schemas(c).every((s: any) => Array.isArray(s.examples) && !('example' in s))).toBe(true);
+
+      c.oasDoc.openAPIVersion = '3.0';
+      c.onOpenApiVersionChange();
+      expect(schemas(c).every((s: any) => typeof s.example === 'string' && !('examples' in s))).toBe(true);
+
+      c.oasDoc.openAPIVersion = '3.1';
+      c.onOpenApiVersionChange();
+      expect(schemas(c).every((s: any) => Array.isArray(s.examples) && !('example' in s))).toBe(true);
+    });
+
+    it('does not touch a header that is not a preset', () => {
+      const own = {name: 'x-request-id', schema: {type: 'string', example: 'abc'}, direction: 'REQUEST', required: false, oasOperationId: 1};
+      const c = loaded(ctx([1]), [own]);
+      c.onOpenApiVersionChange();
+      expect(c.oasDoc.httpHeaders[0].schema).toEqual({type: 'string', example: 'abc'});
+    });
+  });
 
   describe('what is offered', () => {
     it('learns the operations of the document, of every page, when the document is loaded', () => {

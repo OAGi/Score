@@ -1,4 +1,4 @@
-import {OasDoc, OasDocHttpHeader, OasHttpHeaderDirection} from './openapi-doc';
+import {OasDoc, OasDocHttpHeader, OasHttpHeaderDirection, OasSchemaObject} from './openapi-doc';
 import {locationOf} from './oas-doc-http-header-form';
 
 /**
@@ -21,7 +21,9 @@ export interface OasDocHttpHeaderPreset {
 const TRACEPARENT_DESCRIPTION = 'Standard composite identifier allowing for end-to-end correlation across multiple ' +
   'systems and services involved in the transaction. Specified by OTel Trace Context and W3C, the format is ' +
   '<version>-<trace-id>-<parent-id>-<trace-flags>.';
-const TRACEPARENT_PATTERN = '^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$';
+// The version ff, an all-zero trace-id and an all-zero parent-id are invalid: the lookaheads are those of the
+// W3CTraceContextPropagator of the OpenTelemetry JavaScript SDK (the pattern of an OpenAPI Schema Object is ECMA-262).
+const TRACEPARENT_PATTERN = '^(?!ff)[0-9a-f]{2}-(?![0]{32})[0-9a-f]{32}-(?![0]{16})[0-9a-f]{16}-[0-9a-f]{2}$';
 
 export const TRACEPARENT_PRESET: OasDocHttpHeaderPreset = {
   name: 'traceparent',
@@ -54,6 +56,37 @@ export const TRACEPARENT_PRESET: OasDocHttpHeaderPreset = {
     }
   ]
 };
+
+/**
+ * The Schema Object of a header in the form of an OpenAPI version. The presets are written with the {@code example} of
+ * OpenAPI 3.0; in 3.1 the {@code example} of a Schema Object is deprecated, and the {@code examples} array of JSON Schema
+ * 2020-12 takes its place. The server generates the schema as it is stored, so the form is chosen here, when a preset is
+ * offered and when the version of the document changes.
+ */
+export function schemaForVersion(schema: OasSchemaObject, openApi31: boolean): OasSchemaObject {
+  const hasExample = Object.prototype.hasOwnProperty.call(schema, 'example');
+  const examples = schema['examples'];
+  if (openApi31 && hasExample) {
+    // a schema that has its own examples keeps them; the example is dropped
+    const {example, ...rest} = schema;
+    return Array.isArray(examples) ? rest : {...rest, examples: [example]};
+  }
+  if (!openApi31 && Array.isArray(examples) && examples.length > 0) {
+    // OpenAPI 3.0 has the example only: the first of the examples (a preset has one)
+    const {examples: _examples, ...rest} = schema;
+    return hasExample ? rest : {...rest, example: examples[0]};
+  }
+  return schema;
+}
+
+/**
+ * Write the schemas of the headers of the preset in the form of the OpenAPI version of the document (see
+ * {@link schemaForVersion}). The other headers stay as they are.
+ */
+export function adaptPresetSchemas(oasDoc: OasDoc, preset: OasDocHttpHeaderPreset, openApi31: boolean): void {
+  (oasDoc.httpHeaders || []).filter(header => isOfPreset(header, preset))
+    .forEach(header => header.schema = schemaForVersion(header.schema, openApi31));
+}
 
 /** What taking a preset away did: the headers that were removed. */
 export interface OasDocHttpHeaderWithdrawal {
@@ -118,7 +151,8 @@ export function sortHeaders(oasDoc: OasDoc): void {
  * Offer the headers of the preset to the operations: each one gets a header of its own, a copy of the preset's, for
  * each direction in which it has none. The headers that are there are left as they are.
  */
-export function offerPreset(oasDoc: OasDoc, preset: OasDocHttpHeaderPreset, oasOperationIds: number[]): OasDocHttpHeaderOffer {
+export function offerPreset(oasDoc: OasDoc, preset: OasDocHttpHeaderPreset, oasOperationIds: number[],
+                            openApi31 = false): OasDocHttpHeaderOffer {
   const offer: OasDocHttpHeaderOffer = {added: [], skipped: [], requestParameters: 0, responseHeaders: 0};
   oasDoc.httpHeaders = oasDoc.httpHeaders || [];
   for (const oasOperationId of new Set(oasOperationIds)) {
@@ -127,7 +161,10 @@ export function offerPreset(oasDoc: OasDoc, preset: OasDocHttpHeaderPreset, oasO
       offer.skipped.push(oasOperationId);
     } else {
       // a copy, so that a document never shares the schema object of the preset
-      missing.forEach(presetHeader => oasDoc.httpHeaders.push({...JSON.parse(JSON.stringify(presetHeader)), oasOperationId}));
+      missing.forEach(presetHeader => {
+        const copy = JSON.parse(JSON.stringify(presetHeader));
+        oasDoc.httpHeaders.push({...copy, schema: schemaForVersion(copy.schema, openApi31), oasOperationId});
+      });
       offer.requestParameters += missing.filter(presetHeader => presetHeader.direction === 'REQUEST').length;
       offer.responseHeaders += missing.filter(presetHeader => presetHeader.direction === 'RESPONSE').length;
       offer.added.push(oasOperationId);

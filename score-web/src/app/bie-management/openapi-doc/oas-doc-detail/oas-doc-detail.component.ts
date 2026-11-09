@@ -14,6 +14,7 @@ import {OasHttpHeaderDirection} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
 import {directionLabel, locationOf, newHttpHeader} from '../domain/oas-doc-http-header-form';
 import {
+  adaptPresetSchemas,
   adoptServerHeaders,
   hasAnyPreset,
   headersOf,
@@ -490,13 +491,20 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   enableTraceparent() {
     this.fetchOperationIds().subscribe(operationIds => {
       this.operationIds = operationIds;
-      const {added, requestParameters, responseHeaders} = offerPreset(this.oasDoc, TRACEPARENT_PRESET, operationIds);
+      const {added, requestParameters, responseHeaders} = offerPreset(this.oasDoc, TRACEPARENT_PRESET, operationIds,
+        this.isOpenApi31());
       linkHeadersToRows(this.oasDoc, this.rows);
       this.snackBar.open(added.length === 0
         ? 'Every operation has traceparent already.'
         : 'traceparent is added (' + requestParameters + ' request parameter' + (requestParameters === 1 ? '' : 's')
         + ' and ' + responseHeaders + ' response header' + (responseHeaders === 1 ? '' : 's') + ').', '', {duration: 4000});
     });
+  }
+
+  /** The schemas of the preset headers are written in the form of the version: the example of 3.0, the examples of 3.1. */
+  onOpenApiVersionChange() {
+    adaptPresetSchemas(this.oasDoc, TRACEPARENT_PRESET, this.isOpenApi31());
+    linkHeadersToRows(this.oasDoc, this.rows);
   }
 
   disableTraceparent() {
