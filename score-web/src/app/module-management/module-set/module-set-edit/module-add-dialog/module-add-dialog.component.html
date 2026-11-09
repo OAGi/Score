@@ -36,7 +36,7 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>Version</mat-label>
-            <input [(ngModel)]="module.versionNum" data-id="module.versionNum" matInput maxlength="100"/>
+            <input [(ngModel)]="module.versionNum" data-id="module.versionNum" matInput maxlength="45"/>
           </mat-form-field>
           <button (click)="onCreateModule()" [disabled]="!canCreateModule()" color="primary" mat-raised-button>
             <mat-icon>check</mat-icon>
