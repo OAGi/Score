@@ -115,6 +115,22 @@ public interface ExpressBIEPage extends Page, SearchBarPage {
     WebElement getTableRecordByValue(String value);
 
     /**
+     * Return the name of the Business Context that the table row of the given BIE shows.
+     *
+     * @param topLevelAsbiep the BIE whose row is read
+     * @return the name of the shown Business Context
+     */
+    String getShownBusinessContextName(TopLevelASBIEPObject topLevelAsbiep);
+
+    /**
+     * Choose a Business Context in the menu of the Business Contexts column of the table row of the given BIE.
+     *
+     * @param topLevelAsbiep the BIE whose row is used
+     * @param businessContextName the name of the Business Context to choose
+     */
+    void chooseBusinessContext(TopLevelASBIEPObject topLevelAsbiep, String businessContextName);
+
+    /**
      * Return a specific column element from a table row.
      *
      * @param tableRecord the table row element
