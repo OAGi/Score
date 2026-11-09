@@ -100,6 +100,14 @@ describe('OasDocCreateComponent.isDisabled with invalid URL / email fields', () 
     expect(isDisabled(c)).toBe(true);
   });
 
+  it('is disabled when the title is empty or only whitespace', () => {
+    const c = ctx();
+    c.oasDoc.title = '   ';
+    expect(isDisabled(c)).toBe(true);
+    c.oasDoc.title = '';
+    expect(isDisabled(c)).toBe(true);
+  });
+
   it('is disabled when the contact email is invalid', () => {
     const c = ctx();
     c.contactEmail.setValue('nope');

@@ -1100,7 +1100,7 @@ export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   isDisabled(oasDoc1: OasDoc) {
     return (this.disabled) ||
       (oasDoc1.oasDocId === undefined || !oasDoc1.oasDocId) ||
-      (oasDoc1.title === undefined || oasDoc1.title === '') ||
+      (oasDoc1.title === undefined || oasDoc1.title.trim() === '') ||
       (oasDoc1.openAPIVersion === undefined || oasDoc1.openAPIVersion === '') ||
       (oasDoc1.version === undefined || oasDoc1.version === '') ||
       this.termServiceUrl.invalid || this.contactUrl.invalid ||

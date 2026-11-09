@@ -87,6 +87,7 @@ public class OpenAPIDocService {
 
     @Transactional
     public CreateOasDocResponse createOasDoc(ScoreUser requester, CreateOasDocRequest request) {
+        validateOasDocTitle(request.getTitle());
         validateOasDocRequest(
                 request.getOpenAPIVersion(),
                 request.getTermsOfService(),
@@ -106,6 +107,7 @@ public class OpenAPIDocService {
 
     @Transactional
     public UpdateOasDocResponse updateOasDoc(ScoreUser requester, UpdateOasDocRequest request) {
+        validateOasDocTitle(request.getTitle());
         validateOasDocRequest(
                 request.getOpenAPIVersion(),
                 request.getTermsOfService(),
@@ -602,6 +604,12 @@ public class OpenAPIDocService {
                                                   OasDocId oasDocId, OasOperationId oasOperationId) {
         if (!operationExisted) {
             applyInheritedErrorResponse(requester, oasDocId, oasOperationId);
+        }
+    }
+
+    private void validateOasDocTitle(String title) {
+        if (isBlank(title)) {
+            throw new IllegalArgumentException("`title` must not be blank.");
         }
     }
 

@@ -48,7 +48,7 @@ export class OasDocCreateComponent implements OnInit {
 
   isDisabled(oasDoc: OasDoc) {
     return (this.disabled) ||
-      (this.oasDoc.title === undefined || this.oasDoc.title === '') ||
+      (this.oasDoc.title === undefined || this.oasDoc.title.trim() === '') ||
       (this.oasDoc.openAPIVersion === undefined || this.oasDoc.openAPIVersion === '') ||
       (this.oasDoc.version === undefined || this.oasDoc.version === '') ||
       this.termServiceUrl.invalid || this.contactUrl.invalid ||
