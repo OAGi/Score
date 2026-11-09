@@ -808,6 +808,9 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
     public BieSet getBieSet(TopLevelAsbiepId topLevelAsbiepId, boolean used) {
         var topLevelAsbiepQuery = repositoryFactory().topLevelAsbiepQueryRepository(requester());
         TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (topLevelAsbiep == null) {
+            throw new NotFoundException("The BIE does not exist.");
+        }
 
         if (topLevelAsbiep.state() == BieState.WIP) {
             if (!topLevelAsbiep.owner().userId().equals(requester().userId())) {
