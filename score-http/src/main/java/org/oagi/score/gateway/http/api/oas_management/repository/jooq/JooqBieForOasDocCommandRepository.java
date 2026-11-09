@@ -86,12 +86,10 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
                     .add(submitted.getMessageBody());
         }
 
-        // Issue #1791: what the operations (and the other operations of the resources whose path may change) are before
-        // the update, so that the request parameters registered for them follow the change.
+        // Issue #1791: what the operations are before the update, so that the request parameters registered for them
+        // follow the change. A path change moves only the operation that was edited, so no other operation is affected.
         Map<ULong, OasOperationParameterState> parametersBefore = OasOperationParameters.captureAll(dslContext(),
-                submittedBodyTypesByOp.keySet(),
-                request.getBieForOasDocList().stream().map(BieForOasDoc::getOasResourceId).filter(Objects::nonNull)
-                        .map(id -> valueOf(id)).collect(Collectors.toCollection(LinkedHashSet::new)));
+                submittedBodyTypesByOp.keySet(), Collections.emptySet());
 
         // Per-entity "did anything change" accumulators. These mirror the previous per-field-list
         // emptiness checks used to build the response's `changed` flag: resource -> a path change,
@@ -111,19 +109,20 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
         // security exactly once to avoid the second row's delete-then-reinsert clobbering the first.
         // Issue #1347: the same twin-row guard also covers the per-operation error-response body type.
         Set<ULong> securityProcessedOps = new HashSet<>();
+        // A path edit moves the operation to the resource of the new path; it never renames the resource that the other
+        // operations of the same path still use. It is done for every operation before its rows are saved.
+        resourceChanged |= moveOperationsToTheirPaths(request.getBieForOasDocList(), valueOf(oasDocId), requesterId, timestamp);
         for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
             // The Request and Response branches persist the same set of entities (tag, resource,
             // operation, then the body of their own type); each is extracted to a shared helper. The
             // per-branch call order is preserved to keep the emitted statement sequence unchanged.
             if (bieForOasDoc.getMessageBody().equals("Request")) {
                 tagChanged |= saveOperationTag(bieForOasDoc, requesterId, timestamp);
-                resourceChanged |= updateResourcePath(bieForOasDoc, valueOf(oasDocId), requesterId, timestamp);
                 operationChanged |= updateOperationMeta(bieForOasDoc, requesterId, timestamp);
                 requestChanged |= upsertRequestBody(bieForOasDoc, submittedBodyTypesByOp, requesterId, timestamp);
             }
 
             if (bieForOasDoc.getMessageBody().equals("Response")) {
-                resourceChanged |= updateResourcePath(bieForOasDoc, valueOf(oasDocId), requesterId, timestamp);
                 operationChanged |= updateOperationMeta(bieForOasDoc, requesterId, timestamp);
                 tagChanged |= saveOperationTag(bieForOasDoc, requesterId, timestamp);
                 responseChanged |= upsertResponseBody(bieForOasDoc, submittedBodyTypesByOp, requesterId, timestamp);
@@ -211,33 +210,99 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
     }
 
     /**
-     * Update the operation's resource path (and audit columns) when the submitted resource name differs.
-     * The resource must exist for the (oas_resource_id, oas_doc_id) pair. Returns {@code true} when the
-     * path was changed.
+     * Move each submitted operation to the resource of the path its rows now say. A resource is the Path Item of one
+     * path of the document (OpenAPI 3.0.4, 4.7.8: a path is the unique key of the Paths Object), shared by the operations
+     * (verbs) of that path; so a path edit of one row is a move of that operation, and the other operations of the old
+     * path stay where they are.
+     * <ul>
+     *   <li>the resource of the new path is used when the document has one (the lowest id when a legacy document has
+     *       several), otherwise the operation's own resource is renamed when no other operation uses it, otherwise a new
+     *       resource is made;</li>
+     *   <li>the old resource is removed when no operation is left in it.</li>
+     * </ul>
+     * The two rows (Request and Response) of an operation may say different paths when only one of them was edited: the one
+     * that differs from the stored path is the edit, the last of them if both differ. Returns {@code true} when an
+     * operation was moved.
      */
-    private boolean updateResourcePath(BieForOasDoc bieForOasDoc, ULong oasDocId,
-                                       UserId requesterId, LocalDateTime timestamp) {
-        OasResourceRecord oasResourceRecord = dslContext().selectFrom(OAS_RESOURCE)
-                .where(and(OAS_RESOURCE.OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId))).fetchOptional().orElse(null);
-        if (oasResourceRecord == null) {
-            throw new ScoreDataAccessException(new IllegalArgumentException());
-        }
-        if (!StringUtils.equals(bieForOasDoc.getResourceName(), oasResourceRecord.getPath())) {
-            List<Field<?>> oasResourceChangedField = new ArrayList<>();
-            oasResourceChangedField.add(OAS_RESOURCE.PATH);
-            oasResourceRecord.setPath(bieForOasDoc.getResourceName());
-            oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATED_BY);
-            oasResourceRecord.setLastUpdatedBy(valueOf(requesterId));
-            oasResourceChangedField.add(OAS_RESOURCE.LAST_UPDATE_TIMESTAMP);
-            oasResourceRecord.setLastUpdateTimestamp(timestamp);
-            int affectedRows = oasResourceRecord.update(oasResourceChangedField);
-            if (affectedRows != 1) {
-                throw new ScoreDataAccessException(new IllegalStateException());
+    private boolean moveOperationsToTheirPaths(List<BieForOasDoc> rows, ULong oasDocId,
+                                               UserId requesterId, LocalDateTime timestamp) {
+        Map<ULong, ULong> resourceOfOperation = new LinkedHashMap<>();
+        Map<ULong, String> editedPathOfOperation = new LinkedHashMap<>();
+        for (BieForOasDoc row : rows) {
+            if (row == null || row.getOasOperationId() == null) {
+                continue;
             }
-            return true;
+            // the resource that the row belongs to must be a resource of the document
+            OasResourceRecord rowResource = dslContext().selectFrom(OAS_RESOURCE)
+                    .where(and(OAS_RESOURCE.OAS_RESOURCE_ID.eq(valueOf(row.getOasResourceId())),
+                            OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId))).fetchOptional().orElse(null);
+            if (rowResource == null) {
+                throw new ScoreDataAccessException(new IllegalArgumentException());
+            }
+            ULong oasOperationId = valueOf(row.getOasOperationId());
+            OasResourceRecord stored = dslContext().selectFrom(OAS_RESOURCE)
+                    .where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(dslContext().select(OAS_OPERATION.OAS_RESOURCE_ID)
+                            .from(OAS_OPERATION).where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId))))
+                    .fetchOptional().orElse(null);
+            if (stored == null) {
+                continue; // the operation is not stored (anymore): nothing to move
+            }
+            if (!oasDocId.equals(stored.getOasDocId())) {
+                throw new ScoreDataAccessException(new IllegalArgumentException());
+            }
+            resourceOfOperation.put(oasOperationId, stored.getOasResourceId());
+            if (!StringUtils.equals(row.getResourceName(), stored.getPath()) || !editedPathOfOperation.containsKey(oasOperationId)) {
+                editedPathOfOperation.put(oasOperationId, row.getResourceName());
+            }
         }
-        return false;
+
+        boolean moved = false;
+        for (Map.Entry<ULong, String> entry : editedPathOfOperation.entrySet()) {
+            ULong oasOperationId = entry.getKey();
+            String path = entry.getValue();
+            // re-read: an earlier move of this update may have changed the resource of the operation
+            ULong fromResourceId = dslContext().select(OAS_OPERATION.OAS_RESOURCE_ID).from(OAS_OPERATION)
+                    .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId)).fetchOne(OAS_OPERATION.OAS_RESOURCE_ID);
+            OasResourceRecord from = dslContext().selectFrom(OAS_RESOURCE)
+                    .where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(fromResourceId)).fetchOne();
+            if (path == null || StringUtils.equals(path, from.getPath())) {
+                continue;
+            }
+            ULong toResourceId = dslContext().select(OAS_RESOURCE.OAS_RESOURCE_ID).from(OAS_RESOURCE)
+                    .where(OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId).and(OAS_RESOURCE.PATH.eq(path)))
+                    .orderBy(OAS_RESOURCE.OAS_RESOURCE_ID.asc()).limit(1).fetchOne(OAS_RESOURCE.OAS_RESOURCE_ID);
+            boolean onlyOperationOfResource = dslContext().fetchCount(OAS_OPERATION,
+                    OAS_OPERATION.OAS_RESOURCE_ID.eq(fromResourceId)) == 1;
+            if (toResourceId == null && onlyOperationOfResource) {
+                // nobody else is on the path: the path of the resource is the one to change
+                from.setPath(path);
+                from.setLastUpdatedBy(valueOf(requesterId));
+                from.setLastUpdateTimestamp(timestamp);
+                if (from.update(OAS_RESOURCE.PATH, OAS_RESOURCE.LAST_UPDATED_BY, OAS_RESOURCE.LAST_UPDATE_TIMESTAMP) != 1) {
+                    throw new ScoreDataAccessException(new IllegalStateException());
+                }
+                moved = true;
+                continue;
+            }
+            if (toResourceId == null) {
+                toResourceId = dslContext().insertInto(OAS_RESOURCE)
+                        .set(OAS_RESOURCE.OAS_DOC_ID, oasDocId)
+                        .set(OAS_RESOURCE.PATH, path)
+                        .set(OAS_RESOURCE.CREATED_BY, valueOf(requesterId))
+                        .set(OAS_RESOURCE.LAST_UPDATED_BY, valueOf(requesterId))
+                        .set(OAS_RESOURCE.CREATION_TIMESTAMP, timestamp)
+                        .set(OAS_RESOURCE.LAST_UPDATE_TIMESTAMP, timestamp)
+                        .returningResult(OAS_RESOURCE.OAS_RESOURCE_ID).fetchOne().value1();
+            }
+            dslContext().update(OAS_OPERATION).set(OAS_OPERATION.OAS_RESOURCE_ID, toResourceId)
+                    .where(OAS_OPERATION.OAS_OPERATION_ID.eq(oasOperationId)).execute();
+            if (!dslContext().fetchExists(dslContext().selectOne().from(OAS_OPERATION)
+                    .where(OAS_OPERATION.OAS_RESOURCE_ID.eq(fromResourceId)))) {
+                dslContext().delete(OAS_RESOURCE).where(OAS_RESOURCE.OAS_RESOURCE_ID.eq(fromResourceId)).execute();
+            }
+            moved = true;
+        }
+        return moved;
     }
 
     /**
@@ -250,9 +315,10 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
      * reassigned) to keep byte-for-byte parity — {@code last_updated_by} is still advanced.</p>
      */
     private boolean updateOperationMeta(BieForOasDoc bieForOasDoc, UserId requesterId, LocalDateTime timestamp) {
+        // by the operation, not by the resource of the row: the operation may have moved to another resource just now
+        // (that the operation is the document's was checked when it was moved)
         OasOperationRecord oasOperationRecord = dslContext().selectFrom(OAS_OPERATION)
-                .where(and(OAS_OPERATION.OAS_RESOURCE_ID.eq(valueOf(bieForOasDoc.getOasResourceId())),
-                        OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId()))))
+                .where(OAS_OPERATION.OAS_OPERATION_ID.eq(valueOf(bieForOasDoc.getOasOperationId())))
                 .fetchOptional().orElse(null);
         if (oasOperationRecord == null) {
             return false;
