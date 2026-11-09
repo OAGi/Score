@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.context_management.context_category.model.ContextCategoryId;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload.CreateContextSchemeRequest;
+import org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload.CreateContextSchemeValueRequest;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload.UpdateContextSchemeRequest;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.controller.payload.UpdateContextSchemeValueRequest;
 import org.oagi.score.gateway.http.api.context_management.context_scheme.model.ContextSchemeId;
@@ -123,6 +124,27 @@ class ContextSchemeCommandServiceTest {
             for (var request : List.of(noSchemeId, noAgency, noVersion)) {
                 assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
             }
+        }
+        verifyNoInteractions(command);
+    }
+
+    // ----- blank value -----
+
+    @Test
+    void create_rejects_a_blank_value() {
+        for (String blank : new String[]{"", "   "}) {
+            var request = new CreateContextSchemeRequest(CATEGORY_ID, null, "GEO", "Geopolitical",
+                    "desc", "OAGi", "1.0", List.of(new CreateContextSchemeValueRequest(blank, "meaning")));
+            assertThrows(IllegalArgumentException.class, () -> service.create(requester, request));
+        }
+        verifyNoInteractions(command);
+    }
+
+    @Test
+    void update_rejects_a_blank_value() {
+        for (String blank : new String[]{"", "   "}) {
+            var request = updateRequest(List.of(new UpdateContextSchemeValueRequest(null, blank, "meaning")));
+            assertThrows(IllegalArgumentException.class, () -> service.update(requester, request));
         }
         verifyNoInteractions(command);
     }

@@ -71,6 +71,10 @@ public class ContextSchemeCommandService {
                 throw new IllegalArgumentException("Context scheme value '" + value + "' already exists.");
             }
         }
+        // A given value must have text; a missing one is left to the required-field checks of the screens.
+        if (valueList.stream().anyMatch(value -> value != null && !hasText(value))) {
+            throw new IllegalArgumentException("Context scheme value cannot be blank.");
+        }
     }
 
     private static void requireMaxLength(String field, String text, int maxLength) {
