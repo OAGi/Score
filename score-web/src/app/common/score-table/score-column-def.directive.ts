@@ -1,4 +1,4 @@
-import {contentChild, Directive, inject, Injector, input, OnInit, TemplateRef} from '@angular/core';
+import {contentChild, Directive, effect, inject, Injector, input, OnInit, TemplateRef} from '@angular/core';
 import {MatCell, MatColumnDef, MatHeaderCell, MatCellDef, MatHeaderCellDef} from '@angular/material/table';
 import {MatSort} from '@angular/material/sort';
 import {MatMultiSort} from 'ngx-mat-multi-sort';
@@ -90,7 +90,12 @@ export class ScoreHeaderCellDirective {
     const columnDef = inject(CdkColumnDef);
     const resizer = inject(ScoreTableColumnResizeDirective, {self: true});
 
-    resizer.defaultWidth = table().width(columnDef.name);
+    // The width follows the column state: a reset of the columns (or a resize) is drawn, not only the first width. What the user
+    // dragged is in the state too (the drag emits `onResize`), so this puts the same width again.
+    effect(() => {
+      resizer.defaultWidth = table().width(columnDef.name);
+      resizer.setInitialWidth();
+    });
     // Only a column of the table definition can be resized; a fixed column cannot.
     const column = table().def.columns.find(c => c.id === columnDef.name);
     resizer.resizable = !!column && column.resizable !== false;
