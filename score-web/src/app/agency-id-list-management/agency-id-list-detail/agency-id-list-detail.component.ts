@@ -284,12 +284,14 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       }
 
       const data = this.values;
-      if (result.developerDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
-      }
-      if (result.userDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
-      }
+      const clearOtherDefaults = () => {
+        if (result.developerDefault) {
+          data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
+        }
+        if (result.userDefault) {
+          data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
+        }
+      };
 
       if (isAddAction) {
         for (const value of data) {
@@ -302,6 +304,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
           }
         }
 
+        clearOtherDefaults();
         result.guid = uuid();
         data.push(result);
 
@@ -316,6 +319,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
           }
         }
 
+        clearOtherDefaults();
         this._updateDataSource(data.map(row => {
           if (row.guid === result.guid) {
             return result;
