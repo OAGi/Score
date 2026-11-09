@@ -136,3 +136,8 @@ table.compact tr.element-row ::ng-deep td.mat-mdc-cell:not(.compact-cell):not(.m
 .table-scroll-frame.more-end::after {
   opacity: 1;
 }
+
+/* A header text may be on more lines: `header: 'Array\nIndicator'` of the table definition. */
+th.mat-mdc-header-cell {
+  white-space: pre-line;
+}

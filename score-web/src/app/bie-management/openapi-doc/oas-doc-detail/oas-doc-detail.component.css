@@ -380,7 +380,8 @@
   font-size: 18px;
   width: 18px;
   height: 18px;
-  line-height: 18px;
+  /* The global style makes the icon of a button 24px (!important), so the line is 24px too: a shorter line puts the glyph above the middle of the button. */
+  line-height: 24px;
   margin: 0;
   display: block;
 }
