@@ -11,6 +11,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {decodeUnicodeBase64, encodeUnicodeBase64} from '../common/utility';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
@@ -130,7 +131,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   storeUserInfo(res: UserToken) {
-    localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
+    localStorage.setItem(this.USER_INFO_KEY, encodeUnicodeBase64(JSON.stringify(res)));
   }
 
   /**
@@ -145,7 +146,7 @@ export class AuthService implements OnInit, CanActivate {
   getUserToken(): UserToken {
     let value;
     try {
-      value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
+      value = JSON.parse(decodeUnicodeBase64(localStorage.getItem(this.USER_INFO_KEY)));
 
       if (!value.tenant) {
         value.tenant = new TenantProperties();

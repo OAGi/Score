@@ -48,3 +48,26 @@ describe('AuthService.canUsePasskeys', () => {
     expect(service.canUsePasskeys()).toBe(false);
   });
 });
+
+describe('AuthService user token storage', () => {
+  let service: AuthService;
+
+  beforeEach(() => {
+    localStorage.clear();
+    TestBed.configureTestingModule({
+      providers: [AuthService, provideHttpClient(), provideHttpClientTesting(), {provide: Router, useValue: {}}]
+    });
+    service = TestBed.inject(AuthService);
+  });
+
+  it('stores and reads back a token whose username has a non-Latin-1 character', () => {
+    service.storeUserInfo({username: '홍길동', roles: ['end-user'], authentication: 'basic', enabled: true} as any);
+    expect(service.getUserToken().username).toBe('홍길동');
+  });
+
+  it('still reads a token stored earlier with plain btoa', () => {
+    localStorage.setItem(service.USER_INFO_KEY,
+      btoa(JSON.stringify({username: 'alice', roles: ['end-user'], authentication: 'basic', enabled: true})));
+    expect(service.getUserToken().username).toBe('alice');
+  });
+});
