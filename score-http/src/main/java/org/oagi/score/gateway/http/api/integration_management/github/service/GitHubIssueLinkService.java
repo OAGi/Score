@@ -210,9 +210,9 @@ public class GitHubIssueLinkService {
     }
 
     /**
-     * Removes a link and takes the issue's card off the project board — unlinking ends this component's
-     * tracking, so the card is removed (issue #1533, Feature 2) — and drops its cached ETag. The board
-     * and ETag work happen outside the DB transaction so no connection is held during the (GitHub /
+     * Removes a link and, when no other component still links the issue, takes the issue's card off the
+     * project board (issue #1533, Feature 2) and drops its cached ETag. While another component still
+     * tracks the issue, its card and ETag are kept. The board and ETag work happen outside the DB transaction so no connection is held during the (GitHub /
      * Redis) calls, mirroring {@link #link}. Best-effort; no-ops when fieldOption sync is not configured.
      */
     public void unlink(ScoreUser requester, CcType ccType, BigInteger linkId) {
@@ -228,8 +228,9 @@ public class GitHubIssueLinkService {
     /**
      * Transactional, DB-only part of {@link #unlink}: removes the link and garbage-collects the
      * {@code github_issue} registry row (when this was its last link) in one transaction. Returns the
-     * unlinked issue (whenever a link was actually removed) so the caller can take its card off the
-     * board and drop its ETag outside the transaction; {@code null} if there was nothing to unlink.
+     * unlinked issue only when the registry row was removed too, so the caller can take its card off the
+     * board and drop its ETag outside the transaction; {@code null} if there was nothing to unlink or
+     * the issue is still linked to another component.
      * Public only so the Spring proxy can apply {@code @Transactional} — call {@link #unlink}.
      */
     @Transactional
@@ -244,10 +245,10 @@ public class GitHubIssueLinkService {
         GitHubIssueLinkRecord linked = getLinkedIssue(query, ccType, linkId);
         deleteIssueLink(command(requester), ccType, linkId);
         // GC the registry row when this was the last reference (DB hygiene, independent of the board card).
-        if (linked != null) {
-            command(requester).deleteIssueIfOrphaned(linked.issueId());
+        if (linked != null && command(requester).deleteIssueIfOrphaned(linked.issueId())) {
+            return linked;
         }
-        return linked;
+        return null;
     }
 
     /**
