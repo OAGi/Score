@@ -188,10 +188,16 @@ class DtCreateAllowedPrimitiveReleaseTest {
     @Test
     void revisingADataTypeWhoseAllowedPrimitivesPointToAnotherReleaseMakesThemPointToItsOwnRelease() {
         long working = workingReleaseOf("Ag eStandards / Chem eStandards");
-        Record dt = dsl.fetchOne("select m.dt_manifest_id from dt_manifest m join dt_awd_pri p on p.dt_id = m.dt_id "
-                + "and p.release_id = m.release_id join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id "
-                + "where m.release_id = ? and x.release_id <> m.release_id limit 1", working);
-        assertTrue(dt != null, "no Data Type of the library has allowed primitives that point to another release");
+        // Data Types created before the allowed primitives were pointed to their own release have XBTs of another release:
+        // make one, by pointing an allowed primitive to the manifest of the same XBT in the release the library depends on.
+        Record dt = dsl.fetchOne("select m.dt_manifest_id, p.dt_awd_pri_id, other.xbt_manifest_id "
+                + "from dt_manifest m join dt_awd_pri p on p.dt_id = m.dt_id and p.release_id = m.release_id "
+                + "join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id "
+                + "join xbt_manifest other on other.xbt_id = x.xbt_id and other.release_id <> m.release_id "
+                + "where m.release_id = ? limit 1", working);
+        assertTrue(dt != null, "no Data Type of the library uses an XBT that another release has a manifest of");
+        dsl.execute("update dt_awd_pri set xbt_manifest_id = ? where dt_awd_pri_id = ?",
+                dt.get(2, Long.class), dt.get(1, Long.class));
         long dtManifest = dt.get(0, Long.class);
         assertTrue(releaseMismatches(working, dtManifest) > 0, "the Data Type breaks the rule before it is revised");
 

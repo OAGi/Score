@@ -28,10 +28,12 @@ public class ReleaseValidationResponse {
         ACC_Association,
         ASCCP_RoleOfAcc,
         BCCP_BDT,
+        DT_BasedDT,
+        DT_AllowedPrimitive,
         NAMESPACE
     }
 
-    private class ValidationMessage {
+    public class ValidationMessage {
         private ValidationMessageLevel level;
         private String message;
         private ValidationMessageCode code;

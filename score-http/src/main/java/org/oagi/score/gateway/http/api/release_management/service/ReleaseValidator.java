@@ -17,10 +17,13 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManife
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.release_management.controller.payload.ReleaseValidationResponse;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseState;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.oagi.score.gateway.http.api.xbt_management.model.XbtSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -105,8 +108,91 @@ public class ReleaseValidator {
         validateCodeList(response);
         validateAgencyIdList(response);
         validateDt(response);
+        validateDependencies(response);
 
         return response;
+    }
+
+    /**
+     * What the components depend on, as far as it is not only about the namespace. Some of it is in a release the library
+     * depends on, so the components of those releases are read as well.
+     */
+    private void validateDependencies(ReleaseValidationResponse response) {
+        var releaseQuery = repositoryFactory.releaseQueryRepository(requester);
+        ReleaseSummaryRecord workingRelease = releaseQuery.getReleaseSummary(
+                releaseQuery.getReleaseSummary(releaseId).libraryId(), "Working");
+        ReleaseId workingReleaseId = workingRelease.releaseId();
+        List<ReleaseSummaryRecord> dependencyReleases = releaseQuery.getIncludedReleaseSummaryList(workingReleaseId).stream()
+                .filter(e -> !e.releaseId().equals(workingReleaseId))
+                .toList();
+        List<ReleaseId> dependencyReleaseIds = dependencyReleases.stream().map(ReleaseSummaryRecord::releaseId).toList();
+        List<ReleaseId> workingAndDependencyReleaseIds = new ArrayList<>(dependencyReleaseIds);
+        workingAndDependencyReleaseIds.add(workingReleaseId);
+
+        var accQuery = repositoryFactory.accQueryRepository(requester);
+        var asccpQuery = repositoryFactory.asccpQueryRepository(requester);
+        var bccpQuery = repositoryFactory.bccpQueryRepository(requester);
+        var dtQuery = repositoryFactory.dtQueryRepository(requester);
+        var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
+        var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
+        var xbtQuery = repositoryFactory.xbtQueryRepository(requester);
+
+        var dependencies = ReleaseDependencyValidator.Dependencies.none();
+        if (!dependencyReleaseIds.isEmpty()) {
+            // A release is stable when it is published: the 'Working' release, or one that is not published yet, can change.
+            Map<ReleaseId, Boolean> stable = dependencyReleases.stream().collect(Collectors.toMap(
+                    ReleaseSummaryRecord::releaseId,
+                    e -> e.state() == ReleaseState.Published && !"Working".equals(e.releaseNum())));
+            dependencies = new ReleaseDependencyValidator.Dependencies(
+                    locate(accQuery.getAccSummaryList(dependencyReleaseIds), AccSummaryRecord::accManifestId,
+                            e -> stable.get(e.release().releaseId())),
+                    locate(asccpQuery.getAsccpSummaryList(dependencyReleaseIds), AsccpSummaryRecord::asccpManifestId,
+                            e -> stable.get(e.release().releaseId())),
+                    locate(bccpQuery.getBccpSummaryList(dependencyReleaseIds), BccpSummaryRecord::bccpManifestId,
+                            e -> stable.get(e.release().releaseId())),
+                    locate(dtQuery.getDtSummaryList(dependencyReleaseIds), DtSummaryRecord::dtManifestId,
+                            e -> stable.get(e.release().releaseId())),
+                    locateByRelease(dependencyReleaseIds, stable, codeListQuery::getCodeListSummaryList,
+                            CodeListSummaryRecord::codeListManifestId),
+                    locateByRelease(dependencyReleaseIds, stable, agencyIdListQuery::getAgencyIdListSummaryList,
+                            AgencyIdListSummaryRecord::agencyIdListManifestId));
+        }
+
+        var data = new ReleaseDependencyValidator.Data(
+                accList, asccList, bccList, asccpList, bccpList, dtList,
+                dtQuery.getDtAwdPriSummaryList(workingReleaseId),
+                dtQuery.getDtScSummaryList(List.of(workingReleaseId)),
+                dtQuery.getDtScAwdPriSummaryList(workingReleaseId),
+                codeListList, agencyIdListList,
+                xbtQuery.getXbtSummaryList(workingAndDependencyReleaseIds).stream()
+                        .collect(Collectors.toMap(XbtSummaryRecord::xbtManifestId, Function.identity())),
+                xbtQuery.getXbtSummaryList(workingReleaseId).stream()
+                        .map(XbtSummaryRecord::xbtId).collect(Collectors.toSet()),
+                dependencies,
+                new ReleaseDependencyValidator.Assigned(
+                        assignedAccComponentManifestIds, assignedAsccpComponentManifestIds,
+                        assignedBccpComponentManifestIds, assignedDtComponentManifestIds,
+                        assignedCodeListComponentManifestIds, assignedAgencyIdListComponentManifestIds));
+        new ReleaseDependencyValidator(data, response).validate();
+    }
+
+    private static <I, T> Map<I, ReleaseDependencyValidator.Located<T>> locate(
+            List<T> components, Function<T, I> id, Function<T, Boolean> stable) {
+        return components.stream().collect(Collectors.toMap(id,
+                e -> new ReleaseDependencyValidator.Located<>(e, stable.apply(e))));
+    }
+
+    /** For the components that do not say which release they are in: ask release by release. */
+    private static <I, T> Map<I, ReleaseDependencyValidator.Located<T>> locateByRelease(
+            List<ReleaseId> releaseIds, Map<ReleaseId, Boolean> stable,
+            Function<ReleaseId, List<T>> query, Function<T, I> id) {
+        Map<I, ReleaseDependencyValidator.Located<T>> result = new java.util.HashMap<>();
+        for (ReleaseId releaseId : releaseIds) {
+            for (T component : query.apply(releaseId)) {
+                result.put(id.apply(component), new ReleaseDependencyValidator.Located<>(component, stable.get(releaseId)));
+            }
+        }
+        return result;
     }
 
     private void loadManifests() {
@@ -145,128 +231,21 @@ public class ReleaseValidator {
 
     private void validateAcc(ReleaseValidationResponse response) {
         for (AccSummaryRecord acc : accList) {
-            CcState state = acc.state();
-            if (state != CcState.Published && !assignedAccComponentManifestIds.contains(acc.accManifestId())) {
-                continue;
+            if (acc.state() == CcState.Published || assignedAccComponentManifestIds.contains(acc.accManifestId())) {
+                if (acc.namespaceId() == null) {
+                    response.addMessageForAcc(acc.accManifestId(),
+                            Error, "Namespace is required.", NAMESPACE);
+                }
             }
-            if (acc.namespaceId() == null) {
-                response.addMessageForAcc(acc.accManifestId(),
-                        Error, "Namespace is required.", NAMESPACE);
-            }
-
-            // check ACCs whose `basedACC` is this acc.
-            accList.stream().filter(e -> e.accManifestId().equals(acc.basedAccManifestId()))
-                    .forEach(basedAcc -> {
-                        CcState basedAccState = basedAcc.state();
-                        if (basedAccState != CcState.Published) {
-                            if (assignedAccComponentManifestIds.contains(basedAcc.accManifestId())) {
-                                if (basedAccState != CcState.Candidate) {
-                                    response.addMessageForAcc(basedAcc.accManifestId(),
-                                            Error, "'" + basedAcc.den() + "' should be in '" + CcState.Candidate + "'.",
-                                            ACC_BasedACC);
-                                }
-                            } else {
-                                if (basedAcc.prevAccManifestId() == null) {
-                                    response.addMessageForAcc(basedAcc.accManifestId(),
-                                            Error, "'" + basedAcc.den() + "' is needed in the release assignment due to '" + acc.den() + "'.",
-                                            ACC_BasedACC);
-                                } else {
-                                    response.addMessageForAcc(basedAcc.accManifestId(),
-                                            Warning, "'" + basedAcc.den() + "' has been revised but not included in the release assignment.",
-                                            ACC_BasedACC);
-                                }
-                            }
-                        }
-                    });
-
-            // check ASCCs
-            asccList.stream().filter(e -> e.fromAccManifestId().equals(acc.accManifestId()))
-                    .forEach(ascc -> {
-                        AsccpSummaryRecord asccp = asccpMap.get(ascc.toAsccpManifestId());
-                        CcState asccpState = asccp.state();
-                        if (asccpState != CcState.Published) {
-                            if (assignedAsccpComponentManifestIds.contains(asccp.asccpManifestId())) {
-                                if (asccpState != CcState.Candidate) {
-                                    response.addMessageForAsccp(asccp.asccpManifestId(),
-                                            Error, "'" + asccp.den() + "' should be in '" + CcState.Candidate + "'.",
-                                            ACC_Association);
-                                }
-                            } else {
-                                if (asccp.prevAsccpManifestId() == null) {
-                                    response.addMessageForAsccp(asccp.asccpManifestId(),
-                                            Error, "'" + asccp.den() + "' is needed in the release assignment due to '" + acc.den() + "'.",
-                                            ACC_Association);
-                                } else {
-                                    response.addMessageForAsccp(asccp.asccpManifestId(),
-                                            Warning, "'" + asccp.den() + "' has been revised but not included in the release assignment.",
-                                            ACC_Association);
-                                }
-                            }
-                        }
-                    });
-
-            // check BCCs
-            bccList.stream().filter(e -> e.fromAccManifestId().equals(acc.accManifestId()))
-                    .forEach(bcc -> {
-                        BccpSummaryRecord bccp = bccpMap.get(bcc.toBccpManifestId());
-                        CcState bccpState = bccp.state();
-                        if (bccpState != CcState.Published) {
-                            if (assignedBccpComponentManifestIds.contains(bccp.bccpManifestId())) {
-                                if (bccpState != CcState.Candidate) {
-                                    response.addMessageForBccp(bccp.bccpManifestId(),
-                                            Error, "'" + bccp.den() + "' should be in '" + CcState.Candidate + "'.",
-                                            ACC_Association);
-                                }
-                            } else {
-                                if (bccp.prevBccpManifestId() == null) {
-                                    response.addMessageForBccp(bccp.bccpManifestId(),
-                                            Error, "'" + bccp.den() + "' is needed in the release assignment due to '" + acc.den() + "'.",
-                                            ACC_Association);
-                                } else {
-                                    response.addMessageForBccp(bccp.bccpManifestId(),
-                                            Warning, "'" + bccp.den() + "' has been revised but not included in the release assignment.",
-                                            ACC_Association);
-                                }
-                            }
-                        }
-                    });
         }
     }
 
     private void validateAsccp(ReleaseValidationResponse response) {
         for (AsccpSummaryRecord asccp : asccpList) {
-            CcState state = asccp.state();
-            if (state != CcState.Published && !assignedAsccpComponentManifestIds.contains(asccp.asccpManifestId())) {
-                continue;
-            }
-            if (asccp.namespaceId() == null) {
-                response.addMessageForAsccp(asccp.asccpManifestId(),
-                        Error, "Namespace is required.", NAMESPACE);
-            }
-
-            // Check ASCCP.ROLE_OF_ACC
-            AccSummaryRecord acc = accMap.get(asccp.roleOfAccManifestId());
-            if (acc == null) {
-                continue;
-            }
-            CcState accState = acc.state();
-            if (accState != CcState.Published) {
-                if (assignedAccComponentManifestIds.contains(acc.accManifestId())) {
-                    if (accState != CcState.Candidate) {
-                        response.addMessageForAcc(acc.accManifestId(),
-                                Error, "'" + acc.den() + "' should be in '" + CcState.Candidate + "'.",
-                                ASCCP_RoleOfAcc);
-                    }
-                } else {
-                    if (acc.prevAccManifestId() == null) {
-                        response.addMessageForAcc(acc.accManifestId(),
-                                Error, "'" + acc.den() + "' is needed in the release assignment due to '" + asccp.den() + "'.",
-                                ASCCP_RoleOfAcc);
-                    } else {
-                        response.addMessageForAcc(acc.accManifestId(),
-                                Warning, "'" + acc.den() + "' has been revised but not included in the release assignment.",
-                                ASCCP_RoleOfAcc);
-                    }
+            if (asccp.state() == CcState.Published || assignedAsccpComponentManifestIds.contains(asccp.asccpManifestId())) {
+                if (asccp.namespaceId() == null) {
+                    response.addMessageForAsccp(asccp.asccpManifestId(),
+                            Error, "Namespace is required.", NAMESPACE);
                 }
             }
         }
@@ -274,39 +253,10 @@ public class ReleaseValidator {
 
     private void validateBccp(ReleaseValidationResponse response) {
         for (BccpSummaryRecord bccp : bccpList) {
-            CcState state = bccp.state();
-            if (state != CcState.Published && !assignedBccpComponentManifestIds.contains(
-                    bccp.bccpManifestId())) {
-                continue;
-            }
-            if (bccp.namespaceId() == null) {
-                response.addMessageForBccp(bccp.bccpManifestId(),
-                        Error, "Namespace is required.", NAMESPACE);
-            }
-
-            // Check BCCP.BDT
-            DtSummaryRecord dt = dtMap.get(bccp.dtManifestId());
-            if (dt == null) {
-                continue;
-            }
-            CcState dtState = dt.state();
-            if (dtState != CcState.Published) {
-                if (assignedDtComponentManifestIds.contains(dt.dtManifestId())) {
-                    if (dtState != CcState.Candidate) {
-                        response.addMessageForDt(dt.dtManifestId(),
-                                Error, "'" + dt.den() + "' should be in '" + CcState.Candidate + "'.",
-                                BCCP_BDT);
-                    }
-                } else {
-                    if (dt.prevDtManifestId() == null) {
-                        response.addMessageForDt(dt.dtManifestId(),
-                                Error, "'" + dt.den() + "' is needed in the release assignment due to '" + bccp.den() + "'.",
-                                BCCP_BDT);
-                    } else {
-                        response.addMessageForDt(dt.dtManifestId(),
-                                Warning, "'" + dt.den() + "' has been revised but not included in the release assignment.",
-                                BCCP_BDT);
-                    }
+            if (bccp.state() == CcState.Published || assignedBccpComponentManifestIds.contains(bccp.bccpManifestId())) {
+                if (bccp.namespaceId() == null) {
+                    response.addMessageForBccp(bccp.bccpManifestId(),
+                            Error, "Namespace is required.", NAMESPACE);
                 }
             }
         }
