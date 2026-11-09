@@ -5,6 +5,7 @@ import {
   OasSecurityRequirementScheme,
   OasSecurityScheme
 } from '../domain/openapi-doc';
+import {scopeNameError} from '../domain/oas-security-names';
 
 export interface OasDocSecurityRequirementDialogData {
   title: string;
@@ -229,6 +230,10 @@ export class OasDocSecurityRequirementDialogComponent {
     return Array.from(options);
   }
 
+  scopesError(entry: OasSecurityRequirementScheme): string {
+    return (entry.scopes || []).map(scopeNameError).find(error => !!error) || '';
+  }
+
   freeTextScopes(entry: OasSecurityRequirementScheme): string {
     return (entry.scopes || []).join(', ');
   }
@@ -249,7 +254,7 @@ export class OasDocSecurityRequirementDialogComponent {
       return false;
     }
     return this.requirements.every(req =>
-      req.anonymous || (req.schemes || []).some(s => !!s.schemeName));
+      req.anonymous || ((req.schemes || []).some(s => !!s.schemeName) && !(req.schemes || []).some(s => this.scopesError(s))));
   }
 
   apply(): void {

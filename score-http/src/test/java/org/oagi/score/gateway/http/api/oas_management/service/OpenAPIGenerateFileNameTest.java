@@ -13,6 +13,11 @@ class OpenAPIGenerateFileNameTest {
     }
 
     @Test
+    void anEmojiOfTheTitleBecomesOneUnderscoreAndAKoreanLetterStays() {
+        assertEquals("a_b \u0048\uD55C", OpenAPIGenerateService.toFileNamePart("a\uD83D\uDE00b \u0048\uD55C"));
+    }
+
+    @Test
     void keepsAPlainTitleAndVersion() {
         assertEquals("My API_v2", OpenAPIGenerateService.toFileNamePart("My API_v2"));
         assertEquals("1.0.3", OpenAPIGenerateService.toFileNamePart("1.0.3"));

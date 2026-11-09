@@ -158,5 +158,40 @@ ORDER BY c.oas_operation_id, c.seq;
 DROP TEMPORARY TABLE tmp_candidate;
 DROP TEMPORARY TABLE tmp_numbers;
 
+-- ------------------------------------------------------------------
+-- Names of an OpenAPI document are case-sensitive (#1891)
+-- ------------------------------------------------------------------
+--
+-- The OpenAPI Specification (3.0.4 and 3.1.2, "Case Sensitivity" and "Format") makes every field name and every map key
+-- case-sensitive, so Auth and auth are two names. The OAS_* tables are case-insensitive (utf8mb3_general_ci), which made
+-- such names collide in the unique keys and in the lookups. The columns below hold a map key or an identifier of the
+-- specification: the key of components.securitySchemes, the scope names, the operationId and the path of the Paths Object.
+-- The unique keys over them are rebuilt by the change and only become less strict.
+--
+-- The name of a parameter is case-sensitive as well ("Parameter names are case sensitive"). A header parameter is the
+-- exception, because the names of the HTTP headers are case-insensitive (RFC 7230); no lookup by the name of a header
+-- parameter exists, and the code that generates a document already folds the case of a header name.
+--
+-- Not changed: OAS_HTTP_HEADER.HEADER (header names, RFC 7230) and the scheme of an http security scheme
+-- (case-insensitive, RFC 7235).
+--
+-- Character sets:
+-- - The operationId, the path and the name of a parameter keep their character set (utf8mb3): the specification and its
+--   JSON Schema do not limit their characters (a plain string), and the path is made from names that are not limited to ASCII.
+-- - The key of components.securitySchemes is limited to ^[a-zA-Z0-9\.\-_]+$ by the Components Object, and a scope is an
+--   OAuth 2.0 scope token, printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3), so those columns
+--   are ASCII. The service rejects any other name. A row that holds another character fails this upgrade; fix such a name
+--   before upgrading.
+--
+-- A _bin collation still ignores trailing spaces (PAD SPACE): of the lookups, only that of the Operation IDs keeps the exact
+-- matches.
+ALTER TABLE `oas_security_scheme` MODIFY COLUMN `scheme_name` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc; case-sensitive, so Auth and auth are two names. Only letters, digits, ''.'', ''-'' and ''_'' (the Components Object).';
+ALTER TABLE `oas_oauth_scope` MODIFY COLUMN `scope_name` varchar(200) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'REQUIRED. The scope name (the scopes map key). Unique within a flow; case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).';
+ALTER TABLE `oas_doc_security_scope` MODIFY COLUMN `scope_name` varchar(200) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'A scope name required by this entry (oauth2: from the scheme''s flows; openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).';
+ALTER TABLE `oas_operation_security_scope` MODIFY COLUMN `scope_name` varchar(200) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'A scope name required by this entry (oauth2: from the scheme''s flows; openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).';
+ALTER TABLE `oas_operation` MODIFY COLUMN `operation_id` varchar(1024) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.';
+ALTER TABLE `oas_parameter` MODIFY COLUMN `name` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'REQUIRED. The name of the parameter. Parameter names are case sensitive.\nIf in is "path", the name field MUST correspond to a template expression occurring within the path field in the Paths Object. See Path Templating for further information.\nIf in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.\nFor all other cases, the name corresponds to the parameter name used by the in property.';
+ALTER TABLE `oas_resource` MODIFY COLUMN `path` text CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'The OpenAPI path (resource name) for this resource; by default made from the business context and the BIE name. Case-sensitive: /Pets and /pets are two paths.';
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET SQL_NOTES = @OLD_SQL_NOTES;

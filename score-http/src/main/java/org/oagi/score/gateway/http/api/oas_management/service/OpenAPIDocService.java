@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +48,11 @@ public class OpenAPIDocService {
     private static final int LICENSE_URL_MAX_LENGTH = OAS_DOC.LICENSE_URL.getDataType().length();
     // Issue #1729
     private static final int SCHEME_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.SCHEME_NAME.getDataType().length();
+    // Issue #1891: the key of the components.securitySchemes map, per the Components Object of the OpenAPI Specification.
+    private static final Pattern SCHEME_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9.\\-_]+");
+    // Issue #1891: a scope of an oauth2 or openIdConnect scheme is an OAuth 2.0 scope token: printable ASCII without a space,
+    // a double quote and a backslash (RFC 6749 section 3.3).
+    private static final Pattern SCOPE_NAME_PATTERN = Pattern.compile("[\\x21\\x23-\\x5B\\x5D-\\x7E]+");
     private static final int API_KEY_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.API_KEY_NAME.getDataType().length();
     private static final int BEARER_FORMAT_MAX_LENGTH = OAS_SECURITY_SCHEME.BEARER_FORMAT.getDataType().length();
     private static final int OPEN_ID_CONNECT_URL_MAX_LENGTH = OAS_SECURITY_SCHEME.OPEN_ID_CONNECT_URL.getDataType().length();
@@ -645,6 +651,10 @@ public class OpenAPIDocService {
             // Scheme Name is optional; a blank falls back to a unique type-derived default at persist time.
             if (!isBlank(name)) {
                 validateMaxLength("schemeName", name, SCHEME_NAME_MAX_LENGTH);
+                if (!SCHEME_NAME_PATTERN.matcher(name.trim()).matches()) {
+                    throw new IllegalArgumentException("Invalid security scheme name: '" + name.trim()
+                            + "'. A name has only letters, digits, '.', '-' and '_'.");
+                }
                 if (!explicitNames.add(name.trim())) {
                     throw new IllegalArgumentException("Duplicate security scheme name: " + name.trim());
                 }
@@ -720,6 +730,13 @@ public class OpenAPIDocService {
      * `flows: {}`). Each flow needs a valid, unique type and the URLs that its type requires per
      * OpenAPI 3.0.3 (deviceAuthorization is 3.2 and is gated out of the generated output).
      */
+    private void validateScopeName(String scopeName) {
+        if (!isBlank(scopeName) && !SCOPE_NAME_PATTERN.matcher(scopeName.trim()).matches()) {
+            throw new IllegalArgumentException("Invalid scope name: '" + scopeName.trim()
+                    + "'. A scope has only ASCII letters, digits and symbols, without a space, a double quote or a backslash.");
+        }
+    }
+
     private void validateOAuthFlows(List<OasOAuthFlow> flows) {
         if (flows == null || flows.isEmpty()) {
             throw new IllegalArgumentException("An oauth2 security scheme requires at least one OAuth flow.");
@@ -747,6 +764,13 @@ public class OpenAPIDocService {
             }
             if ("deviceAuthorization".equals(ft) && isBlank(flow.getDeviceAuthorizationUrl())) {
                 throw new IllegalArgumentException("`deviceAuthorizationUrl` is required for the deviceAuthorization flow.");
+            }
+            if (flow.getScopes() != null) {
+                for (OasOAuthScope scope : flow.getScopes()) {
+                    if (scope != null) {
+                        validateScopeName(scope.getScopeName());
+                    }
+                }
             }
         }
     }
@@ -780,10 +804,14 @@ public class OpenAPIDocService {
                         && requirementScheme.getScopes() != null && !requirementScheme.getScopes().isEmpty()) {
                     throw new IllegalArgumentException("Scopes are only allowed for oauth2 or openIdConnect security schemes.");
                 }
+                if ("openIdConnect".equals(scheme.getType()) && requirementScheme.getScopes() != null) {
+                    requirementScheme.getScopes().forEach(this::validateScopeName);
+                }
                 if ("oauth2".equals(scheme.getType())) {
                     Set<String> declaredScopes = collectOAuthScopeNames(scheme);
                     if (requirementScheme.getScopes() != null) {
                         for (String scope : requirementScheme.getScopes()) {
+                            validateScopeName(scope);
                             if (!isBlank(scope) && !declaredScopes.contains(scope.trim())) {
                                 throw new IllegalArgumentException("Unknown OAuth2 scope: " + scope);
                             }

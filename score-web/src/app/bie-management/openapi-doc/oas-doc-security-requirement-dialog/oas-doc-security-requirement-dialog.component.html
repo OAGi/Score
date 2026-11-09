@@ -68,6 +68,9 @@
                         <mat-label>Scopes (comma-separated)</mat-label>
                         <input matInput [ngModel]="freeTextScopes(entry)"
                                (ngModelChange)="setFreeTextScopes(entry, $event)">
+                        @if (scopesError(entry)) {
+                          <mat-hint class="text-danger">{{ scopesError(entry) }}</mat-hint>
+                        }
                       </mat-form-field>
                     } @else {
                       <span class="muted-text scopes-field">No scopes</span>
