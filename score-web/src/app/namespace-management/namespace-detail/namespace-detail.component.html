@@ -2,7 +2,7 @@
   <score-detail-card>
     <mat-form-field>
       <mat-label>URI</mat-label>
-      <input matInput required
+      <input matInput required maxlength="100"
         [formControl]="uriForm"
         [value]="uriForm.value">
       @if (uriForm.hasError('pattern')) {
