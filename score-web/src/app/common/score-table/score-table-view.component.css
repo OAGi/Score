@@ -91,3 +91,48 @@ table.compact tr.element-row ::ng-deep td.mat-mdc-cell:not(.compact-cell):not(.m
     padding-left: 0 !important;
   }
 }
+
+/* `scrollable`: the table is as wide as its columns need (never narrower than the container), and only the table scrolls sideways when it is
+   wider: the paginator under it stays where it is. */
+.table-scroll.scrollable {
+  overflow-x: auto;
+}
+
+.table-scroll.scrollable table {
+  width: max-content;
+  min-width: 100%;
+}
+
+/* The shadows at the left and the right of a `scrollable` table say that the columns go on there: the frame draws them over the table
+   (not in it, so they stay when it scrolls), and lets the pointer through. */
+.table-scroll-frame {
+  position: relative;
+}
+
+.table-scroll-frame::before,
+.table-scroll-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.table-scroll-frame::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0));
+}
+
+.table-scroll-frame::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0));
+}
+
+.table-scroll-frame.more-start::before,
+.table-scroll-frame.more-end::after {
+  opacity: 1;
+}

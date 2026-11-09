@@ -130,6 +130,8 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   readonly compactBelow = input(1024);
   /** Highlights the row under the pointer. */
   readonly rowHover = input(false, {transform: booleanAttribute});
+  /** A table wider than the screen (many columns) scrolls sideways instead of cutting its cells. */
+  readonly scrollable = input(false, {transform: booleanAttribute});
   /** The choices of the `select` filters that have no `options` in the definition, by the filter's key. */
   readonly filterOptions = input<Record<string, readonly TableFilterOption[]>>({});
   /**
@@ -188,6 +190,10 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   protected readonly compactDef = contentChild(ScoreCompactDefDirective);
   private readonly tableWrapper = viewChild<ElementRef<HTMLElement>>('tableWrapper');
   private readonly tableWidth = signal(0);
+  private readonly tableScroll = viewChild<ElementRef<HTMLElement>>('tableScroll');
+  /** A `scrollable` table has columns out of view at the left / at the right: the frame draws a shadow there. */
+  protected readonly moreStart = signal(false);
+  protected readonly moreEnd = signal(false);
   /** The table is too narrow for its columns, and the screen says how to draw a row then. */
   protected readonly compact = computed(() => !!this.compactDef() && this.tableWidth() > 0 && this.tableWidth() <= this.compactBelow());
   /** The row whose detail row is open. */
@@ -264,6 +270,29 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
         observer.observe(wrapper);
         this.destroyRef.onDestroy(() => observer.disconnect());
       }
+    });
+    // The shadows at the sides of a `scrollable` table: where the columns go on out of view.
+    effect(onCleanup => {
+      const scroller = this.tableScroll()?.nativeElement;
+      if (!scroller || !this.scrollable()) {
+        this.moreStart.set(false);
+        this.moreEnd.set(false);
+        return;
+      }
+      const update = () => {
+        this.moreStart.set(scroller.scrollLeft > 1);
+        this.moreEnd.set(scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1);
+      };
+      update();
+      scroller.addEventListener('scroll', update, {passive: true});
+      // The columns change the width of the table (a resize, a reset, a column shown), and so does the window the width of the frame.
+      const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : undefined;
+      observer?.observe(scroller);
+      Array.from(scroller.children).forEach(child => observer?.observe(child));
+      onCleanup(() => {
+        scroller.removeEventListener('scroll', update);
+        observer?.disconnect();
+      });
     });
     // The screen decides again: search again.
     effect(() => {

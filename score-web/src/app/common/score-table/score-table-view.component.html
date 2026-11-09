@@ -172,6 +172,8 @@
         }
       </ng-template>
 
+      <div class="table-scroll-frame" [class.more-start]="moreStart()" [class.more-end]="moreEnd()">
+      <div #tableScroll class="table-scroll" [class.scrollable]="scrollable()">
       @if (multiSort()) {
         <table mat-table scoreTable matMultiSort (matSortChange)="onMultiSortChange()" [dataSource]="dataSource"
           [multiTemplateDataRows]="!!detailDef()" [class.has-detail]="!!detailDef()" [class.compact]="compact()" [class.row-hover]="rowHover()">
@@ -282,6 +284,8 @@
           }
         </table>
       }
+      </div>
+      </div>
 
       <!-- The header row is not drawn in the compact layout: without rows, nothing would say that there are none. It is not a row of the
            table (the table does not take back a no-data row once it has drawn it, and code that counts the rows must not see one). -->
