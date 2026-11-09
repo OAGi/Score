@@ -17,7 +17,7 @@ describe('BieExpressComponent', () => {
   });
 });
 
-describe('BieExpressComponent Business Context selection on reload (#387)', () => {
+describe('BieExpressComponent Business Context selection on reload', () => {
   const contexts = (...ids: number[]) => ids.map(id => ({businessContextId: id, guid: 'g' + id, name: 'BC ' + id}));
   const bie = (topLevelAsbiepId: number, ...contextIds: number[]) =>
     ({topLevelAsbiepId, businessContextList: contexts(...contextIds)}) as unknown as BieListEntry;

@@ -4,7 +4,7 @@ import {of} from 'rxjs';
 import {WebPageInfo} from './about/domain/about';
 import {WebPageInfoService} from './basis.service';
 
-describe('WebPageInfoService (#378)', () => {
+describe('WebPageInfoService', () => {
   function create(response: any = {}): WebPageInfoService {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({providers: [{provide: HttpClient, useValue: {get: () => of(response)}}]});

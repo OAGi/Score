@@ -6,7 +6,7 @@ import {ModuleElement} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
 import {ModuleAddDialogComponent} from './module-add-dialog.component';
 
-describe('ModuleAddDialogComponent copy into itself (#126)', () => {
+describe('ModuleAddDialogComponent copy into itself', () => {
   const element = (moduleId: number, name: string, children?: ModuleElement[]): ModuleElement =>
     Object.assign(new ModuleElement(), {moduleId, name, directory: !!children, children});
 

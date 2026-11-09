@@ -7,7 +7,7 @@ import {ModuleService} from '../../../domain/module.service';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
-describe('ModuleSetReleaseValidationDialogComponent (#21)', () => {
+describe('ModuleSetReleaseValidationDialogComponent', () => {
   function create(moduleService: Partial<ModuleService>, afterClosed$: Subject<any> = new Subject<any>()):
       ModuleSetReleaseValidationDialogComponent {
     TestBed.resetTestingModule();
