@@ -287,6 +287,20 @@ describe('LoginComponent passkey sign-in', () => {
       expect(passwordInput()).not.toBeNull();
     });
 
+    it('clears the typed password when the username is changed again', async () => {
+      setup({enabled: true, hasPasskey: false});
+      await typeUsername('bob');
+      fixture.componentInstance.onSubmit();
+      await tick();
+      fixture.componentInstance.credentials.password = 'wrong';
+
+      await typeUsername('alice');
+
+      expect(fixture.componentInstance.credentials.password).toBe('');
+      expect(passwordInput()).toBeNull();
+      expect(continueButton()).not.toBeNull();
+    });
+
     it('tries the passkey again from the retry button', async () => {
       setup({enabled: true, hasPasskey: true});
       passkey.signIn.mockRejectedValue(new PasskeyCancelledError());
