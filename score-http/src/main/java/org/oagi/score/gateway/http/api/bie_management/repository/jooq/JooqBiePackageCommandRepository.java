@@ -193,6 +193,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         copiedBiePackageRecord.setSourceTimestamp(now);
         // Issue #1733: a copy is a new independent draft, not a revision; do not carry the source's reason.
         copiedBiePackageRecord.setRevisionReason(null);
+        // Likewise it has no previous revision; only source_bie_package_id points back to the package it was copied from.
+        copiedBiePackageRecord.setPrevBiePackageId(null);
         BiePackageId copiedBiePackageId = new BiePackageId(
                 dslContext().insertInto(BIE_PACKAGE)
                         .set(copiedBiePackageRecord)
@@ -203,6 +205,7 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
             BiePackageTopLevelAsbiepRecord copiedBiePackageTopLevelAsbiepRecord = biePackageTopLevelAsbiepRecord.copy();
             copiedBiePackageTopLevelAsbiepRecord.setBiePackageTopLevelAsbiepId(null);
             copiedBiePackageTopLevelAsbiepRecord.setBiePackageId(valueOf(copiedBiePackageId));
+            copiedBiePackageTopLevelAsbiepRecord.setPrevTopLevelAsbiepId(null);
             copiedBiePackageTopLevelAsbiepRecord.setBiePackageTopLevelAsbiepId(
                     dslContext().insertInto(BIE_PACKAGE_TOP_LEVEL_ASBIEP)
                             .set(copiedBiePackageTopLevelAsbiepRecord)
