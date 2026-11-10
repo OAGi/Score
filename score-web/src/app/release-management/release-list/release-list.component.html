@@ -16,22 +16,17 @@
 
     <ng-container scoreColumnDef="releaseNum">
       <td score-cell *scoreCellDef="let element">
-        @if (isProcessing(element.state)) {
-          <div class="den score-break-word">
-            <span>{{ element.releaseNum }}</span>
-          </div>
-        } @else {
-          <div class="den score-break-word" (contextmenu)="showUmlDiagram(element, $event)">
-            <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
-          </div>
-        }
+        <!-- also while it is being processed: a release that was left so is recovered in its detail -->
+        <div class="den score-break-word" (contextmenu)="!isProcessing(element.state) && showUmlDiagram(element, $event)">
+          <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
+        </div>
         <div class="description">{{ element.guid }}</div>
       </td>
     </ng-container>
 
     <ng-container scoreColumnDef="state">
       <td score-cell *scoreCellDef="let element">
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
           <span>{{ element.state }}</span>
           @if (isProcessing(element.state)) {
             <mat-progress-spinner mode="indeterminate" [diameter]="18"

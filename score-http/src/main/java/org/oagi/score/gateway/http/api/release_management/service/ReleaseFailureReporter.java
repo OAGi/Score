@@ -159,7 +159,8 @@ public class ReleaseFailureReporter {
 
     private enum Step {
         DRAFTING("release.drafting", "made a draft", "drafted", "Initialized"),
-        PUBLISHING("release.publishing", "published", "published", "Draft");
+        PUBLISHING("release.publishing", "published", "published", "Draft"),
+        INITIALIZING("release.initializing", "taken back to Initialized", "taken back to Initialized", "Draft");
 
         final String tag;
         final String done;
@@ -174,7 +175,11 @@ public class ReleaseFailureReporter {
         }
 
         static Step of(ReleaseState from) {
-            return from == ReleaseState.Publishing ? PUBLISHING : DRAFTING;
+            return switch (from) {
+                case Publishing -> PUBLISHING;
+                case Initializing -> INITIALIZING;
+                default -> DRAFTING;
+            };
         }
     }
 }

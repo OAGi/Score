@@ -66,6 +66,16 @@ public interface ReleaseProgressRepository {
      */
     List<InProgress> lockInProgressSince(LocalDateTime time);
 
+    /**
+     * The release, locked until the end of the transaction, if it is in the middle of a transition and no transaction holds
+     * it: a transition that is being done holds its release until it ends. Empty when it is not in the middle of one, and when
+     * something is holding it; it does not wait.
+     */
+    Optional<InProgress> lockInProgress(ReleaseId releaseId);
+
+    /** The state of the release, without locking it. */
+    Optional<ReleaseState> stateOf(ReleaseId releaseId);
+
     /** Whether the release holds any manifest, i.e. it has been copied. */
     boolean hasManifests(ReleaseId releaseId);
 }

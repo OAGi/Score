@@ -4,6 +4,7 @@ import org.oagi.score.gateway.http.api.release_management.controller.payload.Rel
 import org.oagi.score.gateway.http.api.release_management.controller.payload.ReleaseValidationResponse;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseCleanupEvent;
+import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseInitializeEvent;
 import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseCreateRequestEvent;
 import org.oagi.score.gateway.http.api.release_management.guard.GuardHarness.K;
 
@@ -53,6 +54,8 @@ public final class Arena {
                 harness.releaseService.onReleaseCreateRequestEventReceived(e);
             } else if (event instanceof ReleaseCleanupEvent e) {
                 harness.releaseService.onReleaseCleanupEventReceived(e);
+            } else if (event instanceof ReleaseInitializeEvent e) {
+                harness.releaseService.onReleaseInitializeEventReceived(e);
             }
         }
     }
@@ -78,6 +81,16 @@ public final class Arena {
         }
         try {
             handleEvents();
+        } catch (Throwable t) {
+            return t;
+        }
+        return null;
+    }
+
+    /** The request to take the draft back to 'Initialized', without the handling of its event; whatever fails is returned. */
+    public Throwable requestInitialize() {
+        try {
+            harness.releaseService.transitState(GuardHarness.REQUESTER, harness.transit(this, "Initialized"));
         } catch (Throwable t) {
             return t;
         }

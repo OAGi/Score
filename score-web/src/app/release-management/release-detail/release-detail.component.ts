@@ -1,5 +1,5 @@
-import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
-import {finalize, switchMap} from 'rxjs/operators';
+import { Component, DestroyRef, HostListener, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import {finalize, switchMap, take} from 'rxjs/operators';
 import {AuthService} from '../../authentication/auth.service';
 import {ReleaseService} from '../domain/release.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -10,6 +10,9 @@ import {NamespaceSummary} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {RxStompService} from '../../common/score-rx-stomp';
+import {Message} from '@stomp/stompjs';
 import {hashCode, saveAsBlobResponse} from '../../common/utility';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
@@ -35,6 +38,8 @@ export class ReleaseDetailComponent implements OnInit {
   private auth = inject(AuthService);
   private confirmDialogService = inject(ConfirmDialogService);
   private titleService = inject(Title);
+  private stompService = inject(RxStompService);
+  private destroyRef = inject(DestroyRef);
 
 
   title = 'Releases Detail';
@@ -46,6 +51,7 @@ export class ReleaseDetailComponent implements OnInit {
   namespaceListFilterCtrl: FormControl = new FormControl();
   filteredNamespaceList: ReplaySubject<NamespaceSummary[]> = new ReplaySubject<NamespaceSummary[]>(1);
   isLoading = false;
+  private filterWired = false;
 
   assignable: string[];
   assigned: string[];
@@ -54,8 +60,46 @@ export class ReleaseDetailComponent implements OnInit {
   includeViewOrder = false;
 
   ngOnInit() {
+    this.watchChangesOfThisRelease();
+    this.load();
+  }
+
+  /** The release is being drafted, published or taken back to 'Initialized' (or was left so by an earlier version): it is recovered, not opened. */
+  get inProgress(): boolean {
+    return ['Processing', 'Drafting', 'Publishing', 'Initializing'].includes(this.releaseDetail.state);
+  }
+
+  /** What a release that is in the middle of a transition is doing, and what recovering it does. */
+  get inProgressMessage(): string {
+    switch (this.releaseDetail.state) {
+      case 'Drafting':
+        return 'This release is being made a draft. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Initialized\', as it was before.';
+      case 'Initializing':
+        return 'This release is being taken back to \'Initialized\'. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
+      case 'Publishing':
+        return 'This release is being published. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
+      default:
+        return 'This release was left in the middle of a transition by an earlier version. Ask an administrator to look into it.';
+    }
+  }
+
+  /** When the release changes (the work for it is over, or it was given back), what is shown is loaded again. */
+  private watchChangesOfThisRelease() {
+    this.stompService.watch('/topic/release').pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((message: Message) => {
+      const change = JSON.parse(message.body);
+      // what the user has edited is not replaced, unless the release is the one that was being processed
+      if (this.releaseDetail.releaseId && change.releaseId === this.releaseDetail.releaseId && !this.isLoading
+        && (this.inProgress || !this.isChanged)) {
+        this.load();
+      }
+    });
+  }
+
+  private load() {
     this.isLoading = true;
-    this.route.paramMap.pipe(
+    this.route.paramMap.pipe(take(1),
       switchMap((params: ParamMap) =>
         this.service.getReleaseDetail(params.get('id')))
     ).subscribe(resp => {
@@ -81,10 +125,13 @@ export class ReleaseDetailComponent implements OnInit {
         }
       });
 
-      this.namespaceListFilterCtrl.valueChanges
-        .subscribe(() => {
-          this.filterNamespaceList();
-        });
+      if (!this.filterWired) {
+        this.filterWired = true;
+        this.namespaceListFilterCtrl.valueChanges
+          .subscribe(() => {
+            this.filterNamespaceList();
+          });
+      }
 
       this.isLoading = false;
     }, err => {
@@ -126,7 +173,7 @@ export class ReleaseDetailComponent implements OnInit {
   }
 
   isDisabled() {
-    return !this.userToken.roles.includes('developer') || this.releaseDetail.state === 'Published';
+    return !this.userToken.roles.includes('developer') || this.releaseDetail.state === 'Published' || this.inProgress;
   }
 
   get isChanged() {
@@ -201,6 +248,30 @@ export class ReleaseDetailComponent implements OnInit {
                 duration: 3000,
               });
               return this.router.navigateByUrl('release');
+            });
+        }
+      });
+  }
+
+  recover() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Recover Release?';
+    dialogConfig.data.content = [this.inProgressMessage];
+    dialogConfig.data.action = 'Recover';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.isLoading = true;
+          this.service.recover(this.releaseDetail.releaseId)
+            .pipe(finalize(() => {
+              this.isLoading = false;
+            }))
+            .subscribe(_ => {
+              this.snackBar.open('Recovered', '', {
+                duration: 3000,
+              });
+              this.load();
             });
         }
       });

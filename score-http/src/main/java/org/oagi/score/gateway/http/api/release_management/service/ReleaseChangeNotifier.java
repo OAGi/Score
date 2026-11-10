@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.configuration.websocket.WebSocketAuthorizationInterceptor;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,19 @@ public class ReleaseChangeNotifier {
 
     public static final String TOPIC = "/topic/release";
 
-    /**
-     * What is announced: which release, of which library (none when it is not known), and whether it changed or the work
-     * for it failed, in which case the login id of who asked for it, for that user's screen to say so. Not why: that is told to the user
-     * in a message.
-     */
-    public record Change(LibraryId libraryId, ReleaseId releaseId, String outcome, String username) {
+    /** What is announced to everyone: which release, of which library (none when it is not known). Nothing more. */
+    public record Change(LibraryId libraryId, ReleaseId releaseId) {
     }
 
-    public static final String CHANGED = "changed";
-    public static final String FAILED = "failed";
+    /** The event of {@link Failure}, as the screens that read the topic of an account tell it from a message. */
+    public static final String RELEASE_FAILED = "releaseFailed";
+
+    /**
+     * What is told to the user who asked for a release, and to no one else, when the work for it failed: on the topic of
+     * their own account, which no one else may subscribe to. Not why: that is in the message sent to the user.
+     */
+    public record Failure(String event, LibraryId libraryId, ReleaseId releaseId) {
+    }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,37 +57,42 @@ public class ReleaseChangeNotifier {
         }
     }
 
-    /** The work for the release failed: the release is given back, and the user who asked for it is told. */
+    /**
+     * The work for the release failed and the release is given back: everyone is told that it changed, and the user who
+     * asked for it, on the topic of their account, that it failed.
+     */
     public void failed(ReleaseId releaseId, String requesterUsername) {
         try {
             LibraryId libraryId = repositoryFactory.releaseProgressRepository().libraryOfRelease(releaseId).orElse(null);
-            announce(libraryId, releaseId, FAILED, requesterUsername);
+            changed(libraryId, releaseId);
+            Failure failure = new Failure(RELEASE_FAILED, libraryId, releaseId);
+            afterCommit(() -> send(WebSocketAuthorizationInterceptor.messageTopicOf(requesterUsername), failure));
         } catch (RuntimeException e) {
             logger.warn("The failure of the release " + releaseId + " could not be announced: " + e.getMessage());
         }
     }
 
     public void changed(LibraryId libraryId, ReleaseId releaseId) {
-        announce(libraryId, releaseId, CHANGED, null);
+        Change change = new Change(libraryId, releaseId);
+        afterCommit(() -> send(TOPIC, change));
     }
 
-    private void announce(LibraryId libraryId, ReleaseId releaseId, String outcome, String username) {
-        Change message = new Change(libraryId, releaseId, outcome, username);
+    private static void afterCommit(Runnable action) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    send(message);
+                    action.run();
                 }
             });
         } else {
-            send(message);
+            action.run();
         }
     }
 
-    private void send(Change message) {
+    private void send(String destination, Object message) {
         try {
-            messagingTemplate.convertAndSend(TOPIC, message);
+            messagingTemplate.convertAndSend(destination, message);
         } catch (RuntimeException e) {
             logger.warn("The change of a release could not be announced: " + e.getMessage());
         }

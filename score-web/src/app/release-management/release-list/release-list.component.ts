@@ -5,9 +5,10 @@ import {HttpParams} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
-import {debounceTime, filter, finalize, map, tap} from 'rxjs/operators';
+import {debounceTime, filter, finalize, map} from 'rxjs/operators';
 import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
+import {messageTopicOf} from '../../basis/navbar/navbar.component';
 import {RxStompService} from '../../common/score-rx-stomp';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
@@ -20,12 +21,10 @@ import {ReleaseService} from '../domain/release.service';
 import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
-/** What the server announces of a release: `username` is who asked for it, when the work for it `failed`. */
+/** What the server announces to everyone of a release. */
 interface ReleaseChange {
   libraryId: number;
   releaseId: number;
-  outcome: 'changed' | 'failed';
-  username?: string;
 }
 
 /** How long the list waits for more changes before it is loaded again. */
@@ -75,19 +74,20 @@ export class ReleaseListComponent implements OnInit {
 
   title = 'Release';
 
-  /** A release is being drafted or published (or was left being processed by an earlier version): it is not opened, and shows a spinner. */
+  /** A release is being drafted, published or taken back to 'Initialized' (or was left being processed by an earlier version): it shows a spinner, and its detail is where it is recovered if it was left so. */
   isProcessing(state: string): boolean {
-    return state === 'Processing' || state === 'Drafting' || state === 'Publishing';
+    return state === 'Processing' || state === 'Drafting' || state === 'Publishing' || state === 'Initializing';
   }
 
   readonly libraryChoice = new LibraryChoice(this.auth);
 
-  /** What the compact row shows of a release: made once for a row. A release that is being processed is not a link. */
+  /** What the compact row shows of a release: made once for a row. */
   readonly compactRecord = memoizeRow((release: ReleaseListEntry): CompactRecord => ({
     badges: [{text: release.state, kind: 'state', cssClass: 'release-state', colors: 'release',
       state: this.isProcessing(release.state) ? 'Processing' : release.state}],
     title: release.releaseNum,
-    link: this.isProcessing(release.state) ? undefined : '/release/' + release.releaseId,
+    // also while it is being processed: a release that was left so is recovered in its detail
+    link: '/release/' + release.releaseId,
     subtitle: release.guid,
     created: release.created ? {when: release.created.when, by: release.created.who?.loginId, label: 'Created'} : undefined,
     updated: release.lastUpdated ? {when: release.lastUpdated.when, by: release.lastUpdated.who?.loginId} : undefined
@@ -115,6 +115,7 @@ export class ReleaseListComponent implements OnInit {
 
   ngOnInit() {
     this.watchReleaseChanges();
+    this.watchFailuresOfMyReleases();
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.libraryChoice.init(libraries);
       const libraryId = this.libraryChoice.library?.libraryId;
@@ -140,21 +141,28 @@ export class ReleaseListComponent implements OnInit {
     this.stompService.watch('/topic/release').pipe(
       map((message: Message) => JSON.parse(message.body) as ReleaseChange),
       filter(change => this.ready() && this.isOfChosenLibrary(change.libraryId)),
-      tap(change => this.tellTheRequesterOfAFailure(change)),
       debounceTime(RELOAD_DELAY_MS),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => this.view().reload());
   }
 
   /**
-   * The work for a release failed and the release was given back: the user who asked for it is told here at once, and
-   * what went wrong is in the message sent to the user. The others see the list change, and nothing more.
+   * The work for a release failed and the release was given back: the server tells the user who asked for it, on the topic
+   * of their own account, and no one else. What went wrong is in the message sent to the user.
    */
-  private tellTheRequesterOfAFailure(change: ReleaseChange) {
-    if (change.outcome === 'failed' && change.username === this.auth.getUserToken()?.username) {
+  private watchFailuresOfMyReleases() {
+    const username = this.auth.getUserToken()?.username;
+    if (!username) {
+      return;
+    }
+    this.stompService.watch(messageTopicOf(username)).pipe(
+      map((message: Message) => JSON.parse(message.body)),
+      filter(data => data.event === 'releaseFailed'),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
       this.snackBar.open('A release could not be processed. See your messages for the details.', 'Messages', {duration: 10000})
         .onAction().subscribe(() => this.router.navigateByUrl('/message'));
-    }
+    });
   }
 
   /** A change that does not say which library it is of (0) is taken as of this one. */

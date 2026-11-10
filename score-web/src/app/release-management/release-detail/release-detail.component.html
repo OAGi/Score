@@ -1,5 +1,11 @@
 <score-detail-page [title]="title" [loading]="isLoading">
   <score-detail-card>
+    @if (inProgress) {
+      <div class="release-in-progress d-flex align-items-center">
+        <mat-icon class="release-in-progress-icon">warning</mat-icon>
+        <span>{{ inProgressMessage }}</span>
+      </div>
+    }
     <mat-form-field>
       <mat-label>Release Number</mat-label>
       <input matInput [(ngModel)]="releaseDetail.releaseNum" maxlength="45"
@@ -40,6 +46,12 @@
 
   <ng-container ngProjectAs="[detailActions]">
     @if (userToken.roles.includes('developer')) {
+      @if (releaseDetail.state === 'Drafting' || releaseDetail.state === 'Publishing' || releaseDetail.state === 'Initializing') {
+        <button mat-raised-button color="warn"
+          (click)="recover()">
+          Recover
+        </button>
+      }
       @if (releaseDetail.state === 'Initialized' || releaseDetail.state === 'Draft') {
         <button mat-raised-button color="primary"
           [disabled]="updateDisabled"

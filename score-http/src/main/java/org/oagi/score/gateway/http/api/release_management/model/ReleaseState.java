@@ -21,6 +21,12 @@ public enum ReleaseState {
      * 'Draft' again.
      */
     Publishing,
+    /**
+     * The draft has been asked to go back to 'Initialized', and the work for it (the components become candidates again,
+     * and what the release holds is removed) has not finished. The library is not to be changed in the meantime; when
+     * the work fails, the release is a 'Draft' again.
+     */
+    Initializing,
 
     /**
      * Indicates that the release has been initialized.
@@ -43,6 +49,18 @@ public enum ReleaseState {
      * of a transition that failed, and does not hold its library.
      */
     public boolean inProgress() {
-        return this == Drafting || this == Publishing;
+        return this == Drafting || this == Publishing || this == Initializing;
+    }
+
+    /**
+     * The state a release that is in the middle of a transition is given back to when the transition does not end: the
+     * state it was in before it asked for the transition.
+     */
+    public ReleaseState givenBack() {
+        return switch (this) {
+            case Drafting -> Initialized;
+            case Publishing, Initializing -> Draft;
+            default -> throw new IllegalStateException("The release in '" + this + "' state is not in the middle of a transition.");
+        };
     }
 }

@@ -33,11 +33,7 @@ describe('ReleaseListComponent', () => {
       component.libraryChoice = {library: {libraryId: chosenLibraryId}};
       component.view = () => ({reload});
       component.watchReleaseChanges();
-      component.snackBar = {open: vi.fn(() => ({onAction: () => of(undefined)}))};
-      component.auth = {getUserToken: () => ({username: 'alice'})};
-      component.router = {navigateByUrl: vi.fn()};
-      const announce = (libraryId: number, extra: object = {outcome: 'changed'}) =>
-        messages.next({body: JSON.stringify({libraryId, releaseId: 5, ...extra})});
+      const announce = (libraryId: number) => messages.next({body: JSON.stringify({libraryId, releaseId: 5})});
       return {component, announce, reload};
     }
 
@@ -65,18 +61,22 @@ describe('ReleaseListComponent', () => {
       expect(reload).toHaveBeenCalledTimes(1);
     });
 
-    it('tells only the user who asked for the release that its work failed, and loads the list again for all', () => {
-      const {component, announce, reload} = watching(2);
-      announce(2, {outcome: 'failed', username: 'bob'});
-      vi.advanceTimersByTime(1000);
-      expect(component.snackBar.open).not.toHaveBeenCalled();
-      expect(reload).toHaveBeenCalledTimes(1);
+    it('tells the user who asked for a release that its work failed on the topic of their own account only', () => {
+      const messages = new Subject<{ body: string }>();
+      const component = Object.create(ReleaseListComponent.prototype) as any;
+      component.stompService = {watch: vi.fn(() => messages)};
+      component.destroyRef = {onDestroy: vi.fn(() => () => {})};
+      component.snackBar = {open: vi.fn(() => ({onAction: () => of(undefined)}))};
+      component.auth = {getUserToken: () => ({username: 'alice'})};
+      component.router = {navigateByUrl: vi.fn()};
+      component.watchFailuresOfMyReleases();
 
-      announce(2, {outcome: 'failed', username: 'alice'});
-      vi.advanceTimersByTime(1000);
+      expect(component.stompService.watch).toHaveBeenCalledWith('/topic/message/alice');
+      messages.next({body: JSON.stringify({messageId: '3'})});
+      expect(component.snackBar.open).not.toHaveBeenCalled();
+      messages.next({body: JSON.stringify({event: 'releaseFailed', releaseId: 5})});
       expect(component.snackBar.open).toHaveBeenCalledTimes(1);
       expect(component.router.navigateByUrl).toHaveBeenCalledWith('/message');
-      expect(reload).toHaveBeenCalledTimes(2);
     });
 
     it('does not load before the list is ready', () => {

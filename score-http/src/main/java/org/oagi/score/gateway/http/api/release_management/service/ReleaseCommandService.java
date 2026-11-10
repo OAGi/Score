@@ -24,6 +24,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRe
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseProgressRepository;
 import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseCleanupEvent;
 import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseCreateRequestEvent;
+import org.oagi.score.gateway.http.api.release_management.model.event.ReleaseInitializeEvent;
 import org.oagi.score.gateway.http.api.tag_management.model.AccManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.api.tag_management.model.AsccpManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.api.tag_management.model.BccpManifestTagSummaryRecord;
@@ -101,6 +102,7 @@ public class ReleaseCommandService implements InitializingBean {
 
     private final String RELEASE_CREATE_REQUEST_EVENT = "releaseCreateRequestEvent";
     private final String RELEASE_CLEANUP_EVENT = "releaseCleanupEvent";
+    private final String RELEASE_INITIALIZE_EVENT = "releaseInitializeEvent";
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -108,6 +110,8 @@ public class ReleaseCommandService implements InitializingBean {
                 new ChannelTopic(RELEASE_CREATE_REQUEST_EVENT));
         eventListenerContainer.addMessageListener(this, "onReleaseCleanupEventReceived",
                 new ChannelTopic(RELEASE_CLEANUP_EVENT));
+        eventListenerContainer.addMessageListener(this, "onReleaseInitializeEventReceived",
+                new ChannelTopic(RELEASE_INITIALIZE_EVENT));
     }
 
     /**
@@ -258,6 +262,39 @@ public class ReleaseCommandService implements InitializingBean {
         }
     }
 
+    /**
+     * Gives back a release that has been left in the middle of its transition ('Drafting', 'Publishing' or 'Initializing'), to the state it
+     * was in before: because the server stopped, or the work for it did not end. What is done for the transition is done in
+     * one transaction that is held by its release, so that a release that is being worked on is not given back from under
+     * the work: it is refused, and may be recovered when the work is over or has failed.
+     *
+     * @throws IllegalArgumentException if the requester is not a developer, the release does not exist or is not in the
+     *                                  middle of a transition, or the work for it is going on.
+     */
+    public void recover(ScoreUser requester, ReleaseId releaseId) {
+        if (!requester.isDeveloper()) {
+            throw new IllegalArgumentException("Only users with the '" + DEVELOPER + "' role can recover a release.");
+        }
+
+        var inProgress = progress().lockInProgress(releaseId).orElse(null);
+        if (inProgress == null) {
+            ReleaseState state = progress().stateOf(releaseId)
+                    .orElseThrow(() -> new IllegalArgumentException("Release with ID '" + releaseId + "' does not exist."));
+            if (state.inProgress()) {
+                throw new IllegalArgumentException("The release is being worked on. Try again when it is over.");
+            }
+            throw new IllegalArgumentException("The release in '" + state + "' state is not in the middle of a transition.");
+        }
+
+        ReleaseState back = inProgress.state().givenBack();
+        if (!progress().moveState(releaseId, inProgress.state(), back)) {
+            throw new IllegalArgumentException("The release is no longer in '" + inProgress.state() + "' state.");
+        }
+        logger.warn("The release " + releaseId + " was '" + inProgress.state() + "', and " + requester.username()
+                + " recovered it: it is '" + back + "' again.");
+        changeNotifier.changed(releaseId);
+    }
+
     public void transitState(ScoreUser requester,
                              TransitStateRequest request) {
 
@@ -294,8 +331,8 @@ public class ReleaseCommandService implements InitializingBean {
                 }
 
                 if (requestState == Initialized) {
-                    fromCcState = ReleaseDraft;
-                    toCcState = Candidate;
+                    // the release is 'Initialized' when its event has been handled: until then it is being taken back
+                    requestState = Initializing;
                 } else if (requestState == Published) {
                     // the release is published when its event has been handled: until then it is being published
                     requestState = Publishing;
@@ -308,6 +345,7 @@ public class ReleaseCommandService implements InitializingBean {
             case Processing:
             case Drafting:
             case Publishing:
+            case Initializing:
             case Published:
                 throw new IllegalArgumentException("The release in '" + release.state() + "' state cannot be transited.");
         }
@@ -318,7 +356,7 @@ public class ReleaseCommandService implements InitializingBean {
 
         var command = repositoryFactory.releaseCommandRepository(requester);
 
-        if (requestState == Drafting || requestState == Publishing) {
+        if (requestState.inProgress()) {
             // Only one request takes hold of the release: it is still as it was when it was read.
             if (!progress().takeHold(request.getReleaseId(), release.state(), requestState, requester.userId())) {
                 throw new IllegalArgumentException("The release is no longer in '" + release.state() + "' state.");
@@ -328,66 +366,18 @@ public class ReleaseCommandService implements InitializingBean {
         }
         changeNotifier.changed(release.libraryId(), request.getReleaseId());
 
-        LocalDateTime timestamp = LocalDateTime.now();
+        if (requestState == Initializing) {
+            // The components of the release become candidates again, and what the release holds is removed, when the
+            // event is handled, all together with the end of the transition: see onReleaseInitializeEventReceived.
+            eventPublisher.publish(RELEASE_INITIALIZE_EVENT,
+                    new ReleaseInitializeEvent(requester.userId(), request.getReleaseId()));
+        }
 
         // update CCs' states by transited release state.
         if (fromCcState != null && toCcState != null) {
             if (toCcState == ReleaseDraft) {
                 // The components of the release are moved, and what they hold copied, when the event is handled, all
                 // together with the end of the transition: see onReleaseCreateRequestEventReceived.
-            } else if (toCcState == Candidate) {
-                updateCCStates(requester, release, fromCcState, toCcState, timestamp);
-
-                // Remove release dependencies
-                command.deleteDeps(request.getReleaseId());
-
-                // Remove module set releases
-                var moduleSetReleaseQuery = repositoryFactory.moduleSetReleaseQueryRepository(requester);
-                List<ModuleSetReleaseSummaryRecord> moduleSetReleaseList =
-                        moduleSetReleaseQuery.getModuleSetReleaseSummaryList(release.releaseId());
-
-                if (!moduleSetReleaseList.isEmpty()) {
-                    var moduleManifestCommand = repositoryFactory.moduleManifestCommandRepository(requester);
-                    moduleManifestCommand.deleteModuleManifests(
-                            moduleSetReleaseList.stream().map(e -> e.moduleSetReleaseId()).collect(Collectors.toSet())
-                    );
-                }
-
-                // Remove tags.
-                {
-                    var tagQuery = repositoryFactory.tagQueryRepository(requester);
-                    var tagCommand = repositoryFactory.tagCommandRepository(requester);
-
-                    for (AccManifestTagSummaryRecord accManifestTag : tagQuery.getAccManifestTagList(Arrays.asList(release.releaseId()))) {
-                        tagCommand.removeTag(accManifestTag.tagId(), accManifestTag.accManifestId());
-                    }
-                    for (AsccpManifestTagSummaryRecord asccpManifestTag : tagQuery.getAsccpManifestTagList(Arrays.asList(release.releaseId()))) {
-                        tagCommand.removeTag(asccpManifestTag.tagId(), asccpManifestTag.asccpManifestId());
-                    }
-                    for (BccpManifestTagSummaryRecord bccpManifestTag : tagQuery.getBccpManifestTagList(Arrays.asList(release.releaseId()))) {
-                        tagCommand.removeTag(bccpManifestTag.tagId(), bccpManifestTag.bccpManifestId());
-                    }
-                    for (DtManifestTagSummaryRecord dtManifestTag : tagQuery.getDtManifestTagList(Arrays.asList(release.releaseId()))) {
-                        tagCommand.removeTag(dtManifestTag.tagId(), dtManifestTag.dtManifestId());
-                    }
-                }
-
-                // Remove GitHub issue links before the CCs they reference are deleted (issue #1533).
-                repositoryFactory.gitHubIssueLinkCommandRepository(requester)
-                        .deleteLinksByRelease(release.releaseId());
-
-                // Remove the drafted release's forwarded view-order rows before their ACC/ASCC/BCC
-                // manifests are deleted, so those FKs are never violated (issue #1638).
-                repositoryFactory.bieViewOrderCommandRepository(requester)
-                        .deleteByRelease(release.releaseId());
-
-                var ccCommand = repositoryFactory.ccCommandRepository(requester);
-
-                // Remove replacement
-                ccCommand.clearReplacement(release.releaseId());
-
-                // Remove CCs
-                ccCommand.delete(release.releaseId());
             } else if (toCcState == CcState.Published) {
                 // The components are published, and the release with them, when the event is handled: see
                 // onReleaseCleanupEventReceived.
@@ -400,6 +390,67 @@ public class ReleaseCommandService implements InitializingBean {
                 eventPublisher.publish(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
             }
         }
+    }
+
+    /**
+     * The components of the release become candidates again, and what the release holds is removed: the work of a draft
+     * that goes back to 'Initialized'.
+     */
+    private void takeBackToInitialized(ScoreUser requester, ReleaseSummaryRecord release) {
+        var command = repositoryFactory.releaseCommandRepository(requester);
+
+        updateCCStates(requester, release, ReleaseDraft, Candidate, LocalDateTime.now());
+
+        // Remove release dependencies
+        command.deleteDeps(release.releaseId());
+
+        // Remove module set releases
+        var moduleSetReleaseQuery = repositoryFactory.moduleSetReleaseQueryRepository(requester);
+        List<ModuleSetReleaseSummaryRecord> moduleSetReleaseList =
+                moduleSetReleaseQuery.getModuleSetReleaseSummaryList(release.releaseId());
+
+        if (!moduleSetReleaseList.isEmpty()) {
+            var moduleManifestCommand = repositoryFactory.moduleManifestCommandRepository(requester);
+            moduleManifestCommand.deleteModuleManifests(
+                    moduleSetReleaseList.stream().map(e -> e.moduleSetReleaseId()).collect(Collectors.toSet())
+            );
+        }
+
+        // Remove tags.
+        {
+            var tagQuery = repositoryFactory.tagQueryRepository(requester);
+            var tagCommand = repositoryFactory.tagCommandRepository(requester);
+
+            for (AccManifestTagSummaryRecord accManifestTag : tagQuery.getAccManifestTagList(Arrays.asList(release.releaseId()))) {
+                tagCommand.removeTag(accManifestTag.tagId(), accManifestTag.accManifestId());
+            }
+            for (AsccpManifestTagSummaryRecord asccpManifestTag : tagQuery.getAsccpManifestTagList(Arrays.asList(release.releaseId()))) {
+                tagCommand.removeTag(asccpManifestTag.tagId(), asccpManifestTag.asccpManifestId());
+            }
+            for (BccpManifestTagSummaryRecord bccpManifestTag : tagQuery.getBccpManifestTagList(Arrays.asList(release.releaseId()))) {
+                tagCommand.removeTag(bccpManifestTag.tagId(), bccpManifestTag.bccpManifestId());
+            }
+            for (DtManifestTagSummaryRecord dtManifestTag : tagQuery.getDtManifestTagList(Arrays.asList(release.releaseId()))) {
+                tagCommand.removeTag(dtManifestTag.tagId(), dtManifestTag.dtManifestId());
+            }
+        }
+
+        // Remove GitHub issue links before the CCs they reference are deleted (issue #1533).
+        repositoryFactory.gitHubIssueLinkCommandRepository(requester)
+                .deleteLinksByRelease(release.releaseId());
+
+        // Remove the drafted release's forwarded view-order rows before their ACC/ASCC/BCC
+        // manifests are deleted, so those FKs are never violated (issue #1638).
+        repositoryFactory.bieViewOrderCommandRepository(requester)
+                .deleteByRelease(release.releaseId());
+
+        var ccCommand = repositoryFactory.ccCommandRepository(requester);
+
+        // Remove replacement
+        ccCommand.clearReplacement(release.releaseId());
+
+        // Remove CCs
+        ccCommand.delete(release.releaseId());
     }
 
     private void updateCCStates(ScoreUser requester, ReleaseSummaryRecord release,
@@ -475,7 +526,7 @@ public class ReleaseCommandService implements InitializingBean {
         // the release has taken hold of it.
         progress().lockLibraryOfRelease(releaseId);
 
-        if (isReleaseInAnyOfStates(requester, releaseId, Draft, Processing, Drafting, Publishing)) {
+        if (isReleaseInAnyOfStates(requester, releaseId, Draft, Processing, Drafting, Publishing, Initializing)) {
             throw new IllegalArgumentException("It cannot make any release to 'Draft' due to a release restriction.");
         }
 
@@ -690,6 +741,38 @@ public class ReleaseCommandService implements InitializingBean {
         } catch (RuntimeException e) {
             logger.error("The release " + releaseId + " could not be published: " + e.getMessage(), e);
             giveBack(releaseId, Publishing, Draft, releaseCleanupEvent.getUserId(), e);
+        }
+    }
+
+    /**
+     * This method is invoked by 'releaseInitializeEvent' channel subscriber.
+     *
+     * <p>The components of the release become candidates again, what the release holds is removed, and the release is
+     * 'Initialized', in one transaction of its own, or nothing of it is. When something fails, the release is a 'Draft' again.</p>
+     *
+     * @param releaseInitializeEvent
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void onReleaseInitializeEventReceived(ReleaseInitializeEvent releaseInitializeEvent) {
+        ReleaseId releaseId = releaseInitializeEvent.getReleaseId();
+        try {
+            new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+                if (progress().lockState(releaseId).orElse(null) != Initializing) {
+                    return; // handled already
+                }
+                logger.debug("Received ReleaseInitializeEvent: " + releaseInitializeEvent);
+                ScoreUser requester = sessionService.getScoreUserByUserId(releaseInitializeEvent.getUserId());
+                var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
+
+                ReleaseInProgressGuard.asReleaseWork(() -> takeBackToInitialized(requester, release));
+                if (!progress().moveState(releaseId, Initializing, Initialized)) {
+                    throw new IllegalStateException("The release is no longer being taken back to 'Initialized'.");
+                }
+                changeNotifier.changed(releaseId);
+            });
+        } catch (RuntimeException e) {
+            logger.error("The release " + releaseId + " could not be taken back to 'Initialized': " + e.getMessage(), e);
+            giveBack(releaseId, Initializing, Draft, releaseInitializeEvent.getUserId(), e);
         }
     }
 

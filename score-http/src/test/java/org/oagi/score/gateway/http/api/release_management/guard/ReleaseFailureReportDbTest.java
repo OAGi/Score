@@ -108,6 +108,37 @@ class ReleaseFailureReportDbTest {
     }
 
     @Test
+    void aFailureWhileADraftGoesBackToInitializedIsKeptAndTheDraftIsADraftAgain() {
+        Arena arena = harness.arrange().toDraft();
+        ReleaseId release = arena.release();
+        try {
+            Mockito.clearInvocations(harness.messages);
+            GuardHarness.Observed before = arena.observe();
+            // the request takes hold of the release, and the work is for the handler: nothing is done yet
+            assertEquals(null, arena.requestInitialize());
+            assertEquals("Initializing", arena.observe().releaseState());
+            FaultInjector.Probe probe = new FaultInjector.Probe().failAfterWrite(3);
+            FaultInjector.attach(probe);
+            try {
+                arena.handleEvents();
+            } finally {
+                FaultInjector.detach();
+            }
+
+            assertEquals(before, arena.observe());
+            var rows = harness.dsl.selectFrom(EXCEPTION).where(EXCEPTION.TAG.eq(tagOf("release.initializing", release))).fetch();
+            assertEquals(1, rows.size());
+            ArgumentCaptor<String> subject = ArgumentCaptor.forClass(String.class);
+            Mockito.verify(harness.messages, Mockito.times(1)).asyncSendMessage(Mockito.any(), Mockito.any(),
+                    subject.capture(), Mockito.contains("Draft"), Mockito.eq("text/markdown"));
+            assertTrue(subject.getValue().contains("taken back to Initialized"), subject.getValue());
+        } finally {
+            forget(release);
+            arena.remove();
+        }
+    }
+
+    @Test
     void aFailureThatRollsBackTheGivingBackIsKeptNowhereAndTellsNoOne() {
         // Nothing is kept or told when the release is no longer in the state it was given back from.
         Arena arena = harness.arrange();

@@ -54,7 +54,7 @@ public class ReleaseProgressRecovery {
             var progress = repositoryFactory.releaseProgressRepository();
             int taken = 0;
             for (var inProgress : progress.lockInProgressSince(time)) {
-                ReleaseState back = inProgress.state() == ReleaseState.Drafting ? ReleaseState.Initialized : ReleaseState.Draft;
+                ReleaseState back = inProgress.state().givenBack();
                 if (progress.moveState(inProgress.releaseId(), inProgress.state(), back)) {
                     failureReporter.abandoned(inProgress.releaseId(), inProgress.state(), inProgress.lastUpdatedBy(), time);
                     taken++;

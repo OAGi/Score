@@ -61,7 +61,8 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
             Map.entry(BlobContentManifestId.class, new ManifestTable(BLOB_CONTENT_MANIFEST, BLOB_CONTENT_MANIFEST.BLOB_CONTENT_MANIFEST_ID, BLOB_CONTENT_MANIFEST.RELEASE_ID)));
 
     /** The states a release is in while it is being drafted or published. */
-    private static final List<String> IN_PROGRESS = List.of(ReleaseState.Drafting.name(), ReleaseState.Publishing.name());
+    private static final List<String> IN_PROGRESS = List.of(ReleaseState.Drafting.name(), ReleaseState.Publishing.name(),
+            ReleaseState.Initializing.name());
 
     public JooqReleaseProgressRepository(DSLContext dslContext, ScoreUser requester, RepositoryFactory repositoryFactory) {
         super(dslContext, requester, repositoryFactory);
@@ -185,6 +186,26 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
                 .from(RELEASE)
                 .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId)))
                 .forUpdate()
+                .fetchOptional(RELEASE.STATE)
+                .map(ReleaseState::valueOf);
+    }
+
+    @Override
+    public Optional<InProgress> lockInProgress(ReleaseId releaseId) {
+        return dslContext().select(RELEASE.RELEASE_ID, RELEASE.STATE, RELEASE.LAST_UPDATED_BY)
+                .from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId)), RELEASE.STATE.in(IN_PROGRESS))
+                .forUpdate().skipLocked()
+                .fetchOptional(r -> new InProgress(new ReleaseId(r.get(RELEASE.RELEASE_ID).toBigInteger()),
+                        ReleaseState.valueOf(r.get(RELEASE.STATE)),
+                        new UserId(r.get(RELEASE.LAST_UPDATED_BY).toBigInteger())));
+    }
+
+    @Override
+    public Optional<ReleaseState> stateOf(ReleaseId releaseId) {
+        return dslContext().select(RELEASE.STATE)
+                .from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId)))
                 .fetchOptional(RELEASE.STATE)
                 .map(ReleaseState::valueOf);
     }

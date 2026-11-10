@@ -102,6 +102,11 @@ export class ReleaseService {
     return this.http.post<ReleaseValidationResponse>('/api/releases/' + releaseId + '/state', {state});
   }
 
+  /** Gives back a release that was left being drafted or published to the state it was in before. */
+  recover(releaseId: number): Observable<any> {
+    return this.http.post('/api/releases/' + releaseId + '/recover', {});
+  }
+
   generateMigrationScript(releaseId: number, includeViewOrder = false): Observable<HttpResponse<Blob>> {
     let params = new HttpParams();
     if (includeViewOrder) {
