@@ -460,7 +460,8 @@ public class JooqReleaseQueryRepository extends JooqBaseRepository implements Re
                                     new LibraryId(record.get(RELEASE.as("next").LIBRARY_ID.as("next_library_id")).toBigInteger()),
                                     record.get(RELEASE.as("next").RELEASE_NUM.as("next_release_num")),
                                     ReleaseState.valueOf(record.get(RELEASE.as("next").STATE.as("next_release_state")))
-                            ) : null
+                            ) : null,
+                    false
             );
         }
     }

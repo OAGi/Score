@@ -266,6 +266,35 @@ class ReleaseProgressGuardDbTest {
     }
 
     @Test
+    void aReleaseIsBusyWhileATransactionHoldsItAndNotWhenItWasLeftInTheMiddle() throws Exception {
+        Arena arena = harness.arrange();
+        try {
+            ReleaseId release = arena.release();
+            assertTrue(harness.progress.moveState(release, ReleaseState.Initialized, ReleaseState.Drafting));
+            assertEquals(false, harness.progress.isBusy(release), "left in the middle: nothing holds it");
+
+            CountDownLatch holding = new CountDownLatch(1);
+            CountDownLatch done = new CountDownLatch(1);
+            Future<?> holder = pool.submit(() -> new TransactionTemplate(harness.transactionManager).executeWithoutResult(status -> {
+                harness.progress.lockState(release);
+                holding.countDown();
+                try {
+                    done.await(60, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }));
+            assertTrue(holding.await(60, TimeUnit.SECONDS));
+            assertEquals(true, harness.progress.isBusy(release), "the work holds it");
+            done.countDown();
+            holder.get(60, TimeUnit.SECONDS);
+            assertEquals(false, harness.progress.isBusy(release), "the work is over");
+        } finally {
+            arena.remove();
+        }
+    }
+
+    @Test
     void aReleaseLeftInProcessingByAnEarlierVersionDoesNotHoldItsLibrary() {
         Arena arena = harness.arrange();
         try {

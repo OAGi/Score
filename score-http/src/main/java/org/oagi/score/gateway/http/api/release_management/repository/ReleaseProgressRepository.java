@@ -76,6 +76,12 @@ public interface ReleaseProgressRepository {
     /** The state of the release, without locking it. */
     Optional<ReleaseState> stateOf(ReleaseId releaseId);
 
+    /**
+     * Whether a transaction holds the release (the work for it is going on), which is told by its row being locked. It does not wait for
+     * the lock, and does not keep one: the release is as it was after it. A release that is not there is not busy.
+     */
+    boolean isBusy(ReleaseId releaseId);
+
     /** Whether the release holds any manifest, i.e. it has been copied. */
     boolean hasManifests(ReleaseId releaseId);
 }

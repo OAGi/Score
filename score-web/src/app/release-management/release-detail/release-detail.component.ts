@@ -69,15 +69,30 @@ export class ReleaseDetailComponent implements OnInit {
     return ['Processing', 'Drafting', 'Publishing', 'Initializing'].includes(this.releaseDetail.state);
   }
 
+  /**
+   * The release can be given back: it is in the middle of a transition and nothing is doing the work (it is not busy), for example
+   * because the server stopped. While the work is going on it is refused, so it is not offered.
+   */
+  get recoverable(): boolean {
+    return ['Drafting', 'Publishing', 'Initializing'].includes(this.releaseDetail.state) && !this.releaseDetail.busy;
+  }
+
   /** What a release that is in the middle of a transition is doing, and what recovering it does. */
   get inProgressMessage(): string {
+    const busy = this.releaseDetail.busy;
     switch (this.releaseDetail.state) {
       case 'Drafting':
-        return 'This release is being made a draft. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Initialized\', as it was before.';
+        return busy
+          ? 'This release is being made a draft. Wait until it is done.'
+          : 'This release is being made a draft, but nothing is doing it. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Initialized\', as it was before.';
       case 'Initializing':
-        return 'This release is being taken back to \'Initialized\'. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
+        return busy
+          ? 'This release is being taken back to \'Initialized\'. Wait until it is done.'
+          : 'This release is being taken back to \'Initialized\', but nothing is doing it. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
       case 'Publishing':
-        return 'This release is being published. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
+        return busy
+          ? 'This release is being published. Wait until it is done.'
+          : 'This release is being published, but nothing is doing it. If it stays so, e.g. because the server stopped, recover it: it goes back to \'Draft\', as it was before.';
       default:
         return 'This release was left in the middle of a transition by an earlier version. Ask an administrator to look into it.';
     }

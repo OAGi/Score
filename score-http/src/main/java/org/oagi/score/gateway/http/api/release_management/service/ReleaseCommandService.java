@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -48,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,6 +88,10 @@ public class ReleaseCommandService implements InitializingBean {
 
     @Autowired
     private ObjectProvider<RecordCache> recordCache;
+
+    /** How long the work of a release may take: a release that is in the middle of its work for longer is given back (see {@link ReleaseProgressRecovery}). */
+    @Value("${score.release.in-progress-timeout:PT30M}")
+    private Duration inProgressTimeout;
 
     @Autowired
     private SessionService sessionService;
@@ -584,7 +590,7 @@ public class ReleaseCommandService implements InitializingBean {
     public void onReleaseCreateRequestEventReceived(ReleaseCreateRequestEvent releaseCreateRequestEvent) {
         ReleaseId releaseId = releaseCreateRequestEvent.getReleaseId();
         try {
-            new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            workTransaction().executeWithoutResult(status -> {
                 if (progress().lockState(releaseId).orElse(null) != Drafting) {
                     return; // handled already
                 }
@@ -720,7 +726,7 @@ public class ReleaseCommandService implements InitializingBean {
     public void onReleaseCleanupEventReceived(ReleaseCleanupEvent releaseCleanupEvent) {
         ReleaseId releaseId = releaseCleanupEvent.getReleaseId();
         try {
-            new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            workTransaction().executeWithoutResult(status -> {
                 if (progress().lockState(releaseId).orElse(null) != Publishing) {
                     return; // handled already
                 }
@@ -761,7 +767,7 @@ public class ReleaseCommandService implements InitializingBean {
     public void onReleaseInitializeEventReceived(ReleaseInitializeEvent releaseInitializeEvent) {
         ReleaseId releaseId = releaseInitializeEvent.getReleaseId();
         try {
-            new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            workTransaction().executeWithoutResult(status -> {
                 if (progress().lockState(releaseId).orElse(null) != Initializing) {
                     return; // handled already
                 }
@@ -779,6 +785,17 @@ public class ReleaseCommandService implements InitializingBean {
             logger.error("The release " + releaseId + " could not be taken back to 'Initialized': " + e.getMessage(), e);
             giveBack(releaseId, Initializing, Draft, releaseInitializeEvent.getUserId(), e);
         }
+    }
+
+    /**
+     * The transaction of the work of a release. It has a limit: the work holds the row of its release (which tells that it is going on)
+     * until it ends, so one that never ends, because what it waits for never answers, would make the release look busy for ever.
+     * After the limit it is rolled back, and the release is given back as when any other thing fails.
+     */
+    private TransactionTemplate workTransaction() {
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setTimeout((int) inProgressTimeout.toSeconds());
+        return template;
     }
 
     /**

@@ -139,6 +139,12 @@ public final class GuardHarness implements AutoCloseable {
             return new DataSourceTransactionManager(dataSource);
         }
 
+        /** What the application has: a value such as PT30M is read as a Duration. */
+        @Bean(name = "conversionService")
+        org.springframework.core.convert.ConversionService conversionService() {
+            return org.springframework.boot.convert.ApplicationConversionService.getSharedInstance();
+        }
+
         @Bean
         FaultInjector faultInjector() {
             return new FaultInjector();

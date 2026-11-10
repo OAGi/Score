@@ -30,6 +30,41 @@ describe('ReleaseDetailComponent', () => {
     expect(component('Processing').inProgress).toBe(true);
   });
 
+  describe('whether it can be given back', () => {
+    function inProgress(state: string, busy: boolean) {
+      const c = component(state);
+      c.releaseDetail.busy = busy;
+      return c;
+    }
+
+    it('is offered when it is in the middle of its work and nothing is doing it', () => {
+      for (const state of ['Drafting', 'Publishing', 'Initializing']) {
+        expect(inProgress(state, false).recoverable).toBe(true);
+      }
+    });
+
+    it('is not offered while the work for it is going on, and says to wait', () => {
+      for (const state of ['Drafting', 'Publishing', 'Initializing']) {
+        const c = inProgress(state, true);
+        expect(c.recoverable).toBe(false);
+        expect(c.inProgressMessage).toContain('Wait until it is done.');
+        expect(c.inProgressMessage).not.toContain('recover it');
+      }
+    });
+
+    it('is offered with what recovering does when nothing is doing the work', () => {
+      const drafting = inProgress('Drafting', false);
+      expect(drafting.inProgressMessage).toContain('nothing is doing it');
+      expect(drafting.inProgressMessage).toContain('recover it');
+    });
+
+    it('is not offered for a release that is not in the middle of its work, or was left in \'Processing\'', () => {
+      for (const state of ['Initialized', 'Draft', 'Published', 'Processing']) {
+        expect(inProgress(state, false).recoverable).toBe(false);
+      }
+    });
+  });
+
   it('is not edited while it is in progress', () => {
     expect(component('Drafting').isDisabled()).toBe(true);
     expect(component('Initialized').isDisabled()).toBe(false);

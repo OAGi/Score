@@ -208,6 +208,23 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
     }
 
     @Override
+    public boolean isBusy(ReleaseId releaseId) {
+        try {
+            dslContext().select(RELEASE.RELEASE_ID)
+                    .from(RELEASE)
+                    .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId)))
+                    .forShare().noWait()
+                    .fetch();
+            return false;
+        } catch (RuntimeException e) {
+            if (isLockConflict(e)) {
+                return true;
+            }
+            throw e;
+        }
+    }
+
+    @Override
     public Optional<ReleaseState> stateOf(ReleaseId releaseId) {
         return dslContext().select(RELEASE.STATE)
                 .from(RELEASE)

@@ -46,7 +46,7 @@
 
   <ng-container ngProjectAs="[detailActions]">
     @if (userToken.roles.includes('developer')) {
-      @if (releaseDetail.state === 'Drafting' || releaseDetail.state === 'Publishing' || releaseDetail.state === 'Initializing') {
+      @if (recoverable) {
         <button mat-raised-button color="warn"
           (click)="recover()">
           Recover
