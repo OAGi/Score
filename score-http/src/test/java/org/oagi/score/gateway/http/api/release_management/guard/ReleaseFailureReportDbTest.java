@@ -99,7 +99,7 @@ class ReleaseFailureReportDbTest {
                     subject.capture(), body.capture(), Mockito.eq("text/markdown"));
             assertEquals(List.of(GuardHarness.REQUESTER.userId()), List.copyOf(recipients.getValue()));
             assertTrue(subject.getValue().contains("could not be made a draft"), subject.getValue());
-            assertTrue(body.getValue().contains("Reference: #" + rows.get(0).getExceptionId()), body.getValue());
+            assertTrue(!body.getValue().contains("Reference"), "a number the user cannot look up is not told: " + body.getValue());
             assertTrue(!body.getValue().contains("Exception"), "the user is not told the detail: " + body.getValue());
         } finally {
             forget(release);
@@ -175,7 +175,7 @@ class ReleaseFailureReportDbTest {
             assertTrue(uncompressed(rows.get(0).getExceptionId()).contains("no one was doing it"));
             ArgumentCaptor<Collection<UserId>> recipients = ArgumentCaptor.forClass(Collection.class);
             Mockito.verify(harness.messages, Mockito.times(1)).asyncSendMessage(Mockito.any(), recipients.capture(),
-                    Mockito.any(), Mockito.contains("Reference: #" + rows.get(0).getExceptionId()), Mockito.eq("text/markdown"));
+                    Mockito.any(), Mockito.contains("no one was working on it"), Mockito.eq("text/markdown"));
             assertEquals(List.of(GuardHarness.REQUESTER.userId()), List.copyOf(recipients.getValue()));
         } finally {
             forget(release);

@@ -81,8 +81,7 @@ public class ReleaseFailureReporter {
         logger.warn(technical + " (exception " + exceptionId + ")");
 
         String subject = "Release " + number + " could not be " + step.done;
-        String body = summary + "\n\n" + reason + "\n\n[Go to the release list](" + RELEASE_LIST_PAGE + ")\n\n"
-                + "Reference: #" + exceptionId;
+        String body = summary + "\n\n" + reason + "\n\n[Go to the release list](" + RELEASE_LIST_PAGE + ")";
         changeNotifier.failed(releaseId, sessionService.getScoreUserByUserId(requester).username());
         afterCommit(() -> {
             try {

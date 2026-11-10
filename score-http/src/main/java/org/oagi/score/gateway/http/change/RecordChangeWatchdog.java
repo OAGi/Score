@@ -78,6 +78,8 @@ public class RecordChangeWatchdog implements ChangeLogReader {
     private volatile long emptySince;
 
     private ScheduledExecutorService executor;
+    /** Housekeeping has a thread of its own: deleting a long log takes minutes, and no reader of the log may wait for it. */
+    private ScheduledExecutorService housekeeper;
 
     @Autowired
     public RecordChangeWatchdog(RepositoryFactory repositoryFactory, ApplicationEventPublisher publisher) {
@@ -93,13 +95,21 @@ public class RecordChangeWatchdog implements ChangeLogReader {
             return thread;
         });
         executor.scheduleWithFixedDelay(this::poll, 0, POLL_MILLIS, TimeUnit.MILLISECONDS);
-        executor.scheduleWithFixedDelay(this::purge, 1, 10, TimeUnit.MINUTES);
+        housekeeper = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "record-change-housekeeper");
+            thread.setDaemon(true);
+            return thread;
+        });
+        housekeeper.scheduleWithFixedDelay(this::purge, 1, 10, TimeUnit.MINUTES);
     }
 
     @PreDestroy
     void stop() {
         if (executor != null) {
             executor.shutdownNow();
+        }
+        if (housekeeper != null) {
+            housekeeper.shutdownNow();
         }
     }
 
@@ -250,7 +260,10 @@ public class RecordChangeWatchdog implements ChangeLogReader {
             }
             long since = emptySince;
             if (since != 0 && System.nanoTime() - since >= restartAfterEmptyNanos) {
-                repository.restartNumbering();
+                // Not while the log is being read: the numbering of what is read goes back with it.
+                synchronized (this) {
+                    repository.restartNumbering();
+                }
             }
         } catch (RuntimeException e) {
             logger.warn("The old rows of the change log could not be deleted.", e);

@@ -3,7 +3,7 @@ package org.oagi.score.gateway.http.api.release_management.repository.jooq;
 import org.jooq.DSLContext;
 import org.jooq.Table;
 import org.jooq.TableField;
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
@@ -95,9 +95,15 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
                 .map(JooqReleaseProgressRepository::library);
     }
 
-    /** The error of a lock that is not given at once: the one of a lock wait that is not waited for. */
-    private static boolean isLockConflict(DataAccessException e) {
+    /**
+     * The error of a lock that is not given at once: the one of a lock wait that is not waited for. It comes as the exception of
+     * Spring (the statements are translated as they fail) or, untranslated, as the {@link SQLException} of the driver.
+     */
+    private static boolean isLockConflict(RuntimeException e) {
         for (Throwable t = e; t != null; t = t.getCause()) {
+            if (t instanceof PessimisticLockingFailureException) {
+                return true;
+            }
             if (t instanceof SQLException sql && (sql.getErrorCode() == 1205 || sql.getErrorCode() == 1020
                     || sql.getErrorCode() == 1213)) {
                 return true;
@@ -119,7 +125,7 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
                     .where(RELEASE.LIBRARY_ID.eq(valueOf(libraryId)), RELEASE.STATE.in(IN_PROGRESS))
                     .forShare().noWait()
                     .fetchOne(0, int.class) > 0;
-        } catch (DataAccessException e) {
+        } catch (RuntimeException e) {
             if (isLockConflict(e)) {
                 return true;
             }
@@ -135,7 +141,7 @@ public class JooqReleaseProgressRepository extends JooqBaseRepository implements
                     .where(RELEASE.STATE.in(IN_PROGRESS))
                     .forShare().noWait()
                     .fetchOne(0, int.class) > 0;
-        } catch (DataAccessException e) {
+        } catch (RuntimeException e) {
             if (isLockConflict(e)) {
                 return true;
             }

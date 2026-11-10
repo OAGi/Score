@@ -186,6 +186,41 @@ class ReleaseProgressGuardDbTest {
     }
 
     @Test
+    void aChangeIsRefusedWithTheSameMessageWhileTheWorkOfTheReleaseHoldsItsRows() throws Exception {
+        // The release is in the middle of its work: its transaction holds the rows, so the question is not even answered.
+        Arena arena = harness.arrange();
+        try {
+            ReleaseId release = arena.release();
+            assertTrue(harness.progress.moveState(release, ReleaseState.Initialized, ReleaseState.Drafting));
+            CountDownLatch holding = new CountDownLatch(1);
+            CountDownLatch done = new CountDownLatch(1);
+            Future<?> holder = pool.submit(() -> new TransactionTemplate(harness.transactionManager).executeWithoutResult(status -> {
+                harness.progress.lockState(release);
+                holding.countDown();
+                try {
+                    done.await(60, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }));
+            assertTrue(holding.await(60, TimeUnit.SECONDS));
+            try {
+                for (K kind : K.values()) {
+                    var failure = assertThrows(IllegalArgumentException.class,
+                            () -> harness.updateState(kind, arena.components().get(kind), CcState.WIP), kind.name());
+                    assertTrue(failure.getMessage().contains("being drafted or published"), failure.getMessage());
+                }
+            } finally {
+                done.countDown();
+                holder.get(60, TimeUnit.SECONDS);
+            }
+            arena.observe().states().values().forEach(state -> assertEquals("Candidate", state));
+        } finally {
+            arena.remove();
+        }
+    }
+
+    @Test
     void aReleaseThatWasLeftInTheMiddleOfItsTransitionIsTakenBack() {
         Arena arena = harness.arrange();
         try {
