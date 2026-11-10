@@ -40,7 +40,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
-@EnableTransactionManagement
+@EnableTransactionManagement(order = org.oagi.score.gateway.http.api.release_management.service.ReleaseInProgressGuard.TRANSACTION_ORDER)
 public class RedisConfiguration {
 
     @Autowired

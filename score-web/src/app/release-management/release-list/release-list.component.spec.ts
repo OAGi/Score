@@ -1,4 +1,4 @@
-import {of} from 'rxjs';
+import {of, Subject} from 'rxjs';
 import {ReleaseListComponent} from './release-list.component';
 
 describe('ReleaseListComponent', () => {
@@ -21,5 +21,69 @@ describe('ReleaseListComponent', () => {
     expect(setFilter).toHaveBeenCalledWith('namespaces', []);
     expect(component.filterOptions.set).toHaveBeenCalledWith({namespaces: [{value: '7', label: 'https://adaptstandard.org'}]});
     expect(component.updateExtraParams).toHaveBeenCalled();
+  });
+  describe('when the server announces a change of a release', () => {
+    function watching(chosenLibraryId: number, ready = true) {
+      const messages = new Subject<{ body: string }>();
+      const reload = vi.fn();
+      const component = Object.create(ReleaseListComponent.prototype) as any;
+      component.stompService = {watch: vi.fn(() => messages)};
+      component.destroyRef = {onDestroy: vi.fn(() => () => {})};
+      component.ready = () => ready;
+      component.libraryChoice = {library: {libraryId: chosenLibraryId}};
+      component.view = () => ({reload});
+      component.watchReleaseChanges();
+      component.snackBar = {open: vi.fn(() => ({onAction: () => of(undefined)}))};
+      component.auth = {getUserToken: () => ({username: 'alice'})};
+      component.router = {navigateByUrl: vi.fn()};
+      const announce = (libraryId: number, extra: object = {outcome: 'changed'}) =>
+        messages.next({body: JSON.stringify({libraryId, releaseId: 5, ...extra})});
+      return {component, announce, reload};
+    }
+
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('loads the list again, once for changes in quick succession', () => {
+      const {component, announce, reload} = watching(2);
+      announce(2);
+      announce(2);
+      vi.advanceTimersByTime(1000);
+
+      expect(component.stompService.watch).toHaveBeenCalledWith('/topic/release');
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores a change of another library, and takes one that does not say its library as its own', () => {
+      const {announce, reload} = watching(2);
+      announce(3);
+      vi.advanceTimersByTime(1000);
+      expect(reload).not.toHaveBeenCalled();
+
+      announce(0);
+      vi.advanceTimersByTime(1000);
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('tells only the user who asked for the release that its work failed, and loads the list again for all', () => {
+      const {component, announce, reload} = watching(2);
+      announce(2, {outcome: 'failed', username: 'bob'});
+      vi.advanceTimersByTime(1000);
+      expect(component.snackBar.open).not.toHaveBeenCalled();
+      expect(reload).toHaveBeenCalledTimes(1);
+
+      announce(2, {outcome: 'failed', username: 'alice'});
+      vi.advanceTimersByTime(1000);
+      expect(component.snackBar.open).toHaveBeenCalledTimes(1);
+      expect(component.router.navigateByUrl).toHaveBeenCalledWith('/message');
+      expect(reload).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not load before the list is ready', () => {
+      const {announce, reload} = watching(2, false);
+      announce(2);
+      vi.advanceTimersByTime(1000);
+      expect(reload).not.toHaveBeenCalled();
+    });
   });
 });

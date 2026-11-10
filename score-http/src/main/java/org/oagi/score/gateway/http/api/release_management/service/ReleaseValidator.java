@@ -116,6 +116,50 @@ public class ReleaseValidator {
     }
 
     /**
+     * What a release asks before it becomes a draft, which is more than the validation of its assignment: the components that
+     * are assigned are 'Candidate', since it is the release that moves them. One that is not, because it was moved after the
+     * assignment was made, is told at once, not when the work of the release is done.
+     */
+    public ReleaseValidationResponse validateForDraft() {
+        ReleaseValidationResponse response = validate();
+        String should = "' should be in '" + CcState.Candidate + "' state to be released.";
+        for (AccSummaryRecord acc : accList) {
+            if (assignedAccComponentManifestIds.contains(acc.accManifestId()) && acc.state() != CcState.Candidate) {
+                response.addMessageForAcc(acc.accManifestId(), Error, "'" + acc.den() + should, STATE);
+            }
+        }
+        for (AsccpSummaryRecord asccp : asccpList) {
+            if (assignedAsccpComponentManifestIds.contains(asccp.asccpManifestId()) && asccp.state() != CcState.Candidate) {
+                response.addMessageForAsccp(asccp.asccpManifestId(), Error, "'" + asccp.den() + should, STATE);
+            }
+        }
+        for (BccpSummaryRecord bccp : bccpList) {
+            if (assignedBccpComponentManifestIds.contains(bccp.bccpManifestId()) && bccp.state() != CcState.Candidate) {
+                response.addMessageForBccp(bccp.bccpManifestId(), Error, "'" + bccp.den() + should, STATE);
+            }
+        }
+        for (DtSummaryRecord dt : dtList) {
+            if (assignedDtComponentManifestIds.contains(dt.dtManifestId()) && dt.state() != CcState.Candidate) {
+                response.addMessageForDt(dt.dtManifestId(), Error, "'" + dt.den() + should, STATE);
+            }
+        }
+        for (CodeListSummaryRecord codeList : codeListList) {
+            if (assignedCodeListComponentManifestIds.contains(codeList.codeListManifestId())
+                    && codeList.state() != CcState.Candidate) {
+                response.addMessageForCodeList(codeList.codeListManifestId(), Error, "'" + codeList.name() + should, STATE);
+            }
+        }
+        for (AgencyIdListSummaryRecord agencyIdList : agencyIdListList) {
+            if (assignedAgencyIdListComponentManifestIds.contains(agencyIdList.agencyIdListManifestId())
+                    && agencyIdList.state() != CcState.Candidate) {
+                response.addMessageForAgencyIdList(agencyIdList.agencyIdListManifestId(), Error,
+                        "'" + agencyIdList.name() + should, STATE);
+            }
+        }
+        return response;
+    }
+
+    /**
      * What the components depend on, as far as it is not only about the namespace. Some of it is in a release the library
      * depends on, so the components of those releases are read as well.
      */

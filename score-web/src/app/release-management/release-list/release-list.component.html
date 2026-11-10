@@ -16,7 +16,7 @@
 
     <ng-container scoreColumnDef="releaseNum">
       <td score-cell *scoreCellDef="let element">
-        @if (element.state === 'Processing') {
+        @if (isProcessing(element.state)) {
           <div class="den score-break-word">
             <span>{{ element.releaseNum }}</span>
           </div>
@@ -33,7 +33,7 @@
       <td score-cell *scoreCellDef="let element">
         <div class="d-flex">
           <span>{{ element.state }}</span>
-          @if (element.state === 'Processing') {
+          @if (isProcessing(element.state)) {
             <mat-progress-spinner mode="indeterminate" [diameter]="18"
             style="margin-left: 12px;"></mat-progress-spinner>
           }

@@ -68,6 +68,8 @@ import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepos
 import org.oagi.score.gateway.http.api.log_management.repository.jooq.JooqLogCommandRepository;
 import org.oagi.score.gateway.http.api.log_management.service.LogSerializer;
 import org.oagi.score.gateway.http.api.log_management.service.LogSnapshotResolver;
+import org.oagi.score.gateway.http.api.exception_management.repository.ExceptionCommandRepository;
+import org.oagi.score.gateway.http.api.exception_management.repository.jooq.JooqExceptionCommandRepository;
 import org.oagi.score.gateway.http.api.message_management.repository.MessageCommandRepository;
 import org.oagi.score.gateway.http.api.message_management.repository.MessageQueryRepository;
 import org.oagi.score.gateway.http.api.message_management.repository.jooq.JooqMessageCommandRepository;
@@ -81,8 +83,10 @@ import org.oagi.score.gateway.http.api.namespace_management.repository.jooq.Jooq
 import org.oagi.score.gateway.http.api.oas_management.repository.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.jooq.*;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseCommandRepository;
+import org.oagi.score.gateway.http.api.release_management.repository.ReleaseProgressRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.jooq.JooqReleaseCommandRepository;
+import org.oagi.score.gateway.http.api.release_management.repository.jooq.JooqReleaseProgressRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.jooq.JooqReleaseQueryRepository;
 import org.oagi.score.gateway.http.api.tag_management.repository.TagCommandRepository;
 import org.oagi.score.gateway.http.api.tag_management.repository.TagQueryRepository;
@@ -319,6 +323,11 @@ public class RepositoryFactory {
         return new JooqAgencyIdListQueryRepository(dslContext, requester, this);
     }
 
+    /** What keeps a library as it is while one of its releases is being drafted or published; it is for no user to ask. */
+    public ReleaseProgressRepository releaseProgressRepository() {
+        return new JooqReleaseProgressRepository(dslContext, null, this);
+    }
+
     public ReleaseCommandRepository releaseCommandRepository(ScoreUser requester) {
         return new JooqReleaseCommandRepository(dslContext, requester, this);
     }
@@ -333,6 +342,10 @@ public class RepositoryFactory {
 
     public LibraryQueryRepository libraryQueryRepository(ScoreUser requester) {
         return new JooqLibraryQueryRepository(dslContext, requester, this);
+    }
+
+    public ExceptionCommandRepository exceptionCommandRepository(ScoreUser requester) {
+        return new JooqExceptionCommandRepository(dslContext, requester, this);
     }
 
     public MessageCommandRepository messageCommandRepository(ScoreUser requester) {
