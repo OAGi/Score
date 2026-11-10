@@ -2187,6 +2187,23 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         ACC.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // An ACC that holds the record of its previous release (it went back to it above) goes back to the base it had there: the manifest of
+        // this release that follows the base manifest of the previous release, or that base itself when it is in a release the
+        // library depends on. The base the ACC has in Working may not be in this release (a new ACC that is not assigned), and
+        // the record of the previous release may have no base for the step below to follow.
+        dslContext().update(ACC_MANIFEST
+                        .join(ACC_MANIFEST.as("prev")).on(and(
+                                ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID),
+                                ACC_MANIFEST.ACC_ID.eq(ACC_MANIFEST.as("prev").ACC_ID)))
+                        .leftJoin(ACC_MANIFEST.as("prev_based_in_release")).on(and(
+                                ACC_MANIFEST.as("prev_based_in_release").PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").BASED_ACC_MANIFEST_ID),
+                                ACC_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, coalesce(
+                        ACC_MANIFEST.as("prev_based_in_release").ACC_MANIFEST_ID,
+                        ACC_MANIFEST.as("prev").BASED_ACC_MANIFEST_ID))
+                .where(ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Issue #1552
         // Update ACC_MANIFEST.BASED_ACC_MANIFEST_ID if ACC_MANIFEST.BASED_MANIFEST.ACC_ID is not equal to ACC.BASED_ACC_ID
         dslContext().update(ACC_MANIFEST
@@ -2479,6 +2496,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         DT.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // A Data Type that holds the record of its previous release (it went back to it above) goes back to the base it had
+        // there, as an ACC does (see updateAccDependencies): the base in Working may not be in this release, and the record of
+        // the previous release may have no base for the step below to follow.
+        dslContext().update(DT_MANIFEST
+                        .join(DT_MANIFEST.as("prev")).on(and(
+                                DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID),
+                                DT_MANIFEST.DT_ID.eq(DT_MANIFEST.as("prev").DT_ID)))
+                        .leftJoin(DT_MANIFEST.as("prev_based_in_release")).on(and(
+                                DT_MANIFEST.as("prev_based_in_release").PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").BASED_DT_MANIFEST_ID),
+                                DT_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(DT_MANIFEST.BASED_DT_MANIFEST_ID, coalesce(
+                        DT_MANIFEST.as("prev_based_in_release").DT_MANIFEST_ID,
+                        DT_MANIFEST.as("prev").BASED_DT_MANIFEST_ID))
+                .where(DT_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Issue #1552
         // Update DT_MANIFEST.BASED_DT_MANIFEST_ID if DT_MANIFEST.BASED_MANIFEST.DT_ID is not equal to DT.BASED_DT_ID
         dslContext().update(DT_MANIFEST
@@ -2540,6 +2573,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                 .set(DT_SC_MANIFEST.DT_SC_ID, DT_SC_MANIFEST.as("prev").DT_SC_ID)
                 .where(and(DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         DT.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // A supplementary component that holds the record of its previous release (it went back to it above) goes back to the
+        // base it had there, as an ACC does (see updateAccDependencies): the manifest of this release that follows the base of
+        // the previous release, or that base itself when it is in a release the library depends on.
+        dslContext().update(DT_SC_MANIFEST
+                        .join(DT_SC_MANIFEST.as("prev")).on(and(
+                                DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_ID)))
+                        .leftJoin(DT_SC_MANIFEST.as("prev_based_in_release")).on(and(
+                                DT_SC_MANIFEST.as("prev_based_in_release").PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").BASED_DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID, coalesce(
+                        DT_SC_MANIFEST.as("prev_based_in_release").DT_SC_MANIFEST_ID,
+                        DT_SC_MANIFEST.as("prev").BASED_DT_SC_MANIFEST_ID))
+                .where(DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
                 .execute();
 
         // Update replacement
