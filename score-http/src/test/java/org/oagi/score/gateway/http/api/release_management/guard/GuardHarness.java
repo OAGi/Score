@@ -38,10 +38,19 @@ import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
 import org.oagi.score.gateway.http.cache.RecordCache;
 import org.oagi.score.gateway.http.cache.RecordCacheStatus;
 import org.oagi.score.gateway.http.common.DbRevert;
+import org.oagi.score.gateway.http.common.async.AsyncJobEvents;
+import org.oagi.score.gateway.http.common.async.AsyncJobFailureReporter;
+import org.oagi.score.gateway.http.common.async.AsyncJobRunner;
+import org.oagi.score.gateway.http.common.async.StaleJobSweeper;
+import org.oagi.score.gateway.http.common.async.StompNotifier;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
-import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
+import org.oagi.score.gateway.http.common.async.AsyncJobCodec;
+import org.oagi.score.gateway.http.common.async.AsyncJobPublisher;
+import org.oagi.score.gateway.http.common.async.AsyncJobTransport;
+import org.oagi.score.gateway.http.common.async.GiveBackRetryPolicy;
+import org.oagi.score.gateway.http.common.model.event.Event;
 import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -106,11 +115,11 @@ public final class GuardHarness implements AutoCloseable {
     }
 
     /** Collects what is published, once the transaction that publishes it has committed. */
-    public static class CollectingPublisher extends AfterCommitEventPublisher {
+    public static class CollectingPublisher implements AsyncJobPublisher {
         public final List<Object> events = new CopyOnWriteArrayList<>();
 
         @Override
-        public void publish(String channel, Object event) {
+        public void publish(String channel, String key, Event event) {
             if (TransactionSynchronizationManager.isSynchronizationActive()) {
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
@@ -177,22 +186,48 @@ public final class GuardHarness implements AutoCloseable {
 
         @Bean
         ReleaseChangeNotifier releaseChangeNotifier(RepositoryFactory repositoryFactory) {
-            return new ReleaseChangeNotifier(Mockito.mock(org.springframework.messaging.simp.SimpMessagingTemplate.class),
-                    repositoryFactory);
+            return new ReleaseChangeNotifier(stompNotifier(), repositoryFactory);
         }
 
         @Bean
-        ReleaseFailureReporter releaseFailureReporter(RepositoryFactory repositoryFactory, SessionService sessionService,
-                                                      MessageCommandService messageCommandService,
+        StompNotifier stompNotifier() {
+            return new StompNotifier(Mockito.mock(org.springframework.messaging.simp.SimpMessagingTemplate.class));
+        }
+
+        @Bean
+        AsyncJobRunner asyncJobRunner(PlatformTransactionManager transactionManager) {
+            return new AsyncJobRunner(transactionManager, new GiveBackRetryPolicy());
+        }
+
+        @Bean
+        AsyncJobEvents asyncJobEvents() {
+            // what is subscribed is not delivered: the tests hand the events to the handlers themselves
+            return new AsyncJobEvents(Mockito.mock(AsyncJobTransport.class), new AsyncJobCodec());
+        }
+
+        @Bean
+        StaleJobSweeper staleJobSweeper(PlatformTransactionManager transactionManager) {
+            return new StaleJobSweeper(transactionManager);
+        }
+
+        @Bean
+        AsyncJobFailureReporter asyncJobFailureReporter(RepositoryFactory repositoryFactory, SessionService sessionService,
+                                                        MessageCommandService messageCommandService, StompNotifier stompNotifier) {
+            return new AsyncJobFailureReporter(repositoryFactory, sessionService, messageCommandService, stompNotifier);
+        }
+
+        @Bean
+        ReleaseFailureReporter releaseFailureReporter(RepositoryFactory repositoryFactory,
+                                                      AsyncJobFailureReporter reporter,
                                                       ReleaseChangeNotifier changeNotifier) {
-            return new ReleaseFailureReporter(repositoryFactory, sessionService, messageCommandService, changeNotifier);
+            return new ReleaseFailureReporter(repositoryFactory, reporter, changeNotifier);
         }
 
         @Bean
         ReleaseProgressRecovery releaseProgressRecovery(RepositoryFactory repositoryFactory,
                                                         ReleaseFailureReporter failureReporter,
-                                                        PlatformTransactionManager transactionManager) {
-            return new ReleaseProgressRecovery(repositoryFactory, failureReporter, transactionManager,
+                                                        StaleJobSweeper sweeper) {
+            return new ReleaseProgressRecovery(repositoryFactory, failureReporter, sweeper,
                     java.time.Duration.ofMinutes(30));
         }
 
@@ -268,7 +303,7 @@ public final class GuardHarness implements AutoCloseable {
         Mockito.when(redisson.getLock(Mockito.anyString())).thenReturn(lock);
         context.getBeanFactory().registerSingleton("redissonClient", redisson);
         context.getBeanFactory().registerSingleton("eventListenerContainer", Mockito.mock(EventListenerContainer.class));
-        context.getBeanFactory().registerSingleton("afterCommitEventPublisher", new CollectingPublisher());
+        context.getBeanFactory().registerSingleton("asyncJobPublisher", new CollectingPublisher());
         context.refresh();
         return new GuardHarness(context);
     }

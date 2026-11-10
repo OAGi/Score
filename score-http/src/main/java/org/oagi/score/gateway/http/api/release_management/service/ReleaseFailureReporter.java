@@ -1,25 +1,16 @@
 package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
-import org.oagi.score.gateway.http.api.exception_management.model.ExceptionId;
-import org.oagi.score.gateway.http.api.message_management.service.MessageCommandService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseState;
-import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.async.AsyncJobFailureReporter;
+import org.oagi.score.gateway.http.common.async.FailureReasons;
+import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Tells what went wrong when a release could not be drafted or published, or was taken back because no one was doing it.
@@ -34,20 +25,14 @@ import java.util.List;
 @Component
 public class ReleaseFailureReporter {
 
-    private static final int MAX_CAUSES = 20;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final RepositoryFactory repositoryFactory;
-    private final SessionService sessionService;
-    private final MessageCommandService messageCommandService;
+    private final AsyncJobFailureReporter reporter;
     private final ReleaseChangeNotifier changeNotifier;
 
-    public ReleaseFailureReporter(RepositoryFactory repositoryFactory, SessionService sessionService,
-                                  MessageCommandService messageCommandService, ReleaseChangeNotifier changeNotifier) {
+    public ReleaseFailureReporter(RepositoryFactory repositoryFactory, AsyncJobFailureReporter reporter,
+                                  ReleaseChangeNotifier changeNotifier) {
         this.repositoryFactory = repositoryFactory;
-        this.sessionService = sessionService;
-        this.messageCommandService = messageCommandService;
+        this.reporter = reporter;
         this.changeNotifier = changeNotifier;
     }
 
@@ -56,8 +41,8 @@ public class ReleaseFailureReporter {
         Step step = Step.of(from);
         String number = numberOf(releaseId);
         String technical = "The release " + number + " (" + releaseId.value() + ") could not be " + step.done
-                + ": " + rootMessage(cause);
-        report(releaseId, step.tag, step, requester, technical, withStackTrace(technical, cause), reasonOf(cause), number,
+                + ": " + FailureReasons.rootMessage(cause);
+        report(releaseId, step.tag, step, requester, technical, FailureReasons.withStackTrace(technical, cause), reasonOf(cause), number,
                 "The release **" + number + "** could not be " + step.done + ". It is **" + step.back
                         + "** again, and nothing was changed.");
     }
@@ -76,39 +61,25 @@ public class ReleaseFailureReporter {
 
     private void report(ReleaseId releaseId, String tag, Step step, UserId requester, String technical, String details,
                         String reason, String number, String summary) {
-        ExceptionId exceptionId = repositoryFactory.exceptionCommandRepository(sessionService.getScoreSystemUser())
-                .create(tag + "#" + releaseId.value(), technical, details, requester);
-        logger.warn(technical + " (exception " + exceptionId + ")");
-
         String subject = "Release " + number + " could not be " + step.done;
         String body = summary + "\n\n" + reason + "\n\n[Go to the release list](" + RELEASE_LIST_PAGE + ")";
-        changeNotifier.failed(releaseId, sessionService.getScoreUserByUserId(requester).username());
-        afterCommit(() -> {
-            try {
-                ScoreUser system = sessionService.getScoreSystemUser();
-                messageCommandService.asyncSendMessage(system, List.of(requester), subject, body, "text/markdown");
-            } catch (RuntimeException e) {
-                logger.warn("The failure of the release " + releaseId + " could not be told to the user " + requester
-                        + ": " + e.getMessage());
-            }
-        });
+        changeNotifier.changed(releaseId);
+        reporter.report(new AsyncJobFailureReporter.Report(tag, String.valueOf(releaseId.value()), requester, technical,
+                details, subject, body,
+                new ReleaseChangeNotifier.Failure(ReleaseChangeNotifier.RELEASE_FAILED, libraryOf(releaseId), releaseId)));
+    }
+
+    /** The library the screens look at; none when it cannot be found, since that never keeps the failure from being told. */
+    private LibraryId libraryOf(ReleaseId releaseId) {
+        try {
+            return repositoryFactory.releaseProgressRepository().libraryOfRelease(releaseId).orElse(null);
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     static final String RECOVERY_TAG = "release.recovery";
     static final String RELEASE_LIST_PAGE = "/release";
-
-    private static void afterCommit(Runnable action) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    action.run();
-                }
-            });
-        } else {
-            action.run();
-        }
-    }
 
     private String numberOf(ReleaseId releaseId) {
         return repositoryFactory.releaseProgressRepository().releaseNumOf(releaseId)
@@ -117,43 +88,14 @@ public class ReleaseFailureReporter {
 
     /** What the user is told of the cause: a few kinds, since the rest is for an administrator. */
     static String reasonOf(Throwable cause) {
-        int depth = 0;
-        for (Throwable t = cause; t != null && depth < MAX_CAUSES; t = t.getCause(), depth++) {
-            if (t instanceof ComponentNotMovedException) {
-                return "A component assigned to the release could not be moved to the next state: it may have been"
-                        + " changed in the meantime, or it is no longer a candidate.";
-            }
-            if (t instanceof ConcurrencyFailureException || isLockConflict(t)) {
-                return "Another change was being made at the same time. Please try again.";
-            }
-        }
-        return "An unexpected error occurred. Please try again, and tell an administrator if it happens again.";
+        return FailureReasons.of(cause, ReleaseFailureReporter::ofRelease);
     }
 
-    private static boolean isLockConflict(Throwable t) {
-        return t instanceof SQLException e
-                && ("40001".equals(e.getSQLState()) || e.getErrorCode() == 1205 || e.getErrorCode() == 1213);
-    }
-
-    private static String rootMessage(Throwable cause) {
-        Throwable root = cause;
-        int depth = 0;
-        while (root != null && root.getCause() != null && root.getCause() != root && depth++ < MAX_CAUSES) {
-            root = root.getCause();
-        }
-        return root == null ? "unknown" : root.getClass().getName() + ": " + root.getMessage();
-    }
-
-    /** All there is to know, for the record to keep: what went wrong, whole, and the stack trace that goes with it. */
-    private static String withStackTrace(String technical, Throwable cause) {
-        if (cause == null) {
-            return technical;
-        }
-        StringWriter writer = new StringWriter();
-        writer.write(technical);
-        writer.write("\n\n");
-        cause.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
+    private static Optional<String> ofRelease(Throwable t) {
+        return t instanceof ComponentNotMovedException
+                ? Optional.of("A component assigned to the release could not be moved to the next state: it may have been"
+                + " changed in the meantime, or it is no longer a candidate.")
+                : Optional.empty();
     }
 
     private enum Step {

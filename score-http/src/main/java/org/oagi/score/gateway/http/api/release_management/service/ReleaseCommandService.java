@@ -31,8 +31,7 @@ import org.oagi.score.gateway.http.api.tag_management.model.AsccpManifestTagSumm
 import org.oagi.score.gateway.http.api.tag_management.model.BccpManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.api.tag_management.model.DtManifestTagSummaryRecord;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
-import org.oagi.score.gateway.http.common.model.event.AfterCommitEventPublisher;
-import org.oagi.score.gateway.http.common.model.event.EventListenerContainer;
+import org.oagi.score.gateway.http.common.async.AsyncJobPublisher;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.slf4j.Logger;
@@ -41,12 +40,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
+import org.oagi.score.gateway.http.common.async.AsyncJob;
+import org.oagi.score.gateway.http.common.async.AsyncJobEvents;
+import org.oagi.score.gateway.http.common.async.AsyncJobRunner;
+import org.oagi.score.gateway.http.common.async.IdempotencyGuard;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
@@ -97,7 +97,7 @@ public class ReleaseCommandService implements InitializingBean {
     private SessionService sessionService;
 
     @Autowired
-    private AfterCommitEventPublisher eventPublisher;
+    private AsyncJobPublisher eventPublisher;
 
     @Autowired
     private ReleaseChangeNotifier changeNotifier;
@@ -106,10 +106,10 @@ public class ReleaseCommandService implements InitializingBean {
     private ReleaseFailureReporter failureReporter;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
+    private AsyncJobRunner asyncJobRunner;
 
     @Autowired
-    private EventListenerContainer eventListenerContainer;
+    private AsyncJobEvents asyncJobEvents;
 
     private final String RELEASE_CREATE_REQUEST_EVENT = "releaseCreateRequestEvent";
     private final String RELEASE_CLEANUP_EVENT = "releaseCleanupEvent";
@@ -117,12 +117,11 @@ public class ReleaseCommandService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        eventListenerContainer.addMessageListener(this, "onReleaseCreateRequestEventReceived",
-                new ChannelTopic(RELEASE_CREATE_REQUEST_EVENT));
-        eventListenerContainer.addMessageListener(this, "onReleaseCleanupEventReceived",
-                new ChannelTopic(RELEASE_CLEANUP_EVENT));
-        eventListenerContainer.addMessageListener(this, "onReleaseInitializeEventReceived",
-                new ChannelTopic(RELEASE_INITIALIZE_EVENT));
+        asyncJobEvents.subscribe(RELEASE_CREATE_REQUEST_EVENT, ReleaseCreateRequestEvent.class,
+                this::onReleaseCreateRequestEventReceived);
+        asyncJobEvents.subscribe(RELEASE_CLEANUP_EVENT, ReleaseCleanupEvent.class, this::onReleaseCleanupEventReceived);
+        asyncJobEvents.subscribe(RELEASE_INITIALIZE_EVENT, ReleaseInitializeEvent.class,
+                this::onReleaseInitializeEventReceived);
     }
 
     /**
@@ -380,7 +379,7 @@ public class ReleaseCommandService implements InitializingBean {
         if (requestState == Initializing) {
             // The components of the release become candidates again, and what the release holds is removed, when the
             // event is handled, all together with the end of the transition: see onReleaseInitializeEventReceived.
-            eventPublisher.publish(RELEASE_INITIALIZE_EVENT,
+            eventPublisher.publish(RELEASE_INITIALIZE_EVENT, String.valueOf(request.getReleaseId().value()),
                     new ReleaseInitializeEvent(requester.userId(), request.getReleaseId()));
         }
 
@@ -398,7 +397,8 @@ public class ReleaseCommandService implements InitializingBean {
                 /*
                  * Message Publishing
                  */
-                eventPublisher.publish(RELEASE_CLEANUP_EVENT, releaseCleanupEvent);
+                eventPublisher.publish(RELEASE_CLEANUP_EVENT, String.valueOf(releaseCleanupEvent.getReleaseId().value()),
+                        releaseCleanupEvent);
             }
         }
     }
@@ -565,7 +565,7 @@ public class ReleaseCommandService implements InitializingBean {
             /*
              * Message Publishing
              */
-            eventPublisher.publish(RELEASE_CREATE_REQUEST_EVENT, releaseCreateRequestEvent);
+            eventPublisher.publish(RELEASE_CREATE_REQUEST_EVENT, String.valueOf(releaseId.value()), releaseCreateRequestEvent);
 
             response.clearWarnings();
         }
@@ -589,33 +589,26 @@ public class ReleaseCommandService implements InitializingBean {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void onReleaseCreateRequestEventReceived(ReleaseCreateRequestEvent releaseCreateRequestEvent) {
         ReleaseId releaseId = releaseCreateRequestEvent.getReleaseId();
-        try {
-            workTransaction().executeWithoutResult(status -> {
-                if (progress().lockState(releaseId).orElse(null) != Drafting) {
-                    return; // handled already
-                }
-                logger.debug("Received ReleaseCreateRequestEvent: " + releaseCreateRequestEvent);
-                ScoreUser requester = sessionService.getScoreUserByUserId(releaseCreateRequestEvent.getUserId());
-                doReleaseWork(() -> {
-                    moveToReleaseDraft(requester, releaseCreateRequestEvent);
-                    copyWorkingManifests(requester,
-                            releaseId,
-                            releaseCreateRequestEvent.getAccManifestIds(),
-                            releaseCreateRequestEvent.getAsccpManifestIds(),
-                            releaseCreateRequestEvent.getBccpManifestIds(),
-                            releaseCreateRequestEvent.getDtManifestIds(),
-                            releaseCreateRequestEvent.getCodeListManifestIds(),
-                            releaseCreateRequestEvent.getAgencyIdListManifestIds());
+        runReleaseWork("release.drafting#" + releaseId.value(), releaseId, Drafting, Initialized,
+                releaseCreateRequestEvent.getUserId(), () -> {
+                    logger.debug("Received ReleaseCreateRequestEvent: " + releaseCreateRequestEvent);
+                    ScoreUser requester = sessionService.getScoreUserByUserId(releaseCreateRequestEvent.getUserId());
+                    doReleaseWork(() -> {
+                        moveToReleaseDraft(requester, releaseCreateRequestEvent);
+                        copyWorkingManifests(requester,
+                                releaseId,
+                                releaseCreateRequestEvent.getAccManifestIds(),
+                                releaseCreateRequestEvent.getAsccpManifestIds(),
+                                releaseCreateRequestEvent.getBccpManifestIds(),
+                                releaseCreateRequestEvent.getDtManifestIds(),
+                                releaseCreateRequestEvent.getCodeListManifestIds(),
+                                releaseCreateRequestEvent.getAgencyIdListManifestIds());
+                    });
+                    if (!progress().moveState(releaseId, Drafting, Draft)) {
+                        throw new IllegalStateException("The release is no longer being drafted.");
+                    }
+                    changeNotifier.changed(releaseId);
                 });
-                if (!progress().moveState(releaseId, Drafting, Draft)) {
-                    throw new IllegalStateException("The release is no longer being drafted.");
-                }
-                changeNotifier.changed(releaseId);
-            });
-        } catch (RuntimeException e) {
-            logger.error("The release " + releaseId + " could not be made a draft: " + e.getMessage(), e);
-            giveBack(releaseId, Drafting, Initialized, releaseCreateRequestEvent.getUserId(), e);
-        }
     }
 
     /** The components that are assigned to the release become 'ReleaseDraft'; one that is not 'Candidate' fails it. */
@@ -646,28 +639,30 @@ public class ReleaseCommandService implements InitializingBean {
         }
     }
 
-    /** Gives the release back, after what was done for it has been rolled back. */
-    private ReleaseProgressRepository progress() {
-        return repositoryFactory.releaseProgressRepository();
+    /**
+     * Runs the work of a release as a job (see {@link AsyncJobRunner}): in a transaction of its own that holds the row of
+     * its release and has a time limit, and, when it fails, the release is given back and the user who asked for it is told
+     * what went wrong, in the transaction that gives it back. A release that is not as it was asked to be is not touched.
+     */
+    private void runReleaseWork(String name, ReleaseId releaseId, ReleaseState inProgress, ReleaseState back,
+                                UserId requester, Runnable work) {
+        asyncJobRunner.run(AsyncJob.named(name)
+                .timeout(inProgressTimeout)
+                .idempotentOn(IdempotencyGuard.stateIs(() -> progress().lockState(releaseId), inProgress))
+                .work(work)
+                .onFailure(cause -> {
+                    if (!progress().moveState(releaseId, inProgress, back)) {
+                        logger.warn("The release " + releaseId + " is no longer '" + inProgress + "'.");
+                        return;
+                    }
+                    failureReporter.failed(releaseId, inProgress, requester, cause);
+                })
+                .build());
     }
 
-    /**
-     * Gives the release back, after what was done for it has been rolled back, and tells the user who asked for it what
-     * went wrong: the record of it is kept in the transaction that gives the release back.
-     */
-    private void giveBack(ReleaseId releaseId, ReleaseState from, ReleaseState to, UserId requester, Throwable cause) {
-        try {
-            new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
-                if (!progress().moveState(releaseId, from, to)) {
-                    logger.warn("The release " + releaseId + " is no longer '" + from + "'.");
-                    return;
-                }
-                failureReporter.failed(releaseId, from, requester, cause);
-            });
-        } catch (RuntimeException e) {
-            // it is taken back later: see ReleaseProgressRecovery
-            logger.error("The release " + releaseId + " could not be given back to '" + to + "': " + e.getMessage(), e);
-        }
+    /** The state of the release, for the progress of it. */
+    private ReleaseProgressRepository progress() {
+        return repositoryFactory.releaseProgressRepository();
     }
 
     private void copyWorkingManifests(
@@ -725,34 +720,27 @@ public class ReleaseCommandService implements InitializingBean {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void onReleaseCleanupEventReceived(ReleaseCleanupEvent releaseCleanupEvent) {
         ReleaseId releaseId = releaseCleanupEvent.getReleaseId();
-        try {
-            workTransaction().executeWithoutResult(status -> {
-                if (progress().lockState(releaseId).orElse(null) != Publishing) {
-                    return; // handled already
-                }
-                logger.debug("Received ReleaseCleanupEvent: " + releaseCleanupEvent);
-                ScoreUser requester = sessionService.getScoreUserByUserId(releaseCleanupEvent.getUserId());
-                var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
+        runReleaseWork("release.publishing#" + releaseId.value(), releaseId, Publishing, Draft,
+                releaseCleanupEvent.getUserId(), () -> {
+                    logger.debug("Received ReleaseCleanupEvent: " + releaseCleanupEvent);
+                    ScoreUser requester = sessionService.getScoreUserByUserId(releaseCleanupEvent.getUserId());
+                    var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
 
-                doReleaseWork(() -> {
-                    updateCCStates(requester, release, ReleaseDraft, CcState.Published, LocalDateTime.now());
-                    repositoryFactory.ccCommandRepository(requester).cleanUp(releaseId);
+                    doReleaseWork(() -> {
+                        updateCCStates(requester, release, ReleaseDraft, CcState.Published, LocalDateTime.now());
+                        repositoryFactory.ccCommandRepository(requester).cleanUp(releaseId);
+                    });
+                    updateState(requester, releaseId, Published);
+                    changeNotifier.changed(releaseId);
+
+                    // The published release already holds its own copy of the GitHub issue links (carried over
+                    // when it was drafted); remove the 'Working' release's links for the components included in
+                    // this release so those issues live only in the published release going forward. Links on
+                    // Working components not part of this release are kept (issue #1533). The repository resolves
+                    // the library's 'Working' release internally from the published release.
+                    repositoryFactory.gitHubIssueLinkCommandRepository(requester)
+                            .deleteWorkingLinksIncludedInRelease(releaseId);
                 });
-                updateState(requester, releaseId, Published);
-                changeNotifier.changed(releaseId);
-
-                // The published release already holds its own copy of the GitHub issue links (carried over
-                // when it was drafted); remove the 'Working' release's links for the components included in
-                // this release so those issues live only in the published release going forward. Links on
-                // Working components not part of this release are kept (issue #1533). The repository resolves
-                // the library's 'Working' release internally from the published release.
-                repositoryFactory.gitHubIssueLinkCommandRepository(requester)
-                        .deleteWorkingLinksIncludedInRelease(releaseId);
-            });
-        } catch (RuntimeException e) {
-            logger.error("The release " + releaseId + " could not be published: " + e.getMessage(), e);
-            giveBack(releaseId, Publishing, Draft, releaseCleanupEvent.getUserId(), e);
-        }
     }
 
     /**
@@ -766,36 +754,18 @@ public class ReleaseCommandService implements InitializingBean {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void onReleaseInitializeEventReceived(ReleaseInitializeEvent releaseInitializeEvent) {
         ReleaseId releaseId = releaseInitializeEvent.getReleaseId();
-        try {
-            workTransaction().executeWithoutResult(status -> {
-                if (progress().lockState(releaseId).orElse(null) != Initializing) {
-                    return; // handled already
-                }
-                logger.debug("Received ReleaseInitializeEvent: " + releaseInitializeEvent);
-                ScoreUser requester = sessionService.getScoreUserByUserId(releaseInitializeEvent.getUserId());
-                var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
+        runReleaseWork("release.initializing#" + releaseId.value(), releaseId, Initializing, Draft,
+                releaseInitializeEvent.getUserId(), () -> {
+                    logger.debug("Received ReleaseInitializeEvent: " + releaseInitializeEvent);
+                    ScoreUser requester = sessionService.getScoreUserByUserId(releaseInitializeEvent.getUserId());
+                    var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
 
-                doReleaseWork(() -> takeBackToInitialized(requester, release));
-                if (!progress().moveState(releaseId, Initializing, Initialized)) {
-                    throw new IllegalStateException("The release is no longer being taken back to 'Initialized'.");
-                }
-                changeNotifier.changed(releaseId);
-            });
-        } catch (RuntimeException e) {
-            logger.error("The release " + releaseId + " could not be taken back to 'Initialized': " + e.getMessage(), e);
-            giveBack(releaseId, Initializing, Draft, releaseInitializeEvent.getUserId(), e);
-        }
-    }
-
-    /**
-     * The transaction of the work of a release. It has a limit: the work holds the row of its release (which tells that it is going on)
-     * until it ends, so one that never ends, because what it waits for never answers, would make the release look busy for ever.
-     * After the limit it is rolled back, and the release is given back as when any other thing fails.
-     */
-    private TransactionTemplate workTransaction() {
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        template.setTimeout((int) inProgressTimeout.toSeconds());
-        return template;
+                    doReleaseWork(() -> takeBackToInitialized(requester, release));
+                    if (!progress().moveState(releaseId, Initializing, Initialized)) {
+                        throw new IllegalStateException("The release is no longer being taken back to 'Initialized'.");
+                    }
+                    changeNotifier.changed(releaseId);
+                });
     }
 
     /**

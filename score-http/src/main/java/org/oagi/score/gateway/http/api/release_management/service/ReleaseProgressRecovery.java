@@ -3,12 +3,11 @@ package org.oagi.score.gateway.http.api.release_management.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseState;
+import org.oagi.score.gateway.http.common.async.StaleJobSweeper;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,15 +25,15 @@ public class ReleaseProgressRecovery {
 
     private final RepositoryFactory repositoryFactory;
     private final ReleaseFailureReporter failureReporter;
-    private final PlatformTransactionManager transactionManager;
+    private final StaleJobSweeper sweeper;
     private final Duration timeout;
 
     public ReleaseProgressRecovery(RepositoryFactory repositoryFactory, ReleaseFailureReporter failureReporter,
-                                   PlatformTransactionManager transactionManager,
+                                   StaleJobSweeper sweeper,
                                    @Value("${score.release.in-progress-timeout:PT30M}") Duration timeout) {
         this.repositoryFactory = repositoryFactory;
         this.failureReporter = failureReporter;
-        this.transactionManager = transactionManager;
+        this.sweeper = sweeper;
         this.timeout = timeout;
     }
 
@@ -50,17 +49,9 @@ public class ReleaseProgressRecovery {
 
     /** Takes back the releases that have been in the middle of a transition since before the time; how many. */
     public int recoverSince(LocalDateTime time) {
-        return new TransactionTemplate(transactionManager).execute(status -> {
-            var progress = repositoryFactory.releaseProgressRepository();
-            int taken = 0;
-            for (var inProgress : progress.lockInProgressSince(time)) {
-                ReleaseState back = inProgress.state().givenBack();
-                if (progress.moveState(inProgress.releaseId(), inProgress.state(), back)) {
-                    failureReporter.abandoned(inProgress.releaseId(), inProgress.state(), inProgress.lastUpdatedBy(), time);
-                    taken++;
-                }
-            }
-            return taken;
-        });
+        var progress = repositoryFactory.releaseProgressRepository();
+        return sweeper.sweep(time, progress::lockInProgressSince,
+                inProgress -> progress.moveState(inProgress.releaseId(), inProgress.state(), inProgress.state().givenBack()),
+                inProgress -> failureReporter.abandoned(inProgress.releaseId(), inProgress.state(), inProgress.lastUpdatedBy(), time));
     }
 }

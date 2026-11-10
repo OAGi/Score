@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleaseProgressRepository;
+import org.oagi.score.gateway.http.common.async.StompNotifier;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
-import org.oagi.score.gateway.http.configuration.websocket.WebSocketAuthorizationInterceptor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -23,7 +23,7 @@ class ReleaseChangeNotifierTest {
     private final SimpMessagingTemplate template = mock(SimpMessagingTemplate.class);
     private final RepositoryFactory repositories = mock(RepositoryFactory.class);
     private final ReleaseProgressRepository progress = mock(ReleaseProgressRepository.class);
-    private final ReleaseChangeNotifier notifier = new ReleaseChangeNotifier(template, repositories);
+    private final ReleaseChangeNotifier notifier = new ReleaseChangeNotifier(new StompNotifier(template), repositories);
 
     private final ReleaseId releaseId = new ReleaseId(BigInteger.valueOf(5));
     private final LibraryId libraryId = new LibraryId(BigInteger.valueOf(2));
@@ -74,20 +74,6 @@ class ReleaseChangeNotifierTest {
 
         verify(template).convertAndSend(eq(ReleaseChangeNotifier.TOPIC),
                 eq(new ReleaseChangeNotifier.Change(libraryId, releaseId)));
-    }
-
-    @Test
-    void tellsEveryoneThatTheReleaseChangedAndOnlyTheUserWhoAskedForItThatItsWorkFailed() {
-        when(repositories.releaseProgressRepository()).thenReturn(progress);
-        when(progress.libraryOfRelease(releaseId)).thenReturn(Optional.of(libraryId));
-
-        notifier.failed(releaseId, "alice");
-
-        verify(template).convertAndSend(eq(ReleaseChangeNotifier.TOPIC),
-                eq(new ReleaseChangeNotifier.Change(libraryId, releaseId)));
-        verify(template).convertAndSend(eq(WebSocketAuthorizationInterceptor.messageTopicOf("alice")),
-                eq(new ReleaseChangeNotifier.Failure("releaseFailed", libraryId, releaseId)));
-        verifyNoMoreInteractions(template);
     }
 
     @Test
