@@ -233,6 +233,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
 
         copySeqKeyRecordsFromWorking(releaseId);
         updateSeqKeyPrevNext(releaseId);
+        restoreAssociationsOfRevertedAccs(releaseId, workingReleaseId);
 
         copyXbtManifestRecordsFromWorking(releaseId, workingReleaseId, Collections.emptyList());
         updateXbtDependencies(releaseId);
@@ -1900,6 +1901,83 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                 .where(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))).execute();
     }
 
+    /**
+     * An ACC that has been revised in 'Working' and is not assigned to the release goes into the release as it was in the
+     * previous release: it holds the record of the previous release (see {@link #updateAccDependencies}). Its associations
+     * have to be those of the previous release too, which the copy of the associations of 'Working' does not give when an
+     * association has been removed, or added or re-ordered, since the revision. This replaces the associations (and their
+     * sequence) of such an ACC by the ones of the previous release's ACC, each following its own manifest of this release.
+     */
+    private void restoreAssociationsOfRevertedAccs(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        BigInteger release = releaseId.value();
+        BigInteger working = workingReleaseId.value();
+        String reverted = "select m.acc_manifest_id from acc_manifest m "
+                + "join acc_manifest w on w.acc_manifest_id = m.next_acc_manifest_id and w.release_id = " + working + " "
+                + "where m.release_id = " + release + " and m.prev_acc_manifest_id is not null and w.acc_id <> m.acc_id";
+        if (dslContext().fetch(reverted + " limit 1").isEmpty()) {
+            return;
+        }
+        // The ACC manifests are not changed below, so the subquery is stable; it is wrapped to be used in the UPDATE and DELETE.
+        String s = "(select acc_manifest_id from (" + reverted + ") reverted)";
+
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            dslContext().execute("update " + kind + "_manifest set seq_key_id = null where release_id = " + release
+                    + " and from_acc_manifest_id in " + s);
+        }
+        dslContext().execute("update seq_key set prev_seq_key_id = null, next_seq_key_id = null where from_acc_manifest_id in " + s);
+        dslContext().execute("delete from seq_key where from_acc_manifest_id in " + s);
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            String replacement = "replacement_" + kind + "_manifest_id";
+            dslContext().execute("update " + kind + "_manifest x join " + kind + "_manifest y on x." + replacement + " = y."
+                    + kind + "_manifest_id set x." + replacement + " = null where y.release_id = " + release
+                    + " and y.from_acc_manifest_id in " + s);
+            dslContext().execute("delete from " + kind + "_manifest where release_id = " + release
+                    + " and from_acc_manifest_id in " + s);
+        }
+
+        // the associations of the previous release's ACC
+        dslContext().execute("insert into ascc_manifest (release_id, ascc_id, from_acc_manifest_id, to_asccp_manifest_id, den, "
+                + "conflict, prev_ascc_manifest_id, next_ascc_manifest_id) "
+                + "select " + release + ", a.ascc_id, m.acc_manifest_id, coalesce(t.asccp_manifest_id, a.to_asccp_manifest_id), "
+                + "a.den, a.conflict, a.ascc_manifest_id, a.next_ascc_manifest_id "
+                + "from ascc_manifest a join acc_manifest m on m.prev_acc_manifest_id = a.from_acc_manifest_id "
+                + "and m.release_id = " + release + " and m.acc_manifest_id in " + s + " "
+                + "left join asccp_manifest t on t.prev_asccp_manifest_id = a.to_asccp_manifest_id and t.release_id = " + release);
+        dslContext().execute("insert into bcc_manifest (release_id, bcc_id, from_acc_manifest_id, to_bccp_manifest_id, den, "
+                + "conflict, prev_bcc_manifest_id, next_bcc_manifest_id) "
+                + "select " + release + ", a.bcc_id, m.acc_manifest_id, coalesce(t.bccp_manifest_id, a.to_bccp_manifest_id), "
+                + "a.den, a.conflict, a.bcc_manifest_id, a.next_bcc_manifest_id "
+                + "from bcc_manifest a join acc_manifest m on m.prev_acc_manifest_id = a.from_acc_manifest_id "
+                + "and m.release_id = " + release + " and m.acc_manifest_id in " + s + " "
+                + "left join bccp_manifest t on t.prev_bccp_manifest_id = a.to_bccp_manifest_id and t.release_id = " + release);
+
+        // their sequence, in the order of the previous release
+        dslContext().execute("insert into seq_key (from_acc_manifest_id, ascc_manifest_id) select from_acc_manifest_id, "
+                + "ascc_manifest_id from ascc_manifest where release_id = " + release + " and from_acc_manifest_id in " + s);
+        dslContext().execute("insert into seq_key (from_acc_manifest_id, bcc_manifest_id) select from_acc_manifest_id, "
+                + "bcc_manifest_id from bcc_manifest where release_id = " + release + " and from_acc_manifest_id in " + s);
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            dslContext().execute("update " + kind + "_manifest x join seq_key k on k." + kind + "_manifest_id = x."
+                    + kind + "_manifest_id set x.seq_key_id = k.seq_key_id where x.release_id = " + release
+                    + " and x.from_acc_manifest_id in " + s);
+        }
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            for (String direction : new String[]{"prev", "next"}) {
+                // the key of the new association that follows the association the previous release's key links to
+                dslContext().execute("update seq_key k "
+                        + "join " + kind + "_manifest x on x." + kind + "_manifest_id = k." + kind + "_manifest_id "
+                        + "join " + kind + "_manifest a on a." + kind + "_manifest_id = x.prev_" + kind + "_manifest_id "
+                        + "join seq_key old on old.seq_key_id = a.seq_key_id "
+                        + "left join ascc_manifest oa on oa.seq_key_id = old." + direction + "_seq_key_id "
+                        + "left join bcc_manifest ob on ob.seq_key_id = old." + direction + "_seq_key_id "
+                        + "left join ascc_manifest na on na.prev_ascc_manifest_id = oa.ascc_manifest_id and na.release_id = " + release + " "
+                        + "left join bcc_manifest nb on nb.prev_bcc_manifest_id = ob.bcc_manifest_id and nb.release_id = " + release + " "
+                        + "set k." + direction + "_seq_key_id = ifnull(na.seq_key_id, nb.seq_key_id) "
+                        + "where x.release_id = " + release + " and k.from_acc_manifest_id in " + s);
+            }
+        }
+    }
+
     private void updateSeqKeyPrevNext(ReleaseId releaseId) {
         // Update prev/next seq_key for ASCC
         dslContext().update(SEQ_KEY
@@ -2356,15 +2434,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
     }
 
     private void updateAsccDependencies(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        // The ACC and the ASCCP are mapped on their own: the ASCCP may be in a release the library depends on, which has no
+        // manifest of this release for it to be mapped to, and the ACC has to be mapped nevertheless.
         dslContext().update(ASCC_MANIFEST
                         .join(ACC_MANIFEST)
-                        .on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID))
+                        .on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)))
+                .set(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
+                .where(and(ASCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+        dslContext().update(ASCC_MANIFEST
                         .join(ASCCP_MANIFEST)
                         .on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID)))
-                .set(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
                 .set(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
                 .where(and(ASCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         ASCCP_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
@@ -2418,14 +2501,17 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
     }
 
     private void updateBccDependencies(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        // The ACC and the BCCP are mapped on their own, as for the ASCC (see updateAsccDependencies).
         dslContext().update(BCC_MANIFEST.join(ACC_MANIFEST)
-                        .on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID))
-                        .join(BCCP_MANIFEST)
-                        .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)))
+                        .on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)))
                 .set(BCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
+                .where(and(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+        dslContext().update(BCC_MANIFEST.join(BCCP_MANIFEST)
+                        .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)))
                 .set(BCC_MANIFEST.TO_BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_MANIFEST_ID)
                 .where(and(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         BCCP_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
