@@ -120,3 +120,41 @@ When the Release Draft is rolled back to the Initialized state, the view-order w
 1. A developer signs in to connectCenter after view-order weights have been authored on the two 'Working' children of the view-parent ACC.
 2. Create an initialized release, create a draft from it, assign all candidate content, validate, and create the draft. After the release reaches the Draft state, verify that both weights were forwarded onto the new release: the forwarded rows are keyed on the new release's copied view-parent ACC, the ASCC/BCC child manifests are the new release's copies (not the 'Working' ones), and the weights are preserved. Verify the 'Working' weights are unchanged. (Assertion [#19.2.1](#test-assertion-1921))
 3. Move the draft release back to the Initialized state and verify that the release's forwarded weights are removed while the 'Working' weights remain. (Assertion [#19.2.2](#test-assertion-1922))
+
+## Test Case 19.3
+
+**Release work is all or nothing**
+
+Pre-condition: N/A
+
+> Turning a release into a draft, taking a draft back to Initialized, and publishing a draft do their work in the background (issue #1895). This case verifies that each of them is all or nothing, that the user who asked is told when one fails, and that a library cannot be changed while one of its releases is being worked on. The work is made to fail the way a lost connection to the database would: the database refuses the last step of it, so that everything done before it has to be undone.
+
+### Test Assertion:
+
+#### Test Assertion #19.3.1
+When a release is turned into a draft, the list of releases shows it as a Draft when the work is done, without the user searching again. The assigned components are in the Release Draft state.
+
+#### Test Assertion #19.3.2
+When the work of turning a release into a draft fails, the release is Initialized again, the assigned components are Candidates as they were, and nothing has been copied into the release. The user who asked is told in a message that the release could not be made a draft and that it is Initialized again, whatever page they are on when the work ends. The message does not give a reference number, because the user cannot look one up.
+
+#### Test Assertion #19.3.3
+When the work of taking a draft back to Initialized fails, the release is still a Draft, everything it holds is still there, and the assigned components are still in the Release Draft state. The user who asked is told in a message that the release could not be taken back to Initialized and that it is a Draft again.
+
+#### Test Assertion #19.3.4
+When the work of publishing a draft fails, the release is still a Draft and the assigned components are still in the Release Draft state. The user who asked is told in a message that the release could not be published and that it is a Draft again.
+
+#### Test Assertion #19.3.5
+A release that is left in the middle of its work (for example because the server was stopped) is opened from the list, and its page says that it is being worked on. While it is, the components of its library cannot be changed, and the user is told that a release of the library is being drafted or published; the components of another library can be changed. When a developer gives the release back, it is Initialized again and the library can be changed.
+
+### Test Step Pre-condition:
+1. A developer account (and, for publishing, an administrator account) and a developer namespace are available in connectCenter.
+2. A Candidate Working-branch ACC and an Initialized release of the same library exist.
+3. For the failures, the database is made to refuse the last step of the work of the release.
+4. For the library that cannot be changed, a Working-branch ACC of the library and a Working-branch ACC of another library exist, and the release is put in the state a stopped server leaves it in.
+
+### Test Step:
+1. A developer signs in to connectCenter, opens the Initialized release, creates a draft, assigns all candidate content, validates and creates the draft. With the list of releases open and not searched again, verify that the release becomes a Draft and that the ACC is in the Release Draft state. (Assertion [#19.3.1](#test-assertion-1931))
+2. Make the work fail and create the draft. Verify that the release is Initialized, that the ACC is a Candidate, that no manifest was copied into the release, and that the message of the user says that nothing was changed and has no reference number. (Assertion [#19.3.2](#test-assertion-1932))
+3. Create a draft, make the work fail, and move the draft back to Initialized. Verify that the message of the user says so, that the release is still a Draft, that the number of manifests it holds has not changed, and that the ACC is in the Release Draft state. (Assertion [#19.3.3](#test-assertion-1933))
+4. As an administrator, create a draft, make the work fail, and publish it. Verify that the message of the user says so, that the release is still a Draft, and that the ACC is in the Release Draft state. (Assertion [#19.3.4](#test-assertion-1934))
+5. Put an Initialized release in the middle of its work. Open it and verify the notice. Try to move an ACC of its library to Draft and verify the message and that the ACC is unchanged; move an ACC of another library to Draft and verify that it is changed. Give the release back and verify that it is Initialized and that the ACC of the library can be moved to Draft. (Assertion [#19.3.5](#test-assertion-1935))

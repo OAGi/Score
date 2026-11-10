@@ -38,4 +38,17 @@ public interface EditReleasePage extends Page {
     WebElement getPublishButton();
 
     void publish();
+
+    /**
+     * The notice that says that the release is being worked on (it is being drafted, taken back to 'Initialized' or published),
+     * which is shown in place of the usual buttons.
+     */
+    WebElement getInProgressNotice();
+
+    WebElement getRecoverButton();
+
+    /**
+     * Gives a release that was left in the middle of its work back to the state it was in before, and waits for the answer.
+     */
+    void recover();
 }

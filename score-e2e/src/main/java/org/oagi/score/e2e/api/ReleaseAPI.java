@@ -73,4 +73,39 @@ public interface ReleaseAPI {
      * @return A newly created random release object.
      */
     ReleaseObject createRandomRelease(AppUserObject creator, LibraryObject library, NamespaceObject namespace);
+
+    /**
+     * Puts a release in the state that a stopped server leaves it in: in the middle of its work (for example 'Drafting' or
+     * 'Publishing') with nothing doing the work.
+     *
+     * @param releaseId the release
+     * @param state     the state, as the database has it
+     */
+    void forceState(BigInteger releaseId, String state);
+
+    /**
+     * Makes the work of the release fail where it ends, as a lost connection to the database would: its last step (from
+     * 'Drafting' to 'Draft', from 'Initializing' to 'Initialized', from 'Publishing' to 'Published') is refused by the database,
+     * and what the work did before it is to be undone. {@link #makeTheWorkSucceedAgain} removes it. Giving the release back to the
+     * state it was in is not affected.
+     *
+     * @param releaseId the release
+     */
+    void makeTheWorkFail(BigInteger releaseId);
+
+    /**
+     * Removes what {@link #makeTheWorkFail} made; nothing happens when it was not made.
+     *
+     * @param releaseId the release
+     */
+    void makeTheWorkSucceedAgain(BigInteger releaseId);
+
+    /**
+     * Counts the manifests of the components of every kind (core components, data types, code lists and agency ID lists) that a
+     * release holds.
+     *
+     * @param releaseId the release
+     * @return the number of manifests
+     */
+    int countManifests(BigInteger releaseId);
 }

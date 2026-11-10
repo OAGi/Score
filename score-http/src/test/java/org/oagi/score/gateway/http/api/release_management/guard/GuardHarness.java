@@ -34,6 +34,7 @@ import org.oagi.score.gateway.http.api.message_management.service.MessageCommand
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseChangeNotifier;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseFailureReporter;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseProgressRecovery;
+import org.oagi.score.gateway.http.common.DbRevert;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -214,6 +215,7 @@ public final class GuardHarness implements AutoCloseable {
 
     private final AtomicInteger serial = new AtomicInteger();
     private List<String> releaseTables;
+    private DbRevert.Baseline baseline;
 
     public static GuardHarness open() {
         String database = System.getProperty("DB_DATABASE", System.getenv("DB_DATABASE"));
@@ -285,6 +287,7 @@ public final class GuardHarness implements AutoCloseable {
 
     /** A new release of the library, and one new component of every kind, in 'Working', all of them {@code Candidate}. */
     public Arena arrange() {
+        baseline = DbRevert.capture(dsl);
         long library = one("select library_id from library where name = ?", LIBRARY);
         long working = one("select release_id from `release` where library_id = ? and release_num = 'Working'", library);
         long namespace = one("select namespace_id from `release` where release_id = ?", working);
@@ -362,46 +365,13 @@ public final class GuardHarness implements AutoCloseable {
         return rows;
     }
 
-    /** Removes what is left of a release: what the application does when a draft goes back to 'Initialized', and the rest. */
+    /**
+     * Gives the database back as it was before {@link #arrange()}: the release, the components the test made, and everything the
+     * release made of them (published or not) are deleted, and 'Working' and the releases before it point at what they pointed at.
+     * It is one arena at a time: what another arena made since is deleted with it.
+     */
     void remove(long releaseValue, Map<K, Long> components) {
-        ReleaseId release = new ReleaseId(n(releaseValue));
-        try {
-            factory.releaseCommandRepository(REQUESTER).deleteDeps(release);
-            var tagQuery = factory.tagQueryRepository(REQUESTER);
-            var tagCommand = factory.tagCommandRepository(REQUESTER);
-            tagQuery.getAccManifestTagList(List.of(release)).forEach(t -> tagCommand.removeTag(t.tagId(), t.accManifestId()));
-            tagQuery.getAsccpManifestTagList(List.of(release)).forEach(t -> tagCommand.removeTag(t.tagId(), t.asccpManifestId()));
-            tagQuery.getBccpManifestTagList(List.of(release)).forEach(t -> tagCommand.removeTag(t.tagId(), t.bccpManifestId()));
-            tagQuery.getDtManifestTagList(List.of(release)).forEach(t -> tagCommand.removeTag(t.tagId(), t.dtManifestId()));
-            factory.gitHubIssueLinkCommandRepository(REQUESTER).deleteLinksByRelease(release);
-            factory.bieViewOrderCommandRepository(REQUESTER).deleteByRelease(release);
-            factory.ccCommandRepository(REQUESTER).clearReplacement(release);
-            factory.ccCommandRepository(REQUESTER).delete(release);
-        } catch (RuntimeException ignored) {
-            // what is left is removed below
-        }
-        for (int pass = 0; pass < 8; pass++) {
-            boolean left = false;
-            for (String table : releaseTables()) {
-                try {
-                    dsl.execute("delete from `" + table + "` where release_id = ?", releaseValue);
-                } catch (RuntimeException e) {
-                    left = true;
-                }
-            }
-            if (!left) {
-                break;
-            }
-        }
-        try {
-            dsl.execute("delete from `release` where release_id = ?", releaseValue);
-        } catch (RuntimeException ignored) {
-            // a release that is still referred to is left
-        }
-        // the components of the test are not to be taken by a later release, which moves every component that is 'ReleaseDraft'
-        components.forEach((k, id) -> dsl.execute("update `" + k.table + "` set state = 'WIP' where state in "
-                + "('Candidate', 'ReleaseDraft') and `" + k.record() + "` = (select `" + k.record() + "` from `"
-                + k.manifest() + "` where `" + k.manifestId() + "` = ?)", id));
+        DbRevert.revert(dsl, baseline);
     }
 
     // ---- what the tests observe ----
