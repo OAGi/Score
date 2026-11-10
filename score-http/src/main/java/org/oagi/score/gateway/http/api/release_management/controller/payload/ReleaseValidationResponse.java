@@ -30,6 +30,10 @@ public class ReleaseValidationResponse {
         BCCP_BDT,
         DT_BasedDT,
         DT_AllowedPrimitive,
+        CODE_LIST_BasedCodeList,
+        CODE_LIST_AgencyIdList,
+        AGENCY_ID_LIST_BasedAgencyIdList,
+        AGENCY_ID_LIST_AgencyIdList,
         NAMESPACE
     }
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
@@ -170,6 +171,7 @@ class ReleaseDependencyValidatorMatrixTest {
         final List<AgencyIdListSummaryRecord> agencyIdLists = new ArrayList<>();
         final Map<XbtManifestId, XbtSummaryRecord> xbts = new HashMap<>();
         final Set<XbtId> workingXbtIds = new HashSet<>();
+        final Map<AgencyIdListValueManifestId, AgencyIdListManifestId> agencyValueOwners = new HashMap<>();
 
         final Map<AccManifestId, ReleaseDependencyValidator.Located<AccSummaryRecord>> depAccs = new HashMap<>();
         final Map<AsccpManifestId, ReleaseDependencyValidator.Located<AsccpSummaryRecord>> depAsccps = new HashMap<>();
@@ -304,6 +306,27 @@ class ReleaseDependencyValidatorMatrixTest {
             }
         }
 
+        /** The value of an Agency ID List that is the agency of a Code List or of an Agency ID List. */
+        static final AgencyIdListValueManifestId AGENCY = AgencyIdListValueManifestId.from(n(7));
+
+        void dependentCodeList(CodeListManifestId based, AgencyIdListValueManifestId agency) {
+            codeLists.add(new CodeListSummaryRecord(CodeListManifestId.from(n(DEPENDENT)), CodeListId.from(n(DEPENDENT)),
+                    null, null, based, agency, "cl" + DEPENDENT, null, null, null, null, false,
+                    scenario.dependentState(), null, null, null, List.of()));
+            if (scenario.dependentAssigned()) {
+                assignedCodeLists.add(CodeListManifestId.from(n(DEPENDENT)));
+            }
+        }
+
+        void dependentAgencyIdList(AgencyIdListManifestId based, AgencyIdListValueManifestId agency) {
+            agencyIdLists.add(new AgencyIdListSummaryRecord(AgencyIdListManifestId.from(n(DEPENDENT)),
+                    AgencyIdListId.from(n(DEPENDENT)), null, null, based, "ail" + DEPENDENT, null, null, null, null,
+                    agency, null, false, scenario.dependentState(), null, null, null, List.of()));
+            if (scenario.dependentAssigned()) {
+                assignedAgencyIdLists.add(AgencyIdListManifestId.from(n(DEPENDENT)));
+            }
+        }
+
         void dependentDt(DtManifestId based) {
             dts.add(dt(DEPENDENT, scenario.dependentState(), based, false));
             if (scenario.dependentAssigned()) {
@@ -394,7 +417,7 @@ class ReleaseDependencyValidatorMatrixTest {
 
         void validate() {
             new ReleaseDependencyValidator(new ReleaseDependencyValidator.Data(accs, asccs, bccs, asccps, bccps, dts,
-                    awdPris, scs, scAwdPris, codeLists, agencyIdLists, xbts, workingXbtIds,
+                    awdPris, scs, scAwdPris, codeLists, agencyIdLists, xbts, workingXbtIds, agencyValueOwners,
                     new ReleaseDependencyValidator.Dependencies(depAccs, depAsccps, depBccps, depDts, depCodeLists,
                             depAgencyIdLists),
                     new ReleaseDependencyValidator.Assigned(assignedAccs, assignedAsccps, assignedBccps, assignedDts,
@@ -512,6 +535,36 @@ class ReleaseDependencyValidatorMatrixTest {
                     w.validate();
                     return union(tag(w.response.getStatusMapForDt().get(DtManifestId.from(n(dependentId))), "dependent"),
                             tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependencyId))), "dependency"));
+                }),
+                new Edge("Code List -> base Code List", w -> {
+                    CodeListManifestId base = w.placeCodeList();
+                    w.dependentCodeList(base, null);
+                    w.validate();
+                    return union(tag(w.response.getStatusMapForCodeList().get(CodeListManifestId.from(n(dependentId))), "dependent"),
+                            tag(w.response.getStatusMapForCodeList().get(CodeListManifestId.from(n(dependencyId))), "dependency"));
+                }),
+                new Edge("Code List -> Agency ID List (agency)", w -> {
+                    AgencyIdListManifestId owner = w.placeAgencyIdList();
+                    w.agencyValueOwners.put(World.AGENCY, owner);
+                    w.dependentCodeList(null, World.AGENCY);
+                    w.validate();
+                    return union(tag(w.response.getStatusMapForCodeList().get(CodeListManifestId.from(n(dependentId))), "dependent"),
+                            tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependencyId))), "dependency"));
+                }),
+                new Edge("Agency ID List -> base Agency ID List", w -> {
+                    AgencyIdListManifestId base = w.placeAgencyIdList();
+                    w.dependentAgencyIdList(base, null);
+                    w.validate();
+                    return union(tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependentId))), "dependent"),
+                            tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependencyId))), "dependency"));
+                }),
+                new Edge("Agency ID List -> Agency ID List (agency)", w -> {
+                    AgencyIdListManifestId owner = w.placeAgencyIdList();
+                    w.agencyValueOwners.put(World.AGENCY, owner);
+                    w.dependentAgencyIdList(null, World.AGENCY);
+                    w.validate();
+                    return union(tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependentId))), "dependent"),
+                            tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(dependencyId))), "dependency"));
                 })
         );
     }
@@ -549,5 +602,35 @@ class ReleaseDependencyValidatorMatrixTest {
         assertEquals(Set.of("Error@dependent"), expected(new Scenario(CcState.Candidate, true, Location.PUBLISHED_RELEASE, CcState.Candidate, false, false)));
         assertEquals(Set.of("Warning@dependent"), expected(new Scenario(CcState.Candidate, true, Location.RELEASE_IN_WORK, CcState.Published, false, false)));
         assertEquals(Set.of("Error@dependent"), expected(new Scenario(CcState.Candidate, true, Location.RELEASE_IN_WORK, CcState.WIP, false, false)));
+    }
+
+    private static World candidateWorld() {
+        return new World(new Scenario(CcState.Candidate, true, Location.WORKING, CcState.Published, false, true));
+    }
+
+    @Test
+    void anAgencyOfWhichTheAgencyIdListIsNotFoundIsAnError() {
+        World w = candidateWorld();
+        w.dependentCodeList(null, World.AGENCY);
+        w.validate();
+        assertEquals(Set.of("Error@dependent"),
+                tag(w.response.getStatusMapForCodeList().get(CodeListManifestId.from(n(DEPENDENT))), "dependent"));
+    }
+
+    @Test
+    void anAgencyIdListWhoseAgencyIsAValueOfItselfDependsOnNothing() {
+        World w = candidateWorld();
+        w.agencyValueOwners.put(World.AGENCY, AgencyIdListManifestId.from(n(DEPENDENT)));
+        w.dependentAgencyIdList(null, World.AGENCY);
+        w.validate();
+        assertEquals(Set.of(), tag(w.response.getStatusMapForAgencyIdList().get(AgencyIdListManifestId.from(n(DEPENDENT))), "dependent"));
+    }
+
+    @Test
+    void aCodeListWithoutBaseAndAgencyDependsOnNothing() {
+        World w = candidateWorld();
+        w.dependentCodeList(null, null);
+        w.validate();
+        assertEquals(Set.of(), tag(w.response.getStatusMapForCodeList().get(CodeListManifestId.from(n(DEPENDENT))), "dependent"));
     }
 }

@@ -151,7 +151,7 @@ class ReleaseDependencyValidatorDtTest {
                     wrap(dependencyDts), wrap(dependencyCodeLists), wrap(dependencyAgencyIdLists));
             new ReleaseDependencyValidator(new ReleaseDependencyValidator.Data(List.of(), List.of(), List.of(),
                     List.of(), List.of(), dts, awdPris, scs, scAwdPris,
-                    new ArrayList<>(codeLists.values()), new ArrayList<>(agencyIdLists.values()), xbts, workingXbtIds,
+                    new ArrayList<>(codeLists.values()), new ArrayList<>(agencyIdLists.values()), xbts, workingXbtIds, Map.of(),
                     dependencies,
                     new ReleaseDependencyValidator.Assigned(List.of(), List.of(), List.of(), assignedDts,
                             assignedCodeLists, assignedAgencyIdLists)), response).validate();

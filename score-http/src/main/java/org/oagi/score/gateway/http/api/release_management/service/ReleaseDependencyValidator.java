@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
@@ -106,6 +107,7 @@ final class ReleaseDependencyValidator {
             List<AgencyIdListSummaryRecord> agencyIdLists,
             Map<XbtManifestId, XbtSummaryRecord> xbts,
             Set<XbtId> workingXbtIds,
+            Map<AgencyIdListValueManifestId, AgencyIdListManifestId> agencyValueOwners,
             Dependencies dependencies,
             Assigned assigned) {
     }
@@ -148,6 +150,8 @@ final class ReleaseDependencyValidator {
         validateAsccps();
         validateBccps();
         validateDts();
+        validateCodeLists();
+        validateAgencyIdLists();
     }
 
     // --- ACC, ASCCP, BCCP -------------------------------------------------------------------------------------------
@@ -205,6 +209,58 @@ final class ReleaseDependencyValidator {
         }
     }
 
+    // --- Code List, Agency ID List ----------------------------------------------------------------------------------
+
+    private void validateCodeLists() {
+        for (CodeListSummaryRecord codeList : data.codeLists()) {
+            if (!inRelease(codeList.state(), data.assigned().codeLists().contains(codeList.codeListManifestId()))) {
+                continue;
+            }
+            String dependent = "'" + codeList.name() + "'";
+            if (codeList.basedCodeListManifestId() != null) {
+                dependOnCodeList(dependent, codeList.basedCodeListManifestId(), CODE_LIST_BasedCodeList,
+                        (level, message) -> response.addMessageForCodeList(
+                                codeList.codeListManifestId(), level, message, CODE_LIST_BasedCodeList));
+            }
+            dependOnAgencyOfValue(dependent, codeList.agencyIdListValueManifestId(), null, CODE_LIST_AgencyIdList,
+                    (level, message) -> response.addMessageForCodeList(
+                            codeList.codeListManifestId(), level, message, CODE_LIST_AgencyIdList));
+        }
+    }
+
+    private void validateAgencyIdLists() {
+        for (AgencyIdListSummaryRecord agencyIdList : data.agencyIdLists()) {
+            if (!inRelease(agencyIdList.state(),
+                    data.assigned().agencyIdLists().contains(agencyIdList.agencyIdListManifestId()))) {
+                continue;
+            }
+            String dependent = "'" + agencyIdList.name() + "'";
+            if (agencyIdList.basedAgencyIdListManifestId() != null) {
+                dependOnAgencyIdList(dependent, agencyIdList.basedAgencyIdListManifestId(), AGENCY_ID_LIST_BasedAgencyIdList,
+                        (level, message) -> response.addMessageForAgencyIdList(
+                                agencyIdList.agencyIdListManifestId(), level, message, AGENCY_ID_LIST_BasedAgencyIdList));
+            }
+            dependOnAgencyOfValue(dependent, agencyIdList.agencyIdListValueManifestId(),
+                    agencyIdList.agencyIdListManifestId(), AGENCY_ID_LIST_AgencyIdList,
+                    (level, message) -> response.addMessageForAgencyIdList(
+                            agencyIdList.agencyIdListManifestId(), level, message, AGENCY_ID_LIST_AgencyIdList));
+        }
+    }
+
+    /** The agency of a Code List or an Agency ID List is a value of an Agency ID List; that list is what is depended on. */
+    private void dependOnAgencyOfValue(String dependent, AgencyIdListValueManifestId value, AgencyIdListManifestId self,
+                                       ValidationMessageCode code, BiConsumer<ValidationMessageLevel, String> onDependent) {
+        if (value == null) {
+            return;
+        }
+        AgencyIdListManifestId owner = data.agencyValueOwners().get(value);
+        if (owner == null) {
+            onDependent.accept(Error, dependent + " uses an agency that is in neither 'Working' nor a release the library depends on.");
+        } else if (!owner.equals(self)) {
+            dependOnAgencyIdList(dependent, owner, code, onDependent);
+        }
+    }
+
     // --- DT ---------------------------------------------------------------------------------------------------------
 
     private void validateDts() {
@@ -255,10 +311,10 @@ final class ReleaseDependencyValidator {
                 validateXbt(owner, row.xbt(), onDt);
             }
             if (row.codeList() != null) {
-                dependOnCodeList(owner, row.codeList(), onDt);
+                dependOnCodeList(owner, row.codeList(), DT_AllowedPrimitive, onDt);
             }
             if (row.agencyIdList() != null) {
-                dependOnAgencyIdList(owner, row.agencyIdList(), onDt);
+                dependOnAgencyIdList(owner, row.agencyIdList(), DT_AllowedPrimitive, onDt);
             }
         }
     }
@@ -347,13 +403,13 @@ final class ReleaseDependencyValidator {
         }
     }
 
-    private void dependOnCodeList(String dependent, CodeListManifestId id,
+    private void dependOnCodeList(String dependent, CodeListManifestId id, ValidationMessageCode code,
                                   BiConsumer<ValidationMessageLevel, String> onDependent) {
         CodeListSummaryRecord working = codeListMap.get(id);
         if (working != null) {
             judge(dependent, new Target(working.name(), working.state(), true, data.assigned().codeLists().contains(id),
                     working.prevCodeListManifestId() != null, true,
-                    (level, message) -> response.addMessageForCodeList(id, level, message, DT_AllowedPrimitive)), onDependent);
+                    (level, message) -> response.addMessageForCodeList(id, level, message, code)), onDependent);
             return;
         }
         var dependency = data.dependencies().codeLists().get(id);
@@ -365,13 +421,13 @@ final class ReleaseDependencyValidator {
         }
     }
 
-    private void dependOnAgencyIdList(String dependent, AgencyIdListManifestId id,
+    private void dependOnAgencyIdList(String dependent, AgencyIdListManifestId id, ValidationMessageCode code,
                                       BiConsumer<ValidationMessageLevel, String> onDependent) {
         AgencyIdListSummaryRecord working = agencyIdListMap.get(id);
         if (working != null) {
             judge(dependent, new Target(working.name(), working.state(), true, data.assigned().agencyIdLists().contains(id),
                     working.prevAgencyIdListManifestId() != null, true,
-                    (level, message) -> response.addMessageForAgencyIdList(id, level, message, DT_AllowedPrimitive)), onDependent);
+                    (level, message) -> response.addMessageForAgencyIdList(id, level, message, code)), onDependent);
             return;
         }
         var dependency = data.dependencies().agencyIdLists().get(id);

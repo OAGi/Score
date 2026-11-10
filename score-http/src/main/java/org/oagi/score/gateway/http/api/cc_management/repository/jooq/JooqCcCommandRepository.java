@@ -2770,6 +2770,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         CODE_LIST.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // A Code List that holds the record of its previous release (it went back to it above) goes back to the base it had
+        // there: the manifest of this release that follows the base manifest of the previous release, or that base itself
+        // when it is in a release the library depends on.
+        dslContext().update(CODE_LIST_MANIFEST
+                        .join(CODE_LIST_MANIFEST.as("prev")).on(and(
+                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_ID)))
+                        .leftJoin(CODE_LIST_MANIFEST.as("prev_based_in_release")).on(and(
+                                CODE_LIST_MANIFEST.as("prev_based_in_release").PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").BASED_CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID, coalesce(
+                        CODE_LIST_MANIFEST.as("prev_based_in_release").CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.as("prev").BASED_CODE_LIST_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Update replacement
         dslContext().update(CODE_LIST_MANIFEST.as("working")
                         .join(CODE_LIST_MANIFEST.as("release")).on(and(
@@ -2848,6 +2864,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         AGENCY_ID_LIST.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // An Agency ID List that holds the record of its previous release goes back to the base it had there.
+        dslContext().update(AGENCY_ID_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_MANIFEST.as("prev")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").BASED_AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.as("prev").BASED_AGENCY_ID_LIST_MANIFEST_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Update replacement
         dslContext().update(AGENCY_ID_LIST_MANIFEST.as("working")
                         .join(AGENCY_ID_LIST_MANIFEST.as("release")).on(and(
@@ -2895,14 +2925,43 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         AGENCY_ID_LIST_VALUE_MANIFEST.as("value").RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
-        // To update `code_list_manifest`.`agency_id_list_value_manifest_id`
+        // To update `code_list_manifest`.`agency_id_list_value_manifest_id`: found through the link the copy keeps to the
+        // manifest of 'Working', not through the record, which is the one of the previous release when the Agency ID List
+        // is revised and not assigned. A value of a release the library depends on has no copy, and is kept as it is.
         dslContext().update(CODE_LIST_MANIFEST
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev")).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)))
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
                 .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
                 .where(and(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+
+        // What the agency of a Code List or of an Agency ID List that holds the record of its previous release was there: the
+        // value of this release that follows the value of the previous release, or that value itself when it is in a release
+        // the library depends on.
+        dslContext().update(CODE_LIST_MANIFEST
+                        .join(CODE_LIST_MANIFEST.as("prev")).on(and(
+                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release")).on(and(
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
+        dslContext().update(AGENCY_ID_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_MANIFEST.as("prev")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release")).on(and(
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
                 .execute();
 
         // Update replacement

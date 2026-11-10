@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
+import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 import static org.oagi.score.gateway.http.api.release_management.controller.payload.ReleaseValidationResponse.ValidationMessageCode.*;
@@ -158,6 +160,17 @@ public class ReleaseValidator {
                             AgencyIdListSummaryRecord::agencyIdListManifestId));
         }
 
+        Map<AgencyIdListValueManifestId, AgencyIdListManifestId> agencyValueOwners = new java.util.HashMap<>();
+        Stream.concat(codeListList.stream().map(CodeListSummaryRecord::agencyIdListValueManifestId),
+                        agencyIdListList.stream().map(AgencyIdListSummaryRecord::agencyIdListValueManifestId))
+                .filter(java.util.Objects::nonNull).distinct()
+                .forEach(value -> {
+                    var summary = agencyIdListQuery.getAgencyIdListValueSummary(value);
+                    if (summary != null) {
+                        agencyValueOwners.put(value, summary.agencyIdListManifestId());
+                    }
+                });
+
         var data = new ReleaseDependencyValidator.Data(
                 accList, asccList, bccList, asccpList, bccpList, dtList,
                 dtQuery.getDtAwdPriSummaryList(workingReleaseId),
@@ -168,6 +181,7 @@ public class ReleaseValidator {
                         .collect(Collectors.toMap(XbtSummaryRecord::xbtManifestId, Function.identity())),
                 xbtQuery.getXbtSummaryList(workingReleaseId).stream()
                         .map(XbtSummaryRecord::xbtId).collect(Collectors.toSet()),
+                agencyValueOwners,
                 dependencies,
                 new ReleaseDependencyValidator.Assigned(
                         assignedAccComponentManifestIds, assignedAsccpComponentManifestIds,
