@@ -252,6 +252,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
 
         copyDtAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
         copyDtScAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
+        restoreAllowedPrimitivesOfRevertedDts(releaseId, workingReleaseId);
     }
 
     @Override
@@ -1899,6 +1900,48 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         .join(SEQ_KEY).on(BCC_MANIFEST.BCC_MANIFEST_ID.eq(SEQ_KEY.BCC_MANIFEST_ID)))
                 .set(BCC_MANIFEST.SEQ_KEY_ID, SEQ_KEY.SEQ_KEY_ID)
                 .where(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))).execute();
+    }
+
+    /**
+     * A Data Type that has been revised in 'Working' and is not assigned to the release goes into the release as it was in the
+     * previous release, with the record of that release (see {@link #updateDtDependencies}). The allowed primitives copied from
+     * 'Working' are those of the revision, which the Data Type of the previous release did not have. This replaces the allowed
+     * primitives of such a Data Type and of its supplementary components by the ones of the previous release, each referring to
+     * its manifest of this release (an XBT, a Code List or an Agency ID List of a release the library depends on is kept).
+     */
+    private void restoreAllowedPrimitivesOfRevertedDts(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        BigInteger release = releaseId.value();
+        BigInteger working = workingReleaseId.value();
+        String reverted = "select m.dt_manifest_id from dt_manifest m "
+                + "join dt_manifest w on w.dt_manifest_id = m.next_dt_manifest_id and w.release_id = " + working + " "
+                + "where m.release_id = " + release + " and m.prev_dt_manifest_id is not null and w.dt_id <> m.dt_id";
+        if (dslContext().fetch(reverted + " limit 1").isEmpty()) {
+            return;
+        }
+        String s = "(select dt_manifest_id from (" + reverted + ") reverted)";
+
+        dslContext().execute("delete from dt_awd_pri where release_id = " + release
+                + " and dt_id in (select dt_id from dt_manifest where dt_manifest_id in " + s + ")");
+        dslContext().execute("delete from dt_sc_awd_pri where release_id = " + release
+                + " and dt_sc_id in (select dt_sc_id from dt_sc_manifest where release_id = " + release
+                + " and owner_dt_manifest_id in " + s + ")");
+
+        String mapped = "left join xbt_manifest x on x.prev_xbt_manifest_id = p.xbt_manifest_id and x.release_id = " + release + " "
+                + "left join code_list_manifest c on c.prev_code_list_manifest_id = p.code_list_manifest_id and c.release_id = " + release + " "
+                + "left join agency_id_list_manifest a on a.prev_agency_id_list_manifest_id = p.agency_id_list_manifest_id "
+                + "and a.release_id = " + release + " ";
+        String columns = "coalesce(x.xbt_manifest_id, p.xbt_manifest_id), coalesce(c.code_list_manifest_id, p.code_list_manifest_id), "
+                + "coalesce(a.agency_id_list_manifest_id, p.agency_id_list_manifest_id), p.is_default ";
+        dslContext().execute("insert into dt_awd_pri (release_id, dt_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, "
+                + "agency_id_list_manifest_id, is_default) select " + release + ", m1.dt_id, p.cdt_pri_id, " + columns
+                + "from dt_manifest m1 join dt_manifest m0 on m0.dt_manifest_id = m1.prev_dt_manifest_id "
+                + "join dt_awd_pri p on p.release_id = m0.release_id and p.dt_id = m0.dt_id " + mapped
+                + "where m1.dt_manifest_id in " + s);
+        dslContext().execute("insert into dt_sc_awd_pri (release_id, dt_sc_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, "
+                + "agency_id_list_manifest_id, is_default) select " + release + ", s1.dt_sc_id, p.cdt_pri_id, " + columns
+                + "from dt_sc_manifest s1 join dt_sc_manifest s0 on s0.dt_sc_manifest_id = s1.prev_dt_sc_manifest_id "
+                + "join dt_sc_awd_pri p on p.release_id = s0.release_id and p.dt_sc_id = s0.dt_sc_id " + mapped
+                + "where s1.release_id = " + release + " and s1.owner_dt_manifest_id in " + s);
     }
 
     /**

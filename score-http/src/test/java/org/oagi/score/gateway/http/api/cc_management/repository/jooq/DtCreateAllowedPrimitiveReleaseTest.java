@@ -138,6 +138,48 @@ class DtCreateAllowedPrimitiveReleaseTest {
                 "every XBT, Code List and Agency ID List manifest points to the release of the allowed primitive");
     }
 
+    /**
+     * A record of a release the library depends on is referenced as it is: a Data Type of the dependency that uses an
+     * Agency ID List, a Code List or a custom XBT the library has no manifest for can be the base, and the allowed
+     * primitives keep pointing to the manifests of the dependency release.
+     */
+    @Test
+    void recordsOfAReleaseTheLibraryDependsOnArePointedToAsTheyAre() {
+        long working = workingReleaseOf("Ag eStandards / Chem eStandards");
+        long dependency = dsl.fetchOne("select r.release_id from `release` r join library l using (library_id) "
+                + "where l.name = 'connectSpec' and r.state = 'Published' order by r.release_id desc limit 1")
+                .get(0, Long.class);
+        dsl.execute("insert into release_dep (release_id, depend_on_release_id) values (?, ?)", working, dependency);
+
+        for (String kind : List.of("agency_id_list", "code_list", "xbt")) {
+            Record base = dsl.fetchOne("select m.dt_manifest_id from dt_manifest m "
+                    + "join dt_awd_pri p on p.dt_id = m.dt_id and p.release_id = m.release_id "
+                    + "join " + kind + "_manifest k on k." + kind + "_manifest_id = p." + kind + "_manifest_id "
+                    + "where m.release_id = ? and not exists (select 1 from " + kind + "_manifest t "
+                    + "where t.release_id = ? and t." + kind + "_id = k." + kind + "_id) limit 1", dependency, working);
+            assertTrue(base != null, "no Data Type of the dependency uses a " + kind + " the library has no manifest for");
+            long baseManifest = base.get(0, Long.class);
+            long expected = dsl.fetchOne("select count(*) from dt_awd_pri p "
+                    + "join dt_manifest m on m.dt_id = p.dt_id and m.release_id = p.release_id "
+                    + "where m.dt_manifest_id = ?", baseManifest).get(0, Long.class);
+
+            long created = create(working, baseManifest);
+
+            String owned = "from dt_awd_pri p join dt_manifest m on m.dt_id = p.dt_id and m.release_id = p.release_id "
+                    + "join " + kind + "_manifest k on k." + kind + "_manifest_id = p." + kind + "_manifest_id "
+                    + "where p.release_id = ? and m.dt_manifest_id = ?";
+            long total = dsl.fetchOne("select count(*) from dt_awd_pri p "
+                    + "join dt_manifest m on m.dt_id = p.dt_id and m.release_id = p.release_id "
+                    + "where p.release_id = ? and m.dt_manifest_id = ?", working, created).get(0, Long.class);
+            assertEquals(expected, total, kind + ": no allowed primitive is dropped or added");
+            assertTrue(dsl.fetchOne("select count(*) " + owned + " and k.release_id = ?", working, created, dependency)
+                    .get(0, Long.class) > 0, kind + ": points to the manifest of the dependency release");
+            assertEquals(0, dsl.fetchOne("select count(*) " + owned + " and k.release_id not in (?, ?)",
+                    working, created, working, dependency).get(0, Long.class),
+                    kind + ": points only to the release or its dependency");
+        }
+    }
+
     @Test
     void theCreationFailsWithTheReasonWhenTheReleaseOfTheNewDataTypeHasNoManifestOfAnXbtOfTheBase() {
         long working = workingReleaseOf("Ag eStandards / Chem eStandards");
@@ -157,7 +199,7 @@ class DtCreateAllowedPrimitiveReleaseTest {
 
         assertTrue(e.getMessage().contains("'" + xbtName + "'"), "names the XBT: " + e.getMessage());
         assertTrue(e.getMessage().contains("Working"), "names the release: " + e.getMessage());
-        assertTrue(e.getMessage().contains("no manifest"), "says what is missing: " + e.getMessage());
+        assertTrue(e.getMessage().contains("have a manifest of"), "says what is missing: " + e.getMessage());
         assertEquals(dtsBefore, dsl.fetchOne("select count(*) from dt").get(0, Long.class), "no Data Type is created");
         assertEquals(awdPrisBefore, dsl.fetchOne("select count(*) from dt_awd_pri").get(0, Long.class),
                 "no allowed primitive is created");
@@ -259,7 +301,7 @@ class DtCreateAllowedPrimitiveReleaseTest {
                     newDt = create(working, baseManifest);
                 } catch (IllegalArgumentException e) {
                     // a record the base uses has no manifest in the release: explicit failure, nothing created
-                    assertTrue(e.getMessage().contains("has no manifest of"), where + ": " + e.getMessage());
+                    assertTrue(e.getMessage().contains("have a manifest of"), where + ": " + e.getMessage());
                     assertEquals(dtsBefore, dsl.fetchOne("select count(*) from dt").get(0, Long.class), where);
                     failed++;
                     continue;

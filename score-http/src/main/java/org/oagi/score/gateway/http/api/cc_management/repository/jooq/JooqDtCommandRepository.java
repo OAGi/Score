@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.coalesce;
 import static org.jooq.impl.DSL.inline;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.notExists;
@@ -223,11 +224,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     /**
      * The XBT, Code List and Agency ID List manifests that an allowed primitive (DT_AWD_PRI, DT_SC_AWD_PRI) points to
-     * belong to the release of the allowed primitive. A Data Type created from a base (or revised) in {@code releaseId}
-     * therefore points to the manifests of {@code releaseId}. A record that the base uses but that {@code releaseId} has
-     * no manifest of (for example a custom XBT, which a library has only if its own release has been given one) cannot be
-     * pointed to, so the operation fails with the reason, instead of leaving the allowed primitive pointing to a manifest
-     * of another release or dropping it.
+     * are the ones of {@code releaseId}, or of a release it depends on (release_dep, transitively), which are referenced
+     * as they are. A Data Type created from a base (or revised) in {@code releaseId} therefore points to the manifest of
+     * the same record in {@code releaseId}; a manifest of a release it depends on is kept. A record the base uses whose
+     * manifest is neither of these cannot be pointed to, so the operation fails with the reason, instead of leaving the
+     * allowed primitive pointing to a manifest of an unrelated release or dropping it.
      * <p>
      * Checks the allowed primitives of the Data Type and of its supplementary components.
      */
@@ -269,21 +270,26 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId))).fetchOptional()
                 .map(r -> r.get(RELEASE.RELEASE_NUM)).orElse(String.valueOf(releaseId));
         throw new IllegalArgumentException("The allowed primitives of the base " + base
-                + " use records that release '" + releaseNum + "' has no manifest of: " + String.join(", ", missing)
+                + " use records that neither release '" + releaseNum + "' nor the releases it depends on have a manifest of: " + String.join(", ", missing)
                 + ". The allowed primitives of a Data Type or of a supplementary component have to point to manifests of"
-                + " the release they belong to, so make these records available in release '" + releaseNum + "' first.");
+                + " the release they belong to or to a release it depends on, so make these records available in release '" + releaseNum + "' first.");
     }
 
     private void collectMissing(List<String> missing, ReleaseId releaseId, String owner, Table<?> allowedPrimitives,
                                 Field<ULong> xbtManifestId, Field<ULong> codeListManifestId,
                                 Field<ULong> agencyIdListManifestId, Condition ofBase) {
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        if (dependencies.isEmpty()) {
+            dependencies.add(ULong.valueOf(0));
+        }
         var baseXbt = XBT_MANIFEST.as("base_xbt");
         var targetXbt = XBT_MANIFEST.as("target_xbt");
         dslContext().selectDistinct(XBT.NAME, XBT.BUILTIN_TYPE)
                 .from(allowedPrimitives)
                 .join(baseXbt).on(baseXbt.XBT_MANIFEST_ID.eq(xbtManifestId))
                 .join(XBT).on(XBT.XBT_ID.eq(baseXbt.XBT_ID))
-                .where(and(ofBase, notExists(selectOne().from(targetXbt).where(and(
+                .where(and(ofBase, baseXbt.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetXbt).where(and(
                         targetXbt.RELEASE_ID.eq(valueOf(releaseId)),
                         targetXbt.XBT_ID.eq(baseXbt.XBT_ID))))))
                 .forEach(r -> missing.add("XBT '" + r.get(XBT.NAME) + "' (" + r.get(XBT.BUILTIN_TYPE)
@@ -295,7 +301,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .from(allowedPrimitives)
                 .join(baseCodeList).on(baseCodeList.CODE_LIST_MANIFEST_ID.eq(codeListManifestId))
                 .join(CODE_LIST).on(CODE_LIST.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))
-                .where(and(ofBase, notExists(selectOne().from(targetCodeList).where(and(
+                .where(and(ofBase, baseCodeList.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetCodeList).where(and(
                         targetCodeList.RELEASE_ID.eq(valueOf(releaseId)),
                         targetCodeList.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))))))
                 .forEach(r -> missing.add("Code List '" + r.get(CODE_LIST.NAME) + "' allowed for " + owner));
@@ -306,10 +312,29 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .from(allowedPrimitives)
                 .join(baseAgencyIdList).on(baseAgencyIdList.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
                 .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))
-                .where(and(ofBase, notExists(selectOne().from(targetAgencyIdList).where(and(
+                .where(and(ofBase, baseAgencyIdList.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetAgencyIdList).where(and(
                         targetAgencyIdList.RELEASE_ID.eq(valueOf(releaseId)),
                         targetAgencyIdList.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))))))
                 .forEach(r -> missing.add("Agency ID List '" + r.get(AGENCY_ID_LIST.NAME) + "' allowed for " + owner));
+    }
+
+    /**
+     * The release itself and the releases it depends on (release_dep, transitively): records of these releases can be
+     * referenced as they are.
+     */
+    private List<ULong> releasesAvailableTo(ReleaseId releaseId) {
+        List<ULong> releases = new ArrayList<>();
+        releases.add(valueOf(releaseId));
+        for (int i = 0; i < releases.size(); i++) {
+            dslContext().select(RELEASE_DEP.DEPEND_ON_RELEASE_ID).from(RELEASE_DEP)
+                    .where(RELEASE_DEP.RELEASE_ID.eq(releases.get(i)))
+                    .fetch(RELEASE_DEP.DEPEND_ON_RELEASE_ID).forEach(id -> {
+                        if (!releases.contains(id)) {
+                            releases.add(id);
+                        }
+                    });
+        }
+        return releases;
     }
 
     /**
@@ -317,33 +342,75 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
      * (see {@link #assertAllowedPrimitivesOfDtAvailableInRelease}, which fails when there is none).
      */
     private Field<ULong> xbtManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseXbtManifestId) {
-        return select(max(XBT_MANIFEST.as("in_release").XBT_MANIFEST_ID))
-                .from(XBT_MANIFEST.as("in_release"))
-                .join(XBT_MANIFEST.as("base")).on(
-                        XBT_MANIFEST.as("base").XBT_ID.eq(XBT_MANIFEST.as("in_release").XBT_ID))
+        var inRelease = XBT_MANIFEST.as("in_release");
+        var base = XBT_MANIFEST.as("base");
+        var baseInDependency = XBT_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.XBT_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.XBT_ID.eq(inRelease.XBT_ID))
                 .where(and(
-                        XBT_MANIFEST.as("base").XBT_MANIFEST_ID.eq(baseXbtManifestId),
-                        XBT_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
+                        base.XBT_MANIFEST_ID.eq(baseXbtManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.XBT_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.XBT_MANIFEST_ID.eq(baseXbtManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
     }
 
     private Field<ULong> codeListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseCodeListManifestId) {
-        return select(max(CODE_LIST_MANIFEST.as("in_release").CODE_LIST_MANIFEST_ID))
-                .from(CODE_LIST_MANIFEST.as("in_release"))
-                .join(CODE_LIST_MANIFEST.as("base")).on(
-                        CODE_LIST_MANIFEST.as("base").CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("in_release").CODE_LIST_ID))
+        var inRelease = CODE_LIST_MANIFEST.as("in_release");
+        var base = CODE_LIST_MANIFEST.as("base");
+        var baseInDependency = CODE_LIST_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.CODE_LIST_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.CODE_LIST_ID.eq(inRelease.CODE_LIST_ID))
                 .where(and(
-                        CODE_LIST_MANIFEST.as("base").CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
-                        CODE_LIST_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
+                        base.CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.CODE_LIST_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
     }
 
     private Field<ULong> agencyIdListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseAgencyIdListManifestId) {
-        return select(max(AGENCY_ID_LIST_MANIFEST.as("in_release").AGENCY_ID_LIST_MANIFEST_ID))
-                .from(AGENCY_ID_LIST_MANIFEST.as("in_release"))
-                .join(AGENCY_ID_LIST_MANIFEST.as("base")).on(
-                        AGENCY_ID_LIST_MANIFEST.as("base").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("in_release").AGENCY_ID_LIST_ID))
+        var inRelease = AGENCY_ID_LIST_MANIFEST.as("in_release");
+        var base = AGENCY_ID_LIST_MANIFEST.as("base");
+        var baseInDependency = AGENCY_ID_LIST_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.AGENCY_ID_LIST_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.AGENCY_ID_LIST_ID.eq(inRelease.AGENCY_ID_LIST_ID))
                 .where(and(
-                        AGENCY_ID_LIST_MANIFEST.as("base").AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
-                        AGENCY_ID_LIST_MANIFEST.as("in_release").RELEASE_ID.eq(valueOf(releaseId)))).asField();
+                        base.AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.AGENCY_ID_LIST_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
     }
 
     @Override
