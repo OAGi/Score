@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.release_management.service;
 
 import java.util.Objects;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
+import org.oagi.score.gateway.http.cache.RecordCache;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceDetailsRecord;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.jooq.DSLContext;
@@ -37,6 +38,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,9 @@ public class ReleaseCommandService implements InitializingBean {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private ObjectProvider<RecordCache> recordCache;
 
     @Autowired
     private SessionService sessionService;
@@ -585,7 +590,7 @@ public class ReleaseCommandService implements InitializingBean {
                 }
                 logger.debug("Received ReleaseCreateRequestEvent: " + releaseCreateRequestEvent);
                 ScoreUser requester = sessionService.getScoreUserByUserId(releaseCreateRequestEvent.getUserId());
-                ReleaseInProgressGuard.asReleaseWork(() -> {
+                doReleaseWork(() -> {
                     moveToReleaseDraft(requester, releaseCreateRequestEvent);
                     copyWorkingManifests(requester,
                             releaseId,
@@ -723,7 +728,7 @@ public class ReleaseCommandService implements InitializingBean {
                 ScoreUser requester = sessionService.getScoreUserByUserId(releaseCleanupEvent.getUserId());
                 var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
 
-                ReleaseInProgressGuard.asReleaseWork(() -> {
+                doReleaseWork(() -> {
                     updateCCStates(requester, release, ReleaseDraft, CcState.Published, LocalDateTime.now());
                     repositoryFactory.ccCommandRepository(requester).cleanUp(releaseId);
                 });
@@ -764,7 +769,7 @@ public class ReleaseCommandService implements InitializingBean {
                 ScoreUser requester = sessionService.getScoreUserByUserId(releaseInitializeEvent.getUserId());
                 var release = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId);
 
-                ReleaseInProgressGuard.asReleaseWork(() -> takeBackToInitialized(requester, release));
+                doReleaseWork(() -> takeBackToInitialized(requester, release));
                 if (!progress().moveState(releaseId, Initializing, Initialized)) {
                     throw new IllegalStateException("The release is no longer being taken back to 'Initialized'.");
                 }
@@ -774,6 +779,17 @@ public class ReleaseCommandService implements InitializingBean {
             logger.error("The release " + releaseId + " could not be taken back to 'Initialized': " + e.getMessage(), e);
             giveBack(releaseId, Initializing, Draft, releaseInitializeEvent.getUserId(), e);
         }
+    }
+
+    /**
+     * What a release does to the components and to what it holds. It is not changed by anyone else meanwhile (see
+     * {@link ReleaseInProgressGuard}), and it is a bulk change as far as the cache is concerned (see {@link RecordCache#bulkChange}):
+     * it writes tens of thousands of rows in one transaction.
+     *
+     * <p>The three pieces of work only call this, so that how the cache is kept right can change without them changing.</p>
+     */
+    private void doReleaseWork(Runnable work) {
+        recordCache.getIfAvailable(() -> RecordCache.DISABLED).bulkChange(() -> ReleaseInProgressGuard.asReleaseWork(work));
     }
 
     private void updateState(ScoreUser requester, ReleaseId releaseId, ReleaseState releaseState) {

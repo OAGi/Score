@@ -34,6 +34,9 @@ import org.oagi.score.gateway.http.api.message_management.service.MessageCommand
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseChangeNotifier;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseFailureReporter;
 import org.oagi.score.gateway.http.api.release_management.service.ReleaseProgressRecovery;
+import org.oagi.score.gateway.http.cache.CaffeineRecordCache;
+import org.oagi.score.gateway.http.cache.RecordCache;
+import org.oagi.score.gateway.http.cache.RecordCacheStatus;
 import org.oagi.score.gateway.http.common.DbRevert;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -44,6 +47,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -153,6 +157,13 @@ public final class GuardHarness implements AutoCloseable {
             return new RepositoryFactory(dslContext);
         }
 
+        /** What the work of a release tells to forget: the tests look at what it is asked. */
+        @Bean
+        RecordCache recordCache(ObjectProvider<RepositoryFactory> repositoryFactory) {
+            return Mockito.spy(new CaffeineRecordCache("maximumSize=1000,expireAfterWrite=60s", RecordCacheStatus.alwaysReady(),
+                    repositoryFactory));
+        }
+
         @Bean
         ReleaseInProgressGuard releaseInProgressGuard() {
             return new ReleaseInProgressGuard();
@@ -211,6 +222,7 @@ public final class GuardHarness implements AutoCloseable {
     public final ReleaseProgressRepository progress;
     public final ReleaseProgressRecovery recovery;
     public final MessageCommandService messages;
+    public final RecordCache recordCache;
     public final PlatformTransactionManager transactionManager;
 
     private final AtomicInteger serial = new AtomicInteger();
@@ -267,6 +279,7 @@ public final class GuardHarness implements AutoCloseable {
         this.progress = factory.releaseProgressRepository();
         this.recovery = context.getBean(ReleaseProgressRecovery.class);
         this.messages = context.getBean(MessageCommandService.class);
+        this.recordCache = context.getBean(RecordCache.class);
         this.transactionManager = context.getBean(PlatformTransactionManager.class);
     }
 
@@ -372,6 +385,38 @@ public final class GuardHarness implements AutoCloseable {
      */
     void remove(long releaseValue, Map<K, Long> components) {
         DbRevert.revert(dsl, baseline);
+    }
+
+    /**
+     * What every session of the pool says about the change log: the connection of a piece of work goes back to the pool, and it must
+     * not still be told to write nothing. All the connections there are (and as many as the pool may make) are taken at once, so that
+     * the one that did the work is among them.
+     */
+    public List<Object> sessionsDisablingTheChangeLog() {
+        DataSource dataSource = context.getBean(DataSource.class);
+        List<java.sql.Connection> connections = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+        try {
+            for (int i = 0; i < 30; i++) {
+                java.sql.Connection connection = dataSource.getConnection();
+                connections.add(connection);
+                try (java.sql.Statement st = connection.createStatement(); java.sql.ResultSet rs = st.executeQuery("select @disable_record_change_log")) {
+                    rs.next();
+                    values.add(rs.getObject(1));
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            for (java.sql.Connection connection : connections) {
+                try {
+                    connection.close();
+                } catch (java.sql.SQLException ignored) {
+                    // closed
+                }
+            }
+        }
+        return values;
     }
 
     // ---- what the tests observe ----

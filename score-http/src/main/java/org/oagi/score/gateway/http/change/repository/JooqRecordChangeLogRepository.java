@@ -102,4 +102,15 @@ public class JooqRecordChangeLogRepository implements RecordChangeLogRepository 
             return false;
         }
     }
+
+    @Override
+    public void stopWriting() {
+        // Every trigger writes only while the session variable is NULL.
+        dslContext.execute("SET @disable_record_change_log = 1");
+    }
+
+    @Override
+    public void resumeWriting() {
+        dslContext.execute("SET @disable_record_change_log = NULL");
+    }
 }

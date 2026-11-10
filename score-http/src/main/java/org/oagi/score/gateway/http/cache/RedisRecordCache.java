@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,7 @@ import java.util.*;
  */
 @Component
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
-public class RedisRecordCache implements RecordCache {
+public class RedisRecordCache extends AbstractRecordCache {
 
     /** What every key of the cache starts with. */
     public static final String KEY_PREFIX = "score:cache:";
@@ -68,6 +69,8 @@ public class RedisRecordCache implements RecordCache {
     private final SingleFlight singleFlight = new SingleFlight();
     private final String prefix;
     private final byte[] epochKey;
+    /** The number that every key has after the prefix. Forgetting everything changes it, so that no key of before can be read. */
+    private final byte[] generationKey;
     private final long ttlMillis;
 
     /** The {@link System#nanoTime()} until which Redis is not asked, after a failure. */
@@ -77,8 +80,9 @@ public class RedisRecordCache implements RecordCache {
     public RedisRecordCache(RedisConnectionFactory connectionFactory,
                         ObjectProvider<BuildProperties> buildProperties,
                         RecordCacheStatus status,
-                        @Value("${spring.cache.redis.time-to-live:10m}") Duration timeToLive) {
-        this(connectionFactory, KEY_PREFIX + "{" + version(buildProperties) + "}:", status, timeToLive);
+                        @Value("${spring.cache.redis.time-to-live:10m}") Duration timeToLive,
+                        ObjectProvider<RepositoryFactory> repositoryFactory) {
+        this(connectionFactory, KEY_PREFIX + "{" + version(buildProperties) + "}:", status, timeToLive, repositoryFactory);
     }
 
     private static String version(ObjectProvider<BuildProperties> buildProperties) {
@@ -92,17 +96,41 @@ public class RedisRecordCache implements RecordCache {
      *               (a hash tag), as the application's prefix is
      */
     public RedisRecordCache(RedisConnectionFactory connectionFactory, String prefix, RecordCacheStatus status, Duration timeToLive) {
+        this(connectionFactory, prefix, status, timeToLive, null);
+    }
+
+    private RedisRecordCache(RedisConnectionFactory connectionFactory, String prefix, RecordCacheStatus status, Duration timeToLive,
+                             ObjectProvider<RepositoryFactory> repositoryFactory) {
+        super(repositoryFactory);
         this.connectionFactory = connectionFactory;
         this.prefix = prefix;
         this.status = status;
         this.epochKey = (this.prefix + "epoch").getBytes(StandardCharsets.UTF_8);
+        this.generationKey = (this.prefix + "generation").getBytes(StandardCharsets.UTF_8);
         this.ttlMillis = timeToLive.toMillis();
     }
 
     // ---- the keys ------------------------------------------------------------------------------------------------
 
-    private byte[] keyOf(String key) {
-        return (prefix + key).getBytes(StandardCharsets.UTF_8);
+    /**
+     * The generation is a part of every key, because the cache never scans or flushes the Redis it shares: forgetting everything
+     * is a new generation, and the entries of the one before are never read again and expire as they would have. It is read on the
+     * connection of the call that uses it, so that no instance reads a generation that is older than the one it forgot.
+     */
+    private long generation(RedisConnection connection) {
+        byte[] value = connection.stringCommands().get(generationKey);
+        if (value == null) {
+            // The counter is gone (Redis was flushed, or it evicted the key). It starts again from the time, not from zero, so that
+            // the entries of a generation that was forgotten can never be read again.
+            connection.stringCommands().set(generationKey, Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII),
+                    Expiration.persistent(), SetOption.SET_IF_ABSENT);
+            value = connection.stringCommands().get(generationKey);
+        }
+        return (value == null) ? 0 : Long.parseLong(new String(value, StandardCharsets.US_ASCII));
+    }
+
+    private byte[] keyOf(long generation, String key) {
+        return (prefix + "g" + generation + ":" + key).getBytes(StandardCharsets.UTF_8);
     }
 
     // ---- failure -------------------------------------------------------------------------------------------------
@@ -156,9 +184,10 @@ public class RedisRecordCache implements RecordCache {
         Map<String, Object> found = new HashMap<>();
         List<String> all = new ArrayList<>(keys);
         try (RedisConnection connection = connectionFactory.getConnection()) {
+            long generation = generation(connection);
             for (int from = 0; from < all.size(); from += CHUNK) {
                 List<String> chunk = all.subList(from, Math.min(from + CHUNK, all.size()));
-                byte[][] redisKeys = chunk.stream().map(this::keyOf).toArray(byte[][]::new);
+                byte[][] redisKeys = chunk.stream().map(key -> keyOf(generation, key)).toArray(byte[][]::new);
                 List<byte[]> values = connection.stringCommands().mGet(redisKeys);
                 for (int i = 0; i < chunk.size(); i++) {
                     byte[] value = (values != null) ? values.get(i) : null;
@@ -202,13 +231,14 @@ public class RedisRecordCache implements RecordCache {
         byte[] epochArgument = Long.toString(epoch).getBytes(StandardCharsets.US_ASCII);
         byte[] ttlArgument = Long.toString(ttlMillis).getBytes(StandardCharsets.US_ASCII);
         try (RedisConnection connection = connectionFactory.getConnection()) {
+            long generation = generation(connection);
             for (int from = 0; from < entries.size(); from += STORE_CHUNK) {
                 List<byte[]> keys = new ArrayList<>();
                 List<byte[]> bytes = new ArrayList<>();
                 for (Map.Entry<String, Object> entry : entries.subList(from, Math.min(from + STORE_CHUNK, entries.size()))) {
                     byte[] value = write(entry.getKey(), entry.getValue());
                     if (value != null) {
-                        keys.add(keyOf(entry.getKey()));
+                        keys.add(keyOf(generation, entry.getKey()));
                         bytes.add(value);
                     }
                 }
@@ -252,12 +282,28 @@ public class RedisRecordCache implements RecordCache {
                         Expiration.persistent(), SetOption.SET_IF_ABSENT);
             }
             connection.stringCommands().incr(epochKey);
+            long generation = generation(connection);
             List<String> all = new ArrayList<>(keys);
             for (int from = 0; from < all.size(); from += CHUNK) {
                 byte[][] redisKeys = all.subList(from, Math.min(from + CHUNK, all.size())).stream()
-                        .map(this::keyOf).toArray(byte[][]::new);
+                        .map(key -> keyOf(generation, key)).toArray(byte[][]::new);
                 connection.keyCommands().unlink(redisKeys);
             }
+        }
+    }
+
+    @Override
+    public void invalidateAll() {
+        try (RedisConnection connection = connectionFactory.getConnection()) {
+            // The epoch first, as in invalidate: a store that began before this is refused. Then the generation, which makes every
+            // entry of before unreachable at once, on every instance.
+            if (connection.stringCommands().get(epochKey) == null) {
+                connection.stringCommands().set(epochKey, Long.toString(System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII),
+                        Expiration.persistent(), SetOption.SET_IF_ABSENT);
+            }
+            connection.stringCommands().incr(epochKey);
+            generation(connection);
+            connection.stringCommands().incr(generationKey);
         }
     }
 

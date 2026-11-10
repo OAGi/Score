@@ -50,6 +50,15 @@ public interface RecordCache {
         }
 
         @Override
+        public void invalidateAll() {
+        }
+
+        @Override
+        public void bulkChange(Runnable action) {
+            action.run();
+        }
+
+        @Override
         public boolean isBypassed() {
             return true;
         }
@@ -82,6 +91,28 @@ public interface RecordCache {
      * the writes it does not hide a failure: an entry that is not forgotten is stale, so the caller must retry.
      */
     void invalidate(Collection<String> keys);
+
+    /**
+     * Forgets every entry, as {@link #invalidate} does the entries it names: the epoch changes first, and a failure is not hidden.
+     * It is for a change that reaches too much to name what it reaches (the work of a release copies or removes what a whole
+     * release holds). What it forgets is the entries of this cache, which every instance that shares it sees; a cache that each
+     * instance has of its own is forgotten by this instance only.
+     */
+    void invalidateAll();
+
+    /**
+     * Runs a change that is so big (the work of a release copies or removes what a whole release holds) that telling the cache about
+     * each row costs more than forgetting everything: the change is not told row by row, and the whole cache is forgotten when the
+     * transaction has committed. The change is run in the transaction that is active, so it is all or nothing: when it fails nothing
+     * is forgotten, as nothing has changed.
+     *
+     * <p>How the cache is kept right is for the cache to decide, and may change (what it forgets can become what the change reaches)
+     * without the caller changing. A cache that each instance has of its own is forgotten by this instance only.</p>
+     *
+     * @param action the change
+     * @throws IllegalStateException when no transaction is active
+     */
+    void bulkChange(Runnable action);
 
     /**
      * Whether the cache must not be used by the current thread: its transaction has written to that data without

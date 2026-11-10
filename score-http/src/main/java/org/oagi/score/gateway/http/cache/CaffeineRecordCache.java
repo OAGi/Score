@@ -4,6 +4,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Component
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "caffeine", matchIfMissing = true)
-public class CaffeineRecordCache implements RecordCache {
+public class CaffeineRecordCache extends AbstractRecordCache {
 
     private static final Logger logger = LoggerFactory.getLogger(CaffeineRecordCache.class);
 
@@ -39,9 +41,15 @@ public class CaffeineRecordCache implements RecordCache {
     /** @param spec the Caffeine spec: {@code spring.cache.caffeine.spec}, e.g. {@code maximumSize=200000,expireAfterWrite=600s} */
     @Autowired
     public CaffeineRecordCache(@Value("${spring.cache.caffeine.spec:maximumSize=200000,expireAfterWrite=600s}") String spec,
-                               RecordCacheStatus status) {
+                               RecordCacheStatus status, ObjectProvider<RepositoryFactory> repositoryFactory) {
+        super(repositoryFactory);
         this.cache = Caffeine.from(spec).build();
         this.status = status;
+    }
+
+    /** A cache that is used alone: a bulk change does not stop the change log, as there is no database to stop it in. */
+    public CaffeineRecordCache(String spec, RecordCacheStatus status) {
+        this(spec, status, null);
     }
 
     @Override
@@ -90,6 +98,17 @@ public class CaffeineRecordCache implements RecordCache {
         try {
             epoch.incrementAndGet();
             cache.invalidateAll(keys);
+        } finally {
+            storeLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void invalidateAll() {
+        storeLock.writeLock().lock();
+        try {
+            epoch.incrementAndGet();
+            cache.invalidateAll();
         } finally {
             storeLock.writeLock().unlock();
         }
