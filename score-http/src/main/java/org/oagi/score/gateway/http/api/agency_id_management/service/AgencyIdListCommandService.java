@@ -10,6 +10,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.cc_management.service.ComponentStateChangeEventPublisher;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
+import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -247,6 +248,10 @@ public class AgencyIdListCommandService {
     }
 
     public void revise(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId) {
+        revise(requester, agencyIdListManifestId, false);
+    }
+
+    public void revise(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, boolean recreateLog) {
 
         var query = query(requester);
 
@@ -274,6 +279,15 @@ public class AgencyIdListCommandService {
         }
 
         var command = command(requester);
+
+        // a revision goes on from the log the Agency ID List is in now
+        if (prevAgencyIdListDetails.log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this AGENCY_ID_LIST cannot be found.");
+            }
+            LogId firstLogId = logCommand(requester).create(prevAgencyIdListDetails, Added);
+            command.updateLogId(agencyIdListManifestId, firstLogId);
+        }
 
         command.revise(agencyIdListManifestId);
 
@@ -310,6 +324,11 @@ public class AgencyIdListCommandService {
     }
 
     public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, String comment, String projectFieldOptionOverride) {
+        cancel(requester, agencyIdListManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancel(ScoreUser requester, AgencyIdListManifestId agencyIdListManifestId, String comment, String projectFieldOptionOverride,
+                       boolean recreateLog) {
 
         AgencyIdListDetailsRecord agencyIdListDetails =
                 query(requester).getAgencyIdListDetails(agencyIdListManifestId);
@@ -317,7 +336,7 @@ public class AgencyIdListCommandService {
         if (agencyIdListDetails == null) {
             throw new IllegalArgumentException("Not found a target Agency Id List");
         }
-        if (agencyIdListDetails.log().revisionNum() == 1) {
+        if (agencyIdListDetails.log() != null && agencyIdListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
 
@@ -329,7 +348,10 @@ public class AgencyIdListCommandService {
 
         command.cancel(agencyIdListManifestId);
 
-        LogId logId = logCommand(requester).revertToStableStateByReference(agencyIdListDetails.guid(), CcType.AGENCY_ID_LIST);
+        LogId logId = logCommand(requester).revertToStableStateByReference(
+                agencyIdListDetails.guid(), CcType.AGENCY_ID_LIST, recreateLog,
+                // the history is gone: the Agency ID List as it is now is revision 1
+                () -> logCommand(requester).create(query(requester).getAgencyIdListDetails(agencyIdListManifestId), Added));
         command.updateLogId(agencyIdListManifestId, logId);
 
         // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state

@@ -46,6 +46,12 @@ public interface AsccpCommandRepository {
 
     void cancel(AsccpManifestId asccpManifestId);
 
+    /**
+     * Cancels the revision. When the log the component was in before it cannot be found, it throws
+     * {@code LogNotFoundException} unless {@code recreateLog} lets a new history (revision 1) be written.
+     */
+    void cancel(AsccpManifestId asccpManifestId, boolean recreateLog);
+
     boolean updateOwnership(ScoreUser targetUser, AsccpManifestId asccpManifestId);
 
 }

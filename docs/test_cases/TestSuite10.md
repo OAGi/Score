@@ -1675,3 +1675,25 @@ The developer can cancel the revision of an ACC after removing its base ACC and 
 1. Sign in as a developer, revise an ASCCP, change its ACC, cancel the revision, and verify the role-of ACC and the DEN. (Assertion [#10.25.1](#test-assertion-10251))
 2. Revise a BCCP, change its DT, cancel the revision, and verify the DT, the DEN, the state and the revision number. (Assertion [#10.25.2](#test-assertion-10252))
 3. Revise an ACC that has a base ACC, remove the base ACC, append an ASCCP, cancel the revision, and verify the base ACC and the associations. (Assertion [#10.25.3](#test-assertion-10253))
+
+## Test Case 10.26
+
+**Cancelling a revision when the log to go back to is gone**
+
+Pre-condition: The developer is on the Working branch and owns a published ACC that is revised, and the log the ACC was in before the revision has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #10.26.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the developer does not let it, nothing is changed and the ACC stays in revision. If the developer lets it, the ACC is cancelled to `Published` with revision `1`, and a revision after that is revision `2`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published ACC that is revised, and the log the ACC was in before the revision has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, revise an ACC, and have the logs from before the revision removed from the database.
+2. Cancel the revision and confirm; verify the dialog asks whether to create a new log, and decline; verify the ACC is still `WIP`.
+3. Cancel the revision again, confirm, and let the new log be created; verify the ACC is `Published` with revision `1`, and that revising it again gives revision `2`. (Assertion [#10.26.1](#test-assertion-10261))

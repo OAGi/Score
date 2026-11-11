@@ -12,6 +12,8 @@ import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtDetailsRecord;
 import org.oagi.score.gateway.http.common.model.Guid;
 
+import java.util.function.Supplier;
+
 public interface LogCommandRepository {
 
     LogId create(AccDetailsRecord accDetails, LogAction logAction, String logHash);
@@ -31,5 +33,13 @@ public interface LogCommandRepository {
     void deleteByReference(Guid guid);
 
     LogId revertToStableStateByReference(Guid reference, CcType ccType);
+
+    /**
+     * Same as above, but when the log the component was in cannot be found it throws {@code LogNotFoundException},
+     * unless {@code recreateLog} says that a new history may be written: then what is left of the history is deleted,
+     * and {@code createFirstLog} writes the first log (revision 1) of the component as it is.
+     */
+    LogId revertToStableStateByReference(Guid reference, CcType ccType,
+                                         boolean recreateLog, Supplier<LogId> createFirstLog);
 
 }

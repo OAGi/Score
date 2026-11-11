@@ -11,6 +11,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.DtCommandRepository;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -1175,6 +1176,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
     @Override
     public void cancel(DtManifestId dtManifestId) {
+        cancel(dtManifestId, false);
+    }
+
+    @Override
+    public void cancel(DtManifestId dtManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().dtQueryRepository(requester());
         DtDetailsRecord dt = query.getDtDetails(dtManifestId);
@@ -1283,7 +1289,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(dt.guid(), CcType.DT);
+                .revertToStableStateByReference(dt.guid(), CcType.DT, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().dtQueryRepository(requester()).getDtDetails(dtManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added);
+                });
 
         dslContext().update(DT_MANIFEST)
                 .set(DT_MANIFEST.LOG_ID, valueOf(logId))

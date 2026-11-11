@@ -19,6 +19,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.repository.BccpCommandRepository;
+import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -398,6 +399,11 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
 
     @Override
     public void cancel(BccpManifestId bccpManifestId) {
+        cancel(bccpManifestId, false);
+    }
+
+    @Override
+    public void cancel(BccpManifestId bccpManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().bccpQueryRepository(requester());
         BccpDetailsRecord bccp = query.getBccpDetails(bccpManifestId);
@@ -484,7 +490,11 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(bccp.guid(), CcType.BCCP);
+                .revertToStableStateByReference(bccp.guid(), CcType.BCCP, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().bccpQueryRepository(requester()).getBccpDetails(bccpManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added);
+                });
 
         dslContext().update(BCCP_MANIFEST)
                 .set(BCCP_MANIFEST.LOG_ID, valueOf(logId))

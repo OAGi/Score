@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListC
 import org.oagi.score.gateway.http.api.code_list_management.repository.CodeListQueryRepository;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
+import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -381,6 +382,10 @@ public class CodeListCommandService {
     }
 
     public void revise(ScoreUser requester, CodeListManifestId codeListManifestId) {
+        revise(requester, codeListManifestId, false);
+    }
+
+    public void revise(ScoreUser requester, CodeListManifestId codeListManifestId, boolean recreateLog) {
 
         var query = query(requester);
 
@@ -408,6 +413,16 @@ public class CodeListCommandService {
         }
 
         var command = command(requester);
+
+        // a revision goes on from the log the Code List is in now
+        if (prevCodeListDetails.log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this CODE_LIST cannot be found.");
+            }
+            LogId firstLogId = logCommand(requester).create(prevCodeListDetails, Added);
+            command.updateLogId(codeListManifestId, firstLogId);
+        }
+
         command.revise(codeListManifestId);
 
         LogId logId = logCommand(requester).create(
@@ -442,6 +457,11 @@ public class CodeListCommandService {
     }
 
     public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId, String comment, String projectFieldOptionOverride) {
+        cancel(requester, codeListManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancel(ScoreUser requester, CodeListManifestId codeListManifestId, String comment, String projectFieldOptionOverride,
+                       boolean recreateLog) {
 
         CodeListDetailsRecord codeListDetails =
                 query(requester).getCodeListDetails(codeListManifestId);
@@ -449,7 +469,7 @@ public class CodeListCommandService {
         if (codeListDetails == null) {
             throw new IllegalArgumentException("Not found a target Code List");
         }
-        if (codeListDetails.log().revisionNum() == 1) {
+        if (codeListDetails.log() != null && codeListDetails.log().revisionNum() == 1) {
             throw new IllegalArgumentException("Not found previous revision");
         }
 
@@ -461,7 +481,10 @@ public class CodeListCommandService {
 
         command.cancel(codeListManifestId);
 
-        LogId logId = logCommand(requester).revertToStableStateByReference(codeListDetails.guid(), CcType.CODE_LIST);
+        LogId logId = logCommand(requester).revertToStableStateByReference(
+                codeListDetails.guid(), CcType.CODE_LIST, recreateLog,
+                // the history is gone: the Code List as it is now is revision 1
+                () -> logCommand(requester).create(query(requester).getCodeListDetails(codeListManifestId), Added));
         command.updateLogId(codeListManifestId, logId);
 
         // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state

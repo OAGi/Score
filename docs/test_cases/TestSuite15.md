@@ -928,3 +928,25 @@ The end user can cancel the amendment of an ACC after removing its base ACC and 
 ### Test Step:
 1. Sign in as an end user, amend a BCCP, change its DT, cancel the amendment, and verify the DT, the DEN, the state and the revision number. (Assertion [#15.20.1](#test-assertion-15201))
 2. Amend an ACC that has a base ACC, remove the base ACC, append an ASCCP, cancel the amendment, and verify the base ACC and the associations. (Assertion [#15.20.2](#test-assertion-15202))
+
+## Test Case 15.21
+
+**Cancelling an amendment when the log to go back to is gone**
+
+Pre-condition: The end user is on a non-working branch and owns a production BCCP that is amended, and the log the BCCP was in before the amendment has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #15.21.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written. If the end user does not let it, nothing is changed. If the end user lets it, the BCCP is cancelled to `Production` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on a non-working branch and owns a production BCCP that is amended, and the log the BCCP was in before the amendment has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling an amendment when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as an end user, amend a BCCP, and have the logs from before the amendment removed from the database.
+2. Cancel the amendment and confirm; verify the dialog asks whether to create a new log, and decline; verify the BCCP is still `WIP`.
+3. Cancel the amendment again, confirm, and let the new log be created; verify the BCCP is `Production` with revision `1`. (Assertion [#15.21.1](#test-assertion-15211))

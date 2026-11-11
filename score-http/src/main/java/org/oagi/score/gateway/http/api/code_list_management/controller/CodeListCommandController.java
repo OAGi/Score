@@ -82,20 +82,23 @@ public class CodeListCommandController {
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/revise")
     public void reviseCodeList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("codeListManifestId") CodeListManifestId codeListManifestId) {
+            @PathVariable("codeListManifestId") CodeListManifestId codeListManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        codeListCommandService.revise(sessionService.asScoreUser(user), codeListManifestId);
+        codeListCommandService.revise(sessionService.asScoreUser(user), codeListManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/cancel")
     public void cancelCodeList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("codeListManifestId") CodeListManifestId codeListManifestId,
-            @RequestBody(required = false) Map<String, String> request) {
+            @RequestBody(required = false) Map<String, String> request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         codeListCommandService.cancel(sessionService.asScoreUser(user), codeListManifestId,
                 (request != null) ? request.get("comment") : null,
-                (request != null) ? request.get("projectFieldOptionOverride") : null);
+                (request != null) ? request.get("projectFieldOptionOverride") : null,
+                recreateLog);
     }
 
     @PatchMapping(value = "/{codeListManifestId:[\\d]+}/mark-as-deleted")

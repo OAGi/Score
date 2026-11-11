@@ -36,7 +36,8 @@ import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFor
         TC_10_22_DeveloperBCCPStateManagement.class,
         TC_10_23_DeletingDeveloperBCCP.class,
         TC_10_24_RestoringDeveloperBCCP.class,
-        TC_10_25_CancelRevisionRestoresWhatWasChanged.class
+        TC_10_25_CancelRevisionRestoresWhatWasChanged.class,
+        TC_10_26_CancelWhenTheLogIsGone.class
 })
 public class TS_10 {
 }

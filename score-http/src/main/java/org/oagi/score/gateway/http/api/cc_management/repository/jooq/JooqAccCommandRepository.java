@@ -28,6 +28,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeyType;
 import org.oagi.score.gateway.http.api.cc_management.repository.AccCommandRepository;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
+import org.oagi.score.gateway.http.api.log_management.model.LogUtils;
 import org.oagi.score.gateway.http.api.log_management.service.LogSerializer;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -1610,6 +1611,11 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
     }
 
     public void cancel(AccManifestId accManifestId) {
+        cancel(accManifestId, false);
+    }
+
+    @Override
+    public void cancel(AccManifestId accManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().accQueryRepository(requester());
         AccDetailsRecord acc = query.getAccDetails(accManifestId);
@@ -1687,7 +1693,11 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(acc.guid(), CcType.ACC);
+                .revertToStableStateByReference(acc.guid(), CcType.ACC, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().accQueryRepository(requester()).getAccDetails(accManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added, LogUtils.generateHash());
+                });
 
         dslContext().update(ACC_MANIFEST)
                 .set(ACC_MANIFEST.LOG_ID, valueOf(logId))

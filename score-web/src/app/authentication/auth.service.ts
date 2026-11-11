@@ -317,6 +317,9 @@ export class XhrInterceptor implements HttpInterceptor {
 
 export const SUPPRESS_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
 
+/** The request asks the user itself what to do when the history (log) of a component cannot be found. */
+export const LOG_NOT_FOUND_HANDLED = new HttpContextToken<boolean>(() => false);
+
 @Injectable()
 export class ErrorAlertInterceptor implements HttpInterceptor {
   private auth = inject(AuthService);
@@ -332,6 +335,11 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
+        if (req.context.get(LOG_NOT_FOUND_HANDLED) && req.params.get('recreateLog') !== 'true'
+            && error?.headers?.get('x-error-code') === 'LOG_NOT_FOUND') {
+          return throwError(error);
+        }
+
         if (error instanceof HttpErrorResponse || error.name === 'HttpErrorResponse') {
           if (this.auth.isServiceUnavailableFailure(error, req.url)) {
             this.router.navigate(['/service-unavailable'], {
@@ -343,6 +351,7 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
           switch (error.status) {
             case 400:
             case 403:
+            case 409:
             case 500:
               const errorMessageId = error.headers.get('x-error-message-id');
               const errorMessage = error.headers.get('x-error-message');

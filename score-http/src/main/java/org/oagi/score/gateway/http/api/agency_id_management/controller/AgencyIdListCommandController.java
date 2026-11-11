@@ -62,20 +62,23 @@ public class AgencyIdListCommandController {
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/revise")
     public void reviseAgencyIdList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("agencyIdListManifestId") AgencyIdListManifestId agencyIdListManifestId) {
+            @PathVariable("agencyIdListManifestId") AgencyIdListManifestId agencyIdListManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        agencyIdListCommandService.revise(sessionService.asScoreUser(user), agencyIdListManifestId);
+        agencyIdListCommandService.revise(sessionService.asScoreUser(user), agencyIdListManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/cancel")
     public void cancelAgencyIdList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("agencyIdListManifestId") AgencyIdListManifestId agencyIdListManifestId,
-            @RequestBody(required = false) Map<String, String> request) {
+            @RequestBody(required = false) Map<String, String> request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         agencyIdListCommandService.cancel(sessionService.asScoreUser(user), agencyIdListManifestId,
                 (request != null) ? request.get("comment") : null,
-                (request != null) ? request.get("projectFieldOptionOverride") : null);
+                (request != null) ? request.get("projectFieldOptionOverride") : null,
+                recreateLog);
     }
 
     @PatchMapping(value = "/{agencyIdListManifestId:[\\d]+}/mark-as-deleted")

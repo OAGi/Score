@@ -14,6 +14,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.AsccpCommandRepository;
+import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -399,6 +400,11 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
     }
 
     public void cancel(AsccpManifestId asccpManifestId) {
+        cancel(asccpManifestId, false);
+    }
+
+    @Override
+    public void cancel(AsccpManifestId asccpManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().asccpQueryRepository(requester());
         AsccpDetailsRecord asccp = query.getAsccpDetails(asccpManifestId);
@@ -485,7 +491,11 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(asccp.guid(), CcType.ASCCP);
+                .revertToStableStateByReference(asccp.guid(), CcType.ASCCP, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().asccpQueryRepository(requester()).getAsccpDetails(asccpManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added);
+                });
 
         dslContext().update(ASCCP_MANIFEST)
                 .set(ASCCP_MANIFEST.LOG_ID, valueOf(logId))

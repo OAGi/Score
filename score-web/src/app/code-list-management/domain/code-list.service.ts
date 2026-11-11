@@ -1,6 +1,8 @@
 import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
+import {askToWriteNewLog, logOptions} from '../../common/log-not-found/log-not-found';
 import {CodeListCreateResponse, CodeListDetails, CodeListListEntry, CodeListListEntryRequest, CodeListSummary} from './code-list';
 import {PageResponse} from '../../basis/basis';
 import {Comment} from '../../cc-management/domain/core-component-node';
@@ -12,6 +14,7 @@ import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 @Injectable()
 export class CodeListService {
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
 
 
   getCodeListSummaries(releaseId: number): Observable<CodeListSummary[]> {
@@ -238,11 +241,13 @@ export class CodeListService {
     return this.http.get<boolean>('/api/code-lists/check-name-uniqueness', {params});
   }
 
-  makeNewRevision(codeList: CodeListDetails): Observable<any> {
-    return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/revise', {});
+  makeNewRevision(codeList: CodeListDetails, recreateLog = false): Observable<any> {
+    return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/revise', {}, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.makeNewRevision(codeList, true)));
   }
 
-  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string): Observable<any> {
+  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string,
+                 recreateLog = false): Observable<any> {
     const url = '/api/code-lists/' + manifestId + '/cancel';
     // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
     // values are not sent (post nothing / use the configured fieldOption).
@@ -253,7 +258,8 @@ export class CodeListService {
     if (projectFieldOptionOverride) {
       body.projectFieldOptionOverride = projectFieldOptionOverride;
     }
-    return this.http.patch<any>(url, body);
+    return this.http.patch<any>(url, body, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.cancelRevision(manifestId, comment, projectFieldOptionOverride, true)));
   }
 
   transferOwnership(manifestId: number, targetLoginId: string): Observable<any> {

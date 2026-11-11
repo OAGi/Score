@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.code_list_management.repository.jooq;
 
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueDetailsRecord;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.api.cc_management.model.CcState.Deleted;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CodeListManifest.CODE_LIST_MANIFEST;
@@ -382,6 +384,15 @@ public class JooqCodeListCommandRepository
         nextCodeListRecord.setCreationTimestamp(timestamp);
         nextCodeListRecord.setLastUpdateTimestamp(timestamp);
         nextCodeListRecord.setPrevCodeListId(currentCodeListRecord.getCodeListId());
+        // the base is the record the manifest holds, which is the latest, and not the one the copied record refers to
+        ULong basedCodeListId = dslContext().select(CODE_LIST_MANIFEST.as("based").CODE_LIST_ID)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST_MANIFEST.as("based")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based").CODE_LIST_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
+                .fetchOneInto(ULong.class);
+        if (basedCodeListId != null) {
+            nextCodeListRecord.setBasedCodeListId(basedCodeListId);
+        }
         nextCodeListRecord.setCodeListId(
                 dslContext().insertInto(CODE_LIST)
                         .set(nextCodeListRecord)
@@ -395,6 +406,26 @@ public class JooqCodeListCommandRepository
 
         currentCodeListManifestRecord.setCodeListId(nextCodeListRecord.getCodeListId());
         currentCodeListManifestRecord.update(CODE_LIST_MANIFEST.CODE_LIST_ID);
+
+        markWhatRefersToTheCodeListAfterRevise(currentCodeListManifestRecord);
+    }
+
+    /**
+     * What a revision makes starts without the marker, as it refers to the latest of what it refers to. What refers to the
+     * Code List, or to its values, by their records refers to the records that were revised, which the marker says.
+     */
+    private void markWhatRefersToTheCodeListAfterRevise(CodeListManifestRecord manifest) {
+        dslContext().update(CODE_LIST_MANIFEST).set(CODE_LIST_MANIFEST.CONFLICT, (byte) 0)
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifest.getCodeListManifestId())).execute();
+        dslContext().update(CODE_LIST_VALUE_MANIFEST).set(CODE_LIST_VALUE_MANIFEST.CONFLICT, (byte) 0)
+                .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifest.getCodeListManifestId())).execute();
+        dslContext().update(CODE_LIST_MANIFEST).set(CODE_LIST_MANIFEST.CONFLICT, (byte) 1)
+                .where(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(manifest.getCodeListManifestId())).execute();
+        dslContext().update(CODE_LIST_VALUE_MANIFEST).set(CODE_LIST_VALUE_MANIFEST.CONFLICT, (byte) 1)
+                .where(CODE_LIST_VALUE_MANIFEST.BASED_CODE_LIST_VALUE_MANIFEST_ID.in(
+                        dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID).from(CODE_LIST_VALUE_MANIFEST)
+                                .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifest.getCodeListManifestId()))))
+                .execute();
     }
 
     private void createNewCodeListValueForRevisedRecord(
@@ -402,13 +433,26 @@ public class JooqCodeListCommandRepository
             CodeListRecord nextCodeListRecord,
             LocalDateTime timestamp) {
 
+        // the records of the values, and the latest record of what each is based on (which is what the manifest has),
+        // are read at once, not value by value
+        Map<ULong, CodeListValueRecord> valueRecords = dslContext().selectFrom(CODE_LIST_VALUE)
+                .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.in(dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID)
+                        .from(CODE_LIST_VALUE_MANIFEST)
+                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))))
+                .fetchMap(CODE_LIST_VALUE.CODE_LIST_VALUE_ID);
+        Map<ULong, ULong> basedValueIds = new HashMap<>();
+        dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.as("based").CODE_LIST_VALUE_ID)
+                .from(CODE_LIST_VALUE_MANIFEST)
+                .join(CODE_LIST_VALUE_MANIFEST.as("based")).on(CODE_LIST_VALUE_MANIFEST.BASED_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("based").CODE_LIST_VALUE_MANIFEST_ID))
+                .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
+                .fetch()
+                .forEach(e -> basedValueIds.put(e.value1(), e.value2()));
+
         for (CodeListValueManifestRecord codeListValueManifestRecord : dslContext().selectFrom(CODE_LIST_VALUE_MANIFEST)
                 .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)))
                 .fetch()) {
 
-            CodeListValueRecord prevCodeListValueRecord = dslContext().selectFrom(CODE_LIST_VALUE)
-                    .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(codeListValueManifestRecord.getCodeListValueId()))
-                    .fetchOne();
+            CodeListValueRecord prevCodeListValueRecord = valueRecords.get(codeListValueManifestRecord.getCodeListValueId());
 
             CodeListValueRecord nextCodeListValueRecord = prevCodeListValueRecord.copy();
             nextCodeListValueRecord.setCodeListValueId(null);
@@ -419,6 +463,10 @@ public class JooqCodeListCommandRepository
             nextCodeListValueRecord.setCreationTimestamp(timestamp);
             nextCodeListValueRecord.setLastUpdateTimestamp(timestamp);
             nextCodeListValueRecord.setPrevCodeListValueId(prevCodeListValueRecord.getCodeListValueId());
+            ULong basedCodeListValueId = basedValueIds.get(codeListValueManifestRecord.getCodeListValueManifestId());
+            if (basedCodeListValueId != null) {
+                nextCodeListValueRecord.setBasedCodeListValueId(basedCodeListValueId);
+            }
             nextCodeListValueRecord.setCodeListValueId(
                     dslContext().insertInto(CODE_LIST_VALUE)
                             .set(nextCodeListValueRecord)
@@ -445,9 +493,21 @@ public class JooqCodeListCommandRepository
         CodeListRecord prevCodeListRecord = dslContext().selectFrom(CODE_LIST)
                 .where(CODE_LIST.CODE_LIST_ID.eq(codeListRecord.getPrevCodeListId())).fetchOne();
 
+        assertNothingIsBasedOnValuesAddedInRevision(codeListManifestRecord, codeListRecord);
+
         // update AGENCY ID LIST MANIFEST's codeList_id and revision_id
         codeListManifestRecord.setCodeListId(codeListRecord.getPrevCodeListId());
         codeListManifestRecord.update(CODE_LIST_MANIFEST.CODE_LIST_ID);
+
+        // what refers to the record that is discarded goes back to the previous one
+        dslContext().update(CODE_LIST).set(CODE_LIST.BASED_CODE_LIST_ID, prevCodeListRecord.getCodeListId())
+                .where(CODE_LIST.BASED_CODE_LIST_ID.eq(codeListRecord.getCodeListId())).execute();
+        dslContext().update(CODE_LIST).set(CODE_LIST.REPLACEMENT_CODE_LIST_ID, prevCodeListRecord.getCodeListId())
+                .where(CODE_LIST.REPLACEMENT_CODE_LIST_ID.eq(codeListRecord.getCodeListId())).execute();
+        dslContext().update(CTX_SCHEME).set(CTX_SCHEME.CODE_LIST_ID, prevCodeListRecord.getCodeListId())
+                .where(CTX_SCHEME.CODE_LIST_ID.eq(codeListRecord.getCodeListId())).execute();
+
+        restoreAgencyIdListValue(codeListManifestRecord);
 
         discardLogCodeListValues(codeListManifestRecord);
 
@@ -458,8 +518,198 @@ public class JooqCodeListCommandRepository
         codeListManifestRecord.setLogId(null);
         codeListManifestRecord.update(CODE_LIST_MANIFEST.LOG_ID);
 
+        markWhatRefersToAnOlderRecordInConflict(codeListManifestRecord, prevCodeListRecord);
+
         // delete current CODE_LIST
         codeListRecord.delete();
+    }
+
+    /**
+     * A value added in the revision has no previous record to go back to, so it is deleted. A Code List that has a value
+     * based on it would be left with a value that has no base: that Code List has to be deleted or cancelled first.
+     */
+    private void assertNothingIsBasedOnValuesAddedInRevision(CodeListManifestRecord manifest, CodeListRecord codeList) {
+        List<String> dependents = dslContext().selectDistinct(CODE_LIST.NAME)
+                .from(CODE_LIST_VALUE_MANIFEST)
+                .join(CODE_LIST_VALUE).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID.eq(CODE_LIST_VALUE.CODE_LIST_VALUE_ID))
+                .join(CODE_LIST_VALUE_MANIFEST.as("derived")).on(CODE_LIST_VALUE_MANIFEST.as("derived").BASED_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID))
+                .join(CODE_LIST_MANIFEST).on(CODE_LIST_VALUE_MANIFEST.as("derived").CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID))
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .where(and(
+                        CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifest.getCodeListManifestId()),
+                        CODE_LIST_VALUE.PREV_CODE_LIST_VALUE_ID.isNull()))
+                .fetch(CODE_LIST.NAME);
+        if (!dependents.isEmpty()) {
+            throw new IllegalArgumentException("The Code List '" + codeList.getName() + "' cannot be cancelled because "
+                    + "a value added in this revision is used by the Code List(s) "
+                    + dependents.stream().map(e -> "'" + e + "'").collect(java.util.stream.Collectors.joining(", "))
+                    + ". Delete or cancel them first.");
+        }
+    }
+
+    /**
+     * What refers to an older record than the manifest holds is in conflict, which a cancel brings back to what the record
+     * the Code List went back to says: the Code List and its values by what they are based on, and what is based on them.
+     */
+    private void markWhatRefersToAnOlderRecordInConflict(CodeListManifestRecord manifest, CodeListRecord prevCodeListRecord) {
+        ULong manifestId = manifest.getCodeListManifestId();
+
+        var base = dslContext().select(CODE_LIST.BASED_CODE_LIST_ID, CODE_LIST_MANIFEST.as("based").CODE_LIST_ID)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .leftJoin(CODE_LIST_MANIFEST.as("based")).on(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("based").CODE_LIST_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifestId))
+                .fetchOne();
+        dslContext().update(CODE_LIST_MANIFEST)
+                .set(CODE_LIST_MANIFEST.CONFLICT, referencesAnOlderRecord(base.value1(), base.value2()))
+                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifestId))
+                .execute();
+
+        dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE.BASED_CODE_LIST_VALUE_ID,
+                        CODE_LIST_VALUE_MANIFEST.as("based").CODE_LIST_VALUE_ID)
+                .from(CODE_LIST_VALUE_MANIFEST)
+                .join(CODE_LIST_VALUE).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID.eq(CODE_LIST_VALUE.CODE_LIST_VALUE_ID))
+                .join(CODE_LIST_VALUE_MANIFEST.as("based")).on(CODE_LIST_VALUE_MANIFEST.BASED_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("based").CODE_LIST_VALUE_MANIFEST_ID))
+                .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifestId))
+                .fetch()
+                .forEach(e -> dslContext().update(CODE_LIST_VALUE_MANIFEST)
+                        .set(CODE_LIST_VALUE_MANIFEST.CONFLICT, referencesAnOlderRecord(e.value2(), e.value3()))
+                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID.eq(e.value1()))
+                        .execute());
+
+        // what is based on the Code List refers to the record it went back to
+        dslContext().update(CODE_LIST_MANIFEST).set(CODE_LIST_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(manifestId),
+                        CODE_LIST_MANIFEST.CODE_LIST_ID.in(dslContext().select(CODE_LIST.CODE_LIST_ID).from(CODE_LIST)
+                                .where(CODE_LIST.BASED_CODE_LIST_ID.eq(prevCodeListRecord.getCodeListId())))))
+                .execute();
+        dslContext().update(CODE_LIST_VALUE_MANIFEST).set(CODE_LIST_VALUE_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        CODE_LIST_VALUE_MANIFEST.BASED_CODE_LIST_VALUE_MANIFEST_ID.in(
+                                dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_MANIFEST_ID).from(CODE_LIST_VALUE_MANIFEST)
+                                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(manifestId))),
+                        CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID.in(dslContext().select(CODE_LIST_VALUE.CODE_LIST_VALUE_ID).from(CODE_LIST_VALUE)
+                                .where(CODE_LIST_VALUE.BASED_CODE_LIST_VALUE_ID.in(
+                                        dslContext().select(CODE_LIST_VALUE.CODE_LIST_VALUE_ID).from(CODE_LIST_VALUE)
+                                                .where(CODE_LIST_VALUE.CODE_LIST_ID.eq(prevCodeListRecord.getCodeListId())))))))
+                .execute();
+    }
+
+    private static byte referencesAnOlderRecord(ULong recordReference, ULong manifestReference) {
+        return (byte) ((recordReference != null && manifestReference != null && !recordReference.equals(manifestReference)) ? 1 : 0);
+    }
+
+    /**
+     * The Agency ID of a Code List is kept by its manifest only, so the record that a revision copies does not hold what
+     * it was before the revision. It is found where the Code List was before:
+     * <ul>
+     *   <li>in the manifest of the previous release, which a developer's Code List has (a Code List is published only
+     *   with a release): the Agency ID Value that manifest refers to;</li>
+     *   <li>otherwise (an end-user's Code List is always revised in the release it was made in) in the log of the
+     *   revision before, which holds the GUID of the Agency ID Value. That is only as long as the log is there.</li>
+     * </ul>
+     * The Agency ID Value is found in this release, or in what it depends on. When it cannot be found, the Agency ID
+     * is left as it is.
+     */
+    private void restoreAgencyIdListValue(CodeListManifestRecord codeListManifestRecord) {
+        ULong releaseId = codeListManifestRecord.getReleaseId();
+        ULong valueManifestId = null;
+
+        if (codeListManifestRecord.getPrevCodeListManifestId() != null) {
+            ULong prevValueManifestId = dslContext().select(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                    .from(CODE_LIST_MANIFEST)
+                    .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getPrevCodeListManifestId()))
+                    .fetchOneInto(ULong.class);
+            if (prevValueManifestId != null) {
+                ULong prevValueId = dslContext().select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)
+                        .from(AGENCY_ID_LIST_VALUE_MANIFEST)
+                        .where(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(prevValueManifestId))
+                        .fetchOneInto(ULong.class);
+                valueManifestId = findAgencyIdListValueManifest(releaseId, prevValueId);
+                if (valueManifestId == null) {
+                    return;
+                }
+            }
+        } else {
+            Record snapshot = snapshotOfTheRevisionBefore(codeListManifestRecord);
+            if (snapshot == null) {
+                return;
+            }
+            String agencyIdGuid = snapshot.get("agency_id_guid", String.class);
+            if (agencyIdGuid != null) {
+                valueManifestId = findAgencyIdListValueManifestByGuid(releaseId, agencyIdGuid);
+                if (valueManifestId == null) {
+                    return;
+                }
+            }
+        }
+
+        codeListManifestRecord.setAgencyIdListValueManifestId(valueManifestId);
+        codeListManifestRecord.update(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID);
+    }
+
+    /**
+     * The GUID of the Agency ID Value that the log of the revision before the current one holds (null when it holds none),
+     * or null when there is no such log or it does not hold a Code List.
+     */
+    private Record snapshotOfTheRevisionBefore(CodeListManifestRecord codeListManifestRecord) {
+        ULong logId = codeListManifestRecord.getLogId();
+        if (logId == null) {
+            return null;
+        }
+        Record log = dslContext().fetchOne("select revision_num, prev_log_id from log where log_id = ?", logId.longValue());
+        if (log == null) {
+            return null;
+        }
+        long revisionNum = log.get("revision_num", Long.class);
+        Long prevLogId = log.get("prev_log_id", Long.class);
+        while (prevLogId != null) {
+            Record prev = dslContext().fetchOne(
+                    "select revision_num, prev_log_id, json_contains_path(snapshot, 'one', '$.name') as is_code_list, "
+                            + "json_unquote(json_extract(snapshot, '$.agencyId.guid')) as agency_id_guid from log where log_id = ?", prevLogId);
+            if (prev == null) {
+                return null;
+            }
+            if (prev.get("revision_num", Long.class) < revisionNum) {
+                return Boolean.TRUE.equals(prev.get("is_code_list", Boolean.class)) ? prev : null;
+            }
+            prevLogId = prev.get("prev_log_id", Long.class);
+        }
+        return null;
+    }
+
+    private List<ULong> releaseAndWhatItDependsOn(ULong releaseId) {
+        List<ULong> releaseIds = new java.util.ArrayList<>();
+        releaseIds.add(releaseId);
+        releaseIds.addAll(dslContext().select(RELEASE_DEP.DEPEND_ON_RELEASE_ID).from(RELEASE_DEP)
+                .where(RELEASE_DEP.RELEASE_ID.eq(releaseId)).fetchInto(ULong.class));
+        return releaseIds;
+    }
+
+    /** The manifest of an Agency ID Value in the release, or in what it depends on, by the record of the value or its GUID. */
+    private ULong findAgencyIdListValueManifest(ULong releaseId, ULong agencyIdListValueId) {
+        ULong found = dslContext().select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .from(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .where(and(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId),
+                        AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(agencyIdListValueId)))
+                .fetchAnyInto(ULong.class);
+        if (found != null) {
+            return found;
+        }
+        String guid = dslContext().select(AGENCY_ID_LIST_VALUE.GUID).from(AGENCY_ID_LIST_VALUE)
+                .where(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(agencyIdListValueId)).fetchOneInto(String.class);
+        return findAgencyIdListValueManifestByGuid(releaseId, guid);
+    }
+
+    private ULong findAgencyIdListValueManifestByGuid(ULong releaseId, String guid) {
+        return dslContext().select(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
+                .from(AGENCY_ID_LIST_VALUE_MANIFEST)
+                .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID))
+                .where(and(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.in(releaseAndWhatItDependsOn(releaseId)),
+                        AGENCY_ID_LIST_VALUE.GUID.eq(guid)))
+                .orderBy(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId).desc())
+                .fetchAnyInto(ULong.class);
     }
 
     private void discardLogCodeListValues(CodeListManifestRecord codeListManifestRecord) {
@@ -467,24 +717,38 @@ public class JooqCodeListCommandRepository
                 .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))
                 .fetch();
 
+        // the current and the previous records of the values, read at once
+        Map<ULong, CodeListValueRecord> valueRecords = dslContext().selectFrom(CODE_LIST_VALUE)
+                .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.in(dslContext().select(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID)
+                        .from(CODE_LIST_VALUE_MANIFEST)
+                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))))
+                .fetchMap(CODE_LIST_VALUE.CODE_LIST_VALUE_ID);
+        Map<ULong, CodeListValueRecord> prevValueRecords = dslContext().selectFrom(CODE_LIST_VALUE)
+                .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.in(dslContext().select(CODE_LIST_VALUE.as("current").PREV_CODE_LIST_VALUE_ID)
+                        .from(CODE_LIST_VALUE.as("current"))
+                        .join(CODE_LIST_VALUE_MANIFEST).on(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID.eq(CODE_LIST_VALUE.as("current").CODE_LIST_VALUE_ID))
+                        .where(CODE_LIST_VALUE_MANIFEST.CODE_LIST_MANIFEST_ID.eq(codeListManifestRecord.getCodeListManifestId()))))
+                .fetchMap(CODE_LIST_VALUE.CODE_LIST_VALUE_ID);
+
         for (CodeListValueManifestRecord codeListValueManifest : codeListValueManifests) {
-            CodeListValueRecord codeListValue = dslContext().selectFrom(CODE_LIST_VALUE)
-                    .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(codeListValueManifest.getCodeListValueId()))
-                    .fetchOne();
+            CodeListValueRecord codeListValue = valueRecords.get(codeListValueManifest.getCodeListValueId());
 
             if (codeListValue.getPrevCodeListValueId() == null) {
                 // delete code list value and code list manifest which added this revision
                 codeListValueManifest.delete();
                 codeListValue.delete();
             } else {
-                CodeListValueRecord prevCodeListValue = dslContext().selectFrom(CODE_LIST_VALUE)
-                        .where(CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(codeListValue.getPrevCodeListValueId()))
-                        .fetchOne();
+                CodeListValueRecord prevCodeListValue = prevValueRecords.get(codeListValue.getPrevCodeListValueId());
 
                 prevCodeListValue.setNextCodeListValueId(null);
                 prevCodeListValue.update(CODE_LIST_VALUE.NEXT_CODE_LIST_VALUE_ID);
                 codeListValueManifest.setCodeListValueId(prevCodeListValue.getCodeListValueId());
                 codeListValueManifest.update(CODE_LIST_VALUE_MANIFEST.CODE_LIST_VALUE_ID);
+                // what refers to the record that is discarded goes back to the previous one
+                dslContext().update(CODE_LIST_VALUE).set(CODE_LIST_VALUE.BASED_CODE_LIST_VALUE_ID, prevCodeListValue.getCodeListValueId())
+                        .where(CODE_LIST_VALUE.BASED_CODE_LIST_VALUE_ID.eq(codeListValue.getCodeListValueId())).execute();
+                dslContext().update(CODE_LIST_VALUE).set(CODE_LIST_VALUE.REPLACEMENT_CODE_LIST_VALUE_ID, prevCodeListValue.getCodeListValueId())
+                        .where(CODE_LIST_VALUE.REPLACEMENT_CODE_LIST_VALUE_ID.eq(codeListValue.getCodeListValueId())).execute();
                 codeListValue.delete();
             }
         }

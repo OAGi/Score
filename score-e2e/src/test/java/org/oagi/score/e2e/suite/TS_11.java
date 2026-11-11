@@ -15,7 +15,9 @@ import org.oagi.score.e2e.TS_11_WorkingBranchCodeListManagementForDeveloper.*;
         TC_11_5_EditingARevisionOfADeveloperCodeList.class,
         TC_11_6_DeveloperCodeListStateManagement.class,
         TC_11_7_DeletingACodeList.class,
-        TC_11_8_RestoringDeveloperCodeList.class
+        TC_11_8_RestoringDeveloperCodeList.class,
+        TC_11_9_AgencyIDIsFixedInARevisionAndCancelBringsBackTheRest.class,
+        TC_11_10_CancelWhenTheLogIsGone.class
 })
 public class TS_11 {
 }

@@ -36,7 +36,8 @@ import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForE
         TC_15_17_EndUserBCCPStateManagement.class,
         TC_15_18_DeletingEndUserBCCP.class,
         TC_15_19_RestoringEndUserBCCP.class,
-        TC_15_20_CancelAmendmentRestoresWhatWasChanged.class
+        TC_15_20_CancelAmendmentRestoresWhatWasChanged.class,
+        TC_15_21_CancelWhenTheLogIsGone.class
 })
 public class TS_15 {
 }

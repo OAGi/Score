@@ -13,7 +13,9 @@ import org.oagi.score.e2e.TS_34_WorkingBranchAgencyIDListManagementforDeveloper.
         TC_34_3_CreatingNewRevisionDeveloperAgencyIDList.class,
         TC_34_4_EditingRevisionDeveloperAgencyIDList.class,
         TC_34_5_DeveloperAgencyIDListStateManagement.class,
-        TC_34_6_DeletingAgencyIDList.class
+        TC_34_6_DeletingAgencyIDList.class,
+        TC_34_7_AgencyIDListValueIsFixedInARevisionAndCancelBringsBackTheRest.class,
+        TC_34_8_CancelWhenTheLogIsGone.class
 })
 public class TS_34 {
 }

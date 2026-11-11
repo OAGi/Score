@@ -57,6 +57,12 @@ public interface DtCommandRepository {
 
     void cancel(DtManifestId dtManifestId);
 
+    /**
+     * Cancels the revision. When the log the component was in before it cannot be found, it throws
+     * {@code LogNotFoundException} unless {@code recreateLog} lets a new history (revision 1) be written.
+     */
+    void cancel(DtManifestId dtManifestId, boolean recreateLog);
+
     DtAwdPriId createDtAwdPri(ReleaseId releaseId, DtId dtId,
                               String cdtPriName,
                               XbtManifestId xbtManifestId,

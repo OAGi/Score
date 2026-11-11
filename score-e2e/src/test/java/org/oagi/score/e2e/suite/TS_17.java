@@ -15,7 +15,9 @@ import org.oagi.score.e2e.TS_17_ReleaseBranchCodeListManagementForEndUser.*;
         TC_17_5_EndUserCodeListStateManagement.class,
         TC_17_6_DeletingACodeList.class,
         TC_17_7_RestoringEndUserCodeList.class,
-        TC_17_8_UsingCustomEndUserCodeListInBIEExpression.class
+        TC_17_8_UsingCustomEndUserCodeListInBIEExpression.class,
+        TC_17_9_AgencyIDIsFixedInAnAmendmentAndCancelBringsBackTheRest.class,
+        TC_17_10_CancelWhenTheLogIsGone.class
 })
 public class TS_17 {
 }

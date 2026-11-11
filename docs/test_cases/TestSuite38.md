@@ -521,3 +521,25 @@ The developer can cancel the revision of a DT while a BCCP in revision is on tha
 2. Revise the DT, add a supplementary component, change the inherited supplementary component, and update.
 3. Cancel the revision and verify the state, the revision number, the supplementary component and that no revision is left behind; revise the DT again. (Assertion [#38.16.1](#test-assertion-38161))
 4. Revise a DT and a BCCP that uses it, cancel the revision of the DT, and verify that the BCCP is still in revision and can be cancelled. (Assertion [#38.16.2](#test-assertion-38162))
+
+## Test Case 38.17
+
+**Cancelling a revision of a developer DT when the log to go back to is gone**
+
+Pre-condition: The developer is on the Working branch and owns a published DT that is revised, and the log the DT was in before the revision has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #38.17.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written. If the developer does not let it, nothing is changed. If the developer lets it, the DT is cancelled to `Published` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published DT that is revised, and the log the DT was in before the revision has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision of a developer DT when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, revise a DT, and have the logs from before the revision removed from the database.
+2. Cancel the revision and confirm; verify the dialog asks whether to create a new log, and decline; verify the DT is still `WIP`.
+3. Cancel the revision again, confirm, and let the new log be created; verify the DT is `Published` with revision `1`. (Assertion [#38.17.1](#test-assertion-38171))

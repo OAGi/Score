@@ -150,20 +150,23 @@ public class CcCommandController {
     @PatchMapping(value = "/acc/{accManifestId:[\\d]+}/revise")
     public void reviseAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("accManifestId") AccManifestId accManifestId) {
+            @PathVariable("accManifestId") AccManifestId accManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        ccCommandService.reviseAcc(sessionService.asScoreUser(user), accManifestId);
+        ccCommandService.reviseAcc(sessionService.asScoreUser(user), accManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/acc/{accManifestId:[\\d]+}/cancel")
     public void cancelAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("accManifestId") AccManifestId accManifestId,
-            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
+            @RequestBody(required = false) CcUpdateStateCommentRequest request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         ccCommandService.cancelAcc(sessionService.asScoreUser(user), accManifestId,
                 (request != null) ? request.comment() : null,
-                (request != null) ? request.projectFieldOptionOverride() : null);
+                (request != null) ? request.projectFieldOptionOverride() : null,
+                recreateLog);
     }
 
     @PostMapping(value = "/acc/{accManifestId:[\\d]+}/extension")
@@ -231,20 +234,23 @@ public class CcCommandController {
     @PatchMapping(value = "/asccp/{asccpManifestId:[\\d]+}/revise")
     public void reviseAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId) {
+            @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        ccCommandService.reviseAsccp(sessionService.asScoreUser(user), asccpManifestId);
+        ccCommandService.reviseAsccp(sessionService.asScoreUser(user), asccpManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/asccp/{asccpManifestId:[\\d]+}/cancel")
     public void cancelAsccp(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("asccpManifestId") AsccpManifestId asccpManifestId,
-            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
+            @RequestBody(required = false) CcUpdateStateCommentRequest request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         ccCommandService.cancelAsccp(sessionService.asScoreUser(user), asccpManifestId,
                 (request != null) ? request.comment() : null,
-                (request != null) ? request.projectFieldOptionOverride() : null);
+                (request != null) ? request.projectFieldOptionOverride() : null,
+                recreateLog);
     }
 
     @PostMapping(value = "/oagis/bod")
@@ -317,20 +323,23 @@ public class CcCommandController {
     @PatchMapping(value = "/bccp/{bccpManifestId:[\\d]+}/revise")
     public void reviseAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("bccpManifestId") BccpManifestId bccpManifestId) {
+            @PathVariable("bccpManifestId") BccpManifestId bccpManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        ccCommandService.reviseBccp(sessionService.asScoreUser(user), bccpManifestId);
+        ccCommandService.reviseBccp(sessionService.asScoreUser(user), bccpManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/bccp/{bccpManifestId:[\\d]+}/cancel")
     public void cancelBccp(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("bccpManifestId") BccpManifestId bccpManifestId,
-            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
+            @RequestBody(required = false) CcUpdateStateCommentRequest request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         ccCommandService.cancelBccp(sessionService.asScoreUser(user), bccpManifestId,
                 (request != null) ? request.comment() : null,
-                (request != null) ? request.projectFieldOptionOverride() : null);
+                (request != null) ? request.projectFieldOptionOverride() : null,
+                recreateLog);
     }
 
     @PostMapping(value = "/dt")
@@ -380,20 +389,23 @@ public class CcCommandController {
     @PatchMapping(value = "/dt/{dtManifestId:[\\d]+}/revise")
     public void reviseAcc(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @PathVariable("dtManifestId") DtManifestId dtManifestId) {
+            @PathVariable("dtManifestId") DtManifestId dtManifestId,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
-        ccCommandService.reviseDt(sessionService.asScoreUser(user), dtManifestId);
+        ccCommandService.reviseDt(sessionService.asScoreUser(user), dtManifestId, recreateLog);
     }
 
     @PatchMapping(value = "/dt/{dtManifestId:[\\d]+}/cancel")
     public void cancelDt(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("dtManifestId") DtManifestId dtManifestId,
-            @RequestBody(required = false) CcUpdateStateCommentRequest request) {
+            @RequestBody(required = false) CcUpdateStateCommentRequest request,
+            @RequestParam(name = "recreateLog", defaultValue = "false") boolean recreateLog) {
 
         ccCommandService.cancelDt(sessionService.asScoreUser(user), dtManifestId,
                 (request != null) ? request.comment() : null,
-                (request != null) ? request.projectFieldOptionOverride() : null);
+                (request != null) ? request.projectFieldOptionOverride() : null,
+                recreateLog);
     }
 
     @PutMapping()

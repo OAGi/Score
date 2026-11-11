@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
+import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
@@ -95,6 +96,20 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
             IllegalArgumentException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
         return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /**
+     * The history of a component cannot be found. The client asks the user whether a new history may be written,
+     * and repeats the request with that permission, so it is told apart by a code and not shown as an error.
+     */
+    @ExceptionHandler(LogNotFoundException.class)
+    public ResponseEntity handleLogNotFoundException(
+            LogNotFoundException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
+        headers.set("X-Error-Code", LogNotFoundException.ERROR_CODE);
+        return new ResponseEntity<>(ex.getMessage(), headers, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(IllegalStateException.class)
