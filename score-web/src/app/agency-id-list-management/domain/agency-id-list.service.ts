@@ -209,17 +209,14 @@ export class AgencyIdListService {
   }
 
   editComment(commentId: number, text: string): Observable<any> {
-    return this.http.post('/api/comments/' + commentId, {
+    return this.http.put('/api/comments/' + commentId, {
       commentId,
       text,
     });
   }
 
   deleteComment(comment: Comment): Observable<any> {
-    return this.http.post('/api/comments/' + comment.commentId, {
-      commentId: comment.commentId,
-      delete: true,
-    });
+    return this.http.delete('/api/comments/' + comment.commentId);
   }
 
   getComments(reference): Observable<Comment[]> {

@@ -291,10 +291,7 @@ export class CodeListService {
   }
 
   deleteComment(comment: Comment): Observable<any> {
-    return this.http.put('/api/comments/' + comment.commentId, {
-      commentId: comment.commentId,
-      delete: true,
-    });
+    return this.http.delete('/api/comments/' + comment.commentId);
   }
 
   getComments(reference): Observable<Comment[]> {
