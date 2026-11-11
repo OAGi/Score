@@ -1,3 +1,4 @@
+import {CARDINALITY_MAX_PATTERN} from '../../common/cardinality-max-pattern';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
@@ -1524,7 +1525,7 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
 
     const validators = [];
     validators.push(Validators.required);
-    validators.push(Validators.pattern('[0-9]+|-1|unbounded'));
+    validators.push(Validators.pattern(CARDINALITY_MAX_PATTERN));
     validators.push(this.nonWhitespaceValidator);
     if (this.isBccpDetail(node)) {
       if (this.asBccpDetail(node).bcc.entityType === 'Attribute') {

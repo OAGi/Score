@@ -1,3 +1,4 @@
+import {CARDINALITY_MAX_PATTERN} from '../../common/cardinality-max-pattern';
 import { ChangeDetectorRef, Component, DoCheck, ElementRef, HostListener, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
@@ -2344,7 +2345,7 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
         disabled
       }, [
         Validators.required,
-        Validators.pattern('[0-9]+|-1|unbounded'),
+        Validators.pattern(CARDINALITY_MAX_PATTERN),
         this.nonWhitespaceValidator,
         // validatorFn for minimum value
         (control: AbstractControl): ValidationErrors | null => {
