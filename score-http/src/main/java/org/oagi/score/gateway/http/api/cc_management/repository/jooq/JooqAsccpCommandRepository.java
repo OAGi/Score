@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.UpdateSetFirstStep;
 import org.jooq.UpdateSetMoreStep;
+import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
@@ -361,6 +362,12 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
         nextAsccpRecord.setCreationTimestamp(timestamp);
         nextAsccpRecord.setLastUpdateTimestamp(timestamp);
         nextAsccpRecord.setPrevAsccpId(valueOf(prevAsccp.asccpId()));
+        // the ACC it is the role of is the latest record of the ACC, which is what the manifest has
+        nextAsccpRecord.setRoleOfAccId(dslContext().select(ACC_MANIFEST.ACC_ID)
+                .from(ASCCP_MANIFEST)
+                .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(prevAsccp.asccpManifestId())))
+                .fetchOptionalInto(ULong.class).orElse(null));
         AsccpId nextAsccpId = new AsccpId(dslContext().insertInto(ASCCP)
                 .set(nextAsccpRecord)
                 .returning(ASCCP.ASCCP_ID)
@@ -373,6 +380,7 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
 
         dslContext().update(ASCCP_MANIFEST)
                 .set(ASCCP_MANIFEST.ASCCP_ID, valueOf(nextAsccpId))
+                .set(ASCCP_MANIFEST.CONFLICT, (byte) 0)
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(prevAsccp.asccpManifestId())))
                 .execute();
 
@@ -412,22 +420,25 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
 
         // update ASCCP MANIFEST's asccp_id
         if (prevAsccpRecord.getRoleOfAccId() != null) {
-            AccRecord prevRoleOfAccRecord = dslContext().selectFrom(ACC)
-                    .where(ACC.ACC_ID.eq(prevAsccpRecord.getRoleOfAccId()))
+            // the manifest, in this release, of the ACC that the previous revision was the role of (found by its GUID),
+            // with the name it gives
+            var prevRoleOfAcc = dslContext().select(ACC_MANIFEST.ACC_MANIFEST_ID, ACC.OBJECT_CLASS_TERM)
+                    .from(ACC_MANIFEST)
+                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                    .where(and(
+                            ACC_MANIFEST.RELEASE_ID.eq(valueOf(asccp.release().releaseId())),
+                            ACC.GUID.eq(dslContext().select(ACC.as("prev_role").GUID).from(ACC.as("prev_role"))
+                                    .where(ACC.as("prev_role").ACC_ID.eq(prevAsccpRecord.getRoleOfAccId())))
+                    ))
                     .fetchOne();
+            if (prevRoleOfAcc == null) {
+                throw new IllegalArgumentException("Not found the ACC of the previous revision in the release");
+            }
 
-            AccManifestId prevRoleOfAccManifestId = new AccManifestId(
-                    dslContext().select(ACC_MANIFEST.ACC_MANIFEST_ID)
-                            .from(ACC_MANIFEST)
-                            .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                            .where(and(
-                                    ACC_MANIFEST.RELEASE_ID.eq(valueOf(asccp.release().releaseId())),
-                                    ACC.GUID.eq(prevRoleOfAccRecord.getGuid())
-                            ))
-                            .fetchOneInto(BigInteger.class)
-            );
+            moreStep.set(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, prevRoleOfAcc.value1());
 
-            moreStep.set(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID, valueOf(prevRoleOfAccManifestId));
+            // the name follows the role it is restored to
+            moreStep.set(ASCCP_MANIFEST.DEN, DenUtils.asccpDen(prevAsccpRecord.getPropertyTerm(), prevRoleOfAcc.value2()));
         }
 
         moreStep.where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())))
@@ -439,10 +450,32 @@ public class JooqAsccpCommandRepository extends JooqBaseRepository implements As
                 .where(ASCC.TO_ASCCP_ID.eq(valueOf(asccp.asccpId())))
                 .execute();
 
+        // what refers to the ASCCP was marked as in conflict when it was revised; now that it refers to the
+        // restored record again, it is not in conflict any more
+        dslContext().update(ASCC_MANIFEST)
+                .set(ASCC_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())),
+                        ASCC_MANIFEST.ASCC_ID.in(dslContext().select(ASCC.ASCC_ID).from(ASCC)
+                                .where(ASCC.TO_ASCCP_ID.eq(prevAsccpRecord.getAsccpId())))))
+                .execute();
+
         // unlink prev ASCCP
         dslContext().update(ASCCP)
                 .setNull(ASCCP.NEXT_ASCCP_ID)
                 .where(ASCCP.ASCCP_ID.eq(prevAsccpRecord.getAsccpId()))
+                .execute();
+
+        // the record it went back to may refer to an older record of the ACC than the manifest does
+        dslContext().update(ASCCP_MANIFEST)
+                .set(ASCCP_MANIFEST.CONFLICT, (byte) (dslContext().selectCount().from(ASCCP_MANIFEST)
+                        .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                        .join(ACC_MANIFEST).on(ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                        .where(and(
+                                ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())),
+                                ASCCP.ROLE_OF_ACC_ID.notEqual(ACC_MANIFEST.ACC_ID)))
+                        .fetchOptionalInto(Integer.class).orElse(0) > 0 ? 1 : 0))
+                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccp.asccpManifestId())))
                 .execute();
 
         // clean logs up

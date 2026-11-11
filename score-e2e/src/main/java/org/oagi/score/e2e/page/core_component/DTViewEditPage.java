@@ -320,6 +320,21 @@ public interface DTViewEditPage extends Page {
 
     WebElement getAmendButton();
 
+    /**
+     * Return the UI element of the 'Cancel' button that takes a revision (or an amendment) back.
+     */
+    WebElement getCancelButton();
+
+    /**
+     * Hit the 'Cancel' button and confirm; the revision is taken back and the page reloads.
+     */
+    void hitCancelButton();
+
+    /**
+     * Hit the 'Cancel' button and confirm, for a revision that the server refuses to take back; returns the message shown.
+     */
+    String hitCancelButtonExpectingRefusal();
+
     void hitAmendButton();
 
     WebElement getMoveToQAButton(boolean enabled);

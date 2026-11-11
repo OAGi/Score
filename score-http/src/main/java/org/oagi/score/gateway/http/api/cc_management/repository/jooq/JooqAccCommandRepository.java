@@ -1473,6 +1473,12 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         nextAccRecord.setCreationTimestamp(timestamp);
         nextAccRecord.setLastUpdateTimestamp(timestamp);
         nextAccRecord.setPrevAccId(valueOf(prevAcc.accId()));
+        // what the revision is based on is the latest record of the base, which is what the manifest has
+        nextAccRecord.setBasedAccId(dslContext().select(ACC_MANIFEST.as("based").ACC_ID)
+                .from(ACC_MANIFEST)
+                .join(ACC_MANIFEST.as("based")).on(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("based").ACC_MANIFEST_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())))
+                .fetchOptionalInto(ULong.class).orElse(null));
         AccId nextAccId = new AccId(dslContext().insertInto(ACC)
                 .set(nextAccRecord)
                 .returning(ACC.ACC_ID)
@@ -1487,8 +1493,10 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
         reviseAscc(prevAcc, nextAccId);
         reviseBcc(prevAcc, nextAccId);
 
+        // the new record refers to the latest of what it refers to, so it is not in conflict
         dslContext().update(ACC_MANIFEST)
                 .set(ACC_MANIFEST.ACC_ID, valueOf(nextAccId))
+                .set(ACC_MANIFEST.CONFLICT, (byte) 0)
                 .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())))
                 .execute();
 
@@ -1524,10 +1532,13 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             AccId nextAccId) {
 
         var query = repositoryFactory().accQueryRepository(requester());
+        // the records the associations are made from, read at once
+        Map<ULong, AsccRecord> asccRecords = dslContext().selectFrom(ASCC)
+                .where(ASCC.ASCC_ID.in(dslContext().select(ASCC_MANIFEST.ASCC_ID).from(ASCC_MANIFEST)
+                        .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())))))
+                .fetchMap(ASCC.ASCC_ID);
         for (AsccDetailsRecord ascc : query.getAsccDetailsList(prevAcc.accManifestId())) {
-            AsccRecord nextAsccRecord = dslContext().selectFrom(ASCC)
-                    .where(ASCC.ASCC_ID.eq(valueOf(ascc.asccId())))
-                    .fetchOne().copy();
+            AsccRecord nextAsccRecord = asccRecords.get(valueOf(ascc.asccId())).copy();
             nextAsccRecord.setFromAccId(valueOf(nextAccId));
             nextAsccRecord.setToAsccpId(valueOf(ascc.toAsccp().asccpId()));
             nextAsccRecord.setState(CcState.WIP.name());
@@ -1551,6 +1562,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
 
             dslContext().update(ASCC_MANIFEST)
                     .set(ASCC_MANIFEST.ASCC_ID, valueOf(nextAsccId))
+                    .set(ASCC_MANIFEST.CONFLICT, (byte) 0)
                     .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(valueOf(ascc.asccManifestId())))
                     .execute();
         }
@@ -1561,10 +1573,13 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             AccId nextAccId) {
 
         var query = repositoryFactory().accQueryRepository(requester());
+        // the records the associations are made from, read at once
+        Map<ULong, BccRecord> bccRecords = dslContext().selectFrom(BCC)
+                .where(BCC.BCC_ID.in(dslContext().select(BCC_MANIFEST.BCC_ID).from(BCC_MANIFEST)
+                        .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())))))
+                .fetchMap(BCC.BCC_ID);
         for (BccDetailsRecord bcc : query.getBccDetailsList(prevAcc.accManifestId())) {
-            BccRecord nextBccRecord = dslContext().selectFrom(BCC)
-                    .where(BCC.BCC_ID.eq(valueOf(bcc.bccId())))
-                    .fetchOne().copy();
+            BccRecord nextBccRecord = bccRecords.get(valueOf(bcc.bccId())).copy();
             nextBccRecord.setFromAccId(valueOf(nextAccId));
             nextBccRecord.setToBccpId(valueOf(bcc.toBccp().bccpId()));
             nextBccRecord.setState(CcState.WIP.name());
@@ -1588,6 +1603,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
 
             dslContext().update(BCC_MANIFEST)
                     .set(BCC_MANIFEST.BCC_ID, valueOf(nextBccId))
+                    .set(BCC_MANIFEST.CONFLICT, (byte) 0)
                     .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(valueOf(bcc.bccManifestId())))
                     .execute();
         }
@@ -1614,22 +1630,24 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
 
         // update ACC MANIFEST's acc_id and revision_id
         if (prevAccRecord.getBasedAccId() != null) {
-            AccRecord prevBasedAccRecord = dslContext().selectFrom(ACC)
-                    .where(ACC.ACC_ID.eq(prevAccRecord.getBasedAccId()))
-                    .fetchOne();
+            // the manifest, in this release, of the ACC that the previous revision was based on (found by its GUID)
+            BigInteger prevBasedAccManifestId = dslContext().select(ACC_MANIFEST.ACC_MANIFEST_ID)
+                    .from(ACC_MANIFEST)
+                    .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                    .where(and(
+                            ACC_MANIFEST.RELEASE_ID.eq(valueOf(acc.release().releaseId())),
+                            ACC.GUID.eq(dslContext().select(ACC.as("prev_based").GUID).from(ACC.as("prev_based"))
+                                    .where(ACC.as("prev_based").ACC_ID.eq(prevAccRecord.getBasedAccId())))
+                    ))
+                    .fetchOneInto(BigInteger.class);
+            if (prevBasedAccManifestId == null) {
+                throw new IllegalArgumentException("Not found the base ACC of the previous revision in the release");
+            }
 
-            AccManifestId prevBasedAccManifestId = new AccManifestId(
-                    dslContext().select(ACC_MANIFEST.ACC_MANIFEST_ID)
-                            .from(ACC_MANIFEST)
-                            .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
-                            .where(and(
-                                    ACC_MANIFEST.RELEASE_ID.eq(valueOf(acc.release().releaseId())),
-                                    ACC.GUID.eq(prevBasedAccRecord.getGuid())
-                            ))
-                            .fetchOneInto(BigInteger.class)
-            );
-
-            moreStep.set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, valueOf(prevBasedAccManifestId));
+            moreStep.set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, valueOf(new AccManifestId(prevBasedAccManifestId)));
+        } else {
+            // the previous revision has no base, so a base given in this revision is discarded
+            moreStep.setNull(ACC_MANIFEST.BASED_ACC_MANIFEST_ID);
         }
 
         moreStep.where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))
@@ -1637,11 +1655,30 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
 
         discardLogAssociations(acc);
 
+        // what refers to the ACC was marked as in conflict when it was revised; now that it refers to the
+        // restored record again, it is not in conflict any more
+        dslContext().update(ASCCP_MANIFEST)
+                .set(ASCCP_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        ASCCP_MANIFEST.ROLE_OF_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())),
+                        ASCCP_MANIFEST.ASCCP_ID.in(dslContext().select(ASCCP.ASCCP_ID).from(ASCCP)
+                                .where(ASCCP.ROLE_OF_ACC_ID.eq(prevAccRecord.getAccId())))))
+                .execute();
+        dslContext().update(ACC_MANIFEST)
+                .set(ACC_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())),
+                        ACC_MANIFEST.ACC_ID.in(dslContext().select(ACC.ACC_ID).from(ACC)
+                                .where(ACC.BASED_ACC_ID.eq(prevAccRecord.getAccId())))))
+                .execute();
+
         // unlink prev ACC
         dslContext().update(ACC)
                 .setNull(ACC.NEXT_ACC_ID)
                 .where(ACC.ACC_ID.eq(prevAccRecord.getAccId()))
                 .execute();
+
+        markWhatRefersToAnOlderRecordInConflict(acc.accManifestId());
 
         // clean logs up
         dslContext().update(ACC_MANIFEST)
@@ -1663,28 +1700,57 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .execute();
     }
 
+    /**
+     * The records that the ACC and its associations went back to may refer to an older record of what their manifests
+     * refer to, which is what the marker says; the revision had cleared it.
+     */
+    private void markWhatRefersToAnOlderRecordInConflict(AccManifestId accManifestId) {
+        ULong manifestId = valueOf(accManifestId);
+
+        Record2<ULong, ULong> base = dslContext().select(ACC.BASED_ACC_ID, ACC_MANIFEST.as("based").ACC_ID)
+                .from(ACC_MANIFEST)
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
+                .leftJoin(ACC_MANIFEST.as("based")).on(ACC_MANIFEST.BASED_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("based").ACC_MANIFEST_ID))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(manifestId))
+                .fetchOne();
+        dslContext().update(ACC_MANIFEST)
+                .set(ACC_MANIFEST.CONFLICT, referencesAnOlderRecord(base.value1(), base.value2()))
+                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(manifestId))
+                .execute();
+
+        dslContext().select(ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC.TO_ASCCP_ID, ASCCP_MANIFEST.ASCCP_ID)
+                .from(ASCC_MANIFEST)
+                .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
+                .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(manifestId))
+                .fetch()
+                .forEach(e -> dslContext().update(ASCC_MANIFEST)
+                        .set(ASCC_MANIFEST.CONFLICT, referencesAnOlderRecord(e.value2(), e.value3()))
+                        .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(e.value1()))
+                        .execute());
+
+        dslContext().select(BCC_MANIFEST.BCC_MANIFEST_ID, BCC.TO_BCCP_ID, BCCP_MANIFEST.BCCP_ID)
+                .from(BCC_MANIFEST)
+                .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(manifestId))
+                .fetch()
+                .forEach(e -> dslContext().update(BCC_MANIFEST)
+                        .set(BCC_MANIFEST.CONFLICT, referencesAnOlderRecord(e.value2(), e.value3()))
+                        .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(e.value1()))
+                        .execute());
+    }
+
+    private static byte referencesAnOlderRecord(ULong recordReference, ULong manifestReference) {
+        return (byte) ((recordReference != null && manifestReference != null && !recordReference.equals(manifestReference)) ? 1 : 0);
+    }
+
     private void discardLogAssociations(AccDetailsRecord acc) {
-        var accQuery = repositoryFactory().accQueryRepository(requester());
-
-        AccDetailsRecord prevAcc = accQuery.getAccDetails(acc.prevAccManifestId());
-
         List<AsccManifestRecord> asccManifestRecords = dslContext().selectFrom(ASCC_MANIFEST)
                 .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId()))).fetch();
 
         List<BccManifestRecord> bccManifestRecords = dslContext().selectFrom(BCC_MANIFEST)
                 .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId()))).fetch();
-
-        List<AsccManifestRecord> nullNextPrevAsccManifestRecords = Collections.emptyList();
-        List<BccManifestRecord> nullNextPrevBccManifestRecords = Collections.emptyList();
-
-        if (prevAcc != null) {
-            nullNextPrevAsccManifestRecords = dslContext().selectFrom(ASCC_MANIFEST)
-                    .where(and(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())),
-                            ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID.isNull())).fetch();
-            nullNextPrevBccManifestRecords = dslContext().selectFrom(BCC_MANIFEST)
-                    .where(and(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(prevAcc.accManifestId())),
-                            BCC_MANIFEST.NEXT_BCC_MANIFEST_ID.isNull())).fetch();
-        }
 
         // delete SEQ_KEY for current ACC
         dslContext().update(SEQ_KEY)
@@ -1699,9 +1765,19 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId()))).execute();
         dslContext().deleteFrom(SEQ_KEY).where(SEQ_KEY.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId()))).execute();
 
+        // the current and the previous records, read at once
+        Map<ULong, AsccRecord> asccRecords = dslContext().selectFrom(ASCC)
+                .where(ASCC.ASCC_ID.in(dslContext().select(ASCC_MANIFEST.ASCC_ID).from(ASCC_MANIFEST)
+                        .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))))
+                .fetchMap(ASCC.ASCC_ID);
+        Map<ULong, AsccRecord> prevAsccRecords = dslContext().selectFrom(ASCC)
+                .where(ASCC.ASCC_ID.in(dslContext().select(ASCC.as("current").PREV_ASCC_ID).from(ASCC.as("current"))
+                        .join(ASCC_MANIFEST).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.as("current").ASCC_ID))
+                        .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))))
+                .fetchMap(ASCC.ASCC_ID);
+
         for (AsccManifestRecord asccManifestRecord : asccManifestRecords) {
-            AsccRecord asccRecord = dslContext().selectFrom(ASCC)
-                    .where(ASCC.ASCC_ID.eq(asccManifestRecord.getAsccId())).fetchOne();
+            AsccRecord asccRecord = asccRecords.get(asccManifestRecord.getAsccId());
 
             if (asccRecord.getPrevAsccId() == null) {
                 // delete ascc and ascc manifest which added this revision
@@ -1709,8 +1785,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 asccRecord.delete();
             } else {
                 // delete ascc and update ascc manifest
-                AsccRecord prevAsccRecord = dslContext().selectFrom(ASCC)
-                        .where(ASCC.ASCC_ID.eq(asccRecord.getPrevAsccId())).fetchOne();
+                AsccRecord prevAsccRecord = prevAsccRecords.get(asccRecord.getPrevAsccId());
                 prevAsccRecord.setNextAsccId(null);
                 prevAsccRecord.update(ASCC.NEXT_ASCC_ID);
                 asccManifestRecord.setAsccId(prevAsccRecord.getAsccId());
@@ -1720,36 +1795,18 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             }
         }
 
-        var asccpQuery = repositoryFactory().asccpQueryRepository(requester());
-        for (AsccManifestRecord asccManifestRecord : nullNextPrevAsccManifestRecords) {
-            AsccpSummaryRecord toAsccp = asccpQuery.getAsccpSummary(
-                    new AsccpManifestId(asccManifestRecord.getToAsccpManifestId().toBigInteger()));
-
-            boolean exists = dslContext().selectCount()
-                    .from(ASCC_MANIFEST)
-                    .where(and(
-                            ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())),
-                            ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(valueOf(toAsccp.nextAsccpManifestId()))
-                    ))
-                    .fetchOptionalInto(Integer.class).orElse(0) > 0;
-            if (exists) {
-                continue;
-            }
-
-            AsccManifestRecord newAsccManifestRecord = new AsccManifestRecord();
-            newAsccManifestRecord.setAsccId(asccManifestRecord.getAsccId());
-            newAsccManifestRecord.setReleaseId(valueOf(acc.release().releaseId()));
-            newAsccManifestRecord.setFromAccManifestId(valueOf(acc.accManifestId()));
-            newAsccManifestRecord.setToAsccpManifestId(valueOf(toAsccp.nextAsccpManifestId()));
-            String toAsccpDen = toAsccp.den();
-            newAsccManifestRecord.setDen(DenUtils.asccDen(acc.objectClassTerm(), toAsccpDen));
-            newAsccManifestRecord.setPrevAsccManifestId(asccManifestRecord.getAsccManifestId());
-            dslContext().insertInto(ASCC_MANIFEST).set(newAsccManifestRecord).execute();
-        }
+        Map<ULong, BccRecord> bccRecords = dslContext().selectFrom(BCC)
+                .where(BCC.BCC_ID.in(dslContext().select(BCC_MANIFEST.BCC_ID).from(BCC_MANIFEST)
+                        .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))))
+                .fetchMap(BCC.BCC_ID);
+        Map<ULong, BccRecord> prevBccRecords = dslContext().selectFrom(BCC)
+                .where(BCC.BCC_ID.in(dslContext().select(BCC.as("current").PREV_BCC_ID).from(BCC.as("current"))
+                        .join(BCC_MANIFEST).on(BCC_MANIFEST.BCC_ID.eq(BCC.as("current").BCC_ID))
+                        .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())))))
+                .fetchMap(BCC.BCC_ID);
 
         for (BccManifestRecord bccManifestRecord : bccManifestRecords) {
-            BccRecord bccRecord = dslContext().selectFrom(BCC)
-                    .where(BCC.BCC_ID.eq(bccManifestRecord.getBccId())).fetchOne();
+            BccRecord bccRecord = bccRecords.get(bccManifestRecord.getBccId());
 
             if (bccRecord.getPrevBccId() == null) {
                 // delete bcc and bcc manifest which added this revision
@@ -1757,8 +1814,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 bccRecord.delete();
             } else {
                 // delete bcc and update bcc manifest
-                BccRecord prevBccRecord = dslContext().selectFrom(BCC)
-                        .where(BCC.BCC_ID.eq(bccRecord.getPrevBccId())).fetchOne();
+                BccRecord prevBccRecord = prevBccRecords.get(bccRecord.getPrevBccId());
                 prevBccRecord.setNextBccId(null);
                 prevBccRecord.update(BCC.NEXT_BCC_ID);
                 bccManifestRecord.setBccId(prevBccRecord.getBccId());
@@ -1768,32 +1824,7 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
             }
         }
 
-        var bccpQuery = repositoryFactory().bccpQueryRepository(requester());
-        for (BccManifestRecord bccManifestRecord : nullNextPrevBccManifestRecords) {
-            BccpSummaryRecord toBccp = bccpQuery.getBccpSummary(
-                    new BccpManifestId(bccManifestRecord.getToBccpManifestId().toBigInteger()));
-
-            boolean exists = dslContext().selectCount()
-                    .from(BCC_MANIFEST)
-                    .where(and(
-                            BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.accManifestId())),
-                            BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(valueOf(toBccp.nextBccpManifestId()))
-                    ))
-                    .fetchOptionalInto(Integer.class).orElse(0) > 0;
-            if (exists) {
-                continue;
-            }
-
-            BccManifestRecord newBccManifestRecord = new BccManifestRecord();
-            newBccManifestRecord.setBccId(bccManifestRecord.getBccId());
-            newBccManifestRecord.setReleaseId(valueOf(acc.release().releaseId()));
-            newBccManifestRecord.setFromAccManifestId(valueOf(acc.accManifestId()));
-            newBccManifestRecord.setToBccpManifestId(valueOf(toBccp.nextBccpManifestId()));
-            String toBccpDen = toBccp.den();
-            newBccManifestRecord.setDen(DenUtils.bccDen(acc.objectClassTerm(), toBccpDen));
-            newBccManifestRecord.setPrevBccManifestId(bccManifestRecord.getBccManifestId());
-            dslContext().insertInto(BCC_MANIFEST).set(newBccManifestRecord).execute();
-        }
+        restoreDeletedAssociations(acc);
 
         // update ACCs which using with based current ACC
         dslContext().update(ACC)
@@ -1808,6 +1839,230 @@ public class JooqAccCommandRepository extends JooqBaseRepository implements AccC
                 .execute();
 
         insertSeqKey(acc.accManifestId(), acc.guid());
+    }
+
+    /**
+     * An association of the previous revision that was deleted in this revision has no manifest to go back to, so it
+     * gets one again: of the same ACC and release, to the same property, linked with the same association of the
+     * previous and the next release.
+     */
+    private void restoreDeletedAssociations(AccDetailsRecord acc) {
+        ULong accManifestId = valueOf(acc.accManifestId());
+        List<ULong> releaseIds = releaseAndItsDependencies(acc);
+
+        // the associations, with the GUID of the property each is to
+        List<AsccRecord> deletedAsccs = new ArrayList<>();
+        Map<ULong, String> toAsccpGuids = new HashMap<>();
+        for (org.jooq.Record r : dslContext().select(ASCC.fields()).select(ASCCP.GUID.as("to_guid"))
+                .from(ASCC)
+                .leftJoin(ASCCP).on(ASCCP.ASCCP_ID.eq(ASCC.TO_ASCCP_ID))
+                .where(and(
+                        ASCC.FROM_ACC_ID.eq(valueOf(acc.prevAccId())),
+                        ASCC.ASCC_ID.notIn(dslContext().select(ASCC_MANIFEST.ASCC_ID).from(ASCC_MANIFEST)
+                                .where(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestId)))))
+                .fetch()) {
+            AsccRecord ascc = r.into(ASCC);
+            deletedAsccs.add(ascc);
+            toAsccpGuids.put(ascc.getAsccId(), r.get("to_guid", String.class));
+        }
+        if (!deletedAsccs.isEmpty()) {
+            Map<String, ManifestAndDen> asccpManifests = manifestsByGuid(releaseIds, toAsccpGuids.values(), true);
+            Map<String, ULong> prevManifests = asccManifestsByGuid(acc.prevAccManifestId(), deletedAsccs);
+            Map<String, ULong> nextManifests = asccManifestsByGuid(acc.nextAccManifestId(), deletedAsccs);
+            Map<ULong, BieViewOrderRecord> viewOrders = viewOrdersOfAssociations(acc, prevManifests.values(), true);
+
+            for (AsccRecord ascc : deletedAsccs) {
+                ManifestAndDen toAsccp = asccpManifests.get(toAsccpGuids.get(ascc.getAsccId()));
+                if (toAsccp == null) {
+                    throw new IllegalArgumentException("Not found the ASCCP of the association deleted in this revision, "
+                            + "so the association cannot be restored");
+                }
+
+                ULong prevManifestId = prevManifests.get(ascc.getGuid());
+                ULong nextManifestId = nextManifests.get(ascc.getGuid());
+
+                AsccManifestRecord restored = new AsccManifestRecord();
+                restored.setAsccId(ascc.getAsccId());
+                restored.setReleaseId(valueOf(acc.release().releaseId()));
+                restored.setFromAccManifestId(accManifestId);
+                restored.setToAsccpManifestId(toAsccp.manifestId());
+                restored.setDen(DenUtils.asccDen(acc.objectClassTerm(), toAsccp.den()));
+                restored.setPrevAsccManifestId(prevManifestId);
+                restored.setNextAsccManifestId(nextManifestId);
+                ULong restoredId = dslContext().insertInto(ASCC_MANIFEST).set(restored)
+                        .returning(ASCC_MANIFEST.ASCC_MANIFEST_ID).fetchOne().getAsccManifestId();
+                if (prevManifestId != null) {
+                    dslContext().update(ASCC_MANIFEST).set(ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID, restoredId)
+                            .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(prevManifestId)).execute();
+                }
+                if (nextManifestId != null) {
+                    dslContext().update(ASCC_MANIFEST).set(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID, restoredId)
+                            .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(nextManifestId)).execute();
+                }
+                restoreViewOrder(acc, viewOrders.get(prevManifestId), restoredId, true);
+            }
+        }
+
+        List<BccRecord> deletedBccs = new ArrayList<>();
+        Map<ULong, String> toBccpGuids = new HashMap<>();
+        for (org.jooq.Record r : dslContext().select(BCC.fields()).select(BCCP.GUID.as("to_guid"))
+                .from(BCC)
+                .leftJoin(BCCP).on(BCCP.BCCP_ID.eq(BCC.TO_BCCP_ID))
+                .where(and(
+                        BCC.FROM_ACC_ID.eq(valueOf(acc.prevAccId())),
+                        BCC.BCC_ID.notIn(dslContext().select(BCC_MANIFEST.BCC_ID).from(BCC_MANIFEST)
+                                .where(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(accManifestId)))))
+                .fetch()) {
+            BccRecord bcc = r.into(BCC);
+            deletedBccs.add(bcc);
+            toBccpGuids.put(bcc.getBccId(), r.get("to_guid", String.class));
+        }
+        if (!deletedBccs.isEmpty()) {
+            Map<String, ManifestAndDen> bccpManifests = manifestsByGuid(releaseIds, toBccpGuids.values(), false);
+            Map<String, ULong> prevManifests = bccManifestsByGuid(acc.prevAccManifestId(), deletedBccs);
+            Map<String, ULong> nextManifests = bccManifestsByGuid(acc.nextAccManifestId(), deletedBccs);
+            Map<ULong, BieViewOrderRecord> viewOrders = viewOrdersOfAssociations(acc, prevManifests.values(), false);
+
+            for (BccRecord bcc : deletedBccs) {
+                ManifestAndDen toBccp = bccpManifests.get(toBccpGuids.get(bcc.getBccId()));
+                if (toBccp == null) {
+                    throw new IllegalArgumentException("Not found the BCCP of the association deleted in this revision, "
+                            + "so the association cannot be restored");
+                }
+
+                ULong prevManifestId = prevManifests.get(bcc.getGuid());
+                ULong nextManifestId = nextManifests.get(bcc.getGuid());
+
+                BccManifestRecord restored = new BccManifestRecord();
+                restored.setBccId(bcc.getBccId());
+                restored.setReleaseId(valueOf(acc.release().releaseId()));
+                restored.setFromAccManifestId(accManifestId);
+                restored.setToBccpManifestId(toBccp.manifestId());
+                restored.setDen(DenUtils.bccDen(acc.objectClassTerm(), toBccp.den()));
+                restored.setPrevBccManifestId(prevManifestId);
+                restored.setNextBccManifestId(nextManifestId);
+                ULong restoredId = dslContext().insertInto(BCC_MANIFEST).set(restored)
+                        .returning(BCC_MANIFEST.BCC_MANIFEST_ID).fetchOne().getBccManifestId();
+                if (prevManifestId != null) {
+                    dslContext().update(BCC_MANIFEST).set(BCC_MANIFEST.NEXT_BCC_MANIFEST_ID, restoredId)
+                            .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(prevManifestId)).execute();
+                }
+                if (nextManifestId != null) {
+                    dslContext().update(BCC_MANIFEST).set(BCC_MANIFEST.PREV_BCC_MANIFEST_ID, restoredId)
+                            .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(nextManifestId)).execute();
+                }
+                restoreViewOrder(acc, viewOrders.get(prevManifestId), restoredId, false);
+            }
+        }
+    }
+
+    private record ManifestAndDen(ULong manifestId, String den) {
+    }
+
+    /**
+     * The manifest and the name of the property (an ASCCP, or a BCCP) of each GUID, found in the release, or else in what
+     * it depends on: the order of {@code releaseIds} is the order they are looked into.
+     */
+    private Map<String, ManifestAndDen> manifestsByGuid(List<ULong> releaseIds, Collection<String> guids, boolean asccp) {
+        List<String> distinctGuids = guids.stream().filter(Objects::nonNull).distinct().toList();
+        Map<String, ManifestAndDen> found = new HashMap<>();
+        if (distinctGuids.isEmpty()) {
+            return found;
+        }
+        Map<String, Integer> foundIn = new HashMap<>();
+        var rows = asccp
+                ? dslContext().select(ASCCP.GUID, ASCCP_MANIFEST.RELEASE_ID, ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.DEN)
+                .from(ASCCP_MANIFEST)
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .where(and(ASCCP_MANIFEST.RELEASE_ID.in(releaseIds), ASCCP.GUID.in(distinctGuids)))
+                .fetch()
+                : dslContext().select(BCCP.GUID, BCCP_MANIFEST.RELEASE_ID, BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.DEN)
+                .from(BCCP_MANIFEST)
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .where(and(BCCP_MANIFEST.RELEASE_ID.in(releaseIds), BCCP.GUID.in(distinctGuids)))
+                .fetch();
+        for (var row : rows) {
+            String guid = row.get(0, String.class);
+            int order = releaseIds.indexOf(row.get(1, ULong.class));
+            Integer best = foundIn.get(guid);
+            if (best == null || order < best) {
+                foundIn.put(guid, order);
+                found.put(guid, new ManifestAndDen(row.get(2, ULong.class), row.get(3, String.class)));
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Deleting an association removes the sibling view-order weight it had, so the restored one gets the weight that
+     * the same association has in the previous release, which is where the weights of 'Working' were forwarded to.
+     * What was changed in 'Working' since then is not restored.
+     */
+    private Map<ULong, BieViewOrderRecord> viewOrdersOfAssociations(
+            AccDetailsRecord acc, Collection<ULong> prevManifestIds, boolean ascc) {
+        if (prevManifestIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dslContext().selectFrom(BIE_VIEW_ORDER)
+                .where(and(
+                        BIE_VIEW_ORDER.FROM_ACC_MANIFEST_ID.eq(valueOf(acc.prevAccManifestId())),
+                        ascc ? BIE_VIEW_ORDER.ASCC_MANIFEST_ID.in(prevManifestIds) : BIE_VIEW_ORDER.BCC_MANIFEST_ID.in(prevManifestIds)))
+                .fetchMap(ascc ? BIE_VIEW_ORDER.ASCC_MANIFEST_ID : BIE_VIEW_ORDER.BCC_MANIFEST_ID);
+    }
+
+    private void restoreViewOrder(AccDetailsRecord acc, BieViewOrderRecord previous, ULong restoredManifestId, boolean ascc) {
+        if (previous == null) {
+            return;
+        }
+        BieViewOrderRecord restored = previous.copy();
+        restored.setBieViewOrderId(null);
+        restored.setFromAccManifestId(valueOf(acc.accManifestId()));
+        restored.setAsccManifestId(ascc ? restoredManifestId : null);
+        restored.setBccManifestId(ascc ? null : restoredManifestId);
+        dslContext().insertInto(BIE_VIEW_ORDER).set(restored).execute();
+    }
+
+    /** The release of the ACC, and the releases it depends on, in the order they are looked into. */
+    private List<ULong> releaseAndItsDependencies(AccDetailsRecord acc) {
+        List<ULong> releaseIds = new ArrayList<>();
+        releaseIds.add(valueOf(acc.release().releaseId()));
+        releaseIds.addAll(dslContext().select(RELEASE_DEP.DEPEND_ON_RELEASE_ID).from(RELEASE_DEP)
+                .where(RELEASE_DEP.RELEASE_ID.eq(valueOf(acc.release().releaseId())))
+                .fetchInto(ULong.class));
+        return releaseIds;
+    }
+
+    /** The manifest of each association in the ACC of the previous or the next release, which links to it, by GUID. */
+    private Map<String, ULong> asccManifestsByGuid(AccManifestId neighbourAccManifestId, Collection<AsccRecord> asccs) {
+        Map<String, ULong> manifests = new HashMap<>();
+        if (neighbourAccManifestId == null || asccs.isEmpty()) {
+            return manifests;
+        }
+        dslContext().select(ASCC.GUID, ASCC_MANIFEST.ASCC_MANIFEST_ID)
+                .from(ASCC_MANIFEST)
+                .join(ASCC).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
+                .where(and(
+                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(neighbourAccManifestId)),
+                        ASCC.GUID.in(asccs.stream().map(AsccRecord::getGuid).toList())))
+                .fetch()
+                .forEach(e -> manifests.put(e.value1(), e.value2()));
+        return manifests;
+    }
+
+    private Map<String, ULong> bccManifestsByGuid(AccManifestId neighbourAccManifestId, Collection<BccRecord> bccs) {
+        Map<String, ULong> manifests = new HashMap<>();
+        if (neighbourAccManifestId == null || bccs.isEmpty()) {
+            return manifests;
+        }
+        dslContext().select(BCC.GUID, BCC_MANIFEST.BCC_MANIFEST_ID)
+                .from(BCC_MANIFEST)
+                .join(BCC).on(BCC_MANIFEST.BCC_ID.eq(BCC.BCC_ID))
+                .where(and(
+                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(valueOf(neighbourAccManifestId)),
+                        BCC.GUID.in(bccs.stream().map(BccRecord::getGuid).toList())))
+                .fetch()
+                .forEach(e -> manifests.put(e.value1(), e.value2()));
+        return manifests;
     }
 
     private static class Association {

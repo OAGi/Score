@@ -11,6 +11,7 @@ import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForE
 import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.asccp.TC_15_12_AmendEndUserASCCP;
 import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.asccp.TC_15_13_EndUserASCCPStateManagement;
 import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.bccp.*;
+import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForEndUser.cancel.*;
 
 @Suite
 @SuiteDisplayName("Test Suite 15")
@@ -34,7 +35,8 @@ import org.oagi.score.e2e.TS_15_ReleaseBranchCoreComponentManagementBehaviorForE
         TC_15_16_AmendEndUserBCCP.class,
         TC_15_17_EndUserBCCPStateManagement.class,
         TC_15_18_DeletingEndUserBCCP.class,
-        TC_15_19_RestoringEndUserBCCP.class
+        TC_15_19_RestoringEndUserBCCP.class,
+        TC_15_20_CancelAmendmentRestoresWhatWasChanged.class
 })
 public class TS_15 {
 }

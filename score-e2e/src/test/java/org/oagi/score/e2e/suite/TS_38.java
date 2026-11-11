@@ -22,7 +22,8 @@ import org.oagi.score.e2e.TS_38_WorkingBranchDataTypeManagementForDeveloper.*;
         TC_38_12_DeveloperDTStateManagement.class,
         TC_38_13_DeletingDeveloperDT.class,
         TC_38_14_RestoringDeveloperDT.class,
-        TC_38_15_CreatingDTFromBaseOfDependencyRelease.class
+        TC_38_15_CreatingDTFromBaseOfDependencyRelease.class,
+        TC_38_16_CancelRevisionOfDeveloperDT.class
 })
 public class TS_38 {
 }

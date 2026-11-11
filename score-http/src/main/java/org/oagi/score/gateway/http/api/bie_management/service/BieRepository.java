@@ -172,7 +172,6 @@ public class BieRepository {
         LocalDateTime timestamp = LocalDateTime.now();
 
         BccRecord bccRecord = dslContext.select(
-                BCC.TO_BCCP_ID,
                 BCC.CARDINALITY_MIN,
                 BCC.CARDINALITY_MAX,
                 BCC.DEFAULT_VALUE,
@@ -186,8 +185,10 @@ public class BieRepository {
         BccpRecord bccpRecord = dslContext.select(
                 BCCP.DEFAULT_VALUE,
                 BCCP.FIXED_VALUE)
-                .from(BCCP)
-                .where(BCCP.BCCP_ID.eq(bccRecord.getToBccpId()))
+                .from(BCC_MANIFEST)
+                .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
+                .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(ULong.valueOf(basedBccManifestId.value())))
                 .fetchOneInto(BccpRecord.class);
 
         PrimitiveRestriction primitiveRestriction = getDefaultPrimitiveRestriction(user, bdtManifestId);

@@ -179,46 +179,18 @@ public class JooqAsccpQueryRepository extends JooqBaseRepository implements Ascc
         if (asccpManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        ASCCP_MANIFEST.ASCCP_MANIFEST_ID,
-                        ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID)
-                .from(ASCCP_MANIFEST)
-                .join(RELEASE).on(ASCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevAsccpManifestId = record.get(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID);
-        if (prevAsccpManifestId != null) {
-            return since(new AsccpManifestId(prevAsccpManifestId.toBigInteger()));
-        } else {
-            return new AsccpManifestId(record.get(ASCCP_MANIFEST.ASCCP_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "asccp_manifest", "asccp_manifest_id", "prev_asccp_manifest_id",
+                asccpManifestId.value());
+        return found != null ? new AsccpManifestId(found) : null;
     }
 
     private AsccpManifestId lastChanged(AsccpManifestId asccpManifestId) {
         if (asccpManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        ASCCP_MANIFEST.ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_ID,
-                        ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID, ASCCP_MANIFEST.as("prev").ASCCP_ID)
-                .from(ASCCP_MANIFEST)
-                .join(ASCCP_MANIFEST.as("prev")).on(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID))
-                .join(RELEASE).on(ASCCP_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(valueOf(asccpManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(ASCCP_MANIFEST.ASCCP_ID).equals(record.get(ASCCP_MANIFEST.as("prev").ASCCP_ID))) {
-            return lastChanged(new AsccpManifestId(record.get(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new AsccpManifestId(record.get(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "asccp_manifest", "asccp_manifest_id", "prev_asccp_manifest_id",
+                "asccp_id", asccpManifestId.value());
+        return found != null ? new AsccpManifestId(found) : null;
     }
 
     @Override

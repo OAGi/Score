@@ -21,7 +21,8 @@ import org.oagi.score.e2e.TS_41_ReleaseBranchDataTypeManagementForEndUser.*;
         TC_41_11_EditingExistingSupplementaryComponentsOfRevisionOfEndUserDT.class,
         TC_41_12_EndUserDTStateManagement.class,
         TC_41_13_DeletingEndUserDT.class,
-        TC_41_14_RestoringEndUserDT.class
+        TC_41_14_RestoringEndUserDT.class,
+        TC_41_15_CancelAmendmentOfEndUserDT.class
 })
 public class TS_41 {
 }

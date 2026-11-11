@@ -1647,3 +1647,31 @@ The developer user can restore a deleted BCCP whose BDT is deleted. The UI displ
 5. The developer visits the CC list page and opens the BCCP21024devxdel.
 6. He restores it.
 7. Verify that the BCCP21024devxdel has been restored and is in WIP state. (Assertion [#1](#test-assertion-10241))
+
+## Test Case 10.25
+
+**Cancelling a revision brings back what was changed**
+
+Pre-condition: The developer is on the Working branch and owns published ASCCP, BCCP and ACC components.
+
+
+### Test Assertion:
+
+#### Test Assertion #10.25.1
+The developer can cancel the revision of an ASCCP after changing the ACC it is the role of. The ASCCP is the role of the ACC it was, its DEN is as it was, and it is `Published` with revision `1`.
+
+#### Test Assertion #10.25.2
+The developer can cancel the revision of a BCCP after changing its DT. The BCCP is on the DT it was, its DEN is as it was, and it is `Published` with revision `1`.
+
+#### Test Assertion #10.25.3
+The developer can cancel the revision of an ACC after removing its base ACC and appending an association. The base ACC is back and the appended association is gone.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns published ASCCP, BCCP and ACC components.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision brings back what was changed" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, revise an ASCCP, change its ACC, cancel the revision, and verify the role-of ACC and the DEN. (Assertion [#10.25.1](#test-assertion-10251))
+2. Revise a BCCP, change its DT, cancel the revision, and verify the DT, the DEN, the state and the revision number. (Assertion [#10.25.2](#test-assertion-10252))
+3. Revise an ACC that has a base ACC, remove the base ACC, append an ASCCP, cancel the revision, and verify the base ACC and the associations. (Assertion [#10.25.3](#test-assertion-10253))

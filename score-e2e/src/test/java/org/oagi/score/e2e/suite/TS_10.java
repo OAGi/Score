@@ -7,6 +7,7 @@ import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFor
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.acc.*;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.asccp.*;
 import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.bccp.*;
+import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsForDeveloper.cancel.*;
 
 @Suite
 @SuiteDisplayName("Test Suite 10")
@@ -34,7 +35,8 @@ import org.oagi.score.e2e.TS_10_WorkingBranchCoreComponentManagementBehaviorsFor
         TC_10_21_EditingRevisionDeveloperBCCP.class,
         TC_10_22_DeveloperBCCPStateManagement.class,
         TC_10_23_DeletingDeveloperBCCP.class,
-        TC_10_24_RestoringDeveloperBCCP.class
+        TC_10_24_RestoringDeveloperBCCP.class,
+        TC_10_25_CancelRevisionRestoresWhatWasChanged.class
 })
 public class TS_10 {
 }

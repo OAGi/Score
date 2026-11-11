@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -252,20 +253,25 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         (agencyIdListManifestId != null) ?
                                 repositoryFactory().agencyIdListQueryRepository(requester()).getAgencyIdListSummary(agencyIdListManifestId) : null,
                         (byte) 1 == record.get(DT_AWD_PRI.IS_DEFAULT),
-                        isInherited(dtId, xbtManifestId, codeListManifestId, agencyIdListManifestId)
+                        isInherited(release.releaseId(), dtId, xbtManifestId, codeListManifestId, agencyIdListManifestId)
                 );
             };
         }
     }
 
-    private boolean isInherited(DtId dtId,
+    private boolean isInherited(ReleaseId releaseId,
+                                DtId dtId,
                                 XbtManifestId xbtManifestId,
                                 CodeListManifestId codeListManifestId,
                                 AgencyIdListManifestId agencyIdListManifestId) {
 
-        ULong basedDtId = dslContext().select(DT.BASED_DT_ID)
-                .from(DT)
-                .where(DT.DT_ID.eq(valueOf(dtId)))
+        // the base is the one the manifest has, which is the latest record of the base
+        ULong basedDtId = dslContext().select(DT_MANIFEST.as("based").DT_ID)
+                .from(DT_MANIFEST)
+                .join(DT_MANIFEST.as("based")).on(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(DT_MANIFEST.as("based").DT_MANIFEST_ID))
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        DT_MANIFEST.DT_ID.eq(valueOf(dtId))))
                 .fetchOptionalInto(ULong.class).orElse(null);
         if (basedDtId == null) {
             return false;
@@ -288,46 +294,18 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         if (dtManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        DT_MANIFEST.DT_MANIFEST_ID,
-                        DT_MANIFEST.PREV_DT_MANIFEST_ID)
-                .from(DT_MANIFEST)
-                .join(RELEASE).on(DT_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevDtManifestId = record.get(DT_MANIFEST.PREV_DT_MANIFEST_ID);
-        if (prevDtManifestId != null) {
-            return since(new DtManifestId(prevDtManifestId.toBigInteger()));
-        } else {
-            return new DtManifestId(record.get(DT_MANIFEST.DT_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "dt_manifest", "dt_manifest_id", "prev_dt_manifest_id",
+                dtManifestId.value());
+        return found != null ? new DtManifestId(found) : null;
     }
 
     private DtManifestId lastChanged(DtManifestId dtManifestId) {
         if (dtManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        DT_MANIFEST.DT_MANIFEST_ID, DT_MANIFEST.DT_ID,
-                        DT_MANIFEST.as("prev").DT_MANIFEST_ID, DT_MANIFEST.as("prev").DT_ID)
-                .from(DT_MANIFEST)
-                .join(DT_MANIFEST.as("prev")).on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID))
-                .join(RELEASE).on(DT_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(DT_MANIFEST.DT_ID).equals(record.get(DT_MANIFEST.as("prev").DT_ID))) {
-            return lastChanged(new DtManifestId(record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new DtManifestId(record.get(DT_MANIFEST.as("prev").DT_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "dt_manifest", "dt_manifest_id", "prev_dt_manifest_id",
+                "dt_id", dtManifestId.value());
+        return found != null ? new DtManifestId(found) : null;
     }
 
     @Override
@@ -997,20 +975,25 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
                         (agencyIdListManifestId != null) ?
                                 repositoryFactory().agencyIdListQueryRepository(requester()).getAgencyIdListSummary(agencyIdListManifestId) : null,
                         (byte) 1 == record.get(DT_SC_AWD_PRI.IS_DEFAULT),
-                        isInherited(dtScId, xbtManifestId, codeListManifestId, agencyIdListManifestId)
+                        isInherited(release.releaseId(), dtScId, xbtManifestId, codeListManifestId, agencyIdListManifestId)
                 );
             };
         }
     }
 
-    private boolean isInherited(DtScId dtScId,
+    private boolean isInherited(ReleaseId releaseId,
+                                DtScId dtScId,
                                 XbtManifestId xbtManifestId,
                                 CodeListManifestId codeListManifestId,
                                 AgencyIdListManifestId agencyIdListManifestId) {
 
-        ULong basedDtScId = dslContext().select(DT_SC.BASED_DT_SC_ID)
-                .from(DT_SC)
-                .where(DT_SC.DT_SC_ID.eq(valueOf(dtScId)))
+        // the base is the one the manifest has, which is the latest record of the base
+        ULong basedDtScId = dslContext().select(DT_SC_MANIFEST.as("based").DT_SC_ID)
+                .from(DT_SC_MANIFEST)
+                .join(DT_SC_MANIFEST.as("based")).on(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("based").DT_SC_MANIFEST_ID))
+                .where(and(
+                        DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        DT_SC_MANIFEST.DT_SC_ID.eq(valueOf(dtScId))))
                 .fetchOptionalInto(ULong.class).orElse(null);
         if (basedDtScId == null) {
             return false;
@@ -1033,46 +1016,18 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         if (dtScManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        DT_SC_MANIFEST.DT_SC_MANIFEST_ID,
-                        DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID)
-                .from(DT_SC_MANIFEST)
-                .join(RELEASE).on(DT_SC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevDtScManifestId = record.get(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID);
-        if (prevDtScManifestId != null) {
-            return since(new DtScManifestId(prevDtScManifestId.toBigInteger()));
-        } else {
-            return new DtScManifestId(record.get(DT_SC_MANIFEST.DT_SC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "dt_sc_manifest", "dt_sc_manifest_id", "prev_dt_sc_manifest_id",
+                dtScManifestId.value());
+        return found != null ? new DtScManifestId(found) : null;
     }
 
     private DtScManifestId lastChanged(DtScManifestId dtScManifestId) {
         if (dtScManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.DT_SC_ID,
-                        DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID, DT_SC_MANIFEST.as("prev").DT_SC_ID)
-                .from(DT_SC_MANIFEST)
-                .join(DT_SC_MANIFEST.as("prev")).on(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID))
-                .join(RELEASE).on(DT_SC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(DT_SC_MANIFEST.DT_SC_ID).equals(record.get(DT_SC_MANIFEST.as("prev").DT_SC_ID))) {
-            return lastChanged(new DtScManifestId(record.get(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new DtScManifestId(record.get(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "dt_sc_manifest", "dt_sc_manifest_id", "prev_dt_sc_manifest_id",
+                "dt_sc_id", dtScManifestId.value());
+        return found != null ? new DtScManifestId(found) : null;
     }
 
     @Override

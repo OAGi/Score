@@ -495,3 +495,29 @@ The developer user can open a DT and restore it.
 ### Test Step:
 1. Sign in as a developer and open **Core Component > View/Edit Core Component** with the Working branch selected and deleted DTs visible.
 2. Open a deleted DT and restore it. (Assertion [#38.14.1](#test-assertion-38141))
+
+## Test Case 38.16
+
+**Cancelling the revision of a developer DT**
+
+Pre-condition: The developer is on the Working branch and owns a published DT that has an inherited supplementary component.
+
+
+### Test Assertion:
+
+#### Test Assertion #38.16.1
+The developer can cancel the revision of a DT. The DT is `Published` with revision `1` again, the supplementary component that was added during the revision is gone, and what was changed in an inherited supplementary component is as it was. The DT can be revised again.
+
+#### Test Assertion #38.16.2
+The developer can cancel the revision of a DT while a BCCP in revision is on that DT. The BCCP stays on its DT, and its own revision can be cancelled afterwards.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published DT that has an inherited supplementary component.
+2. The users, branches, releases, and records needed to exercise "Cancelling the revision of a developer DT" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, open a published DT, and note the cardinality and value constraint type of an inherited supplementary component.
+2. Revise the DT, add a supplementary component, change the inherited supplementary component, and update.
+3. Cancel the revision and verify the state, the revision number, the supplementary component and that no revision is left behind; revise the DT again. (Assertion [#38.16.1](#test-assertion-38161))
+4. Revise a DT and a BCCP that uses it, cancel the revision of the DT, and verify that the BCCP is still in revision and can be cancelled. (Assertion [#38.16.2](#test-assertion-38162))

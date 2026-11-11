@@ -492,3 +492,29 @@ The end user can open a deleted DT and restore it.
 ### Test Step:
 1. Sign in as an end user and open **Core Component > View/Edit Core Component** with the selected release branch and deleted DTs visible.
 2. Open a deleted DT and restore it. (Assertion [#41.14.1](#test-assertion-41141))
+
+## Test Case 41.15
+
+**Cancelling the amendment of an end user DT**
+
+Pre-condition: The end user is on a non-working branch and owns a production DT that has an inherited supplementary component.
+
+
+### Test Assertion:
+
+#### Test Assertion #41.15.1
+The end user can cancel the amendment of a DT. The DT is `Production` with revision `1` again, the supplementary component that was added during the amendment is gone, and what was changed in an inherited supplementary component is as it was. The DT can be amended again.
+
+#### Test Assertion #41.15.2
+The end user can cancel the amendment of a DT while a BCCP in amendment is on that DT. The BCCP stays on its DT, and its own amendment can be cancelled afterwards.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on a non-working branch and owns a production DT that has an inherited supplementary component.
+2. The users, branches, releases, and records needed to exercise "Cancelling the amendment of an end user DT" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as an end user, open a production DT, and note the cardinality and value constraint type of an inherited supplementary component.
+2. Amend the DT, add a supplementary component, change the inherited supplementary component, and update.
+3. Cancel the amendment and verify the state, the revision number, the supplementary component and that no amendment is left behind; amend the DT again. (Assertion [#41.15.1](#test-assertion-41151))
+4. Amend a DT and a BCCP that uses it, cancel the amendment of the DT, and verify that the BCCP is still in amendment and can be cancelled. (Assertion [#41.15.2](#test-assertion-41152))

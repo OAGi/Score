@@ -205,46 +205,18 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         if (accManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        ACC_MANIFEST.ACC_MANIFEST_ID,
-                        ACC_MANIFEST.PREV_ACC_MANIFEST_ID)
-                .from(ACC_MANIFEST)
-                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevAccManifestId = record.get(ACC_MANIFEST.PREV_ACC_MANIFEST_ID);
-        if (prevAccManifestId != null) {
-            return since(new AccManifestId(prevAccManifestId.toBigInteger()));
-        } else {
-            return new AccManifestId(record.get(ACC_MANIFEST.ACC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "acc_manifest", "acc_manifest_id", "prev_acc_manifest_id",
+                accManifestId.value());
+        return found != null ? new AccManifestId(found) : null;
     }
 
     private AccManifestId lastChanged(AccManifestId accManifestId) {
         if (accManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        ACC_MANIFEST.ACC_MANIFEST_ID, ACC_MANIFEST.ACC_ID,
-                        ACC_MANIFEST.as("prev").ACC_MANIFEST_ID, ACC_MANIFEST.as("prev").ACC_ID)
-                .from(ACC_MANIFEST)
-                .join(ACC_MANIFEST.as("prev")).on(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID))
-                .join(RELEASE).on(ACC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ACC_MANIFEST.ACC_MANIFEST_ID.eq(valueOf(accManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(ACC_MANIFEST.ACC_ID).equals(record.get(ACC_MANIFEST.as("prev").ACC_ID))) {
-            return lastChanged(new AccManifestId(record.get(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new AccManifestId(record.get(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "acc_manifest", "acc_manifest_id", "prev_acc_manifest_id",
+                "acc_id", accManifestId.value());
+        return found != null ? new AccManifestId(found) : null;
     }
 
     @Override
@@ -783,46 +755,18 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         if (asccManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        ASCC_MANIFEST.ASCC_MANIFEST_ID,
-                        ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
-                .from(ASCC_MANIFEST)
-                .join(RELEASE).on(ASCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevAsccManifestId = record.get(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID);
-        if (prevAsccManifestId != null) {
-            return since(new AsccManifestId(prevAsccManifestId.toBigInteger()));
-        } else {
-            return new AsccManifestId(record.get(ASCC_MANIFEST.ASCC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "ascc_manifest", "ascc_manifest_id", "prev_ascc_manifest_id",
+                asccManifestId.value());
+        return found != null ? new AsccManifestId(found) : null;
     }
 
     private AsccManifestId lastChanged(AsccManifestId asccManifestId) {
         if (asccManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        ASCC_MANIFEST.ASCC_MANIFEST_ID, ASCC_MANIFEST.ASCC_ID,
-                        ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID, ASCC_MANIFEST.as("prev").ASCC_ID)
-                .from(ASCC_MANIFEST)
-                .join(ASCC_MANIFEST.as("prev")).on(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID))
-                .join(RELEASE).on(ASCC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(valueOf(asccManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(ASCC_MANIFEST.ASCC_ID).equals(record.get(ASCC_MANIFEST.as("prev").ASCC_ID))) {
-            return lastChanged(new AsccManifestId(record.get(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new AsccManifestId(record.get(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "ascc_manifest", "ascc_manifest_id", "prev_ascc_manifest_id",
+                "ascc_id", asccManifestId.value());
+        return found != null ? new AsccManifestId(found) : null;
     }
 
     @Override
@@ -1157,46 +1101,18 @@ public class JooqAccQueryRepository extends JooqBaseRepository implements AccQue
         if (bccManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        BCC_MANIFEST.BCC_MANIFEST_ID,
-                        BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
-                .from(BCC_MANIFEST)
-                .join(RELEASE).on(BCC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevBccManifestId = record.get(BCC_MANIFEST.PREV_BCC_MANIFEST_ID);
-        if (prevBccManifestId != null) {
-            return since(new BccManifestId(prevBccManifestId.toBigInteger()));
-        } else {
-            return new BccManifestId(record.get(BCC_MANIFEST.BCC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "bcc_manifest", "bcc_manifest_id", "prev_bcc_manifest_id",
+                bccManifestId.value());
+        return found != null ? new BccManifestId(found) : null;
     }
 
     private BccManifestId lastChanged(BccManifestId bccManifestId) {
         if (bccManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        BCC_MANIFEST.BCC_MANIFEST_ID, BCC_MANIFEST.BCC_ID,
-                        BCC_MANIFEST.as("prev").BCC_MANIFEST_ID, BCC_MANIFEST.as("prev").BCC_ID)
-                .from(BCC_MANIFEST)
-                .join(BCC_MANIFEST.as("prev")).on(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID))
-                .join(RELEASE).on(BCC_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(BCC_MANIFEST.BCC_MANIFEST_ID.eq(valueOf(bccManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(BCC_MANIFEST.BCC_ID).equals(record.get(BCC_MANIFEST.as("prev").BCC_ID))) {
-            return lastChanged(new BccManifestId(record.get(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new BccManifestId(record.get(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "bcc_manifest", "bcc_manifest_id", "prev_bcc_manifest_id",
+                "bcc_id", bccManifestId.value());
+        return found != null ? new BccManifestId(found) : null;
     }
 
     @Override

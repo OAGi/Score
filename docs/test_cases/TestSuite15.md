@@ -904,3 +904,27 @@ The end user can restore a deleted BCCP whose BDT is deleted. The UI display a f
 2. The user opens the page, branch, release, or entity required for "Restoring end user BCCP".
 3. The user performs the workflow described by the assertions.
 4. The user verifies the expected result for each assertion in this test case.
+
+## Test Case 15.20
+
+**Cancelling an amendment brings back what was changed**
+
+Pre-condition: The end user is on a non-working branch and owns production BCCP and ACC components.
+
+
+### Test Assertion:
+
+#### Test Assertion #15.20.1
+The end user can cancel the amendment of a BCCP after changing its DT. The BCCP is on the DT it was, its DEN is as it was, and it is `Production` with revision `1`.
+
+#### Test Assertion #15.20.2
+The end user can cancel the amendment of an ACC after removing its base ACC and appending an association. The base ACC is back and the appended association is gone.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on a non-working branch and owns production BCCP and ACC components.
+2. The users, branches, releases, and records needed to exercise "Cancelling an amendment brings back what was changed" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as an end user, amend a BCCP, change its DT, cancel the amendment, and verify the DT, the DEN, the state and the revision number. (Assertion [#15.20.1](#test-assertion-15201))
+2. Amend an ACC that has a base ACC, remove the base ACC, append an ASCCP, cancel the amendment, and verify the base ACC and the associations. (Assertion [#15.20.2](#test-assertion-15202))

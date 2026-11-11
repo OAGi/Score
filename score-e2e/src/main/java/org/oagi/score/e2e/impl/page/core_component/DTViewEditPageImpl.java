@@ -114,6 +114,10 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
             By.xpath("//span[contains(text(), \"Move to QA\")]//ancestor::button[1]");
     private static final By MOVE_TO_PRODUCTION_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Move to Production\")]//ancestor::button[1]");
+    private static final By CANCEL_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Cancel\")]//ancestor::button[1]");
+    private static final By CONFIRM_CANCEL_BUTTON_LOCATOR = By.xpath(
+            "//mat-dialog-container//button[.//span[contains(text(), \"Okay\")] or contains(normalize-space(.), \"Okay\")]");
     private final DTObject dt;
 
     public DTViewEditPageImpl(BasePage parent, DTObject dt) {
@@ -500,6 +504,29 @@ public class DTViewEditPageImpl extends BasePageImpl implements DTViewEditPage {
     @Override
     public WebElement getReviseButton() {
         return elementToBeClickable(getDriver(), REVISE_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public WebElement getCancelButton() {
+        return elementToBeClickable(getDriver(), CANCEL_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void hitCancelButton() {
+        retry(() -> {
+            click(getCancelButton());
+            click(elementToBeClickable(getDriver(), CONFIRM_CANCEL_BUTTON_LOCATOR));
+        });
+        invisibilityOfElementLocated(getDriver(), By.xpath("//div[contains(@class, \"cdk-overlay-backdrop\")]"));
+        invisibilityOfLoadingContainerElement(getDriver());
+        assert "Canceled".equals(getSnackBarMessage(getDriver()));
+    }
+
+    @Override
+    public String hitCancelButtonExpectingRefusal() {
+        click(getCancelButton());
+        click(elementToBeClickable(getDriver(), CONFIRM_CANCEL_BUTTON_LOCATOR));
+        return getSnackBarMessage(getDriver());
     }
 
     @Override

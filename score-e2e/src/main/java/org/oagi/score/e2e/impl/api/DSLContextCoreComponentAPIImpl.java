@@ -683,7 +683,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(bdt.getGuid());
-        dummyLogRecord.setSnapshot("{}");
+        dummyLogRecord.setSnapshot("{\"component\": \"dt\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bdt.getCreationTimestamp());
 
