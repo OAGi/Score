@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.change.ChangeLogSwitch;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +41,8 @@ public class CaffeineRecordCache extends AbstractRecordCache {
     /** @param spec the Caffeine spec: {@code spring.cache.caffeine.spec}, e.g. {@code maximumSize=200000,expireAfterWrite=600s} */
     @Autowired
     public CaffeineRecordCache(@Value("${spring.cache.caffeine.spec:maximumSize=200000,expireAfterWrite=600s}") String spec,
-                               RecordCacheStatus status, ObjectProvider<RepositoryFactory> repositoryFactory) {
-        super(repositoryFactory);
+                               RecordCacheStatus status, ObjectProvider<ChangeLogSwitch> changeLogSwitch) {
+        super(changeLogSwitch);
         this.cache = Caffeine.from(spec).build();
         this.status = status;
     }

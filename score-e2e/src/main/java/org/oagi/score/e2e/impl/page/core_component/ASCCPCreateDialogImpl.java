@@ -276,6 +276,9 @@ public class ASCCPCreateDialogImpl extends SearchBarPageImpl implements ASCCPCre
         click(getCreateButton());
         waitFor(ofMillis(1000L));
 
+        // the page of the new component opens a moment later, more so when the machine is busy
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(20))
+                .until(d -> d.getCurrentUrl().matches(".*/\\d+$"));
         String url = getDriver().getCurrentUrl();
         BigInteger asccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
 

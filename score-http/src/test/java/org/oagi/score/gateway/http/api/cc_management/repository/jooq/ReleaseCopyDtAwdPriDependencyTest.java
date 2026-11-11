@@ -31,6 +31,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * What the allowed primitives of a Data Type become in a new release, when the Code List they use is not part of the release
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * <pre>
  *   mvn test -Dtest=ReleaseCopyDtAwdPriDependencyTest -DargLine=-Dscore.dtAwdPri=true
  * </pre>
- * The data it needs: a library whose 'Working' release has a Data Type with a Code List as its default.
+ * The data it needs: a library whose 'Working' release has a Data Type with a Code List (connectSpec).
  */
 @EnabledIfSystemProperty(named = "score.dtAwdPri", matches = "true")
 class ReleaseCopyDtAwdPriDependencyTest {
@@ -197,7 +198,7 @@ class ReleaseCopyDtAwdPriDependencyTest {
         var row = dsl.fetchOne("select dm.dt_manifest_id, p.xbt_manifest_id, x.xbt_id "
                 + "from dt_manifest dm join dt_awd_pri p on p.dt_id = dm.dt_id and p.release_id = dm.release_id "
                 + "join xbt_manifest x on x.xbt_manifest_id = p.xbt_manifest_id "
-                + "where dm.release_id = ? and p.xbt_manifest_id is not null limit 1", working);
+                + "where dm.release_id = ? and p.xbt_manifest_id is not null and x.release_id = dm.release_id limit 1", working);
         assertNotNull(row, "no Data Type of the library has an XBT");
         long dtManifest = row.get(0, Long.class);
         long xbtManifest = row.get(1, Long.class);
@@ -236,10 +237,13 @@ class ReleaseCopyDtAwdPriDependencyTest {
                 + "where l.name = 'connectSpec' and r.release_num = 'Working'").get(0, Long.class);
         long libraryId = dsl.fetchOne("select library_id from `release` where release_id = ?", working)
                 .get(0, Long.class);
-        var row = dsl.fetchOne("select dm.dt_manifest_id, dm.dt_id, p.code_list_manifest_id "
+        var row = dsl.fetchOne("select dm.dt_manifest_id, dm.dt_id, p.code_list_manifest_id, p.dt_awd_pri_id "
                 + "from dt_manifest dm join dt_awd_pri p on p.dt_id = dm.dt_id and p.release_id = dm.release_id "
-                + "where dm.release_id = ? and p.is_default = 1 and p.code_list_manifest_id is not null limit 1", working);
-        assertNotNull(row, "no Data Type of the library has a Code List as its default");
+                + "where dm.release_id = ? and p.code_list_manifest_id is not null order by p.is_default desc limit 1", working);
+        assertNotNull(row, "no Data Type of the library has a Code List");
+        // the initial data of the library has no Data Type with a Code List as its default: it is made one here
+        dsl.execute("update dt_awd_pri set is_default = (dt_awd_pri_id = ?) where release_id = ? and dt_id = ?",
+                row.get(3, Long.class), working, row.get(1, Long.class));
         long dtManifest = row.get(0, Long.class);
         long codeListManifest = row.get(2, Long.class);
 

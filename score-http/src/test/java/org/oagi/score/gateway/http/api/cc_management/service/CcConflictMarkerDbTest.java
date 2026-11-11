@@ -85,8 +85,9 @@ class CcConflictMarkerDbTest extends CcReviseCancelFixture {
     void revisedBccpIsNotInConflictAnyMore(Branch branch) {
         useBranch(branch);
         long bccp = pick(Kind.BCCP, "of a Data Type that is published", "exists (select 1 from dt_manifest d join dt x2 on x2.dt_id = d.dt_id "
-                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state = '" + publishedState() + "' and x2.next_dt_id is null)");
+                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state in " + stableStates() + " and x2.next_dt_id is null)");
         long dt = one("select bdt_manifest_id from bccp_manifest where bccp_manifest_id = ?", bccp);
+        watch(Kind.DT, dt);
 
         service.reviseDt(requester, new DtManifestId(n(dt)));
         assertEquals(1L, marker(Kind.BCCP, bccp), "the BCCP refers to the previous record of the Data Type");
@@ -106,6 +107,8 @@ class CcConflictMarkerDbTest extends CcReviseCancelFixture {
         long ascc = one("select ascc_manifest_id from ascc_manifest where from_acc_manifest_id = ? and to_asccp_manifest_id = ?", acc, asccp);
         long bccp = one("select to_bccp_manifest_id from bcc_manifest where from_acc_manifest_id = ? order by 1 limit 1", acc);
         long bcc = one("select bcc_manifest_id from bcc_manifest where from_acc_manifest_id = ? and to_bccp_manifest_id = ?", acc, bccp);
+        watch(Kind.ASCCP, asccp);
+        watch(Kind.BCCP, bccp);
 
         service.reviseAsccp(requester, new AsccpManifestId(n(asccp)));
         service.reviseBccp(requester, new BccpManifestId(n(bccp)));
@@ -164,8 +167,9 @@ class CcConflictMarkerDbTest extends CcReviseCancelFixture {
     void cancelledBccpIsInConflictWhileTheDataTypeIsRevisedAndNotAfterwards(Branch branch) {
         useBranch(branch);
         long bccp = pick(Kind.BCCP, "of a Data Type that is published", "exists (select 1 from dt_manifest d join dt x2 on x2.dt_id = d.dt_id "
-                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state = '" + publishedState() + "' and x2.next_dt_id is null)");
+                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state in " + stableStates() + " and x2.next_dt_id is null)");
         long dt = one("select bdt_manifest_id from bccp_manifest where bccp_manifest_id = ?", bccp);
+        watch(Kind.DT, dt);
 
         service.reviseDt(requester, new DtManifestId(n(dt)));
         service.reviseBccp(requester, new BccpManifestId(n(bccp)));

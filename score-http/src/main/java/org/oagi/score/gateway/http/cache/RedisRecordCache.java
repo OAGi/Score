@@ -2,7 +2,7 @@ package org.oagi.score.gateway.http.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.change.ChangeLogSwitch;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,8 +81,8 @@ public class RedisRecordCache extends AbstractRecordCache {
                         ObjectProvider<BuildProperties> buildProperties,
                         RecordCacheStatus status,
                         @Value("${spring.cache.redis.time-to-live:10m}") Duration timeToLive,
-                        ObjectProvider<RepositoryFactory> repositoryFactory) {
-        this(connectionFactory, KEY_PREFIX + "{" + version(buildProperties) + "}:", status, timeToLive, repositoryFactory);
+                        ObjectProvider<ChangeLogSwitch> changeLogSwitch) {
+        this(connectionFactory, KEY_PREFIX + "{" + version(buildProperties) + "}:", status, timeToLive, changeLogSwitch);
     }
 
     private static String version(ObjectProvider<BuildProperties> buildProperties) {
@@ -100,8 +100,8 @@ public class RedisRecordCache extends AbstractRecordCache {
     }
 
     private RedisRecordCache(RedisConnectionFactory connectionFactory, String prefix, RecordCacheStatus status, Duration timeToLive,
-                             ObjectProvider<RepositoryFactory> repositoryFactory) {
-        super(repositoryFactory);
+                             ObjectProvider<ChangeLogSwitch> changeLogSwitch) {
+        super(changeLogSwitch);
         this.connectionFactory = connectionFactory;
         this.prefix = prefix;
         this.status = status;

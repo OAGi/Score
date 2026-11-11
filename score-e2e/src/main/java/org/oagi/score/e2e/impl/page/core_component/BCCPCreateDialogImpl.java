@@ -278,6 +278,9 @@ public class BCCPCreateDialogImpl extends SearchBarPageImpl implements BCCPCreat
         click(getCreateButton());
         waitFor(ofMillis(2000L));
 
+        // the page of the new component opens a moment later, more so when the machine is busy
+        new org.openqa.selenium.support.ui.WebDriverWait(getDriver(), java.time.Duration.ofSeconds(20))
+                .until(d -> d.getCurrentUrl().matches(".*/\\d+$"));
         String url = getDriver().getCurrentUrl();
         BigInteger bccpManifestId = new BigInteger(url.substring(url.lastIndexOf("/") + 1));
 

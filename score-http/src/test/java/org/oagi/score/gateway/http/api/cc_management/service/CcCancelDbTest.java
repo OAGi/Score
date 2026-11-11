@@ -165,7 +165,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
                 + "coalesce(a.guid, b.guid, 'HEAD') from seq_key s join acc_manifest m on m.acc_manifest_id = s.from_acc_manifest_id "
                 + "left join ascc_manifest am on am.ascc_manifest_id = s.ascc_manifest_id left join ascc a on a.ascc_id = am.ascc_id "
                 + "left join bcc_manifest bm on bm.bcc_manifest_id = s.bcc_manifest_id left join bcc b on b.bcc_id = bm.bcc_id "
-                + "where m.release_id = ?", release)) {
+                + "where m.release_id = ? and " + w(Kind.ACC, "m"), release)) {
             rows.computeIfAbsent(r.get(0, Long.class), k -> new java.util.LinkedHashMap<>())
                     .put(r.get(1, Long.class), java.util.Arrays.asList(r.get(2, Long.class), r.get(3, Long.class), r.get(4, String.class)));
         }
@@ -553,6 +553,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
         useBranch(branch);
         long acc = pick(Kind.ACC, "with associations", NO_BASE + " and " + ASSOCIATIONS);
         long asccp = ids("select to_asccp_manifest_id from ascc_manifest where from_acc_manifest_id = ? order by 1 limit 1", acc).get(0);
+        watch(Kind.ASCCP, asccp);
         roundTrip(() -> {
             revise(Kind.ASCCP, asccp);
             revise(Kind.ACC, acc);
@@ -643,6 +644,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
         useBranch(branch);
         long acc = pick(Kind.ACC, "with associations", NO_BASE + " and " + ASSOCIATIONS);
         long bccp = ids("select to_bccp_manifest_id from bcc_manifest where from_acc_manifest_id = ? order by 1 limit 1", acc).get(0);
+        watch(Kind.BCCP, bccp);
         roundTrip(() -> {
             revise(Kind.BCCP, bccp);
             revise(Kind.ACC, acc);
@@ -864,7 +866,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
         long base = pick(Kind.DT, "with a base of another library and a Data Type based on it", WITH_SC + " and " + CROSS_LIBRARY_BASE
                 + " and exists (select 1 from dt_manifest d where d.based_dt_manifest_id = m.dt_manifest_id)");
         long derived = ids("select dt_manifest_id from dt_manifest where based_dt_manifest_id = ? order by 1 limit 1", base).get(0);
-        used.add(derived);
+        watch(Kind.DT, derived);
         roundTrip(() -> {
             revise(Kind.DT, base);
             revise(Kind.DT, derived);
@@ -880,7 +882,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
         long base = pick(Kind.DT, "with a base of another library and a Data Type based on it", WITH_SC + " and " + CROSS_LIBRARY_BASE
                 + " and exists (select 1 from dt_manifest d where d.based_dt_manifest_id = m.dt_manifest_id)");
         long derived = ids("select dt_manifest_id from dt_manifest where based_dt_manifest_id = ? order by 1 limit 1", base).get(0);
-        used.add(derived);
+        watch(Kind.DT, derived);
         roundTrip(() -> {
             revise(Kind.DT, base);
             revise(Kind.DT, derived);
@@ -895,6 +897,7 @@ class CcCancelDbTest extends CcReviseCancelFixture {
         useBranch(branch);
         long dt = pick(Kind.DT, "used by a BCCP", WITH_SC + " and exists (select 1 from bccp_manifest b where b.bdt_manifest_id = m.dt_manifest_id)");
         long bccp = ids("select bccp_manifest_id from bccp_manifest where bdt_manifest_id = ? order by 1 limit 1", dt).get(0);
+        watch(Kind.BCCP, bccp);
         roundTrip(() -> {
             revise(Kind.DT, dt);
             revise(Kind.BCCP, bccp);

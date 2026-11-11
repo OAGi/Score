@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.oagi.score.gateway.http.change.repository.RecordChangeLogRepository;
-import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.change.ChangeLogSwitch;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -21,19 +20,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class BulkChangeTest {
 
-    private RecordChangeLogRepository changeLog;
+    private ChangeLogSwitch changeLog;
     private AtomicInteger forgotten;
     private AtomicInteger failuresLeft;
     private CaffeineRecordCache cache;
 
     @BeforeEach
     void setUp() {
-        changeLog = Mockito.mock(RecordChangeLogRepository.class);
-        RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
-        Mockito.when(factory.recordChangeLogRepository()).thenReturn(changeLog);
+        changeLog = Mockito.mock(ChangeLogSwitch.class);
         @SuppressWarnings("unchecked")
-        ObjectProvider<RepositoryFactory> provider = Mockito.mock(ObjectProvider.class);
-        Mockito.when(provider.getObject()).thenReturn(factory);
+        ObjectProvider<ChangeLogSwitch> provider = Mockito.mock(ObjectProvider.class);
+        Mockito.when(provider.getObject()).thenReturn(changeLog);
         forgotten = new AtomicInteger();
         failuresLeft = new AtomicInteger();
         cache = new CaffeineRecordCache("maximumSize=100", RecordCacheStatus.alwaysReady(), provider) {

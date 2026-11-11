@@ -347,8 +347,13 @@ class CcReviseHistoryDbTest extends CcReviseCancelFixture {
         revisionLinks(r, kind, oldRecord, newRecord);
         checkEquals(r.newRecord, toLong(r.after.get(kind, newRecord, ownerColumn)), kind + " manifest#" + manifest + " owner ACC");
         checkEquals(oldOwner, toLong(r.before.get(kind, oldRecord, ownerColumn)), kind + " manifest#" + manifest + " previous owner ACC");
-        checkEquals(toLong(r.before.get(kind, oldRecord, targetColumn)), toLong(r.after.get(kind, newRecord, targetColumn)),
-                kind + " manifest#" + manifest + " " + targetColumn);
+        // a revision is made with the record that the manifest of its target holds, which is the one the old record refers
+        // to, unless the target was revised after it (then the old record is marked as in conflict)
+        String targetManifest = targetColumn.substring("to_".length()).replaceAll("_id$", "_manifest");
+        checkEquals(one("select t.`" + targetColumn.substring("to_".length()) + "` from `" + kind.manifest() + "` m join `"
+                        + targetManifest + "` t on t.`" + targetManifest + "_id` = m.`to_" + targetManifest + "_id` where m.`"
+                        + kind.mpk() + "` = ?", manifest),
+                toLong(r.after.get(kind, newRecord, targetColumn)), kind + " manifest#" + manifest + " " + targetColumn);
         r.expect.changeManifest(kind, manifest, kind.pk(), "conflict").change(kind, oldRecord, kind.next());
     }
 
@@ -378,6 +383,8 @@ class CcReviseHistoryDbTest extends CcReviseCancelFixture {
         }
         if (kind == Kind.ASCC || kind == Kind.BCC) {
             except.add("from_acc_id");
+            // checked against the manifest of its target, where the association is revised
+            except.add(kind == Kind.ASCC ? "to_asccp_id" : "to_bccp_id");
         }
         if (kind == Kind.DT_SC) {
             except.add("owner_dt_id");

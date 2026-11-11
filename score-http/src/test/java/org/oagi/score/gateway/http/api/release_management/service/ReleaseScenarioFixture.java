@@ -4,6 +4,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -184,8 +185,11 @@ abstract class ReleaseScenarioFixture {
     void findLibrary(String name) {
         library = one("select library_id from library where name = ?", name);
         working = one("select release_id from `release` where library_id = ? and release_num = 'Working'", library);
-        published = one("select max(release_id) from `release` where library_id = ? and release_num <> 'Working' "
-                + "and state = 'Published'", library);
+        Long latest = dsl.fetchOne("select max(release_id) from `release` where library_id = ? and release_num <> 'Working' "
+                + "and state = 'Published'", library).get(0, Long.class);
+        // what the scenarios start from is a library that has been released
+        Assumptions.assumeTrue(latest != null, "the library '" + name + "' has no Published release");
+        published = latest;
         namespace = one("select namespace_id from `release` where release_id = ?", working);
         anchorAcc = pool(Kind.ACC);
         anchorDt = pool(Kind.DT);

@@ -1502,7 +1502,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
+                                coalesce(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("own_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
                         .join(DT_MANIFEST.as("target")).on(and(
@@ -1512,12 +1512,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("working").RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
                                 DT_MANIFEST.as("working").DT_ID.eq(DT_AWD_PRI.DT_ID)))
                         .join(XBT_MANIFEST.as("working_xbt")).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID))
-                        .join(XBT_MANIFEST.as("target_xbt")).on(and(
+                        .leftJoin(XBT_MANIFEST.as("target_xbt")).on(and(
                                 XBT_MANIFEST.as("target_xbt").NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 XBT_MANIFEST.as("target_xbt").RELEASE_ID.eq(valueOf(releaseId))
                         ))
+                        // the same XBT in the new release, when the allowed primitive points to an XBT of a release the library depends on
+                        .leftJoin(XBT_MANIFEST.as("own_xbt")).on(and(
+                                XBT_MANIFEST.as("own_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                                XBT_MANIFEST.as("own_xbt").RELEASE_ID.eq(valueOf(releaseId)),
+                                XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))
+                        ))
                         .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_AWD_PRI.XBT_MANIFEST_ID.isNotNull(),
+                                // else kept as it is when it is in a release the library depends on and this release has no manifest of it
+                                or(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID.isNotNull(), XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
                                         DT_MANIFEST.as("working").DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 
@@ -1596,7 +1604,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
+                                coalesce(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("own_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
                         .join(DT_SC_MANIFEST.as("target")).on(and(
@@ -1606,12 +1614,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("working").RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                                 DT_SC_MANIFEST.as("working").DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
                         .join(XBT_MANIFEST.as("working_xbt")).on(DT_SC_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID))
-                        .join(XBT_MANIFEST.as("target_xbt")).on(and(
+                        .leftJoin(XBT_MANIFEST.as("target_xbt")).on(and(
                                 XBT_MANIFEST.as("target_xbt").NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 XBT_MANIFEST.as("target_xbt").RELEASE_ID.eq(valueOf(releaseId))
                         ))
+                        // the same XBT in the new release, when the allowed primitive points to an XBT of a release the library depends on
+                        .leftJoin(XBT_MANIFEST.as("own_xbt")).on(and(
+                                XBT_MANIFEST.as("own_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                                XBT_MANIFEST.as("own_xbt").RELEASE_ID.eq(valueOf(releaseId)),
+                                XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))
+                        ))
                         .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_SC_AWD_PRI.XBT_MANIFEST_ID.isNotNull(),
+                                // else kept as it is when it is in a release the library depends on and this release has no manifest of it
+                                or(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID.isNotNull(), XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
                                         DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 

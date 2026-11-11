@@ -175,8 +175,12 @@ public final class GuardHarness implements AutoCloseable {
         /** What the work of a release tells to forget: the tests look at what it is asked. */
         @Bean
         RecordCache recordCache(ObjectProvider<RepositoryFactory> repositoryFactory) {
+            @SuppressWarnings("unchecked")
+            ObjectProvider<org.oagi.score.gateway.http.change.ChangeLogSwitch> changeLogSwitch = Mockito.mock(ObjectProvider.class);
+            Mockito.when(changeLogSwitch.getObject())
+                    .thenReturn(new org.oagi.score.gateway.http.change.RepositoryChangeLogSwitch(repositoryFactory));
             return Mockito.spy(new CaffeineRecordCache("maximumSize=1000,expireAfterWrite=60s", RecordCacheStatus.alwaysReady(),
-                    repositoryFactory));
+                    changeLogSwitch));
         }
 
         @Bean

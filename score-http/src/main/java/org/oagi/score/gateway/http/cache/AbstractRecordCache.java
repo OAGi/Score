@@ -1,7 +1,6 @@
 package org.oagi.score.gateway.http.cache;
 
-import org.oagi.score.gateway.http.change.repository.RecordChangeLogRepository;
-import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.oagi.score.gateway.http.change.ChangeLogSwitch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -19,10 +18,10 @@ abstract class AbstractRecordCache implements RecordCache {
     private static final int ATTEMPTS = 3;
 
     /** Lazy: the repositories use this cache, so it cannot ask for them when it is made. It is null for a cache that is used alone. */
-    private final ObjectProvider<RepositoryFactory> repositoryFactory;
+    private final ObjectProvider<ChangeLogSwitch> changeLogSwitch;
 
-    AbstractRecordCache(ObjectProvider<RepositoryFactory> repositoryFactory) {
-        this.repositoryFactory = repositoryFactory;
+    AbstractRecordCache(ObjectProvider<ChangeLogSwitch> changeLogSwitch) {
+        this.changeLogSwitch = changeLogSwitch;
     }
 
     @Override
@@ -30,8 +29,7 @@ abstract class AbstractRecordCache implements RecordCache {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw new IllegalStateException("A bulk change is run in a transaction.");
         }
-        RecordChangeLogRepository changeLog = (repositoryFactory == null) ? null
-                : repositoryFactory.getObject().recordChangeLogRepository();
+        ChangeLogSwitch changeLog = (changeLogSwitch == null) ? null : changeLogSwitch.getObject();
         if (changeLog != null) {
             changeLog.stopWriting();
         }

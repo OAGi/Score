@@ -159,6 +159,12 @@ class ReleaseDraftLifecycleDbTest {
             if (t.hasRelease()) {
                 where.add("release_id <> " + release);
             }
+            if (!t.hasRelease() && t.primaryKey() == null) {
+                // a link table of a manifest (asccp_manifest_tag, ...): the rows of the manifests of the other releases
+                t.columns().stream().filter(c -> c.endsWith("_manifest_id") && !c.startsWith("next_") && !c.startsWith("prev_"))
+                        .findFirst().ifPresent(c -> where.add("`" + c + "` in (select `" + c + "` from `" + c.substring(0,
+                                c.length() - 3) + "` where release_id <> " + release + ")"));
+            }
             if (t.primaryKey() != null && maxKeys.containsKey(t.name())) {
                 where.add("`" + t.primaryKey() + "` <= " + maxKeys.get(t.name()));
             }
@@ -201,6 +207,13 @@ class ReleaseDraftLifecycleDbTest {
 
         List<Table> tables = tables();
         Map<String, Long> maxKeys = maxKeys(tables);
+        // a release needs a namespace for everything it holds, and a few components of the initial data have none
+        for (String t : List.of("acc", "asccp", "bccp", "dt", "code_list")) {
+            dsl.execute("update `" + t + "` x join `" + t + "_manifest` m on m.`" + t + "_id` = x.`" + t + "_id` "
+                    + "set x.namespace_id = (select namespace_id from `release` where release_id = ?) "
+                    + "where m.release_id = ? and x.namespace_id is null", working, working);
+        }
+
         Map<String, String> candidates = snapshot(tables, -1, maxKeys);
 
         // 2. create the release '8.0' in 'Initialized' state.

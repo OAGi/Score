@@ -61,9 +61,10 @@ class CcRowReferenceDbTest extends CcReviseCancelFixture {
     void revisedAsccpIsTheRoleOfTheLatestAcc(Branch branch) {
         useBranch(branch);
         long asccp = pick(Kind.ASCCP, "the role of an ACC that is published", "exists (select 1 from acc_manifest r join acc a on a.acc_id = r.acc_id "
-                + "where r.acc_manifest_id = m.role_of_acc_manifest_id and a.state = '" + publishedState() + "' and a.next_acc_id is null and "
+                + "where r.acc_manifest_id = m.role_of_acc_manifest_id and a.state in " + stableStates() + " and a.next_acc_id is null and "
                 + "exists (select 1 from ascc_manifest x where x.from_acc_manifest_id = r.acc_manifest_id))");
         long acc = column("select role_of_acc_manifest_id from asccp_manifest where asccp_manifest_id = ?", asccp);
+        watch(Kind.ACC, acc);
 
         service.reviseAcc(requester, new AccManifestId(n(acc)));
         long latestAcc = recordOf(Kind.ACC, acc);
@@ -78,8 +79,9 @@ class CcRowReferenceDbTest extends CcReviseCancelFixture {
     void revisedBccpHasTheLatestDataType(Branch branch) {
         useBranch(branch);
         long bccp = pick(Kind.BCCP, "of a Data Type that is published", "exists (select 1 from dt_manifest d join dt x2 on x2.dt_id = d.dt_id "
-                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state = '" + publishedState() + "' and x2.next_dt_id is null)");
+                + "where d.dt_manifest_id = m.bdt_manifest_id and x2.state in " + stableStates() + " and x2.next_dt_id is null)");
         long dt = column("select bdt_manifest_id from bccp_manifest where bccp_manifest_id = ?", bccp);
+        watch(Kind.DT, dt);
 
         service.reviseDt(requester, new DtManifestId(n(dt)));
         long latestDt = recordOf(Kind.DT, dt);
@@ -96,7 +98,7 @@ class CcRowReferenceDbTest extends CcReviseCancelFixture {
         long base = pick(Kind.DT, "with supplementary components and an XBT as allowed primitive", WITH_SC
                 + " and exists (select 1 from dt_awd_pri p where p.release_id = m.release_id and p.dt_id = m.dt_id and p.xbt_manifest_id is not null)");
         long derived = factory.dtCommandRepository(requester).create(releaseId(), new DtManifestId(n(base))).value().longValue();
-        used.add(derived);
+        watch(Kind.DT, derived);
         publish(Kind.DT, derived);
 
         factory.dtCommandRepository(requester).revise(new DtManifestId(n(base)));
@@ -147,6 +149,7 @@ class CcRowReferenceDbTest extends CcReviseCancelFixture {
         long bcc = ids("select b.bcc_manifest_id from bcc_manifest b join bcc c on c.bcc_id = b.bcc_id where b.to_bccp_manifest_id = ? "
                 + "and c.default_value is null and c.fixed_value is null order by 1 limit 1", bccp).get(0);
         long dt = column("select bdt_manifest_id from bccp_manifest where bccp_manifest_id = ?", bccp);
+        watch(Kind.DT, dt);
 
         service.reviseBccp(requester, new BccpManifestId(n(bccp)));
         dsl.execute("update bccp set default_value = 'LATEST' where bccp_id = ?", recordOf(Kind.BCCP, bccp));
