@@ -84,17 +84,18 @@ class CodeListUpliftDuplicateValuesTest {
     }
 
     @Test
-    void valuesTheBaseCodeListAlreadyDefinesAreReportedCaseInsensitively() {
-        // The base code list was uplifted to the target release as manifest 20; it defines "a" and "B".
+    void valuesTheBaseCodeListAlreadyDefinesAreReportedCaseSensitively() {
+        // The base code list was uplifted to the target release as manifest 20; it defines "a" and "B". A code is
+        // case-sensitive, so "A" and "b" are other codes and only the exact "a" and "B" are duplicates.
         when(queries.getCodeListDetails(manifest(20))).thenReturn(codeList(20, TARGET_RELEASE, null, null, "a", "B"));
         when(queries.getCodeListDetails(manifest(10)))
                 .thenReturn(codeList(10, SOURCE_RELEASE, null, manifest(20), "a", "B"));
         when(queries.getCodeListDetails(manifest(1)))
-                .thenReturn(codeList(1, SOURCE_RELEASE, summary(10), null, "A", "b", "C"));
+                .thenReturn(codeList(1, SOURCE_RELEASE, summary(10), null, "a", "B", "A", "b", "C"));
 
         var result = repository().uplift(REQUESTER, manifest(1), TARGET_RELEASE);
 
-        assertEquals(List.of("a", "b"), result.getSecond());
+        assertEquals(List.of("a", "B"), result.getSecond());
     }
 
     @Test

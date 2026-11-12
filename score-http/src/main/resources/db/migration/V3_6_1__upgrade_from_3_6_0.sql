@@ -193,5 +193,21 @@ ALTER TABLE `oas_operation` MODIFY COLUMN `operation_id` varchar(1024) CHARACTER
 ALTER TABLE `oas_parameter` MODIFY COLUMN `name` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'REQUIRED. The name of the parameter. Parameter names are case sensitive.\nIf in is "path", the name field MUST correspond to a template expression occurring within the path field in the Paths Object. See Path Templating for further information.\nIf in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.\nFor all other cases, the name corresponds to the parameter name used by the in property.';
 ALTER TABLE `oas_resource` MODIFY COLUMN `path` text CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'The OpenAPI path (resource name) for this resource; by default made from the business context and the BIE name. Case-sensitive: /Pets and /pets are two paths.';
 
+-- ------------------------------------------------------------------
+-- The value and the meaning of a code list value
+-- ------------------------------------------------------------------
+--
+-- Both columns were tinytext, which holds 255 BYTES. The dialog counts characters, so a text of 3-byte characters (Korean,
+-- Chinese, ...) that fits the input overflowed the column and the save ended as a generic conflict.
+--
+-- - VALUE is varchar(255) (255 characters, the limit of the input) with a binary collation: a code is an enumeration value
+--   of the generated XML Schema and JSON Schema, which compare it case-sensitively, so 'EA' and 'ea' are two codes.
+-- - MEANING is text: no generated schema carries it and nothing needs it bounded, so the column does not restate the limit
+--   that the input already has. It keeps the case-insensitive collation of the table, as a meaning is a description.
+--
+-- A _bin collation still ignores trailing spaces (PAD SPACE); the service trims a code before saving it.
+ALTER TABLE `code_list_value` MODIFY COLUMN `value` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'The code list value used in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are different values.';
+ALTER TABLE `code_list_value` MODIFY COLUMN `meaning` text DEFAULT NULL COMMENT 'The description or explanation of the code list value, e.g., ''Each'' for EA, ''English'' for EN.';
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET SQL_NOTES = @OLD_SQL_NOTES;

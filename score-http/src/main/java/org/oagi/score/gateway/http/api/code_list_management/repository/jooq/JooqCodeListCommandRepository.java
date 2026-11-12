@@ -924,7 +924,7 @@ public class JooqCodeListCommandRepository
                             .fetchOne().getCodeListManifestId()
             );
 
-            // Use case-insensitive a value set to prevent duplicated CL values
+            // Use a case-sensitive value set to prevent duplicated CL values (EA and ea are different codes)
             Set<String> basedCodeListValueSet = new HashSet();
             targetBasedCodeList.valueList().forEach(e -> {
                 CodeListValueRecord targetCodeListValue = copyCodeListValue(e, targetCodeList);
@@ -943,12 +943,12 @@ public class JooqCodeListCommandRepository
                         .set(targetCodeListValueManifest)
                         .execute();
 
-                basedCodeListValueSet.add(targetCodeListValue.getValue().toLowerCase());
+                basedCodeListValueSet.add(targetCodeListValue.getValue());
             });
 
             sourceCodeList.valueList().stream().forEach(e -> {
-                if (basedCodeListValueSet.contains(e.value().toLowerCase())) {
-                    duplicateValues.add(e.value().toLowerCase());
+                if (basedCodeListValueSet.contains(e.value())) {
+                    duplicateValues.add(e.value());
                     return;
                 }
 

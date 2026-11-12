@@ -96,14 +96,14 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * The column <code>code_list_value.value</code>. The code list value used
      * in the instance data, e.g., EA, US-EN.
      */
-    public final TableField<CodeListValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB(255).nullable(false), this, "The code list value used in the instance data, e.g., EA, US-EN.");
+    public final TableField<CodeListValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(255).nullable(false), this, "The code list value used in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are different values.");
 
     /**
      * The column <code>code_list_value.meaning</code>. The description or
      * explanation of the code list value, e.g., 'Each' for EA, 'English' for
      * EN.
      */
-    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
+    public final TableField<CodeListValueRecord, String> MEANING = createField(DSL.name("meaning"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "The description or explanation of the code list value, e.g., 'Each' for EA, 'English' for EN.");
 
     /**
      * The column <code>code_list_value.definition</code>. Long description or
