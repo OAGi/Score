@@ -32,6 +32,11 @@ export const RELEASE_ASSIGN_TYPE_OPTIONS: { value: string, label: string }[] = [
   {value: 'AGENCY_ID_LIST', label: 'Agency ID List'},
 ];
 
+/** The states that a developer's component may have on this screen. */
+export const RELEASE_ASSIGN_STATE_OPTIONS: string[] = ['WIP', 'Draft', 'Candidate', 'Deleted'];
+/** A deleted component is not worth assigning to a release, so it is left out until the State filter asks for it. */
+export const RELEASE_ASSIGN_DEFAULT_STATES: string[] = ['WIP', 'Draft', 'Candidate'];
+
 @Component({
   standalone: false,
   selector: 'score-release-list',
@@ -56,6 +61,7 @@ export class ReleaseAssignComponent implements OnInit {
   title = 'Releases Assign';
   $hashCode: string;
   typeList = RELEASE_ASSIGN_TYPE_OPTIONS;
+  stateList = RELEASE_ASSIGN_STATE_OPTIONS;
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
@@ -69,6 +75,7 @@ export class ReleaseAssignComponent implements OnInit {
   filter = {
     den: '',
     type: [],
+    state: [...RELEASE_ASSIGN_DEFAULT_STATES],
     owner: []
   };
 
@@ -95,6 +102,7 @@ export class ReleaseAssignComponent implements OnInit {
 
       this.itemsMap = map;
       this.itemsList = this.mapToList(this.itemsMap);
+      this.filterList();
 
       this.loginIdList = accounts;
       this.loginIdListFilterCtrl.valueChanges
@@ -238,6 +246,11 @@ export class ReleaseAssignComponent implements OnInit {
     }
     if (this.filter.type.length > 0) {
       if (this.filter.type.indexOf(node.type) === -1) {
+        return false;
+      }
+    }
+    if (this.filter.state.length > 0) {
+      if (this.filter.state.indexOf(node.state) === -1) {
         return false;
       }
     }
