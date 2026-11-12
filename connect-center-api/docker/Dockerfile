@@ -26,7 +26,7 @@ RUN npm install --no-save --no-package-lock --prefix /sharp \
     "sharp@$(node -p "require('/tmp/docs-package-lock.json').packages['node_modules/sharp'].version")"
 
 
-FROM python:3.13-slim
+FROM python:3.15-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
