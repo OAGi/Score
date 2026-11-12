@@ -85,6 +85,10 @@ public class JooqCodeListCommandRepository
                 throw new IllegalArgumentException("Cannot find a based Code List [codeListManifestId=" + basedCodeListManifestId + "]");
             }
 
+            if (basedCodeListDetails.release() == null || !releaseId.equals(basedCodeListDetails.release().releaseId())) {
+                throw new IllegalArgumentException("The based Code List does not belong to the release [releaseId=" + releaseId + "]");
+            }
+
             codeList.setName(basedCodeListDetails.name());
             agencyIdListValue = basedCodeListDetails.agencyIdListValue();
 

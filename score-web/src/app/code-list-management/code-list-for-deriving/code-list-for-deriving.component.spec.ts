@@ -33,6 +33,43 @@ describe('CodeListForDerivingComponent', () => {
     });
   });
 
+  describe('next without a branch', () => {
+    it('does nothing when no release is chosen', () => {
+      const self = {
+        selection: {selected: [4089]},
+        releaseChoice: {release: undefined},
+        service: {create: vi.fn()},
+        router: {navigate: vi.fn()},
+      };
+      CodeListForDerivingComponent.prototype.next.call(self as never);
+      expect(self.service.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('selection', () => {
+    it('is cleared when the branch changes', () => {
+      const self = {
+        releaseChoice: {choose: vi.fn()},
+        selection: {clear: vi.fn()},
+        applyChoices: vi.fn(),
+      };
+      CodeListForDerivingComponent.prototype.onBranchChange.call(self as never, {releaseId: 3} as never);
+      expect(self.selection.clear).toHaveBeenCalled();
+    });
+
+    it('is cleared when the library changes', () => {
+      const self = {
+        libraryChoice: {choose: vi.fn()},
+        releaseChoice: {init: vi.fn()},
+        selection: {clear: vi.fn()},
+        releaseService: {getReleaseSummaryList: vi.fn(() => of([]))},
+        applyChoices: vi.fn(),
+      };
+      CodeListForDerivingComponent.prototype.onLibraryChange.call(self as never, {libraryId: 2} as never);
+      expect(self.selection.clear).toHaveBeenCalled();
+    });
+  });
+
   describe('template', () => {
     const html = readFileSync(
       join(process.cwd(), 'src/app/code-list-management/code-list-for-deriving/code-list-for-deriving.component.html'), 'utf8');
