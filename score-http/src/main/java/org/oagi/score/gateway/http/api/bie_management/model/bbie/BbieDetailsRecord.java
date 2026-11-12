@@ -42,6 +42,12 @@ public record BbieDetailsRecord(
         return guid();
     }
 
+    public BbieDetailsRecord withPrimitiveRestriction(PrimitiveRestriction primitiveRestriction) {
+        return new BbieDetailsRecord(bbieId, guid, basedBcc, path, hashPath, fromAbieId, toBbiepId, cardinality,
+                primitiveRestriction, valueConstraint, facet, definition, remark, example, nillable, deprecated,
+                used, ownerTopLevelAsbiep, owner, created, lastUpdated);
+    }
+
     public static Builder builder() {
         return new Builder();
     }

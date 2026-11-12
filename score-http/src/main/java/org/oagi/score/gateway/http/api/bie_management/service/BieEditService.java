@@ -500,13 +500,41 @@ public class BieEditService implements InitializingBean {
                     .ownerTopLevelAsbiep(ownerTopLevelAsbiep)
                     .build();
         }
-        return bbieDetails;
+        return withDefaultValueDomain(requester, bbieDetails);
     }
 
     public BbieDetailsRecord getBbieDetails(ScoreUser requester, BbieId bbieId) {
 
         var query = repositoryFactory.bbieQueryRepository(requester);
-        return query.getBbieDetails(bbieId);
+        return withDefaultValueDomain(requester, query.getBbieDetails(bbieId));
+    }
+
+    /**
+     * A BBIE that was saved without a value domain (for example, one created before the Data Type default
+     * could be a Code List or an Agency ID List) uses the default of its Data Type, so it is shown with it.
+     */
+    private BbieDetailsRecord withDefaultValueDomain(ScoreUser requester, BbieDetailsRecord bbieDetails) {
+        if (bbieDetails == null || bbieDetails.basedBcc() == null
+                || (bbieDetails.primitiveRestriction() != null && !bbieDetails.primitiveRestriction().isEmpty())) {
+            return bbieDetails;
+        }
+        BccpSummaryRecord bccp = repositoryFactory.bccpQueryRepository(requester)
+                .getBccpSummary(bbieDetails.basedBcc().toBccpManifestId());
+        DtAwdPriSummaryRecord defaultDtAwdPri = repositoryFactory.dtQueryRepository(requester)
+                .getDefaultDtAwdPriSummary(bccp.dtManifestId());
+        return defaultDtAwdPri == null ? bbieDetails
+                : bbieDetails.withPrimitiveRestriction(PrimitiveRestriction.fromDtAwdPri(defaultDtAwdPri));
+    }
+
+    private BbieScDetailsRecord withDefaultValueDomain(ScoreUser requester, BbieScDetailsRecord bbieScDetails) {
+        if (bbieScDetails == null || bbieScDetails.basedDtSc() == null
+                || (bbieScDetails.primitiveRestriction() != null && !bbieScDetails.primitiveRestriction().isEmpty())) {
+            return bbieScDetails;
+        }
+        DtScAwdPriSummaryRecord defaultDtScAwdPri = repositoryFactory.dtQueryRepository(requester)
+                .getDefaultDtScAwdPriSummary(bbieScDetails.basedDtSc().dtScManifestId());
+        return defaultDtScAwdPri == null ? bbieScDetails
+                : bbieScDetails.withPrimitiveRestriction(PrimitiveRestriction.fromDtScAwdPri(defaultDtScAwdPri));
     }
 
     public AsbiepDetailsRecord getAsbiepDetails(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId,
@@ -588,13 +616,13 @@ public class BieEditService implements InitializingBean {
                     .ownerTopLevelAsbiep(ownerTopLevelAsbiep)
                     .build();
         }
-        return bbieScDetails;
+        return withDefaultValueDomain(requester, bbieScDetails);
     }
 
     public BbieScDetailsRecord getBbieScDetails(ScoreUser requester, BbieScId bbieScId) {
 
         var query = repositoryFactory.bbieScQueryRepository(requester);
-        return query.getBbieScDetails(bbieScId);
+        return withDefaultValueDomain(requester, query.getBbieScDetails(bbieScId));
     }
 
     public List<BieEditUsed> getBieUsedList(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
