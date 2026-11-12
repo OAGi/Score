@@ -368,6 +368,11 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
         return;
       }
 
+      // The backend saves the trimmed Code, so compare and keep the trimmed one.
+      if (typeof result.value === 'string') {
+        result.value = result.value.trim();
+      }
+
       const data = this.values;
       if (isAddAction) {
         for (const value of data) {
