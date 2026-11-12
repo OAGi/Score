@@ -509,6 +509,23 @@ describe('ScoreTableViewComponent', () => {
       expect(fixture.componentInstance.clicked).toEqual(['a']);
       expect(fixture.componentInstance.selection.selected).toEqual([]);
     });
+
+    it('judges the header checkbox by the shown rows only, and keeps the selection of other pages', () => {
+      const fixture = TestBed.createComponent(RowsHostComponent);
+      const host = fixture.componentInstance;
+      host.selection.select('other-page');
+      fixture.detectChanges();
+      const view = fixture.debugElement.query(By.directive(ScoreTableViewComponent)).componentInstance as ScoreTableViewComponent;
+      expect(view.isAllSelected()).toBe(false);
+      expect(view.isSomeSelected()).toBe(false);
+
+      view.masterToggle();
+      expect(host.selection.selected.sort()).toEqual(['a', 'other-page']);
+      expect(view.isAllSelected()).toBe(true);
+
+      view.masterToggle();
+      expect(host.selection.selected).toEqual(['other-page']);
+    });
   });
 
   it('keeps the default header of a column whose cell has control flow, when the columns change', () => {

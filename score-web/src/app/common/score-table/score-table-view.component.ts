@@ -550,17 +550,25 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
     return this.selection().isSelected(this.rowKey()(row));
   }
 
-  /** Whether all the rows that can be selected are. */
+  /** Whether all the rows that can be selected are. Only the shown rows count: the selection may also hold the rows of other pages. */
   isAllSelected(): boolean {
-    return this.selection().selected.length === this.selectableRows().filter(row => this.rowSelectable()(row)).length;
+    const rows = this.selectableRows().filter(row => this.rowSelectable()(row));
+    return rows.length > 0 && rows.every(row => this.isSelected(row));
+  }
+
+  /** Whether some, but not all, of the rows that can be selected are. */
+  isSomeSelected(): boolean {
+    return !this.isAllSelected() && this.selectableRows().some(row => this.rowSelectable()(row) && this.isSelected(row));
   }
 
   masterToggle() {
+    const rows = this.selectableRows().filter(row => this.rowSelectable()(row));
     if (this.isAllSelected()) {
-      this.selection().clear();
+      // Only the shown rows: the rows of other pages stay selected.
+      this.selection().deselect(...rows.map(row => this.rowKey()(row)));
     } else {
       // One call, so `changed` is emitted once: a call per row would draw the whole table once per row.
-      this.selection().select(...this.selectableRows().filter(row => this.rowSelectable()(row)).map(row => this.rowKey()(row)));
+      this.selection().select(...rows.map(row => this.rowKey()(row)));
     }
   }
 

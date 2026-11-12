@@ -182,8 +182,8 @@
               <th mat-header-cell *matHeaderCellDef>
                 @if (!singleSelect() && selectAll()) {
                   <mat-checkbox (change)="$event ? masterToggle() : null"
-                    [checked]="selection().hasValue() && isAllSelected()"
-                    [indeterminate]="selection().hasValue() && !isAllSelected()">
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isSomeSelected()">
                   </mat-checkbox>
                 }
               </th>
@@ -237,8 +237,8 @@
               <th mat-header-cell *matHeaderCellDef>
                 @if (!singleSelect() && selectAll()) {
                   <mat-checkbox (change)="$event ? masterToggle() : null"
-                    [checked]="selection().hasValue() && isAllSelected()"
-                    [indeterminate]="selection().hasValue() && !isAllSelected()">
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isSomeSelected()">
                   </mat-checkbox>
                 }
               </th>
