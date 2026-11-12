@@ -181,6 +181,8 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         copiedBiePackageRecord.setBiePackageId(null);
         copiedBiePackageRecord.setGuid(Guid.create().value());
         copiedBiePackageRecord.setState(BieState.WIP.name());
+        // The name, version ID and version name are unique together, so the copy cannot keep the name of its source.
+        copiedBiePackageRecord.setName("Copy of " + biePackageRecord.getName());
         ULong requesterUserId = valueOf(requester().userId());
         copiedBiePackageRecord.setOwnerUserId(requesterUserId);
         copiedBiePackageRecord.setCreatedBy(requesterUserId);
