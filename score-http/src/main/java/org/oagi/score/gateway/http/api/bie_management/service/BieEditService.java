@@ -642,6 +642,9 @@ public class BieEditService implements InitializingBean {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         TopLevelAsbiepSummaryRecord baseTopLevelAsbiep =
                 topLevelAsbiepQuery.getTopLevelAsbiepSummary(request.getBaseTopLevelAsbiepId());
+        if (baseTopLevelAsbiep == null) {
+            throw new IllegalArgumentException("The base BIE does not exist.");
+        }
 
         if (!topLevelAsbiep.release().releaseId().equals(baseTopLevelAsbiep.release().releaseId())) {
             throw new IllegalArgumentException("The base BIE must belong to the same release as the BIE.");

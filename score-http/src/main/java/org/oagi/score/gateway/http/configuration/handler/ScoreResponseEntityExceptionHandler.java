@@ -4,6 +4,9 @@ import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
+import org.oagi.score.gateway.http.common.model.base.DataValueTooLongException;
+import org.oagi.score.gateway.http.common.model.base.DuplicateValueException;
+import org.oagi.score.gateway.http.common.model.base.ReferencedRecordException;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,9 +130,23 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
                 ex.getErrorMessageId() != null ? ex.getErrorMessageId().toString() : null);
     }
 
+    @ExceptionHandler(DataValueTooLongException.class)
+    public ResponseEntity handleDataValueTooLongException(
+            DataValueTooLongException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler({DuplicateValueException.class, ReferencedRecordException.class})
+    public ResponseEntity handleConflictingDataException(
+            ScoreDataAccessException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return errorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     /**
-     * Defense-in-depth safety net: any foreign-key / integrity violation that is not pre-empted by an
-     * explicit in-use guard is surfaced as a clean 409 CONFLICT instead of a raw 500.
+     * Defense-in-depth safety net for an integrity violation that did not pass through the repository layer's
+     * translation: surfaced as a clean 409 CONFLICT instead of a raw 500.
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handleDataIntegrityViolationException(

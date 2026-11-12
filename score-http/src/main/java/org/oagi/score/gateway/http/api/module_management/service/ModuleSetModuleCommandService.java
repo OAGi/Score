@@ -55,6 +55,9 @@ public class ModuleSetModuleCommandService {
         ModuleSummaryRecord parentModule = null;
         if (request.parentModuleId() != null) {
             parentModule = query.getModule(request.parentModuleId());
+            if (parentModule == null) {
+                throw new IllegalArgumentException("The parent module does not exist.");
+            }
         }
 
         String path = (parentModule != null && hasLength(parentModule.path())) ?
@@ -62,7 +65,7 @@ public class ModuleSetModuleCommandService {
 
         return command(requester).create(
                 request.moduleSetId(),
-                parentModule.moduleId(),
+                (parentModule != null) ? parentModule.moduleId() : null,
                 request.namespaceId(),
                 (request.directory() ? DIRECTORY : FILE),
                 path,
