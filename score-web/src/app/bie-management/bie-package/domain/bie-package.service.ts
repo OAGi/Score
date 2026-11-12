@@ -69,11 +69,10 @@ export class BiePackageService {
     if (request.updaterLoginIdList.length > 0) {
       params = params.set('updaterLoginIdList', request.updaterLoginIdList.join(','));
     }
-    if (request.updatedDate.start) {
-      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
-    }
-    if (request.updatedDate.end) {
-      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    if (!!request.updatedDate.start || !!request.updatedDate.end) {
+      params = params.set('lastUpdatedOn',
+          '[' + (!!request.updatedDate.start ? request.updatedDate.start.getTime() : '') + '~' +
+          (!!request.updatedDate.end ? request.updatedDate.end.getTime() : '') + ']');
     }
     if (request.filters.den) {
       params = params.set('den', request.filters.den);
