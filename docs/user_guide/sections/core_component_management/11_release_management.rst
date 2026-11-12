@@ -147,6 +147,7 @@ To create a release draft:
    created/changed in the *Working* branch. The right, aka *Assigned*
    pane, contains CCs assigned to the release and is initially empty.
    The *Type* filter of the page offers ACC, ASCCP, BCCP, Code List, Agency ID List, and DT.
+   The *State* filter hides CCs in the Deleted state at first; select Deleted to list them as well.
    A DT in the lists links to the Data Type page.
 
 3. Assign CCs to the release by selectively dragging CCs that are in the
@@ -181,7 +182,10 @@ To create a release draft:
    "Core Component" page and on the *Branch* filter at the top-left of
    the page select the release draft from the list to review all CCs in
    the release draft. The user may also want to notify other developers
-   or end users that the release draft is ready for review.
+   or end users that the release draft is ready for review. If the release stays
+   in the middle of processing with nothing working on it, for example because the
+   server stopped, open the detail page of the release and click "Recover" to return
+   it to the state it was in before.
 
 Review a release draft
 ^^^^^^^^^^^^^^^^^^^^^^
