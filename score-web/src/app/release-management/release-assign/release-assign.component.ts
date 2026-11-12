@@ -27,9 +27,9 @@ export const RELEASE_ASSIGN_TYPE_OPTIONS: { value: string, label: string }[] = [
   {value: 'ACC', label: 'ACC'},
   {value: 'ASCCP', label: 'ASCCP'},
   {value: 'BCCP', label: 'BCCP'},
+  {value: 'DT', label: 'DT'},
   {value: 'CODE_LIST', label: 'Code List'},
   {value: 'AGENCY_ID_LIST', label: 'Agency ID List'},
-  {value: 'DT', label: 'DT'},
 ];
 
 @Component({
@@ -157,7 +157,7 @@ export class ReleaseAssignComponent implements OnInit {
 
   _sort(a: AssignableNode, b: AssignableNode): number {
     const sortStateOrder = ['Candidate', 'Draft', 'WIP', 'Deleted'];
-    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'AGENCY_ID_LIST', 'DT'];
+    const sortTypeOrder = ['ACC', 'ASCCP', 'BCCP', 'DT', 'CODE_LIST', 'AGENCY_ID_LIST'];
     if (sortStateOrder.indexOf(a.state) > sortStateOrder.indexOf(b.state)) {
       return 1;
     } else if (sortStateOrder.indexOf(a.state) < sortStateOrder.indexOf(b.state)) {
@@ -193,30 +193,26 @@ export class ReleaseAssignComponent implements OnInit {
   }
 
   assignAll() {
-    const remains = [];
-    for (const node of this.itemsList.assignableList.reverse()) {
-      if (node.state === 'Candidate' && node.visible) {
-        this.itemsList.assignedList.splice(0, 0, node);
-      } else {
-        remains.push(node);
-      }
+    const isMovable = (node: AssignableNode) => node.state === 'Candidate' && node.visible;
+    const moved = this.itemsList.assignableList.filter(isMovable);
+    if (moved.length === 0) {
+      return;
     }
 
-    this.itemsList.assignableList = remains;
+    this.itemsList.assignableList = this.itemsList.assignableList.filter(node => !isMovable(node));
+    this.itemsList.assignedList = [...moved, ...this.itemsList.assignedList];
     this.isValidated = false;
   }
 
   unassignAll() {
-    const remains = [];
-    for (const node of this.itemsList.assignedList.reverse()) {
-      if (node.state === 'Candidate' && node.visible) {
-        this.itemsList.assignableList.splice(0, 0, node);
-      } else {
-        remains.push(node);
-      }
+    const isMovable = (node: AssignableNode) => node.state === 'Candidate' && node.visible;
+    const moved = this.itemsList.assignedList.filter(isMovable);
+    if (moved.length === 0) {
+      return;
     }
 
-    this.itemsList.assignedList = remains;
+    this.itemsList.assignedList = this.itemsList.assignedList.filter(node => !isMovable(node));
+    this.itemsList.assignableList = [...moved, ...this.itemsList.assignableList];
     this.isValidated = false;
   }
 

@@ -22,7 +22,7 @@ describe('ReleaseAssignComponent', () => {
   describe('type filter', () => {
     it('offers Code List and Agency ID List', () => {
       const labels = Object.fromEntries(RELEASE_ASSIGN_TYPE_OPTIONS.map(t => [t.value, t.label]));
-      expect(Object.keys(labels)).toEqual(['ACC', 'ASCCP', 'BCCP', 'CODE_LIST', 'AGENCY_ID_LIST', 'DT']);
+      expect(Object.keys(labels)).toEqual(['ACC', 'ASCCP', 'BCCP', 'DT', 'CODE_LIST', 'AGENCY_ID_LIST']);
       expect(labels['CODE_LIST']).toBe('Code List');
       expect(labels['AGENCY_ID_LIST']).toBe('Agency ID List');
     });
