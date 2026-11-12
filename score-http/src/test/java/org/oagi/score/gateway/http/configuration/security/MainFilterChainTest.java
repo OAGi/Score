@@ -130,7 +130,10 @@ class MainFilterChainTest {
         }
     }
 
+    private SessionService sessionService;
+
     private MockMvc mvc() {
+        sessionService = mock(SessionService.class);
         AppUserDetailsService userDetailsService = mock(AppUserDetailsService.class);
         when(userDetailsService.loadUserByUsername("alice")).thenReturn(
                 new User("alice", new BCryptPasswordEncoder().encode("secret"),
@@ -138,6 +141,7 @@ class MainFilterChainTest {
 
         securityConfiguration = new SecurityConfiguration();
         ReflectionTestUtils.setField(securityConfiguration, "userDetailsService", userDetailsService);
+        ReflectionTestUtils.setField(securityConfiguration, "sessionService", sessionService);
         ReflectionTestUtils.setField(securityConfiguration, "oAuth2AuthorizedClientService", mock(ScoreOAuth2AuthorizedClientService.class));
         ReflectionTestUtils.setField(securityConfiguration, "authenticationSuccessHandler", mock(ScoreAuthenticationSuccessHandler.class));
         ReflectionTestUtils.setField(securityConfiguration, "clientRegistrationRepository", mock(ScoreClientRegistrationRepository.class));
@@ -243,6 +247,27 @@ class MainFilterChainTest {
         mvc.perform(withOrigin(post("/logout"), session, EVIL)).andExpect(status().isForbidden());
         mvc.perform(withOrigin(get("/stub/read"), session, null)).andExpect(status().isOk());
 
+        mvc.perform(withOrigin(post("/logout"), session, APP)).andExpect(status().isOk());
+        mvc.perform(withOrigin(get("/stub/read"), session, null)).andExpect(status().isUnauthorized());
+    }
+
+    // ---- disabled account ----
+
+    @Test
+    void anAccountDisabledAfterSigningInIsRefusedOnEveryRequestButCanSignOut() throws Exception {
+        MockMvc mvc = mvc();
+        MockHttpSession session = signedIn(mvc);
+
+        // Like the real check, an anonymous request is not a disabled account.
+        when(sessionService.isDisabled(org.mockito.ArgumentMatchers.any())).thenAnswer(inv ->
+                inv.getArgument(0) instanceof org.springframework.security.authentication.UsernamePasswordAuthenticationToken);
+
+        mvc.perform(withOrigin(get("/stub/read"), session, null)).andExpect(status().isForbidden());
+        mvc.perform(withOrigin(post("/stub/change"), session, APP)).andExpect(status().isForbidden());
+        // The public paths stay reachable, so that the sign-in page loads with the stale cookie of a disabled account.
+        mvc.perform(withOrigin(get("/info/webpages"), session, null)).andExpect(status().isNotFound());
+        // /ai/** is open on the chain but its endpoints work for the signed-in user, so it is not one of them.
+        mvc.perform(withOrigin(get("/ai/models"), session, null)).andExpect(status().isForbidden());
         mvc.perform(withOrigin(post("/logout"), session, APP)).andExpect(status().isOk());
         mvc.perform(withOrigin(get("/stub/read"), session, null)).andExpect(status().isUnauthorized());
     }
