@@ -31,6 +31,22 @@ describe('WebPageInfoService', () => {
     service.reset();
   });
 
+  it('reads the stored text once for the many reads of a screen, and again when the text changes', () => {
+    const service = create();
+    const info = new WebPageInfo();
+    info.brand = 'first';
+    service.set(info);
+    const read = service.webPageInfo;
+    expect(service.webPageInfo).toBe(read);
+
+    const next = new WebPageInfo();
+    next.brand = 'second';
+    service.set(next);
+    expect(service.webPageInfo).not.toBe(read);
+    expect(service.webPageInfo.brand).toBe('second');
+    service.reset();
+  });
+
   it('loads the page info with non-Latin-1 text without failing', () => {
     const service = create({brand: '환영합니다'});
     let loaded: WebPageInfo;
