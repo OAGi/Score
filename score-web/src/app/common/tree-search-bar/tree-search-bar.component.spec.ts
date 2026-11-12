@@ -140,6 +140,18 @@ describe('TreeSearchBarComponent', () => {
       expect(ctx.scope).toBe('clicked');
     });
 
+    it('follows the user back to a node that the search selected earlier', () => {
+      const ctx = bar({scope: undefined, selectedByMatch: undefined});
+      setSelectedNode.call(ctx, 'root');
+      TreeSearchBarComponent.prototype.onSearch.call(ctx, 'Item/Party');
+      setSelectedNode.call(ctx, 'node'); // the match
+      setSelectedNode.call(ctx, 'clicked');
+      expect(ctx.scope).toBe('clicked');
+
+      setSelectedNode.call(ctx, 'node'); // the user picks the matched node again
+      expect(ctx.scope).toBe('node');
+    });
+
     it('names the node it is scoped to', () => {
       const label = Object.getOwnPropertyDescriptor(TreeSearchBarComponent.prototype, 'scopeLabel')!.get!;
       expect(label.call({scope: {displayName: 'Party', name: 'party'}})).toBe('Party');
