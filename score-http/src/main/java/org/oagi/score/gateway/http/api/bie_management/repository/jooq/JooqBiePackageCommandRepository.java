@@ -22,6 +22,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.jooq.impl.DSL.and;
@@ -181,8 +182,15 @@ public class JooqBiePackageCommandRepository extends JooqBaseRepository implemen
         copiedBiePackageRecord.setBiePackageId(null);
         copiedBiePackageRecord.setGuid(Guid.create().value());
         copiedBiePackageRecord.setState(BieState.WIP.name());
-        // The name, version ID and version name are unique together, so the copy cannot keep the name of its source.
-        copiedBiePackageRecord.setName("Copy of " + biePackageRecord.getName());
+        // The name, version ID and version name are unique together, so the copy cannot keep the name of its source,
+        // nor take the name of an earlier copy.
+        List<String> takenNames = dslContext().select(BIE_PACKAGE.NAME)
+                .from(BIE_PACKAGE)
+                .where(BIE_PACKAGE.NAME.startsWith("Copy of "))
+                .and(BIE_PACKAGE.VERSION_ID.isNotDistinctFrom(biePackageRecord.getVersionId()))
+                .and(BIE_PACKAGE.VERSION_NAME.isNotDistinctFrom(biePackageRecord.getVersionName()))
+                .fetch(BIE_PACKAGE.NAME);
+        copiedBiePackageRecord.setName(BiePackageCopyName.pick(biePackageRecord.getName(), new HashSet<>(takenNames)));
         ULong requesterUserId = valueOf(requester().userId());
         copiedBiePackageRecord.setOwnerUserId(requesterUserId);
         copiedBiePackageRecord.setCreatedBy(requesterUserId);
