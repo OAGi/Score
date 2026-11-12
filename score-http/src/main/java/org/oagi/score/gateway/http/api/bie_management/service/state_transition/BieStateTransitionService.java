@@ -232,8 +232,32 @@ public class BieStateTransitionService {
         if (state == BieState.Discard) {
             throw new IllegalArgumentException("Use the discard API for 'Discard' transitions.");
         }
+        TopLevelAsbiepSummaryRecord root =
+                repositoryFactory.topLevelAsbiepQueryRepository(requester).getTopLevelAsbiepSummary(topLevelAsbiepId);
+        if (root != null) {
+            ensureLegalRootTransition(root.state(), state);
+        }
         ensureCodeListDependenciesForChangingState(requester, List.of(topLevelAsbiepId), state, dependencyCodeListManifestIds);
         ensureBieRelationshipsForChangingState(requester, topLevelAsbiepId, state);
+    }
+
+    /**
+     * The requested state of a root BIE has to be one that the BIE can move to from its current state
+     * ({@link BieState#canMove}); {@code Initiating} is internal and is never a target. A request for the state
+     * the BIE already has is left as it is: it changes nothing, so one already-converted row does not fail a
+     * list request.
+     */
+    static void ensureLegalRootTransition(BieState current, BieState requested) {
+        if (requested == BieState.Initiating) {
+            throw new IllegalArgumentException("The state 'Initiating' cannot be requested.");
+        }
+        if (current == null || current == requested) {
+            return;
+        }
+        if (!current.canMove(requested)) {
+            throw new IllegalArgumentException(
+                    "A BIE in the state '" + current + "' cannot be moved to '" + requested + "'.");
+        }
     }
 
     /**
