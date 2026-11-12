@@ -99,6 +99,7 @@ export class BieUpliftProfileBieComponent {
     saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
 
     this.targetRelease = undefined;
+    this.selection.clear();
     this.applySourceRelease();
     this.view().onSearch();
 
@@ -116,6 +117,7 @@ export class BieUpliftProfileBieComponent {
     // The branches of the previous library must not stay when this library has none to choose.
     this.sourceRelease = undefined;
     this.targetRelease = undefined;
+    this.selection.clear();
     if (this.releases.length > 0) {
       const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
       if (savedReleaseId) {
