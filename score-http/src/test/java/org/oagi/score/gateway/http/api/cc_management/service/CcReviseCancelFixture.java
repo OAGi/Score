@@ -7,7 +7,6 @@ import org.jooq.impl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.common.TestDataSource;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -52,7 +51,6 @@ import static org.mockito.Mockito.mock;
  * same database would still lock the same rows of the library, in an order of their own, and deadlock, so a run takes a
  * lock of the database ({@code GET_LOCK}) for as long as it lives, and a second run waits for the first to end.
  */
-@EnabledIfSystemProperty(named = "score.reviseCancel", matches = "true")
 abstract class CcReviseCancelFixture {
 
     static final String LIBRARY = "connectSpec";

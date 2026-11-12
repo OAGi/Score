@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListValueManifestId;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.mock;
  *   mvn test -Drevision=3.5.0 -Dtest=CodeListAndAgencyIdListCancelDbTest -DargLine=-Dscore.reviseCancel=true
  * </pre>
  */
+@EnabledIfSystemProperty(named = "score.reviseCancel", matches = "true")
 class CodeListAndAgencyIdListCancelDbTest extends CcReviseCancelFixture {
 
     CodeListCommandService codeLists;

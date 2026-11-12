@@ -1,5 +1,6 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   mvn test -Drevision=3.5.0 -Dtest=CcRowReferenceDbTest -DargLine=-Dscore.reviseCancel=true
  * </pre>
  */
+@EnabledIfSystemProperty(named = "score.reviseCancel", matches = "true")
 class CcRowReferenceDbTest extends CcReviseCancelFixture {
 
     private static final String ASSOCIATIONS = "exists (select 1 from ascc_manifest x where x.from_acc_manifest_id = m.acc_manifest_id) "

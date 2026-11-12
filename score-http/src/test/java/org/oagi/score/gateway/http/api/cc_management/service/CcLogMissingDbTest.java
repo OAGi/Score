@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.api.cc_management.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *   mvn test -Drevision=3.5.0 -Dtest=CcLogMissingDbTest -DargLine=-Dscore.reviseCancel=true
  * </pre>
  */
+@EnabledIfSystemProperty(named = "score.reviseCancel", matches = "true")
 class CcLogMissingDbTest extends CcReviseCancelFixture {
 
     static Stream<Arguments> components() {
