@@ -49,68 +49,27 @@ deploy/deploy.sh test --images=http --remote-only   # roll only the backend imag
 | `verify.sh <inst> [ver]` | **hard-asserts** public 200, frontend/backend image==ver, backend 401, Flyway head==ver & success=1 (exit≠0 on any failure); STOMP wss 101 as a warning |
 | `rollback.sh <inst> [ver\|--list]` | restore newest `~/docker-compose.yml.bak-*` (or re-point to a version); `--list` shows each backup's tags |
 | `regen-repo-image.sh <from> [to]` | refresh the baked DB seed: seed clean `<from>` data → migrate with `<to>` backend → dump → rebuild `srt-repo:<to>` |
-| `backup-dbs.sh [host ...]` | pre-deploy: `mysqldump` each fleet DB over TCP:3306 → `~/dumps/<host>_YYYYMMDD.sql`, bundled into `~/dumps/YYYYMMDD.zip` |
+| `backup-dbs.sh <domain>` | `mysqldump` one instance's DB through SSH (`score-db dump` on the host; 3306 is not exposed) → `~/dumps/<domain>_YYYYMMDD.sql` |
 
-### Pre-deploy DB backup (`backup-dbs.sh`)
+### DB backup (`backup-dbs.sh`)
 
-Snapshots the fleet DBs before a deploy. Dumps `main/training/modeldev/cloud` (test excluded —
-it's the pre-release box) with the established Workbench `mysqldump` flags, then bundles the day's
-dumps into a single `~/dumps/YYYYMMDD.zip` (verifies the zip, then removes the raw `.sql` unless
-`--keep-sql`).
-
-```bash
-deploy/backup-dbs.sh                 # back up all four, open SG first, archive to ~/dumps/YYYYMMDD.zip
-deploy/backup-dbs.sh --keep-sql      # keep the raw .sql alongside the zip
-deploy/backup-dbs.sh connectcenter.oagi.org -y   # just PROD, no prompt
-```
-
-Reaching `:3306` needs the fleet SG's DB (3306) rule pointed at your current IP — all fleet
-instances share that SG, so the script runs `open-sg.sh` first (skip with `--no-sg`). The SG
-id/rule ids live in `deploy/deploy.env` (git-ignored). The dump uses table locking (no
-`--single-transaction`, matching the manual command); set `MYSQLDUMP_EXTRA=--single-transaction`
-for a non-blocking InnoDB snapshot.
-
-### Refreshing the DB image seed (`regen-repo-image.sh`)
-
-`srt-repo`'s Dockerfile bakes `score-repo/docker/oagis.sql` (a ~500 MB full dump) into
-`/docker-entrypoint-initdb.d`, so a fresh container starts with that schema+data. When a release
-adds a migration, the seed should be refreshed so the image is canonical for its tag. This
-automates the manual process:
+Dumps one instance's `oagi` DB to `<out>/<domain>_YYYYMMDD.sql` (default `<out>` = `DUMPS_DIR`
+from `deploy.env`, else `~/dumps`). The DB port (3306) is bound to `127.0.0.1` and not open in the
+security group on the instances, so the dump runs **on the instance over SSH** via the
+`score-db dump` helper (no DB password needed, only SSH access). It uses `--single-transaction`
+(no table locks) and rejects a dump that is tiny or lacks the `Dump completed` marker.
 
 ```bash
-deploy/regen-repo-image.sh 3.5.1            # seed 3.5.1 → migrate to score-http/VERSION → rebuild srt-repo
-deploy/regen-repo-image.sh 3.5.1 3.5.2 --push   # ...and push the refreshed image
+deploy/backup-dbs.sh connectcenter.oagi.org
+deploy/backup-dbs.sh cloud.connectcenter.oagi.org --out /tmp/dumps
 ```
-
-What it does, all under a throwaway `srtregen-*` namespace (never touches your normal containers):
-1. run a clean `srt-repo:<from>` on a throwaway volume (seeds baseline data),
-2. run `srt-http-gateway:<to>` (redis alongside) against it so Flyway migrates the schema to `<to>`,
-3. `mysqldump` the migrated `oagi` DB with the exact Workbench flags
-   (`--protocol=tcp --routines --column-statistics=0 --skip-triggers`; MySQL 8 dump is required
-   because `--column-statistics=0` doesn't exist in MariaDB's dump),
-4. validate the dump (size, `flyway_schema_history`, completion marker), back up the old seed to
-   `$TMPDIR/srt-repo-seed-backups/` (it's git-ignored → unrecoverable otherwise), then rebuild
-   via `score-repo/docker/build.sh`.
-
-Flags: `--push`, `--db-port N` (if 3306 is taken), `--backend-image IMG`, `--keep` (debug), `-y`.
-Requires a MySQL 8 `mysqldump` and the DB creds — set `MYSQLDUMP`, `DB_USER`, `DB_PASS`,
-`DB_NAME` in `deploy/deploy.env` (see below).
-
-> Note: `deploy/build-images.sh` bakes the *current* `oagis.sql` as-is. Run `regen-repo-image.sh`
-> first whenever a release adds a migration, so the `srt-repo` image seed matches its tag.
-
-Config lives in `config.sh` (image names, instance hosts, defaults). Environment-specific and
-sensitive values — `SG_ID`, `SG_RULE_IDS`, `AWS_REGION`, `SSH_KEY`, `MYSQLDUMP`, `DUMPS_DIR`,
-`DB_USER`, `DB_PASS`, `DB_NAME`, `DB_PORT` — are **not** committed; put them in `deploy/deploy.env`
-(git-ignored; copy `deploy/deploy.env.example`). `config.sh` sources it and guards steps that
-need them (`require_vars`).
 
 ### SSH preflight (automatic SG open)
 
 Every step that SSHes to an instance (`remote-deploy.sh`, `verify.sh`, `rollback.sh`) first probes
 SSH; **if it's unreachable, it runs `open-sg.sh` to re-point the SG to your current IP and retries**
 — so you don't have to remember to open it when your IP changes. If SSH already works, nothing is
-changed. `backup-dbs.sh` (which uses TCP:3306, not SSH) opens the SG up front instead.
+changed. `backup-dbs.sh` also uses SSH only; run `open-sg.sh` first if your IP changed.
 
 ## Prerequisites
 
