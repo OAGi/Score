@@ -151,16 +151,26 @@ export class BusinessContextValueDialogComponent implements OnInit {
     );
   }
 
+  private schemesInScope(): ContextSchemeSummary[] {
+    return this.contextSchemeList
+      .filter(e => e.contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId);
+  }
+
+  private valuesInScope(): ContextSchemeValueSummary[] {
+    return this.contextSchemeValueList
+      .filter(e => e.contextSchemeId === this.businessContextValue.contextSchemeId);
+  }
+
   filterCtxSchemes() {
     let search = this.contextSchemeListFilterCtrl.value;
     if (!search) {
-      this.filteredContextSchemeList.next(this.contextSchemeList.slice());
+      this.filteredContextSchemeList.next(this.schemesInScope());
       return;
     } else {
       search = search.toLowerCase();
     }
     this.filteredContextSchemeList.next(
-        this.contextSchemeList.filter(contextScheme =>
+        this.schemesInScope().filter(contextScheme =>
             contextScheme.schemeName.toLowerCase().indexOf(search) > -1 ||
             contextScheme.schemeId.toLowerCase().indexOf(search) > -1 ||
             contextScheme.schemeAgencyId.toLowerCase().indexOf(search) > -1)
@@ -170,78 +180,29 @@ export class BusinessContextValueDialogComponent implements OnInit {
   filterCtxSchemeValues() {
     let search = this.contextSchemeValueListFilterCtrl.value;
     if (!search) {
-      this.filteredContextSchemeValueList.next(this.contextSchemeValueList.slice());
+      this.filteredContextSchemeValueList.next(this.valuesInScope());
       return;
     } else {
       search = search.toLowerCase();
     }
+    // Meaning is optional, so a value can have none.
     this.filteredContextSchemeValueList.next(
-        this.contextSchemeValueList.filter(contextSchemeValue =>
+        this.valuesInScope().filter(contextSchemeValue =>
             contextSchemeValue.value.toLowerCase().indexOf(search) > -1 ||
-            contextSchemeValue.meaning.toLowerCase().indexOf(search) > -1)
+            (contextSchemeValue.meaning ?? '').toLowerCase().indexOf(search) > -1)
     );
   }
 
   resetCtxCategories() {
-    this.contextCategoryListFilterCtrl.valueChanges
-      .subscribe(() => {
-        let search = this.contextCategoryListFilterCtrl.value;
-        if (!search) {
-          this.filteredContextCategoryList.next(this.contextCategoryList.slice());
-          return;
-        } else {
-          search = search.toLowerCase();
-        }
-        this.filteredContextCategoryList.next(
-          this.contextCategoryList.filter(e => e.name.toLowerCase().indexOf(search) > -1)
-        );
-      });
     this.filteredContextCategoryList.next(this.contextCategoryList.slice());
   }
 
   resetCtxSchemes() {
-    const contextScheme = this.contextSchemeList
-      .filter(e => e.contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId);
-
-    this.contextSchemeListFilterCtrl.valueChanges
-      .subscribe(() => {
-        let search = this.contextSchemeListFilterCtrl.value;
-        if (!search) {
-          this.filteredContextSchemeList.next(contextScheme.slice());
-          return;
-        } else {
-          search = search.toLowerCase();
-        }
-        this.filteredContextSchemeList.next(
-            contextScheme.filter(e =>
-                e.schemeName.toLowerCase().indexOf(search) > -1 ||
-                e.schemeId.toLowerCase().indexOf(search) > -1 ||
-                e.schemeAgencyId.toLowerCase().indexOf(search) > -1)
-        );
-      });
-    this.filteredContextSchemeList.next(contextScheme.slice());
+    this.filteredContextSchemeList.next(this.schemesInScope());
   }
 
   resetCtxSchemeValues() {
-    const contextSchemeValueList = this.contextSchemeValueList
-      .filter(e => e.contextSchemeId === this.businessContextValue.contextSchemeId);
-
-    this.contextSchemeValueListFilterCtrl.valueChanges
-      .subscribe(() => {
-        let search = this.contextSchemeValueListFilterCtrl.value;
-        if (!search) {
-          this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());
-          return;
-        } else {
-          search = search.toLowerCase();
-        }
-        this.filteredContextSchemeValueList.next(
-            contextSchemeValueList.filter(e =>
-                e.value.toLowerCase().indexOf(search) > -1 ||
-                e.meaning.toLowerCase().indexOf(search) > -1)
-        );
-      });
-    this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());
+    this.filteredContextSchemeValueList.next(this.valuesInScope());
   }
 
   isDisabled() {
