@@ -106,4 +106,30 @@ class TagCommandServiceTest {
         }
         verifyNoInteractions(command);
     }
+
+    @Test
+    void createTrimsNameBeforeCheckingDuplicateAndStoring() {
+        ScoreUser developer = user(ScoreRole.DEVELOPER);
+        when(query.getTagSummaryByName("tag")).thenReturn(new TagSummaryRecord(tagId, "tag", "#000", "#fff"));
+        assertThatThrownBy(() -> service.create(developer, new CreateTagRequest("  tag  ", "#000", "#fff", null)))
+                .isInstanceOf(IllegalArgumentException.class);
+        verifyNoInteractions(command);
+
+        service.create(developer, new CreateTagRequest("  other  ", "#000", "#fff", null));
+        verify(command).create("other", "#000", "#fff", null);
+    }
+
+    @Test
+    void updateTrimsNameBeforeCheckingDuplicateAndStoring() throws Exception {
+        ScoreUser developer = user(ScoreRole.DEVELOPER);
+        when(query.exists(tagId)).thenReturn(true);
+        when(query.getTagSummaryByName("tag"))
+                .thenReturn(new TagSummaryRecord(new TagId(BigInteger.TWO), "tag", "#000", "#fff"));
+        assertThatThrownBy(() -> service.update(developer, new UpdateTagRequest(tagId, "  tag  ", "#000", "#fff", null)))
+                .isInstanceOf(IllegalArgumentException.class);
+        verifyNoInteractions(command);
+
+        service.update(developer, new UpdateTagRequest(tagId, "  other  ", "#000", "#fff", null));
+        verify(command).update(tagId, "other", "#000", "#fff", null);
+    }
 }
