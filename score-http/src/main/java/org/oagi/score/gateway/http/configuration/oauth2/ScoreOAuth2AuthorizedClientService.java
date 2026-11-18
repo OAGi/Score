@@ -153,6 +153,6 @@ public class ScoreOAuth2AuthorizedClientService implements OAuth2AuthorizedClien
         Assert.hasText(principalName, "principalName cannot be empty");
 
         sessionRedisOperations.opsForHash()
-                .delete(getKey(clientRegistrationId, principalName), hashKeys);
+                .delete(getKey(clientRegistrationId, principalName), hashKeys.toArray());
     }
 }
