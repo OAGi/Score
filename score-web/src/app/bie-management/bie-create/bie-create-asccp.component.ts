@@ -139,6 +139,8 @@ export class BieCreateAsccpComponent {
   onBranchChange(release: ReleaseSummary) {
     this.releaseChoice.choose(release);
     this.applyRelease();
+    // A concept chosen from the previous branch's list must not be created.
+    this.selection.clear();
     this.view().onSearch();
   }
 
@@ -147,8 +149,9 @@ export class BieCreateAsccpComponent {
     this.releaseService.getReleaseSummaryList(library.libraryId, ['Published']).subscribe(releases => {
       this.releaseChoice.init(releases.filter(e => !e.workingRelease));
       this.applyRelease();
-      this.view().onSearch();
       this.applyLibrary();
+      this.selection.clear();
+      this.view().onSearch();
     });
   }
 
