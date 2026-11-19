@@ -67,7 +67,7 @@ public class ReleasePackageLoadUploads {
     // ---------------------------------------------------------------------------------------------------------------
 
     /** Takes a package that is sent, and returns when all of it has come. */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public Upload receive(ScoreUser requester, String fileName, InputStream stream, long declaredLength) {
         requireName(fileName);
         if (declaredLength > settings.maxPackageSize()) {
@@ -164,7 +164,7 @@ public class ReleasePackageLoadUploads {
     // What is there
     // ---------------------------------------------------------------------------------------------------------------
 
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public Upload get(ScoreUser requester, String id) {
         Upload upload = uploads.get(id);
         if (upload == null) {
@@ -174,14 +174,14 @@ public class ReleasePackageLoadUploads {
     }
 
     /** Throws a package away. */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public void discard(ScoreUser requester, String id) {
         Upload upload = get(requester, id);
         drop(upload);
     }
 
     /** Gives a package that is ready to a load, which is its own from now on: it is no more here. */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public Upload take(ScoreUser requester, String id) {
         Upload upload = get(requester, id);
         if (upload.state() != State.READY) {

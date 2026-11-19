@@ -123,8 +123,9 @@ public interface ReleasePackageLoadCommandRepository {
     /**
      * Puts the staging schema in the place of the served one: the tables of the served schema are moved to the backup schema
      * and those of the staging schema are moved to the served one, in one statement. A table that has a trigger cannot be
-     * moved to another schema, so the triggers are dropped and made again in the served schema, from the ones of the staging
-     * schema; the triggers and the routines that were there are kept in the backup schema, for {@link #rollbackSwap}.
+     * moved to another schema, so the triggers are dropped and made again where their tables are afterwards, and so are the
+     * routines: the backup schema has the tables, the triggers and the routines the served schema had, which is all that
+     * {@link #rollbackSwap} needs; it is this same operation done again.
      *
      * <p>Nothing is to write to the served schema while it does. When it does not go through, the served schema is as it was
      * (this is said in the exception if it could not be put back).</p>
@@ -133,7 +134,7 @@ public interface ReleasePackageLoadCommandRepository {
      * @param lockWait     how long to wait for a lock a statement of another connection holds, before giving up
      * @param staysInPlace the tables that are not moved, neither those of the served schema nor those of the staging schema (what
      *                     follows the swap itself, such as the record of the load); they have no foreign key, since one that
-     *                     goes to a table that is moved goes with that table. The undo leaves them where they are too.
+     *                     goes to a table that is moved goes with that table, and no trigger. The undo is given the same.
      * @throws SchemaSwapException when the swap did not go through
      */
     SwapOutcome swap(String stagingSchema, String backupSchema, Duration lockWait, Collection<String> staysInPlace);
@@ -144,11 +145,17 @@ public interface ReleasePackageLoadCommandRepository {
     }
 
     /**
-     * Undoes a swap: the tables of the backup schema are moved back, the triggers and the routines that were kept are made
-     * again, and the tables that were swapped in are moved to the discarded schema.
+     * Undoes a swap by doing it again the other way: what the backup schema holds (tables, triggers, routines) is put in the
+     * place of the served schema, and what was served goes to the discarded schema, whole, so that it can be swapped in again.
      *
      * @param discardedSchema an empty schema
-     * @throws SchemaSwapException when the backup schema does not hold a swap, or when it did not go through
+     * @param staysInPlace    the same tables the swap was given
+     * @throws SchemaSwapException when the backup schema holds no tables, or when it did not go through
      */
-    SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait);
+    SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait, Collection<String> staysInPlace);
+
+    /** An undo in which every table was moved. */
+    default SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait) {
+        return rollbackSwap(backupSchema, discardedSchema, lockWait, Set.of());
+    }
 }

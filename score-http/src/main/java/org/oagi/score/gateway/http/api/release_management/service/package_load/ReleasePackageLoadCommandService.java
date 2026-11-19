@@ -71,7 +71,7 @@ public class ReleasePackageLoadCommandService {
      * @throws AccessControlException       for one who is not an administrator
      * @throws ReleasePackageLoadRefusedException when the package is not a package, or another load goes on
      */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public ReleasePackageLoadJob start(ScoreUser requester, Path packageFile, String fileName) {
         try {
             requireAvailable();
@@ -100,7 +100,7 @@ public class ReleasePackageLoadCommandService {
      *
      * @throws ReleasePackageLoadRefusedException when the load is not the latest that succeeded, or another goes on
      */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public ReleasePackageLoadJob rollback(ScoreUser requester, ReleasePackageLoadJobId id) {
         requireAvailable();
         ReleasePackageLoadJob job = jobs().find(id).orElseThrow(() -> new NotFoundException(ReleasePackageLoadMessages.LOAD_NOT_FOUND));
@@ -125,7 +125,7 @@ public class ReleasePackageLoadCommandService {
      * What a load of the package would meet, which nothing is changed to find out: everything that is not as it has to be is told, and a
      * package that has nothing in the way is told to have none.
      */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public ReleasePackageLoadPreflightReport preflight(ScoreUser requester, Path packageFile) {
         Info info = read(packageFile);
         String releaseNum = info.getMigration().getRelease().getReleaseNum();
@@ -139,25 +139,28 @@ public class ReleasePackageLoadCommandService {
         if (!jobs().findActive().isEmpty()) {
             problems.add(ReleasePackageLoadMessages.ANOTHER_LOAD);
         }
+        List<ReleasePackageLoadPreflightReport.Library> libraries = List.of();
         if (format != null) {
             try (ZipScriptSource source = new ZipScriptSource(packageFile.toString())) {
-                problems.addAll(preflight.problems(format, info, source, settings.delta(), new ReleasePackageLoadJobId(BigInteger.ZERO)));
+                ReleasePackageLoadPreflight.Look look = preflight.look(format, info, source, settings.delta(), new ReleasePackageLoadJobId(BigInteger.ZERO));
+                problems.addAll(look.problems());
+                libraries = look.libraries();
             } catch (IOException e) {
                 logger.warn("A package could not be read: " + e.getMessage(), e);
                 throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.NOT_READ, e);
             }
         }
-        return new ReleasePackageLoadPreflightReport(releaseNum, info.getVersion(), format == null ? null : format.name(), List.copyOf(problems));
+        return new ReleasePackageLoadPreflightReport(releaseNum, info.getVersion(), format == null ? null : format.name(), List.copyOf(problems), libraries);
     }
 
     /** The loads that were started last, the latest first. */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public List<ReleasePackageLoadJob> recent(ScoreUser requester, int limit) {
         return jobs().findRecent(Math.max(1, Math.min(limit, 50)));
     }
 
     /** How a load goes. */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public ReleasePackageLoadJob get(ScoreUser requester, ReleasePackageLoadJobId id) {
         return jobs().find(id).orElseThrow(() -> new NotFoundException(ReleasePackageLoadMessages.LOAD_NOT_FOUND));
     }
@@ -166,13 +169,13 @@ public class ReleasePackageLoadCommandService {
      * What keeps loads from working in this application, which is nothing when it is empty: the database user of the application
      * must be allowed to make and drop the schemas a load goes through.
      */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public List<String> unavailable(ScoreUser requester) {
         return problemsOfAvailability();
     }
 
     /** @throws ReleasePackageLoadRefusedException when {@link #unavailable} tells anything */
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public void requireAvailable(ScoreUser requester) {
         requireAvailable();
     }

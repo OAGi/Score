@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.configuration.handler;
 
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadRefusedException;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadWriteFrozenException;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.base.DataValueTooLongException;
@@ -25,6 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.sql.SQLSyntaxErrorException;
+import java.util.Map;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
@@ -87,11 +90,12 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
+    /** A user who may not call what was asked is told what is lacking: the message of the method, or the roles that it requires. */
     @ExceptionHandler(AccessControlException.class)
     public ResponseEntity handleAccessControlException(
             AccessControlException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
-        return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -113,6 +117,23 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
         headers.set("X-Error-Message", toHeaderValue(ex.getMessage()));
         headers.set("X-Error-Code", LogNotFoundException.ERROR_CODE);
         return new ResponseEntity<>(ex.getMessage(), headers, HttpStatus.CONFLICT);
+    }
+
+    /** A release package that is refused (not a package, another one goes on) is a conflict with what the application is, and says why. */
+    @ExceptionHandler(ReleasePackageLoadRefusedException.class)
+    public ResponseEntity handleReleasePackageLoadRefusedException(
+            ReleasePackageLoadRefusedException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return errorResponse(HttpStatus.CONFLICT, ex.getMessage() == null ? "" : ex.getMessage());
+    }
+
+    /** A write that waited for the gate of a release package for longer than it may is told to come again: 503 with the time, the same for every endpoint. */
+    @ExceptionHandler(ReleasePackageLoadWriteFrozenException.class)
+    public ResponseEntity handleReleasePackageLoadWriteFrozenException(
+            ReleasePackageLoadWriteFrozenException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header(HttpHeaders.RETRY_AFTER, "30")
+                .body(Map.of("code", "WRITE_FROZEN", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)

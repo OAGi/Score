@@ -44,8 +44,6 @@ public interface ReleasePackageLoadQueryRepository {
      */
     String fingerprint(String schema, String table);
 
-    /** The releases of the schema: the identifier, and the number of the release. */
-    Map<BigInteger, String> releases(String schema);
 
     /**
      * The foreign keys of the schema that records break: a record that refers to a record that is not there. A schema the

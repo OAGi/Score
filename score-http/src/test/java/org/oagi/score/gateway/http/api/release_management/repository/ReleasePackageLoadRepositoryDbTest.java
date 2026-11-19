@@ -390,6 +390,7 @@ class ReleasePackageLoadRepositoryDbTest {
     void theStagingSchemaIsPutInThePlaceOfTheServedOneAndTheTriggersAndTheFunctionGoWithIt() throws Exception {
         Pair p = twoSchemas();
         Map<String, String> stagingTriggers = triggers(p.staging());
+        Map<String, String> servedTriggers = triggers(p.served().schema);
         int tablesOfServed = tables(p.served().schema);
         int routines = count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + p.staging() + "'");
         assertTrue(stagingTriggers.size() > 50, "triggers: " + stagingTriggers.size());
@@ -401,10 +402,12 @@ class ReleasePackageLoadRepositoryDbTest {
         assertEquals(List.of("of-staging"), markers(p.served().schema), "the served schema now has what the staging schema had");
         assertEquals(List.of("of-served"), markers(p.backup()), "and what it had is in the backup schema");
         assertEquals(stagingTriggers, triggers(p.served().schema), "with the triggers of the staging schema");
-        assertEquals(Map.of(), triggers(p.backup()), "the backup schema has none, since a table with a trigger cannot move");
+        assertEquals(servedTriggers, triggers(p.backup()), "the backup schema has the triggers of the tables it holds");
+        assertEquals(routines, count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + p.backup() + "'"),
+                "and the routines");
         assertEquals(0, tables(p.staging()), "nothing is left in the staging schema");
         assertEquals(routines, count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + p.served().schema + "'"));
-        assertEquals(tablesOfServed + 1, tables(p.backup()), "the tables of the served schema, and the record of the swap");
+        assertEquals(tablesOfServed, tables(p.backup()), "the tables of the served schema");
         assertEquals(p.served().schema, p.served().query.currentSchema());
         // The connection of the application is of the served schema, and what it asks is what the staging schema had.
         assertEquals(List.of("of-staging"), markers(p.served().schema));
@@ -417,6 +420,7 @@ class ReleasePackageLoadRepositoryDbTest {
     void aSwapIsUndoneAndTheServedSchemaIsAsItWasWithItsTriggersAndItsFunction() throws Exception {
         Pair p = twoSchemas();
         Map<String, String> before = triggers(p.served().schema);
+        Map<String, String> stagingTriggers = triggers(p.staging());
         int routines = count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + p.served().schema + "'");
         String discarded = name("discarded");
         p.served().command.createSchema(discarded);
@@ -430,7 +434,10 @@ class ReleasePackageLoadRepositoryDbTest {
         assertEquals(before, triggers(p.served().schema));
         assertEquals(routines, count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + p.served().schema + "'"));
         assertEquals(List.of("after-the-swap", "of-staging"), markers(discarded), "what was swapped in, and what was written to it, is kept apart");
-        assertEquals(1, tables(p.backup()), "only the record of the swap is left in the backup schema");
+        assertEquals(0, tables(p.backup()), "nothing is left in the backup schema");
+        assertEquals(Map.of(), triggers(p.backup()));
+        assertEquals(stagingTriggers, triggers(discarded), "what was swapped in is kept apart whole, with its triggers");
+        assertEquals(routines, count("SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '" + discarded + "'"));
         assertEquals(p.served().schema, p.served().query.currentSchema());
     }
 
@@ -505,6 +512,77 @@ class ReleasePackageLoadRepositoryDbTest {
         assertEquals(List.of("of-staging"), markers(p.served().schema));
     }
 
+    @Test
+    void anUndoThatCannotGetTheLockOfATableLeavesTheSchemasAsTheyWereAndCanBeTriedAgain() throws Exception {
+        Pair p = twoSchemas();
+        Map<String, String> servedTriggers = triggers(p.served().schema);
+        String discarded = name("discarded");
+        p.served().command.createSchema(discarded);
+        p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(10));
+        Map<String, String> swappedIn = triggers(p.served().schema);
+
+        try (Connection other = DriverManager.getConnection(url("mysql"), "root", MARIADB.getPassword())) {
+            other.setAutoCommit(false);
+            try (Statement statement = other.createStatement()) {
+                statement.executeQuery("SELECT COUNT(*) FROM `" + p.served().schema + "`.acc").close();
+
+                SchemaSwapException e = assertThrows(SchemaSwapException.class,
+                        () -> p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(1)));
+
+                assertTrue(e.getMessage().contains("as they were"), e.getMessage());
+            }
+            other.rollback();
+        }
+
+        assertEquals(swappedIn, triggers(p.served().schema), "the triggers that were dropped are made again");
+        assertEquals(servedTriggers, triggers(p.backup()));
+        assertEquals(List.of("of-staging"), markers(p.served().schema));
+        assertEquals(0, tables(discarded));
+
+        p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(10));
+        assertEquals(List.of("of-served"), markers(p.served().schema));
+        assertEquals(servedTriggers, triggers(p.served().schema));
+    }
+
+    @Test
+    void anUndoCanBeUndoneAndTheSwapDoneAgainWithNothingLostOnTheWay() throws Exception {
+        Pair p = twoSchemas();
+        Map<String, String> servedTriggers = triggers(p.served().schema);
+        Map<String, String> stagingTriggers = triggers(p.staging());
+        String discarded = name("discarded");
+        p.served().command.createSchema(discarded);
+
+        p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(10));
+        p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(10));
+        // The undo is the same thing as the swap, so what it put aside can be swapped in again, into the schema that was emptied.
+        p.served().command.swap(discarded, p.backup(), Duration.ofSeconds(10));
+
+        assertEquals(List.of("of-staging"), markers(p.served().schema));
+        assertEquals(stagingTriggers, triggers(p.served().schema));
+        assertEquals(List.of("of-served"), markers(p.backup()));
+        assertEquals(servedTriggers, triggers(p.backup()));
+        assertEquals(0, tables(discarded));
+    }
+
+    @Test
+    void aTriggerThatNamesTheSchemaOfTheBackupSideIsRefusedToo() throws Exception {
+        Pair p = twoSchemas();
+        String discarded = name("discarded");
+        p.served().command.createSchema(discarded);
+        p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(10));
+        Map<String, String> before = triggers(p.served().schema);
+        // A trigger of the schema that is to be swapped back in, which names its own schema.
+        sql("CREATE TABLE `" + p.backup() + "`.names_itself (x INT)");
+        sql("CREATE TRIGGER `" + p.backup() + "`.names_itself_bi BEFORE INSERT ON `" + p.backup() + "`.names_itself FOR EACH ROW SET @x = (SELECT COUNT(*) FROM `" + p.backup() + "`.names_itself)");
+
+        SchemaSwapException e = assertThrows(SchemaSwapException.class,
+                () -> p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(5)));
+
+        assertTrue(e.getMessage().contains("names_itself_bi"), e.getMessage());
+        assertEquals(before, triggers(p.served().schema));
+        assertEquals(0, tables(discarded));
+    }
+
     // ---------------------------------------------------------------------------------------------------------------
     // Tables that stay, numbering, and what tells that something was written
     // ---------------------------------------------------------------------------------------------------------------
@@ -529,7 +607,7 @@ class ReleasePackageLoadRepositoryDbTest {
         assertEquals(List.of("of-staging"), markers(p.served().schema));
 
         sql("UPDATE `" + p.served().schema + "`.release_package_load_job SET state = 'SUCCEEDED'");
-        p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(10));
+        p.served().command.rollbackSwap(p.backup(), discarded, Duration.ofSeconds(10), List.of(job));
 
         assertEquals(List.of("SUCCEEDED"), strings("SELECT state FROM `" + p.served().schema + "`.release_package_load_job"), "and the undo leaves it too");
         assertEquals(List.of("of-served"), markers(p.served().schema));

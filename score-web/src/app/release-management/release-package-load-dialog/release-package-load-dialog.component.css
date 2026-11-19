@@ -111,3 +111,76 @@
   max-height: 240px;
   overflow: auto;
 }
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--mat-sys-secondary-container, #e8f0fe);
+  color: var(--mat-sys-on-secondary-container, #1f3a5f);
+}
+
+.notice mat-icon {
+  flex-shrink: 0;
+}
+
+.notice + .package-pane {
+  margin-top: 12px;
+}
+
+/* A warning that the user must not miss: what it tells cannot be put right afterwards. */
+.notice.warning {
+  background: var(--mat-sys-error-container, #fdecea);
+  color: var(--mat-sys-on-error-container, #8c1d18);
+  font-weight: 500;
+}
+
+/* Many libraries scroll inside the table, so that the result and the buttons below it stay in view. */
+.libraries-scroll {
+  margin-top: 12px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.libraries th {
+  position: sticky;
+  top: 0;
+  background: var(--mat-sys-surface, #fff);
+}
+
+.libraries td.absent {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.libraries {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.libraries th,
+.libraries td {
+  text-align: left;
+  padding: 4px 12px 4px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #ddd);
+}
+
+.libraries th {
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-weight: 500;
+}
+
+/* A library the package changes has its new release in bold; one the package is behind in, which refuses it, is in the error color. */
+.libraries td.changes {
+  font-weight: 700;
+}
+
+.libraries tr.behind td {
+  color: var(--mat-sys-error, #b3261e);
+  font-weight: 700;
+}

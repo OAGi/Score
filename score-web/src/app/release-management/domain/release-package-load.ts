@@ -19,6 +19,16 @@ export interface PackagePreflight {
   format: string | null;
   ok: boolean;
   problems: string[];
+  /** The latest release of each library, in the package and in this database; null where there is none. */
+  libraries: PackageLibraryRelease[];
+}
+
+export interface PackageLibraryRelease {
+  name: string;
+  packageRelease: string | null;
+  currentRelease: string | null;
+  /** Whether the package is behind this database in the library, which refuses it. */
+  behind: boolean;
 }
 
 export type PackageLoadState =

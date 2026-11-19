@@ -1,8 +1,13 @@
 package org.oagi.score.gateway.http.api.release_management.service.package_load;
 
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Info;
+import org.oagi.score.gateway.http.api.library_management.model.LibrarySummaryRecord;
+import org.oagi.score.gateway.http.api.release_management.repository.ReleaseQueryRepository;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.script.ReleasePackageReleases;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.script.ScriptSource;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.format.ReleasePackageFormat;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJobId;
@@ -14,11 +19,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 /**
@@ -49,18 +56,32 @@ public class ReleasePackageLoadPreflight {
         }
     }
 
+    /** What a look finds: what is in the way, and the latest release of each library, in the package and in this database. */
+    public record Look(List<String> problems, List<ReleasePackageLoadPreflightReport.Library> libraries) {
+    }
+
     /**
      * Everything that is not as it has to be, which is nothing changed to find out (but for a schema that is made and dropped to see
      * whether the database user may, when the rest is as it has to be).
      */
     public List<String> problems(ReleasePackageFormat format, Info info, ScriptSource scripts, long delta, ReleasePackageLoadJobId job) {
+        return look(format, info, scripts, delta, job).problems();
+    }
+
+    public Look look(ReleasePackageFormat format, Info info, ScriptSource scripts, long delta, ReleasePackageLoadJobId job) {
         ReleasePackageLoadQueryRepository query = repositories.query();
         String served = query.currentSchema();
         List<String> problems = new ArrayList<>();
 
         problems.addAll(format.problemsOf(info, scripts));
         warnOfTheNumbering(format, query, served, delta);
-        problems.addAll(problemsOfTheReleases(query, served, info));
+        List<ReleasePackageLoadPreflightReport.Library> libraries = List.of();
+        if (problems.isEmpty()) {
+            List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> packaged = releasesOfThePackage(info, scripts);
+            List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> current = latestReleasesOfThisDatabase();
+            problems.addAll(problemsOfTheReleases(current, packaged));
+            libraries = librariesOf(current, packaged);
+        }
         if (new TransactionTemplate(transactionManager).execute(status -> repositoryFactory.releaseProgressRepository().anyLibraryIsBusy())) {
             problems.add(ReleasePackageLoadMessages.BUSY_RELEASE);
         }
@@ -68,7 +89,29 @@ public class ReleasePackageLoadPreflight {
             // The last, since it makes a schema (and drops it): whether the user of the database is allowed to.
             problems.addAll(problemsOfThePrivileges(served, job));
         }
-        return problems;
+        return new Look(problems, libraries);
+    }
+
+    /** The latest release of each library of this database that has one, as the library and the release queries say. */
+    private List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> latestReleasesOfThisDatabase() {
+        ReleaseQueryRepository releases = repositoryFactory.releaseQueryRepository(null);
+        List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> latest = new ArrayList<>();
+        for (LibrarySummaryRecord library : repositoryFactory.libraryQueryRepository(null).getLibrarySummaryList()) {
+            ReleasePackageReleases.latestOf(releases.getReleaseSummaryList(library.libraryId()))
+                    .ifPresent(release -> latest.add(Pair.of(library, release)));
+        }
+        return latest;
+    }
+
+    private List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> releasesOfThePackage(Info info, ScriptSource scripts) {
+        List<String> names = Stream.concat(info.getMigration().getEntrypoints().stream(), info.getMigration().getProcesses().stream())
+                .map(executable -> executable.getScript()).toList();
+        try {
+            return ReleasePackageReleases.latest(scripts, names);
+        } catch (IOException e) {
+            logger.warn("The releases of a package could not be read: " + e.getMessage(), e);
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.NOT_READ, e);
+        }
     }
 
     /**
@@ -90,14 +133,66 @@ public class ReleasePackageLoadPreflight {
         }
     }
 
-    private List<String> problemsOfTheReleases(ReleasePackageLoadQueryRepository query, String served, Info info) {
-        // The package names the other releases than its own (the one it adds, which a database that has it already has too).
-        Set<String> known = Stream.concat(info.getMigration().getMetadata().getReleases().stream(), Stream.of(info.getMigration().getRelease()))
-                .map(release -> String.valueOf(release.getId())).collect(Collectors.toSet());
-        List<String> unknown = query.releases(served).entrySet().stream()
-                .filter(release -> !known.contains(release.getKey().toString()))
-                .map(release -> release.getValue()).toList();
-        return unknown.isEmpty() ? List.of() : List.of(ReleasePackageLoadMessages.unknownReleases(unknown));
+    /**
+     * The package is refused when, in any library, it is behind this database: its latest release is earlier than the one this database
+     * has (a release is numbered as it is made), or it has none of that library but its working release. One that is as far, or further, is
+     * not in the way, and a library of this database that has only its working release is not looked at.
+     */
+    static List<String> problemsOfTheReleases(List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> current,
+                                              List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> packaged) {
+        List<String> problems = new ArrayList<>();
+        for (Pair<LibrarySummaryRecord, ReleaseSummaryRecord> have : current) {
+            Pair<LibrarySummaryRecord, ReleaseSummaryRecord> brings = packaged.stream()
+                    .filter(p -> p.getLeft().libraryId().equals(have.getLeft().libraryId())).findFirst().orElse(null);
+            if (!isBehind(have, brings)) {
+                continue;
+            }
+            String library = nameOf(have, brings);
+            if (brings == null || ReleasePackageReleases.isWorking(brings.getRight())) {
+                problems.add(ReleasePackageLoadMessages.libraryIsMissing(library, have.getRight().releaseNum()));
+            } else {
+                problems.add(ReleasePackageLoadMessages.libraryIsAhead(library, have.getRight().releaseNum(), brings.getRight().releaseNum()));
+            }
+        }
+        return problems;
+    }
+
+    /** Whether the package is behind this database in the library: the rule that refuses it. */
+    private static boolean isBehind(Pair<LibrarySummaryRecord, ReleaseSummaryRecord> have,
+                                    Pair<LibrarySummaryRecord, ReleaseSummaryRecord> brings) {
+        if (have == null || ReleasePackageReleases.isWorking(have.getRight())) {
+            return false;   // a library that has only its working release has nothing a package could be behind
+        }
+        return brings == null || ReleasePackageReleases.isWorking(brings.getRight())
+                || brings.getRight().releaseId().value().compareTo(have.getRight().releaseId().value()) < 0;
+    }
+
+    private static List<ReleasePackageLoadPreflightReport.Library> librariesOf(List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> current,
+                                                                               List<Pair<LibrarySummaryRecord, ReleaseSummaryRecord>> packaged) {
+        Map<BigInteger, ReleasePackageLoadPreflightReport.Library> libraries = new TreeMap<>();
+        for (Pair<LibrarySummaryRecord, ReleaseSummaryRecord> brings : packaged) {
+            Pair<LibrarySummaryRecord, ReleaseSummaryRecord> have = current.stream()
+                    .filter(c -> c.getLeft().libraryId().equals(brings.getLeft().libraryId())).findFirst().orElse(null);
+            libraries.put(brings.getLeft().libraryId().value(), new ReleasePackageLoadPreflightReport.Library(nameOf(have, brings),
+                    brings.getRight().releaseNum(), have == null ? null : have.getRight().releaseNum(), isBehind(have, brings)));
+        }
+        for (Pair<LibrarySummaryRecord, ReleaseSummaryRecord> have : current) {
+            libraries.computeIfAbsent(have.getLeft().libraryId().value(),
+                    id -> new ReleasePackageLoadPreflightReport.Library(nameOf(have, null), null, have.getRight().releaseNum(), isBehind(have, null)));
+        }
+        return List.copyOf(libraries.values());
+    }
+
+    private static String nameOf(Pair<LibrarySummaryRecord, ReleaseSummaryRecord> have,
+                                 Pair<LibrarySummaryRecord, ReleaseSummaryRecord> brings) {
+        if (have != null && have.getLeft().name() != null) {
+            return have.getLeft().name();
+        }
+        if (brings != null && brings.getLeft().name() != null) {
+            return brings.getLeft().name();
+        }
+        Pair<LibrarySummaryRecord, ReleaseSummaryRecord> any = have != null ? have : brings;
+        return "library " + any.getLeft().libraryId();
     }
 
     /**

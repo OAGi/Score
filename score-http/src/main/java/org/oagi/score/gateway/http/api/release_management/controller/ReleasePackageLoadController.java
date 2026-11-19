@@ -13,11 +13,8 @@ import org.oagi.score.gateway.http.api.release_management.service.package_load.R
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadUploads;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadUploads.Upload;
 import org.oagi.score.gateway.http.common.model.AccessControl;
-import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,9 +49,10 @@ public class ReleasePackageLoadController {
         }
     }
 
-    public record PreflightResponse(String releaseNum, String version, String format, boolean ok, List<String> problems) {
+    public record PreflightResponse(String releaseNum, String version, String format, boolean ok, List<String> problems,
+                                    List<ReleasePackageLoadPreflightReport.Library> libraries) {
         static PreflightResponse of(ReleasePackageLoadPreflightReport r) {
-            return new PreflightResponse(r.releaseNum(), r.version(), r.format(), r.ok(), r.problems());
+            return new PreflightResponse(r.releaseNum(), r.version(), r.format(), r.ok(), r.problems(), r.libraries());
         }
     }
 
@@ -72,20 +70,12 @@ public class ReleasePackageLoadController {
     public record SettingsResponse(long maxPackageSize, boolean available, String problem) {
     }
 
-    /** What is asked by one who is not an administrator is refused before the method is called, whichever route it is. */
-    @ExceptionHandler(AccessControlException.class)
-    public ResponseEntity<String> forbidden(AccessControlException e) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Error-Message", "Only an administrator loads release packages.");
-        return new ResponseEntity<>("Only an administrator loads release packages.", headers, HttpStatus.FORBIDDEN);
-    }
-
     // ---------------------------------------------------------------------------------------------------------------
     // The package comes
     // ---------------------------------------------------------------------------------------------------------------
 
     @Operation(summary = "Send a release package (the bytes of the .zip file are the body of the request)")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @PutMapping(value = "/uploads")
     public UploadResponse upload(ScoreUser requester, @RequestParam("fileName") String fileName,
                                  HttpServletRequest request) throws IOException {
@@ -94,14 +84,14 @@ public class ReleasePackageLoadController {
     }
 
     @Operation(summary = "Throw a package away")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @DeleteMapping(value = "/uploads/{uploadId}")
     public void discardUpload(ScoreUser requester, @PathVariable("uploadId") String uploadId) {
         uploads.discard(requester, uploadId);
     }
 
     @Operation(summary = "Look at what is in the way of loading a package; nothing is changed")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @GetMapping(value = "/uploads/{uploadId}/preflight")
     public PreflightResponse preflight(ScoreUser requester, @PathVariable("uploadId") String uploadId) {
         Upload upload = uploads.get(requester, uploadId);
@@ -112,7 +102,7 @@ public class ReleasePackageLoadController {
     }
 
     @Operation(summary = "How large a package may be")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @GetMapping(value = "/settings")
     public SettingsResponse settings(ScoreUser requester) {
         List<String> problems = service.unavailable(requester);
@@ -125,7 +115,7 @@ public class ReleasePackageLoadController {
     // ---------------------------------------------------------------------------------------------------------------
 
     @Operation(summary = "Load a package that has come, in the background")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @PostMapping
     public JobResponse start(ScoreUser requester, @RequestBody StartRequest request) {
         Upload upload = uploads.take(requester, request.uploadId());
@@ -134,7 +124,7 @@ public class ReleasePackageLoadController {
     }
 
     @Operation(summary = "The loads that were started last")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @GetMapping
     public List<JobResponse> recent(ScoreUser requester,
                                     @RequestParam(name = "limit", defaultValue = "10") int limit) {
@@ -142,14 +132,14 @@ public class ReleasePackageLoadController {
     }
 
     @Operation(summary = "How a load goes")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @GetMapping(value = "/{id:[\\d]+}")
     public JobResponse get(ScoreUser requester, @PathVariable("id") BigInteger id) {
         return JobResponse.of(service.get(requester, new ReleasePackageLoadJobId(id)));
     }
 
     @Operation(summary = "Undo the swap of the latest load that succeeded, in the background")
-    @AccessControl(requiredAnyRole = {ADMINISTRATOR})
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     @PostMapping(value = "/{id:[\\d]+}/rollback")
     public JobResponse rollback(ScoreUser requester, @PathVariable("id") BigInteger id) {
         return JobResponse.of(service.rollback(requester, new ReleasePackageLoadJobId(id)));

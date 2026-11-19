@@ -339,7 +339,7 @@ class ReleasePackageLoadEndToEndTest {
 
         assertEquals(ReleasePackageLoadState.ROLLED_BACK, undone.state(), undone.message());
         assertEquals(List.of("dev-only-old", "dev-lib-old", "end-user-lib"), strings("SELECT name FROM oagi.library ORDER BY library_id"));
-        assertEquals(List.of("dev-lib-new", "end-user-lib"), strings("SELECT name FROM " + undone.discardedSchema() + ".library ORDER BY library_id"));
+        assertFalse(schemaExists(undone.discardedSchema()), "what was loaded is not kept");
         assertFalse(schemaExists(job.backupSchema()), "what is put back is no more kept apart");
         assertEquals(triggers, count("SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = 'oagi'"));
         assertEquals(List.of("freeze", "release", "freeze", "release"), freeze.calls);
@@ -448,6 +448,40 @@ class ReleasePackageLoadEndToEndTest {
     }
 
     @Test
+    void aPackageThatIsBehindTheDatabaseInALibraryIsRefusedBeforeAnythingIsChanged() throws Exception {
+        // The library 5 of the database has 10.13.3; the package says it has 10.13.2 of it.
+        sql("INSERT INTO `release` (release_id, library_id, guid, release_num, created_by, last_updated_by, creation_timestamp, last_update_timestamp, state) "
+                + "VALUES (88, 5, 'guid-10-13-3', '10.13.3', 1, 1, NOW(), NOW(), 'Published')");
+        try {
+            String releases = "INSERT INTO `library` (`library_id`,`name`) VALUES (5,'dev-lib-new');\n"
+                    + "INSERT INTO `release` (`release_id`,`library_id`,`release_num`) VALUES (76,5,'10.13.2');\n";
+            ReleasePackageLoadJob job = awaitEnd(service.start(ADMIN, pack(latestSchemaVersion(), releases + developerData(), "mig_10.0.sql"), "old.zip").id());
+
+            assertEquals(ReleasePackageLoadState.FAILED, job.state());
+            assertTrue(job.message().contains("'dev-lib-old' of this database is at 10.13.3, which is later than 10.13.2"), job.message());
+            assertEquals(List.of(), freeze.calls, "writing was never stopped");
+            assertServedSchemaUntouched();
+        } finally {
+            sql("DELETE FROM `release` WHERE release_id = 88");
+        }
+    }
+
+    @Test
+    void aPackageThatHasNoReleaseOfALibraryTheDatabaseHasReleasesOfIsRefused() throws Exception {
+        sql("INSERT INTO `release` (release_id, library_id, guid, release_num, created_by, last_updated_by, creation_timestamp, last_update_timestamp, state) "
+                + "VALUES (88, 5, 'guid-10-13-3', '10.13.3', 1, 1, NOW(), NOW(), 'Published')");
+        try {
+            ReleasePackageLoadJob job = loaded();
+
+            assertEquals(ReleasePackageLoadState.FAILED, job.state());
+            assertTrue(job.message().contains("no release of the library 'dev-lib-old'"), job.message());
+            assertServedSchemaUntouched();
+        } finally {
+            sql("DELETE FROM `release` WHERE release_id = 88");
+        }
+    }
+
+    @Test
     void aLoadThatCannotStopWritingIsRefusedAndLeavesNothing() throws Exception {
         freeze.refuse = true;
 
@@ -468,7 +502,7 @@ class ReleasePackageLoadEndToEndTest {
 
         Path second = pack();
         ReleasePackageLoadRefusedException refused = assertThrows(ReleasePackageLoadRefusedException.class, () -> service.start(ADMIN, second, "second.zip"));
-        assertTrue(refused.getMessage().contains("Another release package is being loaded"), refused.getMessage());
+        assertTrue(refused.getMessage().contains("Another release package is being processed"), refused.getMessage());
         assertFalse(Files.exists(second), "a package that is refused is deleted");
         hold.countDown();
 

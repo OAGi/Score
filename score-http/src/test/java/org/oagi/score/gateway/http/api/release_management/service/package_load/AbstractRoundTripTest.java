@@ -38,9 +38,9 @@ abstract class AbstractRoundTripTest {
 
     static final long DELTA = 100000000L;
 
-    /** What is not compared: the history of the migrations, the changes the triggers log, the record of the loads, and what a swap keeps. */
+    /** What is not compared: the history of the migrations, the changes the triggers log, and the record of the loads. */
     private static final Set<String> NOT_COMPARED = Set.of("flyway_schema_history", "record_change_log", "release_package_load_job",
-            "release_package_load_swap_record", "named_lock");
+            "named_lock");
 
     private static final ScoreUser ADMIN = new ScoreUser(new UserId(BigInteger.ONE), "admin", "Admin", "admin@example.com", true,
             List.of(ScoreRole.ADMINISTRATOR));

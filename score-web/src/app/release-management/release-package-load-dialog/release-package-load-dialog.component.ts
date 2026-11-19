@@ -1,14 +1,15 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {EMPTY, timer} from 'rxjs';
+import {EMPTY, Subject, timer} from 'rxjs';
 import {expand, filter, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {
   LOAD_STEPS,
   PackageLoadJob,
+  PackageLibraryRelease,
   PackageLoadSettings,
   PackagePreflight,
   PackageUpload,
@@ -61,6 +62,9 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
   readonly loadProgress = loadProgress;
   readonly formatBytes = formatBytes;
 
+  /** Tells, once, that a load or an undo that this dialog followed is over and has changed the releases: the list behind is to be loaded again. */
+  readonly changed = new Subject<void>();
+
   readonly step = signal<Step>('package');
   readonly settings = signal<PackageLoadSettings | undefined>(undefined);
   readonly recent = signal<PackageLoadJob[]>([]);
@@ -72,6 +76,11 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
   readonly checking = signal(false);
   readonly starting = signal(false);
   readonly preflight = signal<PackagePreflight | undefined>(undefined);
+  /** The libraries of the package, the ones that need a look first: those the package is behind in, then those it changes. */
+  readonly libraries = computed(() => {
+    const rank = (library: PackageLibraryRelease) => library.behind ? 0 : library.packageRelease !== library.currentRelease ? 1 : 2;
+    return [...(this.preflight()?.libraries ?? [])].sort((a, b) => rank(a) - rank(b));
+  });
   readonly job = signal<PackageLoadJob | undefined>(undefined);
   readonly error = signal<string | undefined>(undefined);
 
@@ -238,6 +247,7 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
     this.step.set('load');
     this.job.set(job);
     this.error.set(undefined);
+    let wasActive = job.active;
     this.service.get(job.id).pipe(
       expand(current => current.active ? timer(POLL_LOAD_MS).pipe(switchMap(() => this.service.get(job.id))) : EMPTY),
       filter(current => !!current),
@@ -247,7 +257,11 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
         this.job.set(current);
         if (!current.active) {
           this.refreshRecent(false);
+          if (wasActive && (current.state === 'SUCCEEDED' || current.state === 'ROLLED_BACK')) {
+            this.changed.next();
+          }
         }
+        wasActive = current.active;
       },
       error: err => this.error.set(errorMessage(err))
     });
@@ -268,8 +282,8 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
 
   rollback(job: PackageLoadJob) {
     const config = this.confirmDialogService.newConfig();
-    config.data.header = 'Undo the load of ' + (job.releaseNum ?? job.packageFileName) + '?';
-    config.data.content = ['The data from before the load is put back. Anything that users saved since the load will be lost.'];
+    config.data.header = 'Undo the update from ' + (job.releaseNum ?? job.packageFileName) + '?';
+    config.data.content = ['The data from before the update is put back. Anything that users saved since the update will be lost.'];
     config.data.action = 'Undo';
     this.confirmDialogService.open(config).afterClosed().subscribe(result => {
       if (!result) {

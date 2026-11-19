@@ -18,7 +18,10 @@ function upload(state: PackageUpload['state'], bytes = 0, total = 100): PackageU
     releaseNum: state === 'READY' ? '10.0' : null, version: state === 'READY' ? '1.2' : null};
 }
 
-const OK: PackagePreflight = {releaseNum: '10.0', version: '1.2', format: 'V1', ok: true, problems: []};
+const OK: PackagePreflight = {
+  releaseNum: '10.0', version: '1.2', format: 'V1', ok: true, problems: [],
+  libraries: [{name: 'connectSpec', packageRelease: '10.13.3', currentRelease: '10.13.2', behind: false}]
+};
 
 describe('ReleasePackageLoadDialogComponent', () => {
   let service: Record<string, ReturnType<typeof vi.fn>>;

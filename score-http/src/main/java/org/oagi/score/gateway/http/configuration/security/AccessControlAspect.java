@@ -93,7 +93,7 @@ public class AccessControlAspect {
             }
             ScoreRole[] requiredAnyRole = accessControl.requiredAnyRole();
             if (requiredAnyRole.length > 0 && !requester.hasAnyRole(requiredAnyRole)) {
-                throw new AccessControlException(requester);
+                throw new AccessControlException(requester, requiredAnyRole, accessControl.errorMessage());
             }
         }
         return joinPoint.proceed();
