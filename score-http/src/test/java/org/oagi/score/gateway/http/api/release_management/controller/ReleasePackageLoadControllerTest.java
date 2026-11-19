@@ -7,7 +7,6 @@ import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJob;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJobId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadState;
-import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadAdvice;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadCommandService;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadPreflightReport;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadRefusedException;
@@ -87,7 +86,7 @@ class ReleasePackageLoadControllerTest {
         when(sessions.getObject()).thenReturn(sessionService);
         mvc = MockMvcBuilders.standaloneSetup((Object) proxy.getProxy())
                 .setCustomArgumentResolvers(new ScoreUserArgumentResolver(sessions))
-                .setControllerAdvice(new ScoreResponseEntityExceptionHandler(), new ReleasePackageLoadAdvice())
+                .setControllerAdvice(new ScoreResponseEntityExceptionHandler())
                 .build();
     }
 
@@ -199,7 +198,8 @@ class ReleasePackageLoadControllerTest {
     void whoIsNotAnAdministratorIsRefusedByEveryRouteAtOnce() throws Exception {
         signedInAs(END_USER);
 
-        mvc.perform(get("/release-package-loads/settings")).andExpect(status().isForbidden());
+        mvc.perform(get("/release-package-loads/settings")).andExpect(status().isForbidden())
+                .andExpect(header().string("X-Error-Message", "Only an administrator can use release packages."));
         mvc.perform(put("/release-package-loads/uploads").param("fileName", "a.zip").content("x")).andExpect(status().isForbidden());
         mvc.perform(post("/release-package-loads").contentType(MediaType.APPLICATION_JSON).content("{\"uploadId\":\"u\"}")).andExpect(status().isForbidden());
         mvc.perform(get("/release-package-loads/7")).andExpect(status().isForbidden());

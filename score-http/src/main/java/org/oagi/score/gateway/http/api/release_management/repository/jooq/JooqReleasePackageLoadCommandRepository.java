@@ -35,9 +35,6 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
     /** The names of the schemas and the tables are put into statements, so they are of what needs no quoting. */
     private static final Pattern IDENTIFIER = Pattern.compile("[A-Za-z0-9_]{1,64}");
 
-    /** What a swap keeps in the backup schema, to be undone by. It is not a table of the application. */
-    static final String SWAP_RECORD = "release_package_load_swap_record";
-
     private record Trigger(String name, String sqlMode, String ddl) {
     }
 
@@ -365,123 +362,130 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
             requireDistinct(live, stagingSchema, backupSchema);
             requireExists(con, stagingSchema);
             requireExists(con, backupSchema);
-            if (!tables(con, backupSchema).isEmpty()) {
-                throw new SchemaSwapException("The backup schema '" + backupSchema + "' is not empty.");
-            }
             List<String> liveTables = tables(con, live);
             List<String> stagingTables = tables(con, stagingSchema);
             liveTables.removeAll(staysInPlace);
             stagingTables.removeAll(staysInPlace);
-            requireNoTriggersOn(con, staysInPlace, live, stagingSchema);
             List<String> missing = liveTables.stream().filter(t -> !stagingTables.contains(t)).toList();
             if (!missing.isEmpty()) {
                 throw new SchemaSwapException("The staging schema lacks tables of the served schema, which would be lost: " + missing);
             }
-
-            List<Trigger> liveTriggers = triggers(con, live);
-            List<Trigger> stagingTriggers = triggers(con, stagingSchema);
-            for (Trigger trigger : stagingTriggers) {
-                if (trigger.ddl().contains("`" + stagingSchema + "`.")) {
-                    throw new SchemaSwapException("The trigger '" + trigger.name() + "' names the staging schema, so it cannot move.");
-                }
-            }
-            List<Routine> liveRoutines = routines(con, live);
-            List<Routine> stagingRoutines = routines(con, stagingSchema);
-
-            keepForRollback(con, backupSchema, liveTriggers, liveRoutines, staysInPlace);
-
-            String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
-            execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
-            try {
-                try {
-                    dropTriggers(con, live, liveTriggers);
-                    dropTriggers(con, stagingSchema, stagingTriggers);
-                    execute(con, renameStatement(live, backupSchema, liveTables, stagingSchema, live, stagingTables));
-                } catch (SQLException e) {
-                    // Nothing was moved (a RENAME is all or nothing), but the triggers may be gone: they are put back where they
-                    // were, and the swap record, which is of no use now, goes.
-                    try {
-                        createTriggers(con, live, liveTriggers);
-                        createTriggers(con, stagingSchema, stagingTriggers);
-                        execute(con, "DROP TABLE IF EXISTS `" + backupSchema + "`.`" + SWAP_RECORD + "`");
-                    } catch (SQLException | RuntimeException restoreFailure) {
-                        e.addSuppressed(restoreFailure);
-                        throw new SchemaSwapException("The swap did not go through, and the triggers could not be put back; the swap record "
-                                + "in '" + backupSchema + "' has them: " + e.getMessage(), e);
-                    }
-                    throw new SchemaSwapException("The swap did not go through, and the schemas are as they were: " + e.getMessage(), e);
-                }
-                try {
-                    createTriggers(con, live, stagingTriggers);
-                    replaceRoutines(con, live, stagingRoutines);
-                } catch (SQLException | RuntimeException e) {
-                    try {
-                        moveBack(con, live, backupSchema, stagingSchema, stagingTables, liveTables, liveTriggers, liveRoutines);
-                        execute(con, "DROP TABLE IF EXISTS `" + backupSchema + "`.`" + SWAP_RECORD + "`");
-                    } catch (SQLException | RuntimeException undoFailure) {
-                        e.addSuppressed(undoFailure);
-                        throw new SchemaSwapException("The swap did not go through, and it could not be undone: the tables of the "
-                                + "served schema are in '" + backupSchema + "' (and the swap record in it says how to put them back): "
-                                + e.getMessage(), e);
-                    }
-                    throw new SchemaSwapException("The swap did not go through, and the served schema is as it was: " + e.getMessage(), e);
-                }
-                return new SwapOutcome(liveTables.size(), stagingTriggers.size(), stagingRoutines.size());
-            } finally {
-                execute(con, "SET lock_wait_timeout = " + savedLockWait);
-            }
+            return replaceServed(con, stagingSchema, backupSchema, lockWait, staysInPlace);
         });
     }
 
     @Override
-    public SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait) {
+    public SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait, Collection<String> staysInPlace) {
         identifier(backupSchema);
         identifier(discardedSchema);
+        staysInPlace.forEach(JooqReleasePackageLoadCommandRepository::identifier);
         return inConnection(con -> {
-            String live = con.getCatalog();
-            requireDistinct(live, backupSchema, discardedSchema);
             requireExists(con, backupSchema);
-            requireExists(con, discardedSchema);
-            if (!tables(con, discardedSchema).isEmpty()) {
-                throw new SchemaSwapException("The discarded schema '" + discardedSchema + "' is not empty.");
-            }
-            List<String> backupTables = tables(con, backupSchema);
-            if (!backupTables.remove(SWAP_RECORD)) {
+            if (tables(con, backupSchema).isEmpty()) {
                 throw new SchemaSwapException("The schema '" + backupSchema + "' does not hold a swap.");
             }
-            List<Trigger> triggers = new ArrayList<>();
-            List<Routine> routines = new ArrayList<>();
-            List<String> staysInPlace = new ArrayList<>();
-            readSwapRecord(con, backupSchema, triggers, routines, staysInPlace);
-            List<String> liveTables = tables(con, live);
-            liveTables.removeAll(staysInPlace);
-
-            String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
-            execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
-            try {
-                try {
-                    moveBack(con, live, backupSchema, discardedSchema, liveTables, backupTables, triggers, routines);
-                } catch (SQLException e) {
-                    throw new SchemaSwapException("The swap was not undone: " + e.getMessage(), e);
-                }
-                return new SwapOutcome(backupTables.size(), triggers.size(), routines.size());
-            } finally {
-                execute(con, "SET lock_wait_timeout = " + savedLockWait);
-            }
+            // The undo is the swap again: what the backup schema holds comes in, and what is served goes to the discarded schema.
+            return replaceServed(con, backupSchema, discardedSchema, lockWait, staysInPlace);
         });
     }
 
     /**
-     * What undoes a swap, and what puts the served schema back when the swap fails after its tables have moved: the triggers
-     * of the served schema are dropped, its tables are moved to {@code toSchema}, those of the backup schema are moved back,
-     * and the triggers and the routines that were kept are made again.
+     * The one thing both the swap and its undo are: the tables, the triggers and the routines of the served schema go to
+     * {@code outgoing}, an empty schema, and those of {@code incoming} take their place. Each side is kept as it is, so that
+     * the schema the served one went to can be swapped back in the same way.
      */
-    private void moveBack(Connection con, String live, String backupSchema, String toSchema, List<String> liveTables,
-                          List<String> backupTables, List<Trigger> triggers, List<Routine> routines) throws SQLException {
-        dropTriggers(con, live, triggers(con, live));
-        execute(con, renameStatement(live, toSchema, liveTables, backupSchema, live, backupTables));
-        createTriggers(con, live, triggers);
-        replaceRoutines(con, live, routines);
+    private SwapOutcome replaceServed(Connection con, String incoming, String outgoing, Duration lockWait,
+                                      Collection<String> staysInPlace) throws SQLException {
+        String live = con.getCatalog();
+        requireDistinct(live, incoming, outgoing);
+        requireExists(con, incoming);
+        requireExists(con, outgoing);
+        if (!tables(con, outgoing).isEmpty()) {
+            throw new SchemaSwapException("The schema '" + outgoing + "' that the served tables go to is not empty.");
+        }
+        List<String> liveTables = tables(con, live);
+        List<String> incomingTables = tables(con, incoming);
+        liveTables.removeAll(staysInPlace);
+        incomingTables.removeAll(staysInPlace);
+        requireNoTriggersOn(con, staysInPlace, live, incoming);
+
+        Side served = new Side(live, liveTables, triggers(con, live), routines(con, live));
+        Side coming = new Side(incoming, incomingTables, triggers(con, incoming), routines(con, incoming));
+        requireNoSchemaNamed(served);
+        requireNoSchemaNamed(coming);
+
+        String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
+        execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
+        try {
+            place(con, served, coming, outgoing, false);
+            return new SwapOutcome(liveTables.size(), coming.triggers().size(), coming.routines().size());
+        } finally {
+            execute(con, "SET lock_wait_timeout = " + savedLockWait);
+        }
+    }
+
+    /** What a schema holds that moves: its tables, and its triggers and routines, which cannot go with a table but are made again. */
+    private record Side(String schema, List<String> tables, List<Trigger> triggers, List<Routine> routines) {
+    }
+
+    /**
+     * {@code served} goes to {@code outgoing} and {@code coming} goes to the schema of {@code served}. A table that has a
+     * trigger cannot be moved to another schema, so the triggers of both are dropped first and made again where their tables
+     * are afterwards. Nothing is lost whichever way it stops: a failure before the tables move puts the triggers back (a
+     * RENAME is all or nothing), and one after it moves everything back the same way, with the roles turned round.
+     */
+    private void place(Connection con, Side served, Side coming, String outgoing, boolean undoing) throws SQLException {
+        String live = served.schema();
+        try {
+            dropTriggers(con, live, served.triggers());
+            dropTriggers(con, coming.schema(), coming.triggers());
+            execute(con, renameStatement(live, outgoing, served.tables(), coming.schema(), live, coming.tables()));
+        } catch (SQLException e) {
+            try {
+                createTriggers(con, live, served.triggers());
+                createTriggers(con, coming.schema(), coming.triggers());
+            } catch (SQLException | RuntimeException restoreFailure) {
+                e.addSuppressed(restoreFailure);
+                throw new SchemaSwapException("The swap did not go through, and the triggers could not be put back: " + e.getMessage(), e);
+            }
+            throw new SchemaSwapException("The swap did not go through, and the schemas are as they were: " + e.getMessage(), e);
+        }
+        try {
+            createTriggers(con, live, coming.triggers());
+            createTriggers(con, outgoing, served.triggers());
+            setRoutines(con, live, coming.routines());
+            setRoutines(con, outgoing, served.routines());
+        } catch (SQLException | RuntimeException e) {
+            if (undoing) {
+                throw new SchemaSwapException("The swap did not go through, and it could not be undone: the tables of the served "
+                        + "schema are in '" + outgoing + "': " + e.getMessage(), e);
+            }
+            try {
+                // What is in the served schema now is what came; what went is in 'outgoing'.
+                place(con, new Side(live, coming.tables(), coming.triggers(), coming.routines()),
+                        new Side(outgoing, served.tables(), served.triggers(), served.routines()), coming.schema(), true);
+            } catch (SQLException | RuntimeException undoFailure) {
+                e.addSuppressed(undoFailure);
+                throw new SchemaSwapException("The swap did not go through, and it could not be undone: the tables of the "
+                        + "served schema are in '" + outgoing + "': " + e.getMessage(), e);
+            }
+            throw new SchemaSwapException("The swap did not go through, and the served schema is as it was: " + e.getMessage(), e);
+        }
+    }
+
+    /** A trigger or a routine that names its own schema would name the wrong one after it moves, so it is not to be moved. */
+    private void requireNoSchemaNamed(Side side) {
+        String named = "`" + side.schema() + "`.";
+        for (Trigger trigger : side.triggers()) {
+            if (trigger.ddl().contains(named)) {
+                throw new SchemaSwapException("The trigger '" + trigger.name() + "' names the schema '" + side.schema() + "', so it cannot move.");
+            }
+        }
+        for (Routine routine : side.routines()) {
+            if (routine.ddl().contains(named)) {
+                throw new SchemaSwapException("The routine '" + routine.name() + "' names the schema '" + side.schema() + "', so it cannot move.");
+            }
+        }
     }
 
     /** One statement: the tables of {@code fromSchema} go to {@code toSchema}, then the tables of {@code otherSchema} go to {@code intoSchema}. */
@@ -501,41 +505,6 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
     // What the swap keeps, and what it moves besides tables
     // ---------------------------------------------------------------------------------------------------------------
 
-    private void keepForRollback(Connection con, String backupSchema, List<Trigger> triggers, List<Routine> routines,
-                                 Collection<String> staysInPlace) throws SQLException {
-        execute(con, "CREATE TABLE `" + backupSchema + "`.`" + SWAP_RECORD + "` ("
-                + "`kind` VARCHAR(16) NOT NULL, `name` VARCHAR(128) NOT NULL, `type` VARCHAR(16) NULL, "
-                + "`sql_mode` TEXT NULL, `ddl` MEDIUMTEXT NOT NULL, PRIMARY KEY (`kind`, `name`))");
-        try (PreparedStatement statement = con.prepareStatement("INSERT INTO `" + backupSchema + "`.`" + SWAP_RECORD
-                + "` (`kind`, `name`, `type`, `sql_mode`, `ddl`) VALUES (?, ?, ?, ?, ?)")) {
-            for (Trigger trigger : triggers) {
-                statement.setString(1, "trigger");
-                statement.setString(2, trigger.name());
-                statement.setString(3, null);
-                statement.setString(4, trigger.sqlMode());
-                statement.setString(5, trigger.ddl());
-                statement.addBatch();
-            }
-            for (Routine routine : routines) {
-                statement.setString(1, "routine");
-                statement.setString(2, routine.name());
-                statement.setString(3, routine.type());
-                statement.setString(4, routine.sqlMode());
-                statement.setString(5, routine.ddl());
-                statement.addBatch();
-            }
-            for (String table : staysInPlace) {
-                statement.setString(1, "stays");
-                statement.setString(2, table);
-                statement.setString(3, null);
-                statement.setString(4, null);
-                statement.setString(5, "");
-                statement.addBatch();
-            }
-            statement.executeBatch();
-        }
-    }
-
     private void requireNoTriggersOn(Connection con, Collection<String> tables, String... schemas) throws SQLException {
         for (String schema : schemas) {
             for (String table : tables) {
@@ -544,23 +513,6 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
                 if (!triggers.isEmpty()) {
                     throw new SchemaSwapException("The table '" + table + "' stays in place, but has triggers (" + triggers + "), which "
                             + "the swap drops and makes again: it is not to have any.");
-                }
-            }
-        }
-    }
-
-    private void readSwapRecord(Connection con, String backupSchema, List<Trigger> triggers, List<Routine> routines,
-                                List<String> staysInPlace) throws SQLException {
-        try (Statement statement = con.createStatement();
-             ResultSet rs = statement.executeQuery("SELECT `kind`, `name`, `type`, `sql_mode`, `ddl` FROM `"
-                     + backupSchema + "`.`" + SWAP_RECORD + "` ORDER BY `kind`, `name`")) {
-            while (rs.next()) {
-                if ("trigger".equals(rs.getString("kind"))) {
-                    triggers.add(new Trigger(rs.getString("name"), rs.getString("sql_mode"), rs.getString("ddl")));
-                } else if ("stays".equals(rs.getString("kind"))) {
-                    staysInPlace.add(rs.getString("name"));
-                } else {
-                    routines.add(new Routine(rs.getString("name"), rs.getString("type"), rs.getString("sql_mode"), rs.getString("ddl")));
                 }
             }
         }
@@ -635,13 +587,16 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
         }
     }
 
-    private void replaceRoutines(Connection con, String schema, List<Routine> routines) throws SQLException {
+    /** Makes the schema have these routines and no others. */
+    private void setRoutines(Connection con, String schema, List<Routine> routines) throws SQLException {
+        for (Routine present : routines(con, schema)) {
+            execute(con, "DROP " + present.type() + " IF EXISTS `" + schema + "`.`" + present.name() + "`");
+        }
         String original = con.getCatalog();
         String sqlMode = single(con, "SELECT @@sql_mode");
         con.setCatalog(schema);
         try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
             for (Routine routine : routines) {
-                execute(con, "DROP " + routine.type() + " IF EXISTS `" + schema + "`.`" + routine.name() + "`");
                 mode.setString(1, routine.sqlMode() == null ? "" : routine.sqlMode());
                 mode.execute();
                 execute(con, SqlDefiner.strip(routine.ddl()));

@@ -6,7 +6,7 @@
   </ng-container>
   <ng-container ngProjectAs="[listActions]">
     @if (isAdmin) {
-      <score-responsive-button label="Load Release Package" icon="cloud_upload" (pressed)="loadReleasePackage()"/>
+      <score-responsive-button label="Update from Release Package" icon="cloud_upload" (pressed)="loadReleasePackage()"/>
     }
     @if (userToken.roles.includes('developer') && libraryChoice.library?.libraryId) {
       <score-responsive-button label="New Release" (pressed)="create()"/>

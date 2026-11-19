@@ -137,14 +137,6 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
     }
 
     @Override
-    public Map<BigInteger, String> releases(String schema) {
-        Map<BigInteger, String> releases = new LinkedHashMap<>();
-        dslContext().resultQuery("SELECT release_id, release_num FROM `" + name(schema) + "`.`release` ORDER BY release_id")
-                .forEach(record -> releases.put(record.get(0, BigInteger.class), record.get(1, String.class)));
-        return releases;
-    }
-
-    @Override
     public List<String> foreignKeyViolations(String schema) {
         // One row for each column of each foreign key, in the order of the key: the key, its table, and where it goes.
         Map<String, List<String[]>> keys = new LinkedHashMap<>();

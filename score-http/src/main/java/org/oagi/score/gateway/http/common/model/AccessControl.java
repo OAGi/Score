@@ -11,4 +11,10 @@ public @interface AccessControl {
 
     ScoreRole[] requiredAnyRole() default {};
 
+    /**
+     * What is told to a user who may not call the method, when it is to be told in other words than the ones made of the roles that
+     * are required ("Only an administrator can access this.").
+     */
+    String errorMessage() default "";
+
 }

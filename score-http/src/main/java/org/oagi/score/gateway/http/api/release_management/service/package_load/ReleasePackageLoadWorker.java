@@ -266,7 +266,7 @@ public class ReleasePackageLoadWorker {
         if (run.backupMade) {
             // The tables of the served schema may be in it, when a swap could not be undone: it is dropped only when it holds none.
             List<String> tables = query.tables(run.backup);
-            if (tables.isEmpty() || tables.equals(List.of("release_package_load_swap_record"))) {
+            if (tables.isEmpty()) {
                 dropQuietly(command, run.backup, message);
             } else {
                 logger.error("The schema " + run.backup + " of the load " + run.id + " holds " + tables.size() + " table(s) and is kept.");
@@ -296,7 +296,7 @@ public class ReleasePackageLoadWorker {
         run.frozen = true;
         command.createSchema(discarded);
         repositories.jobs().schemas(run.id, null, null, discarded);
-        command.rollbackSwap(run.backup, discarded, settings.lockWait());
+        command.rollbackSwap(run.backup, discarded, settings.lockWait(), ReleasePackageLoadTables.STAYS_IN_PLACE);
         connections.refresh();
 
         List<String> warnings = new ArrayList<>();
@@ -311,6 +311,8 @@ public class ReleasePackageLoadWorker {
         }
         StringBuilder message = new StringBuilder(ReleasePackageLoadMessages.ROLLED_BACK);
         dropQuietly(command, run.backup, message);
+        // What was loaded, and what users saved after it, is not kept: the package is loaded again if it is wanted.
+        dropQuietly(command, discarded, message);
         reporter.moved(run.id, run.requester, ReleasePackageLoadState.ROLLED_BACK, message + String.join("", warnings));
     }
 
@@ -357,7 +359,7 @@ public class ReleasePackageLoadWorker {
     private void takeLock(Run run) {
         Lock lock = redisson.getLock(LOCK_NAME);
         if (!lock.tryLock()) {
-            throw new ReleasePackageLoadRefusedException("Another load goes on.");
+            throw new ReleasePackageLoadRefusedException("Another release package is being processed.");
         }
         run.lock = lock;
     }

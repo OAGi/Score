@@ -5,7 +5,7 @@ import {HttpParams} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
-import {debounceTime, filter, finalize, map} from 'rxjs/operators';
+import {debounceTime, filter, finalize, map, takeUntil} from 'rxjs/operators';
 import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
 import {messageTopicOf} from '../../basis/navbar/navbar.component';
@@ -119,16 +119,19 @@ export class ReleaseListComponent implements OnInit {
     return this.auth.isAdmin();
   }
 
-  /** The dialog loads a package in the background: when it is closed the list is loaded again, since a load that has succeeded changes it. */
+  /** The dialog loads a package in the background; a load that has succeeded changes the list, so it is loaded again when the load is over and when the dialog is closed. */
   loadReleasePackage() {
-    this.dialog.open(ReleasePackageLoadDialogComponent, {
+    const dialogRef = this.dialog.open(ReleasePackageLoadDialogComponent, {
       width: '720px',
       maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'score-centered-dialog-panel',
       autoFocus: false,
       disableClose: false
-    }).afterClosed().subscribe(() => this.view().reload());
+    });
+    // The list behind the dialog is loaded again as soon as a load (or its undo) is over, not only when the dialog is closed.
+    dialogRef.componentInstance.changed.pipe(takeUntil(dialogRef.afterClosed())).subscribe(() => this.view().reload());
+    dialogRef.afterClosed().subscribe(() => this.view().reload());
   }
 
   ngOnInit() {
