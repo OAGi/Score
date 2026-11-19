@@ -9,7 +9,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLo
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadCommandService;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadPreflightReport;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadRefusedException;
-import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadTransferSettings;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadProperties;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadUploads;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadUploads.Upload;
 import org.oagi.score.gateway.http.common.model.AccessControl;
@@ -40,7 +40,7 @@ public class ReleasePackageLoadController {
     private ReleasePackageLoadUploads uploads;
 
     @Autowired
-    private ReleasePackageLoadTransferSettings transferSettings;
+    private ReleasePackageLoadProperties properties;
 
     public record UploadResponse(String uploadId, String fileName, String state, long bytes, long totalBytes, String message,
                                  String releaseNum, String version) {
@@ -106,7 +106,7 @@ public class ReleasePackageLoadController {
     @GetMapping(value = "/settings")
     public SettingsResponse settings(ScoreUser requester) {
         List<String> problems = service.unavailable(requester);
-        return new SettingsResponse(transferSettings.maxPackageSize(), problems.isEmpty(),
+        return new SettingsResponse(properties.getMaxPackageSize(), problems.isEmpty(),
                 problems.isEmpty() ? null : String.join("; ", problems));
     }
 

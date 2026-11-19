@@ -123,6 +123,40 @@ score:
     max-prefetched-dependencies: 4
     propagation: "on"   # quoted: YAML reads a bare on as true
 
+  # Loading a release package (Release management). The values below are the defaults; durations are ISO-8601 (PT30S = 30 seconds,
+  # P7D = 7 days). The load needs the Hikari connection pool (the default of Spring Boot) to renew its connections after a swap, and is
+  # refused, with nothing changed, when the pool is another one.
+  #   delta                   the number from which the records of the users are numbered in the package that is loaded
+  #   lock-wait               how long a statement of the swap waits for a lock that another connection holds, before the swap is given up
+  #   drain-wait              how long a load waits, to stop writing, for the writers that are at work; if they do not finish, the load is
+  #                           given up before it changes anything
+  #   write-wait              how long a writer waits, while writing is stopped, before it is refused
+  #   stale-after             how long a load that goes on may stay as it is before it is taken to have been abandoned
+  #   retention               how long the schemas that a load keeps for an undo are kept, from the last change of the load
+  #   max-package-size        the most bytes a package may have (default 1 GiB)
+  #   upload-directory        where the packages on their way to a load are kept (empty: a directory of the temporary files)
+  #   upload-ttl              how long a package that was not loaded is kept
+  #   upload-sweep-interval   how often the packages that are kept too long are thrown away
+  #   purge-interval          how often the loads that are kept longer than the retention are discarded
+  #   purge-initial-delay     the time from start to the first purge
+  #   recovery-interval       how often the loads that were abandoned are taken back
+  #   recovery-initial-delay  the time from start to the first recovery
+  release-package-load:
+    delta: 100000000
+    lock-wait: PT30S
+    drain-wait: PT60S
+    write-wait: PT60S
+    stale-after: PT2H
+    retention: P7D
+    max-package-size: 1073741824
+    upload-directory: ""
+    upload-ttl: PT6H
+    upload-sweep-interval: PT15M
+    purge-interval: PT1H
+    purge-initial-delay: PT5M
+    recovery-interval: PT10M
+    recovery-initial-delay: PT2M
+
   # Passkey (WebAuthn) sign-in for local accounts. It is on exactly when BOTH rp-id and allowed-origins are set, and
   # off when they are empty; there is no separate flag. Set them for a Docker deployment through the environment
   # variables (SCORE_PASSKEY_RP_ID, SCORE_PASSKEY_ALLOWED_ORIGINS, SCORE_PASSKEY_RP_NAME).

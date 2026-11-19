@@ -10,7 +10,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLo
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadCommandService;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadPreflightReport;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadRefusedException;
-import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadTransferSettings;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadProperties;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadUploads;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -75,8 +75,9 @@ class ReleasePackageLoadControllerTest {
         ReleasePackageLoadController controller = new ReleasePackageLoadController();
         ReflectionTestUtils.setField(controller, "service", service);
         ReflectionTestUtils.setField(controller, "uploads", uploads);
-        ReflectionTestUtils.setField(controller, "transferSettings",
-                new ReleasePackageLoadTransferSettings(1234L, "", java.time.Duration.ofHours(6)));
+        ReleasePackageLoadProperties properties = new ReleasePackageLoadProperties();
+        properties.setMaxPackageSize(1234L);
+        ReflectionTestUtils.setField(controller, "properties", properties);
         // As the application has it: the user of the request is given to the method, and AccessControl is checked on it.
         AspectJProxyFactory proxy = new AspectJProxyFactory(controller);
         proxy.setProxyTargetClass(true);

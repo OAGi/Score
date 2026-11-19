@@ -62,7 +62,7 @@ class ReleasePackageFormatsTest {
         assertSame(formats.resolve(info("1.1")), formats.resolve(info("1.7")));
         for (String version : new String[]{"1.0", "2.0", "9.9"}) {
             ReleasePackageLoadRefusedException e = assertThrows(ReleasePackageLoadRefusedException.class, () -> formats.resolve(info(version)), version);
-            assertTrue(e.getMessage().contains("version " + version) && e.getMessage().contains("1.1 up to 2.0"), e.getMessage());
+            assertTrue(e.getMessage().contains("(" + version + ")") && e.getMessage().contains("cannot read"), e.getMessage());
         }
     }
 

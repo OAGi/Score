@@ -48,7 +48,7 @@ public class ReleasePackageLoadWorker {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ReleasePackageLoadRepositories repositories;
-    private final ReleasePackageLoadSettings settings;
+    private final ReleasePackageLoadProperties settings;
     private final ReleasePackageLoadReporter reporter;
     private final ReleasePackageLoadPreflight preflight;
     private final ReleasePackageLoadCopier copier;
@@ -58,7 +58,7 @@ public class ReleasePackageLoadWorker {
     private final AsyncJobRunner asyncJobRunner;
     private final ReleasePackageLoadConnectionPoolRefresher connections;
 
-    public ReleasePackageLoadWorker(ReleasePackageLoadRepositories repositories, ReleasePackageLoadSettings settings, ReleasePackageLoadReporter reporter,
+    public ReleasePackageLoadWorker(ReleasePackageLoadRepositories repositories, ReleasePackageLoadProperties settings, ReleasePackageLoadReporter reporter,
                                ReleasePackageLoadPreflight preflight, ReleasePackageLoadCopier copier, RedissonClient redisson,
                                ObjectProvider<ReleasePackageLoadWriteFreeze> writeFreeze, ObjectProvider<RecordCache> recordCache,
                                AsyncJobRunner asyncJobRunner, ReleasePackageLoadConnectionPoolRefresher connections) {
@@ -129,13 +129,14 @@ public class ReleasePackageLoadWorker {
 
     private void doLoad(Run run) {
         takeLock(run);
+        connections.requireEvictable();
         ReleasePackageLoadCommandRepository command = repositories.command();
         ReleasePackageLoadQueryRepository query = repositories.query();
         run.served = query.currentSchema();
         run.staging = ReleasePackageLoadNames.staging(run.served, run.id);
         run.backup = ReleasePackageLoadNames.backup(run.served, run.id);
         try (ZipScriptSource source = new ZipScriptSource(run.packageFile.toString())) {
-            long delta = settings.delta();
+            long delta = settings.getDelta();
 
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.PREFLIGHT, "Checking that the package can be loaded");
             preflight.check(run.format, run.info, source, delta, run.id);
@@ -171,7 +172,7 @@ public class ReleasePackageLoadWorker {
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.SWAPPING, ReleasePackageLoadMessages.SWAPPING);
             command.createSchema(run.backup);
             run.backupMade = true;
-            command.swap(run.staging, run.backup, settings.lockWait(), ReleasePackageLoadTables.STAYS_IN_PLACE);
+            command.swap(run.staging, run.backup, settings.getLockWait(), ReleasePackageLoadTables.STAYS_IN_PLACE);
             run.swapped = true;
             connections.refresh();
         } catch (IOException e) {
@@ -286,6 +287,7 @@ public class ReleasePackageLoadWorker {
 
     private void doRollback(Run run) {
         takeLock(run);
+        connections.requireEvictable();
         ReleasePackageLoadCommandRepository command = repositories.command();
         String served = repositories.query().currentSchema();
         String discarded = ReleasePackageLoadNames.discarded(served, run.id);
@@ -296,7 +298,7 @@ public class ReleasePackageLoadWorker {
         run.frozen = true;
         command.createSchema(discarded);
         repositories.jobs().schemas(run.id, null, null, discarded);
-        command.rollbackSwap(run.backup, discarded, settings.lockWait(), ReleasePackageLoadTables.STAYS_IN_PLACE);
+        command.rollbackSwap(run.backup, discarded, settings.getLockWait(), ReleasePackageLoadTables.STAYS_IN_PLACE);
         connections.refresh();
 
         List<String> warnings = new ArrayList<>();

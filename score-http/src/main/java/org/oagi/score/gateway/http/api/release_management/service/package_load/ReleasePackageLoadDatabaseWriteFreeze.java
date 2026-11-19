@@ -1,5 +1,7 @@
 package org.oagi.score.gateway.http.api.release_management.service.package_load;
 
+import org.jooq.DSLContext;
+import org.oagi.score.gateway.http.common.lock.DatabaseLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -10,7 +12,7 @@ import java.sql.SQLException;
 
 /**
  * The write freeze that is done in the database, so that it holds for every process that writes to it and for every server: the load
- * takes the gate row with an exclusive lock (see {@link ReleasePackageLoadWriteGate}) on a connection of its own and keeps it, uncommitted, until the freeze
+ * takes the gate row with an exclusive lock (see {@link ReleasePackageLoadTables#WRITE_GATE}) on a connection of its own and keeps it, uncommitted, until the freeze
  * ends. The writers that are at work finish first, the ones that come after wait, reading is not touched, and when the server that
  * froze dies its connection goes with it and the lock is let go.
  */
@@ -20,13 +22,15 @@ public class ReleasePackageLoadDatabaseWriteFreeze implements ReleasePackageLoad
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final DataSource dataSource;
-    private final ReleasePackageLoadSettings settings;
+    private final DatabaseLock gate;
+    private final ReleasePackageLoadProperties settings;
 
     private Connection held;
     private volatile Thread owner;
 
-    public ReleasePackageLoadDatabaseWriteFreeze(DataSource dataSource, ReleasePackageLoadSettings settings) {
+    public ReleasePackageLoadDatabaseWriteFreeze(DataSource dataSource, DSLContext dsl, ReleasePackageLoadProperties settings) {
         this.dataSource = dataSource;
+        this.gate = new DatabaseLock(dataSource, dsl.dialect(), ReleasePackageLoadTables.WRITE_GATE, settings.getDrainWait());
         this.settings = settings;
     }
 
@@ -39,10 +43,10 @@ public class ReleasePackageLoadDatabaseWriteFreeze implements ReleasePackageLoad
         try {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
-            ReleasePackageLoadWriteGate.close(connection, settings.drainWait());
+            gate.holdExclusive(connection, settings.getDrainWait());
         } catch (SQLException e) {
             closeQuietly(connection);
-            logger.warn("Writing could not be stopped (" + (ReleasePackageLoadWriteGate.isTimeout(e) ? "the writers did not finish within " + settings.drainWait() : "an error") + "): " + e.getMessage());
+            logger.warn("Writing could not be stopped (" + (gate.isTimeout(e) ? "the writers did not finish within " + settings.getDrainWait() : "an error") + "): " + e.getMessage());
             throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.CANNOT_STOP_WRITING);
         }
         held = connection;

@@ -30,10 +30,10 @@ public class ReleasePackageLoadWatchdog {
 
     private final ReleasePackageLoadRepositories repositories;
     private final StaleJobSweeper sweeper;
-    private final ReleasePackageLoadSettings settings;
+    private final ReleasePackageLoadProperties settings;
     private final ObjectProvider<ReleasePackageLoadWriteFreeze> writeFreeze;
 
-    public ReleasePackageLoadWatchdog(ReleasePackageLoadRepositories repositories, StaleJobSweeper sweeper, ReleasePackageLoadSettings settings,
+    public ReleasePackageLoadWatchdog(ReleasePackageLoadRepositories repositories, StaleJobSweeper sweeper, ReleasePackageLoadProperties settings,
                                  ObjectProvider<ReleasePackageLoadWriteFreeze> writeFreeze) {
         this.repositories = repositories;
         this.sweeper = sweeper;
@@ -41,11 +41,10 @@ public class ReleasePackageLoadWatchdog {
         this.writeFreeze = writeFreeze;
     }
 
-    @Scheduled(initialDelayString = "${score.release-package-load.recovery-initial-delay:PT2M}",
-            fixedDelayString = "${score.release-package-load.recovery-interval:PT10M}")
+    @Scheduled(initialDelayString = "#{@releasePackageLoadProperties.recoveryInitialDelay}", fixedDelayString = "#{@releasePackageLoadProperties.recoveryInterval}")
     public void recover() {
         try {
-            recoverSince(LocalDateTime.now().minus(settings.staleAfter()));
+            recoverSince(LocalDateTime.now().minus(settings.getStaleAfter()));
         } catch (RuntimeException e) {
             logger.error("The loads of release packages that go on could not be taken back: " + e.getMessage(), e);
         }

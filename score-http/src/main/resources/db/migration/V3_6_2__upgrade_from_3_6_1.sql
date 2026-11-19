@@ -1,7 +1,21 @@
--- ---------------------------------------------------------------------------------------------------------------------
--- 3.6.2: the loads of release packages (the swap of the schema of the application for one that a package was loaded into).
--- ---------------------------------------------------------------------------------------------------------------------
+-- ----------------------------------------------------
+-- Migration script for Score v3.6.2                 --
+--                                                   --
+-- Author: Hakju Oh <hakju.oh@nist.gov>              --
+-- ----------------------------------------------------
 
+SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
+SET FOREIGN_KEY_CHECKS = 0;
+
+SET @OLD_SQL_NOTES = @@SQL_NOTES;
+SET SQL_NOTES = 0;
+
+-- ------------------------------------------------------------------
+-- The loads of release packages (#1758)
+-- ------------------------------------------------------------------
+--
+-- A release package is loaded into a schema of its own, which is then swapped for the schema the application serves.
+--
 -- This table stays where it is when the schema is swapped (the swap moves every other table), so that a load can be followed
 -- from its start to its end, and after it. For the same reason it has no foreign key: a foreign key to a table that is moved
 -- would go with that table.
@@ -26,10 +40,12 @@ CREATE TABLE `release_package_load_job`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC COMMENT ='The loads of release packages, each into a schema of its own, to be swapped for the schema the application serves.';
 
--- ---------------------------------------------------------------------------------------------------------------------
--- A lock that every process that uses this database can take by name, in the database itself, kept until the end of a transaction.
--- ---------------------------------------------------------------------------------------------------------------------
-
+-- ------------------------------------------------------------------
+-- A lock by name, kept in the database (#1758)
+-- ------------------------------------------------------------------
+--
+-- Every process that uses this database can take it, and keeps it until the end of a transaction.
+--
 -- A row is a lock: a process takes it with SELECT ... LOCK IN SHARE MODE (to go on together with the others that do) or FOR UPDATE (to be
 -- alone), and holds it until its transaction ends or its connection is lost. The first use is the gate that stops every writer, of any
 -- process, while the schema is swapped for one that a release package was loaded into: the writers read 'write_gate' with a shared lock
@@ -45,3 +61,6 @@ CREATE TABLE `named_lock`
   ROW_FORMAT = DYNAMIC COMMENT ='The rows that are locked, by name, to coordinate processes through the database. A lock whose row is missing does not lock anything.';
 
 INSERT INTO `named_lock` (`lock_name`) VALUES ('write_gate');
+
+SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
+SET SQL_NOTES = @OLD_SQL_NOTES;

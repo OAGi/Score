@@ -52,12 +52,12 @@ public class ReleasePackageLoadUploads {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ReleasePackageLoadTransferSettings settings;
+    private final ReleasePackageLoadProperties settings;
     private final ReleasePackageLoadCommandService commands;
     private final Map<String, Upload> uploads = new ConcurrentHashMap<>();
     private Path directory;
 
-    public ReleasePackageLoadUploads(ReleasePackageLoadTransferSettings settings, ReleasePackageLoadCommandService commands) {
+    public ReleasePackageLoadUploads(ReleasePackageLoadProperties settings, ReleasePackageLoadCommandService commands) {
         this.settings = settings;
         this.commands = commands;
     }
@@ -70,7 +70,7 @@ public class ReleasePackageLoadUploads {
     @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
     public Upload receive(ScoreUser requester, String fileName, InputStream stream, long declaredLength) {
         requireName(fileName);
-        if (declaredLength > settings.maxPackageSize()) {
+        if (declaredLength > settings.getMaxPackageSize()) {
             throw tooLarge();
         }
         Upload upload = begin(requester, fileName, declaredLength);
@@ -101,7 +101,7 @@ public class ReleasePackageLoadUploads {
     }
 
     private void copy(InputStream stream, Upload upload) throws IOException {
-        long max = settings.maxPackageSize();
+        long max = settings.getMaxPackageSize();
         long bytes = 0;
         long reported = 0;
         byte[] buffer = new byte[64 * 1024];
@@ -199,9 +199,9 @@ public class ReleasePackageLoadUploads {
     }
 
     /** A package that is kept for longer than it may be is thrown away, with the files that no package is of. */
-    @Scheduled(fixedDelayString = "PT15M", initialDelayString = "PT15M")
+    @Scheduled(fixedDelayString = "#{@releasePackageLoadProperties.uploadSweepInterval}", initialDelayString = "#{@releasePackageLoadProperties.uploadSweepInterval}")
     void sweep() {
-        Instant oldest = Instant.now().minus(settings.uploadTtl());
+        Instant oldest = Instant.now().minus(settings.getUploadTtl());
         uploads.values().stream().filter(u -> u.created().isBefore(oldest)).forEach(this::drop);
         try (var files = Files.list(directory())) {
             files.filter(file -> file.getFileName().toString().endsWith(".zip"))
@@ -217,8 +217,8 @@ public class ReleasePackageLoadUploads {
 
     private synchronized Path directory() throws IOException {
         if (directory == null) {
-            Path base = settings.uploadDirectory().isBlank()
-                    ? Path.of(System.getProperty("java.io.tmpdir"), "score-release-package-loads") : Path.of(settings.uploadDirectory());
+            Path base = settings.getUploadDirectory().isBlank()
+                    ? Path.of(System.getProperty("java.io.tmpdir"), "score-release-package-loads") : Path.of(settings.getUploadDirectory());
             directory = Files.createDirectories(base);
         }
         return directory;
@@ -233,7 +233,7 @@ public class ReleasePackageLoadUploads {
     }
 
     private ReleasePackageLoadRefusedException tooLarge() {
-        long max = settings.maxPackageSize();
+        long max = settings.getMaxPackageSize();
         String size = max >= 1024 * 1024 ? max / (1024 * 1024) + " MB" : max / 1024 + " KB";
         return new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.tooLarge(size));
     }

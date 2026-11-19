@@ -60,8 +60,8 @@ class ReleasePackageFormatV1Test {
         List<String> problems = format.problemsOf(info(null, "gone.sql", "code.kts", "ok.sql"), scriptsOf("code.kts", "ok.sql"));
 
         assertEquals(2, problems.size(), problems.toString());
-        assertTrue(problems.get(0).contains("'gone.sql'") && problems.get(0).contains("missing"));
-        assertTrue(problems.get(1).contains("'code.kts'") && problems.get(1).contains("not SQL"));
+        assertTrue(problems.get(0).contains("gone.sql") && problems.get(0).contains("incomplete"));
+        assertTrue(problems.get(1).contains("code.kts") && problems.get(1).contains("not a SQL script"));
     }
 
     @Test

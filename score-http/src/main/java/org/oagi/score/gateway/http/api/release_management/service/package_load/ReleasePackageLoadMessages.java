@@ -18,6 +18,7 @@ public final class ReleasePackageLoadMessages {
     public static final String NOT_A_PACKAGE = "This file is not a release package. Choose the .zip file made by 'Generate Migration Script' of a release.";
     public static final String GONE = "This file is no longer on the server (it was used, discarded, or kept too long). Please choose it again.";
     public static final String NOT_READY = "This file is not ready yet. Please wait until it is received.";
+    public static final String POOL_NOT_EVICTABLE = "The server cannot renew its database connections, which a load needs once it is swapped in (its connection pool is not the one it supports). Nothing was changed.";
     public static final String BEING_LOADED = "This file is already being processed.";
     public static final String BAD_FILE_NAME = "The name of the file may have only letters, digits, dots, dashes and underscores, and must end with .zip.";
 
@@ -92,5 +93,7 @@ public final class ReleasePackageLoadMessages {
     public static final String NOT_UNDONE = "The earlier data could not be put back. It is still kept; please contact your administrator.";
     public static final String LOAD_NOT_FOUND = "This job cannot be found.";
     public static final String ONLY_SUCCEEDED = "Only a job that finished successfully can be undone.";
+    public static final String ONLY_ENDED = "Only a job that is over can be discarded.";
+    public static final String KEEPS_DATA = "This job failed and still keeps data from before. Please contact your administrator; it is not discarded until the data has been looked at.";
     public static final String ONLY_LATEST = "Only the most recent job can be undone, because a later one has replaced what this one brought in.";
 }
