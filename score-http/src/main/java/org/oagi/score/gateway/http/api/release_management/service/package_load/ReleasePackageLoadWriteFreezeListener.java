@@ -5,17 +5,20 @@ import org.jooq.ExecuteListener;
 import org.jooq.ExecuteListenerProvider;
 import org.jooq.ExecuteType;
 import org.jooq.impl.DefaultExecuteListener;
+import org.oagi.score.gateway.http.common.lock.DatabaseLock;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Before a statement of this process writes, goes through the gate (see {@link ReleasePackageLoadWriteGate}): when a load has stopped writing it waits
+ * Before a statement of this process writes, goes through the gate (see {@link ReleasePackageLoadTables#WRITE_GATE}): when a load has stopped writing it waits
  * there, and when it waits for longer than it may it is refused with a {@link ReleasePackageLoadWriteFrozenException}. Inside a transaction the shared lock on the
  * gate lasts until the transaction ends, which is what lets the load wait for the writers that are at work. Reading never goes through it.
  * Other processes that write to the same database (the connect-center-api) go through the same gate on their own.
@@ -29,12 +32,15 @@ public class ReleasePackageLoadWriteFreezeListener implements ExecuteListenerPro
             Pattern.CASE_INSENSITIVE);
 
     private final ObjectProvider<ReleasePackageLoadDatabaseWriteFreeze> freeze;
-    private final ObjectProvider<ReleasePackageLoadSettings> settings;
+    private final ObjectProvider<ReleasePackageLoadProperties> settings;
+    private final ObjectProvider<DataSource> dataSource;
 
     /** Lazy: this listener is a part of the DSLContext that the freeze's own beans may be read with. */
-    public ReleasePackageLoadWriteFreezeListener(@Lazy ObjectProvider<ReleasePackageLoadDatabaseWriteFreeze> freeze, @Lazy ObjectProvider<ReleasePackageLoadSettings> settings) {
+    public ReleasePackageLoadWriteFreezeListener(@Lazy ObjectProvider<ReleasePackageLoadDatabaseWriteFreeze> freeze, @Lazy ObjectProvider<ReleasePackageLoadProperties> settings,
+                                                @Lazy ObjectProvider<DataSource> dataSource) {
         this.freeze = freeze;
         this.settings = settings;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -49,10 +55,12 @@ public class ReleasePackageLoadWriteFreezeListener implements ExecuteListenerPro
                 if (own != null && own.isOwnedBy(Thread.currentThread())) {
                     return;
                 }
+                Duration writeWait = settings.getObject().getWriteWait();
+                DatabaseLock gate = new DatabaseLock(dataSource.getObject(), ctx.dialect(), ReleasePackageLoadTables.WRITE_GATE, writeWait);
                 try {
-                    ReleasePackageLoadWriteGate.enter(ctx.connection(), settings.getObject().writeWait());
+                    gate.holdShared(ctx.connection(), writeWait);
                 } catch (SQLException e) {
-                    if (ReleasePackageLoadWriteGate.isTimeout(e)) {
+                    if (gate.isTimeout(e)) {
                         throw new ReleasePackageLoadWriteFrozenException(ReleasePackageLoadMessages.WRITING_PAUSED, e);
                     }
                     throw new org.jooq.exception.DataAccessException("The gate of the writers could not be read: " + e.getMessage(), e);

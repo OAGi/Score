@@ -101,6 +101,36 @@ public class JooqReleasePackageLoadJobRepository extends JooqBaseRepository impl
     }
 
     @Override
+    public List<ReleasePackageLoadJob> findBefore(ReleasePackageLoadJobId id, ReleasePackageLoadState state) {
+        return dslContext().select(COLUMNS).from(JOB)
+                .where(STATE.eq(state.name()))
+                .and(ID.lt(ULong.valueOf(id.value())))
+                .orderBy(ID.desc())
+                .fetch(this::job);
+    }
+
+    @Override
+    public List<ReleasePackageLoadJob> findNotChangedSince(Set<ReleasePackageLoadState> states, LocalDateTime time) {
+        return dslContext().select(COLUMNS).from(JOB)
+                .where(STATE.in(names(states)))
+                .and(LAST_UPDATE_TIMESTAMP.lt(time))
+                .orderBy(ID)
+                .fetch(this::job);
+    }
+
+    @Override
+    public boolean delete(ReleasePackageLoadJobId id, Set<ReleasePackageLoadState> states) {
+        return dslContext().deleteFrom(JOB)
+                .where(ID.eq(ULong.valueOf(id.value())))
+                .and(STATE.in(names(states)))
+                .execute() == 1;
+    }
+
+    private static Set<String> names(Set<ReleasePackageLoadState> states) {
+        return states.stream().map(Enum::name).collect(Collectors.toSet());
+    }
+
+    @Override
     public boolean moveState(ReleasePackageLoadJobId id, Set<ReleasePackageLoadState> from, ReleasePackageLoadState to, String message) {
         return dslContext().update(JOB)
                 .set(STATE, to.name())

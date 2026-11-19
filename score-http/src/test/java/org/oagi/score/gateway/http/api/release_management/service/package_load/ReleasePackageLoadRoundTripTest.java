@@ -88,7 +88,7 @@ class ReleasePackageLoadRoundTripTest extends AbstractRoundTripTest {
                     + "(1, 'OAGIS', 1, 1, '2026-01-02 03:04:05.123456', '2026-01-02 03:04:05.123456'), "
                     + "(" + (DELTA + 1) + ", 'a user''s library', 1, 1, NOW(6), NOW(6))");
             statement.execute("INSERT INTO `release` (release_id, library_id, guid, release_num, created_by, last_updated_by, creation_timestamp, last_update_timestamp, state) VALUES "
-                    + "(1, 1, 'guid-working', 'Working', 1, 1, NOW(6), NOW(6), 'WIP'), (2, 1, 'guid-10', '10.0', 1, 1, NOW(6), NOW(6), 'Published')");
+                    + "(1, 1, 'guid-working', 'Working', 1, 1, NOW(6), NOW(6), 'Initialized'), (2, 1, 'guid-10', '10.0', 1, 1, NOW(6), NOW(6), 'Published')");
             statement.execute("INSERT INTO namespace (namespace_id, library_id, uri, prefix, description, is_std_nmsp, owner_user_id, created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES "
                     + "(1, 1, 'http://www.openapplications.org/oagis/10', 'oagis', 'O''Reilly \"quoted\" back\\\\slash, new\nline, tab\t, 한글, ありがとう, ünïcödé', 1, 1, 1, 1, NOW(6), NOW(6)), "
                     + "(" + (DELTA + 1) + ", " + (DELTA + 1) + ", 'urn:users', NULL, NULL, 0, 1, 1, 1, NOW(6), NOW(6))");

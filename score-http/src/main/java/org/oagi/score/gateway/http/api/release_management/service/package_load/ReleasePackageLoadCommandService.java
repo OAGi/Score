@@ -40,21 +40,23 @@ public class ReleasePackageLoadCommandService {
     private final Logger logger = LoggerFactory.getLogger(ReleasePackageLoadCommandService.class);
 
     private final ReleasePackageLoadRepositories repositories;
-    private final ReleasePackageLoadSettings settings;
+    private final ReleasePackageLoadProperties settings;
     private final ReleasePackageLoadWorker worker;
     private final ReleasePackageLoadExecutor executor;
     private final ReleasePackageFormats formats;
     private final ReleasePackageLoadPreflight preflight;
+    private final ReleasePackageLoadDiscarder discarder;
 
-    public ReleasePackageLoadCommandService(ReleasePackageLoadRepositories repositories, ReleasePackageLoadSettings settings,
+    public ReleasePackageLoadCommandService(ReleasePackageLoadRepositories repositories, ReleasePackageLoadProperties settings,
                                        ReleasePackageLoadWorker worker, ReleasePackageLoadExecutor executor, ReleasePackageFormats formats,
-                                       ReleasePackageLoadPreflight preflight) {
+                                       ReleasePackageLoadPreflight preflight, ReleasePackageLoadDiscarder discarder) {
         this.repositories = repositories;
         this.settings = settings;
         this.worker = worker;
         this.executor = executor;
         this.formats = formats;
         this.preflight = preflight;
+        this.discarder = discarder;
     }
 
     private ReleasePackageLoadJobRepository jobs() {
@@ -122,6 +124,28 @@ public class ReleasePackageLoadCommandService {
     }
 
     /**
+     * Discards the record of a load that is over, with the schema that holds what it took out (so it can no longer be
+     * undone). What a later load has replaced goes with it, as the schemas of those loads can no longer be put back either.
+     *
+     * @throws ReleasePackageLoadRefusedException when the load is not over, or another goes on
+     */
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
+    public void discard(ScoreUser requester, ReleasePackageLoadJobId id) {
+        requireAvailable();
+        ReleasePackageLoadJob job = jobs().find(id).orElseThrow(() -> new NotFoundException(ReleasePackageLoadMessages.LOAD_NOT_FOUND));
+        if (!ReleasePackageLoadDiscarder.DISCARDABLE.contains(job.state())) {
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.ONLY_ENDED);
+        }
+        if (!jobs().findActive().isEmpty()) {
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.ANOTHER_LOAD);
+        }
+        if (!discarder.canDiscard(job)) {
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.KEEPS_DATA);
+        }
+        discarder.discard(job);
+    }
+
+    /**
      * What a load of the package would meet, which nothing is changed to find out: everything that is not as it has to be is told, and a
      * package that has nothing in the way is told to have none.
      */
@@ -142,7 +166,7 @@ public class ReleasePackageLoadCommandService {
         List<ReleasePackageLoadPreflightReport.Library> libraries = List.of();
         if (format != null) {
             try (ZipScriptSource source = new ZipScriptSource(packageFile.toString())) {
-                ReleasePackageLoadPreflight.Look look = preflight.look(format, info, source, settings.delta(), new ReleasePackageLoadJobId(BigInteger.ZERO));
+                ReleasePackageLoadPreflight.Look look = preflight.look(format, info, source, settings.getDelta(), new ReleasePackageLoadJobId(BigInteger.ZERO));
                 problems.addAll(look.problems());
                 libraries = look.libraries();
             } catch (IOException e) {

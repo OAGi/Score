@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 /**
  * Copies what the users made from the schema the application serves into the schema the package was loaded into, as
- * {@link ReleasePackageTables} says, and finds out whether it was all copied.
+ * {@link ReleasePackageFormat#copyPlan} says, and finds out whether it was all copied.
  */
 @Component
 public class ReleasePackageLoadCopier {

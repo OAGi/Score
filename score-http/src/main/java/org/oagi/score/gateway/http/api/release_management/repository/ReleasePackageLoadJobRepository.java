@@ -35,6 +35,19 @@ public interface ReleasePackageLoadJobRepository {
     /** The latest load that ended as {@code state}, for what undoing a swap needs. */
     Optional<ReleasePackageLoadJob> findLatest(ReleasePackageLoadState state);
 
+    /** The loads that ended as {@code state} before the one given, the latest first; they are what that one has replaced. */
+    List<ReleasePackageLoadJob> findBefore(ReleasePackageLoadJobId id, ReleasePackageLoadState state);
+
+    /** The loads that are in one of the states and have not changed since before the time, the oldest first. */
+    List<ReleasePackageLoadJob> findNotChangedSince(Set<ReleasePackageLoadState> states, LocalDateTime time);
+
+    /**
+     * Removes the record of the load, but only when it is in one of the states: the one that is being moved on is not removed.
+     *
+     * @return whether it was removed
+     */
+    boolean delete(ReleasePackageLoadJobId id, Set<ReleasePackageLoadState> states);
+
     /**
      * Moves the load to the state, only if it is in one of the states it is moved from.
      *
