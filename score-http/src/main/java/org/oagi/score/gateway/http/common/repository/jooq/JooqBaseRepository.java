@@ -38,7 +38,7 @@ public abstract class JooqBaseRepository {
 
     private final DSLContext dslContext;
     private final ScoreUser requester;
-    private final RepositoryFactory repositoryFactory;
+    private RepositoryFactory repositoryFactory;
 
     public JooqBaseRepository(DSLContext dslContext, ScoreUser requester, RepositoryFactory repositoryFactory) {
         this.dslContext = dslContext;
@@ -56,6 +56,11 @@ public abstract class JooqBaseRepository {
 
     public RepositoryFactory repositoryFactory() {
         return repositoryFactory;
+    }
+
+    /** Has the repository ask for the other repositories of a factory that is not the one that made it: the one that is wrapped (see AccessControlAspect). */
+    public void useRepositoryFactory(RepositoryFactory repositoryFactory) {
+        this.repositoryFactory = repositoryFactory;
     }
 
     public final ULong valueOf(Id id) {
