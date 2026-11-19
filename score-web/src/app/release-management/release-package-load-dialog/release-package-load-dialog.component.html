@@ -1,0 +1,185 @@
+<score-dialog-page title="Load Release Package">
+  <div class="dialog-form pane">
+    @switch (step()) {
+
+      <!-- ============ Step 1: the package comes ============ -->
+      @case ('package') {
+        @if (settings()?.available === false) {
+          <div class="problems">
+            <b>Release packages cannot be loaded here.</b>
+            <div>The database account of the application is not allowed to create databases. Please contact your administrator.</div>
+          </div>
+        } @else {
+        <div class="package-pane">
+          <input #fileInput type="file" class="file-input" accept=".zip,application/zip" (change)="onFileChosen($event)">
+          @if (sending()) {
+            <div>
+              <div>Sending <b>{{ upload()?.fileName }}</b>
+                @if (receivingPercent !== null) {
+                  — {{ formatBytes(upload()?.bytes ?? 0) }} of {{ formatBytes(upload()?.totalBytes ?? 0) }}
+                }
+              </div>
+              <mat-progress-bar [mode]="receivingPercent === null ? 'indeterminate' : 'determinate'"
+                                [value]="receivingPercent ?? 0"></mat-progress-bar>
+            </div>
+          } @else {
+            <div class="drop-zone" [class.drag-over]="dragOver()"
+                 (click)="fileInput.click()" (dragover)="onDragOver($event)" (dragleave)="dragOver.set(false)" (drop)="onDrop($event)">
+              <mat-icon class="drop-icon">cloud_upload</mat-icon>
+              <div>Drop a release package (.zip) here, or click to choose one</div>
+            </div>
+          }
+        </div>
+
+        @if (undoable; as last) {
+          <div class="recent-job">
+            <span>The latest load, <b>{{ last.releaseNum ?? last.packageFileName }}</b>, succeeded
+              ({{ last.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm' }}). The load can be undone.</span>
+            <button mat-stroked-button type="button" (click)="rollback(last)">Undo</button>
+          </div>
+        }
+        }
+      }
+
+      <!-- ============ Step 2: what is in the way ============ -->
+      @case ('check') {
+        <div>
+          <div><b>{{ upload()?.fileName }}</b>
+            <span class="meta"> — {{ formatBytes(upload()?.bytes ?? 0) }}</span></div>
+          @if (checking()) {
+            <div class="pt-3">Looking at the package; nothing is changed by that.</div>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          } @else if (preflight(); as report) {
+            <div class="meta pt-1">Release {{ report.releaseNum }} · format version {{ report.version }}</div>
+            @if (report.ok) {
+              <div class="ok-line pt-3">
+                <mat-icon>check_circle</mat-icon>
+                <span>The package can be loaded. It is loaded beside the data in use and put in place at the end. Users cannot
+                  save for a short while at the end, and their work is kept.</span>
+              </div>
+            } @else {
+              <div class="pt-3"><b>The package cannot be loaded:</b></div>
+              <ul class="problems">
+                @for (problem of report.problems; track problem) {
+                  <li>{{ problem }}</li>
+                }
+              </ul>
+            }
+          }
+        </div>
+      }
+
+      <!-- ============ Step 3: the load ============ -->
+      @case ('load') {
+        @if (job(); as current) {
+          <div>
+            <div><b>{{ current.releaseNum ?? current.packageFileName }}</b>
+              <span class="meta"> — {{ current.packageFileName }}</span></div>
+
+            @if (current.active && !isUndo(current)) {
+              <ul class="step-list">
+                @for (item of steps; track item.state; let i = $index) {
+                  <li [class.pending]="i > stepIndex(current)">
+                    @if (i < stepIndex(current)) {
+                      <mat-icon class="done">check_circle</mat-icon>
+                    } @else if (i === stepIndex(current)) {
+                      <mat-spinner [diameter]="22"></mat-spinner>
+                    } @else {
+                      <mat-icon>radio_button_unchecked</mat-icon>
+                    }
+                    <span>{{ item.label }}</span>
+                  </li>
+                }
+              </ul>
+              <mat-progress-bar [mode]="current.state === 'SWAPPING' ? 'indeterminate' : 'determinate'"
+                                [value]="loadProgress(current.state)"></mat-progress-bar>
+              <div class="meta pt-2">{{ current.message }}</div>
+              <div class="meta pt-2">You can close this window; the load goes on. Open it again from the release list to see how it goes.</div>
+            } @else if (current.active) {
+              <div class="pt-3">Undoing the load…</div>
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+              <div class="meta pt-2">{{ current.message }}</div>
+            } @else if (current.state === 'SUCCEEDED') {
+              <div class="ok-line pt-3">
+                <mat-icon>check_circle</mat-icon>
+                <span>The package is loaded. Reload the page to see it.</span>
+              </div>
+              <div class="meta pt-2">{{ current.message }}</div>
+            } @else if (current.state === 'ROLLED_BACK') {
+              <div class="ok-line pt-3">
+                <mat-icon>history</mat-icon>
+                <span>The load is undone: the data from before the load is in use again.</span>
+              </div>
+              <div class="meta pt-2">{{ current.message }}</div>
+            } @else {
+              <div class="error-line">
+                <mat-icon>error</mat-icon>
+                <span>The load failed. {{ current.message }}</span>
+              </div>
+              <div class="meta pt-2">The data in use was not changed, unless the message above says otherwise.</div>
+            }
+          </div>
+        }
+      }
+    }
+
+    @if (error(); as message) {
+      <div class="error-line">
+        <mat-icon>error</mat-icon>
+        <span>{{ message }}</span>
+      </div>
+    }
+  </div>
+
+  <ng-container ngProjectAs="[dialogActions]">
+    @switch (step()) {
+      @case ('package') {
+        <button mat-raised-button type="button" (click)="close()">
+          <mat-icon>close</mat-icon>
+          <span class="ps-2">Close</span>
+        </button>
+      }
+      @case ('check') {
+        <button mat-raised-button type="button" [disabled]="starting()" (click)="chooseAnother()">
+          <mat-icon>arrow_back</mat-icon>
+          <span class="ps-2">Choose another</span>
+        </button>
+        <button mat-raised-button type="button" [disabled]="checking() || starting()" (click)="checkPackage()">
+          <mat-icon>refresh</mat-icon>
+          <span class="ps-2">Check again</span>
+        </button>
+        <button mat-raised-button color="primary" type="button"
+                [disabled]="!preflight()?.ok || checking() || starting()" (click)="startLoad()">
+          @if (starting()) {
+            <mat-spinner [diameter]="18"></mat-spinner>
+          } @else {
+            <mat-icon>play_arrow</mat-icon>
+          }
+          <span class="ps-2">Load</span>
+        </button>
+      }
+      @case ('load') {
+        @if (job(); as current) {
+          @if (!current.active) {
+            @if (current.state === 'SUCCEEDED') {
+              <button mat-stroked-button type="button" (click)="rollback(current)">Undo</button>
+              <button mat-raised-button color="primary" type="button" (click)="reload()">
+                <mat-icon>refresh</mat-icon>
+                <span class="ps-2">Reload</span>
+              </button>
+            } @else {
+              <button mat-raised-button type="button" (click)="backToStart()">
+                <mat-icon>arrow_back</mat-icon>
+                <span class="ps-2">Back</span>
+              </button>
+            }
+          }
+        }
+        <button mat-raised-button type="button" (click)="close()">
+          <mat-icon>close</mat-icon>
+          <span class="ps-2">Close</span>
+        </button>
+      }
+    }
+  </ng-container>
+</score-dialog-page>

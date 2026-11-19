@@ -19,6 +19,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ReleaseListEntry, WorkingRelease} from '../domain/release';
 import {ReleaseService} from '../domain/release.service';
 import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
+import {ReleasePackageLoadDialogComponent} from '../release-package-load-dialog/release-package-load-dialog.component';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
 /** What the server announces to everyone of a release. */
@@ -111,6 +112,23 @@ export class ReleaseListComponent implements OnInit {
 
   get userToken() {
     return this.auth.getUserToken();
+  }
+
+  /** Loading a release package is for administrators: for no one else is the button there. */
+  get isAdmin(): boolean {
+    return this.auth.isAdmin();
+  }
+
+  /** The dialog loads a package in the background: when it is closed the list is loaded again, since a load that has succeeded changes it. */
+  loadReleasePackage() {
+    this.dialog.open(ReleasePackageLoadDialogComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'score-centered-dialog-panel',
+      autoFocus: false,
+      disableClose: false
+    }).afterClosed().subscribe(() => this.view().reload());
   }
 
   ngOnInit() {

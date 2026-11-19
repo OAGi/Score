@@ -6,8 +6,6 @@ import org.oagi.score.gateway.http.cache.RecordChangeKeyResolver;
 import org.oagi.score.gateway.http.cache.TestRecordKeys;
 
 
-import org.oagi.score.gateway.http.api.cc_management.propagation.CcDependencyLookup;
-import org.oagi.score.gateway.http.api.cc_management.propagation.Dependent;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;

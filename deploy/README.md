@@ -43,6 +43,7 @@ deploy/deploy.sh test --images=http --remote-only   # roll only the backend imag
 | script | what it does |
 |---|---|
 | `open-sg.sh [ip]` | re-point the two SSH SG rules to your current public IP (aws CLI) |
+| `grant-load-privileges.sh <domain> [--check-only]` | let the `oagi` DB user make/use/drop the `oagi_*` schemas that loading a release package goes through (without it the app refuses to load packages) |
 | `build-images.sh [ver]` | build all three images (wraps each module's `docker/build.sh`); local build = `linux/amd64`. `PUSH_IMAGE=1` builds **amd64 + arm64** and pushes the multi-arch manifest to Docker Hub directly |
 | `push-images.sh [ver]` | `docker push` the three tags to Docker Hub (tags already published by a `PUSH_IMAGE=1` build are skipped) |
 | `remote-deploy.sh <inst> [ver]` | prune disk + **pull images (validates the tag before editing anything)** + backup compose + bump tags + `up -d` + wait for clean backend startup |
