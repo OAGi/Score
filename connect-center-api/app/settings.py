@@ -121,6 +121,10 @@ class Settings(BaseSettings):
     sql_echo: bool = False
     db_pool_pre_ping: bool = True
 
+    # Writes wait at the gate that score-http closes while it swaps the schema (see app/write_gate.py), for at most this long.
+    db_write_gate_enabled: bool = True
+    db_write_gate_wait_seconds: int = 60
+
     # Dev convenience: create tables at startup (no migrations).
     db_auto_create: bool = False
 

@@ -1,0 +1,113 @@
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 2px dashed var(--mat-sys-outline-variant, #bbb);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.drop-zone.drag-over {
+  border-color: var(--mat-sys-primary, #1976d2);
+  background: color-mix(in srgb, var(--mat-sys-primary, #1976d2) 8%, transparent);
+}
+
+.drop-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.file-input {
+  display: none;
+}
+
+/* The choice of the package fills the height of the pane, so that the drop zone has no empty space below it. */
+.package-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.pane {
+  padding-top: 16px;
+  min-height: 220px;
+}
+
+.step-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.step-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.step-list li.pending {
+  opacity: 0.5;
+}
+
+.step-list mat-icon.done {
+  color: var(--mat-sys-primary, #2e7d32);
+}
+
+.problems {
+  color: var(--mat-sys-error, #b3261e);
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.ok-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ok-line mat-icon {
+  color: var(--mat-sys-primary, #2e7d32);
+}
+
+/* A line of text that wraps must not squeeze the icon beside it. */
+.ok-line mat-icon,
+.error-line mat-icon {
+  flex-shrink: 0;
+}
+
+.error-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--mat-sys-error, #b3261e);
+  margin-top: 12px;
+  word-break: break-word;
+}
+
+.meta {
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-size: 0.9em;
+}
+
+.recent-job {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--mat-sys-on-surface, #000) 5%, transparent);
+}
+
+.entry-list {
+  max-height: 240px;
+  overflow: auto;
+}

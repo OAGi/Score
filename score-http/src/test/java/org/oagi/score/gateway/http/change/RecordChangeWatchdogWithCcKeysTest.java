@@ -15,7 +15,6 @@ import org.oagi.score.gateway.http.cache.RecordCacheStatus;
 import org.oagi.score.gateway.http.cache.TestRecordKeys;
 
 import org.oagi.score.gateway.http.api.cc_management.repository.AffectedRecordsRepository;
-import org.oagi.score.gateway.http.change.RecordRef;
 
 
 

@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.repositories.vendor_plugins import get_vendor_plugin
 from app.settings import settings
+from app.write_gate import install_write_gate
 
 _engine: AsyncEngine | None = None
 _sessionmaker: async_sessionmaker[AsyncSession] | None = None
@@ -38,6 +39,8 @@ def get_engine() -> AsyncEngine:
             echo=settings.sql_echo,
             pool_pre_ping=settings.db_pool_pre_ping,
         )
+        if settings.db_write_gate_enabled:
+            install_write_gate(_engine, settings.db_write_gate_wait_seconds)
     return _engine
 
 

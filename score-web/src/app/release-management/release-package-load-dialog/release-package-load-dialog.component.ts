@@ -1,0 +1,304 @@
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {HttpErrorResponse, HttpEventType} from '@angular/common/http';
+import {MatDialogRef} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {EMPTY, timer} from 'rxjs';
+import {expand, filter, switchMap} from 'rxjs/operators';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {
+  LOAD_STEPS,
+  PackageLoadJob,
+  PackageLoadSettings,
+  PackagePreflight,
+  PackageUpload,
+  formatBytes,
+  loadProgress
+} from '../domain/release-package-load';
+import {ReleasePackageLoadService} from '../domain/release-package-load.service';
+
+/** Where the dialog is: the package comes, it is looked at, it is loaded. */
+type Step = 'package' | 'check' | 'load';
+
+const POLL_LOAD_MS = 2000;
+
+/** The message the server gave for a refusal, else what the browser knows of it. */
+export function errorMessage(err: unknown): string {
+  if (err instanceof HttpErrorResponse) {
+    const header = err.headers?.get('X-Error-Message');
+    if (header) {
+      return header;
+    }
+    if (typeof err.error === 'string' && err.error) {
+      return err.error;
+    }
+    return err.message;
+  }
+  return err instanceof Error ? err.message : String(err);
+}
+
+/**
+ * Loads a release package, which an administrator does from the list of releases: the package is sent from the computer; it is looked
+ * at (nothing is changed by that) and what is in its way is told; then the load goes on in the
+ * background and the dialog follows it, state by state, until it is over. The dialog can be closed while the load goes on: opening it
+ * again shows where the load is.
+ */
+@Component({
+  standalone: false,
+  selector: 'score-release-package-load-dialog',
+  templateUrl: './release-package-load-dialog.component.html',
+  styleUrls: ['./release-package-load-dialog.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export class ReleasePackageLoadDialogComponent implements OnInit {
+  private service = inject(ReleasePackageLoadService);
+  private dialogRef = inject(MatDialogRef<ReleasePackageLoadDialogComponent>);
+  private snackBar = inject(MatSnackBar);
+  private confirmDialogService = inject(ConfirmDialogService);
+  private destroyRef = inject(DestroyRef);
+
+  readonly steps = LOAD_STEPS;
+  readonly loadProgress = loadProgress;
+  readonly formatBytes = formatBytes;
+
+  readonly step = signal<Step>('package');
+  readonly settings = signal<PackageLoadSettings | undefined>(undefined);
+  readonly recent = signal<PackageLoadJob[]>([]);
+
+  readonly dragOver = signal(false);
+  /** While the package is sent to the server, which shows the share that has gone. */
+  readonly sending = signal(false);
+  readonly upload = signal<PackageUpload | undefined>(undefined);
+  readonly checking = signal(false);
+  readonly starting = signal(false);
+  readonly preflight = signal<PackagePreflight | undefined>(undefined);
+  readonly job = signal<PackageLoadJob | undefined>(undefined);
+  readonly error = signal<string | undefined>(undefined);
+
+  ngOnInit() {
+    this.service.settings().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: settings => this.settings.set(settings),
+      error: err => this.error.set(errorMessage(err))
+    });
+    this.refreshRecent(true);
+  }
+
+  // -------------------------------------------------------------------------------------------------------------
+  // Where the dialog starts, and the loads that were
+  // -------------------------------------------------------------------------------------------------------------
+
+  /** The loads that were started last; a load that goes on is followed at once. */
+  private refreshRecent(follow: boolean) {
+    this.service.recent(5).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: jobs => {
+        this.recent.set(jobs);
+        const active = jobs.find(job => job.active);
+        if (follow && active) {
+          this.follow(active);
+        }
+      },
+      error: err => this.error.set(errorMessage(err))
+    });
+  }
+
+  /** The latest load that succeeded, which is the one whose swap can be undone. */
+  get undoable(): PackageLoadJob | undefined {
+    const latestSucceeded = this.recent().find(job => job.state === 'SUCCEEDED');
+    return latestSucceeded && this.recent().every(job => !job.active) ? latestSucceeded : undefined;
+  }
+
+  // -------------------------------------------------------------------------------------------------------------
+  // Step 1: the package comes
+  // -------------------------------------------------------------------------------------------------------------
+
+  onFileChosen(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.item(0);
+    input.value = '';
+    if (file) {
+      this.send(file);
+    }
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver.set(false);
+    const file = event.dataTransfer?.files?.item(0);
+    if (file) {
+      this.send(file);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver.set(true);
+  }
+
+  private send(file: File) {
+    this.error.set(undefined);
+    const max = this.settings()?.maxPackageSize;
+    if (max && file.size > max) {
+      this.error.set('The file is larger than the ' + formatBytes(max) + ' that a package may be.');
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith('.zip')) {
+      this.error.set('A release package is a .zip file.');
+      return;
+    }
+    this.sending.set(true);
+    this.upload.set({uploadId: '', fileName: file.name, state: 'RECEIVING', bytes: 0, totalBytes: file.size,
+      message: null, releaseNum: null, version: null});
+    this.service.upload(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: event => {
+        if (event.type === HttpEventType.UploadProgress) {
+          this.upload.update(upload => upload && {...upload, bytes: event.loaded, totalBytes: event.total ?? file.size});
+        } else if (event.type === HttpEventType.Response && event.body) {
+          this.received(event.body);
+        }
+      },
+      error: err => this.failedToReceive(err)
+    });
+  }
+
+  private received(upload: PackageUpload) {
+    this.upload.set(upload);
+    this.sending.set(false);
+    this.checkPackage();
+  }
+
+  private failedToReceive(err: unknown) {
+    this.sending.set(false);
+    this.upload.set(undefined);
+    this.error.set(errorMessage(err));
+  }
+
+  // -------------------------------------------------------------------------------------------------------------
+  // Step 2: what is in the way
+  // -------------------------------------------------------------------------------------------------------------
+
+  checkPackage() {
+    const upload = this.upload();
+    if (!upload?.uploadId) {
+      return;
+    }
+    this.error.set(undefined);
+    this.step.set('check');
+    this.preflight.set(undefined);
+    this.checking.set(true);
+    this.service.preflight(upload.uploadId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: report => {
+        this.preflight.set(report);
+        this.checking.set(false);
+      },
+      error: err => {
+        this.checking.set(false);
+        this.error.set(errorMessage(err));
+      }
+    });
+  }
+
+  /** Back to the choice of a package: the one that came is thrown away. */
+  chooseAnother() {
+    const upload = this.upload();
+    if (upload?.uploadId) {
+      this.service.discardUpload(upload.uploadId).subscribe({error: () => undefined});
+    }
+    this.upload.set(undefined);
+    this.preflight.set(undefined);
+    this.error.set(undefined);
+    this.step.set('package');
+  }
+
+  // -------------------------------------------------------------------------------------------------------------
+  // Step 3: the load
+  // -------------------------------------------------------------------------------------------------------------
+
+  startLoad() {
+    const upload = this.upload();
+    if (!upload?.uploadId || !this.preflight()?.ok) {
+      return;
+    }
+    this.error.set(undefined);
+    this.starting.set(true);
+    this.service.start(upload.uploadId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: job => {
+        this.starting.set(false);
+        this.upload.set(undefined);
+        this.follow(job);
+      },
+      error: err => {
+        this.starting.set(false);
+        this.error.set(errorMessage(err));
+      }
+    });
+  }
+
+  /** Follows a load, by asking how it goes every few seconds until it is over. */
+  follow(job: PackageLoadJob) {
+    this.step.set('load');
+    this.job.set(job);
+    this.error.set(undefined);
+    this.service.get(job.id).pipe(
+      expand(current => current.active ? timer(POLL_LOAD_MS).pipe(switchMap(() => this.service.get(job.id))) : EMPTY),
+      filter(current => !!current),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: current => {
+        this.job.set(current);
+        if (!current.active) {
+          this.refreshRecent(false);
+        }
+      },
+      error: err => this.error.set(errorMessage(err))
+    });
+  }
+
+  /** The index of the step the load is at, which is past the last one when the load is over. */
+  stepIndex(job: PackageLoadJob): number {
+    const index = this.steps.findIndex(step => step.state === job.state);
+    if (job.state === 'SUCCEEDED') {
+      return this.steps.length;
+    }
+    return index;
+  }
+
+  isUndo(job: PackageLoadJob): boolean {
+    return job.state === 'ROLLING_BACK' || job.state === 'ROLLED_BACK';
+  }
+
+  rollback(job: PackageLoadJob) {
+    const config = this.confirmDialogService.newConfig();
+    config.data.header = 'Undo the load of ' + (job.releaseNum ?? job.packageFileName) + '?';
+    config.data.content = ['The data from before the load is put back. Anything that users saved since the load will be lost.'];
+    config.data.action = 'Undo';
+    this.confirmDialogService.open(config).afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      this.error.set(undefined);
+      this.service.rollback(job.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: started => this.follow(started),
+        error: err => this.error.set(errorMessage(err))
+      });
+    });
+  }
+
+  reload() {
+    window.location.reload();
+  }
+
+  backToStart() {
+    this.job.set(undefined);
+    this.step.set('package');
+    this.refreshRecent(false);
+  }
+
+  close() {
+    this.dialogRef.close();
+  }
+
+  get receivingPercent(): number | null {
+    const upload = this.upload();
+    return upload && upload.totalBytes > 0 ? Math.min(100, Math.round(upload.bytes * 100 / upload.totalBytes)) : null;
+  }
+}

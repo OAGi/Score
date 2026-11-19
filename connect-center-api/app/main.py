@@ -35,6 +35,7 @@ from fastmcp.utilities.lifespan import combine_lifespans
 
 # Application
 from app.database import init_models
+from app.write_gate import WriteFrozenError
 from app.routes.agency_id_list import router as agency_id_list_router
 from app.routes.app_user import router as app_user_router
 from app.routes.biz_ctx import router as biz_ctx_router
@@ -221,6 +222,16 @@ async def normalize_standalone_mcp_get(request: Request, call_next):
         if "mcp-session-id" not in {name.lower() for name in request.headers.keys()}:
             return Response(status_code=405)
     return await call_next(request)
+
+
+@app.exception_handler(WriteFrozenError)
+async def write_frozen_exception_handler(_: Request, exc: WriteFrozenError) -> JSONResponse:
+    """Tell a write that waited for the gate for too long to come again, as score-http does."""
+    return JSONResponse(
+        status_code=503,
+        headers={"Retry-After": "30"},
+        content={"code": "WRITE_FROZEN", "message": str(exc)},
+    )
 
 
 @app.exception_handler(HTTPException)

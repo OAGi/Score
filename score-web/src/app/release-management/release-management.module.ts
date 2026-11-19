@@ -17,6 +17,8 @@ import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
 import {TitleWithLibrarySelector} from '../common/title-with-library-selector/title-with-library-selector';
 import {ReleaseDiagramDialogComponent} from './release-diagram-dialog/release-diagram-dialog.component';
+import {ReleasePackageLoadDialogComponent} from './release-package-load-dialog/release-package-load-dialog.component';
+import {ReleasePackageLoadService} from './domain/release-package-load.service';
 import {SCORE_TABLE} from '../common/score-table';
 import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
@@ -77,10 +79,12 @@ const routes: Routes = [
     ReleaseDetailComponent,
     ReleaseAssignComponent,
     ReleaseWhatsChangedDialogComponent,
-    ReleaseDiagramDialogComponent
+    ReleaseDiagramDialogComponent,
+    ReleasePackageLoadDialogComponent
   ],
   providers: [
-    ReleaseService
+    ReleaseService,
+    ReleasePackageLoadService
   ]
 })
 export class ReleaseManagementModule {

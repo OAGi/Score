@@ -1,6 +1,7 @@
 package org.oagi.score.gateway.http.configuration.security;
 
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -21,6 +22,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 @Component
 public class ScoreUserArgumentResolver implements HandlerMethodArgumentResolver {
+
+    static {
+        // The parameter is the user of the request, not something the caller sends: the documentation of the API leaves it out.
+        SpringDocUtils.getConfig().addRequestWrapperToIgnore(ScoreUser.class);
+    }
 
     private final ObjectProvider<SessionService> sessionService;
 
