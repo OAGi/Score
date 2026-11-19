@@ -12,7 +12,6 @@ import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeyId;
 import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeySummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.repository.SeqKeyQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
-import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -21,8 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
 public class JooqSeqKeyQueryRepository
@@ -36,7 +33,6 @@ public class JooqSeqKeyQueryRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public SeqKeySummaryRecord getSeqKeySummary(SeqKeyId seqKeyId) {
         if (seqKeyId == null) {
             return null;

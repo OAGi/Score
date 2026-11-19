@@ -11,7 +11,6 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocQueryRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.criteria.SelectBieForOasDocListArguments;
-import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.PageResponse;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.SortDirection;
@@ -28,8 +27,6 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.model.SortDirection.ASC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.DSLUtils.contains;
@@ -91,7 +88,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
         };
     }
 
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasDocResponse getOasDoc(
             GetOasDocRequest request) throws ScoreDataAccessException {
         OasDoc oasDoc = null;
@@ -306,7 +302,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasDocListResponse getOasDocList(
             GetOasDocListRequest request) throws ScoreDataAccessException {
         Collection<Condition> conditions = getConditions(request);
@@ -339,7 +334,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasOperationResponse getOasOperation(GetOasOperationRequest request) throws ScoreDataAccessException {
         OasOperation oasOperation = null;
         OasResourceId oasResourceId = request.getOasResourceId();
@@ -387,7 +381,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasRequestTableResponse getOasRequestTable(GetOasRequestTableRequest request) throws ScoreDataAccessException {
         OasRequest oasRequest = null;
         OasRequestRecord oasRequestRecord = null;
@@ -443,7 +436,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetOasResponseTableResponse getOasResponseTable(GetOasResponseTableRequest request) throws ScoreDataAccessException {
         OasResponse oasResponse = null;
         OasResponseRecord oasResponseRecord = null;
@@ -495,7 +487,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
         };
     }
 
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public boolean checkOasDocUniqueness(OasDoc oasDoc)
             throws ScoreDataAccessException {
 
@@ -527,7 +518,6 @@ public class JooqOasDocQueryRepository extends JooqBaseRepository
                 : or(field.isNull(), field.eq(""));
     }
 
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public boolean checkOasDocTitleUniqueness(OasDoc oasDoc)
             throws ScoreDataAccessException {
 

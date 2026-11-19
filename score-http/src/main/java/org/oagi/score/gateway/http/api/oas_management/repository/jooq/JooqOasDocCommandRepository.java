@@ -7,7 +7,6 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.OasDocCommandRepository;
 import org.oagi.score.gateway.http.api.oas_management.repository.criteria.*;
-import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
 
@@ -44,7 +41,6 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public CreateOasDocResponse createOasDoc(
             CreateOasDocRequest request) throws ScoreDataAccessException {
 
@@ -82,7 +78,6 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public UpdateOasDocResponse updateOasDoc(
             UpdateOasDocRequest request) throws ScoreDataAccessException {
 
@@ -164,7 +159,6 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public DeleteOasDocResponse deleteOasDoc(
             DeleteOasDocRequest request) throws ScoreDataAccessException {
 

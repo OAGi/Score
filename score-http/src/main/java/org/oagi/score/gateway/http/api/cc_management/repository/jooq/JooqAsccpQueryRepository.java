@@ -33,8 +33,6 @@ import java.util.List;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.api.log_management.model.LogAction.Revised;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
 public class JooqAsccpQueryRepository extends JooqBaseRepository implements AsccpQueryRepository {
@@ -509,7 +507,6 @@ public class JooqAsccpQueryRepository extends JooqBaseRepository implements Ascc
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public AsccpSummaryRecord findNextAsccpManifest(
             TopLevelAsbiepId topLevelAsbiepId, ReleaseId nextReleaseId) {
 
@@ -526,7 +523,6 @@ public class JooqAsccpQueryRepository extends JooqBaseRepository implements Ascc
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public AsccpSummaryRecord findNextAsccpManifest(
             AsccpManifestId asccpManifestId, ReleaseId nextReleaseId) {
         if (asccpManifestId == null) {

@@ -13,7 +13,6 @@ import org.oagi.score.gateway.http.api.oas_management.controller.payload.GetBieF
 import org.oagi.score.gateway.http.api.oas_management.model.*;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocQueryRepository;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
-import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.SortDirection;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
@@ -33,8 +32,6 @@ import static org.jooq.impl.DSL.castNull;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.gateway.http.api.oas_management.controller.payload.GetAssignedOasTagResponse.EMPTY_INSTANCE;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.model.SortDirection.ASC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
@@ -118,7 +115,6 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public List<OasDocReleaseSummary> getDistinctReleases(OasDocId oasDocId) throws ScoreDataAccessException {
         Result<Record2<ULong, String>> records = selectDistinctReleases(ULong.valueOf(oasDocId.value())).fetch();
         List<OasDocReleaseSummary> releases = new ArrayList<>();
@@ -464,7 +460,6 @@ public class JooqBieForOasDocQueryRepository extends JooqBaseRepository
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public GetBieForOasDocResponse getBieForOasDoc(GetBieForOasDocRequest request) throws ScoreDataAccessException {
         // Issue #1519: each half scans every oas_message_body and LEFT-joins its own body table
         // (oas_request / oas_response), so a body of the OPPOSITE kind produces a row whose

@@ -12,7 +12,6 @@ import org.oagi.score.gateway.http.api.oas_management.model.OasSecurityRequireme
 import org.oagi.score.gateway.http.api.oas_management.model.OpenAPIErrorResponseBodyType;
 import org.oagi.score.gateway.http.api.oas_management.model.OperationErrorResponseAssignment;
 import org.oagi.score.gateway.http.api.oas_management.repository.BieForOasDocCommandRepository;
-import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.model.base.ScoreDataAccessException;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
@@ -35,8 +34,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.util.BooleanUtils.BooleanToByte;
 import static org.oagi.score.gateway.http.common.util.ScoreGuidUtils.randomGuid;
@@ -743,7 +740,6 @@ public class JooqBieForOasDocCommandRepository extends JooqBaseRepository implem
     }
 
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public DeleteBieForOasDocResponse deleteBieForOasDoc(DeleteBieForOasDocRequest request) throws ScoreDataAccessException {
         List<BieForOasDoc> bieForOasDocList = request.getBieForOasDocList();
         OasDocId oasDocId = request.getOasDocId();
