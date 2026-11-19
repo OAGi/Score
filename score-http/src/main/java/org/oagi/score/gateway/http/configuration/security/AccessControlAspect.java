@@ -47,7 +47,7 @@ public class AccessControlAspect {
         return (RepositoryFactory) proxyFactory.getProxy();
     }
 
-    @Around("execution(public * org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory.*(..))")
+    @Around("execution(public * org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory+.*(..))")
     public Object guardRepositories(ProceedingJoinPoint joinPoint) throws Throwable {
         // The repositories that RepositoryFactory makes are not Spring beans (it makes them with 'new', one for each request and
         // each user), so Spring does not wrap them and the aspect of the beans does not reach them. What the factory returns is

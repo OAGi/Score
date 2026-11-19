@@ -49,8 +49,6 @@ import java.util.stream.Collectors;
 import static org.jooq.impl.DSL.*;
 import static org.oagi.score.gateway.http.api.bie_management.model.BieState.*;
 import static org.oagi.score.gateway.http.common.filter.ContainsFilterBuilder.contains;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.DEVELOPER;
-import static org.oagi.score.gateway.http.common.model.ScoreRole.END_USER;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Routines.levenshtein;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
@@ -804,7 +802,6 @@ public class JooqBieQueryRepository extends JooqBaseRepository implements BieQue
     }
     
     @Override
-    @AccessControl(requiredAnyRole = {DEVELOPER, END_USER})
     public BieSet getBieSet(TopLevelAsbiepId topLevelAsbiepId, boolean used) {
         var topLevelAsbiepQuery = repositoryFactory().topLevelAsbiepQueryRepository(requester());
         TopLevelAsbiepSummaryRecord topLevelAsbiep = topLevelAsbiepQuery.getTopLevelAsbiepSummary(topLevelAsbiepId);

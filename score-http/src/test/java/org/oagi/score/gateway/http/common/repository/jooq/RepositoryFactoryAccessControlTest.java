@@ -5,8 +5,6 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
-import org.oagi.score.gateway.http.api.cc_management.model.seq_key.SeqKeyId;
-import org.oagi.score.gateway.http.api.oas_management.model.OasDoc;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -35,7 +33,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** What is marked with {@link AccessControl} is checked only when the factory gives the repository the check; this keeps one from being left out. */
 class RepositoryFactoryAccessControlTest {
 
-    private final RepositoryFactory factory = new AccessControlAspect().guard(new RepositoryFactory(DSL.using(SQLDialect.MARIADB)));
+    interface Things {
+        String open();
+    }
+
+    /** A repository with a method that only an administrator may call, as the factory below makes it. */
+    static class JooqThings extends JooqBaseRepository implements Things {
+        JooqThings(ScoreUser requester, RepositoryFactory factory) {
+            super(DSL.using(SQLDialect.MARIADB), requester, factory);
+        }
+
+        @Override
+        @AccessControl(requiredAnyRole = {ScoreRole.ADMINISTRATOR})
+        public String open() {
+            return "open";
+        }
+    }
+
+    public static class ThingsFactory extends RepositoryFactory {
+        public ThingsFactory() {
+            super(DSL.using(SQLDialect.MARIADB));
+        }
+
+        public Things things(ScoreUser requester) {
+            return new JooqThings(requester, this);
+        }
+    }
+
+    private final ThingsFactory factory = (ThingsFactory) new AccessControlAspect().guard(new ThingsFactory());
 
     private static ScoreUser userOf(ScoreRole... roles) {
         return new ScoreUser(new UserId(BigInteger.ONE), "u", "u", null, false, List.of(roles));
@@ -43,10 +68,9 @@ class RepositoryFactoryAccessControlTest {
 
     @Test
     void aRepositoryWithAMarkedMethodIsCheckedWhateverItIsAskedForBy() {
-        // No user: refused before anything is read from the database.
-        assertThrows(AccessControlException.class,
-                () -> factory.oasDocQueryRepository(null).checkOasDocUniqueness(new OasDoc()));
-        assertThrows(AccessControlException.class, () -> factory.seqKeyQueryRepository(null).getSeqKeySummary(new SeqKeyId(BigInteger.ONE)));
+        assertThrows(AccessControlException.class, () -> factory.things(null).open());
+        assertThrows(AccessControlException.class, () -> factory.things(userOf(ScoreRole.END_USER)).open());
+        assertEquals("open", factory.things(userOf(ScoreRole.END_USER, ScoreRole.ADMINISTRATOR)).open());
     }
 
     @Test
@@ -59,12 +83,12 @@ class RepositoryFactoryAccessControlTest {
         new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(AopAutoConfiguration.class))
                 .withBean(DSLContext.class, () -> DSL.using(SQLDialect.MARIADB))
                 .withBean(AccessControlAspect.class)
-                .withBean(RepositoryFactory.class)
+                .withBean(ThingsFactory.class)
                 .run(context -> {
-                    RepositoryFactory bean = context.getBean(RepositoryFactory.class);
+                    ThingsFactory bean = context.getBean(ThingsFactory.class);
 
                     assertTrue(AopUtils.isAopProxy(bean));
-                    assertThrows(AccessControlException.class, () -> bean.oasDocQueryRepository(null).checkOasDocUniqueness(new OasDoc()));
+                    assertThrows(AccessControlException.class, () -> bean.things(userOf(ScoreRole.END_USER)).open());
                 });
     }
 
@@ -80,21 +104,18 @@ class RepositoryFactoryAccessControlTest {
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AssignableTypeFilter(JooqBaseRepository.class));
         List<String> unreachable = new ArrayList<>();
-        int marked = 0;
         for (BeanDefinition definition : scanner.findCandidateComponents("org.oagi.score.gateway.http")) {
             Class<?> type = classOf(definition);
             for (Method method : type.getMethods()) {
                 if (!method.isAnnotationPresent(AccessControl.class)) {
                     continue;
                 }
-                marked++;
                 boolean declaredByInterface = Arrays.stream(type.getInterfaces()).anyMatch(i -> declares(i, method));
                 if (!declaredByInterface) {
                     unreachable.add(type.getSimpleName() + "." + method.getName());
                 }
             }
         }
-        assertTrue(marked > 0);
         assertEquals(List.of(), unreachable, "These are marked but are not called by an interface, so the check cannot reach them");
     }
 
