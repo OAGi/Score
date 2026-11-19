@@ -44,7 +44,9 @@ public record ScoreUser(UserId userId, String username,
         }
 
         for (ScoreRole role : roles) {
-            return this.roles.contains(role);
+            if (this.roles.contains(role)) {
+                return true;
+            }
         }
 
         return false;
