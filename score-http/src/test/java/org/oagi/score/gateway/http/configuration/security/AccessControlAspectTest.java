@@ -2,6 +2,10 @@ package org.oagi.score.gateway.http.configuration.security;
 
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.common.model.AccessControl;
 import org.oagi.score.gateway.http.common.model.AccessControlException;
@@ -13,7 +17,9 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccessControlAspectTest {
@@ -105,5 +111,34 @@ class AccessControlAspectTest {
         };
 
         assertSame(plain, new AccessControlAspect().guard(plain, Plain.class));
+    }
+
+    /** A bean of Spring, not a repository: the user is the one among the arguments of the call. */
+    public static class SomeService {
+        @AccessControl(requiredAnyRole = {ScoreRole.ADMINISTRATOR})
+        public String forAdministrators(ScoreUser requester) {
+            return "administrators";
+        }
+
+        @AccessControl
+        public String forAnyone(String nobody) {
+            return "anyone";
+        }
+    }
+
+    @Test
+    void aBeanOfSpringIsCheckedByTheUserAmongTheArgumentsOfTheCall() {
+        new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(AopAutoConfiguration.class))
+                .withBean(AccessControlAspect.class)
+                .withBean(SomeService.class)
+                .run(context -> {
+                    SomeService service = context.getBean(SomeService.class);
+
+                    assertTrue(AopUtils.isAopProxy(service));
+                    assertEquals("administrators", service.forAdministrators(userOf(ScoreRole.END_USER, ScoreRole.ADMINISTRATOR)));
+                    assertThrows(AccessControlException.class, () -> service.forAdministrators(userOf(ScoreRole.END_USER)));
+                    assertThrows(AccessControlException.class, () -> service.forAdministrators(null));
+                    assertThrows(AccessControlException.class, () -> service.forAnyone("no user among the arguments"));
+                });
     }
 }
