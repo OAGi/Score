@@ -1,0 +1,613 @@
+package org.oagi.score.gateway.http.api.release_management.repository.jooq;
+
+import org.jooq.DSLContext;
+import org.oagi.score.gateway.http.api.release_management.dataload.LoadProgress;
+import org.oagi.score.gateway.http.api.release_management.dataload.Loader;
+import org.oagi.score.gateway.http.api.release_management.dataload.info.Info;
+import org.oagi.score.gateway.http.api.release_management.dataload.script.SqlDefiner;
+import org.oagi.score.gateway.http.api.release_management.dataload.script.ScriptSource;
+import org.oagi.score.gateway.http.api.release_management.repository.MigrationLoadCommandRepository;
+import org.oagi.score.gateway.http.api.release_management.repository.SchemaMigrator;
+import org.oagi.score.gateway.http.api.release_management.repository.SchemaSwapException;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class JooqMigrationLoadCommandRepository extends JooqBaseRepository implements MigrationLoadCommandRepository {
+
+    /** The names of the schemas and the tables are put into statements, so they are of what needs no quoting. */
+    private static final Pattern IDENTIFIER = Pattern.compile("[A-Za-z0-9_]{1,64}");
+
+    /** What a swap keeps in the backup schema, to be undone by. It is not a table of the application. */
+    static final String SWAP_RECORD = "migration_load_swap_record";
+
+    private record Trigger(String name, String sqlMode, String ddl) {
+    }
+
+    private record Routine(String name, String type, String sqlMode, String ddl) {
+    }
+
+    private final SchemaMigrator schemaMigrator;
+
+    /** @param schemaMigrator what brings a schema to the shape of a version */
+    public JooqMigrationLoadCommandRepository(DSLContext dslContext, ScoreUser requester, RepositoryFactory repositoryFactory,
+                                              SchemaMigrator schemaMigrator) {
+        super(dslContext, requester, repositoryFactory);
+        this.schemaMigrator = schemaMigrator;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Making, migrating, loading
+    // ---------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void createSchema(String schema) {
+        identifier(schema);
+        inConnection(con -> {
+            if (exists(con, schema)) {
+                throw new IllegalStateException("The schema '" + schema + "' exists.");
+            }
+            String characterSet;
+            String collation;
+            try (Statement statement = con.createStatement();
+                 ResultSet rs = statement.executeQuery("SELECT default_character_set_name, default_collation_name "
+                         + "FROM information_schema.schemata WHERE schema_name = DATABASE()")) {
+                rs.next();
+                characterSet = rs.getString(1);
+                collation = rs.getString(2);
+            }
+            execute(con, "CREATE DATABASE `" + schema + "` CHARACTER SET " + characterSet + " COLLATE " + collation);
+            return null;
+        });
+    }
+
+    @Override
+    public void dropSchema(String schema) {
+        identifier(schema);
+        inConnection(con -> {
+            if (schema.equals(con.getCatalog())) {
+                throw new IllegalArgumentException("The schema the application serves is not dropped: " + schema);
+            }
+            execute(con, "DROP DATABASE IF EXISTS `" + schema + "`");
+            return null;
+        });
+    }
+
+    @Override
+    public void migrateSchema(String schema, String targetVersion) {
+        schemaMigrator.migrate(identifier(schema), targetVersion);
+    }
+
+    @Override
+    public void load(String schema, Info info, ScriptSource scripts, long delta, LoadProgress progress, UnaryOperator<String> statements) {
+        identifier(schema);
+        inConnection(con -> {
+            String original = con.getCatalog();
+            con.setCatalog(schema);
+            try {
+                new Loader(delta, scripts, progress, statements).run(con, info);
+            } catch (SQLException | RuntimeException e) {
+                throw e;
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            } finally {
+                con.setCatalog(original);
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public int copyRecords(String fromSchema, String toSchema, String table, String idColumn, BigInteger atLeast) {
+        if (idColumn != null) {
+            identifier(idColumn);
+        }
+        return copy(fromSchema, toSchema, table, idColumn != null && atLeast != null ? "`" + idColumn + "` >= ?" : null, atLeast);
+    }
+
+    @Override
+    public int copyRecordsBelow(String fromSchema, String toSchema, String table, String idColumn, BigInteger below) {
+        return copy(fromSchema, toSchema, table, "`" + identifier(idColumn) + "` < ?", below);
+    }
+
+    /** Copies the records that the condition (which has one parameter, or none) tells, the columns the two tables have in common. */
+    private int copy(String fromSchema, String toSchema, String table, String condition, BigInteger parameter) {
+        identifier(fromSchema);
+        identifier(toSchema);
+        identifier(table);
+        return inConnection(con -> {
+            List<String> columns = commonColumns(con, fromSchema, toSchema, table);
+            if (columns.isEmpty()) {
+                throw new IllegalArgumentException("The table '" + table + "' is not in both '" + fromSchema + "' and '" + toSchema + "'.");
+            }
+            String list = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(", "));
+            String sql = "INSERT INTO `" + toSchema + "`.`" + table + "` (" + list + ") SELECT " + list
+                    + " FROM `" + fromSchema + "`.`" + table + "`" + (condition != null ? " WHERE " + condition : "");
+            String foreignKeyChecks = single(con, "SELECT @@foreign_key_checks");
+            String sqlMode = single(con, "SELECT @@sql_mode");
+            execute(con, "SET foreign_key_checks = 0");
+            // A record numbered 0 (the system's account is) is given its number, not a new one, as a script of a package says too.
+            execute(con, "SET sql_mode = CONCAT_WS(',', NULLIF(@@sql_mode, ''), 'NO_AUTO_VALUE_ON_ZERO')");
+            // What is copied is not a change: the triggers that write what changed (for the cache) have nothing to say.
+            execute(con, "SET @disable_record_change_log = 1");
+            try (PreparedStatement statement = con.prepareStatement(sql)) {
+                if (condition != null) {
+                    statement.setObject(1, parameter);
+                }
+                return statement.executeUpdate();
+            } finally {
+                execute(con, "SET @disable_record_change_log = NULL");
+                try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
+                    mode.setString(1, sqlMode);
+                    mode.execute();
+                }
+                execute(con, "SET foreign_key_checks = " + foreignKeyChecks);
+            }
+        });
+    }
+
+    @Override
+    public int removeRecordsBelow(String schema, String table, String idColumn, BigInteger below) {
+        identifier(schema);
+        identifier(table);
+        identifier(idColumn);
+        return inConnection(con -> {
+            String foreignKeyChecks = single(con, "SELECT @@foreign_key_checks");
+            execute(con, "SET foreign_key_checks = 0");
+            execute(con, "SET @disable_record_change_log = 1");
+            try (PreparedStatement statement = con.prepareStatement("DELETE FROM `" + schema + "`.`" + table + "` WHERE `" + idColumn + "` < ?")) {
+                statement.setObject(1, below);
+                return statement.executeUpdate();
+            } finally {
+                execute(con, "SET @disable_record_change_log = NULL");
+                execute(con, "SET foreign_key_checks = " + foreignKeyChecks);
+            }
+        });
+    }
+
+    @Override
+    public int emptyTable(String schema, String table) {
+        identifier(schema);
+        identifier(table);
+        return inConnection(con -> {
+            String foreignKeyChecks = single(con, "SELECT @@foreign_key_checks");
+            execute(con, "SET foreign_key_checks = 0");
+            execute(con, "SET @disable_record_change_log = 1");
+            try (Statement statement = con.createStatement()) {
+                return statement.executeUpdate("DELETE FROM `" + schema + "`.`" + table + "`");
+            } finally {
+                execute(con, "SET @disable_record_change_log = NULL");
+                execute(con, "SET foreign_key_checks = " + foreignKeyChecks);
+            }
+        });
+    }
+
+    @Override
+    public void copyAutoIncrement(String fromSchema, String toSchema, String table) {
+        identifier(fromSchema);
+        identifier(toSchema);
+        identifier(table);
+        inConnection(con -> {
+            String from = single(con, "SELECT auto_increment FROM information_schema.tables WHERE table_schema = '" + fromSchema
+                    + "' AND table_name = '" + table + "'");
+            String to = single(con, "SELECT auto_increment FROM information_schema.tables WHERE table_schema = '" + toSchema
+                    + "' AND table_name = '" + table + "'");
+            if (from != null && (to == null || new BigInteger(from).compareTo(new BigInteger(to)) > 0)) {
+                execute(con, "ALTER TABLE `" + toSchema + "`.`" + table + "` AUTO_INCREMENT = " + new BigInteger(from));
+            }
+            return null;
+        });
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Swapping
+    // ---------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public SwapOutcome swap(String stagingSchema, String backupSchema, Duration lockWait, Collection<String> staysInPlace) {
+        identifier(stagingSchema);
+        identifier(backupSchema);
+        staysInPlace.forEach(JooqMigrationLoadCommandRepository::identifier);
+        return inConnection(con -> {
+            String live = con.getCatalog();
+            requireDistinct(live, stagingSchema, backupSchema);
+            requireExists(con, stagingSchema);
+            requireExists(con, backupSchema);
+            if (!tables(con, backupSchema).isEmpty()) {
+                throw new SchemaSwapException("The backup schema '" + backupSchema + "' is not empty.");
+            }
+            List<String> liveTables = tables(con, live);
+            List<String> stagingTables = tables(con, stagingSchema);
+            liveTables.removeAll(staysInPlace);
+            stagingTables.removeAll(staysInPlace);
+            requireNoTriggersOn(con, staysInPlace, live, stagingSchema);
+            List<String> missing = liveTables.stream().filter(t -> !stagingTables.contains(t)).toList();
+            if (!missing.isEmpty()) {
+                throw new SchemaSwapException("The staging schema lacks tables of the served schema, which would be lost: " + missing);
+            }
+
+            List<Trigger> liveTriggers = triggers(con, live);
+            List<Trigger> stagingTriggers = triggers(con, stagingSchema);
+            for (Trigger trigger : stagingTriggers) {
+                if (trigger.ddl().contains("`" + stagingSchema + "`.")) {
+                    throw new SchemaSwapException("The trigger '" + trigger.name() + "' names the staging schema, so it cannot move.");
+                }
+            }
+            List<Routine> liveRoutines = routines(con, live);
+            List<Routine> stagingRoutines = routines(con, stagingSchema);
+
+            keepForRollback(con, backupSchema, liveTriggers, liveRoutines, staysInPlace);
+
+            String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
+            execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
+            try {
+                try {
+                    dropTriggers(con, live, liveTriggers);
+                    dropTriggers(con, stagingSchema, stagingTriggers);
+                    execute(con, renameStatement(live, backupSchema, liveTables, stagingSchema, live, stagingTables));
+                } catch (SQLException e) {
+                    // Nothing was moved (a RENAME is all or nothing), but the triggers may be gone: they are put back where they
+                    // were, and the swap record, which is of no use now, goes.
+                    try {
+                        createTriggers(con, live, liveTriggers);
+                        createTriggers(con, stagingSchema, stagingTriggers);
+                        execute(con, "DROP TABLE IF EXISTS `" + backupSchema + "`.`" + SWAP_RECORD + "`");
+                    } catch (SQLException | RuntimeException restoreFailure) {
+                        e.addSuppressed(restoreFailure);
+                        throw new SchemaSwapException("The swap did not go through, and the triggers could not be put back; the swap record "
+                                + "in '" + backupSchema + "' has them: " + e.getMessage(), e);
+                    }
+                    throw new SchemaSwapException("The swap did not go through, and the schemas are as they were: " + e.getMessage(), e);
+                }
+                try {
+                    createTriggers(con, live, stagingTriggers);
+                    replaceRoutines(con, live, stagingRoutines);
+                } catch (SQLException | RuntimeException e) {
+                    try {
+                        moveBack(con, live, backupSchema, stagingSchema, stagingTables, liveTables, liveTriggers, liveRoutines);
+                        execute(con, "DROP TABLE IF EXISTS `" + backupSchema + "`.`" + SWAP_RECORD + "`");
+                    } catch (SQLException | RuntimeException undoFailure) {
+                        e.addSuppressed(undoFailure);
+                        throw new SchemaSwapException("The swap did not go through, and it could not be undone: the tables of the "
+                                + "served schema are in '" + backupSchema + "' (and the swap record in it says how to put them back): "
+                                + e.getMessage(), e);
+                    }
+                    throw new SchemaSwapException("The swap did not go through, and the served schema is as it was: " + e.getMessage(), e);
+                }
+                return new SwapOutcome(liveTables.size(), stagingTriggers.size(), stagingRoutines.size());
+            } finally {
+                execute(con, "SET lock_wait_timeout = " + savedLockWait);
+            }
+        });
+    }
+
+    @Override
+    public SwapOutcome rollbackSwap(String backupSchema, String discardedSchema, Duration lockWait) {
+        identifier(backupSchema);
+        identifier(discardedSchema);
+        return inConnection(con -> {
+            String live = con.getCatalog();
+            requireDistinct(live, backupSchema, discardedSchema);
+            requireExists(con, backupSchema);
+            requireExists(con, discardedSchema);
+            if (!tables(con, discardedSchema).isEmpty()) {
+                throw new SchemaSwapException("The discarded schema '" + discardedSchema + "' is not empty.");
+            }
+            List<String> backupTables = tables(con, backupSchema);
+            if (!backupTables.remove(SWAP_RECORD)) {
+                throw new SchemaSwapException("The schema '" + backupSchema + "' does not hold a swap.");
+            }
+            List<Trigger> triggers = new ArrayList<>();
+            List<Routine> routines = new ArrayList<>();
+            List<String> staysInPlace = new ArrayList<>();
+            readSwapRecord(con, backupSchema, triggers, routines, staysInPlace);
+            List<String> liveTables = tables(con, live);
+            liveTables.removeAll(staysInPlace);
+
+            String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
+            execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
+            try {
+                try {
+                    moveBack(con, live, backupSchema, discardedSchema, liveTables, backupTables, triggers, routines);
+                } catch (SQLException e) {
+                    throw new SchemaSwapException("The swap was not undone: " + e.getMessage(), e);
+                }
+                return new SwapOutcome(backupTables.size(), triggers.size(), routines.size());
+            } finally {
+                execute(con, "SET lock_wait_timeout = " + savedLockWait);
+            }
+        });
+    }
+
+    /**
+     * What undoes a swap, and what puts the served schema back when the swap fails after its tables have moved: the triggers
+     * of the served schema are dropped, its tables are moved to {@code toSchema}, those of the backup schema are moved back,
+     * and the triggers and the routines that were kept are made again.
+     */
+    private void moveBack(Connection con, String live, String backupSchema, String toSchema, List<String> liveTables,
+                          List<String> backupTables, List<Trigger> triggers, List<Routine> routines) throws SQLException {
+        dropTriggers(con, live, triggers(con, live));
+        execute(con, renameStatement(live, toSchema, liveTables, backupSchema, live, backupTables));
+        createTriggers(con, live, triggers);
+        replaceRoutines(con, live, routines);
+    }
+
+    /** One statement: the tables of {@code fromSchema} go to {@code toSchema}, then the tables of {@code otherSchema} go to {@code intoSchema}. */
+    private String renameStatement(String fromSchema, String toSchema, List<String> fromTables,
+                                   String otherSchema, String intoSchema, List<String> otherTables) {
+        List<String> pairs = new ArrayList<>();
+        for (String table : fromTables) {
+            pairs.add("`" + fromSchema + "`.`" + table + "` TO `" + toSchema + "`.`" + table + "`");
+        }
+        for (String table : otherTables) {
+            pairs.add("`" + otherSchema + "`.`" + table + "` TO `" + intoSchema + "`.`" + table + "`");
+        }
+        return "RENAME TABLE " + String.join(", ", pairs);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // What the swap keeps, and what it moves besides tables
+    // ---------------------------------------------------------------------------------------------------------------
+
+    private void keepForRollback(Connection con, String backupSchema, List<Trigger> triggers, List<Routine> routines,
+                                 Collection<String> staysInPlace) throws SQLException {
+        execute(con, "CREATE TABLE `" + backupSchema + "`.`" + SWAP_RECORD + "` ("
+                + "`kind` VARCHAR(16) NOT NULL, `name` VARCHAR(128) NOT NULL, `type` VARCHAR(16) NULL, "
+                + "`sql_mode` TEXT NULL, `ddl` MEDIUMTEXT NOT NULL, PRIMARY KEY (`kind`, `name`))");
+        try (PreparedStatement statement = con.prepareStatement("INSERT INTO `" + backupSchema + "`.`" + SWAP_RECORD
+                + "` (`kind`, `name`, `type`, `sql_mode`, `ddl`) VALUES (?, ?, ?, ?, ?)")) {
+            for (Trigger trigger : triggers) {
+                statement.setString(1, "trigger");
+                statement.setString(2, trigger.name());
+                statement.setString(3, null);
+                statement.setString(4, trigger.sqlMode());
+                statement.setString(5, trigger.ddl());
+                statement.addBatch();
+            }
+            for (Routine routine : routines) {
+                statement.setString(1, "routine");
+                statement.setString(2, routine.name());
+                statement.setString(3, routine.type());
+                statement.setString(4, routine.sqlMode());
+                statement.setString(5, routine.ddl());
+                statement.addBatch();
+            }
+            for (String table : staysInPlace) {
+                statement.setString(1, "stays");
+                statement.setString(2, table);
+                statement.setString(3, null);
+                statement.setString(4, null);
+                statement.setString(5, "");
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        }
+    }
+
+    private void requireNoTriggersOn(Connection con, Collection<String> tables, String... schemas) throws SQLException {
+        for (String schema : schemas) {
+            for (String table : tables) {
+                List<String> triggers = strings(con, "SELECT trigger_name FROM information_schema.triggers "
+                        + "WHERE trigger_schema = ? AND event_object_table = ?", schema, table);
+                if (!triggers.isEmpty()) {
+                    throw new SchemaSwapException("The table '" + table + "' stays in place, but has triggers (" + triggers + "), which "
+                            + "the swap drops and makes again: it is not to have any.");
+                }
+            }
+        }
+    }
+
+    private void readSwapRecord(Connection con, String backupSchema, List<Trigger> triggers, List<Routine> routines,
+                                List<String> staysInPlace) throws SQLException {
+        try (Statement statement = con.createStatement();
+             ResultSet rs = statement.executeQuery("SELECT `kind`, `name`, `type`, `sql_mode`, `ddl` FROM `"
+                     + backupSchema + "`.`" + SWAP_RECORD + "` ORDER BY `kind`, `name`")) {
+            while (rs.next()) {
+                if ("trigger".equals(rs.getString("kind"))) {
+                    triggers.add(new Trigger(rs.getString("name"), rs.getString("sql_mode"), rs.getString("ddl")));
+                } else if ("stays".equals(rs.getString("kind"))) {
+                    staysInPlace.add(rs.getString("name"));
+                } else {
+                    routines.add(new Routine(rs.getString("name"), rs.getString("type"), rs.getString("sql_mode"), rs.getString("ddl")));
+                }
+            }
+        }
+    }
+
+    private List<Trigger> triggers(Connection con, String schema) throws SQLException {
+        List<Trigger> triggers = new ArrayList<>();
+        for (String name : strings(con, "SELECT trigger_name FROM information_schema.triggers WHERE trigger_schema = ? ORDER BY trigger_name", schema)) {
+            // The columns of SHOW CREATE TRIGGER: the name, the sql_mode it was made with, and the statement that made it.
+            try (Statement statement = con.createStatement();
+                 ResultSet rs = statement.executeQuery("SHOW CREATE TRIGGER `" + schema + "`.`" + name + "`")) {
+                if (rs.next()) {
+                    triggers.add(new Trigger(name, rs.getString(2), rs.getString(3)));
+                }
+            }
+        }
+        return triggers;
+    }
+
+    private List<Routine> routines(Connection con, String schema) throws SQLException {
+        List<Routine> routines = new ArrayList<>();
+        try (PreparedStatement statement = con.prepareStatement(
+                "SELECT routine_name, routine_type FROM information_schema.routines WHERE routine_schema = ? ORDER BY routine_name")) {
+            statement.setString(1, schema);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString(1);
+                    String type = rs.getString(2);
+                    try (Statement show = con.createStatement();
+                         ResultSet created = show.executeQuery("SHOW CREATE " + type + " `" + schema + "`.`" + name + "`")) {
+                        if (created.next()) {
+                            routines.add(new Routine(name, type, created.getString(2), created.getString(3)));
+                        }
+                    }
+                }
+            }
+        }
+        return routines;
+    }
+
+    private void dropTriggers(Connection con, String schema, List<Trigger> triggers) throws SQLException {
+        for (Trigger trigger : triggers) {
+            execute(con, "DROP TRIGGER IF EXISTS `" + schema + "`.`" + trigger.name() + "`");
+        }
+    }
+
+    /**
+     * Makes the triggers that the schema does not have, each with the sql_mode it was made with, as the connection's own is put
+     * back. One that is there is left alone, so that this is also what puts back the ones that a failed swap dropped: the table
+     * of a trigger that was not dropped may be held by another connection, and touching it would wait for that.
+     */
+    private void createTriggers(Connection con, String schema, List<Trigger> triggers) throws SQLException {
+        String original = con.getCatalog();
+        String sqlMode = single(con, "SELECT @@sql_mode");
+        List<String> there = strings(con, "SELECT trigger_name FROM information_schema.triggers WHERE trigger_schema = ?", schema);
+        con.setCatalog(schema);
+        try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
+            for (Trigger trigger : triggers) {
+                if (there.contains(trigger.name())) {
+                    continue;
+                }
+                mode.setString(1, trigger.sqlMode() == null ? "" : trigger.sqlMode());
+                mode.execute();
+                execute(con, SqlDefiner.strip(trigger.ddl()));
+            }
+        } finally {
+            try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
+                mode.setString(1, sqlMode);
+                mode.execute();
+            }
+            con.setCatalog(original);
+        }
+    }
+
+    private void replaceRoutines(Connection con, String schema, List<Routine> routines) throws SQLException {
+        String original = con.getCatalog();
+        String sqlMode = single(con, "SELECT @@sql_mode");
+        con.setCatalog(schema);
+        try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
+            for (Routine routine : routines) {
+                execute(con, "DROP " + routine.type() + " IF EXISTS `" + schema + "`.`" + routine.name() + "`");
+                mode.setString(1, routine.sqlMode() == null ? "" : routine.sqlMode());
+                mode.execute();
+                execute(con, SqlDefiner.strip(routine.ddl()));
+            }
+        } finally {
+            try (PreparedStatement mode = con.prepareStatement("SET sql_mode = ?")) {
+                mode.setString(1, sqlMode);
+                mode.execute();
+            }
+            con.setCatalog(original);
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // Small things
+    // ---------------------------------------------------------------------------------------------------------------
+
+    private interface ConnectionWork<T> {
+        T run(Connection con) throws Exception;
+    }
+
+    /** Runs on a connection of the application, and lets the exceptions of the work through as they are. */
+    private <T> T inConnection(ConnectionWork<T> work) {
+        try {
+            return dslContext().connectionResult(con -> {
+                try {
+                    return work.run(con);
+                } catch (SQLException | RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        } catch (org.jooq.exception.DataAccessException e) {
+            // jOOQ wraps what the database says; the cause is what the caller wants to see.
+            if (e.getCause() instanceof RuntimeException cause) {
+                throw cause;
+            }
+            throw e;
+        }
+    }
+
+    private static String identifier(String name) {
+        if (name == null || !IDENTIFIER.matcher(name).matches()) {
+            throw new IllegalArgumentException("Not a name of a schema or a table: " + name);
+        }
+        return name;
+    }
+
+    private static void requireDistinct(String live, String a, String b) {
+        if (live == null || live.equals(a) || live.equals(b) || a.equals(b)) {
+            throw new IllegalArgumentException("The served schema '" + live + "' and the schemas '" + a + "' and '" + b + "' are to be three.");
+        }
+    }
+
+    private void requireExists(Connection con, String schema) throws SQLException {
+        if (!exists(con, schema)) {
+            throw new SchemaSwapException("The schema '" + schema + "' does not exist.");
+        }
+    }
+
+    private boolean exists(Connection con, String schema) throws SQLException {
+        return !strings(con, "SELECT schema_name FROM information_schema.schemata WHERE schema_name = ?", schema).isEmpty();
+    }
+
+    private List<String> tables(Connection con, String schema) throws SQLException {
+        return strings(con, "SELECT table_name FROM information_schema.tables WHERE table_schema = ? AND table_type = 'BASE TABLE' ORDER BY table_name", schema);
+    }
+
+    private List<String> commonColumns(Connection con, String fromSchema, String toSchema, String table) throws SQLException {
+        return strings(con, "SELECT t.column_name FROM information_schema.columns t "
+                + "JOIN information_schema.columns f ON f.table_schema = ? AND f.table_name = t.table_name AND f.column_name = t.column_name "
+                + "WHERE t.table_schema = ? AND t.table_name = ? ORDER BY t.ordinal_position", fromSchema, toSchema, table);
+    }
+
+    private List<String> strings(Connection con, String sql, String... parameters) throws SQLException {
+        List<String> values = new ArrayList<>();
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setString(i + 1, parameters[i]);
+            }
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    values.add(rs.getString(1));
+                }
+            }
+        }
+        return values;
+    }
+
+    private String single(Connection con, String sql) throws SQLException {
+        try (Statement statement = con.createStatement(); ResultSet rs = statement.executeQuery(sql)) {
+            rs.next();
+            return rs.getString(1);
+        }
+    }
+
+    private void execute(Connection con, String sql) throws SQLException {
+        try (Statement statement = con.createStatement()) {
+            statement.execute(sql);
+        }
+    }
+}
