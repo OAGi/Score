@@ -12,7 +12,10 @@ RUN apt-get -y upgrade
 
 VOLUME /var/lib/mysql
 
-ADD oagis.sql /docker-entrypoint-initdb.d/oagis.sql
+ADD oagis.sql /docker-entrypoint-initdb.d/01-oagis.sql
+# Runs as root before oagis.sql (files execute in name order, after MYSQL_USER is created); lets oagi manage every oagi_* database.
+RUN printf '%s\n' 'GRANT ALL PRIVILEGES ON `oagi\_%`.* TO '"'"'oagi'"'"'@'"'"'%'"'"';' 'FLUSH PRIVILEGES;' \
+    > /docker-entrypoint-initdb.d/00-grant-oagi.sql
 
 USER mysql
 EXPOSE 3306
