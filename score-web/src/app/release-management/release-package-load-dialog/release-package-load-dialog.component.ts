@@ -1,14 +1,15 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, computed, inject, signal, viewChild} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {HttpErrorResponse, HttpEventType} from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {EMPTY, Subject, timer} from 'rxjs';
-import {expand, filter, switchMap} from 'rxjs/operators';
+import {EMPTY, Observable, Subject, interval, of, timer} from 'rxjs';
+import {catchError, expand, filter, map, switchMap} from 'rxjs/operators';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {
-  LOAD_STEPS,
   PackageLoadJob,
+  PackageLoadLogLine,
+  PackageLoadLogPage,
   PackageLibraryRelease,
   PackageLoadSettings,
   PackagePreflight,
@@ -19,6 +20,8 @@ import {
 import {ReleasePackageLoadService} from '../domain/release-package-load.service';
 
 /** Where the dialog is: the package comes, it is looked at, it is loaded. */
+const DOTS_MS = 400;
+
 type Step = 'package' | 'check' | 'load';
 
 const POLL_LOAD_MS = 2000;
@@ -58,7 +61,6 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
   private confirmDialogService = inject(ConfirmDialogService);
   private destroyRef = inject(DestroyRef);
 
-  readonly steps = LOAD_STEPS;
   readonly loadProgress = loadProgress;
   readonly formatBytes = formatBytes;
 
@@ -82,9 +84,18 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
     return [...(this.preflight()?.libraries ?? [])].sort((a, b) => rank(a) - rank(b));
   });
   readonly job = signal<PackageLoadJob | undefined>(undefined);
+  /** What the server logged for the load that is followed, which the user may open to read. */
+  readonly logLines = signal<PackageLoadLogLine[]>([]);
+  readonly lastLogLine = computed(() => this.logLines().at(-1));
+  private logNext = 0;
+  private readonly logBox = viewChild<ElementRef<HTMLElement>>('logBox');
   readonly error = signal<string | undefined>(undefined);
 
+  /** The dots after the message of a load that goes on, which come and go (none, ., .., ...) to show that it does. */
+  readonly dots = signal('');
+
   ngOnInit() {
+    interval(DOTS_MS).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(tick => this.dots.set('.'.repeat((tick + 1) % 4)));
     this.service.settings().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: settings => this.settings.set(settings),
       error: err => this.error.set(errorMessage(err))
@@ -242,19 +253,30 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
     });
   }
 
-  /** Follows a load, by asking how it goes every few seconds until it is over. */
+  /** Follows a load, by asking how it goes (and what the server logged) every few seconds until it is over. */
   follow(job: PackageLoadJob) {
     this.step.set('load');
     this.job.set(job);
     this.error.set(undefined);
+    this.logLines.set([]);
+    this.logNext = 0;
     let wasActive = job.active;
-    this.service.get(job.id).pipe(
-      expand(current => current.active ? timer(POLL_LOAD_MS).pipe(switchMap(() => this.service.get(job.id))) : EMPTY),
+    const poll = (): Observable<{job: PackageLoadJob; page: PackageLoadLogPage | null}> => this.service.get(job.id).pipe(
+      switchMap(current => this.service.log(job.id, this.logNext).pipe(
+        map(page => ({job: current, page})),
+        catchError(() => of({job: current, page: null}))
+      ))
+    );
+    poll().pipe(
+      expand(current => current.job.active ? timer(POLL_LOAD_MS).pipe(switchMap(() => poll())) : EMPTY),
       filter(current => !!current),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: current => {
+      next: ({job: current, page}) => {
         this.job.set(current);
+        if (page) {
+          this.appendLog(page);
+        }
         if (!current.active) {
           this.refreshRecent(false);
           if (wasActive && (current.state === 'SUCCEEDED' || current.state === 'ROLLED_BACK')) {
@@ -267,13 +289,22 @@ export class ReleasePackageLoadDialogComponent implements OnInit {
     });
   }
 
-  /** The index of the step the load is at, which is past the last one when the load is over. */
-  stepIndex(job: PackageLoadJob): number {
-    const index = this.steps.findIndex(step => step.state === job.state);
-    if (job.state === 'SUCCEEDED') {
-      return this.steps.length;
+  private appendLog(page: PackageLoadLogPage) {
+    if (page.lines.length === 0) {
+      return;
     }
-    return index;
+    const box = this.logBox()?.nativeElement;
+    const atBottom = !box || box.scrollHeight - box.scrollTop - box.clientHeight < 24;
+    this.logNext = page.next;
+    this.logLines.update(lines => [...lines, ...page.lines]);
+    if (atBottom) {
+      setTimeout(() => {
+        const element = this.logBox()?.nativeElement;
+        if (element) {
+          element.scrollTop = element.scrollHeight;
+        }
+      });
+    }
   }
 
   isUndo(job: PackageLoadJob): boolean {

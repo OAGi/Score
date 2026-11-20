@@ -8,6 +8,9 @@ import org.oagi.score.gateway.http.api.release_management.repository.ReleasePack
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Set;
 
 /**
@@ -21,6 +24,7 @@ public class ReleasePackageLoadReporter {
     public record Progress(ReleasePackageLoadJobId jobId, ReleasePackageLoadState state, String message) {
     }
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ReleasePackageLoadRepositories repositories;
     private final ObjectProvider<StompNotifier> notifier;
 
@@ -43,6 +47,7 @@ public class ReleasePackageLoadReporter {
         if (!repositories.jobs().moveState(id, from, to, message)) {
             throw new IllegalStateException("The load " + id + " is not " + from + " any more, and is not moved to " + to + ".");
         }
+        logger.info("Load " + id + " is " + to + ": " + message);
         tell(requester, new Progress(id, to, message));
     }
 

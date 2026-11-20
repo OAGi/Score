@@ -1,8 +1,11 @@
 package org.oagi.score.gateway.http.api.release_management.repository.jooq;
 
+import org.oagi.score.gateway.http.api.release_management.repository.Account;
+import org.oagi.score.gateway.http.api.release_management.repository.Namespace;
 import org.jooq.DSLContext;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.script.SqlText;
 import org.oagi.score.gateway.http.api.release_management.repository.ColumnReference;
+import org.oagi.score.gateway.http.api.release_management.repository.ForeignKeyViolation;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleasePackageLoadQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
@@ -88,6 +91,22 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
         return differences;
     }
 
+    @Override
+    public boolean hasValues(String schema, String table, String column) {
+        return dslContext().resultQuery("SELECT EXISTS(SELECT 1 FROM " + quoted(schema) + "." + quoted(table)
+                + " WHERE " + quoted(column) + " IS NOT NULL)").fetchOne(0, Boolean.class);
+    }
+
+    @Override
+    public boolean hasRows(String schema, String table) {
+        return dslContext().resultQuery("SELECT EXISTS(SELECT 1 FROM " + quoted(schema) + "." + quoted(table) + ")")
+                .fetchOne(0, Boolean.class);
+    }
+
+    private static String quoted(String identifier) {
+        return "`" + identifier.replace("`", "``") + "`";
+    }
+
     private Set<String> lines(String query, String schema, boolean normalized) {
         return new TreeSet<>(dslContext().resultQuery(query, schema).fetch(record -> {
             String line = record.get(0, String.class);
@@ -137,7 +156,7 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
     }
 
     @Override
-    public List<String> foreignKeyViolations(String schema) {
+    public List<ForeignKeyViolation> foreignKeyViolations(String schema) {
         // One row for each column of each foreign key, in the order of the key: the key, its table, and where it goes.
         Map<String, List<String[]>> keys = new LinkedHashMap<>();
         dslContext().resultQuery("SELECT constraint_name, table_name, column_name, referenced_table_name, referenced_column_name "
@@ -145,8 +164,8 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
                         + "AND referenced_table_name IS NOT NULL ORDER BY table_name, constraint_name, ordinal_position", schema, schema)
                 .forEach(record -> keys.computeIfAbsent(record.get(1, String.class) + "." + record.get(0, String.class), k -> new ArrayList<>())
                         .add(new String[]{record.get(1, String.class), record.get(2, String.class),
-                                record.get(3, String.class), record.get(4, String.class)}));
-        List<String> violations = new ArrayList<>();
+                                record.get(3, String.class), record.get(4, String.class), record.get(0, String.class)}));
+        List<ForeignKeyViolation> violations = new ArrayList<>();
         for (Map.Entry<String, List<String[]>> key : keys.entrySet()) {
             List<String[]> columns = key.getValue();
             String child = "`" + name(schema) + "`.`" + name(columns.get(0)[0]) + "`";
@@ -160,7 +179,7 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
             long broken = dslContext().resultQuery("SELECT COUNT(*) FROM " + child + " c WHERE " + present
                     + " AND NOT EXISTS (SELECT 1 FROM " + parent + " p WHERE " + match + ")").fetchOne(0, Long.class);
             if (broken > 0) {
-                violations.add(key.getKey() + ": " + broken + " record(s) refer to a record of " + columns.get(0)[2] + " that is not there");
+                violations.add(new ForeignKeyViolation(columns.get(0)[0], columns.get(0)[4], columns.get(0)[2], broken));
             }
         }
         return violations;
@@ -191,6 +210,18 @@ public class JooqReleasePackageLoadQueryRepository extends JooqBaseRepository im
         return dslContext().resultQuery("SELECT " + column + " FROM `" + name(schema) + "`.`" + name(table) + "` WHERE " + column + " > ? AND "
                         + column + " < ?" + (withoutDevelopers ? " AND `is_developer` = 0" : "") + " ORDER BY " + column, above, below)
                 .fetch(0, BigInteger.class);
+    }
+
+    @Override
+    public List<Account> accounts(String schema) {
+        return dslContext().resultQuery("SELECT `app_user_id`, `login_id`, `is_developer` FROM `" + name(schema) + "`.`app_user` ORDER BY `app_user_id`")
+                .fetch(record -> new Account(record.get(0, BigInteger.class), record.get(1, String.class), Boolean.TRUE.equals(record.get(2, Boolean.class))));
+    }
+
+    @Override
+    public List<Namespace> namespaces(String schema) {
+        return dslContext().resultQuery("SELECT `namespace_id`, `library_id`, `uri` FROM `" + name(schema) + "`.`namespace` ORDER BY `namespace_id`")
+                .fetch(record -> new Namespace(record.get(0, BigInteger.class), record.get(1, BigInteger.class), record.get(2, String.class)));
     }
 
     /** The names of the schemas and the tables are put into statements, so they are of what needs no quoting. */

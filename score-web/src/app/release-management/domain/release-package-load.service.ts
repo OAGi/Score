@@ -3,6 +3,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {
   PackageLoadJob,
+  PackageLoadLogPage,
   PackageLoadSettings,
   PackagePreflight,
   PackageUpload
@@ -47,6 +48,11 @@ export class ReleasePackageLoadService {
 
   get(id: number): Observable<PackageLoadJob> {
     return this.http.get<PackageLoadJob>(URL + '/' + id);
+  }
+
+  /** What the server logged for the load after the message number given. */
+  log(id: number, after: number): Observable<PackageLoadLogPage> {
+    return this.http.get<PackageLoadLogPage>(URL + '/' + id + '/log', {params: new HttpParams().set('after', after)});
   }
 
   rollback(id: number): Observable<PackageLoadJob> {

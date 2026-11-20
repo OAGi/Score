@@ -442,7 +442,9 @@ class ReleasePackageLoadEndToEndTest {
         ReleasePackageLoadJob job = loaded();
 
         assertEquals(ReleasePackageLoadState.FAILED, job.state());
-        assertTrue(job.message().contains("refer to records that are missing"), job.message());
+        assertTrue(job.message().contains("would refer to records that are not there (")
+                && job.message().matches(".*\\d+ namespace records? refers? to library records.*"), job.message());
+        assertTrue(job.message().contains("job number " + job.id().value()), job.message());
         assertEquals(List.of("freeze", "release"), freeze.calls);
         assertEquals(List.of("dev-only-old", "dev-lib-old", "end-user-lib"), strings("SELECT name FROM oagi.library ORDER BY library_id"));
     }

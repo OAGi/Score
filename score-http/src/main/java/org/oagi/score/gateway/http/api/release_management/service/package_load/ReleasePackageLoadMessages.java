@@ -1,5 +1,7 @@
 package org.oagi.score.gateway.http.api.release_management.service.package_load;
 
+import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJobId;
+
 /**
  * What is said to whoever loads a release package, in words of what they do and what they can do about it: no names of schemas, tables or
  * columns, and nothing of how the program failed (that is for the log, where the number of the load finds it).
@@ -82,10 +84,32 @@ public final class ReleasePackageLoadMessages {
     public static final String STRUCTURE_DIFFERS = "the structure of the loaded data does not match this application.";
     public static final String NOT_ALL_CARRIED_OVER = "some of the work of the users could not be carried over.";
     public static final String CHANGED_WHILE_COPIED = "data was changed by someone while it was being copied. Please try again.";
-    public static final String MISSING_USERS = "some data made by users refers to user accounts that the package does not contain. "
-            + "Please contact the developers and give them the number of this job.";
-    public static final String MISSING_RECORDS = "some records would refer to records that are missing after the update. "
-            + "Please contact the developers and give them the number of this job.";
+    /** What is said when someone is asked to pass the job on: its number is shown in the window of the update, and its progress details are there to be copied. */
+    public static String passOn(ReleasePackageLoadJobId job) {
+        return "Please contact the developers and give them the job number " + job.value() + " (shown at the top of this window) and the text of 'Progress details'.";
+    }
+
+    public static String missingUsers(String what) {
+        return "after the update, some data made by users would refer to user accounts that are not there (" + what + ").";
+    }
+
+    public static String missingRecords(String what) {
+        return "after the update, some records would refer to records that are not there (" + what + ").";
+    }
+
+    /** The load did not start to copy: the accounts, the namespaces, or both, of this database and of the package do not go together. */
+    public static String conflicts(String accounts, String namespaces, ReleasePackageLoadJobId job) {
+        StringBuilder message = new StringBuilder("Nothing was changed.");
+        if (accounts != null) {
+            message.append(" The user accounts of this database and of the package do not go together, so what users made could come to belong to "
+                    + "another person, or the update could not be completed: ").append(accounts).append(".");
+        }
+        if (namespaces != null) {
+            message.append(" The update could not be completed, since a namespace can be in a library once: ").append(namespaces).append(".");
+        }
+        return message.append(" Please contact the developers and give them the job number ").append(job.value())
+                .append(" (shown at the top of this window) and what is listed here.").toString();
+    }
 
     // -- the undo ----------------------------------------------------------------------------------------------------
     public static final String ROLLING_BACK = "Putting the earlier data back. Saving is paused for a short while";

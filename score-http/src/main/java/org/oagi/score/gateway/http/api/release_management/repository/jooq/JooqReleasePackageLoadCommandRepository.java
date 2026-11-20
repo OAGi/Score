@@ -362,14 +362,6 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
             requireDistinct(live, stagingSchema, backupSchema);
             requireExists(con, stagingSchema);
             requireExists(con, backupSchema);
-            List<String> liveTables = tables(con, live);
-            List<String> stagingTables = tables(con, stagingSchema);
-            liveTables.removeAll(staysInPlace);
-            stagingTables.removeAll(staysInPlace);
-            List<String> missing = liveTables.stream().filter(t -> !stagingTables.contains(t)).toList();
-            if (!missing.isEmpty()) {
-                throw new SchemaSwapException("The staging schema lacks tables of the served schema, which would be lost: " + missing);
-            }
             return replaceServed(con, stagingSchema, backupSchema, lockWait, staysInPlace);
         });
     }
@@ -408,20 +400,111 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
         liveTables.removeAll(staysInPlace);
         incomingTables.removeAll(staysInPlace);
         requireNoTriggersOn(con, staysInPlace, live, incoming);
+        // What only the served schema has is not what the swap is about: it is not moved, and stays where it is.
+        List<String> kept = liveTables.stream().filter(table -> !incomingTables.contains(table)).toList();
+        liveTables.removeAll(kept);
+        requireNoKeysFromMovedTo(con, live, liveTables, kept);
+        List<ForeignKey> keptKeys = foreignKeys(con, live, kept, liveTables);
 
-        Side served = new Side(live, liveTables, triggers(con, live), routines(con, live));
-        Side coming = new Side(incoming, incomingTables, triggers(con, incoming), routines(con, incoming));
+        Side served = new Side(live, liveTables, triggers(con, live, liveTables), routines(con, live));
+        Side coming = new Side(incoming, incomingTables, triggers(con, incoming, incomingTables), routines(con, incoming));
         requireNoSchemaNamed(served);
         requireNoSchemaNamed(coming);
 
         String savedLockWait = single(con, "SELECT @@lock_wait_timeout");
         execute(con, "SET lock_wait_timeout = " + Math.max(1, lockWait.toSeconds()));
+        String savedKeyChecks = single(con, "SELECT @@foreign_key_checks");
         try {
-            place(con, served, coming, outgoing, false);
+            // A table that stays refers to a table that moves by a key that would go with it, so the key is taken off and put on the table that comes.
+            execute(con, "SET foreign_key_checks = 0");
+            dropForeignKeys(con, live, keptKeys);
+            try {
+                place(con, served, coming, outgoing, false);
+            } catch (SQLException | RuntimeException e) {
+                try {
+                    addForeignKeys(con, live, keptKeys);
+                } catch (SQLException | RuntimeException restoreFailure) {
+                    e.addSuppressed(restoreFailure);
+                }
+                throw e;
+            }
+            addForeignKeys(con, live, keptKeys);
             return new SwapOutcome(liveTables.size(), coming.triggers().size(), coming.routines().size());
         } finally {
+            execute(con, "SET foreign_key_checks = " + savedKeyChecks);
             execute(con, "SET lock_wait_timeout = " + savedLockWait);
         }
+    }
+
+    /** A key of a table: what makes {@code columns} of {@code table} refer to {@code parentColumns} of {@code parentTable}. */
+    private record ForeignKey(String table, String name, List<String> columns, String parentTable, List<String> parentColumns,
+                              String onUpdate, String onDelete) {
+    }
+
+    /** The keys of the tables {@code children} that refer to the tables {@code parents} of the same schema. */
+    private List<ForeignKey> foreignKeys(Connection con, String schema, Collection<String> children, Collection<String> parents) throws SQLException {
+        Map<String, ForeignKey> keys = new java.util.LinkedHashMap<>();
+        try (PreparedStatement statement = con.prepareStatement(
+                "SELECT k.table_name, k.constraint_name, k.column_name, k.referenced_table_name, k.referenced_column_name, r.update_rule, r.delete_rule "
+                        + "FROM information_schema.key_column_usage k JOIN information_schema.referential_constraints r "
+                        + "ON r.constraint_schema = k.constraint_schema AND r.table_name = k.table_name AND r.constraint_name = k.constraint_name "
+                        + "WHERE k.table_schema = ? AND k.referenced_table_schema = ? ORDER BY k.table_name, k.constraint_name, k.ordinal_position")) {
+            statement.setString(1, schema);
+            statement.setString(2, schema);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    if (!children.contains(rs.getString(1)) || !parents.contains(rs.getString(4))) {
+                        continue;
+                    }
+                    String id = rs.getString(1) + "." + rs.getString(2);
+                    ForeignKey key = keys.get(id);
+                    if (key == null) {
+                        key = new ForeignKey(rs.getString(1), rs.getString(2), new ArrayList<>(), rs.getString(4), new ArrayList<>(),
+                                rs.getString(6), rs.getString(7));
+                        keys.put(id, key);
+                    }
+                    key.columns().add(rs.getString(3));
+                    key.parentColumns().add(rs.getString(5));
+                }
+            }
+        }
+        return new ArrayList<>(keys.values());
+    }
+
+    /** What moves does not refer to what stays: nothing of the package knows the tables that stay, and a key from the moved ones to them would be left behind. */
+    private void requireNoKeysFromMovedTo(Connection con, String schema, Collection<String> moved, Collection<String> kept) throws SQLException {
+        List<ForeignKey> keys = foreignKeys(con, schema, moved, kept);
+        if (!keys.isEmpty()) {
+            throw new SchemaSwapException("Tables that move refer to tables that stay in place: "
+                    + keys.stream().map(key -> key.table() + "." + key.name()).toList());
+        }
+    }
+
+    private void dropForeignKeys(Connection con, String schema, List<ForeignKey> keys) throws SQLException {
+        for (ForeignKey key : keys) {
+            execute(con, "ALTER TABLE `" + schema + "`.`" + key.table() + "` DROP FOREIGN KEY `" + key.name() + "`");
+        }
+    }
+
+    private void addForeignKeys(Connection con, String schema, List<ForeignKey> keys) throws SQLException {
+        for (ForeignKey key : keys) {
+            if (!strings(con, "SELECT constraint_name FROM information_schema.referential_constraints WHERE constraint_schema = ? AND table_name = ? AND constraint_name = ?",
+                    schema, key.table(), key.name()).isEmpty()) {
+                continue;
+            }
+            execute(con, "ALTER TABLE `" + schema + "`.`" + key.table() + "` ADD CONSTRAINT `" + key.name() + "` FOREIGN KEY ("
+                    + quotedList(key.columns()) + ") REFERENCES `" + schema + "`.`" + key.parentTable() + "` (" + quotedList(key.parentColumns())
+                    + ")" + rule(" ON UPDATE ", key.onUpdate()) + rule(" ON DELETE ", key.onDelete()));
+        }
+    }
+
+    /** RESTRICT is what a key does when it says nothing, and said out loud it is kept as NO ACTION: so it is not said. */
+    private static String rule(String clause, String rule) {
+        return "RESTRICT".equals(rule) ? "" : clause + rule;
+    }
+
+    private static String quotedList(List<String> names) {
+        return names.stream().map(name -> "`" + name + "`").collect(Collectors.joining(", "));
     }
 
     /** What a schema holds that moves: its tables, and its triggers and routines, which cannot go with a table but are made again. */
@@ -518,9 +601,12 @@ public class JooqReleasePackageLoadCommandRepository extends JooqBaseRepository 
         }
     }
 
-    private List<Trigger> triggers(Connection con, String schema) throws SQLException {
+    /** The triggers of the tables {@code onTables} of the schema. */
+    private List<Trigger> triggers(Connection con, String schema, Collection<String> onTables) throws SQLException {
         List<Trigger> triggers = new ArrayList<>();
-        for (String name : strings(con, "SELECT trigger_name FROM information_schema.triggers WHERE trigger_schema = ? ORDER BY trigger_name", schema)) {
+        for (String name : strings(con, "SELECT trigger_name FROM information_schema.triggers WHERE trigger_schema = ? AND event_object_table IN ("
+                + (onTables.isEmpty() ? "NULL" : onTables.stream().map(t -> "'" + t.replace("'", "''") + "'").collect(Collectors.joining(", ")))
+                + ") ORDER BY trigger_name", schema)) {
             // The columns of SHOW CREATE TRIGGER: the name, the sql_mode it was made with, and the statement that made it.
             try (Statement statement = con.createStatement();
                  ResultSet rs = statement.executeQuery("SHOW CREATE TRIGGER `" + schema + "`.`" + name + "`")) {

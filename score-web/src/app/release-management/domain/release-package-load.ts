@@ -50,6 +50,21 @@ export interface PackageLoadJob {
   lastUpdateTimestamp: string;
 }
 
+/** One message that the server logged for a load. */
+export interface PackageLoadLogLine {
+  /** Counts the messages of the load from 1. */
+  number: number;
+  time: string;
+  level: string;
+  message: string;
+}
+
+/** The messages logged after the number that was asked after, and the number to ask after next. */
+export interface PackageLoadLogPage {
+  lines: PackageLoadLogLine[];
+  next: number;
+}
+
 export interface PackageLoadSettings {
   maxPackageSize: number;
   /** False when the database user of the application may not make the schemas a load goes through. */

@@ -452,16 +452,52 @@ class ReleasePackageLoadRepositoryDbTest {
     }
 
     @Test
-    void aStagingSchemaThatLacksATableOfTheServedOneIsRefusedAndNothingIsChanged() throws Exception {
+    void aTableThatOnlyTheServedSchemaHasIsNotSwappedAndStaysWhereItIs() throws Exception {
         Pair p = twoSchemas();
         sql("CREATE TABLE `" + p.served().schema + "`.only_in_served (x INT)");
-        Map<String, String> before = triggers(p.served().schema);
+        sql("CREATE TABLE `" + p.served().schema + "`.also_only_in_served (x INT)");
+        sql("INSERT INTO `" + p.served().schema + "`.also_only_in_served VALUES (1)");
 
-        SchemaSwapException e = assertThrows(SchemaSwapException.class,
-                () -> p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(5)));
+        p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(10));
 
-        assertTrue(e.getMessage().contains("only_in_served"), e.getMessage());
-        assertEquals(before, triggers(p.served().schema));
+        for (String table : List.of("only_in_served", "also_only_in_served")) {
+            assertEquals(1, count("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '" + p.served().schema + "' AND table_name = '" + table + "'"), table);
+            assertEquals(0, count("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '" + p.backup() + "' AND table_name = '" + table + "'"), table);
+        }
+        assertEquals(1, count("SELECT COUNT(*) FROM `" + p.served().schema + "`.also_only_in_served"));
+        assertEquals(List.of("of-staging"), markers(p.served().schema));
+        assertEquals(List.of("of-served"), markers(p.backup()));
+    }
+
+    @Test
+    void aTableThatStaysKeepsItsKeyToATableThatIsSwappedAndTheKeyReachesTheTableThatCame() throws Exception {
+        Pair p = twoSchemas();
+        String served = p.served().schema;
+        sql("CREATE TABLE `" + served + "`.kept_child (id INT PRIMARY KEY, configuration_id BIGINT UNSIGNED NOT NULL, "
+                + "other_id BIGINT UNSIGNED NULL, "
+                + "CONSTRAINT kept_child_fk FOREIGN KEY (configuration_id) REFERENCES `" + served + "`.configuration (configuration_id) ON DELETE CASCADE, "
+                + "CONSTRAINT kept_child_plain_fk FOREIGN KEY (other_id) REFERENCES `" + served + "`.configuration (configuration_id))");
+        sql("INSERT INTO `" + served + "`.kept_child (id, configuration_id) SELECT 1, MIN(configuration_id) FROM `" + served + "`.configuration");
+
+        p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(10));
+
+        assertEquals(List.of("kept_child_fk|configuration|CASCADE|RESTRICT", "kept_child_plain_fk|configuration|RESTRICT|RESTRICT"),
+                strings("SELECT CONCAT(constraint_name, '|', referenced_table_name, '|', delete_rule, '|', update_rule) "
+                        + "FROM information_schema.referential_constraints WHERE constraint_schema = '" + served + "' AND table_name = 'kept_child' ORDER BY constraint_name"));
+        assertEquals(0, count("SELECT COUNT(*) FROM information_schema.referential_constraints WHERE constraint_schema = '" + p.backup() + "' AND table_name = 'kept_child'"));
+        assertEquals(1, count("SELECT COUNT(*) FROM `" + served + "`.kept_child"));
+    }
+
+    @Test
+    void aTableThatMovesAndRefersToATableThatStaysIsRefusedAndNothingIsChanged() throws Exception {
+        Pair p = twoSchemas();
+        String served = p.served().schema;
+        sql("CREATE TABLE `" + served + "`.kept_parent (id INT PRIMARY KEY)");
+        sql("ALTER TABLE `" + served + "`.configuration ADD COLUMN kept_id INT NULL, ADD CONSTRAINT configuration_kept_fk FOREIGN KEY (kept_id) REFERENCES kept_parent (id)");
+
+        assertThrows(SchemaSwapException.class, () -> p.served().command.swap(p.staging(), p.backup(), Duration.ofSeconds(5)));
+
+        assertEquals(List.of("of-served"), markers(served));
         assertEquals(0, tables(p.backup()));
     }
 
