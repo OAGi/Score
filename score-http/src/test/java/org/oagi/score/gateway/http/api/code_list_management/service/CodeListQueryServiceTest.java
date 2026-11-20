@@ -2,6 +2,8 @@ package org.oagi.score.gateway.http.api.code_list_management.service;
 
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
+import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
@@ -21,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,136 +31,130 @@ import static org.mockito.Mockito.*;
 
 class CodeListQueryServiceTest {
 
-    @Test
-    void filtersPreloadedCodeListsWithoutTouchingTheDatabase() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        ScoreUser requester = developer();
-        DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-        CodeListManifestId allowedId = new CodeListManifestId(BigInteger.TEN);
-        CodeListSummaryRecord allowed = mock(CodeListSummaryRecord.class);
-        CodeListSummaryRecord disallowed = mock(CodeListSummaryRecord.class);
-        when(allowed.codeListManifestId()).thenReturn(allowedId);
-        when(disallowed.codeListManifestId()).thenReturn(new CodeListManifestId(BigInteger.valueOf(11)));
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableCodeListListByDtManifestId(
-                requester, dtManifestId, List.of(allowed, disallowed), Set.of(allowedId)))
-                .containsExactly(allowed);
-        verifyNoInteractions(repositoryFactory);
+    private static CodeListManifestId id(int value) {
+        return new CodeListManifestId(BigInteger.valueOf(value));
     }
 
-    @Test
-    void fallsBackToAllCodeListsInTheReleaseWhenTheDtHasNoExplicitCodeList() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
-        DtQueryRepository dtQuery = mock(DtQueryRepository.class);
-        ScoreUser requester = developer();
+    private static ValueListCandidate<CodeListManifestId> candidate(int id, Integer base, CcState state) {
+        return new ValueListCandidate<>(id(id), new Guid(String.format("%032x", id)), "list" + id, "l" + id, "1", null,
+                state, base == null ? null : id(base), false);
+    }
+
+    private static CodeListSummaryRecord details(int id, String name) {
+        CodeListSummaryRecord record = mock(CodeListSummaryRecord.class);
+        when(record.codeListManifestId()).thenReturn(id(id));
+        when(record.name()).thenReturn(name);
+        return record;
+    }
+
+    private static Set<CodeListManifestId> ids(int... values) {
+        Set<CodeListManifestId> set = new LinkedHashSet<>();
+        for (int value : values) {
+            set.add(id(value));
+        }
+        return set;
+    }
+
+    private static final ReleaseId RELEASE = new ReleaseId(BigInteger.TEN);
+
+    private final CodeListQueryService service = new CodeListQueryService();
+    private final RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+    private final CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
+    private final DtQueryRepository dtQuery = mock(DtQueryRepository.class);
+    private final ScoreUser requester = developer();
+
+    private void givenReleaseWith(List<ValueListCandidate<CodeListManifestId>> candidates) {
+        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
+        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
+        when(codeListQuery.getCodeListCandidateList(RELEASE)).thenReturn(candidates);
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+    }
+
+    private DtManifestId givenDt() {
         DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-        ReleaseId releaseId = new ReleaseId(BigInteger.TEN);
-        ReleaseSummaryRecord release = new ReleaseSummaryRecord(
-                releaseId, null, "10.9", ReleaseState.Published);
         DtSummaryRecord dt = mock(DtSummaryRecord.class);
-        CodeListSummaryRecord releaseCodeList = mock(CodeListSummaryRecord.class);
-
-        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
-        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
-        when(codeListQuery.availableCodeListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
         when(dtQuery.getDtSummary(dtManifestId)).thenReturn(dt);
-        when(dt.release()).thenReturn(release);
-        when(codeListQuery.getCodeListSummaryList(releaseId)).thenReturn(List.of(releaseCodeList));
-        when(releaseCodeList.state()).thenReturn(CcState.Published);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableCodeListListByDtManifestId(requester, dtManifestId))
-                .containsExactly(releaseCodeList);
-        verify(codeListQuery).getCodeListSummaryList(releaseId);
+        when(dt.release()).thenReturn(new ReleaseSummaryRecord(RELEASE, null, "10.9", ReleaseState.Published));
+        return dtManifestId;
     }
 
-    @Test
-    void keepsExplicitCodeListAvailabilityWithoutReleaseFallback() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-        CodeListSummaryRecord explicitCodeList = mock(CodeListSummaryRecord.class);
-
-        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
-        when(codeListQuery.availableCodeListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of(explicitCodeList));
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableCodeListListByDtManifestId(requester, dtManifestId))
-                .containsExactly(explicitCodeList);
-        verify(repositoryFactory, never()).dtQueryRepository(any());
-    }
-
-    @Test
-    void doesNotFallBackWhenExplicitCodeListRelationHasNoVisibleCandidates() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-
-        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
-        when(codeListQuery.availableCodeListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
-        when(codeListQuery.hasCodeListAvailabilityByDtManifestId(dtManifestId)).thenReturn(true);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableCodeListListByDtManifestId(requester, dtManifestId)).isEmpty();
-        verify(repositoryFactory, never()).dtQueryRepository(any());
-    }
-
-    @Test
-    void fallsBackToAllCodeListsInTheReleaseWhenTheDtScHasNoExplicitCodeList() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
-        DtQueryRepository dtQuery = mock(DtQueryRepository.class);
-        ScoreUser requester = developer();
+    private DtScManifestId givenDtSc() {
         DtScManifestId dtScManifestId = new DtScManifestId(BigInteger.ONE);
-        ReleaseId releaseId = new ReleaseId(BigInteger.TEN);
-        ReleaseSummaryRecord release = new ReleaseSummaryRecord(
-                releaseId, null, "10.9", ReleaseState.Published);
         DtScSummaryRecord dtSc = mock(DtScSummaryRecord.class);
-        CodeListSummaryRecord releaseCodeList = mock(CodeListSummaryRecord.class);
-
-        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
-        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
-        when(codeListQuery.availableCodeListByDtScManifestId(dtScManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
         when(dtQuery.getDtScSummary(dtScManifestId)).thenReturn(dtSc);
-        when(dtSc.release()).thenReturn(release);
-        when(codeListQuery.getCodeListSummaryList(releaseId)).thenReturn(List.of(releaseCodeList));
-        when(releaseCodeList.state()).thenReturn(CcState.Published);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableCodeListListByDtScManifestId(requester, dtScManifestId))
-                .containsExactly(releaseCodeList);
-        verify(codeListQuery).getCodeListSummaryList(releaseId);
+        when(dtSc.release()).thenReturn(new ReleaseSummaryRecord(RELEASE, null, "10.9", ReleaseState.Published));
+        return dtScManifestId;
     }
 
     @Test
-    void doesNotFallBackWhenExplicitCodeListDtScRelationHasNoVisibleCandidates() {
-        CodeListQueryService service = new CodeListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        CodeListQueryRepository codeListQuery = mock(CodeListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtScManifestId dtScManifestId = new DtScManifestId(BigInteger.ONE);
+    void offersEveryCodeListOfTheReleaseThatTheDeveloperCanSeeWhenTheDtNamesNone() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, null, CcState.WIP),
+                candidate(3, null, CcState.Production)));
+        CodeListSummaryRecord first = details(1, "b");
+        CodeListSummaryRecord third = details(3, "a");
+        when(codeListQuery.getNamedCodeListManifestIdsByDtManifestId(dt)).thenReturn(Set.of());
+        when(codeListQuery.getCodeListSummaryListByManifestIds(ids(1, 3))).thenReturn(List.of(third, first));
 
-        when(repositoryFactory.codeListQueryRepository(requester)).thenReturn(codeListQuery);
-        when(codeListQuery.availableCodeListByDtScManifestId(dtScManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
-        when(codeListQuery.hasCodeListAvailabilityByDtScManifestId(dtScManifestId)).thenReturn(true);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+        // the whole release comes in its own order, not ordered by name
+        assertThat(service.availableCodeListListByDtManifestId(requester, dt)).containsExactly(first, third);
+    }
 
-        assertThat(service.availableCodeListListByDtScManifestId(requester, dtScManifestId)).isEmpty();
-        verify(repositoryFactory, never()).dtQueryRepository(any());
+    @Test
+    void offersTheNamedCodeListsWithTheListsDerivedFromThemOrderedByNameAndNothingElse() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, 1, CcState.Published),
+                candidate(3, null, CcState.Published)));
+        CodeListSummaryRecord base = details(1, "z");
+        CodeListSummaryRecord derived = details(2, "a");
+        when(codeListQuery.getNamedCodeListManifestIdsByDtManifestId(dt)).thenReturn(ids(1));
+        when(codeListQuery.getCodeListSummaryListByManifestIds(ids(1, 2))).thenReturn(List.of(base, derived));
+
+        assertThat(service.availableCodeListListByDtManifestId(requester, dt)).containsExactly(derived, base);
+    }
+
+    @Test
+    void doesNotFallBackWhenTheNamedCodeListsAreNotVisibleToTheDeveloper() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.WIP), candidate(2, null, CcState.Published)));
+        when(codeListQuery.getNamedCodeListManifestIdsByDtManifestId(dt)).thenReturn(ids(1));
+
+        assertThat(service.availableCodeListListByDtManifestId(requester, dt)).isEmpty();
+        verify(codeListQuery, never()).getCodeListSummaryListByManifestIds(any());
+    }
+
+    @Test
+    void offersWhatTheDtScNamesAndFallsBackToTheReleaseWhenItNamesNone() {
+        DtScManifestId named = givenDtSc();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, null, CcState.Published)));
+        CodeListSummaryRecord second = details(2, "second");
+        when(codeListQuery.getNamedCodeListManifestIdsByDtScManifestId(named)).thenReturn(ids(2));
+        when(codeListQuery.getCodeListSummaryListByManifestIds(ids(2))).thenReturn(List.of(second));
+
+        assertThat(service.availableCodeListListByDtScManifestId(requester, named)).containsExactly(second);
+
+        CodeListSummaryRecord first = details(1, "first");
+        when(codeListQuery.getNamedCodeListManifestIdsByDtScManifestId(named)).thenReturn(Set.of());
+        when(codeListQuery.getCodeListSummaryListByManifestIds(ids(1, 2))).thenReturn(List.of(first, second));
+
+        assertThat(service.availableCodeListListByDtScManifestId(requester, named)).containsExactly(first, second);
+    }
+
+    @Test
+    void doesNotFallBackWhenTheNamedCodeListsOfTheDtScAreNotVisibleToTheDeveloper() {
+        DtScManifestId dtSc = givenDtSc();
+        givenReleaseWith(List.of(candidate(1, null, CcState.WIP), candidate(2, null, CcState.Published)));
+        when(codeListQuery.getNamedCodeListManifestIdsByDtScManifestId(dtSc)).thenReturn(ids(1));
+
+        assertThat(service.availableCodeListListByDtScManifestId(requester, dtSc)).isEmpty();
+    }
+
+    @Test
+    void offersNothingForADtThatDoesNotExist() {
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published)));
+
+        assertThat(service.availableCodeListListByDtManifestId(requester, new DtManifestId(BigInteger.TWO))).isEmpty();
+        verify(codeListQuery, never()).getCodeListCandidateList(any());
     }
 
     private static ScoreUser developer() {

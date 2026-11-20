@@ -6,6 +6,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.BieUpliftingCustomMa
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.Bbie;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieSc;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
+import org.oagi.score.gateway.http.common.model.ScoreRole;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
@@ -27,8 +31,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 class BieUpliftingCodeListDomainTest {
@@ -44,31 +46,22 @@ class BieUpliftingCodeListDomainTest {
             boolean supplementary, String restriction, boolean targetExists, boolean retained) throws Exception {
         BieUpliftingService service = new BieUpliftingService(new CcMatchingService());
         CcDocument document = mock(CcDocument.class);
-        CodeListSummaryRecord sourceList = codeList(4291);
-        CodeListSummaryRecord targetList = codeList(4633);
-        List<CodeListSummaryRecord> targets = targetExists ? List.of(targetList) : List.of();
+        ValueListCandidate<CodeListManifestId> sourceList = codeList(4291);
+        ValueListCandidate<CodeListManifestId> targetList = codeList(4633);
+        List<ValueListCandidate<CodeListManifestId>> targets = targetExists ? List.of(targetList) : List.of();
         CodeListManifestId allowedId = switch (restriction) {
-            case "allowed" -> targetList.codeListManifestId();
+            case "allowed" -> targetList.manifestId();
             case "disallowed" -> new CodeListManifestId(BigInteger.valueOf(999));
             default -> null;
         };
-        List<CodeListSummaryRecord> availableTargets = "disallowed".equals(restriction)
-                ? List.of() : targets;
-        CodeListQueryService codeListQueryService = mock(CodeListQueryService.class);
-        doReturn(availableTargets).when(codeListQueryService)
-                .availableCodeListListByDtManifestId(any(), any());
-        doReturn(availableTargets).when(codeListQueryService)
-                .availableCodeListListByDtScManifestId(any(), any());
-        ReflectionTestUtils.setField(service, "codeListQueryService", codeListQueryService);
-        ReflectionTestUtils.setField(service, "agencyIdListQueryService", mock(AgencyIdListQueryService.class));
         XbtManifestId defaultPrimitive = new XbtManifestId(BigInteger.valueOf(5192));
 
         var handlerClass = Class.forName(BieUpliftingService.class.getName() + "$BieUpliftingHandler");
         var constructor = handlerClass.getDeclaredConstructors()[0];
         constructor.setAccessible(true);
-        Object handler = constructor.newInstance(service, null, List.of(),
+        Object handler = constructor.newInstance(service, developer(), List.of(),
                 new BieUpliftingCustomMappingTable(List.of()), null, document, null,
-                List.of(), List.of(), List.of(sourceList), null, List.of(), null);
+                List.of(), List.of(), List.of(sourceList), targets, List.of(), List.of());
 
         Object validation;
         CodeListManifestId actualCodeList;
@@ -86,12 +79,14 @@ class BieUpliftingCodeListDomainTest {
             when(defaultRow.isDefault()).thenReturn(true);
             when(document.getDtScAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             BbieSc source = new BbieSc();
-            source.setCodeListManifestId(sourceList.codeListManifestId());
+            source.setCodeListManifestId(sourceList.manifestId());
             BbieSc target = new BbieSc();
             ReflectionTestUtils.invokeMethod(handler, "setValueDomain", source, target, id,
                     List.of(), List.of(sourceList), List.of());
             actualCodeList = target.getCodeListManifestId();
             actualPrimitive = target.getXbtManifestId();
+            List<ValueListCandidate<CodeListManifestId>> availableTargets = ReflectionTestUtils.invokeMethod(service, "availableCodeLists",
+                    developer(), targets, List.of(approved, defaultRow), (java.util.function.Function<DtScAwdPriSummaryRecord, CodeListManifestId>) DtScAwdPriSummaryRecord::codeListManifestId);
             validation = ReflectionTestUtils.invokeMethod(service, "checkBdtCodeListMappable",
                     sourceList, availableTargets);
         } else {
@@ -107,27 +102,80 @@ class BieUpliftingCodeListDomainTest {
             when(defaultRow.isDefault()).thenReturn(true);
             when(document.getDtAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             Bbie source = new Bbie();
-            source.setCodeListManifestId(sourceList.codeListManifestId());
+            source.setCodeListManifestId(sourceList.manifestId());
             Bbie target = new Bbie();
             ReflectionTestUtils.invokeMethod(handler, "setValueDomain", source, target, id,
                     List.of(), List.of(sourceList), List.of());
             actualCodeList = target.getCodeListManifestId();
             actualPrimitive = target.getXbtManifestId();
+            List<ValueListCandidate<CodeListManifestId>> availableTargets = ReflectionTestUtils.invokeMethod(service, "availableCodeLists",
+                    developer(), targets, List.of(approved, defaultRow), (java.util.function.Function<DtAwdPriSummaryRecord, CodeListManifestId>) DtAwdPriSummaryRecord::codeListManifestId);
             validation = ReflectionTestUtils.invokeMethod(service, "checkBdtCodeListMappable",
                     sourceList, availableTargets);
         }
 
-        assertThat(actualCodeList).isEqualTo(retained ? targetList.codeListManifestId() : null);
+        assertThat(actualCodeList).isEqualTo(retained ? targetList.manifestId() : null);
         assertThat(actualPrimitive).isEqualTo(retained ? null : defaultPrimitive);
         assertThat((Boolean) ReflectionTestUtils.invokeMethod(validation, "valid")).isEqualTo(retained);
     }
 
-    private CodeListSummaryRecord codeList(int manifestId) {
-        CodeListSummaryRecord list = mock(CodeListSummaryRecord.class);
-        when(list.codeListManifestId()).thenReturn(new CodeListManifestId(BigInteger.valueOf(manifestId)));
-        when(list.codeListId()).thenReturn(new CodeListId(BigInteger.valueOf(73)));
-        when(list.guid()).thenReturn(new Guid("a".repeat(32)));
-        when(list.name()).thenReturn("oacl_SystemEnvironmentCode");
-        return list;
+    @ParameterizedTest(name = "requester developer={0}, target {1}, end-user owned={2}, retained={3}")
+    @CsvSource({
+            "true, Published, false, true",
+            "true, Production, false, false",
+            "true, Published, true, false",
+            "true, WIP, false, false",
+            "false, Published, false, true",
+            "false, Production, true, true",
+            "false, WIP, false, true"
+    })
+    void uplifteeGetsOnlyWhatTheRequesterCouldAssignWhenEditingTheNode(
+            boolean developer, CcState state, boolean endUserOwned, boolean retained) throws Exception {
+        BieUpliftingService service = new BieUpliftingService(new CcMatchingService());
+        CcDocument document = mock(CcDocument.class);
+        ValueListCandidate<CodeListManifestId> sourceList = codeList(4291);
+        ValueListCandidate<CodeListManifestId> targetList = new ValueListCandidate<>(
+                new CodeListManifestId(BigInteger.valueOf(4633)), new Guid("a".repeat(32)),
+                "oacl_SystemEnvironmentCode", "LIST", "1", null, state, null, endUserOwned);
+        ScoreUser requester = developer ? developer()
+                : new ScoreUser(null, "user", "User", null, false, List.of(ScoreRole.END_USER));
+        XbtManifestId defaultPrimitive = new XbtManifestId(BigInteger.valueOf(5192));
+
+        var handlerClass = Class.forName(BieUpliftingService.class.getName() + "$BieUpliftingHandler");
+        var constructor = handlerClass.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        Object handler = constructor.newInstance(service, requester, List.of(),
+                new BieUpliftingCustomMappingTable(List.of()), null, document, null,
+                List.of(), List.of(), List.of(sourceList), List.of(targetList), List.of(), List.of());
+
+        DtManifestId id = new DtManifestId(BigInteger.valueOf(36469));
+        DtSummaryRecord dt = mock(DtSummaryRecord.class);
+        when(dt.dtManifestId()).thenReturn(id);
+        when(document.getDt(id)).thenReturn(dt);
+        DtAwdPriSummaryRecord approved = mock(DtAwdPriSummaryRecord.class);
+        when(approved.codeListManifestId()).thenReturn(targetList.manifestId());
+        DtAwdPriSummaryRecord defaultRow = mock(DtAwdPriSummaryRecord.class);
+        when(defaultRow.xbtManifestId()).thenReturn(defaultPrimitive);
+        when(defaultRow.isDefault()).thenReturn(true);
+        when(document.getDtAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
+        Bbie source = new Bbie();
+        source.setCodeListManifestId(sourceList.manifestId());
+        Bbie target = new Bbie();
+
+        ReflectionTestUtils.invokeMethod(handler, "setValueDomain", source, target, id,
+                List.of(), List.of(sourceList), List.of());
+
+        assertThat(target.getCodeListManifestId()).isEqualTo(retained ? targetList.manifestId() : null);
+        assertThat(target.getXbtManifestId()).isEqualTo(retained ? null : defaultPrimitive);
+    }
+
+    private ValueListCandidate<CodeListManifestId> codeList(int manifestId) {
+        return new ValueListCandidate<>(new CodeListManifestId(BigInteger.valueOf(manifestId)),
+                new Guid("a".repeat(32)), "oacl_SystemEnvironmentCode", "LIST", "1", null,
+                CcState.Published, null, false);
+    }
+
+    private static ScoreUser developer() {
+        return new ScoreUser(null, "developer", "Developer", null, true, List.of(ScoreRole.DEVELOPER));
     }
 }

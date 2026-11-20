@@ -5,6 +5,8 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSu
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
 import org.oagi.score.gateway.http.api.agency_id_management.repository.AgencyIdListQueryRepository;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
+import org.oagi.score.gateway.http.common.model.Guid;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
@@ -21,144 +23,129 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class AgencyIdListQueryServiceTest {
 
-    @Test
-    void filtersPreloadedAgencyIdListsWithoutTouchingTheDatabase() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        ScoreUser requester = developer();
-        DtScManifestId dtScManifestId = new DtScManifestId(BigInteger.ONE);
-        AgencyIdListManifestId allowedId = new AgencyIdListManifestId(BigInteger.TEN);
-        AgencyIdListSummaryRecord allowed = mock(AgencyIdListSummaryRecord.class);
-        AgencyIdListSummaryRecord disallowed = mock(AgencyIdListSummaryRecord.class);
-        when(allowed.agencyIdListManifestId()).thenReturn(allowedId);
-        when(disallowed.agencyIdListManifestId()).thenReturn(
-                new AgencyIdListManifestId(BigInteger.valueOf(11)));
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableAgencyIdListListByDtScManifestId(
-                requester, dtScManifestId, List.of(allowed, disallowed), Set.of(allowedId)))
-                .containsExactly(allowed);
-        verifyNoInteractions(repositoryFactory);
+    private static AgencyIdListManifestId id(int value) {
+        return new AgencyIdListManifestId(BigInteger.valueOf(value));
     }
 
-    @Test
-    void fallsBackToAllAgencyIdListsInTheReleaseWhenTheDtHasNoExplicitAgencyIdList() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
-        DtQueryRepository dtQuery = mock(DtQueryRepository.class);
-        ScoreUser requester = developer();
+    private static ValueListCandidate<AgencyIdListManifestId> candidate(int id, Integer base, CcState state) {
+        return new ValueListCandidate<>(id(id), new Guid(String.format("%032x", id)), "list" + id, "l" + id, "1", "agency",
+                state, base == null ? null : id(base), false);
+    }
+
+    private static AgencyIdListSummaryRecord details(int id, String name) {
+        AgencyIdListSummaryRecord record = mock(AgencyIdListSummaryRecord.class);
+        when(record.agencyIdListManifestId()).thenReturn(id(id));
+        when(record.name()).thenReturn(name);
+        return record;
+    }
+
+    private static Set<AgencyIdListManifestId> ids(int... values) {
+        Set<AgencyIdListManifestId> set = new LinkedHashSet<>();
+        for (int value : values) {
+            set.add(id(value));
+        }
+        return set;
+    }
+
+    private static final ReleaseId RELEASE = new ReleaseId(BigInteger.TEN);
+
+    private final AgencyIdListQueryService service = new AgencyIdListQueryService();
+    private final RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+    private final AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
+    private final DtQueryRepository dtQuery = mock(DtQueryRepository.class);
+    private final ScoreUser requester = developer();
+
+    private void givenReleaseWith(List<ValueListCandidate<AgencyIdListManifestId>> candidates) {
+        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
+        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
+        when(agencyIdListQuery.getAgencyIdListCandidateList(RELEASE)).thenReturn(candidates);
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+    }
+
+    private DtManifestId givenDt() {
         DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-        ReleaseId releaseId = new ReleaseId(BigInteger.TEN);
-        ReleaseSummaryRecord release = new ReleaseSummaryRecord(
-                releaseId, null, "10.9", ReleaseState.Published);
         DtSummaryRecord dt = mock(DtSummaryRecord.class);
-        AgencyIdListSummaryRecord releaseAgencyIdList = mock(AgencyIdListSummaryRecord.class);
-
-        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
-        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
-        when(agencyIdListQuery.availableAgencyIdListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
         when(dtQuery.getDtSummary(dtManifestId)).thenReturn(dt);
-        when(dt.release()).thenReturn(release);
-        when(agencyIdListQuery.getAgencyIdListSummaryList(releaseId)).thenReturn(List.of(releaseAgencyIdList));
-        when(releaseAgencyIdList.state()).thenReturn(CcState.Production);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dtManifestId))
-                .containsExactly(releaseAgencyIdList);
-        verify(agencyIdListQuery).getAgencyIdListSummaryList(releaseId);
+        when(dt.release()).thenReturn(new ReleaseSummaryRecord(RELEASE, null, "10.9", ReleaseState.Published));
+        return dtManifestId;
     }
 
-    @Test
-    void fallsBackToAllAgencyIdListsInTheReleaseWhenTheDtScHasNoExplicitAgencyIdList() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
-        DtQueryRepository dtQuery = mock(DtQueryRepository.class);
-        ScoreUser requester = developer();
+    private DtScManifestId givenDtSc() {
         DtScManifestId dtScManifestId = new DtScManifestId(BigInteger.ONE);
-        ReleaseId releaseId = new ReleaseId(BigInteger.TEN);
-        ReleaseSummaryRecord release = new ReleaseSummaryRecord(
-                releaseId, null, "10.9", ReleaseState.Published);
         DtScSummaryRecord dtSc = mock(DtScSummaryRecord.class);
-        AgencyIdListSummaryRecord releaseAgencyIdList = mock(AgencyIdListSummaryRecord.class);
-
-        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
-        when(repositoryFactory.dtQueryRepository(requester)).thenReturn(dtQuery);
-        when(agencyIdListQuery.availableAgencyIdListByDtScManifestId(dtScManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
         when(dtQuery.getDtScSummary(dtScManifestId)).thenReturn(dtSc);
-        when(dtSc.release()).thenReturn(release);
-        when(agencyIdListQuery.getAgencyIdListSummaryList(releaseId)).thenReturn(List.of(releaseAgencyIdList));
-        when(releaseAgencyIdList.state()).thenReturn(CcState.Production);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableAgencyIdListListByDtScManifestId(requester, dtScManifestId))
-                .containsExactly(releaseAgencyIdList);
-        verify(agencyIdListQuery).getAgencyIdListSummaryList(releaseId);
+        when(dtSc.release()).thenReturn(new ReleaseSummaryRecord(RELEASE, null, "10.9", ReleaseState.Published));
+        return dtScManifestId;
     }
 
     @Test
-    void doesNotFallBackWhenExplicitAgencyRelationDtScHasNoVisibleCandidates() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtScManifestId dtScManifestId = new DtScManifestId(BigInteger.ONE);
+    void offersEveryAgencyIdListOfTheReleaseThatTheDeveloperCanSeeWhenTheDtNamesNone() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, null, CcState.WIP),
+                candidate(3, null, CcState.Production)));
+        AgencyIdListSummaryRecord first = details(1, "b");
+        AgencyIdListSummaryRecord third = details(3, "a");
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtManifestId(dt)).thenReturn(Set.of());
+        when(agencyIdListQuery.getAgencyIdListSummaryListByManifestIds(ids(1, 3))).thenReturn(List.of(third, first));
 
-        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
-        when(agencyIdListQuery.availableAgencyIdListByDtScManifestId(dtScManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
-        when(agencyIdListQuery.hasAgencyIdListAvailabilityByDtScManifestId(dtScManifestId)).thenReturn(true);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableAgencyIdListListByDtScManifestId(requester, dtScManifestId)).isEmpty();
-        verify(repositoryFactory, never()).dtQueryRepository(any());
+        // the whole release comes in its own order, not ordered by name
+        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dt)).containsExactly(first, third);
     }
 
     @Test
-    void keepsExplicitAgencyIdListAvailabilityWithoutReleaseFallback() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
-        AgencyIdListSummaryRecord explicitAgencyIdList = mock(AgencyIdListSummaryRecord.class);
+    void offersTheNamedAgencyIdListsWithTheListsDerivedFromThemButNotTheOnesTheyAreBasedOn() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, 1, CcState.Published),
+                candidate(3, 2, CcState.Published), candidate(4, null, CcState.Published)));
+        AgencyIdListSummaryRecord middle = details(2, "z");
+        AgencyIdListSummaryRecord leaf = details(3, "a");
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtManifestId(dt)).thenReturn(ids(2));
+        when(agencyIdListQuery.getAgencyIdListSummaryListByManifestIds(ids(2, 3))).thenReturn(List.of(middle, leaf));
 
-        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
-        when(agencyIdListQuery.availableAgencyIdListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production)))
-                .thenReturn(List.of(explicitAgencyIdList));
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
-
-        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dtManifestId))
-                .containsExactly(explicitAgencyIdList);
-        verify(repositoryFactory, never()).dtQueryRepository(any());
+        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dt)).containsExactly(leaf, middle);
     }
 
     @Test
-    void doesNotFallBackWhenExplicitAgencyRelationHasNoVisibleCandidates() {
-        AgencyIdListQueryService service = new AgencyIdListQueryService();
-        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
-        AgencyIdListQueryRepository agencyIdListQuery = mock(AgencyIdListQueryRepository.class);
-        ScoreUser requester = developer();
-        DtManifestId dtManifestId = new DtManifestId(BigInteger.ONE);
+    void doesNotFallBackWhenTheNamedAgencyIdListsAreNotVisibleToTheDeveloper() {
+        DtManifestId dt = givenDt();
+        givenReleaseWith(List.of(candidate(1, null, CcState.WIP), candidate(2, null, CcState.Published)));
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtManifestId(dt)).thenReturn(ids(1));
 
-        when(repositoryFactory.agencyIdListQueryRepository(requester)).thenReturn(agencyIdListQuery);
-        when(agencyIdListQuery.availableAgencyIdListByDtManifestId(dtManifestId,
-                List.of(CcState.Published, CcState.Production))).thenReturn(List.of());
-        when(agencyIdListQuery.hasAgencyIdListAvailabilityByDtManifestId(dtManifestId)).thenReturn(true);
-        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dt)).isEmpty();
+        verify(agencyIdListQuery, never()).getAgencyIdListSummaryListByManifestIds(any());
+    }
 
-        assertThat(service.availableAgencyIdListListByDtManifestId(requester, dtManifestId)).isEmpty();
-        verify(repositoryFactory, never()).dtQueryRepository(any());
+    @Test
+    void offersWhatTheDtScNamesAndFallsBackToTheReleaseWhenItNamesNone() {
+        DtScManifestId dtSc = givenDtSc();
+        givenReleaseWith(List.of(candidate(1, null, CcState.Published), candidate(2, null, CcState.Published)));
+        AgencyIdListSummaryRecord second = details(2, "second");
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtScManifestId(dtSc)).thenReturn(ids(2));
+        when(agencyIdListQuery.getAgencyIdListSummaryListByManifestIds(ids(2))).thenReturn(List.of(second));
+
+        assertThat(service.availableAgencyIdListListByDtScManifestId(requester, dtSc)).containsExactly(second);
+
+        AgencyIdListSummaryRecord first = details(1, "first");
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtScManifestId(dtSc)).thenReturn(Set.of());
+        when(agencyIdListQuery.getAgencyIdListSummaryListByManifestIds(ids(1, 2))).thenReturn(List.of(first, second));
+
+        assertThat(service.availableAgencyIdListListByDtScManifestId(requester, dtSc)).containsExactly(first, second);
+    }
+
+    @Test
+    void doesNotFallBackWhenTheNamedAgencyIdListsOfTheDtScAreNotVisibleToTheDeveloper() {
+        DtScManifestId dtSc = givenDtSc();
+        givenReleaseWith(List.of(candidate(1, null, CcState.WIP), candidate(2, null, CcState.Published)));
+        when(agencyIdListQuery.getNamedAgencyIdListManifestIdsByDtScManifestId(dtSc)).thenReturn(ids(1));
+
+        assertThat(service.availableAgencyIdListListByDtScManifestId(requester, dtSc)).isEmpty();
     }
 
     private static ScoreUser developer() {

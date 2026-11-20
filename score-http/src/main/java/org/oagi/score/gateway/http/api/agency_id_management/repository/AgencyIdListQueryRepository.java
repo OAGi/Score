@@ -14,6 +14,7 @@ import org.oagi.score.gateway.http.common.model.ResultAndCount;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface AgencyIdListQueryRepository {
 
@@ -40,24 +41,16 @@ public interface AgencyIdListQueryRepository {
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
     /**
-     * Returns Agency ID Lists explicitly linked to the DT, including their
-     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtManifestId}
-     * before treating an empty result as an unrestricted release-wide lookup.
+     * Every Agency ID List of the release, with what it takes to decide whether it can be offered for a node and which list
+     * of another release it matches (no values), ordered by manifest.
      */
-    List<AgencyIdListSummaryRecord> availableAgencyIdListByDtManifestId(
-            DtManifestId dtManifestId, List<CcState> states);
+    List<org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<AgencyIdListManifestId>> getAgencyIdListCandidateList(ReleaseId releaseId);
 
-    /**
-     * Returns Agency ID Lists explicitly linked to the DT_SC, including their
-     * related manifests. Callers must consult {@link #hasAgencyIdListAvailabilityByDtScManifestId}
-     * before treating an empty result as an unrestricted release-wide lookup.
-     */
-    List<AgencyIdListSummaryRecord> availableAgencyIdListByDtScManifestId(
-            DtScManifestId dtScManifestId, List<CcState> states);
+    /** The manifest of every Agency ID List that an approved primitive of the DT names, whatever state the list is in. */
+    Set<AgencyIdListManifestId> getNamedAgencyIdListManifestIdsByDtManifestId(DtManifestId dtManifestId);
 
-    boolean hasAgencyIdListAvailabilityByDtManifestId(DtManifestId dtManifestId);
-
-    boolean hasAgencyIdListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
+    /** The manifest of every Agency ID List that an approved primitive of the DT_SC names, whatever state the list is in. */
+    Set<AgencyIdListManifestId> getNamedAgencyIdListManifestIdsByDtScManifestId(DtScManifestId dtScManifestId);
 
     List<AgencyIdListSummaryRecord> getAgencyIdListSummaryListInStates(
             ReleaseId releaseId, List<CcState> states);

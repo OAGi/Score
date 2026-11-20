@@ -2,7 +2,6 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
-import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.bie_management.service.BieAssociationPaths.Association;
 
@@ -41,10 +40,12 @@ import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecor
 import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.*;
 import org.oagi.score.gateway.http.api.cc_management.service.CcMatchingService;
+import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
+import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
+import org.oagi.score.gateway.http.api.cc_management.service.ValueListCandidateRule;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
-import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
-import org.oagi.score.gateway.http.api.code_list_management.service.CodeListQueryService;
-import org.oagi.score.gateway.http.api.agency_id_management.service.AgencyIdListQueryService;
 import org.oagi.score.gateway.http.api.context_management.business_context.model.BusinessContextId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseSummaryRecord;
@@ -63,7 +64,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.math.BigInteger;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -92,12 +92,6 @@ public class BieUpliftingService {
 
     @Autowired
     private BieReadService bieReadService;
-
-    @Autowired
-    private CodeListQueryService codeListQueryService;
-
-    @Autowired
-    private AgencyIdListQueryService agencyIdListQueryService;
 
     @Autowired
     private ReleaseQueryService releaseQueryService;
@@ -446,11 +440,11 @@ public class BieUpliftingService {
         private List<XbtSummaryRecord> sourceXbtList;
         private List<XbtSummaryRecord> targetXbtList;
 
-        private List<CodeListSummaryRecord> sourceCodeListList;
-        private List<CodeListSummaryRecord> targetCodeListList;
+        private List<ValueListCandidate<CodeListManifestId>> sourceCodeListList;
+        private List<ValueListCandidate<CodeListManifestId>> targetCodeListList;
 
-        private List<AgencyIdListSummaryRecord> sourceAgencyIdListList;
-        private List<AgencyIdListSummaryRecord> targetAgencyIdListList;
+        private List<ValueListCandidate<AgencyIdListManifestId>> sourceAgencyIdListList;
+        private List<ValueListCandidate<AgencyIdListManifestId>> targetAgencyIdListList;
 
         private final Map<String, Abie> targetAbies = new LinkedHashMap<>();
         private final Map<String, Bbie> targetBbies = new LinkedHashMap<>();
@@ -463,10 +457,10 @@ public class BieUpliftingService {
                             AsccpManifestId targetAsccpManifestId,
                             List<XbtSummaryRecord> sourceXbtList,
                             List<XbtSummaryRecord> targetXbtList,
-                            List<CodeListSummaryRecord> sourceCodeListList,
-                            List<CodeListSummaryRecord> targetCodeListList,
-                            List<AgencyIdListSummaryRecord> sourceAgencyIdListList,
-                            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
+                            List<ValueListCandidate<CodeListManifestId>> sourceCodeListList,
+                            List<ValueListCandidate<CodeListManifestId>> targetCodeListList,
+                            List<ValueListCandidate<AgencyIdListManifestId>> sourceAgencyIdListList,
+                            List<ValueListCandidate<AgencyIdListManifestId>> targetAgencyIdListList) {
             this.requester = requester;
             this.bizCtxIds = bizCtxIds;
             this.customMappingTable = customMappingTable;
@@ -1101,8 +1095,8 @@ public class BieUpliftingService {
                                     Bbie targetBbie,
                                     DtManifestId targetDtManifestId,
                                     List<XbtSummaryRecord> sourceXbtList,
-                                    List<CodeListSummaryRecord> sourceCodeListList,
-                                    List<AgencyIdListSummaryRecord> sourceAgencyIdListList) {
+                                    List<ValueListCandidate<CodeListManifestId>> sourceCodeListList,
+                                    List<ValueListCandidate<AgencyIdListManifestId>> sourceAgencyIdListList) {
 
             DtSummaryRecord targetDt = targetCcDocument.getDt(targetDtManifestId);
 
@@ -1119,23 +1113,23 @@ public class BieUpliftingService {
                     targetBbie.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbie.getCodeListManifestId() != null) {
-                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.codeListManifestId(), sourceBbie.getCodeListManifestId())).findAny().orElse(null);
+                ValueListCandidate<CodeListManifestId> sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.manifestId(), sourceBbie.getCodeListManifestId())).findAny().orElse(null);
                 // The availability service applies the target DT restriction and
                 // includes permitted derived lists; a release-wide cache would
                 // incorrectly bypass both rules.
-                List<CodeListSummaryRecord> candidates = availableCodeLists(targetDt.dtManifestId());
-                CodeListSummaryRecord targetCodeList = findTargetCodeListMatch(
-                        sourceCodeList, candidates).target();
+                List<ValueListCandidate<CodeListManifestId>> candidates = availableCodeLists(requester, targetCodeListList,
+                        targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()), DtAwdPriSummaryRecord::codeListManifestId);
+                ValueListCandidate<CodeListManifestId> targetCodeList = findValueListMatch(sourceCodeList, candidates).target();
                 if (targetCodeList != null) {
-                    targetBbie.setCodeListManifestId(targetCodeList.codeListManifestId());
+                    targetBbie.setCodeListManifestId(targetCodeList.manifestId());
                 }
             } else if (sourceBbie.getAgencyIdListManifestId() != null) {
-                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.agencyIdListManifestId(), sourceBbie.getAgencyIdListManifestId())).findFirst().orElse(null);
-                List<AgencyIdListSummaryRecord> candidates = availableAgencyIdLists(targetDt.dtManifestId());
-                AgencyIdListSummaryRecord targetAgencyIdList = findTargetAgencyIdListMatch(
-                        sourceAgencyIdList, candidates).target();
+                ValueListCandidate<AgencyIdListManifestId> sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.manifestId(), sourceBbie.getAgencyIdListManifestId())).findFirst().orElse(null);
+                List<ValueListCandidate<AgencyIdListManifestId>> candidates = availableAgencyIdLists(requester, targetAgencyIdListList,
+                        targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()), DtAwdPriSummaryRecord::agencyIdListManifestId);
+                ValueListCandidate<AgencyIdListManifestId> targetAgencyIdList = findValueListMatch(sourceAgencyIdList, candidates).target();
                 if (targetAgencyIdList != null) {
-                    targetBbie.setAgencyIdListManifestId(targetAgencyIdList.agencyIdListManifestId());
+                    targetBbie.setAgencyIdListManifestId(targetAgencyIdList.manifestId());
                 }
             }
 
@@ -1157,8 +1151,8 @@ public class BieUpliftingService {
                                       BbieSc targetBbieSc,
                                       DtScManifestId dtScManifestId,
                                       List<XbtSummaryRecord> sourceXbtList,
-                                      List<CodeListSummaryRecord> sourceCodeListList,
-                                      List<AgencyIdListSummaryRecord> sourceAgencyIdListList) {
+                                      List<ValueListCandidate<CodeListManifestId>> sourceCodeListList,
+                                      List<ValueListCandidate<AgencyIdListManifestId>> sourceAgencyIdListList) {
 
             DtScSummaryRecord targetDtSc = targetCcDocument.getDtSc(dtScManifestId);
 
@@ -1177,21 +1171,21 @@ public class BieUpliftingService {
                     targetBbieSc.setXbtManifestId(targetXbt.xbtManifestId());
                 }
             } else if (sourceBbieSc.getCodeListManifestId() != null) {
-                CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.codeListManifestId(), sourceBbieSc.getCodeListManifestId())).findAny().orElse(null);
+                ValueListCandidate<CodeListManifestId> sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.manifestId(), sourceBbieSc.getCodeListManifestId())).findAny().orElse(null);
                 // DT_SC follows the same candidate policy as DT.
-                List<CodeListSummaryRecord> candidates = availableCodeLists(targetDtSc.dtScManifestId());
-                CodeListSummaryRecord targetCodeList = findTargetCodeListMatch(
-                        sourceCodeList, candidates).target();
+                List<ValueListCandidate<CodeListManifestId>> candidates = availableCodeLists(requester, targetCodeListList,
+                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()), DtScAwdPriSummaryRecord::codeListManifestId);
+                ValueListCandidate<CodeListManifestId> targetCodeList = findValueListMatch(sourceCodeList, candidates).target();
                 if (targetCodeList != null) {
-                    targetBbieSc.setCodeListManifestId(targetCodeList.codeListManifestId());
+                    targetBbieSc.setCodeListManifestId(targetCodeList.manifestId());
                 }
             } else if (sourceBbieSc.getAgencyIdListManifestId() != null) {
-                AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.agencyIdListManifestId(), sourceBbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
-                List<AgencyIdListSummaryRecord> candidates = availableAgencyIdLists(targetDtSc.dtScManifestId());
-                AgencyIdListSummaryRecord targetAgencyIdListManifest = findTargetAgencyIdListMatch(
-                        sourceAgencyIdList, candidates).target();
+                ValueListCandidate<AgencyIdListManifestId> sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(e -> Objects.equals(e.manifestId(), sourceBbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
+                List<ValueListCandidate<AgencyIdListManifestId>> candidates = availableAgencyIdLists(requester, targetAgencyIdListList,
+                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()), DtScAwdPriSummaryRecord::agencyIdListManifestId);
+                ValueListCandidate<AgencyIdListManifestId> targetAgencyIdListManifest = findValueListMatch(sourceAgencyIdList, candidates).target();
                 if (targetAgencyIdListManifest != null) {
-                    targetBbieSc.setAgencyIdListManifestId(targetAgencyIdListManifest.agencyIdListManifestId());
+                    targetBbieSc.setAgencyIdListManifestId(targetAgencyIdListManifest.manifestId());
                 }
             }
 
@@ -1207,42 +1201,6 @@ public class BieUpliftingService {
                 targetBbieSc.setAgencyIdListManifestId(targetDefaultDtScAwdPri.agencyIdListManifestId());
             }
             return targetBbieSc;
-        }
-
-        private List<CodeListSummaryRecord> availableCodeLists(DtManifestId dtManifestId) {
-            if (targetCodeListList == null) {
-                return codeListQueryService.availableCodeListListByDtManifestId(requester, dtManifestId);
-            }
-            return codeListQueryService.availableCodeListListByDtManifestId(
-                    requester, dtManifestId, targetCodeListList,
-                    targetCcDocument.getDtAwdPriList(dtManifestId));
-        }
-
-        private List<CodeListSummaryRecord> availableCodeLists(DtScManifestId dtScManifestId) {
-            if (targetCodeListList == null) {
-                return codeListQueryService.availableCodeListListByDtScManifestId(requester, dtScManifestId);
-            }
-            return codeListQueryService.availableCodeListListByDtScManifestId(
-                    requester, dtScManifestId, targetCodeListList,
-                    targetCcDocument.getDtScAwdPriList(dtScManifestId));
-        }
-
-        private List<AgencyIdListSummaryRecord> availableAgencyIdLists(DtManifestId dtManifestId) {
-            if (targetAgencyIdListList == null) {
-                return agencyIdListQueryService.availableAgencyIdListListByDtManifestId(requester, dtManifestId);
-            }
-            return agencyIdListQueryService.availableAgencyIdListListByDtManifestId(
-                    requester, dtManifestId, targetAgencyIdListList,
-                    targetCcDocument.getDtAwdPriList(dtManifestId));
-        }
-
-        private List<AgencyIdListSummaryRecord> availableAgencyIdLists(DtScManifestId dtScManifestId) {
-            if (targetAgencyIdListList == null) {
-                return agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(requester, dtScManifestId);
-            }
-            return agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(
-                    requester, dtScManifestId, targetAgencyIdListList,
-                    targetCcDocument.getDtScAwdPriList(dtScManifestId));
         }
 
     }
@@ -1314,13 +1272,13 @@ public class BieUpliftingService {
 
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
 
-        List<CodeListSummaryRecord> sourceCodeListList = codeListQuery.getCodeListSummaryList(sourceReleaseId);
-        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(targetAsccp.release().releaseId());
+        var sourceCodeListList = codeListQuery.getCodeListCandidateList(sourceReleaseId);
+        var targetCodeListList = codeListQuery.getCodeListCandidateList(targetReleaseId);
 
         var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
 
-        List<AgencyIdListSummaryRecord> sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(sourceReleaseId);
-        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(targetAsccp.release().releaseId());
+        var sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListCandidateList(sourceReleaseId);
+        var targetAgencyIdListList = agencyIdListQuery.getAgencyIdListCandidateList(targetReleaseId);
 
         BieUpliftingHandler upliftingHandler =
                 new BieUpliftingHandler(request.getRequester(), bizCtxIds, customMappingTable,
@@ -1617,13 +1575,13 @@ public class BieUpliftingService {
 
         var codeListQuery = repositoryFactory.codeListQueryRepository(requester);
 
-        List<CodeListSummaryRecord> sourceCodeListList = codeListQuery.getCodeListSummaryList(sourceRelease.releaseId());
-        List<CodeListSummaryRecord> targetCodeListList = codeListQuery.getCodeListSummaryList(targetRelease.releaseId());
+        var sourceCodeListList = codeListQuery.getCodeListCandidateList(sourceRelease.releaseId());
+        var targetCodeListList = codeListQuery.getCodeListCandidateList(targetRelease.releaseId());
 
         var agencyIdListQuery = repositoryFactory.agencyIdListQueryRepository(requester);
 
-        List<AgencyIdListSummaryRecord> sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(sourceRelease.releaseId());
-        List<AgencyIdListSummaryRecord> targetAgencyIdListList = agencyIdListQuery.getAgencyIdListSummaryList(targetRelease.releaseId());
+        var sourceAgencyIdListList = agencyIdListQuery.getAgencyIdListCandidateList(sourceRelease.releaseId());
+        var targetAgencyIdListList = agencyIdListQuery.getAgencyIdListCandidateList(targetRelease.releaseId());
 
         request.getMappingList().forEach(mapping -> {
             BieUpliftingValidation validation = new BieUpliftingValidation();
@@ -1667,22 +1625,20 @@ public class BieUpliftingService {
                                 DtAwdPriSummaryRecord::xbtManifestId));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else if (bbie.getCodeListManifestId() != null) {
-                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.codeListManifestId(), bbie.getCodeListManifestId())).findFirst().orElse(null);
+                        ValueListCandidate<CodeListManifestId> sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.manifestId(), bbie.getCodeListManifestId())).findFirst().orElse(null);
                         ValueDomainValidationResult result = checkBdtCodeListMappable(
                                 sourceCodeList,
-                                codeListQueryService.availableCodeListListByDtManifestId(
-                                        requester, dt.dtManifestId(), targetCodeListList,
-                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId())));
+                                availableCodeLists(requester, targetCodeListList,
+                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId()), DtAwdPriSummaryRecord::codeListManifestId));
                         validation.setMessage(result.issue());
                         validation.setStatus(result.status());
                         validation.setValid(result.valid());
                     } else {
-                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.agencyIdListManifestId(), bbie.getAgencyIdListManifestId())).findFirst().orElse(null);
+                        ValueListCandidate<AgencyIdListManifestId> sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.manifestId(), bbie.getAgencyIdListManifestId())).findFirst().orElse(null);
                         ValueDomainValidationResult result = checkBdtAgencyIdListMappable(
                                 sourceAgencyIdList,
-                                agencyIdListQueryService.availableAgencyIdListListByDtManifestId(
-                                        requester, dt.dtManifestId(), targetAgencyIdListList,
-                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId())));
+                                availableAgencyIdLists(requester, targetAgencyIdListList,
+                                        targetCcDocument.getDtAwdPriList(dt.dtManifestId()), DtAwdPriSummaryRecord::agencyIdListManifestId));
                         validation.setMessage(result.issue());
                         validation.setStatus(result.status());
                         validation.setValid(result.valid());
@@ -1710,22 +1666,20 @@ public class BieUpliftingService {
                                 DtScAwdPriSummaryRecord::xbtManifestId));
                         validation.setValid(validation.getMessage().isEmpty());
                     } else if (bbieSc.getCodeListManifestId() != null) {
-                        CodeListSummaryRecord sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.codeListManifestId(), bbieSc.getCodeListManifestId())).findFirst().orElse(null);
+                        ValueListCandidate<CodeListManifestId> sourceCodeList = sourceCodeListList.stream().filter(Objects::nonNull).filter(codeList -> Objects.equals(codeList.manifestId(), bbieSc.getCodeListManifestId())).findFirst().orElse(null);
                         ValueDomainValidationResult result = checkBdtCodeListMappable(
                                 sourceCodeList,
-                                codeListQueryService.availableCodeListListByDtScManifestId(
-                                        requester, dtSc.dtScManifestId(), targetCodeListList,
-                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId())));
+                                availableCodeLists(requester, targetCodeListList,
+                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId()), DtScAwdPriSummaryRecord::codeListManifestId));
                         validation.setMessage(result.issue());
                         validation.setStatus(result.status());
                         validation.setValid(result.valid());
                     } else {
-                        AgencyIdListSummaryRecord sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.agencyIdListManifestId(), bbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
+                        ValueListCandidate<AgencyIdListManifestId> sourceAgencyIdList = sourceAgencyIdListList.stream().filter(Objects::nonNull).filter(agencyIdList -> Objects.equals(agencyIdList.manifestId(), bbieSc.getAgencyIdListManifestId())).findFirst().orElse(null);
                         ValueDomainValidationResult result = checkBdtAgencyIdListMappable(
                                 sourceAgencyIdList,
-                                agencyIdListQueryService.availableAgencyIdListListByDtScManifestId(
-                                        requester, dtSc.dtScManifestId(), targetAgencyIdListList,
-                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId())));
+                                availableAgencyIdLists(requester, targetAgencyIdListList,
+                                        targetCcDocument.getDtScAwdPriList(dtSc.dtScManifestId()), DtScAwdPriSummaryRecord::agencyIdListManifestId));
                         validation.setMessage(result.issue());
                         validation.setStatus(result.status());
                         validation.setValid(result.valid());
@@ -1755,9 +1709,9 @@ public class BieUpliftingService {
     }
 
     private ValueDomainValidationResult checkBdtCodeListMappable(
-            CodeListSummaryRecord sourceCodeList,
-            List<CodeListSummaryRecord> targetCodeListList) {
-        CodeListMatch targetCodeListMatch = findTargetCodeListMatch(sourceCodeList, targetCodeListList);
+            ValueListCandidate<CodeListManifestId> sourceCodeList,
+            List<ValueListCandidate<CodeListManifestId>> targetCodeListList) {
+        ValueListMatch<CodeListManifestId> targetCodeListMatch = findValueListMatch(sourceCodeList, targetCodeListList);
         if (targetCodeListMatch.target() != null) {
             return ValueDomainValidationResult.matched(
                     "Target Code List '" + targetCodeListMatch.target().name() + "' selected by " + targetCodeListMatch.matchType().description + ".");
@@ -1768,9 +1722,9 @@ public class BieUpliftingService {
     }
 
     private ValueDomainValidationResult checkBdtAgencyIdListMappable(
-            AgencyIdListSummaryRecord sourceAgencyIdList,
-            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        AgencyIdListMatch targetAgencyIdListMatch = findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList);
+            ValueListCandidate<AgencyIdListManifestId> sourceAgencyIdList,
+            List<ValueListCandidate<AgencyIdListManifestId>> targetAgencyIdListList) {
+        ValueListMatch<AgencyIdListManifestId> targetAgencyIdListMatch = findValueListMatch(sourceAgencyIdList, targetAgencyIdListList);
         if (targetAgencyIdListMatch.target() != null) {
             return ValueDomainValidationResult.matched(
                     "Target Agency ID List '" + targetAgencyIdListMatch.target().name() + "' selected by " + targetAgencyIdListMatch.matchType().description + ".");
@@ -1779,7 +1733,6 @@ public class BieUpliftingService {
                 "Target default primitive selected because no matching Agency ID List is available in the target node.",
                 "Agency ID List '" + sourceName(sourceAgencyIdList) + "' is not allowed in the target node or the system cannot find the exact match agency ID list in the target release, uplifted node will use a default primitive in the domain value restriction.");
     }
-
 
     public XbtSummaryRecord getTargetXbtManifest(
             XbtSummaryRecord sourceXbt,
@@ -1806,13 +1759,8 @@ public class BieUpliftingService {
         }
     }
 
-    record CodeListMatch(CodeListSummaryRecord target, MatchType matchType) {
-    }
-
-    record AgencyIdListMatch(AgencyIdListSummaryRecord target, MatchType matchType) {
-    }
-
-    private record ManifestMatch<T>(T target, MatchType matchType) {
+    /** The list of the target that a list of the source matches, and how it was found; no target when none matches. */
+    record ValueListMatch<I extends ManifestId>(ValueListCandidate<I> target, MatchType matchType) {
     }
 
     private record ValueDomainValidationResult(boolean valid, String status, String issue) {
@@ -1826,111 +1774,65 @@ public class BieUpliftingService {
         }
     }
 
-    public CodeListSummaryRecord getTargetCodeListManifest(
-            CodeListSummaryRecord sourceCodeList,
-            List<CodeListSummaryRecord> targetCodeListList) {
-        return findTargetCodeListMatch(sourceCodeList, targetCodeListList).target();
+    /**
+     * The Code Lists or Agency ID Lists a node can take, from the lists of its release (for the Code Lists of a developer,
+     * not those that the BIE editor keeps a developer from assigning): what the user could newly assign when editing the node.
+     */
+    private <P> List<ValueListCandidate<CodeListManifestId>> availableCodeLists(
+            ScoreUser requester, List<ValueListCandidate<CodeListManifestId>> release,
+            Collection<P> approvedPrimitives, Function<P, CodeListManifestId> codeListOf) {
+        return availableValueLists(release, approvedPrimitives, codeListOf, requester.isDeveloper(),
+                ValueListCandidateRule.Expansion.BASES_AND_THEIR_DERIVED, true);
     }
 
-    CodeListMatch findTargetCodeListMatch(
-            CodeListSummaryRecord sourceCodeList,
-            List<CodeListSummaryRecord> targetCodeListList) {
-        return findTargetCodeListMatch(sourceCodeList, targetCodeListList, null);
+    private <P> List<ValueListCandidate<AgencyIdListManifestId>> availableAgencyIdLists(
+            ScoreUser requester, List<ValueListCandidate<AgencyIdListManifestId>> release,
+            Collection<P> approvedPrimitives, Function<P, AgencyIdListManifestId> agencyIdListOf) {
+        // A developer sees only the Published and Production Agency ID Lists, as in the BIE editor. The BIE editor does not
+        // keep a developer from assigning a Production Agency ID List, so nothing more is taken out.
+        return availableValueLists(release, approvedPrimitives, agencyIdListOf, requester.isDeveloper(),
+                ValueListCandidateRule.Expansion.DERIVED, false);
     }
 
-    CodeListMatch findTargetCodeListMatch(
-            CodeListSummaryRecord sourceCodeList,
-            List<CodeListSummaryRecord> targetCodeListList,
-            Set<CodeListManifestId> allowedManifestIds) {
-        ManifestMatch<CodeListSummaryRecord> match = findManifestMatch(
-                sourceCodeList,
-                targetCodeListList,
-                allowedManifestIds,
-                CodeListSummaryRecord::codeListId,
-                CodeListSummaryRecord::codeListManifestId,
-                e -> e.codeListId() != null,
-                (source, target) -> StringUtils.equals(source.name(), target.name()) &&
-                        StringUtils.equals(source.listId(), target.listId()) &&
-                        StringUtils.equals(source.versionId(), target.versionId()));
-        return new CodeListMatch(match.target(), match.matchType());
+    private <I extends ManifestId, P> List<ValueListCandidate<I>> availableValueLists(
+            List<ValueListCandidate<I>> release, Collection<P> approvedPrimitives, Function<P, I> listOf,
+            boolean developer, ValueListCandidateRule.Expansion expansion, boolean limitToWhatADeveloperCanAssign) {
+        Set<I> named = (approvedPrimitives == null ? List.<P>of() : approvedPrimitives).stream()
+                .filter(Objects::nonNull).map(listOf).filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<I> candidates = ValueListCandidateRule.resolve(release, named, developer, expansion, limitToWhatADeveloperCanAssign);
+        return release.stream().filter(e -> e != null && candidates.contains(e.manifestId())).collect(Collectors.toList());
     }
 
-    public AgencyIdListSummaryRecord getTargetAgencyIdListManifest(
-            AgencyIdListSummaryRecord sourceAgencyIdList,
-            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        return findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList).target();
-    }
-
-    AgencyIdListMatch findTargetAgencyIdListMatch(
-            AgencyIdListSummaryRecord sourceAgencyIdList,
-            List<AgencyIdListSummaryRecord> targetAgencyIdListList) {
-        return findTargetAgencyIdListMatch(sourceAgencyIdList, targetAgencyIdListList, null);
-    }
-
-    AgencyIdListMatch findTargetAgencyIdListMatch(
-            AgencyIdListSummaryRecord sourceAgencyIdList,
-            List<AgencyIdListSummaryRecord> targetAgencyIdListList,
-            Set<AgencyIdListManifestId> allowedManifestIds) {
-        ManifestMatch<AgencyIdListSummaryRecord> match = findManifestMatch(
-                sourceAgencyIdList,
-                targetAgencyIdListList,
-                allowedManifestIds,
-                AgencyIdListSummaryRecord::agencyIdListId,
-                AgencyIdListSummaryRecord::agencyIdListManifestId,
-                e -> e.agencyIdListId() != null,
-                (source, target) -> StringUtils.equals(source.name(), target.name()) &&
-                        StringUtils.equals(source.listId(), target.listId()) &&
-                        StringUtils.equals(source.agencyIdListValueName(), target.agencyIdListValueName()) &&
-                        StringUtils.equals(source.versionId(), target.versionId()));
-        return new AgencyIdListMatch(match.target(), match.matchType());
-    }
-
-    private <S extends CoreComponent<?>, T extends CoreComponent<?>, I, M> ManifestMatch<T> findManifestMatch(
-            S source,
-            List<T> targets,
-            Set<M> allowedManifestIds,
-            Function<T, I> logicalId,
-            Function<T, M> manifestId,
-            Predicate<T> hasLogicalId,
-            BiPredicate<S, T> fallbackMatch) {
+    /**
+     * The list of the target that the list of the source matches: the one with the same GUID, or else the one with the same
+     * name, list ID and version ID (and agency, for an Agency ID List). Targets come in the order of the release, and the
+     * match is the target itself.
+     */
+    <I extends ManifestId> ValueListMatch<I> findValueListMatch(
+            ValueListCandidate<I> source, List<ValueListCandidate<I>> targets) {
         if (source == null || targets == null) {
-            return new ManifestMatch<>(null, null);
+            return new ValueListMatch<>(null, null);
         }
-
-        T targetCandidate = targets.stream()
-                .filter(Objects::nonNull)
-                .filter(hasLogicalId)
-                .filter(target -> ccMatchingService.score(source, target) == 1.0d)
-                .findFirst().orElse(null);
-        MatchType matchType = MatchType.GUID;
-        if (targetCandidate == null) {
-            targetCandidate = targets.stream()
-                    .filter(Objects::nonNull)
-                    .filter(hasLogicalId)
-                    .filter(target -> fallbackMatch.test(source, target))
-                    .findFirst().orElse(null);
-            matchType = MatchType.IDENTIFIERS;
+        for (ValueListCandidate<I> target : targets) {
+            if (target != null && source.guid() != null && source.guid().equals(target.guid())) {
+                return new ValueListMatch<>(target, MatchType.GUID);
+            }
         }
-        if (targetCandidate == null) {
-            return new ManifestMatch<>(null, null);
+        for (ValueListCandidate<I> target : targets) {
+            if (target != null
+                    && StringUtils.equals(source.name(), target.name())
+                    && StringUtils.equals(source.listId(), target.listId())
+                    && StringUtils.equals(source.versionId(), target.versionId())
+                    && StringUtils.equals(source.agencyIdListValueName(), target.agencyIdListValueName())) {
+                return new ValueListMatch<>(target, MatchType.IDENTIFIERS);
+            }
         }
-
-        I targetLogicalId = logicalId.apply(targetCandidate);
-        T selected = targets.stream()
-                .filter(Objects::nonNull)
-                .filter(target -> manifestId.apply(target) != null)
-                .filter(target -> Objects.equals(logicalId.apply(target), targetLogicalId))
-                .filter(target -> allowedManifestIds == null || allowedManifestIds.contains(manifestId.apply(target)))
-                .findFirst().orElse(null);
-        return new ManifestMatch<>(selected, matchType);
+        return new ValueListMatch<>(null, null);
     }
 
-    private String sourceName(CodeListSummaryRecord sourceCodeList) {
-        return sourceCodeList != null ? sourceCodeList.name() : "unknown";
-    }
-
-    private String sourceName(AgencyIdListSummaryRecord sourceAgencyIdList) {
-        return sourceAgencyIdList != null ? sourceAgencyIdList.name() : "unknown";
+    private String sourceName(ValueListCandidate<?> sourceValueList) {
+        return sourceValueList != null ? sourceValueList.name() : "unknown";
     }
 
     private String sourceName(XbtSummaryRecord sourceXbt) {

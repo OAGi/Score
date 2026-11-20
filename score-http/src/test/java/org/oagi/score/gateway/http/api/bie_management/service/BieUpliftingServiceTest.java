@@ -6,6 +6,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListMa
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.asccp.AsccpManifestId;
@@ -58,103 +59,71 @@ class BieUpliftingServiceTest {
         assertThat(result).isNull();
     }
 
+    private static final String GUID_A = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static final String GUID_B = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    private static final String GUID_C = "cccccccccccccccccccccccccccccccc";
+
     @Test
     void resolvesTargetCodeListByGuidBeforeFallbackIdentifiers() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Source", "LIST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Different name", "OTHER", "2");
+        var source = codeListCandidate(101, GUID_A, "Source", "LIST", "1");
+        var byIdentifiers = codeListCandidate(201, GUID_B, "Source", "LIST", "1");
+        var byGuid = codeListCandidate(202, GUID_A, "Different name", "OTHER", "2");
 
-        CodeListSummaryRecord result = service()
-                .getTargetCodeListManifest(source, List.of(target));
+        var result = service().findValueListMatch(source, List.of(byIdentifiers, byGuid));
 
-        assertThat(result).isSameAs(target);
+        assertThat(result.target()).isSameAs(byGuid);
+        assertThat(result.matchType()).hasToString("GUID");
     }
 
     @Test
     void resolvesUpliftedCodeListByNameListIdAndVersion() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Code List", "TEST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Code List", "TEST", "1");
+        var source = codeListCandidate(101, GUID_A, "Test Code List", "TEST", "1");
+        var target = codeListCandidate(202, GUID_B, "Test Code List", "TEST", "1");
 
-        CodeListSummaryRecord result = service()
-                .getTargetCodeListManifest(source, List.of(target));
+        var result = service().findValueListMatch(source, List.of(target));
 
-        assertThat(result).isSameAs(target);
+        assertThat(result.target()).isSameAs(target);
+        assertThat(result.matchType()).hasToString("IDENTIFIERS");
     }
 
     @Test
     void resolvesUpliftedAgencyIdListByItsIdentifiers() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Agency List", "TEST", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Agency List", "TEST", "1");
+        var source = agencyIdListCandidate(101, GUID_A, "Test Agency List", "TEST", "1", null);
+        var target = agencyIdListCandidate(202, GUID_B, "Test Agency List", "TEST", "1", null);
 
-        AgencyIdListSummaryRecord result = service()
-                .getTargetAgencyIdListManifest(source, List.of(target));
-
-        assertThat(result).isSameAs(target);
+        assertThat(service().findValueListMatch(source, List.of(target)).target()).isSameAs(target);
     }
 
     @Test
-    void doesNotSelectMatchingCodeListWhenTargetNodeDoesNotAllowIt() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Code List", "TEST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Code List", "TEST", "1");
+    void doesNotSelectMatchingCodeListWhenTargetNodeOffersNone() {
+        var source = codeListCandidate(101, GUID_A, "Test Code List", "TEST", "1");
 
-        CodeListSummaryRecord result = service()
-                .findTargetCodeListMatch(source, List.of()).target();
-
-        assertThat(result).isNull();
+        assertThat(service().findValueListMatch(source, List.of()).target()).isNull();
     }
 
     @Test
-    void rejectsCodeListWhenApprovalSetIsExplicitlyEmpty() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Code List", "TEST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Code List", "TEST", "1");
+    void selectsTheMatchedTargetItselfAndNeverAnotherListThatSharesItsName() {
+        var source = codeListCandidate(101, GUID_A, "Source", "SOURCE", "1");
+        var sameNameOtherGuid = codeListCandidate(201, GUID_B, "Target", "TARGET", "2");
+        var matched = codeListCandidate(202, GUID_A, "Target", "TARGET", "2");
 
-        assertThat(service().findTargetCodeListMatch(source, List.of(target), Set.of()).target()).isNull();
+        assertThat(service().findValueListMatch(source, List.of(sameNameOtherGuid, matched)).target()).isSameAs(matched);
+        assertThat(service().findValueListMatch(source, List.of(sameNameOtherGuid)).target()).isNull();
     }
 
     @Test
-    void selectsMatchingCodeListWhenTargetNodeHasNoExplicitRestriction() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Code List", "TEST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Code List", "TEST", "1");
+    void selectsTheMatchedTargetItselfForAnAgencyIdList() {
+        var source = agencyIdListCandidate(101, GUID_A, "Source", "SOURCE", "1", null);
+        var sameNameOtherGuid = agencyIdListCandidate(201, GUID_B, "Target", "TARGET", "2", null);
+        var matched = agencyIdListCandidate(202, GUID_A, "Target", "TARGET", "2", null);
 
-        CodeListSummaryRecord result = service()
-                .findTargetCodeListMatch(source, List.of(target)).target();
-
-        assertThat(result).isSameAs(target);
-    }
-
-    @Test
-    void selectsMatchingAgencyIdListWhenTargetNodeAllowsIt() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Agency List", "TEST", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Agency List", "TEST", "1");
-
-        AgencyIdListSummaryRecord result = service()
-                .findTargetAgencyIdListMatch(source, List.of(target)).target();
-
-        assertThat(result).isSameAs(target);
-    }
-
-    @Test
-    void rejectsAgencyIdListWhenApprovalSetIsExplicitlyEmpty() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Agency List", "TEST", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Agency List", "TEST", "1");
-
-        assertThat(service().findTargetAgencyIdListMatch(source, List.of(target), Set.of()).target()).isNull();
-    }
-
-    @Test
-    void selectsMatchingAgencyIdListWhenTargetNodeHasNoExplicitRestriction() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Agency List", "TEST", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Agency List", "TEST", "1");
-
-        AgencyIdListSummaryRecord result = service()
-                .findTargetAgencyIdListMatch(source, List.of(target)).target();
-
-        assertThat(result).isSameAs(target);
+        assertThat(service().findValueListMatch(source, List.of(sameNameOtherGuid, matched)).target()).isSameAs(matched);
     }
 
     @Test
     void backendReviewUsesTheBieAvailableCodeListSelection() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Code List", "TEST", "1");
-        CodeListSummaryRecord target = codeList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Code List", "TEST", "1");
+        var source = codeListCandidate(101, GUID_A, "Test Code List", "TEST", "1");
+        var target = codeListCandidate(202, GUID_B, "Test Code List", "TEST", "1");
         BieUpliftingService service = service();
 
         Object validation = ReflectionTestUtils.invokeMethod(service, "checkBdtCodeListMappable",
@@ -166,8 +135,8 @@ class BieUpliftingServiceTest {
 
     @Test
     void backendReviewUsesTheBieAvailableAgencyIdListSelection() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Test Agency List", "TEST", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Test Agency List", "TEST", "1");
+        var source = agencyIdListCandidate(101, GUID_A, "Test Agency List", "TEST", "1", null);
+        var target = agencyIdListCandidate(202, GUID_B, "Test Agency List", "TEST", "1", null);
         BieUpliftingService service = service();
 
         Object validation = ReflectionTestUtils.invokeMethod(service, "checkBdtAgencyIdListMappable",
@@ -178,82 +147,44 @@ class BieUpliftingServiceTest {
     }
 
     @Test
-    void selectsTheAllowedTargetManifestForAGuidMatchedCodeList() {
-        CodeListSummaryRecord source = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Source", "SOURCE", "1");
-        CodeListSummaryRecord guidMatched = codeList(202, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "2");
-        CodeListSummaryRecord allowedManifest = codeList(203, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "2");
-
-        CodeListSummaryRecord result = service()
-                .findTargetCodeListMatch(source, List.of(allowedManifest)).target();
-
-        assertThat(result).isSameAs(allowedManifest);
-    }
-
-    @Test
-    void selectsTheAllowedTargetManifestForAGuidMatchedAgencyIdList() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Source", "SOURCE", "1");
-        AgencyIdListSummaryRecord guidMatched = agencyIdList(202, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "2");
-        AgencyIdListSummaryRecord allowedManifest = agencyIdList(203, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "2");
-
-        AgencyIdListSummaryRecord result = service()
-                .findTargetAgencyIdListMatch(source, List.of(allowedManifest)).target();
-
-        assertThat(result).isSameAs(allowedManifest);
-    }
-
-    @Test
     void doesNotTreatNullGuidsAsAnExactMatch() {
-        CodeListSummaryRecord source = codeList(101, 7, null, "Source", "SOURCE", "1");
-        CodeListSummaryRecord target = codeList(202, 8, null, "Target", "TARGET", "1");
+        var source = new ValueListCandidate<>(new CodeListManifestId(BigInteger.valueOf(101)), null,
+                "Source", "SOURCE", "1", null, CcState.Published, null, false);
+        var target = new ValueListCandidate<>(new CodeListManifestId(BigInteger.valueOf(202)), null,
+                "Target", "TARGET", "1", null, CcState.Published, null, false);
 
-        CodeListSummaryRecord result = service()
-                .getTargetCodeListManifest(source, List.of(target));
-
-        assertThat(result).isNull();
+        assertThat(service().findValueListMatch(source, List.of(target)).target()).isNull();
     }
 
     @Test
     void usesCcMatchingServiceForCodeAndAgencyIdentityRecords() {
         CcMatchingService matchingService = new CcMatchingService();
-        CodeListSummaryRecord sourceCodeList = codeList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Code", "CODE", "1");
-        CodeListSummaryRecord targetCodeList = codeList(202, 8, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Code", "CODE", "1");
-        AgencyIdListSummaryRecord sourceAgencyIdList = agencyIdList(301, 9, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Agency", "AGENCY", "1");
-        AgencyIdListSummaryRecord targetAgencyIdList = agencyIdList(302, 10, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Agency", "AGENCY", "1");
+        CodeListSummaryRecord sourceCodeList = codeList(101, 7, GUID_A, "Code", "CODE", "1");
+        CodeListSummaryRecord targetCodeList = codeList(202, 8, GUID_A, "Code", "CODE", "1");
+        AgencyIdListSummaryRecord sourceAgencyIdList = agencyIdList(301, 9, GUID_B, "Agency", "AGENCY", "1");
+        AgencyIdListSummaryRecord targetAgencyIdList = agencyIdList(302, 10, GUID_B, "Agency", "AGENCY", "1");
 
         assertThat(matchingService.score(sourceCodeList, targetCodeList)).isEqualTo(1.0d);
         assertThat(matchingService.score(sourceAgencyIdList, targetAgencyIdList)).isEqualTo(1.0d);
     }
 
     @Test
-    void doesNotSelectAnUnrelatedTargetWhenSharedCodeListIdIsNull() {
-        CodeListSummaryRecord source = codeList(101, null, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Source", "SOURCE", "1");
-        CodeListSummaryRecord target = codeList(202, null, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "1");
-
-        assertThat(service().getTargetCodeListManifest(source, List.of(target))).isNull();
-    }
-
-    @Test
     void doesNotMatchCodeListOrAgencyIdListWhenTargetCollectionIsNull() {
-        CodeListSummaryRecord sourceCodeList = codeList(101, 7,
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Code", "CODE", "1");
-        AgencyIdListSummaryRecord sourceAgencyIdList = agencyIdList(101, 7,
-                "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Agency", "AGENCY", "1");
+        var sourceCodeList = codeListCandidate(101, GUID_A, "Code", "CODE", "1");
+        var sourceAgencyIdList = agencyIdListCandidate(101, GUID_B, "Agency", "AGENCY", "1", null);
 
-        assertThat(service().getTargetCodeListManifest(sourceCodeList, null)).isNull();
-        assertThat(service().getTargetAgencyIdListManifest(sourceAgencyIdList, null)).isNull();
+        assertThat(service().findValueListMatch(sourceCodeList, null).target()).isNull();
+        assertThat(service().findValueListMatch(sourceAgencyIdList, null).target()).isNull();
+        assertThat(service().findValueListMatch(null, List.of(sourceCodeList)).target()).isNull();
     }
 
     @Test
     void keepsCandidateOrderWhenFallbackCandidatesAreEquivalent() {
-        CodeListSummaryRecord source = codeList(101, 7,
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Code", "CODE", "1");
-        CodeListSummaryRecord first = codeList(202, 8,
-                "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Code", "CODE", "1");
-        CodeListSummaryRecord second = codeList(203, 8,
-                "cccccccccccccccccccccccccccccccc", "Code", "CODE", "1");
+        var source = codeListCandidate(101, GUID_A, "Code", "CODE", "1");
+        var first = codeListCandidate(202, GUID_B, "Code", "CODE", "1");
+        var second = codeListCandidate(203, GUID_C, "Code", "CODE", "1");
 
-        assertThat(service().getTargetCodeListManifest(source, List.of(first, second)))
-                .isSameAs(first);
+        assertThat(service().findValueListMatch(source, List.of(first, second)).target()).isSameAs(first);
     }
 
     @Test
@@ -309,26 +240,30 @@ class BieUpliftingServiceTest {
 
     @Test
     void doesNotResolveAgencyIdListWhenItsValueNameDiffers() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Agency", "AGENCY", "1", "Source value");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Agency", "AGENCY", "1", "Target value");
+        var source = agencyIdListCandidate(101, GUID_A, "Agency", "AGENCY", "1", "Source value");
+        var target = agencyIdListCandidate(202, GUID_B, "Agency", "AGENCY", "1", "Target value");
 
-        assertThat(service().getTargetAgencyIdListManifest(source, List.of(target))).isNull();
+        assertThat(service().findValueListMatch(source, List.of(target)).target()).isNull();
     }
 
     @Test
     void resolvesAgencyIdListWhenAllFallbackIdentifiersIncludingValueNameMatch() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, 7, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Agency", "AGENCY", "1", "Value");
-        AgencyIdListSummaryRecord target = agencyIdList(202, 8, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "Agency", "AGENCY", "1", "Value");
+        var source = agencyIdListCandidate(101, GUID_A, "Agency", "AGENCY", "1", "Value");
+        var target = agencyIdListCandidate(202, GUID_B, "Agency", "AGENCY", "1", "Value");
 
-        assertThat(service().getTargetAgencyIdListManifest(source, List.of(target))).isSameAs(target);
+        assertThat(service().findValueListMatch(source, List.of(target)).target()).isSameAs(target);
     }
 
-    @Test
-    void doesNotSelectAnUnrelatedTargetWhenSharedAgencyIdListIdIsNull() {
-        AgencyIdListSummaryRecord source = agencyIdList(101, null, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Source", "SOURCE", "1");
-        AgencyIdListSummaryRecord target = agencyIdList(202, null, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Target", "TARGET", "1");
+    private static ValueListCandidate<CodeListManifestId> codeListCandidate(
+            int manifestId, String guid, String name, String listId, String versionId) {
+        return new ValueListCandidate<>(new CodeListManifestId(BigInteger.valueOf(manifestId)),
+                new Guid(guid), name, listId, versionId, null, CcState.Published, null, false);
+    }
 
-        assertThat(service().getTargetAgencyIdListManifest(source, List.of(target))).isNull();
+    private static ValueListCandidate<AgencyIdListManifestId> agencyIdListCandidate(
+            int manifestId, String guid, String name, String listId, String versionId, String valueName) {
+        return new ValueListCandidate<>(new AgencyIdListManifestId(BigInteger.valueOf(manifestId)),
+                new Guid(guid), name, listId, versionId, valueName, CcState.Published, null, false);
     }
 
     private static BieUpliftingService service() {

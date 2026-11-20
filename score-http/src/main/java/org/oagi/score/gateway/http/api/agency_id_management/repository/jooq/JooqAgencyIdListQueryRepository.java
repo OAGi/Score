@@ -31,7 +31,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.Tables;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
@@ -220,129 +219,67 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
     }
 
     @Override
-    public List<AgencyIdListSummaryRecord> availableAgencyIdListByDtManifestId(
-            DtManifestId dtManifestId, List<CcState> states) {
+    public List<org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<AgencyIdListManifestId>> getAgencyIdListCandidateList(ReleaseId releaseId) {
+        if (releaseId == null) {
+            return Collections.emptyList();
+        }
 
-        Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
+        var owner = ownerTable();
+        return dslContext().select(
                         AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
-                        DT_MANIFEST.RELEASE_ID)
+                        AGENCY_ID_LIST.GUID, AGENCY_ID_LIST.NAME, AGENCY_ID_LIST.LIST_ID, AGENCY_ID_LIST.VERSION_ID,
+                        AGENCY_ID_LIST_VALUE.NAME.as("agency_id_list_value_name"),
+                        AGENCY_ID_LIST.STATE,
+                        AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID,
+                        owner.IS_DEVELOPER)
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .join(owner).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(owner.APP_USER_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .leftJoin(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .orderBy(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
+                .fetch(record -> new org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<>(
+                        new AgencyIdListManifestId(record.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()),
+                        new Guid(record.get(AGENCY_ID_LIST.GUID)),
+                        record.get(AGENCY_ID_LIST.NAME), record.get(AGENCY_ID_LIST.LIST_ID), record.get(AGENCY_ID_LIST.VERSION_ID),
+                        record.get(AGENCY_ID_LIST_VALUE.NAME.as("agency_id_list_value_name")),
+                        CcState.valueOf(record.get(AGENCY_ID_LIST.STATE)),
+                        (record.get(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID) != null) ?
+                                new AgencyIdListManifestId(record.get(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()) : null,
+                        (byte) 1 != record.get(owner.IS_DEVELOPER)));
+    }
+
+    @Override
+    public Set<AgencyIdListManifestId> getNamedAgencyIdListManifestIdsByDtManifestId(DtManifestId dtManifestId) {
+        if (dtManifestId == null) {
+            return Collections.emptySet();
+        }
+        return new LinkedHashSet<>(dslContext().selectDistinct(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(DT_MANIFEST)
                 .join(DT_AWD_PRI).on(and(
                         DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
-                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)
-                ))
-                .join(AGENCY_ID_LIST_MANIFEST).on(and(
-                        DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID),
-                        DT_MANIFEST.RELEASE_ID.eq(AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
-                ))
-                .join(AGENCY_ID_LIST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID),
-                        states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)))
+                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                .fetch();
-
-        if (result.size() > 0) {
-            return result.stream().map(e ->
-                            availableAgencyIdListByManifestId(
-                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()), states))
-                    .flatMap(e -> e.stream())
-                    .distinct()
-                    .sorted(Comparator.comparing(AgencyIdListSummaryRecord::name))
-                    .collect(Collectors.toList());
-
-        }
-        return Collections.emptyList();
+                .and(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull())
+                .orderBy(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID)
+                .fetch(record -> new AgencyIdListManifestId(record.get(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger())));
     }
 
     @Override
-    public List<AgencyIdListSummaryRecord> availableAgencyIdListByDtScManifestId(
-            DtScManifestId dtScManifestId, List<CcState> states) {
-
-        Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
-                        AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID,
-                        DT_SC_MANIFEST.RELEASE_ID)
+    public Set<AgencyIdListManifestId> getNamedAgencyIdListManifestIdsByDtScManifestId(DtScManifestId dtScManifestId) {
+        if (dtScManifestId == null) {
+            return Collections.emptySet();
+        }
+        return new LinkedHashSet<>(dslContext().selectDistinct(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID)
                 .from(DT_SC_MANIFEST)
                 .join(DT_SC_AWD_PRI).on(and(
                         DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
-                        DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)
-                ))
-                .join(AGENCY_ID_LIST_MANIFEST).on(and(
-                        DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID),
-                        DT_SC_MANIFEST.RELEASE_ID.eq(AGENCY_ID_LIST_MANIFEST.RELEASE_ID)
-                ))
-                .join(AGENCY_ID_LIST).on(and(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID),
-                        states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                .fetch();
-
-        if (result.size() > 0) {
-            return result.stream().map(e ->
-                            availableAgencyIdListByManifestId(
-                                    new AgencyIdListManifestId(e.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()), states))
-                    .flatMap(e -> e.stream())
-                    .distinct()
-                    .sorted(Comparator.comparing(AgencyIdListSummaryRecord::name))
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean hasAgencyIdListAvailabilityByDtManifestId(DtManifestId dtManifestId) {
-        return dtManifestId != null && dslContext().fetchExists(
-                selectOne().from(DT_MANIFEST).join(DT_AWD_PRI).on(and(
-                        DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
-                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
-                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                        .and(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull()));
-    }
-
-    @Override
-    public boolean hasAgencyIdListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId) {
-        return dtScManifestId != null && dslContext().fetchExists(
-                selectOne().from(DT_SC_MANIFEST).join(DT_SC_AWD_PRI).on(and(
-                        DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                         DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
-                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                        .and(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull()));
-    }
-
-    private List<AgencyIdListSummaryRecord> availableAgencyIdListByManifestId(
-            AgencyIdListManifestId agencyIdListManifestId, List<CcState> states) {
-
-        if (agencyIdListManifestId == null) {
-            return Collections.emptyList();
-        }
-
-        List<AgencyIdListSummaryRecord> availableAgencyIdLists = new ArrayList<>();
-        AgencyIdListSummaryRecord agencyIdList = getAgencyIdListSummary(agencyIdListManifestId);
-        if (agencyIdList == null || (!states.isEmpty() && !states.contains(agencyIdList.state()))) {
-            return Collections.emptyList();
-        }
-        availableAgencyIdLists.add(agencyIdList);
-
-        List<AgencyIdListManifestId> associatedAgencyIdLists = dslContext().selectDistinct(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID)
-                .from(AGENCY_ID_LIST_MANIFEST)
-                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
-                .where(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID.in(
-                        availableAgencyIdLists.stream()
-                                .filter(e -> e.agencyIdListManifestId() != null)
-                                .map(e -> e.agencyIdListManifestId())
-                                .distinct()
-                                .collect(Collectors.toList())
-                ).and(states.isEmpty() ? trueCondition() : AGENCY_ID_LIST.STATE.in(states)))
-                .fetchStream().map(record ->
-                        new AgencyIdListManifestId(record.get(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger()))
-                .collect(Collectors.toList());
-
-        List<AgencyIdListSummaryRecord> mergedAgencyIdLists = new ArrayList();
-        mergedAgencyIdLists.addAll(availableAgencyIdLists);
-        for (AgencyIdListManifestId associatedAgencyId : associatedAgencyIdLists) {
-            mergedAgencyIdLists.addAll(
-                    availableAgencyIdListByManifestId(
-                            associatedAgencyId, states)
-            );
-        }
-        return mergedAgencyIdLists.stream().distinct().collect(Collectors.toList());
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
+                .and(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull())
+                .orderBy(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID)
+                .fetch(record -> new AgencyIdListManifestId(record.get(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID).toBigInteger())));
     }
 
     @Override

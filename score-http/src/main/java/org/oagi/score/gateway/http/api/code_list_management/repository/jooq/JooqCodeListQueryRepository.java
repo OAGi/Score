@@ -33,7 +33,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.oagi.score.gateway.http.common.repository.jooq.DefaultModuleSetRelease;
@@ -221,89 +220,63 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
     }
 
     @Override
-    public List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states) {
+    public List<org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<CodeListManifestId>> getCodeListCandidateList(ReleaseId releaseId) {
+        if (releaseId == null) {
+            return Collections.emptyList();
+        }
 
-        Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
+        var owner = ownerTable();
+        return dslContext().select(
                         CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
-                        DT_MANIFEST.RELEASE_ID)
+                        CODE_LIST.GUID, CODE_LIST.NAME, CODE_LIST.LIST_ID, CODE_LIST.VERSION_ID, CODE_LIST.STATE,
+                        CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID,
+                        owner.IS_DEVELOPER)
+                .from(CODE_LIST_MANIFEST)
+                .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                .join(owner).on(CODE_LIST.OWNER_USER_ID.eq(owner.APP_USER_ID))
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .orderBy(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
+                .fetch(record -> new org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<>(
+                        new CodeListManifestId(record.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()),
+                        new Guid(record.get(CODE_LIST.GUID)),
+                        record.get(CODE_LIST.NAME), record.get(CODE_LIST.LIST_ID), record.get(CODE_LIST.VERSION_ID),
+                        null,
+                        CcState.valueOf(record.get(CODE_LIST.STATE)),
+                        (record.get(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID) != null) ?
+                                new CodeListManifestId(record.get(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID).toBigInteger()) : null,
+                        (byte) 1 != record.get(owner.IS_DEVELOPER)));
+    }
+
+    @Override
+    public Set<CodeListManifestId> getNamedCodeListManifestIdsByDtManifestId(DtManifestId dtManifestId) {
+        if (dtManifestId == null) {
+            return Collections.emptySet();
+        }
+        return new LinkedHashSet<>(dslContext().selectDistinct(DT_AWD_PRI.CODE_LIST_MANIFEST_ID)
                 .from(DT_MANIFEST)
                 .join(DT_AWD_PRI).on(and(
                         DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
-                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)
-                ))
-                .join(CODE_LIST_MANIFEST).on(and(
-                        DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID),
-                        DT_MANIFEST.RELEASE_ID.eq(CODE_LIST_MANIFEST.RELEASE_ID)
-                ))
-                .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
+                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                .fetch();
-
-        if (result.size() > 0) {
-            return result.stream().map(e ->
-                            availableCodeListByCodeListManifestId(
-                                    new CodeListManifestId(e.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()), states))
-                    .flatMap(e -> e.stream())
-                    .distinct()
-                    .sorted(Comparator.comparing(CodeListSummaryRecord::name))
-                    .collect(Collectors.toList());
-
-        }
-        return Collections.emptyList();
+                .and(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull())
+                .orderBy(DT_AWD_PRI.CODE_LIST_MANIFEST_ID)
+                .fetch(record -> new CodeListManifestId(record.get(DT_AWD_PRI.CODE_LIST_MANIFEST_ID).toBigInteger())));
     }
 
     @Override
-    public List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states) {
-
-        Result<Record2<ULong, ULong>> result = dslContext().selectDistinct(
-                        CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID,
-                        DT_SC_MANIFEST.RELEASE_ID)
+    public Set<CodeListManifestId> getNamedCodeListManifestIdsByDtScManifestId(DtScManifestId dtScManifestId) {
+        if (dtScManifestId == null) {
+            return Collections.emptySet();
+        }
+        return new LinkedHashSet<>(dslContext().selectDistinct(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID)
                 .from(DT_SC_MANIFEST)
                 .join(DT_SC_AWD_PRI).on(and(
                         DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
-                        DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)
-                ))
-                .join(CODE_LIST_MANIFEST).on(and(
-                        DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID),
-                        DT_SC_MANIFEST.RELEASE_ID.eq(CODE_LIST_MANIFEST.RELEASE_ID)
-                ))
-                .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
-                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                .fetch();
-
-        if (result.size() > 0) {
-            return result.stream().map(e ->
-                            availableCodeListByCodeListManifestId(
-                                    new CodeListManifestId(e.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()), states))
-                    .flatMap(e -> e.stream())
-                    .distinct()
-                    .sorted(Comparator.comparing(CodeListSummaryRecord::name))
-                    .collect(Collectors.toList());
-
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean hasCodeListAvailabilityByDtManifestId(DtManifestId dtManifestId) {
-        return dtManifestId != null && dslContext().fetchExists(
-                selectOne().from(DT_MANIFEST).join(DT_AWD_PRI).on(and(
-                        DT_MANIFEST.RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
-                        DT_MANIFEST.DT_ID.eq(DT_AWD_PRI.DT_ID)))
-                        .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(dtManifestId)))
-                        .and(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull()));
-    }
-
-    @Override
-    public boolean hasCodeListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId) {
-        return dtScManifestId != null && dslContext().fetchExists(
-                selectOne().from(DT_SC_MANIFEST).join(DT_SC_AWD_PRI).on(and(
-                        DT_SC_MANIFEST.RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                         DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
-                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
-                        .and(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull()));
+                .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
+                .and(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull())
+                .orderBy(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID)
+                .fetch(record -> new CodeListManifestId(record.get(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID).toBigInteger())));
     }
 
     /**
@@ -354,51 +327,6 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         finalCodeListState,
                         topLevelAsbiep))
                 .collect(Collectors.toList());
-    }
-
-    private List<CodeListSummaryRecord> availableCodeListByCodeListManifestId(
-            CodeListManifestId codeListManifestId, List<CcState> states) {
-        if (codeListManifestId == null) {
-            return Collections.emptyList();
-        }
-
-        var queryBuilder = new GetCodeListSummaryQueryBuilder();
-        List<CodeListSummaryRecord> availableCodeLists = queryBuilder.select()
-                .where(and(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
-                .fetch(queryBuilder.mapper());
-
-        List<CodeListManifestId> associatedCodeLists = dslContext().selectDistinct(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID)
-                .from(CODE_LIST_MANIFEST)
-                .join(CODE_LIST).on(and(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
-                .where(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.in(
-                        availableCodeLists.stream()
-                                .filter(e -> e.basedCodeListManifestId() != null)
-                                .map(e -> e.basedCodeListManifestId())
-                                .distinct()
-                                .collect(Collectors.toList())
-                ))
-                .fetchStream().map(record ->
-                        new CodeListManifestId(record.get(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID).toBigInteger()))
-                .collect(Collectors.toList());
-
-        List<CodeListSummaryRecord> mergedCodeLists = new ArrayList();
-        mergedCodeLists.addAll(availableCodeLists);
-        for (CodeListManifestId associatedCodeListId : associatedCodeLists) {
-            mergedCodeLists.addAll(
-                    availableCodeListByCodeListManifestId(associatedCodeListId, states)
-            );
-        }
-
-        // #1094: Add Code list which is base availableCodeLists
-        List<CodeListSummaryRecord> baseCodeLists = queryBuilder.select()
-                .where(and(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID.eq(valueOf(codeListManifestId)),
-                        states.isEmpty() ? trueCondition() : CODE_LIST.STATE.in(states)))
-                .fetch(queryBuilder.mapper());
-
-        mergedCodeLists.addAll(baseCodeLists);
-        return mergedCodeLists.stream().distinct().collect(Collectors.toList());
     }
 
     private List<CodeListValueSummaryRecord> getCodeListValueSummaryList(
