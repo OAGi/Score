@@ -172,6 +172,15 @@ export class BieExpressComponent implements OnInit {
     });
   }
 
+  /** Whether a Meta Header or Pagination Response option, each of which forces the Package option to EACH, is on. */
+  private hasPackageForcingOption(): boolean {
+    return !!(this.option.metaHeaderTopLevelAsbiepId
+      || this.option.paginationResponseTopLevelAsbiepId
+      || this.option.metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate
+      || this.option.paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate
+      || this.option.metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate);
+  }
+
   toggleMetaHeaderOption(event, disabled: boolean,
                          includeMetaHeaderForJsonPropertyKey: string,
                          metaHeaderTopLevelAsbiepIdPropertyKey: string) {
@@ -183,7 +192,9 @@ export class BieExpressComponent implements OnInit {
       this.option[includeMetaHeaderForJsonPropertyKey] = false;
       this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = undefined;
 
-      this.option.packageOption = this.previousPackageOption;
+      if (!this.hasPackageForcingOption()) {
+        this.option.packageOption = this.previousPackageOption;
+      }
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.width = window.innerWidth + 'px';
@@ -194,6 +205,9 @@ export class BieExpressComponent implements OnInit {
       const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
+          if (!this.hasPackageForcingOption()) {
+            this.previousPackageOption = this.option.packageOption;
+          }
           this.option[includeMetaHeaderForJsonPropertyKey] = true;
           this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
@@ -202,7 +216,6 @@ export class BieExpressComponent implements OnInit {
           } else if (includeMetaHeaderForJsonPropertyKey.includes('PostTemplate')) {
             this.option.suppressRootPropertyForOpenAPI30PostTemplate = false;
           }
-          this.previousPackageOption = this.option.packageOption;
           this.option.packageOption = 'EACH';
         } else {
           this.option[includeMetaHeaderForJsonPropertyKey] = false;
@@ -223,7 +236,9 @@ export class BieExpressComponent implements OnInit {
       this.option[includePaginationResponseForJsonPropertyKey] = false;
       this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = undefined;
 
-      this.option.packageOption = this.previousPackageOption;
+      if (!this.hasPackageForcingOption()) {
+        this.option.packageOption = this.previousPackageOption;
+      }
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.width = window.innerWidth + 'px';
@@ -234,6 +249,9 @@ export class BieExpressComponent implements OnInit {
       const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
+          if (!this.hasPackageForcingOption()) {
+            this.previousPackageOption = this.option.packageOption;
+          }
           this.option[includePaginationResponseForJsonPropertyKey] = true;
           this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
@@ -242,7 +260,6 @@ export class BieExpressComponent implements OnInit {
           } else if (includePaginationResponseForJsonPropertyKey.includes('PostTemplate')) {
             this.option.suppressRootPropertyForOpenAPI30PostTemplate = false;
           }
-          this.previousPackageOption = this.option.packageOption;
           this.option.packageOption = 'EACH';
         } else {
           this.option[includePaginationResponseForJsonPropertyKey] = false;
