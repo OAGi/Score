@@ -15,6 +15,7 @@ import {OasDocSecurityRequirementDialogComponent} from './oas-doc-security-requi
 import {OasDocConfirmMessageDialogComponent} from './oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {MatMultiSortModule} from 'ngx-mat-multi-sort';
 import {AuthService} from '../../authentication/auth.service';
+import {canActivateUser, NOT_DEVELOPERS_OPENAPI} from '../../authentication/can-activate-user';
 import {MaterialModule} from '../../material.module';
 import {ScoreCommonModule} from '../../common/score-common.module';
 import {SearchBarModule} from '../../common/search-bar/search-bar.module';
@@ -27,6 +28,9 @@ import {ResponsiveButtonComponent} from '../../common/responsive-button';
 import {JsonEditorComponent} from '../../common/json-editor';
 
 
+/** A user who may not use OpenAPI Documents goes to the Express BIE page that links them. */
+const endUser = canActivateUser(NOT_DEVELOPERS_OPENAPI, '/profile_bie/express');
+
 const routes: Routes = [
   {
     path: 'profile_bie/express/oas_doc',
@@ -34,7 +38,7 @@ const routes: Routes = [
       {
         path: '',
         component: OasDocListComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, endUser],
         title: 'OpenAPI Document'
       },
       {
@@ -43,7 +47,7 @@ const routes: Routes = [
           {
             path: '',
             component: OasDocCreateComponent,
-            canActivate: [AuthService],
+            canActivate: [AuthService, endUser],
             title: 'Create OpenAPI Document'
           }
         ]
@@ -55,13 +59,7 @@ const routes: Routes = [
           {
             path: '',
             component: OasDocDetailComponent,
-            canActivate: [AuthService],
-          },
-          {
-            path: 'assign',
-            component: OasDocAssignDialogComponent,
-            canActivate: [AuthService],
-            title: 'Assign OpenAPI Document'
+            canActivate: [AuthService, endUser],
           }
         ]
       },

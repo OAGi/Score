@@ -163,6 +163,8 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
       let errorMessage;
       if (err.status === 403) {
         errorMessage = 'You do not have access permission.';
+      } else if (err.status === 404) {
+        errorMessage = 'The component to browse was not found.';
       } else {
         errorMessage = 'Something\'s wrong.';
       }

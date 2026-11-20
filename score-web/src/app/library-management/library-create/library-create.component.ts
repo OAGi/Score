@@ -34,11 +34,6 @@ export class LibraryCreateComponent {
   namespacePrefixForm = new FormControl('');
 
   ngOnInit() {
-    if (!this.isAdmin) {
-      this.router.navigateByUrl('/');
-      return;
-    }
-
     this.library = new LibraryDetails();
 
     this.linkForm = new FormControl({value: this.library.link, disabled: !this.isAdmin},

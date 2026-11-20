@@ -4,7 +4,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {CommonModule} from '@angular/common';
-import {CanActivateAdmin, CanActivateUser} from '../authentication/auth.service';
+import {canActivateUser, ONLY_ADMINISTRATORS} from '../authentication/can-activate-user';
 import {SettingsAccountComponent} from './settings-account/settings-account.component';
 import {SettingsAccountService} from './settings-account/domain/settings-account.service';
 import {SettingsMenuComponent} from './settings-menu/settings-menu.component';
@@ -17,6 +17,10 @@ import {EmailValidationComponent} from './email-validation/email-validation.comp
 import {SettingsPreferencesComponent} from './settings-preferences/settings-preferences.component';
 import {SettingsPreferencesService} from './settings-preferences/domain/settings-preferences.service';
 
+const signedIn = canActivateUser();
+/** A user who may not change the application settings goes to the first page of the account settings. */
+const administrator = canActivateUser(ONLY_ADMINISTRATORS, '/settings/account/personal-info');
+
 const routes: Routes = [
   {
     path: 'settings/account',
@@ -27,33 +31,33 @@ const routes: Routes = [
     path: 'settings/account/personal-info',
     component: SettingsAccountComponent,
     data: {section: 'personal-info'},
-    canActivate: [CanActivateUser],
+    canActivate: [signedIn],
     title: 'Personal Info'
   },
   {
     path: 'settings/account/password',
     component: SettingsAccountComponent,
     data: {section: 'password'},
-    canActivate: [CanActivateUser],
+    canActivate: [signedIn],
     title: 'Change password'
   },
   {
     path: 'settings/account/passkeys',
     component: SettingsAccountComponent,
     data: {section: 'passkeys'},
-    canActivate: [CanActivateUser],
+    canActivate: [signedIn],
     title: 'Passkeys'
   },
   {
     path: 'settings/email_validation',
     component: EmailValidationComponent,
-    canActivate: [CanActivateUser],
+    canActivate: [signedIn],
     title: 'Email Validation',
   },
   {
     path: 'settings/preferences',
     component: SettingsPreferencesComponent,
-    canActivate: [CanActivateUser],
+    canActivate: [signedIn],
     title: 'Preferences'
   },
   {
@@ -65,28 +69,28 @@ const routes: Routes = [
     path: 'settings/application_settings/features',
     component: SettingsApplicationSettingsComponent,
     data: {section: 'features'},
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Application Features'
   },
   {
     path: 'settings/application_settings/smtp',
     component: SettingsApplicationSettingsComponent,
     data: {section: 'smtp'},
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'SMTP Settings'
   },
   {
     path: 'settings/application_settings/filename-expressions',
     component: SettingsApplicationSettingsComponent,
     data: {section: 'filename-expressions'},
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Filename Expressions'
   },
   {
     path: 'settings/application_settings/web-page',
     component: SettingsApplicationSettingsComponent,
     data: {section: 'web-page'},
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Web Page Settings'
   }
 ];

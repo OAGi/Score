@@ -5,6 +5,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
+import {BUSINESS_TERM_USERS, canActivateUser} from '../authentication/can-activate-user';
 import {BusinessTermService} from './domain/business-term.service';
 import {BusinessTermListComponent} from './business-term-list/business-term-list.component';
 import {BusinessTermCreateComponent} from './business-term-create/business-term-create.component';
@@ -24,6 +25,8 @@ import {SCORE_TABLE} from '../common/score-table';
 import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
 
+const businessTermUser = canActivateUser(BUSINESS_TERM_USERS);
+
 const routes: Routes = [
   {
     path: 'business_term_management',
@@ -31,19 +34,19 @@ const routes: Routes = [
       {
         path: 'business_term',
         component: BusinessTermListComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, businessTermUser],
         title: 'Business Term'
       },
       {
         path: 'business_term/create',
         component: BusinessTermCreateComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, businessTermUser],
         title: 'Create Business Term'
       },
       {
         path: 'business_term/:id',
         component: BusinessTermDetailComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, businessTermUser],
         title: 'Business Term'
       },
       {
@@ -52,13 +55,13 @@ const routes: Routes = [
           {
             path: '',
             component: AssignedBusinessTermListComponent,
-            canActivate: [AuthService],
+            canActivate: [AuthService, businessTermUser],
             title: 'Assign Business Term'
           },
           {
             path: 'details/:id',
             component: AssignedBusinessTermDetailComponent,
-            canActivate: [AuthService],
+            canActivate: [AuthService, businessTermUser],
             title: 'Assign Business Term'
           },
           {
@@ -67,13 +70,13 @@ const routes: Routes = [
               {
                 path: '',
                 component: AssignBusinessTermBieComponent,
-                canActivate: [AuthService],
+                canActivate: [AuthService, businessTermUser],
                 title: 'Assign Business Term'
               },
               {
                 path: 'bt',
                 component: AssignBusinessTermBtComponent,
-                canActivate: [AuthService],
+                canActivate: [AuthService, businessTermUser],
                 title: 'Assign Business Term'
               }
             ]

@@ -27,6 +27,7 @@ import {
   TenantProperties,
   UserToken
 } from './domain/auth';
+import {ROLE} from './domain/role';
 import {MultiActionsSnackBarComponent} from '../common/multi-actions-snack-bar/multi-actions-snack-bar.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {RxStompService} from '../common/score-rx-stomp';
@@ -42,9 +43,9 @@ export class AuthService implements OnInit, CanActivate {
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
   USER_INFO_KEY = 'X-Score-UserInfo';
-  ROLE_DEVELOPER = 'developer';
-  ROLE_END_USER = 'end-user';
-  ROLE_ADMIN = 'admin';
+  ROLE_DEVELOPER = ROLE.DEVELOPER;
+  ROLE_END_USER = ROLE.END_USER;
+  ROLE_ADMIN = ROLE.ADMIN;
 
   ngOnInit() {
   }
@@ -416,79 +417,8 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
   }
 }
 
-function getResolvedUrl(route: ActivatedRouteSnapshot): string {
+export function getResolvedUrl(route: ActivatedRouteSnapshot): string {
   return route.pathFromRoot
     .map(v => v.url.map(segment => segment.toString()).join('/'))
     .join('/');
-}
-
-@Injectable()
-export class CanActivateDeveloper implements CanActivate {
-  private authService = inject(AuthService);
-
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
-    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
-    const userToken = this.authService.getUserToken();
-    if (userToken.roles.includes(this.authService.ROLE_DEVELOPER)) {
-      return true;
-    }
-
-    this.authService.logout(getResolvedUrl(route));
-    return false;
-  }
-
-}
-
-@Injectable()
-export class CanActivateAdmin implements CanActivate {
-  private authService = inject(AuthService);
-
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
-    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
-    const userToken = this.authService.getUserToken();
-    if (userToken.roles.includes(this.authService.ROLE_ADMIN)) {
-      return true;
-    }
-
-    this.authService.logout(getResolvedUrl(route));
-    return false;
-  }
-
-}
-
-@Injectable()
-export class CanActivateUser implements CanActivate {
-  private authService = inject(AuthService);
-
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
-    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
-    const userToken = this.authService.getUserToken();
-    if (this.authService.isAuthenticated()) {
-      return true;
-    }
-
-    this.authService.logout(getResolvedUrl(route));
-    return false;
-  }
-
-}
-
-@Injectable()
-export class CanActivateTenantInstance implements CanActivate {
-  private authService = inject(AuthService);
-
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
-    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
-    const userToken = this.authService.getUserToken();
-    return userToken.tenant.enabled;
-  }
-
 }

@@ -94,8 +94,16 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
           }
           this.leftDataSource.data = this.assignableMapToList(assignable);
           this.isUpdating = false;
-        });
-      });
+        }, err => this.onLoadError(err));
+      }, err => this.onLoadError(err));
+  }
+
+  /** The module set release is missing or not accessible: say why and go back to the list. */
+  private onLoadError(err: any): void {
+    this.isUpdating = false;
+    this.snackBar.open(err?.status === 403 ? 'You do not have access permission.'
+      : (err?.status === 404 ? 'The requested module set release is unavailable.' : 'Something\'s wrong.'), '', {duration: 3000});
+    this.router.navigateByUrl('/module_management/module_set_release');
   }
 
   ngAfterViewInit() {

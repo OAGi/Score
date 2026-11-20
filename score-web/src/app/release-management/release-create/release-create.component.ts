@@ -50,11 +50,6 @@ export class ReleaseCreateComponent implements OnInit {
   }
 
   ngOnInit() {
-    const userToken = this.auth.getUserToken();
-    if (!userToken.roles.includes('developer')) {
-      this.router.navigateByUrl('/');
-    }
-
     this.namespaceListFilterCtrl.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {

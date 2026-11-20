@@ -4,7 +4,7 @@ import {AccountListDialogComponent} from './account-list-dialog/account-list-dia
 import {PendingListService} from './domain/pending-list.service';
 import {PendingDetailComponent} from './pending-detail/pending-detail.component';
 import {PendingListComponent} from './pending-list/pending-list.component';
-import {CanActivateAdmin, CanActivateDeveloper, CanActivateTenantInstance, CanActivateUser} from '../authentication/auth.service';
+import {allOf, canActivateUser, MULTI_TENANT_ON, ONLY_ADMINISTRATORS} from '../authentication/can-activate-user';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
@@ -27,71 +27,74 @@ import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
 
 
+const administrator = canActivateUser(ONLY_ADMINISTRATORS);
+const tenantAdministrator = canActivateUser(allOf(ONLY_ADMINISTRATORS, MULTI_TENANT_ON));
+
 export const routes: Routes = [
   {
     path: 'account',
     component: AccountListComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Account'
   },
   {
     path: 'account/create',
     component: AccountCreateComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Create Account'
   },
   {
     path: 'account/transfer_ownership',
     component: TransferOwnershipListComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Transfer Ownership'
   },
   {
     path: 'account/pending',
     component: PendingListComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Pending Account'
   },
   {
     path: 'account/pending/:id',
     component: PendingDetailComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Pending Account'
   },
   {
     path: 'account/:id',
     component: AccountDetailComponent,
-    canActivate: [CanActivateAdmin],
+    canActivate: [administrator],
     title: 'Account'
   },
   {
     path: 'tenant',
     component: TenantListComponent,
-    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
+    canActivate: [tenantAdministrator],
     title: 'Tenant'
   },
   {
     path: 'tenant/create',
     component: TenantCreateComponent,
-    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
+    canActivate: [tenantAdministrator],
     title: 'Create Tenant'
   },
   {
     path: 'tenant/:id',
     component: UpdateTenantComponent,
-    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
+    canActivate: [tenantAdministrator],
     title: 'Tenant'
   },
   {
     path: 'tenant/bis-ctx/:id',
     component: TenantBusinessCtxDetailComponent,
-    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
+    canActivate: [tenantAdministrator],
     title: 'Tenant Business Context'
   },
   {
     path: 'tenant/users/:id',
     component: TenantUserDetailComponent,
-    canActivate: [CanActivateAdmin, CanActivateTenantInstance],
+    canActivate: [tenantAdministrator],
     title: 'Tenant Users'
   },
 ];
@@ -127,10 +130,6 @@ export const routes: Routes = [
   providers: [
     AccountListService,
     PendingListService,
-    CanActivateUser,
-    CanActivateDeveloper,
-    CanActivateAdmin,
-    CanActivateTenantInstance,
     TenantListService
   ]
 })

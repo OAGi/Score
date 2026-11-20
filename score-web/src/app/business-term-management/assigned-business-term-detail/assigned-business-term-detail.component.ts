@@ -41,6 +41,11 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
     this.assignedBusinessTerm = new AssignedBusinessTermDetails();
     const assignedBusinessTermId = this.route.snapshot.queryParams.id;
     const bieType = this.route.snapshot.queryParams.type;
+    if (!assignedBusinessTermId || !bieType) {
+      // The assignment is looked up by its type and id in the query, as the list links it.
+      this.redirectToAssignedBusinessTermList();
+      return;
+    }
     this.service.getAssignedBusinessTerm(bieType, assignedBusinessTermId).subscribe(assignedBusinessTerm => {
       if (!assignedBusinessTerm) {
         this.redirectToAssignedBusinessTermList();
@@ -51,7 +56,8 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
       setAppTitleIfPresent(this.titleService, this.assignedBusinessTerm.businessTerm, 'Business Term Assignment');
       this.hashCode = hashCode(this.assignedBusinessTerm);
     }, err => {
-      if (err.status === 404) {
+      // A type the server does not know is answered with 400, as an id that is not a number is with 404.
+      if (err.status === 404 || err.status === 400) {
         this.redirectToAssignedBusinessTermList();
         return;
       }
