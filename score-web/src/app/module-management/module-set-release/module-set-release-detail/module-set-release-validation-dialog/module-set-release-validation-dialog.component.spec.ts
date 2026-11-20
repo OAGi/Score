@@ -25,10 +25,10 @@ describe('ModuleSetReleaseValidationDialogComponent', () => {
 
   it('separates the invalid list from the "# Valid:" header with a line break', () => {
     const component = create({} as ModuleService);
-    component.resp.results = {
-      'invalid-one': 'error',
-      'valid-one': 'Valid'
-    } as any;
+    component.resp.results = new Map([
+      ['invalid-one', 'error'],
+      ['valid-one', 'Valid']
+    ]);
 
     let copied = '';
     component.clipboard = {copy: (text: string) => (copied = text)} as any;
@@ -81,7 +81,7 @@ describe('ModuleSetReleaseValidationDialogComponent', () => {
 
       expect(() => progress$.error(new HttpErrorResponse({error: 'boom'}))).not.toThrow();
       expect(component.resp.done).toBe(true);
-      expect(component.resp.results['req-1']).toBeDefined();
+      expect(component.resp.results.get('req-1')).toBeDefined();
     } finally {
       vi.useRealTimers();
     }
