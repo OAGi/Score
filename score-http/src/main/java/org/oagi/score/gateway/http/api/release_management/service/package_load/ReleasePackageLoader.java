@@ -995,7 +995,7 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_asccp_manifest_id\": " + entry.getKey() + "', '\"replacement_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_asccp_manifest_id\": " + entry.getKey() + "', '\"prev_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_asccp_manifest_id\": " + entry.getKey() + "', '\"next_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_asccp_manifest_id\": " + entry.getKey() + "', '\"from_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
+                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_asccp_manifest_id\": " + entry.getKey() + "', '\"to_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
             }
         }
     }
@@ -1081,7 +1081,7 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_bccp_manifest_id\": " + entry.getKey() + "', '\"replacement_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_bccp_manifest_id\": " + entry.getKey() + "', '\"prev_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
                 statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_bccp_manifest_id\": " + entry.getKey() + "', '\"next_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_bccp_manifest_id\": " + entry.getKey() + "', '\"from_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
+                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_bccp_manifest_id\": " + entry.getKey() + "', '\"to_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
             }
         }
     }
