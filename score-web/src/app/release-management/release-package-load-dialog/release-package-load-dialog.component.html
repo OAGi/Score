@@ -103,26 +103,12 @@
               </div>
             }
             <div [class.pt-3]="current.active && !isUndo(current)"><b>{{ current.releaseNum ?? current.packageFileName }}</b>
-              <span class="meta"> — {{ current.packageFileName }}</span></div>
+              <span class="meta"> — {{ current.packageFileName }} · Job number {{ current.id }}</span></div>
 
             @if (current.active && !isUndo(current)) {
               <mat-progress-bar class="mt-3" [mode]="current.state === 'SWAPPING' ? 'indeterminate' : 'determinate'"
                                 [value]="loadProgress(current.state)"></mat-progress-bar>
-              <div class="meta pt-2">{{ current.message }}</div>
-              <ul class="step-list">
-                @for (item of steps; track item.state; let i = $index) {
-                  <li [class.pending]="i > stepIndex(current)">
-                    @if (i < stepIndex(current)) {
-                      <mat-icon class="done">check_circle</mat-icon>
-                    } @else if (i === stepIndex(current)) {
-                      <mat-spinner [diameter]="22"></mat-spinner>
-                    } @else {
-                      <mat-icon>radio_button_unchecked</mat-icon>
-                    }
-                    <span>{{ item.label }}</span>
-                  </li>
-                }
-              </ul>
+              <div class="meta pt-2">{{ current.message }}{{ dots() }}</div>
             } @else if (current.active) {
               <div class="pt-3">Undoing the update…</div>
               <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -145,6 +131,24 @@
                 <span>The update failed. {{ current.message }}</span>
               </div>
               <div class="meta pt-2">The data in use was not changed, unless the message above says otherwise.</div>
+            }
+
+            @if (logLines().length) {
+              <mat-expansion-panel class="server-log" hideToggle="false">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Progress details</mat-panel-title>
+                  <mat-panel-description><span class="server-log-latest">{{ lastLogLine()?.message }}</span></mat-panel-description>
+                </mat-expansion-panel-header>
+                <div #logBox class="server-log-lines">
+                  @for (line of logLines(); track line.number) {
+                    <div class="log-line" [class.warn]="line.level === 'WARN'" [class.error]="line.level === 'ERROR'">
+                      <span class="log-time">{{ line.time | date: 'HH:mm:ss' }}</span>
+                      <span class="log-level">{{ line.level }}</span>
+                      <span class="log-message">{{ line.message }}</span>
+                    </div>
+                  }
+                </div>
+              </mat-expansion-panel>
             }
           </div>
         }

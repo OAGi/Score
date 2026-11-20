@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.release_management.service.package_load.s
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJob;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJobId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadState;
+import org.oagi.score.gateway.http.api.release_management.repository.ForeignKeyViolation;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleasePackageLoadCommandRepository;
 import org.oagi.score.gateway.http.api.release_management.repository.ReleasePackageLoadQueryRepository;
 import org.oagi.score.gateway.http.cache.RecordCache;
@@ -23,12 +24,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -57,11 +60,13 @@ public class ReleasePackageLoadWorker {
     private final ObjectProvider<RecordCache> recordCache;
     private final AsyncJobRunner asyncJobRunner;
     private final ReleasePackageLoadConnectionPoolRefresher connections;
+    private final ReleasePackageLoadLog log;
 
     public ReleasePackageLoadWorker(ReleasePackageLoadRepositories repositories, ReleasePackageLoadProperties settings, ReleasePackageLoadReporter reporter,
                                ReleasePackageLoadPreflight preflight, ReleasePackageLoadCopier copier, RedissonClient redisson,
                                ObjectProvider<ReleasePackageLoadWriteFreeze> writeFreeze, ObjectProvider<RecordCache> recordCache,
-                               AsyncJobRunner asyncJobRunner, ReleasePackageLoadConnectionPoolRefresher connections) {
+                               AsyncJobRunner asyncJobRunner, ReleasePackageLoadConnectionPoolRefresher connections,
+                               ReleasePackageLoadLog log) {
         this.repositories = repositories;
         this.settings = settings;
         this.reporter = reporter;
@@ -72,6 +77,7 @@ public class ReleasePackageLoadWorker {
         this.recordCache = recordCache;
         this.asyncJobRunner = asyncJobRunner;
         this.connections = connections;
+        this.log = log;
     }
 
     /** What a run of the worker holds, for what is to be put back when it ends, whichever way. */
@@ -89,6 +95,8 @@ public class ReleasePackageLoadWorker {
         boolean stagingMade;
         boolean backupMade;
         boolean swapped;
+        /** How the run ended, for the last line of its log: null while it goes on. */
+        Boolean ok;
 
         Run(ReleasePackageLoadJobId id, ScoreUser requester, Path packageFile, Info info, ReleasePackageFormat format) {
             this.id = id;
@@ -106,7 +114,10 @@ public class ReleasePackageLoadWorker {
     public void load(ReleasePackageLoadJob job, ScoreUser requester, Path packageFile, Info info, ReleasePackageFormat format) {
         Run run = new Run(job.id(), requester, packageFile, info, format);
         asyncJobRunner.run(AsyncJob.named("release-package-load#" + job.id()).withoutTransaction()
-                .work(() -> doLoad(run))
+                .work(() -> {
+                    log.mark(run.id);
+                    doLoad(run);
+                })
                 .onFailure(cause -> failedLoad(run, cause))
                 .always(() -> finish(run, true))
                 .build());
@@ -117,7 +128,10 @@ public class ReleasePackageLoadWorker {
         Run run = new Run(job.id(), requester, null, null, null);
         run.backup = job.backupSchema();
         asyncJobRunner.run(AsyncJob.named("release-package-load.rollback#" + job.id()).withoutTransaction()
-                .work(() -> doRollback(run))
+                .work(() -> {
+                    log.mark(run.id);
+                    doRollback(run);
+                })
                 .onFailure(cause -> failedRollback(run, cause))
                 .always(() -> finish(run, false))
                 .build());
@@ -148,10 +162,12 @@ public class ReleasePackageLoadWorker {
             // The shape the package says it was written for when it says (so that its statements fit), otherwise the latest; then the rest of the migrations.
             command.migrateSchema(run.staging, run.format.schemaVersionOf(run.info).orElse(null));
             command.load(run.staging, run.info, source, delta,
-                    message -> logger.debug("Load " + run.id + ": " + message), run.format.statements());
+                    message -> logger.info("Load " + run.id + ": " + message), run.format.statements());
 
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.MIGRATING, ReleasePackageLoadMessages.MIGRATING);
             command.migrateSchema(run.staging, null);
+
+            requireNoConflicts(run, query, delta);
 
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.COPYING, ReleasePackageLoadMessages.COPYING);
             ReleasePackageLoadWriteFreeze freeze = writeFreeze.getIfAvailable(ReleasePackageLoadUnavailableWriteFreeze::new);
@@ -161,7 +177,7 @@ public class ReleasePackageLoadWorker {
             Map<String, String> before = copier.fingerprints(run.served, steps);
             AtomicInteger copied = new AtomicInteger();
             copier.copy(run.served, run.staging, steps, delta, run.info, message -> {
-                logger.debug("Load " + run.id + ": " + message);
+                logger.info("Load " + run.id + ": " + message);
                 reporter.said(run.id, run.requester, ReleasePackageLoadState.COPYING,
                         ReleasePackageLoadMessages.copying(copied.incrementAndGet(), steps.size()));
             });
@@ -181,45 +197,79 @@ public class ReleasePackageLoadWorker {
         succeeded(run);
     }
 
+    /** Before anything is paused or copied: what the users made must be able to be put together with what the package brings. */
+    private void requireNoConflicts(Run run, ReleasePackageLoadQueryRepository query, long delta) {
+        List<CopyStep> steps = copier.stepsToCopy(run.format, run.served, run.staging);
+        BigInteger ownBelow = steps.stream().filter(step -> "app_user".equals(step.table())).map(CopyStep::ownBelow)
+                .filter(java.util.Objects::nonNull).findFirst().orElse(null);
+        List<String> accounts = ownBelow == null ? List.of() : ReleasePackageLoadAccountCheck.differences(query.accounts(run.served),
+                query.accounts(run.staging), BigInteger.valueOf(delta), ownBelow);
+        List<String> namespaces = List.of();
+        if (steps.stream().anyMatch(step -> "namespace".equals(step.table()))) {
+            BigInteger packageMax = query.maxId(run.staging, "namespace", "namespace_id").orElse(BigInteger.ZERO);
+            namespaces = ReleasePackageLoadNamespaceCheck.differences(query.namespaces(run.served), query.namespaces(run.staging), packageMax);
+        }
+        if (!accounts.isEmpty() || !namespaces.isEmpty()) {
+            logger.warn("The load " + run.id + " is not carried on: " + String.join("; ", accounts) + String.join("; ", namespaces));
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.conflicts(
+                    accounts.isEmpty() ? null : ReleasePackageLoadAccountCheck.told(accounts),
+                    namespaces.isEmpty() ? null : ReleasePackageLoadAccountCheck.told(namespaces), run.id));
+        }
+    }
+
     private void requireVerified(Run run, List<CopyStep> steps, Map<String, String> before, long delta) {
         ReleasePackageLoadQueryRepository query = repositories.query();
         List<String> problems = new ArrayList<>();
         // The table of the history is the migration tool's own (its text columns take the collation of the schema it was made in), not the application's.
-        problems.addAll(query.differences(run.served, run.staging).stream().filter(line -> !ofTheMigrationHistory(line)).limit(10).toList());
+        List<String> differences = query.differences(run.served, run.staging).stream().filter(line -> !ofTheMigrationHistory(line)).toList();
+        ReleasePackageLoadStructureCheck.Result structure = ReleasePackageLoadStructureCheck.of(differences, run.served, query);
+        structure.tolerated().forEach(line -> logger.warn("The load " + run.id + " goes on, though " + line
+                + ": nothing is lost by it, and the swap puts it right"));
+        problems.addAll(structure.blocking().stream().limit(10).toList());
         problems.addAll(copier.missing(run.served, run.staging, steps, delta, run.info).stream().map(m -> "not all copied: " + m).toList());
-        problems.addAll(query.foreignKeyViolations(run.staging).stream().limit(5).toList());
+        List<ForeignKeyViolation> brokenBefore = query.foreignKeyViolations(run.served);
+        List<ForeignKeyViolation> brokenAfter = query.foreignKeyViolations(run.staging);
+        List<ForeignKeyViolation> broken = ForeignKeyViolation.addedBy(brokenAfter, brokenBefore);
+        brokenAfter.stream().filter(violation -> !broken.contains(violation)).forEach(violation -> logger.warn("The load " + run.id
+                + " goes on, though " + violation + ": it was so before the load: the load is not what broke it"));
         Map<String, String> after = copier.fingerprints(run.served, steps);
         before.forEach((table, fingerprint) -> {
             if (!fingerprint.equals(after.get(table))) {
                 problems.add("something was written to " + table + " while it was copied");
             }
         });
-        if (!problems.isEmpty()) {
-            logger.warn("The load " + run.id + " is not swapped in: " + String.join("; ", problems));
-            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.stopped(String.join(" ", reasonsOf(problems))));
+        if (!problems.isEmpty() || !broken.isEmpty()) {
+            logger.warn("The load " + run.id + " is not swapped in: " + String.join("; ", problems)
+                    + broken.stream().limit(5).map(violation -> "; " + violation).collect(Collectors.joining()));
+            throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.stopped(String.join(" ", reasonsOf(problems, broken, run.id))));
         }
     }
 
     /** What the problems found come to, in the words of whoever loads: one sentence for each kind of them. */
-    private static List<String> reasonsOf(List<String> problems) {
+    private static List<String> reasonsOf(List<String> problems, List<ForeignKeyViolation> broken, ReleasePackageLoadJobId job) {
         Predicate<String> notCopied = p -> p.startsWith("not all copied");
         Predicate<String> written = p -> p.startsWith("something was written");
-        Predicate<String> dangling = p -> p.contains("record(s) refer");
         List<String> reasons = new ArrayList<>();
         // What is none of the others is a difference of the structure of the schemas.
-        if (problems.stream().anyMatch(notCopied.or(written).or(dangling).negate())) {
+        if (problems.stream().anyMatch(notCopied.or(written).negate())) {
             reasons.add(ReleasePackageLoadMessages.STRUCTURE_DIFFERS);
         }
-        if (problems.stream().anyMatch(p -> p.contains("of app_user that is not there"))) {
-            reasons.add(ReleasePackageLoadMessages.MISSING_USERS);
-        } else if (problems.stream().anyMatch(dangling)) {
-            reasons.add(ReleasePackageLoadMessages.MISSING_RECORDS);
+        List<ForeignKeyViolation> ofUsers = broken.stream().filter(violation -> violation.parentTable().equals("app_user")).toList();
+        List<ForeignKeyViolation> ofOthers = broken.stream().filter(violation -> !violation.parentTable().equals("app_user")).toList();
+        if (!ofUsers.isEmpty()) {
+            reasons.add(ReleasePackageLoadMessages.missingUsers(ReleasePackageLoadBrokenReferences.told(ofUsers)));
+        }
+        if (!ofOthers.isEmpty()) {
+            reasons.add(ReleasePackageLoadMessages.missingRecords(ReleasePackageLoadBrokenReferences.told(ofOthers)));
         }
         if (problems.stream().anyMatch(notCopied)) {
             reasons.add(ReleasePackageLoadMessages.NOT_ALL_CARRIED_OVER);
         }
         if (problems.stream().anyMatch(written)) {
             reasons.add(ReleasePackageLoadMessages.CHANGED_WHILE_COPIED);
+        }
+        if (!broken.isEmpty()) {
+            reasons.add(ReleasePackageLoadMessages.passOn(job));
         }
         return reasons;
     }
@@ -248,13 +298,16 @@ public class ReleasePackageLoadWorker {
         }
         String message = ReleasePackageLoadMessages.SUCCEEDED + String.join("", warnings);
         reporter.moved(run.id, run.requester, ReleasePackageLoadState.SUCCEEDED, message);
+        run.ok = true;
     }
 
     private void failedLoad(Run run, Throwable cause) {
+        run.ok = run.swapped;
         if (run.swapped) {
             // The swap is done, and cannot be what failed: it is what came after.
             logger.error("The load " + run.id + " failed after the swap: " + describe(cause), cause);
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.SUCCEEDED, ReleasePackageLoadMessages.AFTER_LOAD_PROBLEM);
+            run.ok = true;
             return;
         }
         logger.error("The load " + run.id + " failed: " + describe(cause), cause);
@@ -316,9 +369,11 @@ public class ReleasePackageLoadWorker {
         // What was loaded, and what users saved after it, is not kept: the package is loaded again if it is wanted.
         dropQuietly(command, discarded, message);
         reporter.moved(run.id, run.requester, ReleasePackageLoadState.ROLLED_BACK, message + String.join("", warnings));
+        run.ok = true;
     }
 
     private void failedRollback(Run run, Throwable cause) {
+        run.ok = false;
         try {
             logger.error("The undo of the load " + run.id + " failed: " + describe(cause), cause);
             reporter.moved(run.id, run.requester, ReleasePackageLoadState.FAILED, ReleasePackageLoadMessages.NOT_UNDONE);
@@ -333,6 +388,8 @@ public class ReleasePackageLoadWorker {
 
     private void finish(Run run, boolean deletePackage) {
         try {
+            logger.info((deletePackage ? "Loading " : "Undo ") + (Boolean.TRUE.equals(run.ok) ? "completed" : "failed"));
+            log.unmark();
             if (run.frozen) {
                 writeFreeze.getIfAvailable(ReleasePackageLoadUnavailableWriteFreeze::new).release();
             }

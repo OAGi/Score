@@ -36,6 +36,7 @@ describe('ReleasePackageLoadDialogComponent', () => {
       start: vi.fn(() => of(job(7, 'PENDING'))),
       recent: vi.fn(() => of(recent)),
       get: vi.fn(),
+      log: vi.fn(() => of({lines: [], next: 0})),
       rollback: vi.fn(() => of(job(7, 'ROLLING_BACK'))),
     };
     confirmed = true;
@@ -210,13 +211,6 @@ describe('ReleasePackageLoadDialogComponent', () => {
     dialog.rollback(job(7, 'SUCCEEDED'));
 
     expect(service['rollback']).not.toHaveBeenCalled();
-  });
-
-  it('places a load at its step, past the last one when it has succeeded', () => {
-    const dialog = create();
-    expect(dialog.stepIndex(job(1, 'PREFLIGHT'))).toBe(0);
-    expect(dialog.stepIndex(job(1, 'COPYING'))).toBe(3);
-    expect(dialog.stepIndex(job(1, 'SUCCEEDED'))).toBe(6);
   });
 
   describe('errorMessage', () => {

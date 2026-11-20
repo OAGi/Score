@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJob;
 import org.oagi.score.gateway.http.api.release_management.model.ReleasePackageLoadJobId;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadCommandService;
+import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadLog;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadPreflightReport;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadRefusedException;
 import org.oagi.score.gateway.http.api.release_management.service.package_load.ReleasePackageLoadProperties;
@@ -38,6 +39,9 @@ public class ReleasePackageLoadController {
 
     @Autowired
     private ReleasePackageLoadUploads uploads;
+
+    @Autowired
+    private ReleasePackageLoadLog loadLog;
 
     @Autowired
     private ReleasePackageLoadProperties properties;
@@ -136,6 +140,16 @@ public class ReleasePackageLoadController {
     @GetMapping(value = "/{id:[\\d]+}")
     public JobResponse get(ScoreUser requester, @PathVariable("id") BigInteger id) {
         return JobResponse.of(service.get(requester, new ReleasePackageLoadJobId(id)));
+    }
+
+    @Operation(summary = "What the server logged for a load, after the given message number (0 for all of it)")
+    @AccessControl(requiredAnyRole = {ADMINISTRATOR}, errorMessage = ReleasePackageLoadMessages.ONLY_ADMINISTRATOR)
+    @GetMapping(value = "/{id:[\\d]+}/log")
+    public ReleasePackageLoadLog.Page log(ScoreUser requester, @PathVariable("id") BigInteger id,
+                                          @RequestParam(name = "after", defaultValue = "0") long after) {
+        ReleasePackageLoadJobId jobId = new ReleasePackageLoadJobId(id);
+        service.get(requester, jobId);
+        return loadLog.after(jobId, after);
     }
 
     @Operation(summary = "Undo the swap of the latest load that succeeded, in the background")

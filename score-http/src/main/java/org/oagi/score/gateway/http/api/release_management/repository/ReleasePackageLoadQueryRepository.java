@@ -25,6 +25,12 @@ public interface ReleasePackageLoadQueryRepository {
      */
     List<String> differences(String schema, String otherSchema);
 
+    /** Whether any record of the table has a value (not NULL) in the column. */
+    boolean hasValues(String schema, String table, String column);
+
+    /** Whether the table has any record. */
+    boolean hasRows(String schema, String table);
+
     /** The tables of the schema (not the views), by name. */
     List<String> tables(String schema);
 
@@ -49,9 +55,9 @@ public interface ReleasePackageLoadQueryRepository {
      * The foreign keys of the schema that records break: a record that refers to a record that is not there. A schema the
      * application made has none; one that records were copied into (without the foreign keys being checked) may.
      *
-     * @return a line for each foreign key that is broken, with how many records break it; empty when none is
+     * @return each foreign key that is broken, with how many records break it; empty when none is
      */
-    List<String> foreignKeyViolations(String schema);
+    List<ForeignKeyViolation> foreignKeyViolations(String schema);
 
     /** The columns of the schema that are foreign keys to the column of the table (a key of more than one column is not one of them). */
     List<ColumnReference> columnsReferencing(String schema, String table, String column);
@@ -65,4 +71,10 @@ public interface ReleasePackageLoadQueryRepository {
      * @param withoutDevelopers when true, only the records of {@code app_user} that are not of a developer
      */
     List<BigInteger> idsBetween(String schema, String table, String idColumn, BigInteger above, BigInteger below, boolean withoutDevelopers);
+
+    /** The user accounts of the schema. */
+    List<Account> accounts(String schema);
+
+    /** The namespaces of the schema. */
+    List<Namespace> namespaces(String schema);
 }

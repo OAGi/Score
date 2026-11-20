@@ -39,27 +39,6 @@
   min-height: 220px;
 }
 
-.step-list {
-  list-style: none;
-  padding: 0;
-  margin: 16px 0;
-}
-
-.step-list li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 0;
-}
-
-.step-list li.pending {
-  opacity: 0.5;
-}
-
-.step-list mat-icon.done {
-  color: var(--mat-sys-primary, #2e7d32);
-}
-
 .problems {
   color: var(--mat-sys-error, #b3261e);
   margin: 8px 0 0;
@@ -178,9 +157,94 @@
 /* A library the package changes has its new release in bold; one the package is behind in, which refuses it, is in the error color. */
 .libraries td.changes {
   font-weight: 700;
+  color: var(--mat-sys-on-surface, #000);
 }
 
 .libraries tr.behind td {
   color: var(--mat-sys-error, #b3261e);
   font-weight: 700;
+}
+
+/* What the server logged for the load: the latest message while it is closed, all of them, as the server wrote them, when it is open. */
+.server-log {
+  --mat-expansion-header-collapsed-state-height: 32px;
+  --mat-expansion-header-expanded-state-height: 32px;
+  margin-top: 16px;
+  box-shadow: none;
+  border: 1px solid var(--mat-sys-outline-variant, #ddd);
+}
+
+.server-log ::ng-deep .mat-expansion-panel-header {
+  padding: 0 12px;
+  font-size: 0.9em;
+}
+
+.server-log ::ng-deep .mat-expansion-panel-header-title,
+.server-log ::ng-deep .mat-expansion-panel-header-description {
+  align-items: center;
+  margin-right: 12px;
+}
+
+/* The title keeps its one line; the latest message takes what is left of the row and is cut with an ellipsis. */
+.server-log ::ng-deep .mat-expansion-panel-header-title {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.server-log ::ng-deep .mat-expansion-panel-header-description {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.server-log ::ng-deep .mat-expansion-indicator::after {
+  padding: 2px;
+  vertical-align: middle;
+}
+
+.server-log ::ng-deep .mat-expansion-panel-body {
+  padding: 0 12px 8px;
+}
+
+.server-log-latest {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.server-log-lines {
+  max-height: 260px;
+  overflow: auto;
+  font-family: monospace;
+  font-size: 0.8em;
+  line-height: 1.5;
+}
+
+.log-line {
+  display: flex;
+  gap: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-time,
+.log-level {
+  flex-shrink: 0;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.log-level {
+  width: 3.6em;
+}
+
+.log-line.warn .log-level,
+.log-line.warn .log-message {
+  color: var(--mat-sys-tertiary, #8a5a00);
+}
+
+.log-line.error .log-level,
+.log-line.error .log-message {
+  color: var(--mat-sys-error, #b3261e);
 }
