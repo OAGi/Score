@@ -31,7 +31,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
     this.resp = new ModuleSetReleaseValidateResponse();
     this.resp.progress = 0;
     this.resp.length = 0;
-    this.resp.results = {} as any;
+    this.resp.results = new Map<string, string>();
   }
 
   ngOnInit(): void {
@@ -47,6 +47,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
       ).subscribe({
         next: (res) => {
           this.resp = res;
+          this.resp.results = new Map(Object.entries(res.results ?? {}));
           this.determinate = true;
           if (res.done) {
             closeTimer$.next('Done');
@@ -54,7 +55,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
         },
         error: (res: HttpErrorResponse) => {
           this.resp.done = true;
-          this.resp.results[resp.requestId] = res.message;
+          this.resp.results.set(resp.requestId, res.message);
         }
       });
     });
@@ -72,7 +73,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
       return [];
     }
 
-    return Object.keys(this.resp.results);
+    return Array.from(this.resp.results.keys());
   }
 
   get invalidKeys(): string[] {
@@ -84,7 +85,7 @@ export class ModuleSetReleaseValidationDialogComponent implements OnInit {
   }
 
   value(key: string): string {
-    return this.resp.results[key];
+    return this.resp.results.get(key) ?? '';
   }
 
   copyToClipboard() {

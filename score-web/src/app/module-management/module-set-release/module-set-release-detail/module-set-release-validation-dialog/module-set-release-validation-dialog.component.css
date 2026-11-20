@@ -1,5 +1,5 @@
 .content {
-  display: inline-block;
+  display: block;
   box-sizing: border-box;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -7,8 +7,8 @@
   line-height: 20px;
   width: 100%;
   min-height: 24px;
-  padding-bottom: 8px;
-  padding-top: 9px;
+  padding-bottom: 0;
+  padding-top: 16px;
   border-bottom: 1px solid transparent;
   color: rgba(0, 0, 0, 0.7);
 }

@@ -165,7 +165,7 @@ export class ModuleSetReleaseDetailComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.width = '80vw';
-    dialogConfig.height = '60%';
+    dialogConfig.autoFocus = false;
     dialogConfig.data = {
       moduleSetReleaseId: this.moduleSetRelease.moduleSetReleaseId,
       expressionOption,
