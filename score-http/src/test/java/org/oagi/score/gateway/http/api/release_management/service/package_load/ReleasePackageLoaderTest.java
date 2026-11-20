@@ -10,12 +10,14 @@ import org.oagi.score.gateway.http.api.release_management.model.package_info.Tab
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -98,6 +100,23 @@ class ReleasePackageLoaderTest {
         ResultSet ids = mock(ResultSet.class);
         ResultSet manifestIds = mock(ResultSet.class);
         when(con.createStatement()).thenReturn(statement);
+        // Each renumbering of a snapshot or a path is a prepared statement: what it looks for and what it puts in.
+        List<String> renumbered = new ArrayList<>();
+        when(con.prepareStatement(anyString())).thenAnswer(inv -> {
+            PreparedStatement prepared = mock(PreparedStatement.class);
+            String[] params = new String[2];
+            doAnswer(set -> {
+                if ((int) set.getArgument(0) <= 2) {
+                    params[(int) set.getArgument(0) - 1] = set.getArgument(1);
+                }
+                return null;
+            }).when(prepared).setString(anyInt(), anyString());
+            when(prepared.executeUpdate()).thenAnswer(run -> {
+                renumbered.add(params[0] + " => " + params[1]);
+                return 0;
+            });
+            return prepared;
+        });
         when(statement.executeQuery(anyString())).thenAnswer(inv ->
                 ((String) inv.getArgument(0)).contains("`" + manifestTable + "`.`" + manifestIdColumn + "`") ? manifestIds : ids);
         when(ids.next()).thenReturn(true, false);
@@ -109,16 +128,14 @@ class ReleasePackageLoaderTest {
         method.setAccessible(true);
         method.invoke(new ReleasePackageLoader(1000L, null, null, null), con, info);
 
-        var captor = org.mockito.ArgumentCaptor.forClass(String.class);
-        verify(statement, atLeast(0)).execute(captor.capture());
-        return captor.getAllValues();
+        return renumbered;
     }
 
     @Test
     void theToAsccpManifestIdKeyOfALogSnapshotKeepsItsNameWhenTheIdIsRelocated() throws Exception {
         List<String> sql = statementsOf("relocatingAsccp", "asccp_id", "asccp_manifest_id", "asccp", "asccp_manifest");
 
-        assertTrue(sql.stream().anyMatch(s -> s.contains("REPLACE(`snapshot`, '\"to_asccp_manifest_id\": 7', '\"to_asccp_manifest_id\": 1007')")), sql.toString());
+        assertTrue(sql.stream().anyMatch(s -> s.equals("\"to_asccp_manifest_id\": 7(?![0-9]) => \"to_asccp_manifest_id\": 1007")), sql.toString());
         assertTrue(sql.stream().noneMatch(s -> s.contains("from_asccp_manifest_id")), sql.toString());
     }
 
@@ -126,7 +143,7 @@ class ReleasePackageLoaderTest {
     void theToBccpManifestIdKeyOfALogSnapshotKeepsItsNameWhenTheIdIsRelocated() throws Exception {
         List<String> sql = statementsOf("relocatingBccp", "bccp_id", "bccp_manifest_id", "bccp", "bccp_manifest");
 
-        assertTrue(sql.stream().anyMatch(s -> s.contains("REPLACE(`snapshot`, '\"to_bccp_manifest_id\": 7', '\"to_bccp_manifest_id\": 1007')")), sql.toString());
+        assertTrue(sql.stream().anyMatch(s -> s.equals("\"to_bccp_manifest_id\": 7(?![0-9]) => \"to_bccp_manifest_id\": 1007")), sql.toString());
         assertTrue(sql.stream().noneMatch(s -> s.contains("from_bccp_manifest_id")), sql.toString());
     }
 
