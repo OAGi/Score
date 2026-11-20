@@ -200,6 +200,11 @@ public class AgencyIdListQueryService {
                 releaseId, agencyIdListManifestId, agencyIdListValueManifestId, listId, versionId);
     }
 
+    /** Whether the release has an Agency ID List that is not deleted, whatever a list page is filtered by. */
+    public boolean hasActiveAgencyIdList(ScoreUser requester, ReleaseId releaseId) {
+        return query(requester).countActiveAgencyIdLists(releaseId) > 0;
+    }
+
     public boolean hasSameNameAgencyIdList(
             ScoreUser requester, ReleaseId releaseId,
             AgencyIdListManifestId agencyIdListManifestId,

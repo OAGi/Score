@@ -90,6 +90,9 @@ public interface AgencyIdListQueryRepository {
 
     int countActiveAgencyIdLists(AgencyIdListManifestId excludedAgencyIdListManifestId);
 
+    /** How many Agency ID Lists of the release are not deleted, with no filter of a list page. */
+    int countActiveAgencyIdLists(ReleaseId releaseId);
+
     boolean hasSameAgencyIdList(ReleaseId releaseId,
                                 AgencyIdListManifestId agencyIdListManifestId,
                                 AgencyIdListValueManifestId agencyIdListValueManifestId,
