@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -598,6 +599,37 @@ public class ReleasePackageLoader {
         }
     }
 
+    /**
+     * Moves the number of {@code key} in the {@code log} snapshots of the loaded records from {@code from} to {@code to}.
+     * The number is taken whole: 12 is not the start of 123.
+     */
+    private void renumberSnapshot(Connection conn, Metadata metadata, String key, long from, long to) throws SQLException {
+        String search = "\"" + key + "\": " + from;
+        renumber(conn, "log", "snapshot", search, search + "(?![0-9])", "\"" + key + "\": " + to,
+                "`log_id` > " + metadata.getTable("log").getMaxId());
+    }
+
+    /**
+     * Moves the number of the {@code tag} segment in the {@code path} of the BIE records from {@code from} to
+     * {@code to}. A segment is taken whole: {@code DT-12} is not the start of {@code DT-123}.
+     */
+    private void renumberPath(Connection conn, String table, String tag, long from, long to) throws SQLException {
+        String search = tag + "-" + from;
+        renumber(conn, table, "path", search, "(?<![A-Z_])" + search + "(?![0-9])", tag + "-" + to, null);
+    }
+
+    private void renumber(Connection conn, String table, String column, String like, String pattern, String replacement,
+                          String condition) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET `" + column
+                + "` = REGEXP_REPLACE(`" + column + "`, ?, ?) WHERE `" + column + "` LIKE ?"
+                + (condition != null ? " AND " + condition : ""))) {
+            statement.setString(1, pattern);
+            statement.setString(2, replacement);
+            statement.setString(3, "%" + like + "%");
+            statement.executeUpdate();
+        }
+    }
+
     private void relocatingEndUserData(Connection conn, Info info) throws SQLException {
         try (Statement statement = conn.createStatement()) {
             statement.execute("SET FOREIGN_KEY_CHECKS = 0");
@@ -693,17 +725,15 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bie_user_ext_revision` SET `user_ext_acc_id` = " + entry.getValue() + " WHERE `user_ext_acc_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"acc_id\": " + entry.getKey() + "', '\"acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_acc_id\": " + entry.getKey() + "', '\"based_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_acc_id\": " + entry.getKey() + "', '\"replacement_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_acc_id\": " + entry.getKey() + "', '\"prev_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_acc_id\": " + entry.getKey() + "', '\"next_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"from_acc_id\": " + entry.getKey() + "', '\"from_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"role_of_acc_id\": " + entry.getKey() + "', '\"role_of_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"ext_acc_id\": " + entry.getKey() + "', '\"ext_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"user_ext_acc_id\": " + entry.getKey() + "', '\"user_ext_acc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "from_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "role_of_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "ext_acc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "user_ext_acc_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : accManifestIdMap.entrySet()) {
@@ -723,12 +753,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'ACC-" + entry.getKey() + "', 'ACC-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "ACC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "ACC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "ACC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "ACC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "ACC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "ACC", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -738,15 +768,13 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"acc_manifest_id\": " + entry.getKey() + "', '\"acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_acc_manifest_id\": " + entry.getKey() + "', '\"based_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_acc_manifest_id\": " + entry.getKey() + "', '\"replacement_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_acc_manifest_id\": " + entry.getKey() + "', '\"prev_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_acc_manifest_id\": " + entry.getKey() + "', '\"next_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"from_acc_manifest_id\": " + entry.getKey() + "', '\"from_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"role_of_acc_manifest_id\": " + entry.getKey() + "', '\"role_of_acc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "from_acc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "role_of_acc_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -788,12 +816,10 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `ascc_manifest` SET `ascc_id` = " + entry.getValue() + " WHERE `ascc_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"ascc_id\": " + entry.getKey() + "', '\"ascc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_ascc_id\": " + entry.getKey() + "', '\"replacement_ascc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_ascc_id\": " + entry.getKey() + "', '\"prev_ascc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_ascc_id\": " + entry.getKey() + "', '\"next_ascc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "ascc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_ascc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_ascc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_ascc_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : asccManifestIdMap.entrySet()) {
@@ -807,12 +833,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'ASCC-" + entry.getKey() + "', 'ASCC-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "ASCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "ASCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "ASCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "ASCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "ASCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "ASCC", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -822,13 +848,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"ascc_manifest_id\": " + entry.getKey() + "', '\"ascc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_ascc_manifest_id\": " + entry.getKey() + "', '\"based_ascc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_ascc_manifest_id\": " + entry.getKey() + "', '\"replacement_ascc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_ascc_manifest_id\": " + entry.getKey() + "', '\"prev_ascc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_ascc_manifest_id\": " + entry.getKey() + "', '\"next_ascc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "ascc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_ascc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_ascc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_ascc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_ascc_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -870,12 +894,10 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bcc_manifest` SET `bcc_id` = " + entry.getValue() + " WHERE `bcc_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bcc_id\": " + entry.getKey() + "', '\"bcc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_bcc_id\": " + entry.getKey() + "', '\"replacement_bcc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_bcc_id\": " + entry.getKey() + "', '\"prev_bcc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_bcc_id\": " + entry.getKey() + "', '\"next_bcc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "bcc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_bcc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_bcc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_bcc_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : bccManifestIdMap.entrySet()) {
@@ -889,12 +911,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'BCC-" + entry.getKey() + "', 'BCC-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "BCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "BCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "BCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "BCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "BCC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "BCC", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -904,13 +926,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bcc_manifest_id\": " + entry.getKey() + "', '\"bcc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_bcc_manifest_id\": " + entry.getKey() + "', '\"based_bcc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_bcc_manifest_id\": " + entry.getKey() + "', '\"replacement_bcc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_bcc_manifest_id\": " + entry.getKey() + "', '\"prev_bcc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_bcc_manifest_id\": " + entry.getKey() + "', '\"next_bcc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "bcc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_bcc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_bcc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_bcc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_bcc_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -952,13 +972,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `asccp_manifest` SET `asccp_id` = " + entry.getValue() + " WHERE `asccp_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"asccp_id\": " + entry.getKey() + "', '\"asccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_asccp_id\": " + entry.getKey() + "', '\"replacement_asccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_asccp_id\": " + entry.getKey() + "', '\"prev_asccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_asccp_id\": " + entry.getKey() + "', '\"next_asccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_asccp_id\": " + entry.getKey() + "', '\"to_asccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "asccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_asccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_asccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_asccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "to_asccp_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : asccpManifestIdMap.entrySet()) {
@@ -974,12 +992,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'ASCCP-" + entry.getKey() + "', 'ASCCP-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "ASCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "ASCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "ASCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "ASCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "ASCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "ASCCP", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -989,14 +1007,12 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"asccp_manifest_id\": " + entry.getKey() + "', '\"asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_asccp_manifest_id\": " + entry.getKey() + "', '\"based_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_asccp_manifest_id\": " + entry.getKey() + "', '\"replacement_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_asccp_manifest_id\": " + entry.getKey() + "', '\"prev_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_asccp_manifest_id\": " + entry.getKey() + "', '\"next_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_asccp_manifest_id\": " + entry.getKey() + "', '\"to_asccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "asccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_asccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_asccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_asccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_asccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "to_asccp_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1038,13 +1054,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bccp_manifest` SET `bccp_id` = " + entry.getValue() + " WHERE `bccp_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bccp_id\": " + entry.getKey() + "', '\"bccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_bccp_id\": " + entry.getKey() + "', '\"replacement_bccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_bccp_id\": " + entry.getKey() + "', '\"prev_bccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_bccp_id\": " + entry.getKey() + "', '\"next_bccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_bccp_id\": " + entry.getKey() + "', '\"to_bccp_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "bccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_bccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_bccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_bccp_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "to_bccp_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : bccpManifestIdMap.entrySet()) {
@@ -1060,12 +1074,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'BCCP-" + entry.getKey() + "', 'BCCP-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "BCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "BCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "BCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "BCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "BCCP", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "BCCP", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -1075,14 +1089,12 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bccp_manifest_id\": " + entry.getKey() + "', '\"bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_bccp_manifest_id\": " + entry.getKey() + "', '\"based_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_bccp_manifest_id\": " + entry.getKey() + "', '\"replacement_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_bccp_manifest_id\": " + entry.getKey() + "', '\"prev_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_bccp_manifest_id\": " + entry.getKey() + "', '\"next_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"to_bccp_manifest_id\": " + entry.getKey() + "', '\"to_bccp_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "bccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_bccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_bccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_bccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_bccp_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "to_bccp_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1140,17 +1152,15 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `dt_usage_rule` SET `target_dt_id` = " + entry.getValue() + " WHERE `target_dt_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"dt_id\": " + entry.getKey() + "', '\"dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_dt_id\": " + entry.getKey() + "', '\"based_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_dt_id\": " + entry.getKey() + "', '\"replacement_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_dt_id\": " + entry.getKey() + "', '\"prev_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_dt_id\": " + entry.getKey() + "', '\"next_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"owner_dt_id\": " + entry.getKey() + "', '\"owner_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bdt_id\": " + entry.getKey() + "', '\"bdt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"cdt_id\": " + entry.getKey() + "', '\"cdt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"target_dt_id\": " + entry.getKey() + "', '\"target_dt_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "owner_dt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "bdt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "cdt_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "target_dt_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : dtManifestIdMap.entrySet()) {
@@ -1167,12 +1177,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'DT-" + entry.getKey() + "', 'DT-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "DT", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "DT", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "DT", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "DT", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "DT", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "DT", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -1182,15 +1192,13 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"dt_manifest_id\": " + entry.getKey() + "', '\"dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_dt_manifest_id\": " + entry.getKey() + "', '\"based_dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_dt_manifest_id\": " + entry.getKey() + "', '\"replacement_dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_dt_manifest_id\": " + entry.getKey() + "', '\"prev_dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_dt_manifest_id\": " + entry.getKey() + "', '\"next_dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"owner_dt_manifest_id\": " + entry.getKey() + "', '\"owner_dt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bdt_manifest_id\": " + entry.getKey() + "', '\"bdt_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "owner_dt_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "bdt_manifest_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : dtAwdPriIdMap.entrySet()) {
@@ -1252,15 +1260,13 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `dt_usage_rule` SET `target_dt_sc_id` = " + entry.getValue() + " WHERE `target_dt_sc_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"dt_sc_id\": " + entry.getKey() + "', '\"dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_dt_sc_id\": " + entry.getKey() + "', '\"based_dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_dt_sc_id\": " + entry.getKey() + "', '\"replacement_dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_dt_sc_id\": " + entry.getKey() + "', '\"prev_dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_dt_sc_id\": " + entry.getKey() + "', '\"next_dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"cdt_sc_id\": " + entry.getKey() + "', '\"cdt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"target_dt_sc_id\": " + entry.getKey() + "', '\"target_dt_sc_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "dt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_dt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_dt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_dt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_dt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "cdt_sc_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "target_dt_sc_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : dtScManifestIdMap.entrySet()) {
@@ -1274,12 +1280,12 @@ public class ReleasePackageLoader {
             }
 
             try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `abie` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbie` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `asbiep` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbiep` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
-                statement.execute("UPDATE `bbie_sc` SET `path` = REPLACE(`path`, 'DT_SC-" + entry.getKey() + "', 'DT_SC-" + entry.getValue() + "')");
+                renumberPath(conn, "abie", "DT_SC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbie", "DT_SC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie", "DT_SC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "asbiep", "DT_SC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbiep", "DT_SC", entry.getKey(), entry.getValue());
+                renumberPath(conn, "bbie_sc", "DT_SC", entry.getKey(), entry.getValue());
 
                 statement.execute("UPDATE `abie` SET `hash_path` = SHA2(`path`, 256)");
                 statement.execute("UPDATE `asbie` SET `hash_path` = SHA2(`path`, 256)");
@@ -1289,14 +1295,12 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `bbie_sc` SET `hash_path` = SHA2(`path`, 256)");
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"dt_sc_manifest_id\": " + entry.getKey() + "', '\"dt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_dt_sc_manifest_id\": " + entry.getKey() + "', '\"based_dt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_dt_sc_manifest_id\": " + entry.getKey() + "', '\"replacement_dt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_dt_sc_manifest_id\": " + entry.getKey() + "', '\"prev_dt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_dt_sc_manifest_id\": " + entry.getKey() + "', '\"next_dt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"bdt_sc_manifest_id\": " + entry.getKey() + "', '\"bdt_sc_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "dt_sc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_dt_sc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_dt_sc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_dt_sc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_dt_sc_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "bdt_sc_manifest_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : dtScAwdPriIdMap.entrySet()) {
@@ -1331,11 +1335,9 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `seq_key` SET `next_seq_key_id` = " + entry.getValue() + " WHERE `next_seq_key_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"seq_key_id\": " + entry.getKey() + "', '\"seq_key_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_seq_key_id\": " + entry.getKey() + "', '\"prev_seq_key_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_seq_key_id\": " + entry.getKey() + "', '\"next_seq_key_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "seq_key_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_seq_key_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_seq_key_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1379,13 +1381,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `ctx_scheme` SET `code_list_id` = " + entry.getValue() + " WHERE `code_list_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"code_list_id\": " + entry.getKey() + "', '\"code_list_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_code_list_id\": " + entry.getKey() + "', '\"based_code_list_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_code_list_id\": " + entry.getKey() + "', '\"replacement_code_list_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_code_list_id\": " + entry.getKey() + "', '\"prev_code_list_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_code_list_id\": " + entry.getKey() + "', '\"next_code_list_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "code_list_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_code_list_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_code_list_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_code_list_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_code_list_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : codeListManifestIdMap.entrySet()) {
@@ -1403,13 +1403,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `module_code_list_manifest` SET `code_list_manifest_id` = " + entry.getValue() + " WHERE `code_list_manifest_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"code_list_manifest_id\": " + entry.getKey() + "', '\"code_list_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_code_list_manifest_id\": " + entry.getKey() + "', '\"based_code_list_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_code_list_manifest_id\": " + entry.getKey() + "', '\"replacement_code_list_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_code_list_manifest_id\": " + entry.getKey() + "', '\"prev_code_list_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_code_list_manifest_id\": " + entry.getKey() + "', '\"next_code_list_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "code_list_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_code_list_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_code_list_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_code_list_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_code_list_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1451,13 +1449,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `code_list_value_manifest` SET `code_list_value_id` = " + entry.getValue() + " WHERE `code_list_value_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"code_list_value_id\": " + entry.getKey() + "', '\"code_list_value_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_code_list_value_id\": " + entry.getKey() + "', '\"based_code_list_value_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_code_list_value_id\": " + entry.getKey() + "', '\"replacement_code_list_value_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_code_list_value_id\": " + entry.getKey() + "', '\"prev_code_list_value_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_code_list_value_id\": " + entry.getKey() + "', '\"next_code_list_value_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "code_list_value_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_code_list_value_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_code_list_value_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_code_list_value_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_code_list_value_id", entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Long, Long> entry : codeListValueManifestIdMap.entrySet()) {
@@ -1469,13 +1465,11 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `code_list_value_manifest` SET `next_code_list_value_manifest_id` = " + entry.getValue() + " WHERE `next_code_list_value_manifest_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"code_list_value_manifest_id\": " + entry.getKey() + "', '\"code_list_value_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"based_code_list_value_manifest_id\": " + entry.getKey() + "', '\"based_code_list_value_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"replacement_code_list_value_manifest_id\": " + entry.getKey() + "', '\"replacement_code_list_value_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_code_list_value_manifest_id\": " + entry.getKey() + "', '\"prev_code_list_value_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_code_list_value_manifest_id\": " + entry.getKey() + "', '\"next_code_list_value_manifest_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "code_list_value_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "based_code_list_value_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "replacement_code_list_value_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_code_list_value_manifest_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_code_list_value_manifest_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1509,11 +1503,9 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `xbt_manifest` SET `log_id` = " + entry.getValue() + " WHERE `log_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"log_id\": " + entry.getKey() + "', '\"log_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"prev_log_id\": " + entry.getKey() + "', '\"prev_log_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"next_log_id\": " + entry.getKey() + "', '\"next_log_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "log_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "prev_log_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "next_log_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1546,9 +1538,7 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `release` SET `namespace_id` = " + entry.getValue() + " WHERE `namespace_id` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"namespace_id\": " + entry.getKey() + "', '\"namespace_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "namespace_id", entry.getKey(), entry.getValue());
         }
     }
 
@@ -1705,14 +1695,12 @@ public class ReleasePackageLoader {
                 statement.execute("UPDATE `xbt` SET `last_updated_by` = " + entry.getValue() + " WHERE `last_updated_by` = " + entry.getKey());
             }
 
-            try (Statement statement = conn.createStatement()) {
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"app_user_id\": " + entry.getKey() + "', '\"app_user_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"created_by\": " + entry.getKey() + "', '\"created_by\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"last_updated_by\": " + entry.getKey() + "', '\"last_updated_by\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"owner_user_id\": " + entry.getKey() + "', '\"owner_user_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"sender_id\": " + entry.getKey() + "', '\"sender_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-                statement.execute("UPDATE `log` SET `snapshot` = REPLACE(`snapshot`, '\"recipient_id\": " + entry.getKey() + "', '\"recipient_id\": " + entry.getValue() + "') WHERE `log_id` > " + metadata.getTable("log").getMaxId());
-            }
+            renumberSnapshot(conn, metadata, "app_user_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "created_by", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "last_updated_by", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "owner_user_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "sender_id", entry.getKey(), entry.getValue());
+            renumberSnapshot(conn, metadata, "recipient_id", entry.getKey(), entry.getValue());
         }
     }
 
