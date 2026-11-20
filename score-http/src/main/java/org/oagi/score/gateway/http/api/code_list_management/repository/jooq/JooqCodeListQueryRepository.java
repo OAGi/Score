@@ -1147,6 +1147,10 @@ public class JooqCodeListQueryRepository extends JooqBaseRepository implements C
                         field = MODULE.PATH;
                         break;
 
+                    case "state":
+                        field = CODE_LIST.STATE;
+                        break;
+
                     case "lastUpdateTimestamp":
                         field = CODE_LIST.LAST_UPDATE_TIMESTAMP;
                         break;
