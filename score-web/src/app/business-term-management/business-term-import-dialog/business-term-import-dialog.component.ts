@@ -22,7 +22,7 @@ import {
   UriMode,
 } from './business-term-import.model';
 import {autoDetect, buildImportRows, isMappingComplete} from './business-term-import.mapping';
-import {isValidUri, validateImportRow} from './business-term-import.validation';
+import {hasAllowedUriScheme, isValidUri, validateImportRow} from './business-term-import.validation';
 import {BusinessTermService} from '../domain/business-term.service';
 
 type ImportPhase = 'upload' | 'map' | 'preview' | 'result';
@@ -312,7 +312,7 @@ export class BusinessTermImportDialogComponent implements OnDestroy {
       return false;
     }
     const base = (this.mapping.uriBase || '').trim();
-    return base.length > 0 && !isValidUri(base);
+    return base.length > 0 && !(isValidUri(base) && hasAllowedUriScheme(base));
   }
 
   get canProceedFromMapping(): boolean {
