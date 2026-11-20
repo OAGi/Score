@@ -82,10 +82,6 @@ export class ReleaseAssignComponent implements OnInit {
   isValidated = false;
 
   ngOnInit() {
-    const userToken = this.auth.getUserToken();
-    if (!userToken.roles.includes('developer')) {
-      this.router.navigateByUrl('/');
-    }
     this.isLoading = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
@@ -110,6 +106,11 @@ export class ReleaseAssignComponent implements OnInit {
       this.filteredLoginIdList.next(this.loginIdList);
 
       this.isLoading = false;
+    }, err => {
+      this.isLoading = false;
+      this.snackBar.open(err.status === 403 ? 'You do not have access permission.'
+        : (err.status === 404 ? 'The requested release is unavailable.' : 'Something\'s wrong.'), '', {duration: 3000});
+      this.router.navigateByUrl('/release');
     });
   }
 

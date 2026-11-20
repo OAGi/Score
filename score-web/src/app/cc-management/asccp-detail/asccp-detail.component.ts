@@ -270,9 +270,14 @@ export class AsccpDetailComponent implements OnInit, OnDestroy, CcTreeValidation
         this.redirectToCcList();
         return;
       }
-      this.snackBar.open('Something\'s wrong.', '', {
+      const errorMessage = (err.status === 403) ?
+        'You do not have access permission.' : 'Something\'s wrong.';
+      this.snackBar.open(errorMessage, '', {
         duration: 3000
       });
+      if (err.status === 403) {
+        this.router.navigateByUrl('/core_component');
+      }
     });
   }
 

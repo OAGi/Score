@@ -6,7 +6,7 @@ import {OAuth2AppInfo, UserToken} from '../../authentication/domain/auth';
 import {PasskeyService} from '../../authentication/passkey/passkey.service';
 import {PasskeyCancelledError} from '../../authentication/passkey/passkey';
 import {PasskeyOfferService} from '../passkey-offer/passkey-offer.service';
-import {map, Observable, shareReplay} from 'rxjs';
+import {catchError, map, Observable, of, shareReplay} from 'rxjs';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WebPageInfo} from '../about/domain/about';
@@ -203,11 +203,15 @@ export class LoginComponent implements OnDestroy {
     this.snackBar.open('Signed in as \'' + resp.username + '\' (' + role + ')', '', {
       duration: 3000,
     });
-    this.router.navigateByUrl(this.next).then(() => {
-      // After a password sign-in, offer a passkey to a user who has none (see PasskeyOfferService).
-      if (method === 'password') {
-        this.passkeyOffer.offerAfterPasswordSignIn(resp.username);
-      }
+    // The sign-in response lacks some fields of the stored token (e.g. `enabled`, which shows the navigation bar and
+    // lets the route guards through), so the token is completed from the session before the first page opens.
+    this.auth.reloadUserToken().pipe(catchError(() => of(undefined))).subscribe(() => {
+      this.router.navigateByUrl(this.next).then(() => {
+        // After a password sign-in, offer a passkey to a user who has none (see PasskeyOfferService).
+        if (method === 'password') {
+          this.passkeyOffer.offerAfterPasswordSignIn(resp.username);
+        }
+      });
     });
   }
 

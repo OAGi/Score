@@ -29,6 +29,11 @@ export class BieAcceptOwnershipTransferRequestComponent implements OnInit {
     href = href.substring(0, href.indexOf('/profile_bie'));
 
     this.service.getBieListByTopLevelAsbiepId(topLevelAsbiepId).subscribe(bie => {
+      if (!bie) {
+        this.onBieUnavailable();
+        return;
+      }
+
       this.service.transferOwnership(topLevelAsbiepId, targetLoginId, true, {
         bie_link: href + '/profile_bie/' + topLevelAsbiepId,
         bie_name: bie.den,
@@ -43,7 +48,17 @@ export class BieAcceptOwnershipTransferRequestComponent implements OnInit {
         this.loading = false;
         this.router.navigateByUrl('/profile_bie');
       });
+    }, err => {
+      this.loading = false;
+      this.snackBar.open(err.status === 403 ? 'You do not have access permission.' : 'Something\'s wrong.', '', {duration: 3000});
+      this.router.navigateByUrl('/profile_bie');
     });
+  }
+
+  private onBieUnavailable() {
+    this.loading = false;
+    this.snackBar.open('The requested BIE is unavailable.', '', {duration: 3000});
+    this.router.navigateByUrl('/profile_bie');
   }
 
 }

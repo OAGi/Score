@@ -41,6 +41,10 @@ export class UpdateTenantComponent implements OnInit {
       this.hashCode = hashCode(resp);
       this.tenant = resp;
       setAppTitleIfPresent(this.titleService, this.tenant.name, 'Tenant');
+    }, err => {
+      this.snackBar.open(err.status === 403 ? 'You do not have access permission.'
+        : (err.status === 404 ? 'The requested tenant is unavailable.' : 'Something\'s wrong.'), '', {duration: 3000});
+      this.router.navigateByUrl('/tenant');
     });
   }
 

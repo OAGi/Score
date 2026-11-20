@@ -9,6 +9,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {AuthService} from '../authentication/auth.service';
+import {canActivateUser, ONLY_DEVELOPERS} from '../authentication/can-activate-user';
 import {ReleaseService} from './domain/release.service';
 import {ReleaseCreateComponent} from './release-create/release-create.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -23,6 +24,9 @@ import {SCORE_TABLE} from '../common/score-table';
 import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
 
+/** A user who may not create or assign a release goes to the release list. */
+const developer = canActivateUser(ONLY_DEVELOPERS, '/release');
+
 const routes: Routes = [
   {
     path: 'release',
@@ -35,7 +39,7 @@ const routes: Routes = [
       }, {
         path: 'create',
         component: ReleaseCreateComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, developer],
         title: 'Create Release'
       }, {
         path: ':id',
@@ -48,7 +52,7 @@ const routes: Routes = [
         }, {
           path: 'assign',
           component: ReleaseAssignComponent,
-          canActivate: [AuthService],
+          canActivate: [AuthService, developer],
           title: 'Assign Release'
         }]
       }

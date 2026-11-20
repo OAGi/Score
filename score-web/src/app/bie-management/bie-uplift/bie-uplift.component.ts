@@ -33,6 +33,7 @@ import {BieEditAbieNode, RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {saveBooleanProperty} from '../../common/utility';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {Title} from '@angular/platform-browser';
 import {formatAppTitle} from '../../common/app-title.strategy';
 import {CardinalityDecorator} from '../../common/tree-viewport/cardinality-decorator';
@@ -196,6 +197,7 @@ export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private titleService = inject(Title);
+  private snackBar = inject(MatSnackBar);
   private confirmDialogService = inject(ConfirmDialogService);
   webPageInfo = inject(WebPageInfoService);
 
@@ -418,15 +420,25 @@ export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost
           }
 
           this.loading = false;
-        }, () => {
-          this.loading = false;
-        });
-      }, () => {
-        this.loading = false;
-      });
-    }, () => {
-      this.loading = false;
-    });
+        }, err => this.onLoadError(err));
+      }, err => this.onLoadError(err));
+    }, err => this.onLoadError(err));
+  }
+
+  /** The BIE to uplift is missing or not accessible: say why and go back to the BIE list to pick another. */
+  private onLoadError(err: any): void {
+    this.loading = false;
+    let errorMessage = 'Something\'s wrong.';
+    if (err?.status === 403) {
+      errorMessage = 'You do not have access permission.';
+    } else if (err?.status === 404) {
+      errorMessage = 'The requested BIE is unavailable.';
+    } else if (err?.status === 400) {
+      // e.g. 'Source BIE release record not found.'
+      errorMessage = err.headers?.get('x-error-message') || 'The requested BIE is unavailable.';
+    }
+    this.snackBar.open(errorMessage, '', {duration: 3000});
+    this.router.navigateByUrl('/profile_bie');
   }
 
   private updatePageTitle(): void {

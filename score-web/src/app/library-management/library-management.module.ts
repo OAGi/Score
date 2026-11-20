@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {LibraryService} from './domain/library.service';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../authentication/auth.service';
+import {canActivateUser, ONLY_ADMINISTRATORS} from '../authentication/can-activate-user';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {ScoreCommonModule} from '../common/score-common.module';
@@ -14,6 +15,9 @@ import {LibraryDetailComponent} from './library-detail/library-detail.component'
 import {SCORE_TABLE} from '../common/score-table';
 import {RecordCompactRowComponent} from '../common/record-compact-row';
 import {ResponsiveButtonComponent} from '../common/responsive-button';
+
+/** A user who may not create a library goes to the library list. */
+const administrator = canActivateUser(ONLY_ADMINISTRATORS, '/library');
 
 const routes: Routes = [
   {
@@ -28,7 +32,7 @@ const routes: Routes = [
       {
         path: 'create',
         component: LibraryCreateComponent,
-        canActivate: [AuthService],
+        canActivate: [AuthService, administrator],
         title: 'Create Library'
       },
       {

@@ -41,6 +41,10 @@ export class MessageViewComponent implements OnInit {
       ).subscribe(message => {
         this.message = message;
         setAppTitleIfPresent(this.titleService, this.message.subject, 'Message');
+      }, err => {
+        this.snackBar.open(err?.status === 403 ? 'You do not have access permission.'
+          : 'The requested message is unavailable.', '', {duration: 3000});
+        this.router.navigateByUrl('/message');
       });
     });
   }

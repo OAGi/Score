@@ -1913,3 +1913,32 @@ describe('BieUpliftComponent', () => {
     expect(childTarget.source).toBe(childSource);
   });
 });
+
+describe('BieUpliftComponent load errors', () => {
+  function fail(status: number, serverMessage?: string) {
+    const ctx: any = {loading: true, snackBar: {open: vi.fn()}, router: {navigateByUrl: vi.fn()}};
+    (BieUpliftComponent.prototype as any).onLoadError.call(ctx, {status, headers: {get: () => serverMessage}});
+    return ctx;
+  }
+
+  it.each([
+    [404, 'The requested BIE is unavailable.'],
+    [403, 'You do not have access permission.'],
+    [500, 'Something\'s wrong.']
+  ])('goes back to the BIE list with a message for %i', (status, message) => {
+    const ctx = fail(status);
+    expect(ctx.snackBar.open).toHaveBeenCalledWith(message, '', {duration: 3000});
+    expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/profile_bie');
+    expect(ctx.loading).toBe(false);
+  });
+});
+
+describe('BieUpliftComponent load errors from the server message', () => {
+  it('shows the message the server gives for a bad request, such as a BIE that is not found', () => {
+    const ctx: any = {loading: true, snackBar: {open: vi.fn()}, router: {navigateByUrl: vi.fn()}};
+    (BieUpliftComponent.prototype as any).onLoadError.call(ctx,
+      {status: 400, headers: {get: () => 'Source BIE release record not found.'}});
+    expect(ctx.snackBar.open).toHaveBeenCalledWith('Source BIE release record not found.', '', {duration: 3000});
+    expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/profile_bie');
+  });
+});

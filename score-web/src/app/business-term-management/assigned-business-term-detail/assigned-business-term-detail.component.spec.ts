@@ -1,4 +1,4 @@
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {AssignedBusinessTermDetailComponent} from './assigned-business-term-detail.component';
 
 describe('AssignedBusinessTermDetailComponent', () => {
@@ -32,6 +32,41 @@ describe('AssignedBusinessTermDetailComponent', () => {
       component.checkIfPrimaryWillBeOverwrittenAndDoUpdate(edited);
       expect(component.confirmDialogService.open).toHaveBeenCalled();
       expect(component.doUpdate).not.toHaveBeenCalled();
+    });
+  });
+  describe('opening an assignment that cannot be loaded', () => {
+    function open(query: any, result: any) {
+      const component = Object.create(AssignedBusinessTermDetailComponent.prototype) as any;
+      component.route = {snapshot: {queryParams: query}};
+      component.service = {getAssignedBusinessTerm: vi.fn(() => result)};
+      component.titleService = {setTitle: vi.fn()};
+      component.snackBar = {open: vi.fn()};
+      component.router = {navigateByUrl: vi.fn()};
+      component.ngOnInit();
+      return component;
+    }
+
+    const list = '/business_term_management/assign_business_term';
+
+    it('goes back to the list when the link has no type and id', () => {
+      const component = open({}, of(undefined));
+      expect(component.service.getAssignedBusinessTerm).not.toHaveBeenCalled();
+      expect(component.snackBar.open).toHaveBeenCalledWith(
+        'The requested business term assignment is unavailable.', '', {duration: 3000});
+      expect(component.router.navigateByUrl).toHaveBeenCalledWith(list);
+    });
+
+    it.each([404, 400])('says the assignment is unavailable for %i', status => {
+      const component = open({type: 'ASBIE', id: '5'}, throwError(() => ({status})));
+      expect(component.snackBar.open).toHaveBeenCalledWith(
+        'The requested business term assignment is unavailable.', '', {duration: 3000});
+      expect(component.router.navigateByUrl).toHaveBeenCalledWith(list);
+    });
+
+    it('says there is no access permission for 403', () => {
+      const component = open({type: 'ASBIE', id: '5'}, throwError(() => ({status: 403})));
+      expect(component.snackBar.open).toHaveBeenCalledWith('You do not have access permission.', '', {duration: 3000});
+      expect(component.router.navigateByUrl).toHaveBeenCalledWith(list);
     });
   });
 });

@@ -4,7 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {provideHttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {vi} from 'vitest';
 import {LoginComponent} from './login.component';
 import {AuthService} from '../../authentication/auth.service';
@@ -44,6 +44,7 @@ describe('LoginComponent passkey sign-in', () => {
       getOAuth2AppInfos: vi.fn().mockReturnValue(of(options.oidc ?? [])),
       getUserToken: vi.fn().mockReturnValue({roles: ['']}),
       storeUserInfo: vi.fn(),
+      reloadUserToken: vi.fn(() => of({})),
       authenticate: vi.fn()
     };
     passkey = {
@@ -340,6 +341,39 @@ describe('LoginComponent passkey sign-in', () => {
 
       expect(auth.authenticate).toHaveBeenCalled();
       expect(offer.offerAfterPasswordSignIn).toHaveBeenCalledWith('bob');
+    });
+  });
+
+  describe('completing the stored token after a sign-in', () => {
+    function signInWithPassword() {
+      auth.authenticate.mockImplementation((_credentials, ok) => ok({username: 'alice', roles: ['end-user']}));
+      fixture.componentInstance.login();
+    }
+
+    it('reloads the token from the session before the first page opens', () => {
+      setup({enabled: true});
+      const order: string[] = [];
+      auth.reloadUserToken.mockImplementation(() => {
+        order.push('reload');
+        return of({});
+      });
+      router.navigateByUrl.mockImplementation(() => {
+        order.push('navigate');
+        return Promise.resolve(true);
+      });
+
+      signInWithPassword();
+
+      expect(order).toEqual(['reload', 'navigate']);
+    });
+
+    it('still opens the page when the token cannot be reloaded', () => {
+      setup({enabled: true});
+      auth.reloadUserToken.mockReturnValue(throwError(() => new Error('500')));
+
+      signInWithPassword();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/');
     });
   });
 
