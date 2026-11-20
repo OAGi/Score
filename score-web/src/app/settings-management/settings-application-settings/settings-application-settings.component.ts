@@ -285,10 +285,28 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
     // Handle 'Ctrl/Command+S'
     const metaOrCtrlKeyPressed = $event.metaKey || $event.ctrlKey;
     if (metaOrCtrlKeyPressed && charCode === 's') {
-      $event.preventDefault();
-      $event.stopPropagation();
-
-      this.updateWebPageInfo();
+      if (this.section === 'smtp') {
+        if (!this.applicationSettingsInfo?.smtpSettingsInfo) {
+          return;
+        }
+        $event.preventDefault();
+        $event.stopPropagation();
+        this.updateApplicationSettingsInfo();
+      } else if (this.section === 'filename-expressions') {
+        if (!this.applicationSettingsInfo) {
+          return;
+        }
+        $event.preventDefault();
+        $event.stopPropagation();
+        this.updateBieFilenameExpressions();
+      } else if (this.section === 'web-page') {
+        if (!this.webPageInfo) {
+          return;
+        }
+        $event.preventDefault();
+        $event.stopPropagation();
+        this.updateWebPageInfo();
+      }
     }
   }
 
