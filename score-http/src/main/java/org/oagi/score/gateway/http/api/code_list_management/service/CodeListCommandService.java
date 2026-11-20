@@ -63,6 +63,16 @@ public class CodeListCommandService {
 
         var command = command(requester);
 
+        // A developer makes a code list in the Working release, and an end user in another release.
+        boolean working = repositoryFactory.releaseQueryRepository(requester)
+                .getReleaseSummary(request.releaseId()).isWorkingRelease();
+        if (requester.isDeveloper() && !working) {
+            throw new IllegalArgumentException("Developers can only create a Code List in the Working release.");
+        }
+        if (!requester.isDeveloper() && working) {
+            throw new IllegalArgumentException("End users cannot create a Code List in the Working release.");
+        }
+
         CodeListManifestId codeListManifestId =
                 command.create(request.releaseId(), request.basedCodeListManifestId());
 
