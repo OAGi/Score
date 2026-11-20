@@ -214,6 +214,14 @@ public class AgencyIdListQueryController {
                 releaseId, agencyIdListManifestId, agencyIdListValueManifestId, listId, versionId);
     }
 
+    @GetMapping(value = "/has-active")
+    public boolean hasActiveAgencyIdList(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @RequestParam(name = "releaseId") ReleaseId releaseId) {
+
+        return agencyIdListQueryService.hasActiveAgencyIdList(sessionService.asScoreUser(user), releaseId);
+    }
+
     @GetMapping(value = "/check-name-uniqueness")
     public boolean checkNameUniqueness(
             @AuthenticationPrincipal AuthenticatedPrincipal user,

@@ -1236,6 +1236,18 @@ public class JooqAgencyIdListQueryRepository extends JooqBaseRepository implemen
     }
 
     @Override
+    public int countActiveAgencyIdLists(ReleaseId releaseId) {
+        return dslContext().selectCount()
+                .from(AGENCY_ID_LIST_MANIFEST)
+                .join(AGENCY_ID_LIST).on(Tables.AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                .where(and(
+                        AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        AGENCY_ID_LIST.STATE.notEqual("Deleted")
+                ))
+                .fetchOptionalInto(Integer.class).orElse(0);
+    }
+
+    @Override
     public boolean hasSameAgencyIdList(ReleaseId releaseId,
                                        AgencyIdListManifestId agencyIdListManifestId,
                                        AgencyIdListValueManifestId agencyIdListValueManifestId,

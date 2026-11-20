@@ -153,6 +153,11 @@ export class AgencyIdListService {
     });
   }
 
+  /** Whether the branch has an Agency ID List that is not deleted, whatever the list page is filtered by. */
+  hasActiveAgencyIdList(releaseId: number): Observable<boolean> {
+    return this.http.get<boolean>('/api/agency-id-lists/has-active', {params: new HttpParams().set('releaseId', '' + releaseId)});
+  }
+
   checkUniqueness(agencyIdList: AgencyIdListDetails): Observable<boolean> {
     let params = new HttpParams()
         .set('releaseId', '' + agencyIdList.release.releaseId)

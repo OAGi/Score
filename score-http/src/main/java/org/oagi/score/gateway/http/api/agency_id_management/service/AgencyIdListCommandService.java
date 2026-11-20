@@ -12,6 +12,7 @@ import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,24 @@ public class AgencyIdListCommandService {
     public AgencyIdListManifestId create(ScoreUser requester, CreateAgencyIdListRequest request) {
 
         var command = command(requester);
+
+        // A developer makes a list in the Working release, and an end user in another release.
+        ReleaseId releaseId = (request.basedAgencyIdListManifestId() != null)
+                ? query(requester).getAgencyIdListReleaseId(request.basedAgencyIdListManifestId())
+                : request.releaseId();
+        boolean working = repositoryFactory.releaseQueryRepository(requester).getReleaseSummary(releaseId).isWorkingRelease();
+        if (requester.isDeveloper() && !working) {
+            throw new IllegalArgumentException("Developers can only create an Agency ID List in the Working release.");
+        }
+        if (!requester.isDeveloper() && working) {
+            throw new IllegalArgumentException("End users cannot create an Agency ID List in the Working release.");
+        }
+
+        // A developer has one Agency ID List in a release, as when a deleted one is restored.
+        if (requester.isDeveloper() && request.basedAgencyIdListManifestId() == null
+                && query(requester).countActiveAgencyIdLists(releaseId) > 0) {
+            throw new IllegalArgumentException("Another active Agency ID List has been found. Only one Agency ID List for developers is allowed.");
+        }
 
         AgencyIdListManifestId agencyIdListManifestId =
                 command.create(request.releaseId(), request.basedAgencyIdListManifestId());

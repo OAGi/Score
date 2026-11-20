@@ -114,7 +114,17 @@ export class AgencyIdListListComponent {
   /** While an item is being deleted. */
   readonly busy = signal(false);
 
-  readonly load = (params: HttpParams) => this.service.getAgencyIdListListPage(params);
+  /**
+   * Whether the branch has an Agency ID List that is not deleted. It is asked of the server, not told by the rows of the page, which a
+   * filter or another page leaves out. It is taken as true until it is known, so that the button does not show for a moment.
+   */
+  readonly branchHasAgencyIdList = signal(true);
+
+  /** Every load of the page (a search, a delete, a purge, a restore) asks again whether the branch has a list. */
+  readonly load = (params: HttpParams) => {
+    this.refreshBranchHasAgencyIdList();
+    return this.service.getAgencyIdListListPage(params);
+  };
   readonly rowSelectable = (row: AgencyIdListListEntry) =>
     this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.loginId === this.currentUser;
 
@@ -138,6 +148,15 @@ export class AgencyIdListListComponent {
         this.ready.set(true);
       });
     });
+  }
+
+  private refreshBranchHasAgencyIdList() {
+    const release = this.releaseChoice.release;
+    if (!release?.workingRelease || !this.auth.getUserToken()?.roles.includes('developer')) {
+      return;
+    }
+    this.service.hasActiveAgencyIdList(release.releaseId)
+      .subscribe(exists => this.branchHasAgencyIdList.set(exists));
   }
 
   /** The library and the branch go to the query. */
@@ -199,7 +218,7 @@ export class AgencyIdListListComponent {
       if (!this.releaseChoice.release?.workingRelease) {
         return false;
       }
-      return (this.view()?.dataSource.data ?? []).filter(e => e.state !== 'Deleted').length === 0;
+      return !this.branchHasAgencyIdList();
     } else {
       if (this.releaseChoice.release?.workingRelease) {
         return false;
