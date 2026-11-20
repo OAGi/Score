@@ -5,6 +5,8 @@ import {
   ImportRow,
 } from './business-term-import.model';
 
+const ALLOWED_URI_SCHEMES = ['http', 'https', 'urn'];
+
 /**
  * Approximate mirror of the backend {@code Utility.isValidURI}, which only rejects values that make
  * {@code new java.net.URI(value)} throw a syntax error — i.e. it is very permissive (relative and
@@ -24,6 +26,15 @@ export function isValidUri(value: string): boolean {
     return false;
   }
   return true;
+}
+
+/**
+ * Mirror of the server's {@code BusinessTermInputValidator.hasAllowedScheme}: the value must carry an
+ * http, https or urn scheme. Only meaningful for a value that {@link isValidUri} already accepts.
+ */
+export function hasAllowedUriScheme(value: string): boolean {
+  const match = /^([A-Za-z][A-Za-z0-9+.-]*):/.exec(value);
+  return !!match && ALLOWED_URI_SCHEMES.includes(match[1].toLowerCase());
 }
 
 /**
@@ -49,6 +60,8 @@ export function validateImportRow(row: ImportRow): string[] {
     errors.push('The external reference URI is longer than ' + EXTERNAL_REFERENCE_URI_MAX_LENGTH + ' characters limit.');
   } else if (!isValidUri(uri)) {
     errors.push(uri + ' is not a valid URI.');
+  } else if (!hasAllowedUriScheme(uri)) {
+    errors.push(uri + ' is not an absolute http, https or urn URI.');
   }
 
   if (id.length > 0 && id.length > EXTERNAL_REFERENCE_ID_MAX_LENGTH) {

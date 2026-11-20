@@ -1,4 +1,4 @@
-import {isValidUri, validateImportRow} from './business-term-import.validation';
+import {hasAllowedUriScheme, isValidUri, validateImportRow} from './business-term-import.validation';
 import {
   BUSINESS_TERM_NAME_MAX_LENGTH,
   EXTERNAL_REFERENCE_ID_MAX_LENGTH,
@@ -46,7 +46,28 @@ describe('isValidUri — mirrors the permissive java.net.URI check', () => {
   });
 });
 
+describe('hasAllowedUriScheme — mirrors the server scheme rule', () => {
+
+  it('accepts http, https and urn in any case', () => {
+    for (const ok of ['http://x.example.com/1', 'https://x.example.com/1', 'HTTPS://x.example.com/1', 'urn:example:1']) {
+      expect(hasAllowedUriScheme(ok), ok).toBe(true);
+    }
+  });
+
+  it('rejects relative, scheme-less and other-scheme values', () => {
+    for (const bad of ['term/1', 'glossary.example.com/term/', 'glossary.example.com:8080/x', 'ftp://host/x', 'javascript:alert(1)', '']) {
+      expect(hasAllowedUriScheme(bad), bad).toBe(false);
+    }
+  });
+});
+
 describe('validateImportRow — server-parity row validation', () => {
+
+  it('flags a URI without an http, https or urn scheme', () => {
+    for (const uri of ['terms/123', 'ftp://host/x']) {
+      expect(validateImportRow(row({externalReferenceUri: uri}))).toContain(uri + ' is not an absolute http, https or urn URI.');
+    }
+  });
 
   it('a well-formed row has no errors', () => {
     expect(validateImportRow(row({}))).toEqual([]);

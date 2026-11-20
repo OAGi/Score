@@ -5,7 +5,7 @@ import {
   TargetField,
   UriMode,
 } from './business-term-import.model';
-import {isValidUri} from './business-term-import.validation';
+import {hasAllowedUriScheme, isValidUri} from './business-term-import.validation';
 
 /**
  * Header aliases used to auto-map common Enterprise Data Platform exports onto connectCenter fields.
@@ -152,5 +152,5 @@ export function isMappingComplete(mapping: ColumnMapping | null): boolean {
   if (mapping.uriMode === 'COLUMN') {
     return !!mapping.uriColumn;
   }
-  return !!(mapping.uriBase && mapping.uriBase.trim()) && isValidUri(mapping.uriBase.trim()) && !!mapping.uriIdColumn;
+  return !!(mapping.uriBase && mapping.uriBase.trim()) && isValidUri(mapping.uriBase.trim()) && hasAllowedUriScheme(mapping.uriBase.trim()) && !!mapping.uriIdColumn;
 }
