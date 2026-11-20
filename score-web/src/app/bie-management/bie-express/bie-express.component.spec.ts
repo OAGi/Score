@@ -9,6 +9,7 @@ import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListEntry} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieExpressComponent} from './bie-express.component';
+import {BieExpressOption} from './domain/generate-expression';
 import {BieExpressService} from './domain/bie-express.service';
 
 describe('BieExpressComponent', () => {
@@ -95,5 +96,54 @@ describe('BieExpressComponent Business Context selection on reload', () => {
     component.load(new HttpParams()).subscribe({error: () => {}});
 
     expect(component.businessContextSelection).toEqual({});
+  });
+});
+
+describe('BieExpressComponent Package option with Meta Header and Pagination Response options', () => {
+  let component: BieExpressComponent;
+  let dialogResult: number | undefined;
+
+  beforeEach(() => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        {provide: BieExpressService, useValue: {}},
+        {provide: BieListService, useValue: {}},
+        {provide: ReleaseService, useValue: {}},
+        {provide: LibraryService, useValue: {}},
+        {provide: AuthService, useValue: {getUserToken: () => undefined}},
+        {provide: MatDialog, useValue: {open: () => ({afterClosed: () => of(dialogResult)})}},
+        {provide: WebPageInfoService, useValue: {}},
+      ]
+    });
+    component = TestBed.runInInjectionContext(() => new BieExpressComponent());
+    component.option = new BieExpressOption();
+    component.option.packageOption = 'ALL';
+    dialogResult = 1;
+  });
+
+  const metaHeader = () => component.toggleMetaHeaderOption(null, false, 'includeMetaHeaderForJson', 'metaHeaderTopLevelAsbiepId');
+  const pagination = () => component.togglePaginationResponseOption(null, false,
+    'includePaginationResponseForJson', 'paginationResponseTopLevelAsbiepId');
+
+  it('restores the original Package option after both options are switched off', () => {
+    metaHeader();
+    pagination();
+    expect(component.option.packageOption).toBe('EACH');
+
+    metaHeader();
+    pagination();
+    expect(component.option.packageOption).toBe('ALL');
+  });
+
+  it('keeps EACH while the other option is still on', () => {
+    metaHeader();
+    pagination();
+
+    metaHeader();
+    expect(component.option.packageOption).toBe('EACH');
+
+    pagination();
+    expect(component.option.packageOption).toBe('ALL');
   });
 });
