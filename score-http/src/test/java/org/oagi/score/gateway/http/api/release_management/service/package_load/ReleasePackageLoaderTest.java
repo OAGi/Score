@@ -6,7 +6,9 @@ import org.oagi.score.gateway.http.api.release_management.model.package_info.Inf
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Metadata;
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Migration;
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Release;
+import org.oagi.score.gateway.http.api.release_management.model.package_info.Table;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -78,6 +80,54 @@ class ReleasePackageLoaderTest {
         assertThrows(IllegalStateException.class, () -> new ReleasePackageLoader(100000000L, null, null, null).run(con, info(1)));
 
         InOrderHelper.assertAutoCommitOffThenOn(con);
+    }
+
+    private static List<String> statementsOf(String relocating, String idColumn, String manifestIdColumn, String table, String manifestTable) throws Exception {
+        Info info = info();
+        List<Table> tables = new ArrayList<>();
+        for (String name : List.of(table, manifestTable, "log")) {
+            Table t = new Table();
+            t.setTableName(name);
+            t.setMaxId(0L);
+            tables.add(t);
+        }
+        info.getMigration().getMetadata().setTables(tables);
+
+        Connection con = mock(Connection.class);
+        Statement statement = mock(Statement.class);
+        ResultSet ids = mock(ResultSet.class);
+        ResultSet manifestIds = mock(ResultSet.class);
+        when(con.createStatement()).thenReturn(statement);
+        when(statement.executeQuery(anyString())).thenAnswer(inv ->
+                ((String) inv.getArgument(0)).contains("`" + manifestTable + "`.`" + manifestIdColumn + "`") ? manifestIds : ids);
+        when(ids.next()).thenReturn(true, false);
+        when(ids.getLong(idColumn)).thenReturn(5L);
+        when(manifestIds.next()).thenReturn(true, false);
+        when(manifestIds.getLong(manifestIdColumn)).thenReturn(7L);
+
+        Method method = ReleasePackageLoader.class.getDeclaredMethod(relocating, Connection.class, Info.class);
+        method.setAccessible(true);
+        method.invoke(new ReleasePackageLoader(1000L, null, null, null), con, info);
+
+        var captor = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(statement, atLeast(0)).execute(captor.capture());
+        return captor.getAllValues();
+    }
+
+    @Test
+    void theToAsccpManifestIdKeyOfALogSnapshotKeepsItsNameWhenTheIdIsRelocated() throws Exception {
+        List<String> sql = statementsOf("relocatingAsccp", "asccp_id", "asccp_manifest_id", "asccp", "asccp_manifest");
+
+        assertTrue(sql.stream().anyMatch(s -> s.contains("REPLACE(`snapshot`, '\"to_asccp_manifest_id\": 7', '\"to_asccp_manifest_id\": 1007')")), sql.toString());
+        assertTrue(sql.stream().noneMatch(s -> s.contains("from_asccp_manifest_id")), sql.toString());
+    }
+
+    @Test
+    void theToBccpManifestIdKeyOfALogSnapshotKeepsItsNameWhenTheIdIsRelocated() throws Exception {
+        List<String> sql = statementsOf("relocatingBccp", "bccp_id", "bccp_manifest_id", "bccp", "bccp_manifest");
+
+        assertTrue(sql.stream().anyMatch(s -> s.contains("REPLACE(`snapshot`, '\"to_bccp_manifest_id\": 7', '\"to_bccp_manifest_id\": 1007')")), sql.toString());
+        assertTrue(sql.stream().noneMatch(s -> s.contains("from_bccp_manifest_id")), sql.toString());
     }
 
     private static final class InOrderHelper {
