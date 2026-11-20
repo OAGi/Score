@@ -159,3 +159,64 @@ Un-checking a used, expandable node whose descendants are all un-used does not t
 5. Un-check the same node again, confirm the dialog via "Uncheck anyway", and verify the node is now un-checked (its used descendants cleared). (Assertion [#25.3.2](#test-assertion-2532))
 6. Check the same node's "Used" on again and verify no confirmation dialog appears and it becomes checked immediately. (Assertion [#25.3.5](#test-assertion-2535))
 7. On a leaf node whose "Used" is checked, un-check it and verify no confirmation dialog appears and the change is applied immediately. (Assertion [#25.3.4](#test-assertion-2534))
+
+## Test Case 25.4
+
+**Code Lists that a developer is offered for a value domain**
+
+> The Value Domain of a BBIE whose data type names no Code List offers the Code Lists of the release of the BIE. A developer is offered only the Published and Production ones. A Production Code List is the one of an end user: the developer sees it, but cannot assign it, so its option is disabled. The same rule applies to a BBIE_SC and to a data type that names Code Lists, which come with the lists derived from or based on them. When a BIE is uplifted, a developer gets only a Code List that the editor would let the developer assign for the same node.
+
+Pre-condition: N/A
+
+
+### Test Assertion:
+
+#### Test Assertion #25.4.1
+A Published Code List of a developer can be chosen as the Value Domain of a BBIE of the developer's BIE.
+
+#### Test Assertion #25.4.2
+A Code List of a developer that is not Published (for example in WIP), and a Code List of an end user that is not in Production, are not offered to the developer.
+
+#### Test Assertion #25.4.3
+A Production Code List of an end user is listed to the developer, but its option is disabled and it cannot be chosen.
+
+### Test Step Pre-condition:
+1. A developer-owned top-level BIE in `WIP` state exists in a release branch, with a BBIE whose data type has a Token primitive and names no Code List.
+2. In that release there are a developer Code List in Published and one in WIP, and an end user Code List in Production and one in WIP.
+
+
+### Test Step:
+1. A developer signs in to connectCenter, opens the top-level BIE in the BIE editor, selects the BBIE, marks it Used and sets the Value Domain Restriction to `Code`.
+2. Search the Value Domain for the Published developer Code List and verify that its option can be chosen. (Assertion [#25.4.1](#test-assertion-2541))
+3. Search for the developer Code List in WIP and the end user Code List in WIP and verify that neither is listed. (Assertion [#25.4.2](#test-assertion-2542))
+4. Search for the end user Code List in Production and verify that it is listed and that its option is disabled. (Assertion [#25.4.3](#test-assertion-2543))
+
+## Test Case 25.5
+
+**Agency ID Lists that a developer is offered for a value domain**
+
+> The Value Domain of a BBIE whose data type names no Agency ID List offers the Agency ID Lists of the release of the BIE. A developer is offered only the Published and Production ones. Unlike a Code List, an Agency ID List in Production, the one of an end user, can be assigned by a developer. The same rule applies to a BBIE_SC and to a data type that names Agency ID Lists, which come with the lists derived from them. When a BIE is uplifted, a developer gets only an Agency ID List that the editor would offer for the same node.
+
+Pre-condition: N/A
+
+
+### Test Assertion:
+
+#### Test Assertion #25.5.1
+A Published Agency ID List of a developer can be chosen as the Value Domain of a BBIE of the developer's BIE.
+
+#### Test Assertion #25.5.2
+A Production Agency ID List of an end user can be chosen by the developer.
+
+#### Test Assertion #25.5.3
+An Agency ID List that is not Published or Production (for example in WIP) is not offered to the developer, whether a developer or an end user owns it.
+
+### Test Step Pre-condition:
+1. A developer-owned top-level BIE in `WIP` state exists in a release branch, with a BBIE whose data type has a Token primitive and names no Agency ID List.
+2. In that release there are a developer Agency ID List in Published and one in WIP, and an end user Agency ID List in Production and one in WIP.
+
+
+### Test Step:
+1. A developer signs in to connectCenter, opens the top-level BIE in the BIE editor, selects the BBIE, marks it Used and sets the Value Domain Restriction to `Agency`.
+2. Search the Value Domain for the Published developer Agency ID List and the end user Agency ID List in Production and verify that both options can be chosen. (Assertions [#25.5.1](#test-assertion-2551), [#25.5.2](#test-assertion-2552))
+3. Search for the developer Agency ID List in WIP and the end user Agency ID List in WIP and verify that neither is listed. (Assertion [#25.5.3](#test-assertion-2553))

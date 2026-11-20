@@ -136,6 +136,8 @@
 	- [Test Case 25.1 - Reuse a BIE](/docs/test_cases/TestSuite25.md#test-case-251)
 	- [Test Case 25.2 - Create a Top-level BIE from a BIE node](/docs/test_cases/TestSuite25.md#test-case-252)
 	- [Test Case 25.3 - Warn before an "Used" un-check clears used descendants](/docs/test_cases/TestSuite25.md#test-case-253)
+	- [Test Case 25.4 - Code Lists that a developer is offered for a value domain](/docs/test_cases/TestSuite25.md#test-case-254)
+	- [Test Case 25.5 - Agency ID Lists that a developer is offered for a value domain](/docs/test_cases/TestSuite25.md#test-case-255)
 - [Test Suite 26 - User Guide](/docs/test_cases/TestSuite26.md)
 	- [Test Case 26.1 - The User Guide is accessible](/docs/test_cases/TestSuite26.md#test-case-261)
 - [Test Suite 27 - About Page](/docs/test_cases/TestSuite27.md)

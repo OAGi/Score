@@ -15,6 +15,7 @@ import org.oagi.score.gateway.http.common.model.ResultAndCount;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface CodeListQueryRepository {
 
@@ -39,22 +40,16 @@ public interface CodeListQueryRepository {
     List<CodeListSummaryRecord> getCodeListSummaryList(LibraryId libraryId, String releaseNum, CcState state);
 
     /**
-     * Returns code lists explicitly linked to the DT, including their related
-     * manifests. Callers must consult {@link #hasCodeListAvailabilityByDtManifestId}
-     * before treating an empty result as an unrestricted release-wide lookup.
+     * Every Code List of the release, with what it takes to decide whether it can be offered for a node and which list of
+     * another release it matches (no values), ordered by manifest.
      */
-    List<CodeListSummaryRecord> availableCodeListByDtManifestId(DtManifestId dtManifestId, List<CcState> states);
+    List<org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate<CodeListManifestId>> getCodeListCandidateList(ReleaseId releaseId);
 
-    /**
-     * Returns code lists explicitly linked to the DT_SC, including their
-     * related manifests. Callers must consult {@link #hasCodeListAvailabilityByDtScManifestId}
-     * before treating an empty result as an unrestricted release-wide lookup.
-     */
-    List<CodeListSummaryRecord> availableCodeListByDtScManifestId(DtScManifestId dtScManifestId, List<CcState> states);
+    /** The manifest of every Code List that an approved primitive of the DT names, whatever state the list is in. */
+    Set<CodeListManifestId> getNamedCodeListManifestIdsByDtManifestId(DtManifestId dtManifestId);
 
-    boolean hasCodeListAvailabilityByDtManifestId(DtManifestId dtManifestId);
-
-    boolean hasCodeListAvailabilityByDtScManifestId(DtScManifestId dtScManifestId);
+    /** The manifest of every Code List that an approved primitive of the DT_SC names, whatever state the list is in. */
+    Set<CodeListManifestId> getNamedCodeListManifestIdsByDtScManifestId(DtScManifestId dtScManifestId);
 
     /**
      * Returns the top-level BIEs that currently assign the given code list.

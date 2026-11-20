@@ -4353,6 +4353,65 @@ public class TC_6_2_EndUserAuthorizedManagementBIE extends BaseTest {
         }
     }
 
+    @Test
+    @DisplayName("TC_6_2_TA_8_4")
+    public void end_user_is_offered_agency_id_lists_in_any_state_whoever_owns_them() {
+        AppUserObject usera;
+        ASCCPObject asccp;
+        BCCPObject bccp;
+        TopLevelASBIEPObject useraBIE;
+        AgencyIDListObject publishedList, otherEndUserWipList, otherEndUserProductionList;
+        {
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            String releaseNumber = "10.8.8";
+            ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, releaseNumber);
+
+            AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+            AppUserObject otherEndUser = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(otherEndUser);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            NamespaceObject developerNamespace = getAPIFactory().getNamespaceAPI().createRandomDeveloperNamespace(developer, library);
+            NamespaceObject otherEndUserNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(otherEndUser, library);
+            NamespaceObject userNamespace = getAPIFactory().getNamespaceAPI().createRandomEndUserNamespace(usera, library);
+
+            // The Agency ID Lists of another end user in WIP and in Production, and a Published one of a developer.
+            publishedList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(developer, developerNamespace, release, "Published");
+            otherEndUserWipList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(otherEndUser, otherEndUserNamespace, release, "WIP");
+            otherEndUserProductionList = getAPIFactory().getAgencyIDListAPI().createRandomAgencyIDList(otherEndUser, otherEndUserNamespace, release, "Production");
+
+            BusinessContextObject context = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            CoreComponentAPI cc = getAPIFactory().getCoreComponentAPI();
+            // A "Text" BDT with a Token primitive that names no Code List and no Agency ID List.
+            DTObject textBdt = cc.getBDTByGuidAndReleaseNum(library, "89be97039be04d6f9cfda107d75926b5", releaseNumber);
+            ACCObject acc = cc.createRandomACC(usera, release, userNamespace, "Published");
+            bccp = cc.createRandomBCCP(release, textBdt, usera, userNamespace, "Production");
+            cc.appendBCC(acc, bccp, "Production");
+            asccp = cc.createRandomASCCP(acc, usera, userNamespace, "Published");
+            useraBIE = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(context), asccp, usera, "WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(useraBIE);
+        WebElement node = editBIEPage.getNodeByPath("/" + asccp.getPropertyTerm() + "/" + bccp.getPropertyTerm());
+        EditBIEPage.BBIEPanel bbiePanel = editBIEPage.getBBIEPanel(node);
+        bbiePanel.toggleUsed();
+        bbiePanel.setValueDomainRestriction("Agency");
+
+        /**
+         * An end user is not limited by the state of an Agency ID List, nor by who owns it: the Agency ID Lists of
+         * the release are offered in every state, including the one in WIP of another end user.
+         */
+        for (AgencyIDListObject list : Arrays.asList(publishedList, otherEndUserWipList, otherEndUserProductionList)) {
+            assertEquals(org.oagi.score.e2e.TS_25_DeveloperBIEManagement.ValueDomainOptions.Offer.SELECTABLE,
+                    org.oagi.score.e2e.TS_25_DeveloperBIEManagement.ValueDomainOptions.offerOf(getDriver(), bbiePanel, list.getName()),
+                    list.getName() + " in " + list.getState());
+        }
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

@@ -10,6 +10,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.bbie.Bbie;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie_sc.BbieSc;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueListCandidate;
+import org.oagi.score.gateway.http.common.model.ScoreRole;
+import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.api.cc_management.model.CcState;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
@@ -28,8 +32,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 class BieUpliftingAgencyIdListDomainTest {
@@ -45,31 +47,22 @@ class BieUpliftingAgencyIdListDomainTest {
             boolean supplementary, String restriction, boolean targetExists, boolean retained) throws Exception {
         BieUpliftingService service = new BieUpliftingService(new CcMatchingService());
         CcDocument document = mock(CcDocument.class);
-        AgencyIdListSummaryRecord sourceList = agencyIdList(4291, 73);
-        AgencyIdListSummaryRecord targetList = agencyIdList(4633, 73);
-        List<AgencyIdListSummaryRecord> targets = targetExists ? List.of(targetList) : List.of();
+        ValueListCandidate<AgencyIdListManifestId> sourceList = agencyIdList(4291, 73);
+        ValueListCandidate<AgencyIdListManifestId> targetList = agencyIdList(4633, 73);
+        List<ValueListCandidate<AgencyIdListManifestId>> targets = targetExists ? List.of(targetList) : List.of();
         AgencyIdListManifestId allowedId = switch (restriction) {
-            case "allowed" -> targetList.agencyIdListManifestId();
+            case "allowed" -> targetList.manifestId();
             case "disallowed" -> new AgencyIdListManifestId(BigInteger.valueOf(999));
             default -> null;
         };
-        List<AgencyIdListSummaryRecord> availableTargets = "disallowed".equals(restriction)
-                ? List.of() : targets;
-        AgencyIdListQueryService agencyIdListQueryService = mock(AgencyIdListQueryService.class);
-        doReturn(availableTargets).when(agencyIdListQueryService)
-                .availableAgencyIdListListByDtManifestId(any(), any());
-        doReturn(availableTargets).when(agencyIdListQueryService)
-                .availableAgencyIdListListByDtScManifestId(any(), any());
-        ReflectionTestUtils.setField(service, "agencyIdListQueryService", agencyIdListQueryService);
-        ReflectionTestUtils.setField(service, "codeListQueryService", mock(CodeListQueryService.class));
         XbtManifestId defaultPrimitive = new XbtManifestId(BigInteger.valueOf(5193));
 
         var handlerClass = Class.forName(BieUpliftingService.class.getName() + "$BieUpliftingHandler");
         var constructor = handlerClass.getDeclaredConstructors()[0];
         constructor.setAccessible(true);
-        Object handler = constructor.newInstance(service, null, List.of(),
+        Object handler = constructor.newInstance(service, developer(), List.of(),
                 new BieUpliftingCustomMappingTable(List.of()), null, document, null,
-                List.of(), List.of(), List.of(), null, List.of(sourceList), null);
+                List.of(), List.of(), List.of(), List.of(), List.of(sourceList), targets);
 
         Object validation;
         AgencyIdListManifestId actualAgencyIdList;
@@ -87,12 +80,14 @@ class BieUpliftingAgencyIdListDomainTest {
             when(defaultRow.isDefault()).thenReturn(true);
             when(document.getDtScAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             BbieSc source = new BbieSc();
-            source.setAgencyIdListManifestId(sourceList.agencyIdListManifestId());
+            source.setAgencyIdListManifestId(sourceList.manifestId());
             BbieSc target = new BbieSc();
             ReflectionTestUtils.invokeMethod(handler, "setValueDomain", source, target, id,
                     List.of(), List.of(), List.of(sourceList));
             actualAgencyIdList = target.getAgencyIdListManifestId();
             actualPrimitive = target.getXbtManifestId();
+            List<ValueListCandidate<AgencyIdListManifestId>> availableTargets = ReflectionTestUtils.invokeMethod(service, "availableAgencyIdLists",
+                    developer(), targets, List.of(approved, defaultRow), (java.util.function.Function<DtScAwdPriSummaryRecord, AgencyIdListManifestId>) DtScAwdPriSummaryRecord::agencyIdListManifestId);
             validation = ReflectionTestUtils.invokeMethod(service, "checkBdtAgencyIdListMappable",
                     sourceList, availableTargets);
         } else {
@@ -108,28 +103,51 @@ class BieUpliftingAgencyIdListDomainTest {
             when(defaultRow.isDefault()).thenReturn(true);
             when(document.getDtAwdPriList(id)).thenReturn(List.of(approved, defaultRow));
             Bbie source = new Bbie();
-            source.setAgencyIdListManifestId(sourceList.agencyIdListManifestId());
+            source.setAgencyIdListManifestId(sourceList.manifestId());
             Bbie target = new Bbie();
             ReflectionTestUtils.invokeMethod(handler, "setValueDomain", source, target, id,
                     List.of(), List.of(), List.of(sourceList));
             actualAgencyIdList = target.getAgencyIdListManifestId();
             actualPrimitive = target.getXbtManifestId();
+            List<ValueListCandidate<AgencyIdListManifestId>> availableTargets = ReflectionTestUtils.invokeMethod(service, "availableAgencyIdLists",
+                    developer(), targets, List.of(approved, defaultRow), (java.util.function.Function<DtAwdPriSummaryRecord, AgencyIdListManifestId>) DtAwdPriSummaryRecord::agencyIdListManifestId);
             validation = ReflectionTestUtils.invokeMethod(service, "checkBdtAgencyIdListMappable",
                     sourceList, availableTargets);
         }
 
-        assertThat(actualAgencyIdList).isEqualTo(retained ? targetList.agencyIdListManifestId() : null);
+        assertThat(actualAgencyIdList).isEqualTo(retained ? targetList.manifestId() : null);
         assertThat(actualPrimitive).isEqualTo(retained ? null : defaultPrimitive);
         assertThat((Boolean) ReflectionTestUtils.invokeMethod(validation, "valid")).isEqualTo(retained);
     }
 
-    private AgencyIdListSummaryRecord agencyIdList(int manifestId, int agencyIdListId) {
-        return new AgencyIdListSummaryRecord(
-                new AgencyIdListManifestId(BigInteger.valueOf(manifestId)),
-                new AgencyIdListId(BigInteger.valueOf(agencyIdListId)),
-                new Guid("a".repeat(32)), null,
-                null,
-                "Test Agency List", "TEST", "1", null, null, null, "Value",
-                false, CcState.Published, null, null, null, null);
+    @ParameterizedTest(name = "developer={0}, state={1}, offered={2}")
+    @CsvSource({
+            "true, Published, true", "true, Production, true", "true, WIP, false", "true, QA, false",
+            "false, Published, true", "false, Production, true", "false, WIP, true", "false, QA, true"
+    })
+    void upliftingOffersWhatTheBieEditorOffersByStateOfTheUser(boolean developer, CcState state, boolean offered) {
+        BieUpliftingService service = new BieUpliftingService(new CcMatchingService());
+        // A data type that names no Agency ID List offers every list of the release that the user can see.
+        ValueListCandidate<AgencyIdListManifestId> list = new ValueListCandidate<>(
+                new AgencyIdListManifestId(BigInteger.valueOf(4633)), new Guid("a".repeat(32)),
+                "Test Agency List", "TEST", "1", "Value", state, null, false);
+        ScoreUser requester = developer ? developer()
+                : new ScoreUser(null, "enduser", "End User", null, false, List.of(ScoreRole.END_USER));
+
+        List<ValueListCandidate<AgencyIdListManifestId>> available = ReflectionTestUtils.invokeMethod(service,
+                "availableAgencyIdLists", requester, List.of(list), List.<DtAwdPriSummaryRecord>of(),
+                (java.util.function.Function<DtAwdPriSummaryRecord, AgencyIdListManifestId>) DtAwdPriSummaryRecord::agencyIdListManifestId);
+
+        assertThat(available).isEqualTo(offered ? List.of(list) : List.of());
+    }
+
+    private ValueListCandidate<AgencyIdListManifestId> agencyIdList(int manifestId, int agencyIdListId) {
+        return new ValueListCandidate<>(new AgencyIdListManifestId(BigInteger.valueOf(manifestId)),
+                new Guid("a".repeat(32)), "Test Agency List", "TEST", "1", "Value",
+                CcState.Published, null, false);
+    }
+
+    private static ScoreUser developer() {
+        return new ScoreUser(null, "developer", "Developer", null, true, List.of(ScoreRole.DEVELOPER));
     }
 }
