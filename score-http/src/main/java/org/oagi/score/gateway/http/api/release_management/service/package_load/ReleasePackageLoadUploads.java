@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
@@ -190,7 +191,21 @@ public class ReleasePackageLoadUploads {
         if (!uploads.remove(id, upload)) {
             throw new ReleasePackageLoadRefusedException(ReleasePackageLoadMessages.BEING_LOADED);
         }
+        keepForTheLoad(upload.file());
         return upload;
+    }
+
+    /**
+     * A package that is taken is no more in the list, so the sweep would take its file for one that no package is of, and throw it away
+     * when it is older than it may be, in the middle of the load that reads it. Its time is made new, so that it is kept for as long as
+     * a package is kept again, which is longer than a load goes on.
+     */
+    private void keepForTheLoad(Path file) {
+        try {
+            Files.setLastModifiedTime(file, FileTime.from(Instant.now()));
+        } catch (IOException e) {
+            logger.warn("The time of a package that is taken could not be made new: " + e.getMessage());
+        }
     }
 
     /** Gives a package that was taken back, when the load did not start. */
