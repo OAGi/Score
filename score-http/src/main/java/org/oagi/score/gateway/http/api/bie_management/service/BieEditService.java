@@ -1091,7 +1091,33 @@ public class BieEditService implements InitializingBean {
             throw new IllegalArgumentException("The BIE in " + e.getInvalidState() + " state cannot be edited.");
         }
 
+        var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
+        TopLevelAsbiepSummaryRecord reuseTopLevelAsbiep =
+                topLevelAsbiepQuery.getTopLevelAsbiepSummary(request.getReuseTopLevelAsbiepId());
+        if (reuseTopLevelAsbiep == null) {
+            throw new IllegalArgumentException("The BIE to reuse does not exist.");
+        }
+        validateReuseTarget(topLevelAsbiep.topLevelAsbiepId(), reuseTopLevelAsbiep.topLevelAsbiepId(),
+                requester.hasRole(DEVELOPER),
+                sessionService.getScoreUserByUserId(reuseTopLevelAsbiep.owner().userId()).isDeveloper(),
+                id -> topLevelAsbiepQuery.getTopLevelAsbiepSummary(id).basedTopLevelAsbiepId());
+
         doReuseBIE(requester, topLevelAsbiep.topLevelAsbiepId(), request, false);
+    }
+
+    /**
+     * Refuses a BIE to reuse that is the edited BIE, is derived from it, or is an end user's BIE for a developer.
+     */
+    static void validateReuseTarget(TopLevelAsbiepId editedTopLevelAsbiepId,
+                                    TopLevelAsbiepId reuseTopLevelAsbiepId,
+                                    boolean requesterIsDeveloper, boolean reuseOwnerIsDeveloper,
+                                    Function<TopLevelAsbiepId, TopLevelAsbiepId> basedTopLevelAsbiepIdOf) {
+        if (isBasedOn(reuseTopLevelAsbiepId, editedTopLevelAsbiepId, basedTopLevelAsbiepIdOf)) {
+            throw new IllegalArgumentException("The BIE to reuse must not be the BIE itself nor a BIE derived from it.");
+        }
+        if (requesterIsDeveloper && !reuseOwnerIsDeveloper) {
+            throw new IllegalArgumentException("Developers are not permitted to reuse end users' BIEs.");
+        }
     }
 
     private void doReuseBIE(ScoreUser requester,
