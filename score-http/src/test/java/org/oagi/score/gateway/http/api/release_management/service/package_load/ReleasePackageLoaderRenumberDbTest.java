@@ -3,7 +3,9 @@ package org.oagi.score.gateway.http.api.release_management.service.package_load;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.oagi.score.gateway.http.api.release_management.model.package_info.Info;
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Metadata;
+import org.oagi.score.gateway.http.api.release_management.model.package_info.Migration;
 import org.oagi.score.gateway.http.api.release_management.model.package_info.Table;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -112,5 +114,36 @@ class ReleasePackageLoaderRenumberDbTest {
         assertEquals("ACC-3>DT-123", one("SELECT `path` FROM `abie` WHERE `abie_id` = 2"));
         assertEquals("ACC-3>DT-1012>DT_SC-12>DT-1012", one("SELECT `path` FROM `abie` WHERE `abie_id` = 3"));
         assertEquals("ACC-1001>ACC-1001>ACC-12", one("SELECT `path` FROM `abie` WHERE `abie_id` = 4"));
+    }
+
+    @Test
+    void aLibraryTheDatabaseHasAndThePackageDoesNotIsMovedWithEverythingThatReferencesIt() throws Exception {
+        try (Statement statement = con.createStatement()) {
+            for (String table : List.of("library", "release", "namespace", "module_set", "bie_package")) {
+                statement.execute("DROP TABLE IF EXISTS `" + table + "`");
+                statement.execute("CREATE TABLE `" + table + "` (`" + table + "_id` BIGINT PRIMARY KEY"
+                        + ("library".equals(table) ? "" : ", `library_id` BIGINT") + ")");
+            }
+            statement.execute("INSERT INTO `library` VALUES (1), (7)");
+            for (String table : List.of("release", "namespace", "module_set", "bie_package")) {
+                statement.execute("INSERT INTO `" + table + "` VALUES (1, 1), (2, 7)");
+            }
+        }
+        Table library = new Table();
+        library.setTableName("library");
+        library.setMaxId(1L);
+        Metadata metadata = new Metadata();
+        metadata.setTables(List.of(library));
+        Migration migration = new Migration();
+        migration.setMetadata(metadata);
+        Info info = new Info();
+        info.setMigration(migration);
+
+        invoke("relocatingLibrary", new Class<?>[]{Connection.class, Info.class}, con, info);
+
+        assertEquals("1,1007", one("SELECT GROUP_CONCAT(`library_id` ORDER BY `library_id`) FROM `library`"));
+        for (String table : List.of("release", "namespace", "module_set", "bie_package")) {
+            assertEquals("1,1007", one("SELECT GROUP_CONCAT(`library_id` ORDER BY `" + table + "_id`) FROM `" + table + "`"));
+        }
     }
 }
