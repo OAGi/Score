@@ -314,8 +314,8 @@ export class UsedBie {
   cardinalityMin: number;
   cardinalityMax: number;
   deprecated: boolean;
-  /** The definition of the ASBIE, BBIE or BBIE_SC itself (its Context Definition). */
-  definition?: string;
+  /** Whether the ASBIE or BBIE is nillable (always false for a BBIE_SC). */
+  nillable: boolean;
 
   constructor(obj) {
     this.used = obj && obj.used;
@@ -328,7 +328,7 @@ export class UsedBie {
     this.cardinalityMin = obj && obj.cardinalityMin || 0;
     this.cardinalityMax = obj && obj.cardinalityMax || 0;
     this.deprecated = obj && obj.deprecated || false;
-    this.definition = obj && obj.definition || undefined;
+    this.nillable = obj && obj.nillable || false;
   }
 }
 

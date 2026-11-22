@@ -1,6 +1,6 @@
 import {AttrValue, parseSearchExpression} from './search-expression';
 import {PathPattern} from './path-pattern';
-import {associationKey, componentSearchAttributes, definitionAttributes} from './component-search-attributes';
+import {associationIdKey, componentSearchAttributes} from './component-search-attributes';
 
 /** The mask after a path of nodes, each given as its name and attributes. */
 function matches(expr: string, ...path: {name: string, [attribute: string]: AttrValue}[]): boolean {
@@ -11,6 +11,31 @@ function matches(expr: string, ...path: {name: string, [attribute: string]: Attr
 }
 
 describe('parseSearchExpression', () => {
+  it('holds a comparison with a list of values when any one of them satisfies it', () => {
+    const node = {name: 'Code', tag: ['Draft', 'Core'] as readonly string[], none: [] as readonly string[]};
+    expect(matches('*[tag = "core"]', node)).toBe(true);
+    expect(matches('*[tag = "Other"]', node)).toBe(false);
+    expect(matches('*[contains(tag, "raf")]', node)).toBe(true);
+    expect(matches('*[tag != "Core"]', node)).toBe(true);
+    expect(matches('*[none = ""]', node)).toBe(false);
+    expect(matches('*[tag]', node)).toBe(true);
+    expect(matches('*[none]', node)).toBe(false);
+  });
+
+  it('treats a null (an absent part in JSON, e.g. the qualifier of a data type) as a missing value', () => {
+    const node = {name: 'Code', qualifier: null as unknown as AttrValue, den: 'Code. Type', min: null as unknown as AttrValue, max: null as unknown as AttrValue};
+    expect(matches('*[qualifier = "null"]', node)).toBe(false);
+    expect(matches('*[qualifier != "x"]', node)).toBe(false);
+    expect(matches('*[not(qualifier != "x")]', node)).toBe(true);
+    expect(matches('*[qualifier = ""]', node)).toBe(false);
+    expect(matches('*[contains(qualifier, "nul")]', node)).toBe(false);
+    expect(matches('*[starts-with(qualifier, "")]', node)).toBe(false);
+    expect(matches('*[qualifier]', node)).toBe(false);
+    expect(matches('*[cardinality = 0..1]', {...node, cardinality_min: null as unknown as AttrValue, cardinality_max: null as unknown as AttrValue})).toBe(false);
+    expect(matches('*[cardinality != 0..1]', {...node, cardinality_min: null as unknown as AttrValue, cardinality_max: null as unknown as AttrValue})).toBe(false);
+    expect(matches('*[den != "x"]', node)).toBe(true);
+  });
+
   it('reads an expression without a predicate as plain names, as it always was', () => {
     const parsed = parseSearchExpression('/Sender/Release ID');
     expect(parsed.rooted).toBe(true);
@@ -116,42 +141,41 @@ describe('search predicates', () => {
   });
 });
 
-describe('the definitions of a row', () => {
-  type Part = {definition?: string};
-  const found = (expr: string, parts: Record<string, Part | undefined>) =>
-    matches(expr, {name: 'Code', ...componentSearchAttributes('BCCP', 'Code'), ...definitionAttributes(parts)});
+describe('the attributes of a component a row shows', () => {
+  const found = (expr: string, component: object, association?: object) =>
+    matches(expr, {name: 'Code', ...componentSearchAttributes('BCCP', 'Code', component, association)});
 
-  it('are asked for by their own names, each empty for a part that has none', () => {
-    const parts = {definition: {definition: 'A code'}, association_definition: {}, type_definition: {definition: 'A type'}};
-    expect(found("*[definition = '']", parts)).toBe(false);
-    expect(found("*[association_definition = '']", parts)).toBe(true);
-    expect(found("*[type_definition = '']", parts)).toBe(false);
-    expect(found("*[definition != '' and association_definition = '' and type_definition != '']", parts)).toBe(true);
+  it('are the flags and the qualifier of the component, and a test on one it has not is false', () => {
+    const acc = {objectClassQualifier: 'Qualified', abstract: true};
+    expect(found('*[abstract]', acc)).toBe(true);
+    expect(found('*[abstract = true and object_class_qualifier = Qualified]', acc)).toBe(true);
+    expect(found('*[reusable]', acc)).toBe(false);
+    expect(found('*[commonly_used = false]', {commonlyUsed: false})).toBe(true);
+    expect(found('*[reusable = true]', {reusable: true})).toBe(true);
   });
 
-  it('are not asked of a part the row does not have', () => {
-    const parts = {definition: {definition: 'A code'}, association_definition: undefined, type_definition: undefined};
-    expect(found("*[association_definition = '']", parts)).toBe(false);
-    expect(found("*[type_definition = '']", parts)).toBe(false);
-    expect(found("*[association_definition != '']", parts)).toBe(false);
+  it('say nillable when the association that ties the node to its parent is, or the component is', () => {
+    expect(found('*[nillable = true]', {nillable: false}, {nillable: true})).toBe(true);
+    expect(found('*[nillable = true]', {nillable: true}, {nillable: false})).toBe(true);
+    expect(found('*[nillable = true]', {nillable: false}, {nillable: false})).toBe(false);
+    expect(found('*[nillable = true]', {nillable: true})).toBe(true);
+    expect(found('*[nillable = false]', {})).toBe(false);
   });
 
-  it('are empty for a part without one, whether it has none or an empty one', () => {
-    for (const part of [{}, {definition: ''}, {definition: undefined}]) {
-      expect(found("*[definition = '']", {definition: part})).withContext(JSON.stringify(part)).toBe(true);
-      expect(found("*[definition != '']", {definition: part})).withContext(JSON.stringify(part)).toBe(false);
-    }
+  it('list the tags of the component, any of which satisfies a comparison', () => {
+    const component = {tagList: [{name: 'Core'}, {name: 'Draft'}]};
+    expect(found('*[tag = Core]', component)).toBe(true);
+    expect(found('*[tag = Other]', component)).toBe(false);
+    expect(found('*[tag]', {tagList: []})).toBe(false);
   });
 
-  it('is found by its words when there is one', () => {
-    const parts = {definition: {definition: 'A code that identifies a Party'}};
-    expect(found("*[definition != '']", parts)).toBe(true);
-    expect(found('*[contains(definition, "Party")]', parts)).toBe(true);
+  it('are not the texts of the definitions, which the backend holds', () => {
+    expect(found("*[definition = '']", {})).toBe(false);
   });
 
-  it('is made into keys that tell associations apart by their definition', () => {
-    expect(associationKey({definition: 'A'})).not.toBe(associationKey({definition: 'B'}));
-    expect(associationKey({})).toBe(associationKey(undefined));
-    expect(associationKey({definition: ''})).toBe('');
+  it('tell associations apart by their manifest id', () => {
+    expect(associationIdKey({manifestId: 1})).not.toBe(associationIdKey({manifestId: 2}));
+    expect(associationIdKey({})).toBe(associationIdKey(undefined));
+    expect(associationIdKey(undefined)).toBe('');
   });
 });

@@ -1,3 +1,4 @@
+import {CcSearchService, ccServerSearchOf} from '../../cc-management/domain/cc-server-search';
 import {CARDINALITY_MAX_PATTERN} from '../../common/cardinality-max-pattern';
 import { ChangeDetectorRef, Component, DoCheck, ElementRef, HostListener, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -6,7 +7,7 @@ import {BieEditService} from '../bie-edit/domain/bie-edit.service';
 import {catchError, finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Location} from '@angular/common';
-import {forkJoin, Observable, of, ReplaySubject} from 'rxjs';
+import {firstValueFrom, forkJoin, Observable, of, ReplaySubject} from 'rxjs';
 import {BieViewOrderService} from '../../cc-management/model-browser/domain/bie-view-order.service';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {
@@ -113,6 +114,8 @@ const UPDATE_OAS_AFTER_ADD = true;
   styleUrls: ['./bie-edit.component.css']
 })
 export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListener<BieFlatNode>, BieTreeRowHost {
+
+  private ccSearchService = inject(CcSearchService);
   private service = inject(BieEditService);
   private ccNodeService = inject(CcNodeService);
   private bieViewOrderService = inject(BieViewOrderService);
@@ -349,7 +352,10 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       const doAfter = () => {
         this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
         this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
-        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
+        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database,
+          (predicates, caseSensitive) => firstValueFrom(this.service.searchNodes(this.topLevelAsbiepId, predicates, caseSensitive)),
+          ccServerSearchOf(this.ccSearchService),
+          (attribute, text) => this.service.suggestSearchValues(this.topLevelAsbiepId, attribute, text));
         this.dataSource.init();
         this.cardinality.restore();
         this.dataSource.hideUnused = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_UNUSED_PROPERTY_KEY, false);
@@ -974,7 +980,10 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
       const doAfter = () => {
         this.dataSource = new BieFlatNodeDataSource<BieFlatNode>(database, this.service, this.ccNodeService, [this,]);
         this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
-        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database);
+        this.searcher = new BieFlatNodeDataSourceSearcher<BieFlatNode>(this.dataSource, database,
+          (predicates, caseSensitive) => firstValueFrom(this.service.searchNodes(this.topLevelAsbiepId, predicates, caseSensitive)),
+          ccServerSearchOf(this.ccSearchService),
+          (attribute, text) => this.service.suggestSearchValues(this.topLevelAsbiepId, attribute, text));
         this.dataSource.init();
 
         // recover the tree expansion status

@@ -1,3 +1,4 @@
+import {Observable} from 'rxjs';
 import {SEARCH_FUNCTIONS} from './search-expression';
 import {Continuation, PredicateTail, RANGE_ATTRIBUTES, predicateTail} from './search-grammar';
 
@@ -16,12 +17,26 @@ const AXIS_DETAILS: [string, string][] = [
 /** An attribute of a node that a search predicate may ask about. */
 export interface SearchAttribute {
   name: string;
-  kind: 'text' | 'flag';
+  /** `text` is free text or an enum, `number` compares numerically, `flag` is true/false. */
+  kind: 'text' | 'number' | 'flag';
+  /**
+   * Where the value is looked up: `graph` attributes travel with the search graph and are judged in the browser (the
+   * default), `server` attributes are searched by the backend and only the matches reach the graph. Text that differs
+   * per place and is long (remarks, examples) is `server`; see the hybrid tree search plan.
+   */
+  source?: 'graph' | 'server';
+  /** Whether a node can have several values of it; a comparison then holds when any one of them satisfies it. */
+  multiple?: boolean;
   description: string;
   /** The values worth offering after `name =`, when the attribute has a fixed set of them. */
   values?: string[];
   /** Whether the values are written without quotes (`cardinality = 0..1`). */
   bare?: boolean;
+  /**
+   * Looks up the values worth offering after `name =` for the text typed so far, when there are too many to list (or
+   * they live on the server); the search bar waits for them and then offers them like `values`.
+   */
+  valueSource?: (text: string) => Observable<string[]>;
 }
 
 /** One completion: replace `[from, to)` of the expression with `insert`. */
@@ -119,14 +134,17 @@ export function suggestSearch(expression: string, caret: number, attributes: Sea
     return stepSuggestions(before, caret, attributes);
   }
 
-  const {prefix, word, wordStart, quote} = context;
+  const {prefix, word, wordStart, quote, quoteChar} = context;
   const tail = predicateTail(prefix);
   if (!tail) {
     return NO_SUGGESTIONS;
   }
   const last = tail.tokens[tail.tokens.length - 1];
   if (quote) {
-    const values = last?.type === 'Op' ? valueSuggestions(attributeOf(tail.tokens[tail.tokens.length - 2]?.text), false) : [];
+    const searched = searchedByText(tail.tokens, attributes);
+    const values = last?.type === 'Op' ? valueSuggestions(attributeOf(tail.tokens[tail.tokens.length - 2]?.text), false, quoteChar)
+      // the text a function looks for: the values that the function would find the typed text in
+      : searched ? valueSuggestions(searched.attribute, false, quoteChar).filter(v => fits(searched.function, word, v.label)) : [];
     return rank(word, wordStart, caret, values);
   }
   return rank(word, wordStart, caret, predicateSuggestions(tail, attributes, expression.substring(caret)));
@@ -142,7 +160,8 @@ function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[]
   const inPath = ['Slash', 'SlashSlash', 'DoubleColon'].includes(last?.type);
   const items: SearchSuggestion[] = [];
 
-  if (afterOp) {
+  // the values of an attribute that is looked up are offered inside the quotes only: until then the grammar goes on
+  if (afterOp && !attributeOf(beforeLast?.text)?.valueSource) {
     const values = valueSuggestions(attributeOf(beforeLast?.text), true);
     if (values.length > 0) {
       return values;
@@ -150,7 +169,10 @@ function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[]
   }
   // a comparison is made with a value, never with a path: after an operator only values and functions make sense
   if (next.has('name') && !inPath && !afterOp) {
-    items.push(...attributeSuggestions(attributes));
+    // an attribute that the condition joined by `and` already compares with `=` is not offered again: a second equality on it
+    // can only repeat the first or contradict it
+    const compared = equalityComparedByAnd(tokens);
+    items.push(...attributeSuggestions(attributes).filter(a => !compared.has(a.label.toLowerCase())));
   }
   if (next.has('call')) {
     items.push(...functionSuggestions());
@@ -214,6 +236,30 @@ function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[]
   return parameter ? argumentSuggestions(parameter, items, tokens, call.index, attributes) : items;
 }
 
+/** The attributes compared with `=` in the conditions joined by `and` that lead up to the end of the tokens (an `or` or an opening bracket ends them). */
+function equalityComparedByAnd(tokens: {type: string, text: string}[]): Set<string> {
+  const compared = new Set<string>();
+  let depth = 0;
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const {type, text} = tokens[i];
+    if (type === 'RParen' || type === 'RBracket') {
+      depth++;
+    } else if (type === 'LParen' || type === 'LBracket') {
+      if (depth-- === 0) {
+        break;
+      }
+    } else if (depth === 0) {
+      if (type === 'Ident' && text.toLowerCase() === 'or') {
+        break;
+      }
+      if (type === 'Op' && text === '=' && tokens[i - 1]?.type === 'Ident') {
+        compared.add(tokens[i - 1].text.toLowerCase());
+      }
+    }
+  }
+  return compared;
+}
+
 /** The function call whose argument the end of the tokens begins: its name and the place of the argument (from 0). */
 function enclosingCall(tokens: {type: string, text: string}[]): {name: string, index: number} | undefined {
   let depth = 0;
@@ -237,6 +283,26 @@ function enclosingCall(tokens: {type: string, text: string}[]): {name: string, i
   return undefined;
 }
 
+/** The attribute a text function (`contains`, `starts-with`, `ends-with`) searches, when the tokens end where its text begins. */
+function searchedByText(tokens: {type: string, text: string}[], attributes: SearchAttribute[]): { attribute: SearchAttribute, function: string } | undefined {
+  if (tokens[tokens.length - 1]?.type !== 'Comma') {
+    return undefined;
+  }
+  const call = enclosingCall(tokens);
+  if (!call || call.index !== 1 || !SEARCH_FUNCTIONS.includes(call.name.toLowerCase())) {
+    return undefined;
+  }
+  const attribute = attributes.find(a => a.name.toLowerCase() === tokens[tokens.length - 2]?.text.toLowerCase());
+  return attribute ? {attribute, function: call.name.toLowerCase()} : undefined;
+}
+
+/** Whether a function finds the typed text in the value: at its start, at its end, or anywhere in it. */
+function fits(searchFunction: string, typed: string, value: string): boolean {
+  const text = value.toLowerCase();
+  const wanted = typed.toLowerCase();
+  return searchFunction === 'starts-with' ? text.startsWith(wanted) : searchFunction === 'ends-with' ? text.endsWith(wanted) : text.includes(wanted);
+}
+
 /** What may be written where a function's argument begins: only what the argument is (a path, an attribute, a text). */
 function argumentSuggestions(parameter: FunctionParameter, items: SearchSuggestion[], tokens: {type: string, text: string}[],
                              index: number, attributes: SearchAttribute[]): SearchSuggestion[] {
@@ -249,7 +315,7 @@ function argumentSuggestions(parameter: FunctionParameter, items: SearchSuggesti
     default: {
       // the text a function looks for: the values of the attribute it searches, when it has a fixed set of them
       const searched = attributes.find(a => a.name.toLowerCase() === tokens[tokens.length - 2]?.text.toLowerCase());
-      const values = (searched?.values ?? []).map(v => ({label: v, insert: `"${v}"`, detail: searched.name, kind: 'value' as const}));
+      const values = searched?.kind === 'text' ? valueSuggestions({...searched, bare: false}, true).map(v => ({...v, insert: v.insert.trimEnd()})) : [];
       return [{label: '"text"', insert: '""', detail: parameter.detail, kind: 'snippet', caretBack: 1}, ...values];
     }
   }
@@ -270,6 +336,8 @@ interface Context {
   wordStart: number;
   /** Whether the caret is inside a quoted text. */
   quote: boolean;
+  /** The character that opened the quoted text (`"` or `'`), which is the one that closes it. */
+  quoteChar: string;
 }
 
 /** Reads the part of the expression before the caret: whether it ends in a predicate, and the word being typed. */
@@ -296,17 +364,17 @@ function readContext(before: string): Context {
     }
   }
   if (depth === 0) {
-    return {predicate: false, prefix: '', word: '', wordStart: before.length, quote: false};
+    return {predicate: false, prefix: '', word: '', wordStart: before.length, quote: false, quoteChar: ''};
   }
   if (quote) {
     return {
       predicate: true, prefix: before.substring(predicateStart, quoteStart), word: before.substring(quoteStart + 1),
-      wordStart: quoteStart + 1, quote: true
+      wordStart: quoteStart + 1, quote: true, quoteChar: quote
     };
   }
   const body = before.substring(predicateStart);
   const word = /[A-Za-z0-9_-]*$/.exec(body)[0];
-  return {predicate: true, prefix: body.substring(0, body.length - word.length), word, wordStart: before.length - word.length, quote: false};
+  return {predicate: true, prefix: body.substring(0, body.length - word.length), word, wordStart: before.length - word.length, quote: false, quoteChar: ''};
 }
 
 function stepSuggestions(before: string, caret: number, attributes: SearchAttribute[]): SearchSuggestions {
@@ -345,7 +413,7 @@ function stepSuggestions(before: string, caret: number, attributes: SearchAttrib
 
 function attributeSuggestions(attributes: SearchAttribute[]): SearchSuggestion[] {
   return attributes.map(a => ({
-    label: a.name, insert: a.name + ' ', detail: a.description + (a.kind === 'flag' ? ' (true/false)' : ''), kind: 'attribute' as const
+    label: a.name, insert: a.name + ' ', detail: a.description + (a.kind === 'flag' ? ' (true/false)' : '') + (a.source === 'server' ? ' [searched on the server, saved text only]' : ''), kind: 'attribute' as const
   }));
 }
 
@@ -376,16 +444,45 @@ function operatorSuggestions(attribute: SearchAttribute | undefined): SearchSugg
     .map(c => ({label: c.op, insert: c.op + ' ', detail: c.detail, kind: 'operator' as const}));
 }
 
-function valueSuggestions(attribute: SearchAttribute | undefined, quoted: boolean): SearchSuggestion[] {
+function valueSuggestions(attribute: SearchAttribute | undefined, quoted: boolean, closing = '"'): SearchSuggestion[] {
   if (!attribute) {
     return [];
   }
   if (attribute.kind === 'flag') {
     return ['true', 'false'].map(v => ({label: v, insert: v + ' ', detail: attribute.name, kind: 'value' as const}));
   }
-  return (attribute.values ?? []).map(v => ({
-    label: v, insert: quoted ? (attribute.bare ? `${v} ` : `"${v}" `) : `${v}"`, detail: attribute.name, kind: 'value' as const
-  }));
+  return (attribute.values ?? []).flatMap(v => {
+    // a text has no escape for its own quote: inside a quoted text only the values without the closing quote can go on
+    if (!quoted) {
+      return v.includes(closing) ? [] : [{label: v, insert: `${v}${closing}`, detail: attribute.name, kind: 'value' as const}];
+    }
+    const quote = attribute.bare ? '' : ['"', '\''].find(q => !v.includes(q));
+    return quote === undefined ? [] : [{label: v, insert: `${quote}${v}${quote} `, detail: attribute.name, kind: 'value' as const}];
+  });
+}
+
+/** What the search bar has to look up before it can offer the values at the caret: the attribute and the text typed of its value. */
+export interface ValueLookup {
+  attribute: SearchAttribute;
+  text: string;
+}
+
+/** The lookup the caret asks for (inside the quotes after `attribute =`, or in the text of `contains(attribute, ...)`), when there is one. */
+export function valueLookup(expression: string, caret: number, attributes: SearchAttribute[]): ValueLookup | undefined {
+  const context = readContext(expression.substring(0, caret));
+  const tail = context.predicate ? predicateTail(context.prefix) : undefined;
+  const tokens = tail?.tokens ?? [];
+  // only a text can come in the argument of a function, so its values are offered as soon as it begins; after an
+  // operator the grammar still allows more than a text, so they wait for the quote
+  const searched = searchedByText(tokens, attributes)?.attribute;
+  const name = context.quote && tokens[tokens.length - 1]?.type === 'Op' ? tokens[tokens.length - 2]?.text.toLowerCase() : undefined;
+  const attribute = (name ? attributes.find(a => a.name.toLowerCase() === name) : undefined) ?? searched;
+  return attribute?.valueSource ? {attribute, text: context.word} : undefined;
+}
+
+/** The attributes with the values found for one of them, ready for `suggestSearch`. */
+export function withValues(attributes: SearchAttribute[], attribute: SearchAttribute, values: string[]): SearchAttribute[] {
+  return attributes.map(a => a === attribute ? {...a, values} : a);
 }
 
 /** Keeps the suggestions that start with (then contain) what has been typed, and leaves out one that is already complete. */
@@ -421,24 +518,51 @@ const COMPONENT_COLUMNS: SearchAttribute[] = [
   {name: 'cardinality_max', kind: 'text', description: 'the maximum of the cardinality (unbounded is above any number), e.g. cardinality_max < 10'},
   {name: 'state', kind: 'text', description: 'the state of the component (WIP, Draft, Published, ...)'},
   {name: 'guid', kind: 'text', description: 'the GUID of the component'},
-  {name: 'deprecated', kind: 'flag', description: 'the component is deprecated'}
+  {name: 'deprecated', kind: 'flag', description: 'the component is deprecated'},
+  {name: 'tag', kind: 'text', multiple: true, description: 'the tags of the component, e.g. tag = "Core"'}
+];
+
+/** The columns of the core components that only the trees of core components show (the BIE trees show them of the BIE). */
+const CC_ONLY_COLUMNS: SearchAttribute[] = [
+  {name: 'object_class_qualifier', kind: 'text', description: 'ACC: the object class qualifier'},
+  {name: 'abstract', kind: 'flag', description: 'ACC: the component is abstract'},
+  {name: 'reusable', kind: 'flag', description: 'ASCCP: the component is reusable'},
+  {name: 'commonly_used', kind: 'flag', description: 'DT: the data type is commonly used'},
+  {
+    name: 'nillable', kind: 'flag',
+    description: 'ASCCP / BCCP / BCC: the component, or the association that ties the node to its parent, is nillable'
+  }
 ];
 
 /** The definitions of the core components a row of the component tree (or the model browser) shows. */
 const CC_DEFINITION_COLUMNS: SearchAttribute[] = [
   {
-    name: 'definition', kind: 'text',
-    description: 'the definition of what the node is: its ASCC or BCC when it is tied to its parent by one, else its component; empty when it has none, e.g. definition = \'\''
+    name: 'definition', kind: 'text', source: 'server',
+    description: 'the definition of what the node is: its ASCC or BCC when it is tied to its parent by one, else its component; only the ones that have one are found, and = and != compare the whole text'
   },
-  {name: 'association_definition', kind: 'text', description: 'ASCCP / BCCP: the definition of the ASCC or BCC that ties it to its parent'},
-  {name: 'component_definition', kind: 'text', description: 'ASCCP / BCCP: the definition of the ASCCP or BCCP'},
-  {name: 'type_definition', kind: 'text', description: 'BCCP: the definition of its data type'}
+  {name: 'definition_source', kind: 'text', source: 'server', description: 'the source of that definition'},
+  {
+    name: 'association_definition', kind: 'text', source: 'server',
+    description: 'ASCCP / BCCP: the definition of the ASCC or BCC that ties it to its parent'
+  },
+  {name: 'component_definition', kind: 'text', source: 'server', description: 'ASCCP / BCCP: the definition of the ASCCP or BCCP'},
+  {name: 'type_definition', kind: 'text', source: 'server', description: 'BCCP: the definition of its data type'},
+  {
+    name: 'default_value', kind: 'text', source: 'server',
+    description: 'BCC / BCCP / DT_SC: the default value (the BCC\'s when the node is tied to its parent by one)'
+  },
+  {
+    name: 'fixed_value', kind: 'text', source: 'server',
+    description: 'BCC / BCCP / DT_SC: the fixed value (the BCC\'s when the node is tied to its parent by one)'
+  },
+  {name: 'content_component_definition', kind: 'text', source: 'server', description: 'DT: the definition of the content component'}
 ];
 
 /** The attributes of the nodes of a core component tree (the ACC, ASCCP, BCCP, DT and extension screens). */
 export const COMPONENT_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ACC', 'ASCCP', 'BCCP', 'DT', 'DT_SC']},
   ...COMPONENT_COLUMNS,
+  ...CC_ONLY_COLUMNS,
   ...CC_DEFINITION_COLUMNS
 ];
 
@@ -446,6 +570,7 @@ export const COMPONENT_SEARCH_ATTRIBUTES: SearchAttribute[] = [
 export const MODEL_BROWSER_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
   ...COMPONENT_COLUMNS,
+  ...CC_ONLY_COLUMNS,
   ...CC_DEFINITION_COLUMNS
 ];
 
@@ -454,13 +579,34 @@ export const BIE_SEARCH_ATTRIBUTES: SearchAttribute[] = [
   {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
   {name: 'display_name', kind: 'text', description: 'ASBIEP / BBIEP / BBIE_SC: the display name set on the BIE'},
   {
-    name: 'definition', kind: 'text',
-    description: 'the definition set on the BIE (its Context Definition); empty when it has none, e.g. definition = \'\''
+    name: 'definition', kind: 'text', source: 'server',
+    description: 'the definition set on the BIE (its Context Definition); only the BIEs that have one are found, and = and != compare the whole text'
   },
-  {name: 'association_definition', kind: 'text', description: 'ASBIEP / BBIEP: the definition of the ASCC or BCC that ties it to its parent'},
-  {name: 'component_definition', kind: 'text', description: 'ABIE / ASBIEP / BBIEP / BBIE_SC: the definition of the ASCCP, BCCP or DT_SC it profiles'},
-  {name: 'type_definition', kind: 'text', description: 'ABIE / ASBIEP: the definition of its ACC'},
-  ...COMPONENT_COLUMNS,
+  {name: 'remark', kind: 'text', source: 'server', description: 'the remark set on the BIE'},
+  {name: 'example', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the example set on the BIE'},
+  {name: 'fixed_value', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the fixed value set on the BIE'},
+  {name: 'default_value', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the default value set on the BIE'},
+  {
+    name: 'business_term', kind: 'text', source: 'server', multiple: true,
+    description: 'the business terms of the BIE: the assigned ones when Business Term is enabled, else the business term text set on it'
+  },
+  {
+    name: 'value_domain_restriction', kind: 'text', source: 'server', values: ['Primitive', 'Code List', 'Agency ID List'],
+    description: 'BBIEP / BBIE_SC: the kind of value domain the BIE restricts its value to'
+  },
+  {
+    name: 'value_domain', kind: 'text', source: 'server',
+    description: 'BBIEP / BBIE_SC: the name of the primitive, code list or agency ID list the BIE restricts its value to; without value_domain_restriction all three are searched'
+  },
+  {name: 'association_definition', kind: 'text', source: 'server', description: 'ASBIEP / BBIEP: the definition of the ASCC or BCC that ties it to its parent'},
+  {name: 'component_definition', kind: 'text', source: 'server', description: 'ABIE / ASBIEP / BBIEP / BBIE_SC: the definition of the ASCCP, BCCP or DT_SC it profiles'},
+  {name: 'type_definition', kind: 'text', source: 'server', description: 'ABIE / ASBIEP: the definition of its ACC'},
+  ...COMPONENT_COLUMNS.map(column => column.name === 'deprecated' ?
+    {...column, description: 'the BIE or the core component it profiles is deprecated'} : column),
+  {
+    name: 'nillable', kind: 'flag',
+    description: 'ASBIEP / BBIEP: the BIE is nillable, or the core component (or the association that ties the node to its parent) is'
+  },
   {name: 'used', kind: 'flag', description: 'the node is used in the BIE'},
   {name: 'inherited', kind: 'flag', description: 'the node is inherited'},
   {name: 'reused', kind: 'flag', description: 'the node is a reused BIE'}

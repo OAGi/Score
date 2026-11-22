@@ -18,7 +18,7 @@ public class BieEditUsed {
     private int cardinalityMin;
     private int cardinalityMax;
     private boolean deprecated;
-    /** The definition of the ASBIE, BBIE or BBIE_SC itself; null when it has none. */
-    private String definition;
+    /** Whether the ASBIE or BBIE is nillable; false for a BBIE_SC, which has no such setting. */
+    private boolean nillable;
 
 }

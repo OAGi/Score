@@ -36,6 +36,9 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsReco
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.repository.criteria.CcListFilterCriteria;
 import org.oagi.score.gateway.http.api.cc_management.service.CcQueryService;
+import org.oagi.score.gateway.http.api.cc_management.service.CcSearchService;
+import org.oagi.score.gateway.http.api.cc_management.model.cc_search.CcSearchRequest;
+import org.oagi.score.gateway.http.api.cc_management.model.cc_search.CcSearchResponse;
 import org.oagi.score.gateway.http.api.cc_management.service.dsl.CcQueryInterpreter;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummaryRecord;
 import org.oagi.score.gateway.http.api.code_list_management.service.CodeListQueryService;
@@ -96,6 +99,9 @@ public class CcQueryController {
     private AgencyIdListQueryService agencyIdListQueryService;
 
     @Autowired
+    private CcSearchService ccSearchService;
+
+    @Autowired
     private SessionService sessionService;
 
     @Autowired
@@ -103,6 +109,18 @@ public class CcQueryController {
 
     @Autowired
     private PlantUmlService plantUmlService;
+
+    @Operation(
+            summary = "Find the Core Components of a release by their text",
+            description = "Answers the server-side predicates of a core component tree search (the definitions): "
+                    + "for each predicate, the components of the release of the tree's root it holds for."
+    )
+    @PostMapping(value = "/search-nodes", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CcSearchResponse searchNodes(
+            @AuthenticationPrincipal AuthenticatedPrincipal requester,
+            @RequestBody CcSearchRequest request) {
+        return ccSearchService.searchNodes(sessionService.asScoreUser(requester), request);
+    }
 
     @Operation(
             summary = "Retrieve a paginated list of Core Components",

@@ -7,6 +7,9 @@ import {
   ModelBrowserNodeDataSource
 } from './model-browser-node';
 import {BieViewOrderEntry} from './bie-view-order';
+import {CcServerMarks} from '../../domain/cc-server-search';
+import {DagPathSearch} from '../../../common/tree-search/dag-path-search';
+import {PathPattern} from '../../../common/tree-search/path-pattern';
 
 /**
  * #1638 model-browser wiring tests. These exercise the REAL classes the Model Browser uses to apply
@@ -274,5 +277,68 @@ describe('ModelBrowserAsccpNodeDetail.updateAscc (association definition)', () =
     const d = detail();
     expect(() => d.updateAscc(ascc(null))).not.toThrow();
     expect(d.ascc.cardinalityMax).toBe(1);
+  });
+});
+
+describe('ModelBrowserNodeDatabase.searchGraph with the answer of the backend', () => {
+  /** A database whose nodes are all given up front. */
+  class FixedDatabase extends ModelBrowserNodeDatabase<any> {
+    constructor() {
+      super(null as any, 'ACC', 1);
+    }
+
+    override children(node: any) {
+      return node.children;
+    }
+  }
+
+  it('flags the nodes whose association or component the backend found text in', () => {
+    const db = new FixedDatabase();
+    const beta = asccChild('Beta', 2);
+    const gamma = bccChild('Gamma', 3);
+    const root = accParent(1, [beta, gamma]);
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const marks = new CcServerMarks([{id: '0', flag: 'srv_0', attribute: 'definition', operator: 'CONTAINS', value: 'x'}],
+      {matches: {'0': {...none, asccs: [2], bccps: [80003]}}}, false);
+
+    const found = (expr: string) => {
+      const graph = db.searchGraph(root, marks);
+      const pattern = new PathPattern(expr);
+      return new DagPathSearch(graph.dag, pattern).search({
+        ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll([[root.name]])
+      }).total;
+    };
+
+    // Beta is tied to its parent by ASCC 2, which has the text; Gamma has a BCC (3) that has none, and its BCCP's text is not its own
+    expect(found('Beta[srv_0]')).toBe(1);
+    expect(found('Gamma[srv_0]')).toBe(0);
+    expect(found('Beta[not(srv_0)]')).toBe(0);
+  });
+
+  it('searches deprecated as the tree shows it: the component, the association that ties it to its parent, or the data type', () => {
+    const db = new FixedDatabase();
+    const viaBcc = bccChild('ViaBcc', 2);
+    (viaBcc.bccNode as any).deprecated = true;
+    const viaDataType = bccChild('ViaDataType', 3);
+    (viaDataType.bdtNode as any).deprecated = true;
+    const viaAscc = asccChild('ViaAscc', 4);
+    (viaAscc.asccNode as any).deprecated = true;
+    const plain = bccChild('Plain', 5);
+    const root = accParent(1, [viaBcc, viaDataType, viaAscc, plain]);
+    [viaBcc, viaDataType, viaAscc, plain].forEach(node => node.deprecated = node.ccDeprecated);
+
+    const found = (expr: string) => {
+      const graph = db.searchGraph(root);
+      const pattern = new PathPattern(expr);
+      return new DagPathSearch(graph.dag, pattern).search({
+        ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll([[root.name]])
+      }).total;
+    };
+
+    expect(found('*[deprecated]')).toBe(3);
+    expect(found('ViaBcc[deprecated]')).toBe(1);
+    expect(found('ViaDataType[deprecated]')).toBe(1);
+    expect(found('ViaAscc[deprecated]')).toBe(1);
+    expect(found('Plain[deprecated]')).toBe(0);
   });
 });

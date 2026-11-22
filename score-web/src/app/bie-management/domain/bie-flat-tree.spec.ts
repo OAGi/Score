@@ -5,6 +5,9 @@ import {
   BieFlatNodeDatabase,
   BieFlatNodeDataSource
 } from './bie-flat-tree';
+import {BIE_VALUE_CONSTRAINT_ROW_PREDICATES, BIE_VALUE_DOMAIN_ROW_PREDICATE, BieServerMarks} from './bie-server-search';
+import {CcServerMarks} from '../../cc-management/domain/cc-server-search';
+import {ServerPredicate} from '../../common/tree-search/server-predicate';
 import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-view-order';
 import {of} from 'rxjs';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
@@ -400,6 +403,42 @@ describe('Association expansion after loading', () => {
   });
 });
 
+describe('the cycle rule of a BIE tree', () => {
+  /** A chain of nodes, each the child of the one before, with the ASCCP and group-ness given. */
+  function chain(...links: {asccp: number, group?: boolean}[]): AsbiepFlatNode[] {
+    const nodes = links.map((link, i) => {
+      const n = new AsbiepFlatNode();
+      n.name = 'n' + i;
+      n.asccpNode = {manifestId: link.asccp} as any;
+      n.accNode = {manifestId: 1, componentType: link.group ? 'SemanticGroup' : 'Embedded'} as any;
+      return n;
+    });
+    nodes.forEach((n, i) => n.parent = nodes[i - 1]);
+    return nodes;
+  }
+
+  it('does not count a group as a place a component repeats: a group is not shown', () => {
+    // Attachment > (References Group) > Metadata > (References Group) > Document Reference
+    const [attachment, group, metadata, group2, reference] = chain({asccp: 1}, {asccp: 9, group: true}, {asccp: 2}, {asccp: 9, group: true}, {asccp: 3});
+    const db = newDb();
+    expect(db.detectCycle(group2)).toBe(false);
+    expect(db.detectCycle(reference)).toBe(false);
+    expect((db as any).isCycleNode(group2)).toBe(false);
+    expect((db as any).isCycleNode(reference)).toBe(false);
+    expect(attachment && group && metadata).toBeTruthy();
+  });
+
+  it('still stops at a component that repeats, and at a group that holds itself', () => {
+    const [a, b, a2] = chain({asccp: 1}, {asccp: 2}, {asccp: 1});
+    expect(newDb().detectCycle(a2)).toBe(true);
+    expect((newDb() as any).isCycleNode(a2)).toBe(true);
+    expect(b).toBeTruthy();
+    const [g, g2] = chain({asccp: 9, group: true}, {asccp: 9, group: true});
+    expect(newDb().detectCycle(g2)).toBe(true);
+    expect(g).toBeTruthy();
+  });
+});
+
 describe('BBIE supplementary-component expansion', () => {
   it.each(['Attribute', 'Element'])('uses positive SC cardinality for %s BBIEs', entityType => {
     const node = bbiepChild('Field', 1);
@@ -497,7 +536,11 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
       super(null as any, null as any, 0, [], []);
     }
 
-    loadChildren() {
+    /** A node can say which node holds the children it would load (a cycle loads them only when asked for them). */
+    loadChildren(node: any) {
+      if (node.loadsAs && node.getChildren().length === 0) {
+        node._children = node.loadsAs.children;
+      }
     }
   }
 
@@ -509,10 +552,10 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     return copy;
   }
 
-  function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean}) {
+  function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean, marks?: BieServerMarks}) {
     // the tree answers for its own filters: the search does not pass its state in
     db.filters.setActive('hideUnused', !!options?.hideUnused);
-    const graph = db.searchGraph(root);
+    const graph = db.searchGraph(root, options?.marks);
     const pattern = new PathPattern(expr, false, mode);
     const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
     const attributes = [(a: string) => ({name: root.name, displayName: root.displayName || root.name, used: !!root.used})[a]];
@@ -532,15 +575,67 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     const root = abieParent(1, [item, box]);
     root.used = true;
     [item, box, item2].forEach(n => n.parent = n === item2 ? box : root);
+    [item, item2].forEach(n => n.children.forEach(c => c.parent = n));
     return {root, item, box, item2};
   }
+
+  it('knows the children of a component that is only met as a cycle where its places are first met', () => {
+    // Root -> Left -> X (the place met first, its Item is a cycle, Left being the same ASCCP as Item) and
+    // Root -> Right -> X' (another place of X, where Item is a real place with a Code below it)
+    const x1 = asbiepChild('X', 30);
+    const cycleItem = asbiepChild('Item', 31);
+    cycleItem.isCycle = true;
+    x1.children = [cycleItem];
+    const left = asbiepChild('Left', 32);
+    left.asccpNode = {manifestId: 70031} as any;
+    left.children = [x1];
+    const x2 = sameComponentAs(x1, 'X', 30);
+    const item = asbiepChild('Item', 31);
+    item.children = [bbiepChild('Code', 21)];
+    x2.children = [item];
+    const right = asbiepChild('Right', 33);
+    right.children = [x2];
+    const root = abieParent(1, [left, right]);
+    root.used = true;
+    left.parent = right.parent = root;
+    x1.parent = left;
+    x2.parent = right;
+    cycleItem.parent = x1;
+    item.parent = x2;
+    item.children.forEach(c => c.parent = item);
+    (cycleItem as any).loadsAs = item;
+
+    expect(search(new FixedDatabase(), root, '//Right/X/Item/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, '//Code').found.total).toBe(1);
+  });
+
+  it('counts what is below an unused node as unused, whatever its own flag says', () => {
+    const {root, item, box, item2} = tree();
+    item.used = true;
+    item.children[0].used = true;
+    item2.used = true;
+    item2.children[0].used = true;
+    box.used = true;
+    // a used node below an unused one (the row says used, the parent's says unused)
+    (box as any)._used = false;
+
+    const count = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+
+    // below Item (used) both are used; below Box (unused) the Item and its Code are not
+    expect(count('//*[type = BBIEP and used]')).toBe(1);
+    expect(count('Box/Item[used]')).toBe(0);
+    expect(count('Item[used]')).toBe(1);
+    // and it does not matter that loading the child checked the parent in the meantime
+    (box as any)._used = true;
+    expect(count('Box/Item[used]')).toBe(1);
+  });
 
   it('shares one record between the places of a component', () => {
     const {root} = tree();
     const {graph} = search(new FixedDatabase(), root, 'Item');
 
-    // Root, Item, Code, Box: the second Item place is the same component as the first
-    expect(graph.dag.names.length).toBe(4);
+    // Root, Item, Code, Box, and the second Item place, which is under another association (its Code is shared)
+    expect(graph.dag.names.length).toBe(5);
     expect(search(new FixedDatabase(), root, 'Item').found.total).toBe(2);
     expect(search(new FixedDatabase(), root, 'Item/Code').found.total).toBe(2);
   });
@@ -571,6 +666,34 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     expect(search(new FixedDatabase(), root, 'Item[type = "ASBIEP" and used]').found.total).toBe(1);
   });
 
+  it('tells the places of a component apart by what is set on the BIE: nillable and deprecated', () => {
+    const {root, item, box, item2} = tree();
+    box.used = true;
+    item2.used = true;
+    const attributeOf = (graph: any, node: any, name: string) => graph.dag.attributes[name]?.[graph.recordOf(node)];
+
+    item2.bieNillable = true;
+    let graph = search(new FixedDatabase(), root, 'Item').graph;
+    expect(graph.recordOf(item2)).not.toBe(graph.recordOf(item));
+    expect(graph.dag.attributes['nillable'][graph.recordOf(item2)]).toBe(true);
+    expect(graph.dag.attributes['nillable'][graph.recordOf(item)]).toBe(false);
+
+    item2.bieNillable = false;
+    const code = item2.children[0] as any;
+    code.bieNillable = true;
+    graph = search(new FixedDatabase(), root, 'Item').graph;
+    expect(graph.dag.attributes['nillable'][graph.recordOf(code)]).toBe(true);
+    // only an ASBIEP and a BBIEP can be nillable
+    expect(attributeOf(graph, root, 'nillable')).toBeUndefined();
+
+    // deprecated on the BIE alone (the core component is not)
+    code.bieNillable = false;
+    code.deprecated = true;
+    graph = search(new FixedDatabase(), root, 'Item').graph;
+    expect(graph.dag.attributes['deprecated'][graph.recordOf(code)]).toBe(true);
+    expect(attributeOf(graph, item.children[0], 'deprecated')).toBe(false);
+  });
+
   it('searches the tree the user sees, which is only what the BIE uses, the same way', () => {
     const {root, item2} = tree();
     item2.used = true;
@@ -594,60 +717,166 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     expect(search(new FixedDatabase(), root, '/Parent-1/Bo', {exact: true, anchored: true}).found.total).toBe(0);
   });
 
-  it('tells the places of a component apart by the definition of their BIE', () => {
-    const {root, item, item2} = tree();
-    item2.definition = 'The second item';
+  const serverPredicate = (operator: ServerPredicate['operator'], value: string, attribute = 'definition'): ServerPredicate =>
+    ({id: '0', flag: 'srv_0', attribute, operator, value});
 
-    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+  it('flags the places the backend found text in, and tells them apart from the other places of the component', () => {
+    const {root, item, item2} = tree();
+    const marks = new BieServerMarks([serverPredicate('CONTAINS', 'second')], {
+      matches: {'0': [{table: 'asbie', hashPath: item2.asbieHashPath, path: item2.asbiePath}]}
+    }, false);
+
+    const found = (expr: string) => search(new FixedDatabase(), root, expr, {}, {marks}).found.total;
     expect(found('Item')).toBe(2);
-    expect(found("Item[definition = '']")).toBe(1);
-    expect(found("Item[definition != '']")).toBe(1);
-    expect(found('Item[contains(definition, "second")]')).toBe(1);
-    // the place without one shares the record of its component, the other is a record of its own
-    const {graph} = search(new FixedDatabase(), root, 'Item');
+    expect(found('Item[srv_0]')).toBe(1);
+    expect(found('Item[not(srv_0)]')).toBe(1);
+    expect(found('Box/Item[srv_0]/Code')).toBe(1);
+    // the place without a match shares the record of its component, the other is a record of its own
+    const {graph} = search(new FixedDatabase(), root, 'Item', {}, {marks});
     expect(graph.recordOf(item2)).not.toBe(graph.recordOf(item));
+    expect(graph.flagsOf(item2)).toEqual({srv_0: true});
+    expect(graph.flagsOf(item)).toEqual({});
   });
 
-  it('reads the definition of the loaded details before the one the tree was loaded with', () => {
+  it('flags a place of the backend whether it is used or not', () => {
+    const {root, item, box, item2} = tree();
+    item.used = true;
+    item.children[0].used = true;
+    box.used = false;
+    item2.used = false;
+    item2.children[0].used = false;
+    const code = item2.children[0];
+    const marks = new BieServerMarks([serverPredicate('EQUALS', 'token', 'value_domain')], {
+      matches: {'0': [{table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath}]}
+    }, false);
+
+    expect(search(new FixedDatabase(), root, 'Box/Item/Code[srv_0]', {}, {marks}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Code[srv_0 and not(used)]', {}, {marks}).found.total).toBe(1);
+  });
+
+  it('puts nothing of the BIE text into the graph when the backend has not been asked', () => {
     const {root, item2} = tree();
-    item2.definition = 'Old text';
-    item2._detail = {asbie: {definition: 'New text'}} as any;
+    item2._detail = {isChanged: false, asbie: {definition: 'The second item'}, asbiep: {}} as any;
 
-    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
-    expect(found("Item[definition = 'New text']")).toBe(1);
-    expect(found("Item[definition = 'Old text']")).toBe(0);
-    // a definition that is loaded but has no text is empty
-    item2._detail = {asbie: {definition: null}} as any;
-    expect(found("Item[definition = '']")).toBe(2);
+    const {graph, found} = search(new FixedDatabase(), root, 'Item');
+
+    expect(found.total).toBe(2);
+    // the BIE text is not part of the graph, nor is any definition text
+    expect(Object.keys(graph.dag.attributes ?? {}).filter(k => k.includes('definition'))).toEqual([]);
   });
 
-  it('asks for the definitions of the core components a row shows by their own names', () => {
+  it('judges a place with unsaved text by that text instead of by what the backend has saved', () => {
+    const {root, item2} = tree();
+    const savedElsewhere = {table: 'asbie', hashPath: item2.asbieHashPath, path: item2.asbiePath};
+    // the backend knows the old text; the editor has the new one
+    item2._detail = {isChanged: true, asbie: {definition: 'New text'}, asbiep: {}} as any;
+
+    const foundBy = (predicate: ServerPredicate, saved: boolean) => search(new FixedDatabase(), root, 'Item[srv_0]', {}, {
+      marks: new BieServerMarks([predicate], {matches: {'0': saved ? [savedElsewhere] : []}}, false)
+    }).found.total;
+
+    expect(foundBy(serverPredicate('CONTAINS', 'new'), false)).toBe(1);
+    expect(foundBy(serverPredicate('CONTAINS', 'old'), true)).toBe(0);
+  });
+
+  it('flags the places by what the backend said about the definitions of the core components they profile', () => {
     const {root, item, item2} = tree();
-    item.asccpNode.definition = 'Item component';
-    item.accNode.definition = 'Item type';
-    item.asccNode.definition = 'An association';
-    item2.asccNode.definition = 'Another association';
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const predicates = [
+      {id: '0', flag: 'srv_0', attribute: 'association_definition', operator: 'CONTAINS', value: 'x'},
+      {id: '1', flag: 'srv_1', attribute: 'component_definition', operator: 'CONTAINS', value: 'x'},
+      {id: '2', flag: 'srv_2', attribute: 'type_definition', operator: 'CONTAINS', value: 'x'}
+    ] as any;
+    const ccMarks = new CcServerMarks(predicates, {matches: {
+      '0': {...none, asccs: [10]},
+      '1': {...none, asccps: [item.asccpNode.manifestId]},
+      '2': {...none, accs: [item.accNode.manifestId]}
+    }}, false);
+    const found = (expr: string) => {
+      const db = new FixedDatabase();
+      db.filters.setActive('hideUnused', false);
+      const graph = db.searchGraph(root, undefined, ccMarks);
+      const pattern = new PathPattern(expr);
+      return new DagPathSearch(graph.dag, pattern).search({
+        ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll([[root.name]])
+      }).total;
+    };
 
-    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
-    // the component and its type are the same in both places, the association is not
-    expect(found("Item[component_definition = 'Item component']")).toBe(2);
-    expect(found("Item[type_definition = 'Item type']")).toBe(2);
-    expect(found("Item[association_definition = 'An association']")).toBe(1);
-    expect(found("Item[association_definition = 'Another association']")).toBe(1);
-    expect(found("Item[association_definition = '']")).toBe(0);
-    // the BIE's own definition is not the core component's
-    expect(found("Item[definition = 'Item component']")).toBe(0);
-    expect(found("Item[definition = '']")).toBe(2);
+    // the association is the one of the first place (ASCC 10) only; the component and its type are those of both
+    expect(found('Item[srv_0]')).toBe(1);
+    expect(found('Item[srv_1]')).toBe(2);
+    expect(found('Item[srv_2]')).toBe(2);
+    // a BBIEP has an association and a component, but no type
+    expect(found('Code[srv_2]')).toBe(0);
   });
 
-  it('does not say the definition of a part a row does not have is empty', () => {
-    const {root} = tree();
-    const found = (expr: string) => search(new FixedDatabase(), root, expr).found.total;
+  it('judges the value domain of a place by its row when it has one and by the default of its data type when it has none', () => {
+    const {root, item, box, item2} = tree();
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const code = item.children[0];
+    // the two places of Code are two rows of the BIE
+    const top = root.asbiepPath;
+    (item as any)._asbiePath = top + '>ASCC-10';
+    (code as any)._bbiePath = top + '>ASCC-10>BCC-20';
+    (box as any)._asbiePath = top + '>ASCC-11';
+    (item2 as any)._asbiePath = top + '>ASCC-11>ASCC-12';
+    (item2.children[0] as any)._bbiePath = top + '>ASCC-11>ASCC-12>BCC-20';
+    const predicates = [{id: '0', flag: 'srv_0', attribute: 'value_domain', operator: 'EQUALS', value: 'token'}] as any;
+    // the data type of Code starts with token; the row of the first Code says something else
+    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [code.bccpNode.manifestId]}}}, false);
+    const row = {table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath};
+    const found = (expr: string, ownRow: boolean) => {
+      const marks = new BieServerMarks([...predicates, BIE_VALUE_DOMAIN_ROW_PREDICATE],
+        {matches: {'0': [], [BIE_VALUE_DOMAIN_ROW_PREDICATE.id]: ownRow ? [row] : []}}, false);
+      const db = new FixedDatabase();
+      db.filters.setActive('hideUnused', false);
+      const graph = db.searchGraph(root, marks, ccMarks);
+      const pattern = new PathPattern(expr);
+      return new DagPathSearch(graph.dag, pattern).search({
+        ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll([[root.name]])
+      }).total;
+    };
 
-    // a BBIEP has an association and a component, but no type
-    expect(found("Code[association_definition = '' and component_definition = '']")).toBe(2);
-    expect(found("Code[type_definition = '']")).toBe(0);
-    expect(found("Item[type_definition = '']")).toBe(2);
+    expect(found('Code[srv_0]', false)).toBe(2);
+    expect(found('Code[srv_0]', true)).toBe(1);
+    expect(found('Code[not(srv_0)]', true)).toBe(1);
+  });
+
+  it('judges the fixed value and the default value of a place by its row when the row stores one and by its core component when it does not', () => {
+    const {root, item, box, item2} = tree();
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const code = item.children[0];
+    const top = root.asbiepPath;
+    (item as any)._asbiePath = top + '>ASCC-10';
+    (code as any)._bbiePath = top + '>ASCC-10>BCC-20';
+    (box as any)._asbiePath = top + '>ASCC-11';
+    (item2 as any)._asbiePath = top + '>ASCC-11>ASCC-12';
+    (item2.children[0] as any)._bbiePath = top + '>ASCC-11>ASCC-12>BCC-20';
+    const [fixedRow, defaultRow] = BIE_VALUE_CONSTRAINT_ROW_PREDICATES;
+    const predicates = [{id: '0', flag: 'srv_0', attribute: 'fixed_value', operator: 'EQUALS', value: 'X'}] as any;
+    // the BCCP of Code has the fixed value X, the BIE row of its first place has another fixed value (or a default value)
+    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [code.bccpNode.manifestId]}}}, false);
+    const row = {table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath};
+    const found = (expr: string, rows: {row: boolean, kind: 'fixed' | 'default'}) => {
+      const matches: Record<string, any[]> = {'0': []};
+      matches[fixedRow.id] = rows.row && rows.kind === 'fixed' ? [row] : [];
+      matches[defaultRow.id] = rows.row && rows.kind === 'default' ? [row] : [];
+      const marks = new BieServerMarks([...predicates, ...BIE_VALUE_CONSTRAINT_ROW_PREDICATES], {matches}, false);
+      const db = new FixedDatabase();
+      db.filters.setActive('hideUnused', false);
+      const graph = db.searchGraph(root, marks, ccMarks);
+      const pattern = new PathPattern(expr);
+      return new DagPathSearch(graph.dag, pattern).search({
+        ancestors: [], record: graph.recordOf(root), mask: pattern.stepAll([[root.name]])
+      }).total;
+    };
+
+    // no row: both places say the value of the BCCP
+    expect(found('Code[srv_0]', {row: false, kind: 'fixed'})).toBe(2);
+    // a row with another fixed value, or with a default value: the first place is judged by its row, the second has none
+    expect(found('Code[srv_0]', {row: true, kind: 'fixed'})).toBe(1);
+    expect(found('Code[srv_0]', {row: true, kind: 'default'})).toBe(1);
+    expect(found('Code[not(srv_0)]', {row: true, kind: 'default'})).toBe(1);
   });
 
   it('keeps a place that shows only some of its children apart from its component', () => {

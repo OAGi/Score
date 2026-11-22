@@ -353,15 +353,25 @@ The attributes depend on the tree:
    * - ``object_class_term``, ``property_term``, ``den``, ``data_type_term``, ``representation_term``, ``qualifier``
      - The terms of the component the node shows. A kind of component has only its own terms (e.g., ``object_class_term`` for an ACC), and a test on an attribute the node does not have is false.
    * - ``component_type``, ``entity_type``, ``state``, ``guid``, ``deprecated``
-     - The component type of an ACC, the entity type (Element or Attribute) of a BCC, the state, the GUID, and whether the component is deprecated.
+     - The component type of an ACC, the entity type (Element or Attribute) of a BCC, the state, the GUID, and whether the node is deprecated. In the Core Component trees and the Model Browser a node is deprecated when the tree shows it as deprecated: its component is, or the association (ASCC or BCC) that ties it to its parent is, or (for a BCCP) its data type is.
+   * - ``object_class_qualifier``, ``abstract``, ``reusable``, ``commonly_used``, ``nillable``
+     - Core Component trees and the Model Browser: the object class qualifier and whether the component is abstract (ACC), reusable (ASCCP), commonly used (DT), or nillable (ASCCP or BCCP, or the BCC that ties the node to its parent). Used alone (``[abstract]``), a flag tests that it is true.
+   * - ``tag``
+     - The tags of the component. A node can have several, and ``tag = "Core"`` is true if any one of them is Core.
    * - ``cardinality``, ``cardinality_min``, ``cardinality_max``
      - How often the node may occur under its parent (see below).
-   * - ``definition``, ``association_definition``, ``component_definition``, ``type_definition``
-     - The definitions shown for the node. ``definition = ''`` finds nodes that have a definition field that is empty.
+   * - ``definition``, ``definition_source``, ``association_definition``, ``component_definition``, ``type_definition``, ``default_value``, ``fixed_value``, ``content_component_definition``
+     - Core Component trees and the Model Browser: the definitions shown for the node and the source of its definition, the default and fixed values (of the BCC that ties the node to its parent, or else of its component), and the definition of the content component of a data type (DT). ``definition`` is the one of the association (ASCC or BCC) that ties the node to its parent, or else the one of its component. These are searched on the server (see below).
+   * - ``definition``, ``remark``, ``example``, ``fixed_value``, ``default_value``, ``business_term``
+     - BIE trees: the text set on the BIE itself. ``definition`` is the Context Definition. ``example``, ``fixed_value``, and ``default_value`` exist on BBIEP and BBIE_SC nodes only. ``business_term`` is the assigned Business Terms when Business Term is enabled (and you are not a developer), and the Business Term text of the BIE otherwise. These are searched on the server (see below). In the BIE trees, ``association_definition``, ``component_definition``, and ``type_definition`` are the definitions of the core components the node profiles; they are searched on the server too.
    * - ``display_name``
      - BIE trees: the display name set on an ASBIEP, BBIEP, or BBIE_SC.
    * - ``used``, ``inherited``, ``reused``
-     - BIE trees: whether the node is used, inherited, or a reused BIE. Used alone (``[used]``), they test that the flag is true.
+     - BIE trees: whether the node is used, inherited, or a reused BIE. Used alone (``[used]``), they test that the flag is true. A node is used when the BIE says so and every node above it is used: what is below an unused node is unused, even if its own setting says used. A search does not depend on which nodes you have opened. A used element that cannot be seen in the tree (below a User Extension Group, or below a recursive association that the tree does not expand) is not found either.
+   * - ``nillable``, ``deprecated``
+     - BIE trees: what is set on the BIE as well as on the core component it profiles. ``nillable`` is true when the BIE (ASBIEP or BBIEP) is nillable or the core component, or the association that ties the node to its parent, is. ``deprecated`` is true when the BIE or its core component is deprecated. These come with the tree, so a search for them needs no request to the server.
+
+An attribute that a node has no value for (for example, the qualifier of a data type that has none) is missing: a test on it is false, ``!=`` and ``not(...)`` of a comparison included (``not(qualifier != "x")`` finds the nodes without a qualifier, and ``qualifier != "x"`` does not).
 
 A word after a comparison is read as text, so ``type = ACC`` needs no quotes.
 Put quotes around text that contains anything other than ASCII letters, digits, ``_`` and ``-``.
@@ -370,7 +380,23 @@ Attribute names are written as listed here, e.g., ``display_name`` and not ``dis
 
 To search by cardinality, use ``cardinality = 0..1``, or ``Optional``, ``Required``, or ``Prohibited``.
 Only ``=`` and ``!=`` can be used with ``cardinality``.
+A search covers every node that the tree shows. A component is shown again each time it comes in the tree, and the tree stops at an ASCCP that is already among the nodes above it (the node is shown, its children are not), so a search finds the nodes the screen would show once you opened them all.
 ``cardinality_min`` and ``cardinality_max`` are numbers, and an unbounded maximum is larger than any number, so ``cardinality_max < 10`` leaves unbounded nodes out.
+
+Text searched on the server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The texts that differ from node to node and can be long (the definitions, the remark, the example, the values, and the business terms) are searched by the server instead of by the browser.
+They are marked "searched on the server" in the suggestions, and can be mixed with the other attributes in one expression, e.g., ``*[used = true and contains(definition, "price")]`` or ``*[not(contains(remark, "obsolete"))]``.
+A search that uses them waits for one answer from the server, which takes a fraction of a second.
+
+- Only ``=``, ``!=``, ``contains``, ``starts-with``, and ``ends-with`` can be used with them, and a value is required (``*[remark]`` is not valid).
+  ``=`` and ``!=`` compare the whole text.
+- A node that has no text for the attribute (the field was never filled in) is neither equal to anything nor different from anything, so ``remark != "x"`` finds only nodes that have a remark. ``remark = ""`` finds only the nodes whose remark was saved as an empty text.
+- The server ignores upper and lower case and also accents, so ``cafe`` finds ``café``. (The other attributes only ignore the case.)
+- In the BIE trees, the server searches what is saved. Text you have typed and not saved yet is searched as you typed it, but only in the nodes whose details are loaded (the nodes you have opened). The Business Term is always searched as saved.
+- A BIE that reuses another BIE is searched for its own text; the text of the reused BIE is not included.
+- In the uplift target tree there is nothing saved yet, so these attributes are not offered there.
 
 Suggestions and errors
 ^^^^^^^^^^^^^^^^^^^^^^

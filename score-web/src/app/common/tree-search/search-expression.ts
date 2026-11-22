@@ -563,7 +563,7 @@ class PredicateCompiler {
     return (f: Frame) => {
       const actualMin = f.ctx.attr('cardinality_min');
       const actualMax = f.ctx.attr('cardinality_max');
-      return actualMin !== undefined && actualMax !== undefined && ((actualMin === min && actualMax === max) === equal);
+      return actualMin != null && actualMax != null && ((actualMin === min && actualMax === max) === equal);
     };
   }
 
@@ -695,7 +695,8 @@ class PredicateCompiler {
     return (f, e) => {
       const a = nodes[0](f, e);
       const b = nodes[1](f, e);
-      return a !== undefined && b !== undefined && test(fold(a, e.caseSensitive), fold(b, e.caseSensitive));
+      return a != null && b != null
+        && anyValue(a, x => anyValue(b, y => test(fold(x, e.caseSensitive), fold(y, e.caseSensitive))));
     };
   }
 
@@ -842,7 +843,22 @@ const TEXT_FUNCTIONS: Record<string, (a: string, b: string) => boolean> = {
 const UNBOUNDED = /^(\*|unbounded|∞|infinity)$/i;
 
 function truthy(value: AttrValue): boolean {
-  return value !== undefined && value !== false && value !== '' && value !== 0;
+  if (isList(value)) {
+    return value.length > 0;
+  }
+  return value != null && value !== false && value !== '' && value !== 0;
+}
+
+function isList(value: AttrValue): value is readonly string[] {
+  return Array.isArray(value);
+}
+
+/** Whether `test` holds for the value, or for any one of them when the attribute has several (an empty list has none). */
+function anyValue(value: AttrValue, test: (single: string | number | boolean) => boolean): boolean {
+  if (isList(value)) {
+    return value.some(v => test(v));
+  }
+  return value != null && test(value);
 }
 
 function fold(value: AttrValue, caseSensitive: boolean): string {
@@ -851,13 +867,21 @@ function fold(value: AttrValue, caseSensitive: boolean): string {
 }
 
 /**
- * Compares two values; a comparison with a missing value is false (so is `!=`: an attribute a node does not have
+ * Compares two values; a comparison with a missing value (undefined or null) is false (so is `!=`: an attribute a node does not have
  * is not "different"). Flags compare with `true`/`false`, numbers numerically, anything else as text.
  */
 function compare(op: string, a: AttrValue, b: AttrValue, caseSensitive: boolean): boolean {
-  if (a === undefined || b === undefined) {
+  // a NULL (what a JSON `null` says of an absent part, e.g. the qualifier of a data type) is as missing as an undefined
+  if (a == null || b == null) {
     return false;
   }
+  if (isList(a) || isList(b)) {
+    return anyValue(a, x => anyValue(b, y => compareSingle(op, x, y, caseSensitive)));
+  }
+  return compareSingle(op, a, b, caseSensitive);
+}
+
+function compareSingle(op: string, a: string | number | boolean, b: string | number | boolean, caseSensitive: boolean): boolean {
   let order: number;
   const x0 = typeof a === 'string' && UNBOUNDED.test(a) && typeof b === 'number' ? Infinity : a;
   const y0 = typeof b === 'string' && UNBOUNDED.test(b) && typeof a === 'number' ? Infinity : b;

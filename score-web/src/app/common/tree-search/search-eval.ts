@@ -1,5 +1,8 @@
-/** What a node tells a search predicate about itself: a string, a number, a flag, or nothing at all. */
-export type AttrValue = string | number | boolean | undefined;
+/**
+ * What a node tells a search predicate about itself: a string, a number, a flag, or nothing at all. An attribute with
+ * several values (a tag list) is a list of strings; a comparison with it holds when any of its values satisfies it.
+ */
+export type AttrValue = string | number | boolean | readonly string[] | undefined;
 
 /** Reads the attribute of the node a predicate is judging. */
 export type AttrLookup = (attribute: string) => AttrValue;

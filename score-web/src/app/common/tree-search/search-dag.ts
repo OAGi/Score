@@ -32,8 +32,8 @@ export function sameSearchDag(a: SearchDag, b: SearchDag): boolean {
   if (a === b) {
     return true;
   }
-  const same = <T>(x: ArrayLike<T> | undefined, y: ArrayLike<T> | undefined): boolean =>
-    x === y || (!!x && !!y && x.length === y.length && Array.prototype.every.call(x, (value, i) => value === y[i]));
+  const same = <T>(x: ArrayLike<T> | undefined, y: ArrayLike<T> | undefined, equal: (p: T, q: T) => boolean = (p, q) => p === q): boolean =>
+    x === y || (!!x && !!y && x.length === y.length && Array.prototype.every.call(x, (value, i) => equal(value, y[i])));
   if (a.names.length !== b.names.length || !a.names.every((names, i) => same(names, b.names[i]))) {
     return false;
   }
@@ -43,7 +43,10 @@ export function sameSearchDag(a: SearchDag, b: SearchDag): boolean {
   const attributesA = a.attributes ?? {};
   const attributesB = b.attributes ?? {};
   const attributeNames = Object.keys(attributesA);
-  return attributeNames.length === Object.keys(attributesB).length && attributeNames.every(name => same(attributesA[name], attributesB[name]));
+  // a multiple valued attribute (`tag`) has a list on every build of the DAG, which is the same value when it holds the same items
+  const sameValue = (x: AttrValue, y: AttrValue): boolean => x === y || (Array.isArray(x) && Array.isArray(y) && same(x, y));
+  return attributeNames.length === Object.keys(attributesB).length &&
+    attributeNames.every(name => same(attributesA[name], attributesB[name], sameValue));
 }
 
 /** Builds a `SearchDag` record by record; a record is identified by a key so that equal components are shared. */

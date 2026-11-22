@@ -4,6 +4,8 @@ import {ExpressionEvaluator, FlatNode} from '../flat-tree';
 import {GraphTreeSearch, TreeGraphAdapter} from './graph-tree-search';
 import {PatternExpressionEvaluator} from './pattern-expression-evaluator';
 import {parseSearchExpression} from './search-expression';
+import {ParseError} from './search-grammar';
+import {ServerPredicate, splitServerPredicates} from './server-predicate';
 
 /** What the searcher needs from the tree data source: the visible (expanded) node list and its expansion state. */
 export interface TreeSearchDataSource<N> {
@@ -30,6 +32,8 @@ export interface TreeSearchVisit<N> {
   /** Whether the visit expanded the node and so counts against `TreeSearchLimits.expandLimit`. */
   expanded: boolean;
 }
+
+const NO_ATTRIBUTES: ReadonlySet<string> = new Set();
 
 /** How long a search pass works before it hands the thread back to the browser (so the page stays responsive). */
 const TIME_SLICE_MS = 12;
@@ -179,6 +183,23 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     return undefined;
   }
 
+  /** The attributes the backend searches (lower case): `SearchAttribute.source` is `server`. None by default. */
+  protected serverAttributes(): ReadonlySet<string> {
+    return NO_ATTRIBUTES;
+  }
+
+  /**
+   * Asks the backend which places satisfy the predicates and remembers the answer, so that the graph the tree describes
+   * itself with (`graphAdapter().dag()` and `attributesOf`) has the flag of each predicate set on those places.
+   */
+  protected resolveServerPredicates(predicates: ServerPredicate[], caseSensitive: boolean): Promise<void> {
+    return Promise.resolve();
+  }
+
+  /** Forgets what `resolveServerPredicates` remembered. */
+  protected clearServerPredicates() {
+  }
+
   /** The number of matches of the latest search (a lower bound while `fullSearched` is false). */
   get resultCount(): number {
     return this.usingGraph ? this.graphResultCount : this.searchResult.length;
@@ -286,22 +307,73 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
       return of(-1);
     }
     this.expressionError = undefined;
-    const done = new AsyncSubject<number>();
-    this.isSearching = true;
-    const graph = this.prepareGraphSearch(inputKeyword, selectedNode);
-    if (!graph && parsed.needsContext) {
-      // judging a node by its surroundings needs the component graph; walking the tree cannot do it
-      this.isSearching = false;
-      this.expressionError = 'This expression is too complex to search here';
+    let split;
+    try {
+      split = splitServerPredicates(inputKeyword, this.serverAttributes());
+    } catch (e) {
+      if (!(e instanceof ParseError)) {
+        throw e;
+      }
+      this.expressionError = e.message + ' (at ' + (e.position + 1) + ')';
       this.progress.next();
       return of(-1);
     }
-    if (graph) {
-      this.runGraphSearch(graph, inputKeyword, this.generation, done);
-    } else {
-      this.runPass(inputKeyword, selectedNode, this.generation, done);
+    const done = new AsyncSubject<number>();
+    this.isSearching = true;
+    if (split.predicates.length > 0) {
+      this.runServerSearch(split.expression, split.predicates, inputKeyword, selectedNode, this.generation, done);
+      return done.asObservable();
     }
+    this.startSearch(inputKeyword, inputKeyword, selectedNode, parsed.needsContext, done);
     return done.asObservable();
+  }
+
+  /** Runs the search of the expression the graph can judge (`graphExpression`); `keyword` is what the user typed. */
+  private startSearch(keyword: string, graphExpression: string, selectedNode: N, needsContext: boolean, done: AsyncSubject<number>) {
+    const graph = this.prepareGraphSearch(graphExpression, selectedNode);
+    if (!graph && (needsContext || graphExpression !== keyword)) {
+      // judging a node by its surroundings needs the component graph; walking the tree cannot do it, nor ask the backend
+      this.isSearching = false;
+      this.expressionError = 'This expression is too complex to search here';
+      this.progress.next();
+      done.next(-1);
+      done.complete();
+      return;
+    }
+    if (graph) {
+      this.runGraphSearch(graph, keyword, this.generation, done);
+    } else {
+      this.runPass(keyword, selectedNode, this.generation, done);
+    }
+  }
+
+  /** Asks the backend for the server predicates, and then runs the graph search over the expression without them. */
+  private async runServerSearch(graphExpression: string, predicates: ServerPredicate[], keyword: string, selectedNode: N,
+                                generation: number, done: AsyncSubject<number>) {
+    const inZone = zoneRunner();
+    this.searchedUnit = 'components';
+    this.progress.next();
+    try {
+      await this.resolveServerPredicates(predicates, false);
+    } catch (error) {
+      inZone(() => {
+        if (generation === this.generation) {
+          this.resetSearch();
+          this.expressionError = 'The server could not search this expression';
+          this.progress.next();
+        }
+        done.next(-1);
+        done.complete();
+      });
+      return;
+    }
+    inZone(() => {
+      if (generation !== this.generation) {
+        done.complete();
+        return;
+      }
+      this.startSearch(keyword, graphExpression, selectedNode, true, done);
+    });
   }
 
   /** Releases what the searcher holds outside the page (its graph search session). */
@@ -329,6 +401,7 @@ export abstract class TreeNodeSearcher<N extends FlatNode, D extends TreeSearchD
     this.graphCurrentNode = undefined;
     this.searchedUnit = 'nodes';
     this.graph?.clear();
+    this.clearServerPredicates();
     this.progress.next();
   }
 

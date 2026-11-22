@@ -1,3 +1,4 @@
+import {CcSearchService, ccServerSearchOf} from '../domain/cc-server-search';
 import {CARDINALITY_MAX_PATTERN} from '../../common/cardinality-max-pattern';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
@@ -102,6 +103,8 @@ import {ccNodeUrl} from '../domain/cc-node-url';
   styleUrls: ['./acc-detail.component.css']
 })
 export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
+
+  private ccSearchService = inject(CcSearchService);
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -277,7 +280,7 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
 
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
       this.cardinality.restore();
 
@@ -428,7 +431,7 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
       this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'ACC', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
 
       this.workingRelease = rootNode.release.workingRelease;

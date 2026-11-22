@@ -1,6 +1,9 @@
-import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {associationIdKey, cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../common/tree-search/search-expression';
-import {BIE_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
+import {BIE_SEARCH_ATTRIBUTES, SearchAttribute} from '../../common/tree-search/search-suggest';
+import {satisfiesServerPredicate, ServerPredicate} from '../../common/tree-search/server-predicate';
+import {attributesOfRow, BIE_CC_FALLBACK_ATTRIBUTES, BIE_COMPONENT_TEXT_ATTRIBUTES, BIE_SUGGESTED_ATTRIBUTES, BIE_TEXT_ATTRIBUTES, BIE_VALUE_CONSTRAINT_ATTRIBUTES, BIE_VALUE_CONSTRAINT_ROW_PREDICATES, BIE_VALUE_DOMAIN_ATTRIBUTES, BIE_VALUE_DOMAIN_ROW_PREDICATE, BieServerMarks, BieServerSearch, BieServerValues} from './bie-server-search';
+import {CcKey, CcPlace, CcServerMarks, CcServerSearch} from '../../cc-management/domain/cc-server-search';
 import {
   AccSummary,
   AsccpSummary,
@@ -46,8 +49,8 @@ export interface BieFlatNode extends FlatNode {
   deprecated: boolean;
   ccDeprecated: boolean;
   rootNode: BieEditAbieNode;
-  /** The definition of the BIE (its Context Definition); undefined where the tree does not know it. */
-  definition?: string;
+  /** Whether the ASBIE or BBIE itself is nillable (not the core component); undefined where the tree does not know it. */
+  bieNillable?: boolean;
   inverseMode: boolean;
 
   used: boolean | undefined;
@@ -312,6 +315,7 @@ export abstract class BieFlatNodeImpl implements BieFlatNode {
   _queryPath: string;
 
   deprecated: boolean;
+  bieNillable?: boolean;
   rootNode: BieEditAbieNode;
 
   get inverseMode(): boolean {
@@ -430,12 +434,6 @@ export class AbieFlatNode extends BieFlatNodeImpl {
     this.bieId = abieId;
   }
 
-  /** The definition of the root's ASBIEP, which the tree is not loaded with: known once the details are loaded. */
-  get definition(): string | undefined {
-    const loaded = (this._detail as BieEditAbieNodeDetail)?.asbiep.definition;
-    return loaded !== undefined ? loaded ?? '' : undefined;
-  }
-
   get asbiepPath(): string {
     if (!this._asbiepPath) {
       this._asbiepPath = 'ASCCP-' + this.asccpNode.manifestId;
@@ -499,7 +497,6 @@ export class AsbiepFlatNode extends AbieFlatNode {
   intermediateAccNodes: CcGraphNode[];
   asccNode: CcGraphNode;
 
-  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -602,16 +599,6 @@ export class AsbiepFlatNode extends AbieFlatNode {
     this._cardinalityMax = cardinalityMax;
   }
 
-  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
-  override get definition(): string {
-    const loaded = (this._detail as BieEditAsbiepNodeDetail)?.asbie.definition;
-    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
-  }
-
-  override set definition(definition: string) {
-    this._definition = definition;
-  }
-
   get ccDeprecated(): boolean {
     return this.asccpNode.deprecated || this.accNode.deprecated || this.asccNode.deprecated;
   }
@@ -633,7 +620,6 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
   bccpNode: CcGraphNode;
   bdtNode: CcGraphNode;
 
-  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -756,16 +742,6 @@ export class BbiepFlatNode extends BieFlatNodeImpl {
     this._cardinalityMax = cardinalityMax;
   }
 
-  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
-  get definition(): string {
-    const loaded = (this._detail as BieEditBbiepNodeDetail)?.bbie.definition;
-    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
-  }
-
-  set definition(definition: string) {
-    this._definition = definition;
-  }
-
   get ccDeprecated(): boolean {
     return this.bccpNode.deprecated || this.bdtNode.deprecated || this.bccNode.deprecated;
   }
@@ -780,7 +756,6 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
   bdtScNode: CcGraphNode;
   bdtNode: CcGraphNode;
 
-  private _definition: string;
   private _cardinalityMin: number = undefined;
   private _cardinalityMax: number = undefined;
 
@@ -845,16 +820,6 @@ export class BbieScFlatNode extends BieFlatNodeImpl {
 
   set cardinalityMax(cardinalityMax: number) {
     this._cardinalityMax = cardinalityMax;
-  }
-
-  /** The definition of the BIE (its Context Definition): the loaded details', or else the one the tree was loaded with. */
-  get definition(): string {
-    const loaded = (this._detail as BieEditBbieScNodeDetail)?.bbieSc.definition;
-    return loaded !== undefined ? loaded ?? '' : this._definition ?? '';
-  }
-
-  set definition(definition: string) {
-    this._definition = definition;
   }
 
   get ccDeprecated(): boolean {
@@ -1456,6 +1421,7 @@ export class AsbieDetail {
 
   set nillable(value: boolean) {
     this._nillable = value;
+    this._node.bieNillable = value;
     this._node.fireChangeEvent('nillable', value);
   }
 
@@ -1774,6 +1740,7 @@ export class BbieDetail {
 
   set nillable(value: boolean) {
     this._nillable = value;
+    this._node.bieNillable = value;
     this._node.fireChangeEvent('nillable', value);
   }
 
@@ -2685,7 +2652,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
    *
    * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
    */
-  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+  searchGraph(root: T, marks?: BieServerMarks, ccMarks?: CcServerMarks): {
+    dag: SearchDag, recordOf: (node: T) => number, flagsOf: (node: T) => Record<string, AttrValue>
+  } | undefined {
     const filtered = this.filters.active;
     // A search result stays visible in the tree whatever the filters say, but the graph is what the search is made
     // from, so the filters alone decide here.
@@ -2708,21 +2677,27 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       const key = keyOf(node);
       const raw = this.unwrapNode(node);
       const {index} = builder.record(key, [raw.name], this.identityKey(node),
-        {...bieSearchAttributes(raw, raw.name), ...blankBieDefinition(raw), used: false, inherited: false, reused: false});
-      // A node that is a cycle (it has no children loaded) or shows only some of its children says nothing about
-      // what its component's children are.
-      if (!represented.has(key) && !this.isCycleNode(node) && !this.hasFilteredChildren(node)) {
+        {...bieSearchAttributes(raw, raw.name), used: false, inherited: false, reused: false, ...ccFlags(raw)});
+      // A node that shows only some of its children says nothing about what its component's children are. A cycle has
+      // none loaded, but its component's children can be read from it all the same (see `childrenOfPlace`).
+      if (!represented.has(key) && !this.hasFilteredChildren(node)) {
         represented.add(key);
         representatives.push(node);
       }
       return index;
     };
 
-    // a place with a definition of its BIE, and the places above it, have to be found by walking from the root
-    const definedPlaces = this.placesWithBieDefinition(root);
+    // the places the backend found text in (or that have unsaved text), and the places above them, have to be found by
+    // walking from the root
+    const marked = this.markedPlaces(root, marks, shownChildren);
+    // A place whose BIE row says a value domain, a fixed value or a default value has the one the row says, whatever its
+    // core component starts with; what the row says nothing about is that of the core component.
+    const ccFlags = (raw: T): Record<string, AttrValue> =>
+      ccMarks?.flagsOf(biePlace(raw), attributesOfRow(marked.flags.get(raw))) ?? {};
+    const hasBieFlags = (raw: T): boolean => !!(raw.bieNillable || (raw.deprecated && !raw.ccDeprecated));
     const carriesBieData = (node: T): boolean => {
       const raw = this.unwrapNode(node);
-      return filtered || !!(raw.used || raw.inherited || raw.reused) || definedPlaces.has(raw);
+      return filtered || !!(raw.used || raw.inherited || raw.reused) || hasBieFlags(raw) || marked.places.has(raw);
     };
 
     const isSpecial = (node: T): boolean => {
@@ -2730,9 +2705,14 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       return filtered || carriesBieData(node) || (!!raw.displayName && raw.displayName !== raw.name) || this.hasFilteredChildren(node);
     };
 
-    const place = (node: T): {record: number, clone: boolean} => {
+    // What is below an unused node is unused, whatever its own row says: a node is used when it is and everything above it
+    // is. What the BIE stores decides when it stores something (loading a used node below an unused one makes the tree
+    // check the unused one, which must not change what a search finds); a node it stores nothing about says what it is now.
+    const place = (node: T, parentUsed = true): {record: number, clone: boolean} => {
+      const raw0 = this.unwrapNode(node);
+      const usedHere = parentUsed && (this.storedUsed(raw0) ?? !!raw0.used);
       const placed = shownChildren(node)
-        .map(child => carriesBieData(child) ? place(child) : {record: plain(child), clone: false});
+        .map(child => carriesBieData(child) ? place(child, usedHere) : {record: plain(child), clone: false});
       if (!isSpecial(node) && !placed.some(child => child.clone)) {
         return {record: plain(node), clone: false};
       }
@@ -2740,7 +2720,9 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       const names = [raw.name, raw.displayName].filter((name, i, all) => !!name && all.indexOf(name) === i);
       const {index} = builder.record('@' + (cloneCount++), names, this.identityKey(node), {
         ...bieSearchAttributes(raw, raw.displayName || raw.name),
-        used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
+        used: usedHere, inherited: !!raw.inherited, reused: !!raw.reused,
+        ...ccFlags(raw),
+        ...marked.flags.get(raw)
       });
       builder.setChildren(index, placed.map(child => child.record));
       clones.set(raw, index);
@@ -2751,7 +2733,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       place(root);
       for (let i = 0; i < representatives.length; i++) {
         const node = representatives[i];
-        builder.setChildren(builder.indexOf(keyOf(node)), this.children(node).map(child => plain(child)));
+        builder.setChildren(builder.indexOf(keyOf(node)), this.childrenOfPlace(node).map(child => plain(child)));
       }
     } catch (e) {
       return undefined;
@@ -2759,6 +2741,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
     return {
       dag: builder.build(),
+      flagsOf: node => ({...ccFlags(this.unwrapNode(node)), ...marked.flags.get(this.unwrapNode(node))}),
       recordOf: node => {
         const clone = clones.get(this.unwrapNode(node));
         if (clone !== undefined) {
@@ -2772,7 +2755,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
 
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(bieCardinality(this.unwrapNode(node))) + associationKey(bieAssociation(this.unwrapNode(node)));
+    return identity === undefined ? undefined : identity + cardinalityKey(bieCardinality(this.unwrapNode(node))) + associationIdKey(bieAssociation(this.unwrapNode(node)));
   }
 
   /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
@@ -2801,28 +2784,68 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
   }
 
   /**
-   * The loaded nodes that have a definition of their BIE, and the ones above them. (A node used in the BIE has its
-   * parents used, but a definition can be set on a node that is not used.)
+   * The places that a server predicate holds for, and the places above them (which a search graph needs a record of
+   * their own for). A place is one the backend found (its rows are looked up by hash path, and only the branches that
+   * lead to a matched path are followed, so nothing unrelated is unfolded), or one with unsaved text, which is judged
+   * here with the text being edited instead of what the backend has saved.
    */
-  private placesWithBieDefinition(root: T): Set<unknown> {
+  private markedPlaces(root: T, marks: BieServerMarks | undefined, shownChildren: (node: T) => T[]):
+    {places: Set<unknown>, flags: Map<unknown, Record<string, AttrValue>>} {
     const places = new Set<unknown>();
+    const flags = new Map<unknown, Record<string, AttrValue>>();
+    if (!marks) {
+      return {places, flags};
+    }
+
+    const followed = new Set<unknown>();
+    const follow = (node: T): boolean => {
+      const raw = this.unwrapNode(node);
+      if (!raw || followed.has(raw)) {
+        return places.has(raw);
+      }
+      followed.add(raw);
+      let found = false;
+      if (raw.isGroup || marks.leadsToMatch(bieEntryPath(raw))) {
+        for (const child of shownChildren(node)) {
+          found = follow(child) || found;
+        }
+      }
+      const own = marks.flagsOf(bieRows(raw));
+      if (own.length > 0) {
+        flags.set(raw, Object.fromEntries(own.map(flag => [flag, true])));
+      }
+      if (found || own.length > 0) {
+        places.add(raw);
+      }
+      return places.has(raw);
+    };
+    follow(root);
+
+    // what is being edited is only known to the nodes that are loaded, so those are the ones to look at
     const visited = new Set<unknown>();
-    const visit = (node: T): boolean => {
+    const overlay = (node: T): boolean => {
       const raw = this.unwrapNode(node);
       if (!raw || visited.has(raw)) {
         return places.has(raw);
       }
       visited.add(raw);
       const children = raw.getChildren ? raw.getChildren() : raw.children;
-      // every child is visited, so that all the places below a node are found
-      const below = children.map(child => visit(child as T)).some(found => found);
-      if (below || !!raw.definition) {
+      let found = false;
+      for (const child of children) {
+        found = overlay(child as T) || found;
+      }
+      const unsaved = unsavedFlags(raw, marks);
+      if (unsaved) {
+        flags.set(raw, {...flags.get(raw), ...unsaved});
+        found = true;
+      }
+      if (found) {
         places.add(raw);
       }
       return places.has(raw);
     };
-    visit(root);
-    return places;
+    overlay(root);
+    return {places, flags};
   }
 
   /** Whether the node is used or inherited, or has such a node below it, whether "Hide unused" is on or not. */
@@ -2842,6 +2865,29 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     return (rawNode.getChildren ? rawNode.getChildren() : rawNode.children) as BieFlatNode[];
   }
 
+  /** Whether the children of a cycle are being read (the tree itself never loads them). */
+  private loadingCycle = false;
+
+  /**
+   * The children of a place for the search graph. A cycle shows none, but its component has the same children at any
+   * other place, and the search stops at a component that is on its own path by itself; so they are read from a copy
+   * of the node (the tree keeps showing the cycle as it is), and no component is left without children for lack of
+   * a place that is not a cycle among the places the graph visits.
+   */
+  private childrenOfPlace(node: T): T[] {
+    if (!this.isCycleNode(node)) {
+      return this.children(node);
+    }
+    const copy = Object.create(this.unwrapNode(node)) as T;
+    (copy as any)._children = [];
+    this.loadingCycle = true;
+    try {
+      return this.children(copy);
+    } finally {
+      this.loadingCycle = false;
+    }
+  }
+
   private isCycleNode(node: BieFlatNode): boolean {
     if (!node || node.isCycle) {
       return !!node?.isCycle;
@@ -2854,6 +2900,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     }
 
     let parent = node.parent as BieFlatNode;
+    let nodeStillInGroups = true;
     const visitedParents = new Set<BieFlatNode>();
     while (parent) {
       if (visitedParents.has(parent)) {
@@ -2861,9 +2908,10 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       }
       visitedParents.add(parent);
       const parentSelf = ((parent as any).self || parent) as AsbiepFlatNode;
-      if (parentSelf?.bieType === 'ASBIEP' && parentSelf.asccpNode?.manifestId === asccpManifestId) {
+      if (!isAboveInternally(self, parentSelf, nodeStillInGroups) && parentSelf?.bieType === 'ASBIEP' && parentSelf.asccpNode?.manifestId === asccpManifestId) {
         return true;
       }
+      nodeStillInGroups = nodeStillInGroups && parentSelf?.isGroup;
       parent = parent.parent as BieFlatNode;
     }
     return false;
@@ -2937,11 +2985,31 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     );
   }
 
+  /** What the BIE stores about the node being used: undefined when it stores nothing (the root is always used). */
+  storedUsed(node: BieFlatNode): boolean | undefined {
+    const raw = this.unwrapNode(node as T) as BieFlatNode;
+    if (raw.isGroup) {
+      return raw.parent ? this.storedUsed(raw.parent as BieFlatNode) : undefined;
+    }
+    let rows: UsedBie[];
+    if (raw instanceof AsbiepFlatNode) {
+      rows = (this._usedAsbieMap[raw.asccNode.manifestId] || []).filter((u: UsedBie) => u.hashPath === raw.asbieHashPath
+        && u.ownerTopLevelAsbiepId === (raw.reused ? (raw.parent as AbieFlatNode).topLevelAsbiepId : raw.topLevelAsbiepId));
+    } else if (raw instanceof BbiepFlatNode) {
+      rows = (this._usedBbieMap[raw.bccNode.manifestId] || []).filter((u: UsedBie) => u.hashPath === raw.bbieHashPath && u.ownerTopLevelAsbiepId === raw.topLevelAsbiepId);
+    } else if (raw instanceof BbieScFlatNode) {
+      rows = (this._usedBbieScMap[raw.bdtScNode.manifestId] || []).filter((u: UsedBie) => u.hashPath === raw.hashPath && u.ownerTopLevelAsbiepId === raw.topLevelAsbiepId);
+    } else {
+      return raw.bieType === 'ABIE' ? true : undefined;
+    }
+    return rows.length > 0 ? rows[0].used : undefined;
+  }
+
   loadChildren(node: T) {
     // `children` is hide-unused aware and can therefore be empty even after
     // the raw child list has been materialized. Use the unfiltered list to
     // make loading idempotent when the data source hides unused nodes.
-    if (node.getChildren().length > 0 || this.isCycleNode(node)) {
+    if (node.getChildren().length > 0 || (this.isCycleNode(node) && !this.loadingCycle)) {
       return;
     }
 
@@ -3041,7 +3109,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
-        node.definition = used[0].definition;
+        node.bieNillable = used[0].nillable;
       }
     }
 
@@ -3080,7 +3148,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
-        node.definition = used[0].definition;
+        node.bieNillable = used[0].nillable;
       }
     }
 
@@ -3111,7 +3179,6 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
         node.cardinalityMin = used[0].cardinalityMin;
         node.cardinalityMax = used[0].cardinalityMax;
         node.deprecated = node.ccDeprecated || used[0].deprecated;
-        node.definition = used[0].definition;
       }
     }
 
@@ -3361,15 +3428,18 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
       return false;
     }
     let cur = node.parent;
+    let groupsAbove = true;
     const visitedParents = new Set<BieFlatNode>();
     while (cur) {
       if (visitedParents.has(cur)) {
         break;
       }
       visitedParents.add(cur);
-      if ((cur as AbieFlatNode).asccpNode?.manifestId === asccpManifestId) {
+      const curSelf = ((cur as any).self || cur) as AsbiepFlatNode;
+      if (!isAboveInternally(node, curSelf, groupsAbove) && (cur as AbieFlatNode).asccpNode?.manifestId === asccpManifestId) {
         return true;
       }
+      groupsAbove = groupsAbove && !!curSelf?.isGroup;
       cur = cur.parent as BieFlatNode;
     }
     return false;
@@ -4014,13 +4084,65 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
   extends TreeNodeSearcher<T, BieFlatNodeDataSource<T>>
   implements ChangeListener<BieFlatNodeDataSource<T>> {
 
-  override readonly searchAttributes = BIE_SEARCH_ATTRIBUTES;
+  /** What the backend said about the server predicates of the latest search: about the BIE, and about its components. */
+  private serverMarks: BieServerMarks | undefined;
+  private componentMarks: CcServerMarks | undefined;
+  private readonly serverNames: ReadonlySet<string>;
 
+  /**
+   * @param serverSearch          asks the backend about the text of the BIE (definition, remark, ...); a tree that is not a saved
+   *                              BIE (the target of an uplift) has none and so cannot be searched by that text
+   * @param componentServerSearch asks the backend about the definitions of the core components the tree profiles
+   * @param serverValues          asks the backend for the values the search bar offers after `business_term =`
+   */
   constructor(dataSource: BieFlatNodeDataSource<T>,
-              private database: BieFlatNodeDatabase<T>) {
+              private database: BieFlatNodeDatabase<T>,
+              private serverSearch?: BieServerSearch,
+              private componentServerSearch?: CcServerSearch,
+              serverValues?: BieServerValues) {
     super(dataSource);
+    const names = new Set<string>();
+    if (serverSearch) {
+      // a value domain is the BIE's where it stores one and the data type's where it does not: both are needed
+      BIE_TEXT_ATTRIBUTES.forEach(name => (componentServerSearch || !BIE_VALUE_DOMAIN_ATTRIBUTES.has(name)) && names.add(name));
+    }
+    if (componentServerSearch) {
+      BIE_COMPONENT_TEXT_ATTRIBUTES.forEach(name => names.add(name));
+    }
+    this.serverNames = names;
+    (this as {searchAttributes: SearchAttribute[]}).searchAttributes =
+      BIE_SEARCH_ATTRIBUTES.filter(a => a.source !== 'server' || names.has(a.name.toLowerCase()))
+        .map(a => serverValues && BIE_SUGGESTED_ATTRIBUTES.has(a.name) ? {...a, valueSource: (text: string) => serverValues(a.name, text)} : a);
     dataSource.addListener(this);
     dataSource.searcher = this;
+  }
+
+  protected override serverAttributes(): ReadonlySet<string> {
+    return this.serverNames;
+  }
+
+  protected override async resolveServerPredicates(predicates: ServerPredicate[], caseSensitive: boolean): Promise<void> {
+    let own = predicates.filter(p => BIE_TEXT_ATTRIBUTES.has(p.attribute));
+    if (this.componentServerSearch && own.some(p => BIE_VALUE_DOMAIN_ATTRIBUTES.has(p.attribute))) {
+      own = [...own, BIE_VALUE_DOMAIN_ROW_PREDICATE];
+    }
+    if (this.componentServerSearch && own.some(p => BIE_VALUE_CONSTRAINT_ATTRIBUTES.has(p.attribute))) {
+      own = [...own, ...BIE_VALUE_CONSTRAINT_ROW_PREDICATES];
+    }
+    const components = !this.componentServerSearch ? [] :
+      predicates.filter(p => BIE_COMPONENT_TEXT_ATTRIBUTES.has(p.attribute) || BIE_CC_FALLBACK_ATTRIBUTES.has(p.attribute));
+    const root = this.dataSource.data[0]?.self as unknown as AbieFlatNode;
+    const [bie, cc] = await Promise.all([
+      own.length > 0 ? this.serverSearch(own, caseSensitive) : undefined,
+      components.length > 0 ? this.componentServerSearch({type: 'ASCCP', manifestId: root.asccpNode.manifestId}, components, caseSensitive) : undefined
+    ]);
+    this.serverMarks = bie ? new BieServerMarks(own, bie, caseSensitive) : undefined;
+    this.componentMarks = cc ? new CcServerMarks(components, cc, caseSensitive) : undefined;
+  }
+
+  protected override clearServerPredicates() {
+    this.serverMarks = undefined;
+    this.componentMarks = undefined;
   }
 
   /**
@@ -4031,7 +4153,7 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
     let graph: ReturnType<BieFlatNodeDatabase<T>['searchGraph']>;
     return {
       dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0]);
+        graph = this.database.searchGraph(this.dataSource.data[0], this.serverMarks, this.componentMarks);
         return graph?.dag;
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
@@ -4043,7 +4165,8 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
         const raw = node.self || node;
         return {
           ...bieSearchAttributes(raw, raw.displayName || raw.name),
-          used: !!raw.used, inherited: !!raw.inherited, reused: !!raw.reused
+          used: isUsedInTree(raw), inherited: !!raw.inherited, reused: !!raw.reused,
+          ...graph?.flagsOf(node)
         };
       },
       childrenOf: node => this.database.children(node),
@@ -4098,23 +4221,39 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
  * components the row shows: `association_definition` (ASCC or BCC), `component_definition` (ASCCP, BCCP or DT_SC) and
  * `type_definition` (ACC).
  */
+/**
+ * Whether an ancestor is a group the rule "a component is not expanded below itself" does not go by. A semantic group
+ * is not shown in a BIE tree (what it holds is shown where it stands), so it is no place a component can repeat: only
+ * a group directly above a group (a group in a group) counts, as that is what keeps a group from holding itself.
+ */
+function isAboveInternally(node: BieFlatNode, ancestor: BieFlatNode, onlyGroupsBetween: boolean): boolean {
+  return !!ancestor?.isGroup && !(onlyGroupsBetween && !!node?.isGroup);
+}
+
 function bieSearchAttributes(node: BieFlatNode, text: string): Record<string, AttrValue> {
   const component = node instanceof BbiepFlatNode ? node.bccpNode : node instanceof BbieScFlatNode ? node.bdtScNode
     : node instanceof AsbiepFlatNode ? node.asccpNode : node instanceof AbieFlatNode ? node.accNode : undefined;
   const association = bieAssociation(node);
-  const bieDefinition = node.definition;
   return {
     ...componentSearchAttributes(node.bieType, text, component, association, bieCardinality(node)),
+    // what is set on the BIE counts besides what the core component says (nillable when either is, deprecated likewise)
+    // only an ASBIEP and a BBIEP can be nillable: the other nodes have no such value, as in the component trees
+    nillable: node instanceof AsbiepFlatNode || node instanceof BbiepFlatNode ?
+      !!(node.bieNillable || component?.nillable || association?.nillable) : undefined,
+    deprecated: !!(node.deprecated || component?.deprecated),
     // an ABIE has no display name of its own
     display_name: node.bieType !== 'ABIE' && node.displayName ? node.displayName : undefined,
-    ...definitionAttributes({
-      definition: bieDefinition === undefined ? undefined : {definition: bieDefinition},
-      association_definition: association,
-      component_definition: node instanceof AbieFlatNode ? node.asccpNode : node instanceof BbiepFlatNode ? node.bccpNode
-        : node instanceof BbieScFlatNode ? node.bdtScNode : undefined,
-      type_definition: node instanceof AbieFlatNode ? node.accNode : undefined
-    })
   };
+}
+
+/** Whether the node is used and so is everything above it: what is below an unused node is shown as unused. */
+function isUsedInTree(node: BieFlatNode): boolean {
+  for (let n: BieFlatNode = node; n; n = n.parent as BieFlatNode) {
+    if (!(n.self || n).used) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
@@ -4122,9 +4261,115 @@ function bieAssociation(node: BieFlatNode): CcGraphNode | undefined {
   return node instanceof BbiepFlatNode ? node.bccNode : node instanceof AsbiepFlatNode ? node.asccNode : undefined;
 }
 
-/** What a place that carries no BIE data says about its definition: nothing, where there is a BIE definition to have. */
-function blankBieDefinition(node: BieFlatNode): Record<string, AttrValue> {
-  return {definition: node.definition === undefined ? undefined : ''};
+/** What the backend is asked about for a node: the core components its definitions are those of. */
+function biePlace(node: BieFlatNode): CcPlace {
+  const association = bieAssociation(node);
+  const associationKey: CcKey | undefined = association ?
+    {kind: node instanceof BbiepFlatNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
+  const component: CcKey | undefined = node instanceof BbiepFlatNode ? {kind: 'bccp', manifestId: node.bccpNode.manifestId}
+    : node instanceof BbieScFlatNode ? {kind: 'dtSc', manifestId: node.bdtScNode.manifestId}
+      : node instanceof AbieFlatNode ? {kind: 'asccp', manifestId: node.asccpNode.manifestId} : undefined;
+  return {
+    own: associationKey ?? component,
+    association: associationKey,
+    component,
+    type: node instanceof AbieFlatNode ? {kind: 'acc', manifestId: node.accNode.manifestId} : undefined,
+    // what the edit screen shows for a BBIEP the BIE stores no value constraint for is that of its BCCP, for a BBIE_SC that of its DT_SC
+    valueConstraint: node instanceof BbiepFlatNode || node instanceof BbieScFlatNode ? component : undefined
+  };
+}
+
+/** The rows of the BIE that a node's text is kept in, as the backend names them (`BieSearchNodeKey`). */
+function bieRows(node: BieFlatNode): {table: string, hashPath: string}[] {
+  switch (node.bieType) {
+    case 'ABIE':
+      return [{table: 'asbiep', hashPath: (node as AbieFlatNode).asbiepHashPath}, {table: 'abie', hashPath: node.hashPath}];
+    case 'ASBIEP':
+      return [{table: 'asbie', hashPath: (node as AsbiepFlatNode).asbieHashPath},
+        {table: 'asbiep', hashPath: (node as AsbiepFlatNode).asbiepHashPath}, {table: 'abie', hashPath: node.hashPath}];
+    case 'BBIEP':
+      return [{table: 'bbie', hashPath: (node as BbiepFlatNode).bbieHashPath},
+        {table: 'bbiep', hashPath: (node as BbiepFlatNode).bbiepHashPath}];
+    case 'BBIE_SC':
+      return [{table: 'bbie_sc', hashPath: (node as BbieScFlatNode).bbieScHashPath}];
+    default:
+      return [];
+  }
+}
+
+/** The path of the first row of a node (the one the paths of its rows and of everything below it start with). */
+function bieEntryPath(node: BieFlatNode): string {
+  switch (node.bieType) {
+    case 'ABIE':
+      return (node as AbieFlatNode).asbiepPath;
+    case 'ASBIEP':
+      return (node as AsbiepFlatNode).asbiePath;
+    case 'BBIEP':
+      return (node as BbiepFlatNode).bbiePath;
+    case 'BBIE_SC':
+      return (node as BbieScFlatNode).bbieScPath;
+    default:
+      return node.path;
+  }
+}
+
+/**
+ * What a node says now about the server predicates, when it has text that is not saved yet: the answer of the backend
+ * is about what is saved. Undefined when the node has nothing unsaved (or its details are not loaded).
+ */
+function unsavedFlags(node: BieFlatNode, marks: BieServerMarks): Record<string, AttrValue> | undefined {
+  const detail = (node as BieFlatNodeImpl)._detail;
+  if (!detail || !detail.isChanged) {
+    return undefined;
+  }
+  const flags: Record<string, AttrValue> = {};
+  // the fixed value and the default value are the BIE's while it has one of them, and those of the core component after
+  // it has none: a place that holds none now says nothing about them, so that the core component's answer stands
+  const constraintText = (attribute: string) => unsavedText(node, detail, attribute);
+  const noConstraint = constraintText('fixed_value') !== null && !constraintText('fixed_value') && !constraintText('default_value');
+  for (const predicate of marks.predicates) {
+    const text = unsavedText(node, detail, predicate.attribute);
+    if (text === null) {
+      continue;
+    }
+    if (BIE_VALUE_CONSTRAINT_ROW_PREDICATES.includes(predicate)) {
+      flags[predicate.flag] = !!text;
+    } else if (!(noConstraint && BIE_VALUE_CONSTRAINT_ATTRIBUTES.has(predicate.attribute))) {
+      flags[predicate.flag] = satisfiesServerPredicate(text, predicate, marks.caseSensitive);
+    }
+  }
+  return Object.keys(flags).length > 0 ? flags : undefined;
+}
+
+/** The text the details of a node hold for the attribute; undefined when it has none, null when the details do not know it. */
+function unsavedText(node: BieFlatNode, detail: BieEditNodeDetail, attribute: string): string | undefined | null {
+  let values: Record<string, string | undefined>;
+  switch (node.bieType) {
+    case 'ABIE': {
+      const d = detail as BieEditAbieNodeDetail;
+      values = {definition: d.asbiep.definition, remark: d.asbiep.remark};
+      break;
+    }
+    case 'ASBIEP': {
+      const d = detail as BieEditAsbiepNodeDetail;
+      values = {definition: d.asbie.definition, remark: d.asbiep.remark};
+      break;
+    }
+    case 'BBIEP': {
+      const d = detail as BieEditBbiepNodeDetail;
+      values = {definition: d.bbie.definition, remark: d.bbiep.remark, example: d.bbie.example,
+        fixed_value: d.bbie.fixedValue, default_value: d.bbie.defaultValue};
+      break;
+    }
+    case 'BBIE_SC': {
+      const d = (detail as BieEditBbieScNodeDetail).bbieSc;
+      values = {definition: d.definition, remark: d.remark, example: d.example, fixed_value: d.fixedValue, default_value: d.defaultValue};
+      break;
+    }
+    default:
+      return null;
+  }
+  return attribute in values ? values[attribute] : null;
 }
 
 /** The cardinality of the ASBIE, BBIE or BBIE_SC that ties a node to its parent (an ABIE has none). */

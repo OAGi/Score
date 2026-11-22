@@ -213,6 +213,10 @@ public class RepositoryFactory {
         return new JooqDtQueryRepository(dslContext, requester, this);
     }
 
+    public CcSearchQueryRepository ccSearchQueryRepository(ScoreUser requester) {
+        return new JooqCcSearchQueryRepository(dslContext, requester, this);
+    }
+
     public CcQueryRepository ccQueryRepository(ScoreUser requester) {
         return new JooqCcQueryRepository(dslContext, requester, this);
     }
@@ -422,6 +426,10 @@ public class RepositoryFactory {
 
     public AsbieQueryRepository asbieQueryRepository(ScoreUser requester) {
         return new JooqAsbieQueryRepository(dslContext, requester, this);
+    }
+
+    public BieSearchQueryRepository bieSearchQueryRepository(ScoreUser requester) {
+        return new JooqBieSearchQueryRepository(dslContext, requester, this);
     }
 
     public BbieCommandRepository bbieCommandRepository(ScoreUser requester) {
