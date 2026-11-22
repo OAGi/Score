@@ -1,6 +1,8 @@
-import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
+import {associationIdKey, cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../common/tree-search/search-expression';
-import {COMPONENT_SEARCH_ATTRIBUTES} from '../../common/tree-search/search-suggest';
+import {COMPONENT_SEARCH_ATTRIBUTES, SearchAttribute} from '../../common/tree-search/search-suggest';
+import {satisfiesServerPredicate, ServerPredicate} from '../../common/tree-search/server-predicate';
+import {CcKey, CcPlace, CcSearchRoot, CcServerMarks, CcServerSearch} from './cc-server-search';
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {TreeFilterChange, TreeFilterSet} from '../../common/tree-viewport/tree-filter';
 import {CcHideProhibitedFilter, HIDE_PROHIBITED_FILTER} from './cc-tree-filters';
@@ -991,7 +993,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
    *
    * Undefined when the tree cannot be described this way, in which case it has to be searched by walking it.
    */
-  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
+  searchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
     const builder = new SearchDagBuilder();
     const clones = new WeakMap<object, number>();
     const shown = (nodes: T[]): T[] => this.filters.visibleChildren(nodes);
@@ -1008,7 +1010,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
 
     const plain = (node: T): number => {
       const {index, created} = builder.record(keyOf(node), [this.plainName(node)], this.identityKey(node),
-        ccSearchAttributes(node, this.plainName(node)));
+        ccSearchAttributes(node, this.plainName(node), marks));
       if (created) {
         representatives.push(node);
       }
@@ -1027,10 +1029,13 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
       const plainChildren = builder.childrenOf(plainIndex);
       const sameChildren = !children || (children.length === plainChildren.length
         && children.every((child, i) => child.record === plainChildren[i]));
-      if (node.name === this.plainName(node) && sameChildren) {
+      // text that is edited and not saved yet is only known to the node, so the place gets a record of its own for it
+      const unsaved = marks && ccUnsavedFlags(node, marks);
+      if (node.name === this.plainName(node) && sameChildren && !unsaved) {
         return {record: plainIndex, clone: false};
       }
-      const {index} = builder.record('@' + (cloneCount++), [node.name], this.identityKey(node), ccSearchAttributes(node, node.name));
+      const {index} = builder.record('@' + (cloneCount++), [node.name], this.identityKey(node),
+        {...ccSearchAttributes(node, node.name, marks), ...unsaved});
       builder.setChildren(index, children ? children.map(child => child.record) : plainChildren);
       clones.set(node, index);
       return {record: index, clone: true};
@@ -1063,13 +1068,18 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
   /** What makes two nodes the same component: they show the same thing and so have the same children. */
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node)) + associationKey(ccAssociation(node));
+    return identity === undefined ? undefined : identity + cardinalityKey(ccCardinality(node)) + associationIdKey(ccAssociation(node));
   }
 
-  /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
+  /**
+   * The component a node shows, which is what the rule "a component is not expanded below itself" goes by. The screens
+   * stop an expansion at an ASCCP that is among its ancestors, but expand an ACC as often as it comes (it is the role of
+   * several ASCCPs), so an ACC is told apart by what it hangs from: otherwise a search would not reach what the tree shows.
+   */
   private identityKey(node: T): string | undefined {
     if (node instanceof AccFlatNode) {
-      return 'ACC-' + node.accNode.manifestId;
+      const parent = node.parent as T | undefined;
+      return 'ACC-' + node.accNode.manifestId + (parent ? '<' + this.identityKey(parent) : '');
     }
     if (node instanceof AsccpFlatNode) {
       return 'ASCCP-' + node.asccpNode.manifestId;
@@ -1432,24 +1442,52 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
   extends TreeNodeSearcher<T, CcFlatNodeDataSource<T>>
   implements ChangeListener<CcFlatNodeDataSource<T>> {
 
-  override readonly searchAttributes = COMPONENT_SEARCH_ATTRIBUTES;
+  /** What the backend said about the server predicates of the latest search. */
+  private serverMarks: CcServerMarks | undefined;
+  private readonly serverNames: ReadonlySet<string>;
 
+  /** @param serverSearch asks the backend about the definitions of the components; without it they cannot be searched */
   constructor(dataSource: CcFlatNodeDataSource<T>,
-              private database: CcFlatNodeDatabase<T>) {
+              private database: CcFlatNodeDatabase<T>,
+              private serverSearch?: CcServerSearch) {
     super(dataSource);
+    (this as {searchAttributes: SearchAttribute[]}).searchAttributes = serverSearch ?
+      COMPONENT_SEARCH_ATTRIBUTES : COMPONENT_SEARCH_ATTRIBUTES.filter(a => a.source !== 'server');
+    this.serverNames = serverSearch ?
+      new Set(COMPONENT_SEARCH_ATTRIBUTES.filter(a => a.source === 'server').map(a => a.name.toLowerCase())) : new Set();
     dataSource.addListener(this);
+  }
+
+  protected override serverAttributes(): ReadonlySet<string> {
+    return this.serverNames;
+  }
+
+  protected override async resolveServerPredicates(predicates: ServerPredicate[], caseSensitive: boolean): Promise<void> {
+    const root = ccSearchRoot(this.dataSource.data[0]);
+    if (!root) {
+      throw new Error('The tree has no root to search in.');
+    }
+    const response = await this.serverSearch(root, predicates, caseSensitive);
+    this.serverMarks = new CcServerMarks(predicates, response, caseSensitive);
+  }
+
+  protected override clearServerPredicates() {
+    this.serverMarks = undefined;
   }
 
   protected override graphAdapter(): TreeGraphAdapter<T> {
     let graph: ReturnType<CcFlatNodeDatabase<T>['searchGraph']>;
     return {
       dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0]);
+        graph = this.database.searchGraph(this.dataSource.data[0], this.serverMarks);
         return graph?.dag;
       },
       recordOf: node => graph ? graph.recordOf(node) : -1,
       namesOf: node => [node.name],
-      attributesOf: node => ccSearchAttributes(node, node.name),
+      attributesOf: node => ({
+        ...ccSearchAttributes(node, node.name, this.serverMarks),
+        ...(this.serverMarks && ccUnsavedFlags(node, this.serverMarks))
+      }),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -1474,22 +1512,97 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
 
 }
 
-/** What a search predicate can ask about a node of the component tree. */
-function ccSearchAttributes(node: CcFlatNode, text: string): Record<string, AttrValue> {
+/**
+ * What a search predicate can ask about a node of the component tree. The definitions are held by the backend: what it
+ * answered for the node's components is set as the flags of the predicates (`marks`).
+ */
+function ccSearchAttributes(node: CcFlatNode, text: string, marks?: CcServerMarks): Record<string, AttrValue> {
   const component = node instanceof AccFlatNode ? node.accNode : node instanceof AsccpFlatNode ? node.asccpNode
     : node instanceof BccpFlatNode ? node.bccpNode : node instanceof DtFlatNode ? node.dtNode
       : node instanceof DtScFlatNode ? node.dtScNode : undefined;
-  const association = ccAssociation(node);
   return {
-    ...componentSearchAttributes(node.type, text, component, association, ccCardinality(node)),
-    // `definition` is the one the node is about: the ASCC's or BCC's of a node that is tied to its parent by one, else its component's
-    ...definitionAttributes({
-      definition: association ?? component,
-      association_definition: association,
-      component_definition: node instanceof AsccpFlatNode || node instanceof BccpFlatNode ? component : undefined,
-      type_definition: node instanceof BccpFlatNode ? node.bdtNode : undefined
-    })
+    ...componentSearchAttributes(node.type, text, component, ccAssociation(node), ccCardinality(node)),
+    // deprecated is what the tree shows: the component, the association that ties it to its parent, or (BCCP) its data type
+    deprecated: !!node.deprecated,
+    ...marks?.flagsOf(ccPlace(node))
   };
+}
+
+/** The component a node shows, as the backend names it. */
+function ccComponentKey(node: CcFlatNode): CcKey | undefined {
+  return node instanceof AccFlatNode ? {kind: 'acc', manifestId: node.accNode.manifestId}
+    : node instanceof AsccpFlatNode ? {kind: 'asccp', manifestId: node.asccpNode.manifestId}
+      : node instanceof BccpFlatNode ? {kind: 'bccp', manifestId: node.bccpNode.manifestId}
+        : node instanceof DtFlatNode ? {kind: 'dt', manifestId: node.dtNode.manifestId}
+          : node instanceof DtScFlatNode ? {kind: 'dtSc', manifestId: node.dtScNode.manifestId} : undefined;
+}
+
+/** What the backend is asked about for a node: the components its definitions are those of. */
+function ccPlace(node: CcFlatNode): CcPlace {
+  const association = ccAssociation(node);
+  const associationKey: CcKey | undefined = association ?
+    {kind: node instanceof AsccpFlatNode ? 'ascc' : 'bcc', manifestId: association.manifestId} : undefined;
+  const component = ccComponentKey(node);
+  return {
+    own: associationKey ?? component,
+    association: associationKey,
+    component: node instanceof AsccpFlatNode || node instanceof BccpFlatNode ? component : undefined,
+    type: node instanceof BccpFlatNode ? {kind: 'dt', manifestId: node.bdtNode.manifestId} : undefined
+  };
+}
+
+/** The tree's root as the backend is told about it. */
+function ccSearchRoot(node: CcFlatNode | undefined): CcSearchRoot | undefined {
+  const key = node && ccComponentKey(node);
+  const types: Partial<Record<CcKey['kind'], CcSearchRoot['type']>> = {acc: 'ACC', asccp: 'ASCCP', bccp: 'BCCP', dt: 'DT'};
+  return key && types[key.kind] ? {type: types[key.kind], manifestId: key.manifestId} : undefined;
+}
+
+/**
+ * What a node says now about the server predicates, when it has a definition that is not saved yet: the answer of the
+ * backend is about what is saved. Undefined when the node has nothing unsaved.
+ */
+function ccUnsavedFlags(node: CcFlatNode, marks: CcServerMarks): Record<string, AttrValue> | undefined {
+  const detail = node.detail;
+  if (!detail || !detail.isChanged) {
+    return undefined;
+  }
+  type Part = {definition?: string, definitionSource?: string} | undefined;
+  let association: Part;
+  let component: Part;
+  if (node instanceof AsccpFlatNode) {
+    association = (detail as CcAsccpNodeInfo).ascc;
+    component = (detail as CcAsccpNodeInfo).asccp;
+  } else if (node instanceof BccpFlatNode) {
+    association = (detail as CcBccpNodeInfo).bcc;
+    component = (detail as CcBccpNodeInfo).bccp;
+  } else {
+    component = detail as unknown as Part;
+  }
+  const flags: Record<string, AttrValue> = {};
+  for (const predicate of marks.predicates) {
+    let text: string | undefined | null;
+    switch (predicate.attribute) {
+      case 'definition':
+        text = (association ?? component)?.definition;
+        break;
+      case 'definition_source':
+        text = (association ?? component)?.definitionSource;
+        break;
+      case 'association_definition':
+        text = association?.definition;
+        break;
+      case 'component_definition':
+        text = association ? component?.definition : undefined;
+        break;
+      default:
+        text = null; // not known from the details
+    }
+    if (text !== null) {
+      flags[predicate.flag] = satisfiesServerPredicate(text, predicate, marks.caseSensitive);
+    }
+  }
+  return Object.keys(flags).length > 0 ? flags : undefined;
 }
 
 /** The ASCC or BCC that ties a node to its parent (the other kinds have none). */

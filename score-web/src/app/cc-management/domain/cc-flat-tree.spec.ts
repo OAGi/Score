@@ -3,6 +3,8 @@ import {CcAccNodeInfo, CcAsccpNodeInfo, CcBccpNodeInfo, CcGraph, CcGraphNode} fr
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
 import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 import {PathPattern} from '../../common/tree-search/path-pattern';
+import {CcServerMarks} from './cc-server-search';
+import {ServerPredicate} from '../../common/tree-search/server-predicate';
 
 function graphWithUserExtensionAssociationWithoutTargetAcc(): CcGraph {
   return {
@@ -99,8 +101,8 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
     return walk(root);
   }
 
-  function found(database: CcFlatNodeDatabase<CcFlatNode>, root: CcFlatNode, expr: string): number {
-    const searchGraph = database.searchGraph(root);
+  function found(database: CcFlatNodeDatabase<CcFlatNode>, root: CcFlatNode, expr: string, marks?: CcServerMarks): number {
+    const searchGraph = database.searchGraph(root, marks);
     const pattern = new PathPattern(expr);
     const chain: CcFlatNode[] = [];
     for (let n = root; n; n = n.parent as CcFlatNode) {
@@ -113,33 +115,45 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
     }).total;
   }
 
-  it('asks for the definitions of a node by what it is: its association when it has one, else its component', () => {
-    const withDefinitions = graph();
-    const nodes = withDefinitions.graph.nodes as any;
-    nodes['ASCC-2'].definition = 'The association';
-    nodes['ASCCP-3'].definition = 'The release component';
-    nodes['ACC-4'].definition = 'The item type';
-    nodes['BCC-9'].definition = 'The bcc';
-    nodes['BCCP-6'].definition = 'The bccp';
-    nodes['DT-7'].definition = 'The data type';
-    const database = new CcFlatNodeDatabase<CcFlatNode>(withDefinitions, 'ACC', 1);
+  it('flags a node by the definition of what it is: its association when it has one, else its component', () => {
+    const database = new CcFlatNodeDatabase<CcFlatNode>(graph(), 'ACC', 1);
     const root = database.rootNode;
-    const count = (expr: string) => found(database, root, expr);
+    const predicate = (id: string, attribute: string): ServerPredicate =>
+      ({id, flag: 'srv_' + id, attribute, operator: 'CONTAINS', value: 'x'});
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const marks = new CcServerMarks([predicate('0', 'definition'), predicate('1', 'association_definition'),
+      predicate('2', 'component_definition'), predicate('3', 'type_definition')], {
+      matches: {
+        '0': {...none, asccs: [2], bccs: [9], accs: [4]},
+        '1': {...none, asccs: [2], bccs: [9]},
+        '2': {...none, asccps: [3], bccps: [6]},
+        '3': {...none, dts: [7]}
+      }
+    }, false);
+    const count = (expr: string) => found(database, root, expr, marks);
 
     // an ASCCP that is tied to its parent by an ASCC: the ASCC's definition is the one it is about
-    expect(count("Release[definition = 'The association']")).toBe(1);
-    expect(count("Release[association_definition = 'The association']")).toBe(1);
-    expect(count("Release[component_definition = 'The release component']")).toBe(1);
-    expect(count("Release[definition = 'The release component']")).toBe(0);
-    // a BCCP appears twice: with a BCC that has a definition and with one that has none
-    expect(count("Identifier[type = BCCP and definition = 'The bcc']")).toBe(1);
-    expect(count("Identifier[type = BCCP and definition = '']")).toBe(1);
-    expect(count("Identifier[type = BCCP and component_definition = 'The bccp']")).toBe(2);
-    expect(count("Identifier[type = BCCP and type_definition = 'The data type']")).toBe(2);
+    expect(count('Release[srv_0]')).toBe(1);
+    expect(count('Release[srv_1]')).toBe(1);
+    expect(count('Release[srv_2]')).toBe(1);
+    // a BCCP appears twice: under a BCC that has the text and under one that has not
+    expect(count('Identifier[type = BCCP and srv_0]')).toBe(1);
+    expect(count('Identifier[type = BCCP and not(srv_0)]')).toBe(1);
+    expect(count('Identifier[type = BCCP and srv_2]')).toBe(2);
+    expect(count('Identifier[type = BCCP and srv_3]')).toBe(2);
     // an ACC has no association and no component of its own to ask for
-    expect(count("Item[definition = 'The item type']")).toBe(1);
-    expect(count("Item[component_definition = '']")).toBe(0);
-    expect(count("Item[association_definition = '']")).toBe(0);
+    expect(count('Item[srv_0]')).toBe(1);
+    expect(count('Item[srv_1]')).toBe(0);
+    expect(count('Item[srv_2]')).toBe(0);
+  });
+
+  it('puts no definition text into the graph when the backend has not been asked', () => {
+    const withDefinitions = graph();
+    (withDefinitions.graph.nodes as any)['ASCC-2'].definition = 'The association';
+    const database = new CcFlatNodeDatabase<CcFlatNode>(withDefinitions, 'ACC', 1);
+
+    expect(found(database, database.rootNode, "Release[definition = 'The association']")).toBe(0);
+    expect(found(database, database.rootNode, 'Release')).toBe(1);
   });
 
   it('counts what walking the tree finds, for single names and for paths', () => {
@@ -161,6 +175,23 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
     expect(found(database, root, 'Shown')).toBe(1);
     expect(found(database, root, 'Release')).toBe(0);
     expect(found(database, root, 'Identifier')).toBe(4);
+  });
+
+  it('judges a node with an unsaved definition by that text instead of what the backend has saved', () => {
+    const database = new CcFlatNodeDatabase<CcFlatNode>(graph(), 'ACC', 1);
+    const root = database.rootNode;
+    const release = root.children[0] as any;
+    release.detail = {isChanged: true, asccp: {propertyTerm: 'Release', definition: 'Component'},
+      ascc: {definition: 'Brand new association text'}};
+    const none = {accs: [], asccs: [], asccps: [], bccs: [], bccps: [], dts: [], dtScs: []};
+    const predicate = (value: string): ServerPredicate => ({id: '0', flag: 'srv_0', attribute: 'definition', operator: 'CONTAINS', value});
+    const marks = (value: string, saved: number[]) =>
+      new CcServerMarks([predicate(value)], {matches: {'0': {...none, asccs: saved}}}, false);
+
+    expect(found(database, root, 'Release[srv_0]', marks('brand new', []))).toBe(1);
+    expect(found(database, root, 'Release[srv_0]', marks('old text', [2]))).toBe(0);
+    // what is not edited keeps the answer of the backend
+    expect(found(database, root, 'Identifier[type = BCCP and srv_0]', marks('x', []))).toBe(0);
   });
 
   it('follows the children a node has actually been given', () => {
@@ -185,17 +216,80 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
   });
 });
 
-describe('the definition of a component that is being edited', () => {
-  it('is what the graph says about the component, so that a search finds what is in the details', () => {
-    const accNode = {type: 'ACC', manifestId: 1, objectClassTerm: 'Party', deprecated: false, definition: 'As loaded'} as any;
-    const node = new AccFlatNode(accNode);
-    const info = new CcAccNodeInfo(node, {accManifestId: 1, objectClassTerm: 'Party', definition: {content: 'As loaded'}, owner: {loginId: 'oagis'}} as any);
+describe('CcFlatNodeDatabase.searchGraph and what the tree shows', () => {
+  /**
+   * Root ACC -> ASCCP P (role of ACC A) -> ACC A -> ASCCP Q (role of ACC B) -> ACC B -> ASCCP R (role of ACC A) -> ACC A -> ASCCP Q.
+   * ACC A comes twice along the path (below P and below R), and the screens expand both, as only an ASCCP that is among
+   * its own ancestors is not expanded: Q below the second A is the cycle.
+   */
+  function graph(): CcGraph {
+    const flags = {deprecated: false, state: 'Published'};
+    return {
+      graph: {
+        nodes: {
+          'ACC-1': {type: 'ACC', manifestId: 1, objectClassTerm: 'Root', ...flags},
+          'ASCC-10': {type: 'ASCC', manifestId: 10, cardinalityMin: 0, cardinalityMax: 1, ...flags},
+          'ASCCP-11': {type: 'ASCCP', manifestId: 11, propertyTerm: 'P', ...flags},
+          'ACC-2': {type: 'ACC', manifestId: 2, objectClassTerm: 'A', ...flags},
+          'ASCC-12': {type: 'ASCC', manifestId: 12, cardinalityMin: 0, cardinalityMax: 1, ...flags},
+          'ASCCP-13': {type: 'ASCCP', manifestId: 13, propertyTerm: 'Q', ...flags},
+          'ACC-3': {type: 'ACC', manifestId: 3, objectClassTerm: 'B', ...flags},
+          'ASCC-14': {type: 'ASCC', manifestId: 14, cardinalityMin: 0, cardinalityMax: 1, ...flags},
+          'ASCCP-15': {type: 'ASCCP', manifestId: 15, propertyTerm: 'R', ...flags},
+          'BCC-16': {type: 'BCC', manifestId: 16, entityType: 'Element', cardinalityMin: 0, cardinalityMax: 1, deprecated: true, state: 'Published'},
+          'BCCP-17': {type: 'BCCP', manifestId: 17, propertyTerm: 'Leaf', ...flags},
+          'DT-18': {type: 'DT', manifestId: 18, den: 'Leaf. Type', ...flags}
+        },
+        edges: {
+          'ACC-1': {targets: ['ASCC-10']},
+          'ASCC-10': {targets: ['ASCCP-11']},
+          'ASCCP-11': {targets: ['ACC-2']},
+          'ACC-2': {targets: ['ASCC-12', 'BCC-16']},
+          'ASCC-12': {targets: ['ASCCP-13']},
+          'ASCCP-13': {targets: ['ACC-3']},
+          'ACC-3': {targets: ['ASCC-14']},
+          'ASCC-14': {targets: ['ASCCP-15']},
+          'ASCCP-15': {targets: ['ACC-2']},
+          'BCC-16': {targets: ['BCCP-17']},
+          'BCCP-17': {targets: ['DT-18']}
+        }
+      }
+    } as unknown as CcGraph;
+  }
 
-    info.definition = 'Being edited';
-    expect(accNode.definition).toBe('Being edited');
+  function count(database: CcFlatNodeDatabase<CcFlatNode>, expr: string): number {
+    const root = database.rootNode;
+    const searchGraph = database.searchGraph(root);
+    const pattern = new PathPattern(expr);
+    return new DagPathSearch(searchGraph.dag, pattern).search({
+      ancestors: [], record: searchGraph.recordOf(root),
+      mask: pattern.stepAll([[root.name]], [attribute => searchGraph.dag.attributes?.[attribute]?.[searchGraph.recordOf(root)]])
+    }).total;
+  }
 
-    info.definition = '';
-    expect(accNode.definition).toBeUndefined();
+  /** The tree as the screens unfold it: an ASCCP that is among its ancestors is shown, not expanded. */
+  function screenSize(database: CcFlatNodeDatabase<CcFlatNode>): number {
+    const walk = (node: CcFlatNode): number => 1 + (node instanceof AsccpFlatNode && node.isCycle ? 0
+      : database.getChildren(node).reduce((sum, child) => sum + walk(child), 0));
+    return walk(database.rootNode);
+  }
+
+  it('expands an ACC each time it comes along a path, as the tree does, until an ASCCP repeats', () => {
+    const database = new CcFlatNodeDatabase<CcFlatNode>(graph(), 'ACC', 1);
+
+    expect(count(database, '//*')).toBe(screenSize(database));
+    // A comes below P and below R; the second Q is the cycle (shown, not expanded)
+    expect(count(database, '//*[type = ACC and object_class_term = "A"]')).toBe(2);
+    expect(count(database, '//*[type = ASCCP and property_term = "Q"]')).toBe(2);
+    expect(count(database, '//*[type = BCCP]')).toBe(2);
+  });
+
+  it('judges a node deprecated by what the tree shows: its association too', () => {
+    const database = new CcFlatNodeDatabase<CcFlatNode>(graph(), 'ACC', 1);
+
+    // the BCC is deprecated, its BCCP is not: the node is shown as deprecated
+    expect(count(database, '//*[deprecated]')).toBe(2);
+    expect(count(database, '//*[type = BCCP and not(deprecated)]')).toBe(0);
   });
 });
 

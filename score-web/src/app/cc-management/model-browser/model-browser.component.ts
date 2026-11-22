@@ -1,3 +1,4 @@
+import {CcSearchService, ccServerSearchOf} from '../domain/cc-server-search';
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {catchError, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -55,6 +56,8 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
   styleUrls: ['./model-browser.component.css']
 })
 export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<ModelBrowserNode>, ModelBrowserTreeRowHost {
+
+  private ccSearchService = inject(CcSearchService);
   private ccNodeService = inject(CcNodeService);
   private snackBar = inject(MatSnackBar);
   private location = inject(Location);
@@ -150,7 +153,7 @@ export class ModelBrowserComponent implements OnInit, OnDestroy, ChangeListener<
       this.dataSource = new ModelBrowserNodeDataSource<ModelBrowserNode>(database, this.ccNodeService, [this,]);
       this.dataSource.nodeExpanded$.subscribe(node => this.onNodeExpanded(node));
       this.searcher?.dispose();
-      this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database);
+      this.searcher = new ModelBrowserNodeDataSourceSearcher<ModelBrowserNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
       this.cardinality.restore();
       this.orderWeight.restore();

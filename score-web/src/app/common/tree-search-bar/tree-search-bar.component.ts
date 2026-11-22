@@ -3,15 +3,35 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Eleme
 import {MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {ViewportRuler} from '@angular/cdk/scrolling';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, of, Subscription} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {SearchAttribute, SearchSuggestion, suggestSearch} from '../tree-search/search-suggest';
+import {SearchAttribute, SearchSuggestion, suggestSearch, ValueLookup, valueLookup, withValues} from '../tree-search/search-suggest';
 import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
+
+/** How long the search bar waits for the typing to pause before it asks for the values of an attribute. */
+const LOOKUP_DELAY_MS = 200;
+/** How long the values it was told are kept. */
+const LOOKUP_KEEP_MS = 15000;
+
+/** The suggestions at the caret, each as the whole expression that choosing it leads to. */
+function suggestionsAt(text: string, caret: number, attributes: SearchAttribute[]) {
+  const {from, to, items} = suggestSearch(text, caret, attributes);
+  return items.map(suggestion => ({
+    suggestion,
+    expression: text.substring(0, from) + suggestion.insert + text.substring(to),
+    caret: from + suggestion.insert.length - (suggestion.caretBack ?? 0)
+  }));
+}
+
+function lookupKey(lookup: ValueLookup): string {
+  return lookup.attribute.name + '|' + lookup.text.toLowerCase();
+}
 
 /** What the search bar needs to scroll to a node: the tree viewport (or a derivative of it). */
 export interface TreeScrollTarget<N = any> {
@@ -123,6 +143,19 @@ export class TreeSearchBarComponent<N = any> {
   /** What the field suggests at the caret, each as the whole expression that choosing it leads to. */
   suggestions: { suggestion: SearchSuggestion, expression: string, caret: number }[] = [];
   private selectedAt = 0;
+  private lookupTimer: ReturnType<typeof setTimeout> | undefined;
+  private lookupRequest: Subscription | undefined;
+  /** The values looked up so far, for a short while (the BIE changes as it is edited). */
+  private readonly lookedUp = {
+    entries: new Map<string, { values: string[], at: number }>(),
+    get(key: string) {
+      const entry = this.entries.get(key);
+      return entry && Date.now() - entry.at < LOOKUP_KEEP_MS ? entry : undefined;
+    },
+    set(key: string, entry: { values: string[], at: number }) {
+      this.entries.set(key, entry);
+    }
+  };
   /** The width of the suggestion panel: the width of the search bar, to the end of its last button. */
   panelWidth = 'auto';
 
@@ -136,12 +169,31 @@ export class TreeSearchBarComponent<N = any> {
     }
     this.refreshPanelWidth();
     const text = input.value;
-    const {from, to, items} = suggestSearch(text, input.selectionStart ?? text.length, attributes);
-    this.suggestions = items.map(suggestion => ({
-      suggestion,
-      expression: text.substring(0, from) + suggestion.insert + text.substring(to),
-      caret: from + suggestion.insert.length - (suggestion.caretBack ?? 0)
-    }));
+    const caret = input.selectionStart ?? text.length;
+    clearTimeout(this.lookupTimer);
+    this.lookupRequest?.unsubscribe();
+    // the values of some attributes are looked up on the server: they are offered once they have come
+    const lookup = valueLookup(text, caret, attributes);
+    const found = lookup && this.lookedUp.get(lookupKey(lookup));
+    if (lookup && !found) {
+      this.lookupTimer = setTimeout(() => this.lookUp(lookup, text, caret, attributes), LOOKUP_DELAY_MS);
+    }
+    this.suggestions = suggestionsAt(text, caret, lookup && found ? withValues(attributes, lookup.attribute, found.values) : attributes);
+  }
+
+  private lookUp(lookup: ValueLookup, text: string, caret: number, attributes: SearchAttribute[]) {
+    this.lookupRequest = lookup.attribute.valueSource(lookup.text).pipe(catchError(() => of([] as string[]))).subscribe(values => {
+      this.lookedUp.set(lookupKey(lookup), {values, at: Date.now()});
+      const input = this.searchInput?.nativeElement;
+      // what was typed meanwhile has its own lookup; this one is for the field as it was asked
+      if (input && input.value === text && (input.selectionStart ?? text.length) === caret && document.activeElement === input) {
+        this.suggestions = suggestionsAt(text, caret, withValues(attributes, lookup.attribute, values));
+        if (this.suggestions.length > 0) {
+          this.autocomplete?.openPanel();
+        }
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   refreshPanelWidth() {

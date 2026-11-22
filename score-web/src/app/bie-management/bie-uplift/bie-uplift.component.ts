@@ -1,7 +1,8 @@
+import {CcSearchService, ccServerSearchOf} from '../../cc-management/domain/cc-server-search';
 import {faCircleExclamation, faRecycle} from '@fortawesome/free-solid-svg-icons';
 import { Component, DoCheck, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {forkJoin, Observable, of} from 'rxjs';
+import {firstValueFrom, forkJoin, Observable, of} from 'rxjs';
 import {finalize, map, switchMap} from 'rxjs/operators';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
@@ -184,6 +185,8 @@ export class BieUpliftTargetFlatNodeDatabase<T extends BieFlatNode> extends BieF
   styleUrls: ['./bie-uplift.component.css']
 })
 export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost {
+
+  private ccSearchService = inject(CcSearchService);
   private bizCtxService = inject(BusinessContextService);
   private bieListService = inject(BieListService);
   private accountService = inject(AccountListService);
@@ -333,7 +336,10 @@ export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost
           sourceRootNode, this.topLevelAsbiepId, sourceUsedBieList, sourceRefBieList);
         sourceDatabase.setBaseUsedBieList(sourceBaseUsedBieList);
         this.sourceDataSource = new BieFlatNodeDataSource<BieUpliftSourceFlatNode>(sourceDatabase, this.bieEditService, this.ccNodeService);
-        this.sourceSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>(this.sourceDataSource, sourceDatabase);
+        this.sourceSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftSourceFlatNode>(this.sourceDataSource, sourceDatabase,
+          (predicates, caseSensitive) => firstValueFrom(this.bieEditService.searchNodes(this.topLevelAsbiepId, predicates, caseSensitive)),
+          ccServerSearchOf(this.ccSearchService),
+          (attribute, text) => this.bieEditService.suggestSearchValues(this.topLevelAsbiepId, attribute, text));
         this.sourceDataSource.init();
 
         this.sourceDataSource.hideUnused = true;
@@ -343,7 +349,8 @@ export class BieUpliftComponent implements OnInit, DoCheck, BieUpliftTreeRowHost
         const targetDatabase = new BieUpliftTargetFlatNodeDatabase<BieUpliftTargetFlatNode>(targetCcGraph,
           targetRootNode, undefined, [], []);
         this.targetDataSource = new BieFlatNodeDataSource<BieUpliftTargetFlatNode>(targetDatabase, this.bieEditService, this.ccNodeService);
-        this.targetSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>(this.targetDataSource, targetDatabase);
+        this.targetSearcher = new BieFlatNodeDataSourceSearcher<BieUpliftTargetFlatNode>(this.targetDataSource, targetDatabase, undefined,
+          ccServerSearchOf(this.ccSearchService));
         this.targetDataSource.init();
 
         this.bieUpliftService.getUpliftBieMap(this.topLevelAsbiepId, this.targetReleaseId).subscribe(bieUpliftMap => {

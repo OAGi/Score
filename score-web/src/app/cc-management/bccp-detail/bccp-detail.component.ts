@@ -1,3 +1,4 @@
+import {CcSearchService, ccServerSearchOf} from '../domain/cc-server-search';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SidenavPageComponent} from '../../common/sidenav-page/sidenav-page.component';
@@ -71,6 +72,8 @@ import {ccNodeUrl} from '../domain/cc-node-url';
   styleUrls: ['./bccp-detail.component.css']
 })
 export class BccpDetailComponent implements OnInit, OnDestroy, CcTreeValidationHost {
+
+  private ccSearchService = inject(CcSearchService);
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private searchOptionsService = inject(SearchOptionsService);
@@ -230,7 +233,7 @@ export class BccpDetailComponent implements OnInit, OnDestroy, CcTreeValidationH
 
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'BCCP', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
       this.cardinality.restore();
 
@@ -371,7 +374,7 @@ export class BccpDetailComponent implements OnInit, OnDestroy, CcTreeValidationH
       this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'BCCP', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
 
       this.workingRelease = bccpDetails.release.workingRelease;

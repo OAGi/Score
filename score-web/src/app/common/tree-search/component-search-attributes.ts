@@ -37,13 +37,19 @@ export interface ComponentTerms {
   state?: string;
   guid?: string;
   deprecated?: boolean;
-  definition?: string;
+  tagList?: {name: string}[];
+  objectClassQualifier?: string;
+  abstract?: boolean;
+  nillable?: boolean;
+  reusable?: boolean;
+  commonlyUsed?: boolean;
 }
 
-/** The association (ASCC or BCC) that ties a component to its parent, which has a definition of its own (and a BCC an entity type). */
+/** The association (ASCC or BCC) that ties a component to its parent (a BCC has an entity type). */
 export interface AssociationTerms {
+  manifestId?: number;
   entityType?: string;
-  definition?: string;
+  nillable?: boolean;
 }
 
 /**
@@ -51,7 +57,8 @@ export interface AssociationTerms {
  * the names the database gives them (`object_class_term` of an ACC, `property_term` of an ASCCP or BCCP, `den`,
  * `data_type_term`, `representation_term`, `component_type`, ...: a component has only its own kind's, and a test on
  * a column it has not is false), and the `entity_type` of the BCC that ties it to its parent. `text` is what the
- * node reads in the tree, which is what `text()` answers. The definitions a row shows come from `definitionAttributes`.
+ * node reads in the tree, which is what `text()` answers. The texts of the definitions are held by the backend, not by
+ * the tree (see `SearchAttribute.source`).
  */
 export function componentSearchAttributes(
   type: string, text: string, component?: ComponentTerms, association?: AssociationTerms,
@@ -62,27 +69,21 @@ export function componentSearchAttributes(
     object_class_term: component?.objectClassTerm, property_term: component?.propertyTerm, den: component?.den,
     data_type_term: component?.dataTypeTerm, representation_term: component?.representationTerm, qualifier: component?.qualifier,
     component_type: component?.componentType, state: component?.state, guid: component?.guid, deprecated: component?.deprecated,
+    tag: component?.tagList?.map(tag => tag.name),
+    object_class_qualifier: component?.objectClassQualifier, abstract: component?.abstract, reusable: component?.reusable,
+    commonly_used: component?.commonlyUsed,
+    // nillable when the association that ties the node to its parent is, or its component is
+    nillable: association?.nillable === undefined && component?.nillable === undefined ? undefined
+      : !!(association?.nillable || component?.nillable),
     entity_type: association?.entityType
   };
 }
 
 /**
- * The definitions a row shows, each asked for by its own name (`definition`, `association_definition`, ...): the value of a
- * part is its definition, empty when it has none, and a part the row does not have is not there at all, so that
- * `definition = ''` finds the nodes that have a part without a definition and no others.
+ * What makes the nodes of a component differ by the association that ties them to their parent, when what a search knows
+ * about an association is held by the backend: the same component under another association is another record, so that
+ * what the backend says about the association is said about the places under it only.
  */
-export function definitionAttributes(parts: Record<string, { definition?: string } | undefined>): Record<string, AttrValue> {
-  const attributes: Record<string, AttrValue> = {};
-  for (const name of Object.keys(parts)) {
-    attributes[name] = parts[name] ? parts[name].definition ?? '' : undefined;
-  }
-  return attributes;
-}
-
-/**
- * What makes the nodes of a component differ by the association that ties them to their parent: the same component under
- * another association is another node when the associations are defined differently.
- */
-export function associationKey(association?: AssociationTerms): string {
-  return association?.definition ? '$' + association.definition : '';
+export function associationIdKey(association?: AssociationTerms): string {
+  return association?.manifestId !== undefined ? '$' + association.manifestId : '';
 }

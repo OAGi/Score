@@ -1,3 +1,5 @@
+import {ServerPredicate} from '../../../common/tree-search/server-predicate';
+import {BieSearchResponse} from '../../domain/bie-server-search';
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
@@ -28,6 +30,20 @@ export class BieEditService {
 
   getGraphNode(topLevelAsbiepId: number): Observable<CcGraph> {
     return this.http.get<CcGraph>('/api/graphs/top_level_asbiep/' + topLevelAsbiepId);
+  }
+
+  /** The places of the BIE whose text satisfies the predicates of a tree search (see `BieServerSearch`). */
+  searchNodes(topLevelAsbiepId: number, predicates: ServerPredicate[], caseSensitive: boolean): Observable<BieSearchResponse> {
+    return this.http.post<BieSearchResponse>('/api/profile_bie/' + topLevelAsbiepId + '/search-nodes', {
+      predicates: predicates.map(p => ({
+        id: p.id, attribute: p.attribute, operator: p.operator, value: p.value, caseSensitive
+      }))
+    });
+  }
+
+  /** The values of a server-searched attribute that the BIE holds and that contain the text (what the search bar offers). */
+  suggestSearchValues(topLevelAsbiepId: number, attribute: string, text: string): Observable<string[]> {
+    return this.http.get<string[]>('/api/profile_bie/' + topLevelAsbiepId + '/search-values', {params: {attribute, text}});
   }
 
   getRootNode(topLevelAsbiepId): Observable<BieEditAbieNode> {

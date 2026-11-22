@@ -1,6 +1,8 @@
-import {associationKey, cardinalityKey, componentSearchAttributes, definitionAttributes, NodeCardinality} from '../../../common/tree-search/component-search-attributes';
+import {associationIdKey, cardinalityKey, componentSearchAttributes, NodeCardinality} from '../../../common/tree-search/component-search-attributes';
 import {AttrValue} from '../../../common/tree-search/search-expression';
-import {MODEL_BROWSER_SEARCH_ATTRIBUTES} from '../../../common/tree-search/search-suggest';
+import {MODEL_BROWSER_SEARCH_ATTRIBUTES, SearchAttribute} from '../../../common/tree-search/search-suggest';
+import {ServerPredicate} from '../../../common/tree-search/server-predicate';
+import {CcKey, CcPlace, CcSearchRoot, CcServerMarks, CcServerSearch} from '../../domain/cc-server-search';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
 import {TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
@@ -1607,7 +1609,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   private _viewOrderMap: Map<string, number> = new Map<string, number>();
   /** Bumped whenever the sibling order changes, which invalidates a search DAG built from the old order. */
   private _viewOrderVersion = 0;
-  private _searchGraph: {version: number, root: T, dag: SearchDag, builder: SearchDagBuilder} | undefined;
+  private _searchGraph: {version: number, root: T, marks: CcServerMarks | undefined, dag: SearchDag, builder: SearchDagBuilder} | undefined;
 
   dataSource: ModelBrowserNodeDataSource<T>;
 
@@ -1972,9 +1974,10 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
    * millions of nodes they unfold into. Built from the tree's own `children()` (one representative node per
    * component), so the names and the order are exactly the tree's; rebuilt when the sibling order changes.
    */
-  searchGraph(root: T): {dag: SearchDag, recordOf: (node: T) => number} {
-    if (!this._searchGraph || this._searchGraph.version !== this._viewOrderVersion || this._searchGraph.root !== root) {
-      this._searchGraph = {version: this._viewOrderVersion, root, ...this.buildSearchGraph(root)};
+  searchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, recordOf: (node: T) => number} {
+    if (!this._searchGraph || this._searchGraph.version !== this._viewOrderVersion || this._searchGraph.root !== root
+      || this._searchGraph.marks !== marks) {
+      this._searchGraph = {version: this._viewOrderVersion, root, marks, ...this.buildSearchGraph(root, marks)};
     }
     const builder = this._searchGraph.builder;
     return {
@@ -1986,11 +1989,11 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     };
   }
 
-  private buildSearchGraph(root: T): {dag: SearchDag, builder: SearchDagBuilder} {
+  private buildSearchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, builder: SearchDagBuilder} {
     const builder = new SearchDagBuilder();
     const representatives: T[] = [];
     const record = (node: T): number => {
-      const {index, created} = builder.record(this.searchKey(node), [node.name], this.identityKey(node), browserSearchAttributes(node));
+      const {index, created} = builder.record(this.searchKey(node), [node.name], this.identityKey(node), browserSearchAttributes(node, marks));
       if (created) {
         representatives.push(node);
       }
@@ -2007,7 +2010,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   /** What makes two tree nodes the same component: they show the same thing and so have the same name and children. */
   private searchKey(node: T): string | undefined {
     const identity = this.identityKey(node);
-    return identity === undefined ? undefined : identity + cardinalityKey(browserCardinality(node)) + associationKey(browserAssociation(node));
+    return identity === undefined ? undefined : identity + cardinalityKey(browserCardinality(node)) + associationIdKey(browserAssociation(node));
   }
 
   /** The component a node shows, which is what the rule "a component is not expanded below itself" goes by. */
@@ -2042,21 +2045,49 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
   extends TreeNodeSearcher<T, ModelBrowserNodeDataSource<T>>
   implements ChangeListener<ModelBrowserNodeDataSource<T>> {
 
-  override readonly searchAttributes = MODEL_BROWSER_SEARCH_ATTRIBUTES;
+  /** What the backend said about the server predicates of the latest search. */
+  private serverMarks: CcServerMarks | undefined;
+  private readonly serverNames: ReadonlySet<string>;
 
+  /** @param serverSearch asks the backend about the definitions of the components; without it they cannot be searched */
   constructor(dataSource: ModelBrowserNodeDataSource<T>,
-              private database: ModelBrowserNodeDatabase<T>) {
+              private database: ModelBrowserNodeDatabase<T>,
+              private serverSearch?: CcServerSearch) {
     super(dataSource);
+    (this as {searchAttributes: SearchAttribute[]}).searchAttributes = serverSearch ?
+      MODEL_BROWSER_SEARCH_ATTRIBUTES : MODEL_BROWSER_SEARCH_ATTRIBUTES.filter(a => a.source !== 'server');
+    this.serverNames = serverSearch ?
+      new Set(MODEL_BROWSER_SEARCH_ATTRIBUTES.filter(a => a.source === 'server').map(a => a.name.toLowerCase())) : new Set();
     dataSource.addListener(this);
   }
 
+  protected override serverAttributes(): ReadonlySet<string> {
+    return this.serverNames;
+  }
+
+  protected override async resolveServerPredicates(predicates: ServerPredicate[], caseSensitive: boolean): Promise<void> {
+    const self = this.dataSource.data[0]?.self;
+    const root: CcSearchRoot | undefined = self instanceof ModelBrowserBccpNode ?
+      {type: 'BCCP', manifestId: self.bccpNode.manifestId}
+      : self instanceof ModelBrowserAccNode ? {type: 'ASCCP', manifestId: self.asccpNode.manifestId} : undefined;
+    if (!root) {
+      throw new Error('The tree has no root to search in.');
+    }
+    const response = await this.serverSearch(root, predicates, caseSensitive);
+    this.serverMarks = new CcServerMarks(predicates, response, caseSensitive);
+  }
+
+  protected override clearServerPredicates() {
+    this.serverMarks = undefined;
+  }
+
   protected override graphAdapter(): TreeGraphAdapter<T> {
-    const graph = () => this.database.searchGraph(this.dataSource.data[0]);
+    const graph = () => this.database.searchGraph(this.dataSource.data[0], this.serverMarks);
     return {
       dag: () => graph().dag,
       recordOf: node => graph().recordOf(node),
       namesOf: node => node.isGroup || node.isChoice ? undefined : [node.name],
-      attributesOf: node => browserSearchAttributes(node),
+      attributesOf: node => browserSearchAttributes(node, this.serverMarks),
       childrenOf: node => this.database.children(node)
     };
   }
@@ -2085,7 +2116,7 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
 const BIE_TYPE_OF_CC_TYPE: Record<string, string> = {ACC: 'ABIE', ASCCP: 'ASBIEP', BCCP: 'BBIEP', BDT_SC: 'BBIE_SC'};
 
 /** What a search predicate can ask about a node of the model browser. */
-function browserSearchAttributes(node: ModelBrowserNode): Record<string, AttrValue> {
+function browserSearchAttributes(node: ModelBrowserNode, marks?: CcServerMarks): Record<string, AttrValue> {
   const self = node.self;
   const component = self instanceof ModelBrowserBccpNode ? self.bccpNode : self instanceof ModelBrowserBdtScNode ? self.bdtScNode
     : self instanceof ModelBrowserAsccpNode ? self.asccpNode : self instanceof ModelBrowserAccNode ? self.accNode : undefined;
@@ -2093,13 +2124,28 @@ function browserSearchAttributes(node: ModelBrowserNode): Record<string, AttrVal
   return {
     ...componentSearchAttributes(BIE_TYPE_OF_CC_TYPE[node.ccType] ?? node.ccType, node.name, component, association,
       browserCardinality(node)),
-    // `definition` is the one the node is about: the ASCC's or BCC's of a node that is tied to its parent by one, else its component's
-    ...definitionAttributes({
-      definition: association ?? component,
-      association_definition: association,
-      component_definition: self instanceof ModelBrowserAsccpNode || self instanceof ModelBrowserBccpNode ? component : undefined,
-      type_definition: self instanceof ModelBrowserBccpNode ? self.bdtNode : undefined
-    })
+    // deprecated is what the tree shows: the component, the association that ties it to its parent, or (BCCP) its data type
+    deprecated: !!node.deprecated,
+    // the definitions are held by the backend: what it answered for the node's components
+    ...marks?.flagsOf(browserPlace(node))
+  };
+}
+
+/** What the backend is asked about for a node: the components its definitions are those of. */
+function browserPlace(node: ModelBrowserNode): CcPlace {
+  const self = node.self;
+  const association = browserAssociation(node);
+  const associationKey: CcKey | undefined = association ?
+    {kind: self instanceof ModelBrowserBccpNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
+  const component: CcKey | undefined = self instanceof ModelBrowserBccpNode ? {kind: 'bccp', manifestId: self.bccpNode.manifestId}
+    : self instanceof ModelBrowserBdtScNode ? {kind: 'dtSc', manifestId: self.bdtScNode.manifestId}
+      : self instanceof ModelBrowserAsccpNode ? {kind: 'asccp', manifestId: self.asccpNode.manifestId}
+        : self instanceof ModelBrowserAccNode ? {kind: 'acc', manifestId: self.accNode.manifestId} : undefined;
+  return {
+    own: associationKey ?? component,
+    association: associationKey,
+    component: self instanceof ModelBrowserAsccpNode || self instanceof ModelBrowserBccpNode ? component : undefined,
+    type: self instanceof ModelBrowserBccpNode ? {kind: 'dt', manifestId: self.bdtNode.manifestId} : undefined
   };
 }
 

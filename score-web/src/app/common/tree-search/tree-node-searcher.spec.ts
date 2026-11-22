@@ -29,6 +29,20 @@ class TestSearcher extends TreeNodeSearcher<TestNode, TreeSearchDataSource<TestN
     return this.dataSource.data.indexOf(n);
   }
 
+  asked: string[][] = [];
+  serverError: Error | undefined;
+
+  protected override serverAttributes(): ReadonlySet<string> {
+    return new Set(['remark']);
+  }
+
+  protected override async resolveServerPredicates(predicates: {value: string}[]): Promise<void> {
+    this.asked.push(predicates.map(p => p.value));
+    if (this.serverError) {
+      throw this.serverError;
+    }
+  }
+
   protected getEvaluator(expr: string): ExpressionEvaluator<TestNode> {
     return {range: () => [], eval: n => n.id.startsWith(expr), keywordForHighlight: () => expr};
   }
@@ -106,5 +120,42 @@ describe('TreeNodeSearcher', () => {
     expect(await pending).toBeUndefined();
     expect(searcher.searchResult).toEqual([]);
     expect(searcher.isSearching).toBe(false);
+  });
+
+  it('does not ask the server about an expression that has no server attribute', async () => {
+    const {searcher, root} = setup({threshold: 100, expandLimit: 100});
+    await run(searcher, 'hit', root);
+
+    expect(searcher.asked).toEqual([]);
+  });
+
+  it('asks the server once for the conditions on server attributes, and says so when the tree cannot use the answer', async () => {
+    const {searcher, root} = setup({threshold: 100, expandLimit: 100});
+    const index = await run(searcher, '//*[remark = "x" or contains(remark, "y")]', root);
+
+    expect(searcher.asked).toEqual([['x', 'y']]);
+    expect(index).toBe(-1);
+    expect(searcher.expressionError).toBe('This expression is too complex to search here');
+    expect(searcher.isSearching).toBe(false);
+  });
+
+  it('reports a server that fails and leaves the search ready for the next one', async () => {
+    const {searcher, root} = setup({threshold: 100, expandLimit: 100});
+    searcher.serverError = new Error('down');
+
+    expect(await run(searcher, '//*[remark = "x"]', root)).toBe(-1);
+    expect(searcher.expressionError).toBe('The server could not search this expression');
+    expect(searcher.isSearching).toBe(false);
+
+    searcher.serverError = undefined;
+    expect(await run(searcher, 'hit', root)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('refuses a server attribute that is ordered or has no value to compare with', async () => {
+    const {searcher, root} = setup({threshold: 100, expandLimit: 100});
+
+    expect(await run(searcher, '//*[remark < "x"]', root)).toBe(-1);
+    expect(searcher.expressionError).toContain('= and != only');
+    expect(searcher.asked).toEqual([]);
   });
 });

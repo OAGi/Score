@@ -45,6 +45,24 @@ class CoreComponentGraphContextIdentityTest {
     }
 
     @Test
+    void exposesTheFlagsAndQualifierASearchAsksAboutButNoDefinitionText() {
+        AccSummaryRecord acc = mock(AccSummaryRecord.class);
+        when(acc.accManifestId()).thenReturn(AccManifestId.from("11"));
+        when(acc.accId()).thenReturn(AccId.from("101"));
+        when(acc.state()).thenReturn(CcState.Published);
+        when(acc.componentType()).thenReturn(OagisComponentType.Base);
+        when(acc.isAbstract()).thenReturn(true);
+        when(acc.objectClassQualifier()).thenReturn("Qualified");
+        when(acc.definition()).thenReturn(new org.oagi.score.gateway.http.api.cc_management.model.Definition("The text", "source"));
+        when(ccDocument.getTagListByAccManifestId(any())).thenReturn(Collections.emptyList());
+
+        Node node = context.toNode(acc);
+
+        assertThat(node.getProperties()).containsEntry("abstract", true).containsEntry("objectClassQualifier", "Qualified")
+                .doesNotContainKey("definition");
+    }
+
+    @Test
     void exposesDtIdentityUsedByBbieMappings() {
         DtSummaryRecord dt = mock(DtSummaryRecord.class);
         when(dt.dtManifestId()).thenReturn(DtManifestId.from("21"));

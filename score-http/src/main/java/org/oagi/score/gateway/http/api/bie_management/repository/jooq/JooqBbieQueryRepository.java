@@ -302,7 +302,7 @@ public class JooqBbieQueryRepository extends JooqBaseRepository implements BbieQ
                         BBIE.HASH_PATH, BBIE.OWNER_TOP_LEVEL_ASBIEP_ID,
                         BBIEP.DISPLAY_NAME,
                         BBIE.CARDINALITY_MIN, BBIE.CARDINALITY_MAX,
-                        BBIE.IS_DEPRECATED, BBIE.DEFINITION)
+                        BBIE.IS_DEPRECATED, BBIE.IS_NILLABLE)
                 .from(BBIE)
                 .join(BBIEP).on(and(
                         BBIE.TO_BBIEP_ID.eq(BBIEP.BBIEP_ID),
@@ -321,7 +321,7 @@ public class JooqBbieQueryRepository extends JooqBaseRepository implements BbieQ
                     bieEditUsed.setCardinalityMin(record.get(BBIE.CARDINALITY_MIN));
                     bieEditUsed.setCardinalityMax(record.get(BBIE.CARDINALITY_MAX));
                     bieEditUsed.setDeprecated(record.get(BBIE.IS_DEPRECATED) == 1);
-                    bieEditUsed.setDefinition(record.get(BBIE.DEFINITION));
+                    bieEditUsed.setNillable(record.get(BBIE.IS_NILLABLE) == 1);
                     return bieEditUsed;
                 })
                 .collect(Collectors.toList());

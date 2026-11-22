@@ -22,6 +22,18 @@ describe('sameSearchDag', () => {
     expect(sameSearchDag(dag(), dag({extraAttribute: true}))).toBe(false);
   });
 
+  it('takes the lists of a multiple valued attribute for the same when they hold the same items', () => {
+    const withTags = (...tags: string[]) => {
+      const builder = new SearchDagBuilder();
+      builder.record('root', ['Root'], 'root', {tag: tags});
+      return builder.build();
+    };
+
+    expect(sameSearchDag(withTags('Core', 'Verb'), withTags('Core', 'Verb'))).toBe(true);
+    expect(sameSearchDag(withTags('Core', 'Verb'), withTags('Core'))).toBe(false);
+    expect(sameSearchDag(withTags('Core', 'Verb'), withTags('Verb', 'Core'))).toBe(false);
+  });
+
   it('tells a value that is there from one that is not', () => {
     const builder = new SearchDagBuilder();
     builder.record('root', ['Root'], 'root', {});

@@ -1,3 +1,4 @@
+import {CcSearchService, ccServerSearchOf} from '../domain/cc-server-search';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatSidenav} from '@angular/material/sidenav';
@@ -89,6 +90,8 @@ import {ccNodeUrl} from '../domain/cc-node-url';
   styleUrls: ['./bdt-detail.component.css']
 })
 export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, CcTreeValidationHost {
+
+  private ccSearchService = inject(CcSearchService);
   private service = inject(CcNodeService);
   protected githubService = inject(GithubIntegrationService);
   private codeListService = inject(CodeListService);
@@ -270,7 +273,7 @@ export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, 
 
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
       this.cardinality.restore();
       this.dataSource.hideProhibited = loadBooleanProperty(this.auth.getUserToken(), this.HIDE_PROHIBITED_PROPERTY_KEY, true);
@@ -440,7 +443,7 @@ export class BdtDetailComponent implements OnInit, OnDestroy, DtPrimitiveAware, 
       this.validation.markStale();
       const database = new CcFlatNodeDatabase<CcFlatNode>(ccGraph, 'DT', this.manifestId);
       this.dataSource = new CcFlatNodeDataSource<CcFlatNode>(database, this.service);
-      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database);
+      this.searcher = new CcFlatNodeDataSourceSearcher<CcFlatNode>(this.dataSource, database, ccServerSearchOf(this.ccSearchService));
       this.dataSource.init();
       this.dataSource.hideProhibited = hideProhibited;
 

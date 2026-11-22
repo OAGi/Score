@@ -25,6 +25,9 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.tree.BieEdi
 import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.tree.BieEditRef;
 import org.oagi.score.gateway.http.api.bie_management.service.BieCreateFromExistingBieService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieEditService;
+import org.oagi.score.gateway.http.api.bie_management.service.BieSearchService;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchRequest;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchResponse;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionService;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.ascc.AsccManifestId;
@@ -48,6 +51,9 @@ public class BieEditController {
 
     @Autowired
     private BieEditService service;
+
+    @Autowired
+    private BieSearchService bieSearchService;
 
     @Autowired
     private BieCreateFromExistingBieService createBieFromExistingBieService;
@@ -74,6 +80,26 @@ public class BieEditController {
         } catch (IllegalArgumentException e) {
             throw new NotFoundException();
         }
+    }
+
+    /**
+     * The places of a BIE that satisfy the server-side predicates of a tree search (text too heavy for the search graph).
+     */
+    @PostMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/search-nodes",
+            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public BieSearchResponse searchNodes(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                         @PathVariable("topLevelAsbiepId") TopLevelAsbiepId topLevelAsbiepId,
+                                         @RequestBody BieSearchRequest request) {
+        return bieSearchService.searchNodes(sessionService.asScoreUser(user), topLevelAsbiepId, request);
+    }
+
+    /** The values of a server-searched attribute that the BIE holds and that contain the text, for the search bar to suggest. */
+    @GetMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/search-values", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<String> suggestSearchValues(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @PathVariable("topLevelAsbiepId") TopLevelAsbiepId topLevelAsbiepId,
+                                            @RequestParam("attribute") String attribute,
+                                            @RequestParam(value = "text", defaultValue = "") String text) {
+        return bieSearchService.suggestValues(sessionService.asScoreUser(user), topLevelAsbiepId, attribute, text);
     }
 
     @GetMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/abie/{manifestId:[\\d]+}")

@@ -3,7 +3,6 @@ package org.oagi.score.gateway.http.api.graph.model;
 import lombok.Data;
 import org.oagi.score.gateway.http.api.cc_management.model.CcDocument;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
-import org.oagi.score.gateway.http.api.cc_management.model.Definition;
 import org.oagi.score.gateway.http.api.cc_management.model.ManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.acc.AccSummaryRecord;
@@ -242,7 +241,10 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("objectClassTerm", acc.objectClassTerm());
         node.put("den", acc.den());
         node.put("componentType", acc.componentType().name());
-        putDefinition(node, acc.definition());
+        node.put("abstract", acc.isAbstract());
+        if (StringUtils.hasLength(acc.objectClassQualifier())) {
+            node.put("objectClassQualifier", acc.objectClassQualifier());
+        }
         return node;
     }
 
@@ -257,7 +259,8 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put(Node.GUID_PROPERTY, asccp.guid());
         node.put("propertyTerm", asccp.propertyTerm());
         node.put("den", asccp.den());
-        putDefinition(node, asccp.definition());
+        node.put("reusable", asccp.reusable());
+        node.put("nillable", asccp.nillable());
         return node;
     }
 
@@ -272,7 +275,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put(Node.GUID_PROPERTY, bccp.guid());
         node.put("propertyTerm", bccp.propertyTerm());
         node.put("den", bccp.den());
-        putDefinition(node, bccp.definition());
+        node.put("nillable", bccp.nillable());
         return node;
     }
 
@@ -285,7 +288,6 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("cardinalityMin", ascc.cardinality().min());
         node.put("cardinalityMax", ascc.cardinality().max());
         node.put("den", ascc.den());
-        putDefinition(node, ascc.definition());
         return node;
     }
 
@@ -299,7 +301,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("cardinalityMax", bcc.cardinality().max());
         node.put("entityType", bcc.entityType().name());
         node.put("den", bcc.den());
-        putDefinition(node, bcc.definition());
+        node.put("nillable", bcc.nillable());
         return node;
     }
 
@@ -314,7 +316,7 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("dataTypeTerm", dt.dataTypeTerm());
         node.put("den", dt.den());
         node.put("qualifier", dt.qualifier());
-        putDefinition(node, dt.definition());
+        node.put("commonlyUsed", dt.commonlyUsed());
         return node;
     }
 
@@ -333,14 +335,6 @@ public class CoreComponentGraphContext implements GraphContext {
         node.put("representationTerm", dtSc.representationTerm());
         node.put("cardinalityMin", dtSc.cardinality().min());
         node.put("cardinalityMax", dtSc.cardinality().max());
-        putDefinition(node, dtSc.definition());
         return node;
-    }
-
-    /** A definition is sent only when there is one: a node without it reads as an empty definition. */
-    private static void putDefinition(Node node, Definition definition) {
-        if (definition != null && StringUtils.hasLength(definition.content())) {
-            node.put("definition", definition.content());
-        }
     }
 }
