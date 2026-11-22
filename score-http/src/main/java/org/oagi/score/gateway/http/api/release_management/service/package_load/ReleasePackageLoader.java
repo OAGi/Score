@@ -1560,6 +1560,10 @@ public class ReleasePackageLoader {
 
         for (Map.Entry<Long, Long> entry : libraryIdMap.entrySet()) {
             try (Statement statement = conn.createStatement()) {
+                statement.execute("UPDATE `bie_package` SET `library_id` = " + entry.getValue() + " WHERE `library_id` = " + entry.getKey());
+                statement.execute("UPDATE `library` SET `library_id` = " + entry.getValue() + " WHERE `library_id` = " + entry.getKey());
+                statement.execute("UPDATE `module_set` SET `library_id` = " + entry.getValue() + " WHERE `library_id` = " + entry.getKey());
+                statement.execute("UPDATE `namespace` SET `library_id` = " + entry.getValue() + " WHERE `library_id` = " + entry.getKey());
                 statement.execute("UPDATE `release` SET `library_id` = " + entry.getValue() + " WHERE `library_id` = " + entry.getKey());
             }
         }
