@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -268,6 +269,11 @@ public class SecurityConfiguration {
                             .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
                                 @Override
                                 public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                    if (exception instanceof DisabledException) {
+                                        // The web app tells a disabled account apart (403) from wrong credentials (401).
+                                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "The account is disabled.");
+                                        return;
+                                    }
                                     super.onAuthenticationFailure(request, response, exception);
                                 }
                             });
