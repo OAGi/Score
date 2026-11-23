@@ -50,6 +50,12 @@ export class ScoreWebComponent implements OnInit, DoCheck {
     const isAuthenticated = this.auth.isAuthenticated();
     if (this.wasAuthenticated && !isAuthenticated &&
       !this.auth.isLogoutInProgress() && this.shouldRedirectToLogin()) {
+      if (this.auth.getUserToken()?.enabled === false) {
+        // The account was disabled while signed in: it is not a sign-out, so send it to the disabled page.
+        this.router.navigate(['/disabled']);
+        this.wasAuthenticated = isAuthenticated;
+        return;
+      }
       this.snackBar.open('Authentication required', '', {
         duration: 3000,
       });
