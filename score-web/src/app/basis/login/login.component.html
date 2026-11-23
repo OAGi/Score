@@ -26,7 +26,7 @@
             </label>
             <input type="text" name="login" id="login_field" class="form-control input-block" tabindex="1" placeholder="Your username"
               autocapitalize="off" autocorrect="off" [attr.autocomplete]="showPasskey ? 'username webauthn' : 'username'"
-              autofocus="autofocus" [ngModel]="credentials.username" (ngModelChange)="onUsernameChange($event)"
+              autofocus="autofocus" [readonly]="checking" [ngModel]="credentials.username" (ngModelChange)="onUsernameChange($event)"
               (keydown.enter)="onUsernameEnter($event)">
             @if (showPasswordFields) {
               <label for="password">

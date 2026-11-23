@@ -4,7 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {provideHttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {of, throwError} from 'rxjs';
+import {of, Subject, throwError} from 'rxjs';
 import {vi} from 'vitest';
 import {LoginComponent} from './login.component';
 import {AuthService} from '../../authentication/auth.service';
@@ -283,6 +283,27 @@ describe('LoginComponent passkey sign-in', () => {
       await tick();
 
       expect(passkey.signIn).not.toHaveBeenCalledWith(false);
+      expect(passwordInput()).not.toBeNull();
+    });
+
+    it('locks the username field while the account is being checked, and unlocks it afterwards', async () => {
+      setup({enabled: true});
+      const lookup = new Subject<boolean>();
+      passkey.hasPasskey.mockReturnValue(lookup);
+      await typeUsername('oagis');
+      expect(usernameInput().readOnly).toBe(false);
+
+      el().querySelector('form')!.dispatchEvent(new Event('submit'));
+      await tick();
+
+      expect(usernameInput().readOnly).toBe(true);
+      expect(passwordInput()).toBeNull();
+
+      lookup.next(false);
+      lookup.complete();
+      await tick();
+
+      expect(usernameInput().readOnly).toBe(false);
       expect(passwordInput()).not.toBeNull();
     });
 
