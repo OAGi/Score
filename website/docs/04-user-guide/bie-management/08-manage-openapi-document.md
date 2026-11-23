@@ -158,6 +158,37 @@ To set the security of an operation:
 
 4. Click the "Update" button on the "Edit OpenAPI Document" page to save the changes.
 
+## Configure Request Parameters and Response Headers
+
+The "Endpoint Details" table includes a *Request Parameters* column and a *Response Headers* column. Each lists the HTTP parameters and headers of the operation as chips, and the plus icon of the column adds one. A request parameter can be in the query, a header, the path or a cookie; a response header is always a header.
+
+To add a request parameter or a response header to an operation:
+
+1. In the "Endpoint Details" table, click the plus icon in the *Request Parameters* or the *Response Headers* cell of the desired operation.
+
+2. On the returned "Add HTTP Request Parameter" or "Add HTTP Response Header" dialog, fill out:
+
+    1. *In* (request parameter only). One of *query*, *header*, *path* or *cookie*.
+    2. *Name* (Mandatory). A header name may have letters, digits and ``! # $ % & ' * + - . ^ _ ` | ~`` only. OpenAPI ignores a request parameter named `Accept`, `Content-Type` or `Authorization` and a response header named `Content-Type`, so these are refused. The name of a path parameter must be a `{name}` in the resource path of the operation.
+    3. *Description (optional)*.
+    4. *Required*. A path parameter is always required.
+    5. *Serialization*. Choose *Schema*, with its *Style*, *Explode* and, for a query parameter, *Allow reserved*, or *Content (media type)* with a *Media type* such as `text/plain`.
+    6. *Schema (JSON)* and an optional *Example (JSON)*. The example overrides the example of the schema.
+
+3. Click the "Add" button. Warnings, such as one for a header parameter named `Cookie`, are shown in the dialog; they do not block the change.
+
+Click a chip to open the "Edit" dialog, where you can save the changes or click "Delete" to remove it. The change is kept on the page until you click the "Update" button on the "Edit OpenAPI Document" page, which also checks it against OpenAPI 3.0.4 or 3.1.2, whichever the document uses.
+
+To give every operation the `traceparent` header of the W3C Trace Context at once, use the *Parameters & Headers* section between the *Security Schemes* section and the "Endpoint Details" table:
+
+1. Click the "Enable traceparent" button. Every operation that lacks it gets an optional `traceparent` request parameter (in a header) and a required `traceparent` response header. The button is available while an operation lacks it.
+
+2. Click the "Disable traceparent" button to remove them from every operation. The button is available while an operation has it.
+
+3. Click the "Update" button to save the changes.
+
+An operation that is added later does not have `traceparent` until "Enable traceparent" is clicked again.
+
 ## Configure Error Responses
 
 In addition to its success response, every operation that connectCenter generates is given a default set of `4xx`/`5xx` error responses. By default these error responses are *description only* — a status code and a human-readable description with no response body. You can attach a structured error body to an operation through the *Error Response* column of the *Endpoint Details* table.
@@ -273,9 +304,11 @@ In the *Endpoint Details* panel of an OpenAPI Document, each operation has an *O
 
 The *Operation ID* is required and must be unique within the document:
 
-1. If the *Operation ID* is left empty, the cell shows "Operation ID is required." and clicking the "Update" button is blocked.
+1. If the *Operation ID* is left empty, the cell shows an "Operation ID is required." error.
 
 2. If two operations in the same document have the same *Operation ID*, the affected cells show "Operation ID must be unique within the document."
+
+While a rule is broken, the "Update" button stays disabled. The server checks the whole document, including the operations on other pages of the *Endpoint Details* table, and a list of every broken rule is shown above the table. Each entry names the *Verb*, *Resource Name* and *Message Body* of the operation that breaks it. Fix the marked operations; "Update" becomes available again once nothing is broken.
 
 ## Remove BIEs from an OpenAPI Document
 

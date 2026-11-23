@@ -23,11 +23,11 @@ verify it can be restored — it is your only way back if something goes wrong. 
    ```yaml
    services:
      frontend:
-       image: oagi1docker/srt-web:3.6.0
+       image: oagi1docker/srt-web:3.6.1
      backend:
-       image: oagi1docker/srt-http-gateway:3.6.0
+       image: oagi1docker/srt-http-gateway:3.6.1
      db:
-       image: oagi1docker/srt-repo:3.6.0
+       image: oagi1docker/srt-repo:3.6.1
    ```
 
    Leave the `redis` image and your named volumes unchanged so the new containers attach to your
@@ -53,7 +53,9 @@ verify it can be restored — it is your only way back if something goes wrong. 
 
 ## Upgrading to 3.6.x
 
-Version 3.6.0 is a platform release, so read these notes before upgrading from 3.5.x:
+Version 3.6.0 is a platform release, so read these notes before upgrading from 3.5.x. Version 3.6.1
+adds only the `V3_6_1` Flyway migration (the tables and columns for the HTTP headers of an
+OpenAPI Document), which is also applied automatically:
 
 - **Database.** The `V3_6_0` Flyway migration is applied automatically on first start. It adds the
   passkey tables, lookup indexes on the default-primitive tables, a faster `levenshtein`

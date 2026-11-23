@@ -78,21 +78,23 @@ const config: Config = {
           routeBasePath: '/',
           editUrl: 'https://github.com/OAGi/Score/tree/gh-pages/website',
           showLastUpdateTime: true,
-          // One docs version per MINOR line, labelled "X.Y" (a patch release
-          // updates the docs of its line in place).
-          //   docs/               -> 3.6, the latest line, served at the site root
-          //   versioned_docs/...  -> 3.5 snapshot (internal name 3.5.x), served under /3.5/
+          // One docs version per MINOR line (a patch release updates the docs of
+          // its line in place). The dropdown label is the LATEST PATCH of the line
+          // ("X.Y.Z"), so bump the label when a patch is released; the URL path stays
+          // the minor line ("X.Y").
+          //   docs/               -> the 3.6 line (latest), served at the site root
+          //   versioned_docs/...  -> the 3.5 line (internal name 3.5.x), served under /3.5/
           // When the next minor line is started, snapshot the finished docs with
           //   npm run docusaurus docs:version 3.6
           // then add the new label for `current` below and set its `path` to ''.
           lastVersion: 'current',
           versions: {
             current: {
-              label: '3.6',
+              label: '3.6.1',
               path: '',
             },
             '3.5.x': {
-              label: '3.5',
+              label: '3.5.3',
               path: '3.5',
             },
           },
@@ -143,7 +145,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          // Switches between the 3.6 and 3.5 documentation (see the
+          // Switches between the 3.6.x and 3.5.x documentation (see the
           // docs.versions comment above); stays on the same page when the
           // target version has it.
           type: 'docsVersionDropdown',

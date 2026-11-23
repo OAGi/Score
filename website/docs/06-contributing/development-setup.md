@@ -45,7 +45,7 @@ not have to apply SQL by hand:
 
 ```bash
 # Database (MariaDB/MySQL-compatible, pre-seeded connectCenter repository)
-docker run --name srt-repo -d -p 3306:3306 oagi1docker/srt-repo:3.6.0
+docker run --name srt-repo -d -p 3306:3306 oagi1docker/srt-repo:3.6.1
 
 # Redis (session store + cache)
 docker run --name redis -d -p 6379:6379 redis:7.4
@@ -122,7 +122,7 @@ The backend manages its own schema with **Flyway** on startup
 classpath under `score-http/src/main/resources/db/migration` (e.g.
 `V3_5_0__upgrade_from_3_4_2.sql`, `V3_6_0__upgrade_from_3_5_2.sql`). Flyway is
 configured to baseline at version **3.4.0** (`FLYWAY_BASELINE_VERSION`), so a
-database seeded from `srt-repo:3.6.0` is brought up to the current schema
+database seeded from `srt-repo:3.6.1` is brought up to the current schema
 automatically when you start the backend.
 
 :::note[Two sets of SQL scripts]

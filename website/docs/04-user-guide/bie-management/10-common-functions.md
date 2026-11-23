@@ -51,6 +51,20 @@ The *Working* branch offers WIP, Draft, Candidate, Release Draft, Published, and
 A published release offers WIP, QA, Production, Published, and Deleted, because QA and Production exist only on a published release.
 The *State* filter in the pick dialogs also narrows the list; components that cannot be picked (for example, a deleted property that cannot be appended) are not offered.
 
+### Page size of a table
+
+Every table has an *Items per page* list at the bottom, next to the pagination buttons. Besides the fixed sizes, the last row of the list, *Custom*, holds a page size of your own:
+
+1. Open the *Items per page* list and point at the number of the *Custom* row. A field appears.
+
+2. Type a whole number from 1 to 1000 and press the Enter key, or click outside the field. A number above 1000 becomes 1000.
+
+3. Click the *Custom* row to use that size. The table shows that many rows per page.
+
+To change the size, point at the number again and type a new one. To remove it, click the button in the field.
+
+The custom size is kept for your account in the browser, and it is offered in the *Items per page* list of every table. It is not shared with other browsers.
+
 ### Narrow screens
 
 On a narrow screen, such as a phone or a window made narrow, the tables of connectCenter switch to a compact layout.

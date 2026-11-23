@@ -23,7 +23,7 @@ website/
 
 Sources: the User Guide pages were converted from the Sphinx/reStructuredText guide in
 `../docs/user_guide`; the Getting Started / Architecture / Operations / Contributing / Reference
-pages were authored from the codebase and config of the **v3.6.0** release (the 3.5.x snapshot from **v3.5.3**); the wiki content
+pages were authored from the codebase and config of the **v3.6.1** release (the 3.5.x snapshot from **v3.5.3**); the wiki content
 was rewritten for the current product.
 
 ## Local development
@@ -46,12 +46,12 @@ link or anchor fails the build.
 ## Versioning
 
 The site has **one docs version per minor line**, labelled `X.Y`, and the navbar dropdown
-switches between them:
+switches between them; each entry is labelled with the latest patch of its line (bump the label in `docusaurus.config.ts` when a patch is released):
 
 | Version | Source | URL |
 |---|---|---|
-| **3.6** (latest) | `docs/` | `/Score/` |
-| **3.5** | `versioned_docs/version-3.5.x/` | `/Score/3.5/` |
+| **3.6.1** (latest 3.6.x) | `docs/` | `/Score/` |
+| **3.5.3** (latest 3.5.x) | `versioned_docs/version-3.5.x/` | `/Score/3.5/` |
 
 A **patch** release does not create a version: update the docs of its line in place (image tags,
 dependency versions, and the cumulative `07-reference/whats-new.md`). When a new **minor** line

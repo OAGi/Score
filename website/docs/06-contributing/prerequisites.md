@@ -69,7 +69,7 @@ the backend. `score-http` does not use MCP; the MCP SDK is excluded from the bui
 The single-page web application.
 
 - **Angular ~22.2** — `score-web/package.json` pins `@angular/core` to
-  `~22.2.4`. (The published `score-web` version is `3.6.0`.) Component
+  `~22.2.5`. (The published `score-web` version is `3.6.1`.) Component
   architecture, RxJS, and Angular Material are core to this module.
 - **TypeScript ~6.0** — all frontend code is TypeScript.
 - **Node.js 22.22.3+, 24.15+ or 26+** — the `engines` field accepts

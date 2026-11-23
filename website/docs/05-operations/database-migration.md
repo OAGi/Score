@@ -127,7 +127,7 @@ MariaDB port `3306` on the same host port and stores data in the `db-volume`:
 
 ```yaml
 db:
-  image: oagi1docker/srt-repo:3.6.0
+  image: oagi1docker/srt-repo:3.6.1
   ports:
     - 3306:3306
   volumes:

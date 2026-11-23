@@ -291,6 +291,12 @@ To change the code list state:
 
 4. Confirm (or cancel) the state change.
 
+To change the state of several code lists at once, check the checkboxes in front of them on the "Code List" page and click the state button on the top-right corner of the page ("Move to Draft", "Move to QA", "Move to Candidate", "Move to Production", or "Back to WIP"). A button is shown only when it applies to every selected code list, and the current user must own all of them:
+
+- "Move to Draft" (from WIP) and "Move to Candidate" (from Draft) apply on the Working Branch.
+- "Move to QA" (from WIP) and "Move to Production" (from QA) apply on a release.
+- "Back to WIP" applies to code lists in the Draft, QA, or Candidate state.
+
 ## Transfer ownership of a code list
 
 To let another developer make changes to a code list, the current owner has to transfer ownership of the code list to another developer.
@@ -304,3 +310,5 @@ To transfer ownership:
 3. A dialog is displayed to select a developer. Use the filter on the top to find the desired developer and check the checkbox in front of it.
 
 4. Click the "Transfer" button.
+
+To transfer several code lists at once, check the checkboxes in front of them (all must be in the WIP state and owned by the current user) and click the "Transfer Ownership" button on the top-right corner of the page. Then continue from step 3.

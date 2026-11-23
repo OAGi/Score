@@ -4,12 +4,96 @@ sidebar_position: 1
 toc_max_heading_level: 2
 ---
 
-What's new in the **3.6** line — the current published release is **3.6.0**. connectCenter
+What's new in the **3.6** line — the latest release of the line is **3.6.1**. connectCenter
 follows [Semantic Versioning](./release-numbering.md); each change below links to its GitHub
 issue. The same history — including releases before 3.6.0 — is maintained on the
 [Release Detail wiki](https://github.com/OAGi/Score/wiki/Release-Detail) and the
 [GitHub releases](https://github.com/OAGi/Score/releases). Documentation for the previous line is
-available from the version selector (**3.5**).
+available from the version selector (**3.5.3**).
+
+## 3.6.1
+
+This release adds support for OpenTelemetry's `traceparent` HTTP request and response headers in
+OpenAPI Documents, bulk actions on the Code List list, and a custom page size for every table. It
+also fixes the release process, the cancelling of a revision or an amendment, Data Type and BIE
+handling, and OpenAPI Document generation, and refreshes the platform with Angular 22.2.5.
+
+### Enhancements
+
+#### OpenAPI / OAS
+
+- [Issue #1791 - OpenAPI Doc: add checkbox to enable Open Telemetry's traceparent HTTP request and response headers](https://github.com/OAGi/Score/issues/1791)
+
+  > The requests and responses of an OpenAPI Document can carry general HTTP headers, with
+  > `traceparent` as a preset. The headers are checked against OpenAPI 3.0 and 3.1, and the
+  > Operation ID and Resource Name of an operation are now made and checked on the server.
+
+#### Code List and user interface
+
+- [Issue #1881 - Add bulk actions (state change, transfer ownership) to the Code List list](https://github.com/OAGi/Score/issues/1881)
+- [Issue #1883 - Let a user type a page size of their own in the Items per page list of every table](https://github.com/OAGi/Score/issues/1883)
+
+### Bug fixes
+
+#### OpenAPI / OAS
+
+- [Issue #1788 - OpenAPI Doc: type: ["string", null] for various format: options including "date-time"](https://github.com/OAGi/Score/issues/1788)
+  — the empty example of a date-time, date or time field is no longer written to the OpenAPI schema.
+- [Issue #1891 - OpenAPI Doc: names the OpenAPI Specification defines as case-sensitive are compared case-insensitively (database collation)](https://github.com/OAGi/Score/issues/1891)
+
+#### Release
+
+- [Issue #1895 - Releasing a draft or publishing it can leave a release half done, and components can be changed while it is being released](https://github.com/OAGi/Score/issues/1895)
+
+  > The work of a release now runs in a transaction of its own and has a time limit. Only the user
+  > who requested it is told when it fails, and **Recover** is offered only for a release that
+  > nothing is working on.
+
+#### Core Components and BIE
+
+- [Issue #1896 - Cancelling a revision or an amendment does not always bring a component back as it was, and some screens read an older version of what a component refers to](https://github.com/OAGi/Score/issues/1896)
+
+  > Cancelling a revision or an amendment now gives back everything a Core Component or a Data
+  > Type had, and Code Lists and Agency ID Lists follow the same revise, amend and cancel rules as
+  > the other components.
+
+- [Issue #1879 - Handle a Data Type whose default Value Constraint is a Code List when creating, editing, and generating a BIE](https://github.com/OAGi/Score/issues/1879)
+- [Issue #1884 - Copy the allowed primitives of a base Data Type into the release of the new Data Type](https://github.com/OAGi/Score/issues/1884)
+- [Issue #1885 - Make the Core Component list usable with 1000 items per page](https://github.com/OAGi/Score/issues/1885)
+- [Issue #1886 - Apply the Date Time / Date / Time primitive rule of #808 wherever a BBIE or BBIE SC starts with a primitive, from one place](https://github.com/OAGi/Score/issues/1886)
+
+### Platform updates
+
+- score-web upgraded to Angular 22.2.5 (Angular Material/CDK 22.2.6), and CodeMirror added for the
+  JSON editors.
+- AspectJ upgraded from 1.9.26 to 1.9.27, Guava from 33.7.2 to 33.8.0, and Apache Commons Lang
+  from 3.21.0 to 3.22.0.
+- Routine library and security updates.
+
+### Upgrade note
+
+Before proceeding with the upgrade, we strongly recommend **backing up your data**. Database
+version management is handled by Flyway: on first startup the backend automatically applies the
+`V3_6_1` migration — which adds the tables and columns for the HTTP headers of an OpenAPI
+Document — so you do not need to manually apply a database migration SQL script.
+
+### Docker environment
+
+If you are running connectCenter in a Docker environment, update the following image tags:
+
+- `srt-web` to `3.6.1`
+- `srt-http-gateway` to `3.6.1`
+- `srt-repo` to `3.6.1` (optional, see the note below)
+- `redis` to `7.4`
+
+> **Note on `srt-repo`:** `srt-repo` `3.6.1` is built from the same MariaDB 11.8.9 as `3.6.0`, and
+> the seed data and database schema are unchanged. It only refreshes the operating-system packages
+> of the image (for example, a security update of Perl). The database schema is updated by the
+> backend through Flyway, so an existing installation keeps working with `srt-repo` `3.6.0`, and
+> you may update it at your convenience. A new installation should use `3.6.1`.
+
+See [Installation with Docker](../02-getting-started/installation-docker.md) for an example
+`docker-compose.yml`.
 
 ## 3.6.0
 
