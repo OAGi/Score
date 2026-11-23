@@ -68,7 +68,11 @@ export class BieExpressComponent implements OnInit {
   readonly load = (params: HttpParams) => this.bieListService.getBieListPage(params).pipe(
     tap({
       next: resp => resp.list.forEach((elm: BieListEntry) => {
-        this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
+        // Keep the Business Context the user chose while it is still one of the BIE's Business Contexts.
+        const chosen = this.businessContextSelection[elm.topLevelAsbiepId];
+        if (!chosen || !elm.businessContextList.some(bc => bc.businessContextId === chosen.businessContextId)) {
+          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContextList[0];
+        }
       }),
       error: () => this.businessContextSelection = {}
     })

@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.account_management.model.UserSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.CopyBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.BieState;
+import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -221,5 +225,118 @@ class BiePackageCommandServiceTest {
 
         assertThrows(DataAccessForbiddenException.class,
                 () -> service.update(anotherUser(ScoreRole.ADMINISTRATOR), aRequest("Name", "v1.0", "v1", "desc")));
+    }
+
+    private static TopLevelAsbiepId tlaId(long value) {
+        return new TopLevelAsbiepId(BigInteger.valueOf(value));
+    }
+
+    @Test
+    void a_bie_that_was_replaced_cannot_replace_its_replacement() {
+        // A is replaced by B (B.prev = A): replacing B with A would make a cycle
+        when(query.getBieReplacementListInBiePackage(PACKAGE_ID))
+                .thenReturn(List.of(new BieReplacementRecord(tlaId(2), tlaId(1))));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(2), tlaId(1)));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(1), tlaId(1)));
+        verify(command, never()).replaceBieInBiePackage(any(), any(), any());
+    }
+
+    @Test
+    void a_bie_outside_the_replacement_chain_can_replace() {
+        when(query.getBieReplacementListInBiePackage(PACKAGE_ID))
+                .thenReturn(List.of(new BieReplacementRecord(tlaId(2), tlaId(1))));
+
+        service.replaceBieInBiePackage(requester, PACKAGE_ID, tlaId(2), tlaId(3));
+
+        verify(command).replaceBieInBiePackage(PACKAGE_ID, tlaId(2), tlaId(3));
+    }
+
+    private BiePackageSummaryRecord aSummary(BiePackageId id, BieState state, BiePackageId prev) {
+        return new BiePackageSummaryRecord(id, null, null, "Name", "v1.0", "v1", "desc",
+                null, null, state, null, prev);
+    }
+
+    @Test
+    void a_production_package_is_revised_once() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID))).thenReturn(List.of());
+        when(query.hasDuplicateVersion(any(), any())).thenReturn(false);
+
+        service.revise(requester, PACKAGE_ID);
+
+        verify(command).revise(eq(PACKAGE_ID), any());
+    }
+
+    @Test
+    void a_package_that_already_has_a_newer_revision_cannot_be_revised_again() {
+        BiePackageId revision = new BiePackageId(BigInteger.valueOf(6));
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID)))
+                .thenReturn(List.of(aSummary(revision, BieState.WIP, PACKAGE_ID)));
+
+        assertThrows(IllegalArgumentException.class, () -> service.revise(requester, PACKAGE_ID));
+        verify(command, never()).revise(any(), any());
+    }
+
+    @Test
+    void a_revision_chain_can_keep_growing_from_its_latest_production_package() {
+        BiePackageId second = new BiePackageId(BigInteger.valueOf(6));
+        BiePackageId third = new BiePackageId(BigInteger.valueOf(7));
+        when(query.hasDuplicateVersion(any(), any())).thenReturn(false);
+
+        // PACKAGE_ID (Production) -> second (WIP, then Production): the first is closed, the latest is open.
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(PACKAGE_ID, BieState.Production, null));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(PACKAGE_ID)))
+                .thenReturn(List.of(aSummary(second, BieState.Production, PACKAGE_ID)));
+        when(query.getBiePackageSummary(second)).thenReturn(aSummary(second, BieState.Production, PACKAGE_ID));
+        when(query.getBiePackagesReferencingAsPrevious(List.of(second))).thenReturn(List.of());
+        when(command.revise(eq(second), any())).thenReturn(third);
+
+        assertThrows(IllegalArgumentException.class, () -> service.revise(requester, PACKAGE_ID));
+        service.revise(requester, second);
+
+        verify(command, never()).revise(eq(PACKAGE_ID), any());
+        verify(command).revise(eq(second), any());
+    }
+
+    private BiePackageSummaryRecord aSummary(BieState state, UserId ownerId) {
+        return new BiePackageSummaryRecord(PACKAGE_ID, null, null, "Name", "v1.0", "v1", "desc", null, null,
+                state, new UserSummaryRecord(ownerId, "someone", "Someone", List.of()), null);
+    }
+
+    private static final UserId ANOTHER_USER = new UserId(BigInteger.valueOf(43));
+
+    @Test
+    void copy_rejects_an_unknown_package() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(null);
+        assertThrows(org.oagi.score.gateway.http.common.model.NotFoundException.class,
+                () -> service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID))));
+        verify(command, never()).copy(any());
+    }
+
+    @Test
+    void copy_rejects_the_wip_package_of_another_user() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(BieState.WIP, ANOTHER_USER));
+        assertThrows(DataAccessForbiddenException.class, () -> service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID))));
+        verify(command, never()).copy(any());
+    }
+
+    @Test
+    void copy_allows_qa_and_production_of_another_user() {
+        for (BieState state : List.of(BieState.QA, BieState.Production)) {
+            when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(state, ANOTHER_USER));
+            service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID)));
+        }
+        verify(command, times(2)).copy(PACKAGE_ID);
+    }
+
+    @Test
+    void copy_allows_the_own_wip_package() {
+        when(query.getBiePackageSummary(PACKAGE_ID)).thenReturn(aSummary(BieState.WIP, requester.userId()));
+        service.copy(requester, new CopyBiePackageRequest(List.of(PACKAGE_ID)));
+        verify(command).copy(PACKAGE_ID);
     }
 }

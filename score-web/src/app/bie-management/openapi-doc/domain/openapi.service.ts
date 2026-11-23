@@ -12,6 +12,7 @@ import {
   ReusedBIEViolationCheck
 } from './openapi-doc';
 import {Observable} from 'rxjs';
+import {OasDocChangeResult, OasDocChangeSet, OasOperationCandidate, OasOperationProposal} from './oas-doc-change';
 import {PageRequest, PageResponse} from '../../../basis/basis';
 import {ReleaseSummary} from '../../../release-management/domain/release';
 
@@ -112,7 +113,9 @@ export class OpenAPIService {
       contactEmail: oasDoc.contactEmail,
       licenseUrl: oasDoc.licenseUrl,
       securitySchemes: oasDoc.securitySchemes,
-      securityRequirements: oasDoc.securityRequirements
+      securityRequirements: oasDoc.securityRequirements,
+      // Issue #1791: undefined (not sent) keeps the HTTP headers of the document as they are; [] removes them.
+      httpHeaders: oasDoc.httpHeaders
     });
   }
 
@@ -130,8 +133,56 @@ export class OpenAPIService {
       contactEmail: oasDoc.contactEmail,
       licenseUrl: oasDoc.licenseUrl,
       securitySchemes: oasDoc.securitySchemes,
-      securityRequirements: oasDoc.securityRequirements
+      securityRequirements: oasDoc.securityRequirements,
+      // Issue #1791: undefined (not sent) keeps the HTTP headers of the document as they are; [] removes them.
+      httpHeaders: oasDoc.httpHeaders
     });
+  }
+
+  // What the user has changed of the document, as a whole: the server checks whether it can be saved, and saves it. The check
+  // keeps nothing; a save is all of it or nothing, and a refusal (400) has the same answer as a check, with what is wrong.
+  checkChanges(oasDocId: number, changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
+    return this.http.post<OasDocChangeResult>('/api/oas_doc/' + oasDocId + '/changes/check', this.changeSetJson(changeSet));
+  }
+
+  saveChanges(oasDocId: number, changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
+    return this.http.put<OasDocChangeResult>('/api/oas_doc/' + oasDocId + '/changes', this.changeSetJson(changeSet));
+  }
+
+  // What the server makes of an operation that is about to be added (its Resource Name and Operation ID), and whether it
+  // can be added. Nothing is saved.
+  proposeOperation(oasDocId: number, candidate: OasOperationCandidate): Observable<OasOperationProposal> {
+    return this.http.post<OasOperationProposal>('/api/oas_doc/' + oasDocId + '/operations/propose', candidate);
+  }
+
+  // The same for operations that are added together: each is judged against the document and against the ones before it.
+  proposeOperations(oasDocId: number, candidates: OasOperationCandidate[]): Observable<OasOperationProposal[]> {
+    return this.http.post<OasOperationProposal[]>('/api/oas_doc/' + oasDocId + '/operations/propose-all', candidates);
+  }
+
+  private changeSetJson(changeSet: OasDocChangeSet): any {
+    const oasDoc = changeSet.document;
+    return {
+      document: oasDoc ? {
+        oasDocId: oasDoc.oasDocId,
+        title: oasDoc.title,
+        openAPIVersion: oasDoc.openAPIVersion,
+        version: oasDoc.version,
+        licenseName: oasDoc.licenseName,
+        description: oasDoc.description,
+        termsOfService: oasDoc.termsOfService,
+        contactName: oasDoc.contactName,
+        contactUrl: oasDoc.contactUrl,
+        contactEmail: oasDoc.contactEmail,
+        licenseUrl: oasDoc.licenseUrl,
+        securitySchemes: oasDoc.securitySchemes,
+        securityRequirements: oasDoc.securityRequirements
+      } : null,
+      operations: changeSet.operations.map(operation => operation.json),
+      headers: changeSet.headers,
+      added: (changeSet.added || []).map(row => row.additionJson),
+      removed: (changeSet.removed || []).map(row => row.json)
+    };
   }
 
   checkUniqueness(oasDoc: OasDoc): Observable<any> {

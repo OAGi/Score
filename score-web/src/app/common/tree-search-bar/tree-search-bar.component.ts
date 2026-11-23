@@ -98,6 +98,7 @@ export class TreeSearchBarComponent<N = any> {
    */
   @Input() set selectedNode(node: N | undefined | null) {
     if (node !== this.selectedByMatch) {
+      this.selectedByMatch = undefined; // the user picked another node, so the match no longer holds the selection
       this.scope = node ?? undefined;
     }
   }

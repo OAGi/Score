@@ -31,6 +31,6 @@ export class ContextSchemeValueDialogComponent implements OnInit {
   }
 
   isDisabled() {
-    return !this.contextSchemeValue.value;
+    return !this.contextSchemeValue.value?.trim();
   }
 }

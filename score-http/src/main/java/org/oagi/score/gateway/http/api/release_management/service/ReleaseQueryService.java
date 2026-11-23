@@ -121,7 +121,12 @@ public class ReleaseQueryService {
      * @return The {@link ReleaseDetailsRecord} containing the release details.
      */
     public ReleaseDetailsRecord getReleaseDetails(ScoreUser requester, ReleaseId releaseId) {
-        return query(requester).getReleaseDetails(releaseId);
+        ReleaseDetailsRecord details = query(requester).getReleaseDetails(releaseId);
+        if (details != null && details.state() != null && details.state().inProgress()) {
+            // whether the work for it is going on, or it was left so: only a release in the middle of its work is asked
+            details = details.withBusy(repositoryFactory.releaseProgressRepository().isBusy(releaseId));
+        }
+        return details;
     }
 
     /**

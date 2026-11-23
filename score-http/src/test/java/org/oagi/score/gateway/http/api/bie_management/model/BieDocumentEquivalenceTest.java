@@ -170,7 +170,9 @@ class BieDocumentEquivalenceTest {
             }
 
             int bies = 0;
-            for (var row : dsl.fetch("select top_level_asbiep_id, owner_user_id, release_id from top_level_asbiep order by 1")) {
+            // A BIE whose owner is gone does not exist for the application (it is in no list, and reading it is a NotFoundException).
+            for (var row : dsl.fetch("select top_level_asbiep_id, owner_user_id, release_id from top_level_asbiep t"
+                    + " where exists (select 1 from app_user u where u.app_user_id = t.owner_user_id) order by 1")) {
                 TopLevelAsbiepId id = new TopLevelAsbiepId(row.get(0, ULong.class).toBigInteger());
                 UserId owner = new UserId(row.get(1, ULong.class).toBigInteger());
                 ReleaseId release = new ReleaseId(row.get(2, ULong.class).toBigInteger());

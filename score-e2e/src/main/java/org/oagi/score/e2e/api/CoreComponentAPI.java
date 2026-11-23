@@ -225,4 +225,20 @@ public interface CoreComponentAPI {
     String getDefaultValueDomainByCDTRepresentationTerm(String representationTerm);
 
     DTObject getRevisedDT(DTObject previousDT);
+
+    /**
+     * Remove, as someone with access to the database would, the logs of the component (all of its revisions) that are
+     * older than its latest revision, so that a cancel has no log to go back to.
+     *
+     * @param guid the GUID of the component
+     */
+    void deleteLogsBeforeTheLatestRevision(String guid);
+
+    /**
+     * Remove, as someone with access to the database would, all the logs of the component, so that nothing is left of its
+     * history.
+     *
+     * @param guid the GUID of the component
+     */
+    void deleteLogs(String guid);
 }

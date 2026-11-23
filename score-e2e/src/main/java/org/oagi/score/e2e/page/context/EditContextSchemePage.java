@@ -3,6 +3,7 @@ package org.oagi.score.e2e.page.context;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.obj.ContextSchemeObject;
 import org.oagi.score.e2e.obj.ContextSchemeValueObject;
+import org.oagi.score.e2e.page.ConfirmDialog;
 import org.oagi.score.e2e.page.Page;
 import org.openqa.selenium.WebElement;
 
@@ -231,6 +232,14 @@ public interface EditContextSchemePage extends Page {
     String getConfirmationDialogMessage();
 
     LoadFromCodeListDialog continueToLoadFromCodeListDialog();
+
+    /**
+     * Return the confirm dialog that is shown when what a code list loads does not fit the context scheme, such as
+     * the 'Cannot load the code list' and the 'Some values cannot be loaded' dialogs.
+     *
+     * @return the confirm dialog
+     */
+    ConfirmDialog getConfirmDialog();
 
 
 }

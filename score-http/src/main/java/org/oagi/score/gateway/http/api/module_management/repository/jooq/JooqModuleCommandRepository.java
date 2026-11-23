@@ -55,7 +55,7 @@ public class JooqModuleCommandRepository extends JooqBaseRepository implements M
 
         return new ModuleId(
                 dslContext().insertInto(MODULE)
-                        .set(MODULE.PARENT_MODULE_ID, valueOf(parentModuleId))
+                        .set(MODULE.PARENT_MODULE_ID, (parentModuleId != null) ? valueOf(parentModuleId) : null)
                         .set(MODULE.PATH, path)
                         .set(MODULE.TYPE, moduleType.name())
                         .set(MODULE.NAME, name)

@@ -34,6 +34,8 @@ deploy/deploy.sh test --open-sg    # ...re-open SSH to your current IP first (ne
 deploy/deploy.sh test --remote-only  # roll test to the already-pushed images (no rebuild)
 deploy/deploy.sh test --no-db      # frontend + backend only; leave the db container alone
 deploy/deploy.sh test 3.5.2 -y     # explicit version, no confirmation prompt
+deploy/deploy.sh test --images=http --remote-only   # roll only the backend image (any of web,http,repo)
+# per-image tags: TAG_WEB / TAG_HTTP / TAG_REPO env (srt-repo has its own score-repo/VERSION)
 ```
 
 ## Individual steps

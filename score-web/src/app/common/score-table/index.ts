@@ -8,3 +8,4 @@ export * from './score-table';
 export * from './score-detail-def.directive';
 export * from './score-compact-def.directive';
 export * from './in-memory-load';
+export * from './edited-rows';

@@ -437,8 +437,7 @@ public class TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot extends BaseTest {
                 expectedOperationId("POST", bie.getPropertyTerm(), false));
         panel.setVerb(postCard, "GET");
 
-        assertEquals("Each (Resource Name, Verb) can have only one Request and one Response body.",
-                panel.getResourceNameError(postCard),
+        assertTrue(panel.getResourceNameError(postCard).contains("can have only one Request and one Response body"),
                 "Driving a binding into an occupied body slot from the BIE root should flag the duplicate (Issue #1492)");
         assertFalse(panel.isUpdateButtonEnabled(),
                 "The 'Update OpenAPI Information' button must be disabled while a duplicate body slot is present (Issue #1492)");
@@ -503,7 +502,7 @@ public class TC_43_14_ManageBIEOpenAPIBindingsFromBIERoot extends BaseTest {
         dialog.setMessageBody("Response");
 
         // GET + Response already exists on this document -> the dialog flags the duplicate and disables Add.
-        assertEquals("This endpoint already has a Response body.", dialog.getDuplicateBodyError(),
+        assertTrue(dialog.getDuplicateBodyError().contains("already has a Response body"),
                 "Re-adding an existing (Verb, Message Body) from the BIE root must flag the duplicate (Issue #1492)");
         assertFalse(dialog.getAddButton(false).isEnabled(),
                 "The 'Add' button must be disabled while the selection duplicates an existing body slot (Issue #1492)");

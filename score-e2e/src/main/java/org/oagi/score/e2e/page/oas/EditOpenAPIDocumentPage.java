@@ -508,6 +508,12 @@ public interface EditOpenAPIDocumentPage extends Page {
     String getRowOperationIdError(WebElement tableRecord);
 
     /**
+     * What the server says is wrong with what the user has changed of the document (the banner above the table), waiting up to five
+     * seconds for it; empty when the server finds nothing wrong.
+     */
+    java.util.List<String> getChangeViolations();
+
+    /**
      * Return whether the 'Array Indicator' control of an operation row is disabled.
      *
      * @param tableRecord the operation row

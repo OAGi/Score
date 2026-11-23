@@ -31,6 +31,7 @@ import org.oagi.score.gateway.http.common.model.WhoAndWhen;
 import org.oagi.score.gateway.http.common.repository.jooq.JooqBaseRepository;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -191,46 +192,18 @@ public class JooqBccpQueryRepository extends JooqBaseRepository implements BccpQ
         if (bccpManifestId == null) {
             return null;
         }
-        Record2<ULong, ULong> record = dslContext().select(
-                        BCCP_MANIFEST.BCCP_MANIFEST_ID,
-                        BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
-                .from(BCCP_MANIFEST)
-                .join(RELEASE).on(BCCP_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        ULong prevBccpManifestId = record.get(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID);
-        if (prevBccpManifestId != null) {
-            return since(new BccpManifestId(prevBccpManifestId.toBigInteger()));
-        } else {
-            return new BccpManifestId(record.get(BCCP_MANIFEST.BCCP_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.since(dslContext(), "bccp_manifest", "bccp_manifest_id", "prev_bccp_manifest_id",
+                bccpManifestId.value());
+        return found != null ? new BccpManifestId(found) : null;
     }
 
     private BccpManifestId lastChanged(BccpManifestId bccpManifestId) {
         if (bccpManifestId == null) {
             return null;
         }
-        Record4<ULong, ULong, ULong, ULong> record = dslContext().select(
-                        BCCP_MANIFEST.BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_ID,
-                        BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID, BCCP_MANIFEST.as("prev").BCCP_ID)
-                .from(BCCP_MANIFEST)
-                .join(BCCP_MANIFEST.as("prev")).on(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID))
-                .join(RELEASE).on(BCCP_MANIFEST.as("prev").RELEASE_ID.eq(RELEASE.RELEASE_ID))
-                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccpManifestId)))
-                .fetchOptional().orElse(null);
-        if (record == null) {
-            return null;
-        }
-
-        if (record.get(BCCP_MANIFEST.BCCP_ID).equals(record.get(BCCP_MANIFEST.as("prev").BCCP_ID))) {
-            return lastChanged(new BccpManifestId(record.get(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID).toBigInteger()));
-        } else {
-            return new BccpManifestId(record.get(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID).toBigInteger());
-        }
+        BigInteger found = ManifestHistory.lastChanged(dslContext(), "bccp_manifest", "bccp_manifest_id", "prev_bccp_manifest_id",
+                "bccp_id", bccpManifestId.value());
+        return found != null ? new BccpManifestId(found) : null;
     }
 
     @Override

@@ -22,7 +22,7 @@
 
   <ng-template #messageBodyControl let-element>
     <mat-select [(ngModel)]="messageBodySelection[element.topLevelAsbiepId]" required="true"
-      [panelWidth]="null"
+      [panelWidth]="null" (ngModelChange)="propose()"
       (click)="$event.stopPropagation()">
       <!-- Issue #1610: GET never carries a request body; DELETE may, in any version
            (dropped from the generated document in 3.0). -->
@@ -33,16 +33,16 @@
       <mat-error>
         Message Body is required.
       </mat-error>
-    } @else if (isSelected(element) && isDuplicateBodySlotForAdd(element)) {
-      <!-- Issue #1492 (Option 2): this (verb, message body) already exists on the document. -->
-      <mat-error>
-        This endpoint already has a {{ messageBodySelection[element.topLevelAsbiepId] }} body.
-      </mat-error>
+    } @else if (isSelected(element)) {
+      <!-- What the server says is wrong with adding it: the endpoint has this body already, the Operation ID is used... -->
+      @for (problem of problemsOf(element); track $index) {
+        <mat-error>{{ problem }}</mat-error>
+      }
     }
   </ng-template>
 
   <ng-template #arrayIndicatorControl let-element>
-    <mat-checkbox [(ngModel)]="element.arrayIndicator" (click)="$event.stopPropagation()"></mat-checkbox>
+    <mat-checkbox [(ngModel)]="element.arrayIndicator" (ngModelChange)="propose()" (click)="$event.stopPropagation()"></mat-checkbox>
   </ng-template>
 
   <score-table-view emptyMessage="No Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
@@ -190,7 +190,7 @@
       <span class="ps-2">Close</span>
     </button>
     <button mat-raised-button (click)="addBieForOasDoc()" color="primary"
-      [disabled]="loading || view().loading() || selection.isEmpty() || isOptionMissing() || hasDuplicateBodySlotSelected()">
+      [disabled]="loading || view().loading() || selection.isEmpty() || isOptionMissing() || isAddRefused()">
       <mat-icon>add</mat-icon>
       <span class="ps-2">Add</span>
     </button>

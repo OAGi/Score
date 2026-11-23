@@ -1144,12 +1144,18 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         requester_user_id: AppUserId,
     ) -> bool:
         """Create a revised DT working copy and move the manifest head to it."""
-        dt_manifest = await self._session.get(DtManifest, int(dt_manifest_id))
-        if dt_manifest is None:
+        based_manifest = aliased(DtManifest)
+        row = (
+            await self._session.execute(
+                select(DtManifest, Dt, based_manifest.dt_id)
+                .join(Dt, Dt.dt_id == DtManifest.dt_id)
+                .outerjoin(based_manifest, based_manifest.dt_manifest_id == DtManifest.based_dt_manifest_id)
+                .where(DtManifest.dt_manifest_id == int(dt_manifest_id))
+            )
+        ).first()
+        if row is None:
             return False
-        dt = await self._session.get(Dt, int(dt_manifest.dt_id))
-        if dt is None:
-            return False
+        dt_manifest, dt, latest_based_dt_id = row
 
         now = datetime.utcnow()
         prev_dt_id = int(dt.dt_id)
@@ -1159,7 +1165,7 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
             qualifier=dt.qualifier,
             representation_term=dt.representation_term,
             six_digit_id=dt.six_digit_id,
-            based_dt_id=dt.based_dt_id,
+            based_dt_id=latest_based_dt_id if latest_based_dt_id is not None else dt.based_dt_id,
             definition=dt.definition,
             definition_source=dt.definition_source,
             namespace_id=dt.namespace_id,
@@ -1188,15 +1194,19 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         )
         dt_manifest.dt_id = int(next_dt.dt_id)
 
-        dt_sc_manifests = (
+        based_sc_manifest = aliased(DtScManifest)
+        dt_sc_rows = (
             await self._session.execute(
-                select(DtScManifest).where(DtScManifest.owner_dt_manifest_id == int(dt_manifest_id))
+                select(DtScManifest, DtSc, based_sc_manifest.dt_sc_id)
+                .join(DtSc, DtSc.dt_sc_id == DtScManifest.dt_sc_id)
+                .outerjoin(
+                    based_sc_manifest,
+                    based_sc_manifest.dt_sc_manifest_id == DtScManifest.based_dt_sc_manifest_id,
+                )
+                .where(DtScManifest.owner_dt_manifest_id == int(dt_manifest_id))
             )
-        ).scalars().all()
-        for dt_sc_manifest in dt_sc_manifests:
-            prev_dt_sc = await self._session.get(DtSc, int(dt_sc_manifest.dt_sc_id))
-            if prev_dt_sc is None:
-                continue
+        ).all()
+        for dt_sc_manifest, prev_dt_sc, latest_based_dt_sc_id in dt_sc_rows:
             next_dt_sc = DtSc(
                 guid=str(prev_dt_sc.guid),
                 object_class_term=prev_dt_sc.object_class_term,
@@ -1207,7 +1217,9 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
                 owner_dt_id=int(next_dt.dt_id),
                 cardinality_min=int(prev_dt_sc.cardinality_min),
                 cardinality_max=prev_dt_sc.cardinality_max,
-                based_dt_sc_id=prev_dt_sc.based_dt_sc_id,
+                based_dt_sc_id=(
+                    latest_based_dt_sc_id if latest_based_dt_sc_id is not None else prev_dt_sc.based_dt_sc_id
+                ),
                 default_value=prev_dt_sc.default_value,
                 fixed_value=prev_dt_sc.fixed_value,
                 is_deprecated=bool(prev_dt_sc.is_deprecated),
@@ -1382,11 +1394,7 @@ class MariaDbDataTypeRepository(DataTypeRepositoryContract):
         count = await self._session.scalar(
             select(func.count())
             .select_from(DtManifest)
-            .join(Dt, DtManifest.dt_id == Dt.dt_id)
-            .where(
-                DtManifest.dt_manifest_id != int(dt_manifest_id),
-                Dt.based_dt_id == int(dt_manifest.dt_id),
-            )
+            .where(DtManifest.based_dt_manifest_id == int(dt_manifest_id))
         )
         return int(count or 0) > 0
 

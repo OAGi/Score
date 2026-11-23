@@ -231,7 +231,7 @@ public class JooqModuleManifestQueryRepository extends JooqBaseRepository implem
                                 MODULE_DT_MANIFEST.MODULE_SET_RELEASE_ID.eq(valueOf(moduleSetReleaseId))))
                 .where(and(
                         DT_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                        DT.BASED_DT_ID.isNotNull(),
+                        DT_MANIFEST.BASED_DT_MANIFEST_ID.isNotNull(),
                         MODULE_DT_MANIFEST.MODULE_DT_MANIFEST_ID.isNull()))
                 .fetchStream().map(e ->
                         new AssignNodeRecord(

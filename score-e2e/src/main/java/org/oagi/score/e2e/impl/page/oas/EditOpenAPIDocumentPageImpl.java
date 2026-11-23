@@ -756,12 +756,33 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
     }
 
     @Override
-    public String getRowOperationIdError(WebElement tableRecord) {
-        try {
-            return getText(getColumnByName(tableRecord, "operationId").findElement(By.tagName("mat-error")));
-        } catch (NoSuchElementException e) {
-            return "";
+    public java.util.List<String> getChangeViolations() {
+        for (int attempt = 0; attempt < 20; attempt++) {
+            var items = getDriver().findElements(By.cssSelector("div.oas-change-violations li"));
+            if (!items.isEmpty()) {
+                return items.stream().map(item -> getText(item)).toList();
+            }
+            waitFor(Duration.ofMillis(250));
         }
+        return java.util.List.of();
+    }
+
+    @Override
+    public String getRowOperationIdError(WebElement tableRecord) {
+        // A blank Operation ID is the page's to say at once; a duplicate is the server's, which answers a moment after the
+        // change: wait for the error (up to five seconds). An empty string when there is none.
+        for (int attempt = 0; attempt < 20; attempt++) {
+            try {
+                String text = getText(getColumnByName(tableRecord, "operationId").findElement(By.tagName("mat-error")));
+                if (text != null && !text.isBlank()) {
+                    return text;
+                }
+            } catch (NoSuchElementException e) {
+                // not there (yet)
+            }
+            waitFor(Duration.ofMillis(250));
+        }
+        return "";
     }
 
     @Override
@@ -815,9 +836,15 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         // Issue #1492 (Option 2): the Message Body cell renders 'Duplicate <Request|Response> body on this
         // endpoint.' inside div.oas-body-slot-error-text when the row's (Resource Name, Verb, Message Body)
         // slot is duplicated; absent otherwise.
-        WebElement cell = getColumnByName(tableRecord, "messageBody");
-        var errors = cell.findElements(By.cssSelector("div.oas-body-slot-error-text"));
-        return errors.isEmpty() ? "" : getText(errors.get(0));
+        // The server says it, a moment after the change: wait for it (up to five seconds).
+        for (int attempt = 0; attempt < 20; attempt++) {
+            var errors = getColumnByName(tableRecord, "messageBody").findElements(By.cssSelector("div.oas-body-slot-error-text"));
+            if (!errors.isEmpty() && !getText(errors.get(0)).isBlank()) {
+                return getText(errors.get(0));
+            }
+            waitFor(Duration.ofMillis(250));
+        }
+        return "";
     }
 
     @Override
@@ -825,8 +852,14 @@ public class EditOpenAPIDocumentPageImpl extends BasePageImpl implements EditOpe
         // Issue #1492: a duplicate body slot surfaces 'Duplicate <Request|Response> body on this endpoint.'
         // inside div.oas-body-slot-error-text in the MESSAGE BODY cell (the Verb cell intentionally does NOT
         // repeat it; the Resource Name cell shows a separate mat-error). Check the Message Body cell.
-        WebElement messageBodyCell = getColumnByName(tableRecord, "messageBody");
-        return !messageBodyCell.findElements(By.cssSelector("div.oas-body-slot-error-text")).isEmpty();
+        // The server says it, a moment after the change: wait for it (up to five seconds).
+        for (int attempt = 0; attempt < 20; attempt++) {
+            if (!getColumnByName(tableRecord, "messageBody").findElements(By.cssSelector("div.oas-body-slot-error-text")).isEmpty()) {
+                return true;
+            }
+            waitFor(Duration.ofMillis(250));
+        }
+        return false;
     }
 
     /* ----------------------------------------------------- Issue #1347: error response body type */

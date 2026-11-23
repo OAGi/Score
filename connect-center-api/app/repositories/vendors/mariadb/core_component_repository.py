@@ -17,6 +17,7 @@ from typing import Any, Literal
 
 from sqlalchemy import Select, and_, bindparam, func, literal, select, text, union_all, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.repositories.contracts.core_component import CoreComponentRepositoryContract
 from app.repositories.contracts.log import LogRepositoryContract
@@ -1556,12 +1557,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         requester_user_id: AppUserId,
     ) -> bool:
         """Create a revised ACC working copy and move the manifest head to it."""
-        acc_manifest = await self._session.get(AccManifest, int(acc_manifest_id))
-        if acc_manifest is None:
+        target = aliased(AccManifest)
+        row = (
+            await self._session.execute(
+                select(AccManifest, Acc, target.acc_id)
+                .join(Acc, Acc.acc_id == AccManifest.acc_id)
+                .outerjoin(target, target.acc_manifest_id == AccManifest.based_acc_manifest_id)
+                .where(AccManifest.acc_manifest_id == int(acc_manifest_id))
+            )
+        ).first()
+        if row is None:
             return False
-        acc = await self._session.get(Acc, int(acc_manifest.acc_id))
-        if acc is None:
-            return False
+        acc_manifest, acc, latest_target_id = row
 
         now = datetime.utcnow()
         prev_acc_id = int(acc.acc_id)
@@ -1572,7 +1579,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             object_class_qualifier=acc.object_class_qualifier,
             definition=acc.definition,
             definition_source=acc.definition_source,
-            based_acc_id=acc.based_acc_id,
+            based_acc_id=latest_target_id if latest_target_id is not None else acc.based_acc_id,
             namespace_id=acc.namespace_id,
             owner_user_id=int(requester_user_id),
             created_by=int(requester_user_id),
@@ -2346,12 +2353,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         requester_user_id: AppUserId,
     ) -> bool:
         """Create a revised ASCCP working copy and move the manifest head to it."""
-        asccp_manifest = await self._session.get(AsccpManifest, int(asccp_manifest_id))
-        if asccp_manifest is None:
+        target = aliased(AccManifest)
+        row = (
+            await self._session.execute(
+                select(AsccpManifest, Asccp, target.acc_id)
+                .join(Asccp, Asccp.asccp_id == AsccpManifest.asccp_id)
+                .outerjoin(target, target.acc_manifest_id == AsccpManifest.role_of_acc_manifest_id)
+                .where(AsccpManifest.asccp_manifest_id == int(asccp_manifest_id))
+            )
+        ).first()
+        if row is None:
             return False
-        asccp = await self._session.get(Asccp, int(asccp_manifest.asccp_id))
-        if asccp is None:
-            return False
+        asccp_manifest, asccp, latest_target_id = row
 
         now = datetime.utcnow()
         prev_asccp_id = int(asccp.asccp_id)
@@ -2363,7 +2376,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             is_nillable=bool(asccp.is_nillable),
             definition=asccp.definition,
             definition_source=asccp.definition_source,
-            role_of_acc_id=asccp.role_of_acc_id,
+            role_of_acc_id=latest_target_id if latest_target_id is not None else asccp.role_of_acc_id,
             namespace_id=asccp.namespace_id,
             owner_user_id=int(requester_user_id),
             created_by=int(requester_user_id),
@@ -2465,12 +2478,18 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         requester_user_id: AppUserId,
     ) -> bool:
         """Create a revised BCCP working copy and move the manifest head to it."""
-        bccp_manifest = await self._session.get(BccpManifest, int(bccp_manifest_id))
-        if bccp_manifest is None:
+        target = aliased(DtManifest)
+        row = (
+            await self._session.execute(
+                select(BccpManifest, Bccp, target.dt_id)
+                .join(Bccp, Bccp.bccp_id == BccpManifest.bccp_id)
+                .outerjoin(target, target.dt_manifest_id == BccpManifest.bdt_manifest_id)
+                .where(BccpManifest.bccp_manifest_id == int(bccp_manifest_id))
+            )
+        ).first()
+        if row is None:
             return False
-        bccp = await self._session.get(Bccp, int(bccp_manifest.bccp_id))
-        if bccp is None:
-            return False
+        bccp_manifest, bccp, latest_target_id = row
 
         now = datetime.utcnow()
         prev_bccp_id = int(bccp.bccp_id)
@@ -2478,7 +2497,7 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
             guid=str(bccp.guid),
             property_term=bccp.property_term,
             representation_term=bccp.representation_term,
-            bdt_id=bccp.bdt_id,
+            bdt_id=latest_target_id if latest_target_id is not None else bccp.bdt_id,
             definition=bccp.definition,
             definition_source=bccp.definition_source,
             namespace_id=bccp.namespace_id,
@@ -3236,22 +3255,24 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         timestamp: datetime,
     ) -> None:
         """Clone ASCC rows for an ACC revision and retarget their manifests."""
-        ascc_manifests = (
+        rows = (
             await self._session.execute(
-                select(AsccManifest).where(AsccManifest.from_acc_manifest_id == int(from_acc_manifest_id))
+                select(AsccManifest, Ascc, AsccpManifest.asccp_id)
+                .join(Ascc, Ascc.ascc_id == AsccManifest.ascc_id)
+                .outerjoin(
+                    AsccpManifest, AsccpManifest.asccp_manifest_id == AsccManifest.to_asccp_manifest_id
+                )
+                .where(AsccManifest.from_acc_manifest_id == int(from_acc_manifest_id))
             )
-        ).scalars().all()
-        for ascc_manifest in ascc_manifests:
-            ascc = await self._session.get(Ascc, int(ascc_manifest.ascc_id))
-            if ascc is None:
-                continue
+        ).all()
+        for ascc_manifest, ascc, latest_asccp_id in rows:
             next_ascc = Ascc(
                 guid=str(ascc.guid),
                 cardinality_min=ascc.cardinality_min,
                 cardinality_max=ascc.cardinality_max,
                 seq_key=ascc.seq_key,
                 from_acc_id=int(next_acc_id),
-                to_asccp_id=int(ascc.to_asccp_id),
+                to_asccp_id=latest_asccp_id if latest_asccp_id is not None else ascc.to_asccp_id,
                 definition=ascc.definition,
                 definition_source=ascc.definition_source,
                 is_deprecated=bool(ascc.is_deprecated),
@@ -3279,20 +3300,20 @@ class MariaDbCoreComponentRepository(CoreComponentRepositoryContract):
         timestamp: datetime,
     ) -> None:
         """Clone BCC rows for an ACC revision and retarget their manifests."""
-        bcc_manifests = (
+        rows = (
             await self._session.execute(
-                select(BccManifest).where(BccManifest.from_acc_manifest_id == int(from_acc_manifest_id))
+                select(BccManifest, Bcc, BccpManifest.bccp_id)
+                .join(Bcc, Bcc.bcc_id == BccManifest.bcc_id)
+                .outerjoin(BccpManifest, BccpManifest.bccp_manifest_id == BccManifest.to_bccp_manifest_id)
+                .where(BccManifest.from_acc_manifest_id == int(from_acc_manifest_id))
             )
-        ).scalars().all()
-        for bcc_manifest in bcc_manifests:
-            bcc = await self._session.get(Bcc, int(bcc_manifest.bcc_id))
-            if bcc is None:
-                continue
+        ).all()
+        for bcc_manifest, bcc, latest_bccp_id in rows:
             next_bcc = Bcc(
                 guid=str(bcc.guid),
                 cardinality_min=bcc.cardinality_min,
                 cardinality_max=bcc.cardinality_max,
-                to_bccp_id=int(bcc.to_bccp_id),
+                to_bccp_id=latest_bccp_id if latest_bccp_id is not None else bcc.to_bccp_id,
                 from_acc_id=int(next_acc_id),
                 seq_key=bcc.seq_key,
                 entity_type=bcc.entity_type,

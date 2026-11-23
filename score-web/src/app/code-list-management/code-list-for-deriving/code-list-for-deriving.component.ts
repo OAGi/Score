@@ -100,11 +100,13 @@ export class CodeListForDerivingComponent {
 
   onBranchChange(release: ReleaseSummary) {
     this.releaseChoice.choose(release);
+    this.selection.clear();
     this.applyChoices();
   }
 
   onLibraryChange(library: LibrarySummary) {
     this.libraryChoice.choose(library);
+    this.selection.clear();
     this.releaseService.getReleaseSummaryList(library.libraryId, ['Published']).subscribe(releases => {
       this.releaseChoice.init(releases);
       this.applyChoices();
@@ -113,7 +115,7 @@ export class CodeListForDerivingComponent {
 
   /** Derives a code list from the selected one, as the code list page does, and opens the new code list. */
   next() {
-    if (this.selection.selected.length === 0) {
+    if (this.selection.selected.length === 0 || !this.releaseChoice.release) {
       return;
     }
     this.service.create(this.releaseChoice.release.releaseId, this.selection.selected[0]).subscribe(resp => {

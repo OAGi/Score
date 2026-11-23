@@ -3,6 +3,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
+import {MatIconButtonSizesModule} from 'mat-icon-button-sizes';
 
 /**
  * Common shell of a dialog built around a `score-table-view`, so that every such dialog has the same paddings, title and close
@@ -20,7 +21,8 @@ import {MatIconModule} from '@angular/material/icon';
   templateUrl: './dialog-page.component.html',
   styleUrl: './dialog-page.component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatCardModule, MatDialogModule, MatButtonModule, MatIconModule]
+  // MatIconButtonSizesModule: what makes `mat-small-icon-button` of the close button the small button of the app
+  imports: [MatCardModule, MatDialogModule, MatButtonModule, MatIconModule, MatIconButtonSizesModule]
 })
 export class DialogPageComponent {
   /** Plain title; leave it `null` when the title is given through `[dialogTitle]`. */

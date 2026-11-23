@@ -86,7 +86,7 @@
                 Move to Production
               </button>
             }
-            @if ((state === 'Published' || state === 'Production') && (access === 'CanMove' || access === 'CanEdit')) {
+            @if (state === 'Production' && !userRoles.includes('developer') && (access === 'CanMove' || access === 'CanEdit')) {
               <button mat-raised-button color="warn" (click)="makeNewRevision()"
                 [disabled]="isUpdating">
                 {{ userRoles.includes('developer') ? 'Revise' : 'Amend' }}

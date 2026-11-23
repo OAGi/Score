@@ -145,6 +145,8 @@ public class OpenAPIGenerateService {
         // Issue #1347: single idempotent post-step — merge the defaulted 4xx/5xx error responses
         // into every generated operation (after all templates are built, before serialization).
         generateExpression.generateErrorResponses();
+        // Issue #1791: then the HTTP headers of the document, so that they reach the error responses too.
+        generateExpression.generateHttpHeaders();
 
         File schemaExpressionFile;
         try {
@@ -257,7 +259,7 @@ public class OpenAPIGenerateService {
                 for (OpenAPITemplateForVerbOption template : entry.getValue()) {
                     String key = entry.getKey();
                     if (key.endsWith("Entry")) {
-                        key = key.substring(0, key.indexOf("Entry")) + template.getMessageBodyType() + "Entry";
+                        key = key.substring(0, key.length() - "Entry".length()) + template.getMessageBodyType() + "Entry";
                     } else {
                         key = key + template.getMessageBodyType();
                     }
@@ -305,7 +307,7 @@ public class OpenAPIGenerateService {
 
                     String key = entry.getKey();
                     if (key.endsWith("Entry")) {
-                        key = key.substring(0, key.indexOf("Entry")) + suffix + "Entry";
+                        key = key.substring(0, key.length() - "Entry".length()) + suffix + "Entry";
                     } else {
                         key = key + suffix;
                     }

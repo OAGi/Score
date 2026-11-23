@@ -42,7 +42,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.bccp.BccpSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord;
-import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriDetailsRecord;
+import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScAwdPriSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScSummaryRecord;
@@ -500,13 +500,41 @@ public class BieEditService implements InitializingBean {
                     .ownerTopLevelAsbiep(ownerTopLevelAsbiep)
                     .build();
         }
-        return bbieDetails;
+        return withDefaultValueDomain(requester, bbieDetails);
     }
 
     public BbieDetailsRecord getBbieDetails(ScoreUser requester, BbieId bbieId) {
 
         var query = repositoryFactory.bbieQueryRepository(requester);
-        return query.getBbieDetails(bbieId);
+        return withDefaultValueDomain(requester, query.getBbieDetails(bbieId));
+    }
+
+    /**
+     * A BBIE that was saved without a value domain (for example, one created before the Data Type default
+     * could be a Code List or an Agency ID List) uses the default of its Data Type, so it is shown with it.
+     */
+    private BbieDetailsRecord withDefaultValueDomain(ScoreUser requester, BbieDetailsRecord bbieDetails) {
+        if (bbieDetails == null || bbieDetails.basedBcc() == null
+                || (bbieDetails.primitiveRestriction() != null && !bbieDetails.primitiveRestriction().isEmpty())) {
+            return bbieDetails;
+        }
+        BccpSummaryRecord bccp = repositoryFactory.bccpQueryRepository(requester)
+                .getBccpSummary(bbieDetails.basedBcc().toBccpManifestId());
+        DtAwdPriSummaryRecord defaultDtAwdPri = repositoryFactory.dtQueryRepository(requester)
+                .getDefaultDtAwdPriSummary(bccp.dtManifestId());
+        return defaultDtAwdPri == null ? bbieDetails
+                : bbieDetails.withPrimitiveRestriction(PrimitiveRestriction.fromDtAwdPri(defaultDtAwdPri));
+    }
+
+    private BbieScDetailsRecord withDefaultValueDomain(ScoreUser requester, BbieScDetailsRecord bbieScDetails) {
+        if (bbieScDetails == null || bbieScDetails.basedDtSc() == null
+                || (bbieScDetails.primitiveRestriction() != null && !bbieScDetails.primitiveRestriction().isEmpty())) {
+            return bbieScDetails;
+        }
+        DtScAwdPriSummaryRecord defaultDtScAwdPri = repositoryFactory.dtQueryRepository(requester)
+                .getDefaultDtScAwdPriSummary(bbieScDetails.basedDtSc().dtScManifestId());
+        return defaultDtScAwdPri == null ? bbieScDetails
+                : bbieScDetails.withPrimitiveRestriction(PrimitiveRestriction.fromDtScAwdPri(defaultDtScAwdPri));
     }
 
     public AsbiepDetailsRecord getAsbiepDetails(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId,
@@ -588,13 +616,13 @@ public class BieEditService implements InitializingBean {
                     .ownerTopLevelAsbiep(ownerTopLevelAsbiep)
                     .build();
         }
-        return bbieScDetails;
+        return withDefaultValueDomain(requester, bbieScDetails);
     }
 
     public BbieScDetailsRecord getBbieScDetails(ScoreUser requester, BbieScId bbieScId) {
 
         var query = repositoryFactory.bbieScQueryRepository(requester);
-        return query.getBbieScDetails(bbieScId);
+        return withDefaultValueDomain(requester, query.getBbieScDetails(bbieScId));
     }
 
     public List<BieEditUsed> getBieUsedList(ScoreUser requester, TopLevelAsbiepId topLevelAsbiepId) {
@@ -642,16 +670,40 @@ public class BieEditService implements InitializingBean {
         var topLevelAsbiepQuery = repositoryFactory.topLevelAsbiepQueryRepository(requester);
         TopLevelAsbiepSummaryRecord baseTopLevelAsbiep =
                 topLevelAsbiepQuery.getTopLevelAsbiepSummary(request.getBaseTopLevelAsbiepId());
+        if (baseTopLevelAsbiep == null) {
+            throw new IllegalArgumentException("The base BIE does not exist.");
+        }
+
+        if (!topLevelAsbiep.release().releaseId().equals(baseTopLevelAsbiep.release().releaseId())) {
+            throw new IllegalArgumentException("The base BIE must belong to the same release as the BIE.");
+        }
+        if (!topLevelAsbiepQuery.getRootAsccpManifestId(topLevelAsbiep.topLevelAsbiepId())
+                .equals(topLevelAsbiepQuery.getRootAsccpManifestId(baseTopLevelAsbiep.topLevelAsbiepId()))) {
+            throw new IllegalArgumentException("The base BIE must be based on the same root ASCCP as the BIE.");
+        }
+        if (isBasedOn(baseTopLevelAsbiep.topLevelAsbiepId(), topLevelAsbiep.topLevelAsbiepId(),
+                id -> topLevelAsbiepQuery.getTopLevelAsbiepSummary(id).basedTopLevelAsbiepId())) {
+            throw new IllegalArgumentException("The base BIE must not be the BIE itself nor a BIE derived from it.");
+        }
 
         overrideInheritedBIE(requester, topLevelAsbiep, baseTopLevelAsbiep);
 
-        ULong topLevelAsbiepId = ULong.valueOf(topLevelAsbiep.topLevelAsbiepId().value());
-        ULong baseTopLevelAsbiepId = ULong.valueOf(baseTopLevelAsbiep.topLevelAsbiepId().value());
+        repositoryFactory.topLevelAsbiepCommandRepository(requester)
+                .updateBasedTopLevelAsbiepId(topLevelAsbiep.topLevelAsbiepId(), baseTopLevelAsbiep.topLevelAsbiepId());
+    }
 
-        dslContext.update(TOP_LEVEL_ASBIEP)
-                .set(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID, baseTopLevelAsbiepId)
-                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId))
-                .execute();
+    /**
+     * Whether the base chain that starts at the given BIE (itself included) reaches the target BIE.
+     */
+    static boolean isBasedOn(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId targetTopLevelAsbiepId,
+                             Function<TopLevelAsbiepId, TopLevelAsbiepId> basedTopLevelAsbiepIdOf) {
+        Set<TopLevelAsbiepId> visited = new HashSet<>();
+        for (TopLevelAsbiepId id = topLevelAsbiepId; id != null && visited.add(id); id = basedTopLevelAsbiepIdOf.apply(id)) {
+            if (id.equals(targetTopLevelAsbiepId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void overrideInheritedBIE(ScoreUser requester,
@@ -787,7 +839,7 @@ public class BieEditService implements InitializingBean {
                         if (asbiepId == null) {
                             asbiepId = baseAsbie.getToAsbiepId();
                         }
-                        if (!isInInheritance(asbiepId, prevToAsbiepId)) {
+                        if (!isInInheritance(requester, asbiepId, prevToAsbiepId)) {
                             inheritedAsbie.setToAsbiepId(asbiepId);
                         }
 
@@ -986,33 +1038,9 @@ public class BieEditService implements InitializingBean {
                 });
     }
 
-    private boolean isInInheritance(ULong baseAsbiepId, ULong asbiepId) {
-        List<Record2<ULong, ULong>> topLevelAsbiepIdToAsbiepIdList =
-                dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                                TOP_LEVEL_ASBIEP.ASBIEP_ID)
-                        .from(TOP_LEVEL_ASBIEP)
-                        .where(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(baseAsbiepId))
-                        .fetch();
-        Set<ULong> inheritance = new HashSet<>();
-        while (!topLevelAsbiepIdToAsbiepIdList.isEmpty()) {
-            inheritance.addAll(topLevelAsbiepIdToAsbiepIdList.stream()
-                    .map(e -> e.get(TOP_LEVEL_ASBIEP.ASBIEP_ID)).collect(Collectors.toList()));
-            if (inheritance.contains(asbiepId)) {
-                return true;
-            }
-
-            topLevelAsbiepIdToAsbiepIdList =
-                    dslContext.select(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
-                                    TOP_LEVEL_ASBIEP.ASBIEP_ID)
-                            .from(TOP_LEVEL_ASBIEP)
-                            .where(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID.in(
-                                    topLevelAsbiepIdToAsbiepIdList.stream()
-                                            .map(e -> e.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)).collect(Collectors.toList())
-                            ))
-                            .fetch();
-        }
-
-        return inheritance.contains(asbiepId);
+    private boolean isInInheritance(ScoreUser requester, ULong baseAsbiepId, ULong asbiepId) {
+        return repositoryFactory.topLevelAsbiepQueryRepository(requester).isInInheritance(
+                new AsbiepId(baseAsbiepId.toBigInteger()), new AsbiepId(asbiepId.toBigInteger()));
     }
 
     @Transactional
@@ -1117,7 +1145,7 @@ public class BieEditService implements InitializingBean {
                         .where(ASBIEP.ASBIEP_ID.eq(asbieRecord.getToAsbiepId()))
                         .fetchOneInto(ULong.class);
 
-        if (!nestedCall || !isInInheritance(reuseAsbiepId, prevToAsbiepId)) {
+        if (!nestedCall || !isInInheritance(requester, reuseAsbiepId, prevToAsbiepId)) {
             asbieRecord.setToAsbiepId(reuseAsbiepId);
         }
 
@@ -1572,14 +1600,7 @@ public class BieEditService implements InitializingBean {
                 var bccpQuery = repositoryFactory.bccpQueryRepository(requester);
                 BccpSummaryRecord bccpRecord = bccpQuery.getBccpSummary(bccRecord.toBccpManifestId());
 
-                List<DtAwdPriSummaryRecord> dtAwdPriList = dtQuery.getDtAwdPriSummaryList(bccpRecord.dtManifestId());
-                dtAwdPriList = dtAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtAwdPriSummaryRecord defaultDtAwdPri = dtAwdPriList.get(0);
+                DtAwdPriSummaryRecord defaultDtAwdPri = dtQuery.getDefaultDtAwdPriSummary(bccpRecord.dtManifestId());
                 if (defaultDtAwdPri.codeListManifestId() != null) {
                     bbieRecord.setXbtManifestId(null);
                     bbieRecord.setCodeListManifestId(ULong.valueOf(defaultDtAwdPri.codeListManifestId().value()));
@@ -1633,24 +1654,17 @@ public class BieEditService implements InitializingBean {
                 bbieScRecord.setCardinalityMin(dtScRecord.cardinality().min());
                 bbieScRecord.setCardinalityMax(dtScRecord.cardinality().max());
 
-                List<DtScAwdPriDetailsRecord> dtScAwdPriList = dtScRecord.dtScAwdPriList();
-                dtScAwdPriList = dtScAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtScAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtScAwdPriDetailsRecord defaultDtScAwdPri = dtScAwdPriList.get(0);
-                if (defaultDtScAwdPri.codeList() != null) {
+                DtScAwdPriSummaryRecord defaultDtScAwdPri = dtQuery.getDefaultDtScAwdPriSummary(dtScRecord.dtScManifestId());
+                if (defaultDtScAwdPri.codeListManifestId() != null) {
                     bbieScRecord.setXbtManifestId(null);
-                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultDtScAwdPri.codeList().codeListManifestId().value()));
+                    bbieScRecord.setCodeListManifestId(ULong.valueOf(defaultDtScAwdPri.codeListManifestId().value()));
                     bbieScRecord.setAgencyIdListManifestId(null);
-                } else if (defaultDtScAwdPri.agencyIdList() != null) {
+                } else if (defaultDtScAwdPri.agencyIdListManifestId() != null) {
                     bbieScRecord.setXbtManifestId(null);
                     bbieScRecord.setCodeListManifestId(null);
-                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultDtScAwdPri.agencyIdList().agencyIdListManifestId().value()));
+                    bbieScRecord.setAgencyIdListManifestId(ULong.valueOf(defaultDtScAwdPri.agencyIdListManifestId().value()));
                 } else {
-                    bbieScRecord.setXbtManifestId(ULong.valueOf(defaultDtScAwdPri.xbt().xbtManifestId().value()));
+                    bbieScRecord.setXbtManifestId(ULong.valueOf(defaultDtScAwdPri.xbtManifestId().value()));
                     bbieScRecord.setCodeListManifestId(null);
                     bbieScRecord.setAgencyIdListManifestId(null);
                 }

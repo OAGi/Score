@@ -360,3 +360,47 @@ The developer user who is not the current owner can also restore. He becomes a n
 2. Restore the code list and verify that all of its code values are restored as well. (Assertion [#11.8.1](#test-assertion-1181))
 3. Open a deleted code list owned by another developer.
 4. Restore the code list and verify that ownership is transferred to the restoring developer. (Assertion [#11.8.2](#test-assertion-1182))
+
+## Test Case 11.9
+
+**Cancelling the revision of a developer code list**
+
+Pre-condition: The developer is on the Working branch and owns a published code list that has an Agency ID and a value.
+
+
+### Test Assertion:
+
+#### Test Assertion #11.9.1
+In a revision the Agency ID List and the Agency ID List Value of the code list cannot be changed. When the developer cancels the revision after changing the version and adding a value, the code list is `Published` with revision `1`, with its version, its Agency ID and its values as they were, and without the added value.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published code list that has an Agency ID and a value.
+2. The users, branches, releases, and records needed to exercise "Cancelling the revision of a developer code list" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, open a published code list, and note its Agency ID List and Agency ID List Value.
+2. Revise the code list and verify that the Agency ID List and the Agency ID List Value are disabled.
+3. Change the version, add a value, and update; cancel the revision; verify the state, the revision number, the version, the Agency ID, and the values. (Assertion [#11.9.1](#test-assertion-1191))
+
+## Test Case 11.10
+
+**Cancelling a revision of a code list when the log to go back to is gone**
+
+Pre-condition: The developer is on the right branch and a code list is in revision, and the log the code list was in before has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #11.10.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the developer does not let it, nothing is changed and the code list stays `WIP`. If the developer lets it, the code list is cancelled to `Published` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the right branch and a code list is in revision, and the log the code list was in before has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision of a code list when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in, revise the code list, and have the logs from before removed from the database.
+2. Cancel and confirm; verify the dialog asks whether to create a new log, and decline; verify the code list is still `WIP`.
+3. Cancel again, confirm, and let the new log be created; verify the code list is `Published` with revision `1`. (Assertion [#11.10.1](#test-assertion-11101))

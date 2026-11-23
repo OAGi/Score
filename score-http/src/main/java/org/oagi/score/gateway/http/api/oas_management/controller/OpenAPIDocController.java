@@ -8,6 +8,10 @@ import org.oagi.score.gateway.http.api.context_management.business_context.servi
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.oas_management.controller.payload.*;
 import org.oagi.score.gateway.http.api.oas_management.model.*;
+import org.oagi.score.gateway.http.api.oas_management.service.OasDocChangeService;
+import org.oagi.score.gateway.http.api.oas_management.service.OasOperationNaming;
+import org.oagi.score.gateway.http.api.oas_management.service.OasOperationProposer;
+import org.oagi.score.gateway.http.api.oas_management.model.OasDocViolationException;
 import org.oagi.score.gateway.http.api.oas_management.service.OpenAPIDocService;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.*;
@@ -39,6 +43,12 @@ public class OpenAPIDocController {
 
     @Autowired
     private OpenAPIDocService oasDocService;
+
+    @Autowired
+    private OasDocChangeService oasDocChangeService;
+
+    @Autowired
+    private OasOperationProposer oasOperationProposer;
 
     @Autowired
     private BusinessContextQueryService businessContextQueryService;
@@ -134,6 +144,7 @@ public class OpenAPIDocController {
         request.setLicenseUrl(oasDoc.getLicenseUrl());
         // Issue #1729: carry the configured Security Schemes.
         request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setHttpHeaders(oasDoc.getHttpHeaders());
         request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         CreateOasDocResponse response = oasDocService.createOasDoc(sessionService.asScoreUser(user), request);
@@ -392,7 +403,6 @@ public class OpenAPIDocController {
         if (oasDocResponse != null) {
             oasDocVersion = oasDocResponse.getOasDoc().getVersion();
         }
-        String bieForOasDocPropertyTermWithDash = assignBieForOasDoc.getPropertyTerm().replaceAll("\\s", "-");
         //get BusinessContext for the assigned BieForOasDoc
         assignBieForOasDoc.setBusinessContexts(
                 businessContextQueryService.getBusinessContextSummaryList(
@@ -400,25 +410,19 @@ public class OpenAPIDocController {
                         assignBieForOasDoc.getTopLevelAsbiepId(), request.getBusinessContext())
         );
 
-        String businessContextName = assignBieForOasDoc.getBusinessContexts().get(0).name().toLowerCase();
-        businessContextName = businessContextName.replace(' ', '-');
-
         boolean isArray = request.isMakeArrayIndicator();
-        if (oasDocVersion != null) {
-            resourceName = "/" + businessContextName + "/" + oasDocVersion + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
-                    bieForOasDocPropertyTermWithDash.toLowerCase());
-
-        } else {
-            resourceName = "/" + businessContextName + "/" + ((isArray) ? bieForOasDocPropertyTermWithDash.toLowerCase() + "-list" :
-                    bieForOasDocPropertyTermWithDash.toLowerCase());
-        }
+        resourceName = OasOperationNaming.buildResourcePath(assignBieForOasDoc.getBusinessContexts().get(0).name(),
+                oasDocVersion, assignBieForOasDoc.getPropertyTerm(), isArray);
         request.setPath(resourceName);
         request.setVerb(verbOption);
-        // Issue #1732: the frontend builds the operationId ('<verb><BIEName>[List]', no
-        // business-context prefix) and sends it; the backend just stores it. businessContextName
-        // above is still used to build the resource path. Guard: operationId is required (NOT NULL).
+        // Issue #1732: the operationId is '<verb><BIEName>[List]' (no business-context prefix). Guard: it is
+        // required (NOT NULL).
         String operationId = assignBieForOasDoc.getOperationId();
         if (operationId == null || operationId.isBlank()) {
+            // the client gave none: it is made from the verb and the BIE, as the Operation ID of a BIE that is added is
+            operationId = OasOperationNaming.buildOperationId(verbOption, assignBieForOasDoc.getPropertyTerm(), isArray);
+        }
+        if (operationId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         request.setOperationId(operationId);
@@ -474,6 +478,9 @@ public class OpenAPIDocController {
         List<String> errorMessages = new ArrayList<>();
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(sessionService.asScoreUser(user));
         getBieForOasDocRequest.setOasDocId(oasDocId);
+        // all the operations of the document, not the first page
+        getBieForOasDocRequest.setPageIndex(-1);
+        getBieForOasDocRequest.setPageSize(-1);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(sessionService.asScoreUser(user), getBieForOasDocRequest);
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
             for (BieForOasDoc bieForOasDoc : bieForOasDocList.getResults()) {
@@ -519,6 +526,9 @@ public class OpenAPIDocController {
         List<String> errorMessages = new ArrayList<>();
         GetBieForOasDocRequest getBieForOasDocRequest = new GetBieForOasDocRequest(sessionService.asScoreUser(user));
         getBieForOasDocRequest.setOasDocId(oasDocId);
+        // all the operations of the document, not the first page
+        getBieForOasDocRequest.setPageIndex(-1);
+        getBieForOasDocRequest.setPageSize(-1);
         GetBieForOasDocResponse bieForOasDocList = oasDocService.getBieForOasDoc(
                 sessionService.asScoreUser(user), getBieForOasDocRequest);
         if (bieForOasDocList != null && bieForOasDocList.getResults() != null) {
@@ -679,6 +689,56 @@ public class OpenAPIDocController {
         }
     }
 
+    /** The same for operations that are added together: each is judged against the document and against the ones before it. */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operations/propose-all", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<OasOperationProposal> proposeOperations(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody List<OasOperationCandidate> candidates) {
+        return oasOperationProposer.proposeAll(sessionService.asScoreUser(user), oasDocId, candidates);
+    }
+
+    /**
+     * What the server makes of an operation that is about to be added to the document (its Resource Name and Operation ID, when
+     * the user gave none), and whether it can be added. Nothing is saved.
+     */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/operations/propose", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public OasOperationProposal proposeOperation(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasOperationCandidate candidate) {
+        return oasOperationProposer.propose(sessionService.asScoreUser(user), oasDocId, candidate);
+    }
+
+    /**
+     * Whether what the user has changed of the document can be saved, and what the document would have then (the request
+     * parameters and response headers, those registered for the operations included). Nothing is saved.
+     */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/changes/check", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public OasDocChangeResult checkChanges(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasDocChangeSet changeSet) {
+        return oasDocChangeService.check(sessionService.asScoreUser(user), oasDocId, changeSet);
+    }
+
+    /** Saves what the user has changed of the document, all of it or nothing. The rules are those of the check. */
+    @RequestMapping(value = "/oas_doc/{id:[\\d]+}/changes", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OasDocChangeResult> saveChanges(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("id") OasDocId oasDocId,
+            @RequestBody OasDocChangeSet changeSet) {
+        try {
+            return ResponseEntity.ok(oasDocChangeService.save(sessionService.asScoreUser(user), oasDocId, changeSet));
+        } catch (OasDocViolationException e) {
+            return ResponseEntity.badRequest().body(OasDocChangeResult.invalid(e.violations(), e.derived()));
+        }
+    }
+
     // Issue #1347: document-level "apply Error Response Body Type to all operations". Applies across ALL
     // of the document's operations (the grid is server-paginated), so a client that only holds one page
     // still updates every operation.
@@ -743,6 +803,7 @@ public class OpenAPIDocController {
         request.setLicenseUrl(oasDoc.getLicenseUrl());
         // Issue #1729: carry the configured Security Schemes.
         request.setSecuritySchemes(oasDoc.getSecuritySchemes());
+        request.setHttpHeaders(oasDoc.getHttpHeaders());
         request.setSecurityRequirements(oasDoc.getSecurityRequirements());
 
         UpdateOasDocResponse response = oasDocService.updateOasDoc(sessionService.asScoreUser(user), request);

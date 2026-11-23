@@ -107,6 +107,30 @@ class AgencyIdListCommandServiceUpdateValueTest {
     }
 
     @Test
+    void update_rejects_a_name_list_id_or_version_without_text() {
+        for (String blank : new String[]{null, "", "   "}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> service.update(requester, updateRequest(blank, "1", "custom-list", List.of())));
+            assertThrows(IllegalArgumentException.class,
+                    () -> service.update(requester, updateRequest("Custom agency list", blank, "custom-list", List.of())));
+            assertThrows(IllegalArgumentException.class,
+                    () -> service.update(requester, updateRequest("Custom agency list", "1", blank, List.of())));
+        }
+
+        verify(command, never()).update(any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void update_saves_the_trimmed_name_list_id_and_version() {
+        when(query.getAgencyIdListValueDetailsList(manifestId)).thenReturn(List.of());
+
+        service.update(requester, updateRequest(" Custom agency list ", " 1 ", " custom-list ", List.of()));
+
+        verify(command).update(eq(manifestId), eq("Custom agency list"), eq("1"), eq("custom-list"),
+                any(), any(), any(), any(), any());
+    }
+
+    @Test
     void update_applies_requested_flags_to_a_newly_added_value() {
         when(query.getAgencyIdListValueDetailsList(manifestId)).thenReturn(List.of());
 
@@ -166,8 +190,13 @@ class AgencyIdListCommandServiceUpdateValueTest {
     }
 
     private UpdateAgencyIdListRequest updateRequest(List<UpdateAgencyIdListValueRequest> valueList) {
+        return updateRequest("Custom agency list", "1", "custom-list", valueList);
+    }
+
+    private UpdateAgencyIdListRequest updateRequest(
+            String name, String versionId, String listId, List<UpdateAgencyIdListValueRequest> valueList) {
         return new UpdateAgencyIdListRequest(manifestId,
-                "Custom agency list", "1", "custom-list", null,
+                name, versionId, listId, null,
                 null, null, namespaceId, false, valueList);
     }
 

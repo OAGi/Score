@@ -1,35 +1,46 @@
-import {ChangeDetectionStrategy, Component, HostListener, inject, OnInit, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DoCheck, HostListener, inject, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {
   BieForOasDoc,
   BieForOasDocDeleteRequest,
-  BieForOasDocUpdateRequest,
   OasDoc,
+  OasDocHttpHeader,
   OasSecurityRequirement,
   OasSecurityScheme,
   SimpleOasDoc,
   toMinorOpenApiVersion
 } from '../domain/openapi-doc';
-import {
-  applyResourceArrayMarker,
-  buildOperationId,
-  OasOperationValidator,
-  recomputeOperationId
-} from '../domain/oas-operation-validation';
+import {OasHttpHeaderDirection} from '../domain/openapi-doc';
 import {OpenAPIService} from '../domain/openapi.service';
+import {directionLabel, locationOf, newHttpHeader} from '../domain/oas-doc-http-header-form';
+import {
+  adaptPresetSchemas,
+  adoptServerHeaders,
+  hasAnyPreset,
+  headersOf,
+  lacksPreset,
+  linkHeadersToRows,
+  offerPreset,
+  sortHeaders,
+  TRACEPARENT_PRESET,
+  withdrawPreset
+} from '../domain/oas-doc-http-header-preset';
+import {OasDocChangeChecker} from '../domain/oas-doc-change-checker';
+import {applyDerivedOperations, OasDocChangeResult, OasDocChangeSet, OasDocHeaderEdits, OasDocViolation} from '../domain/oas-doc-change';
 import {FormControl} from '@angular/forms';
 import {httpUrlValidator, optionalEmailValidator} from '../oas-doc-url.validator';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ErrorStateMatcher} from '@angular/material/core';
-import {forkJoin} from 'rxjs';
+import {defer, forkJoin, of} from 'rxjs';
 import {hashCode, saveAsBlobResponse, saveBranch} from '../../../common/utility';
 import {SelectionModel} from '@angular/cdk/collections';
-import {finalize, tap} from 'rxjs/operators';
+import {finalize, map, switchMap, tap} from 'rxjs/operators';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {OasDocAssignDialogComponent} from '../oas-doc-assign-dialog/oas-doc-assign-dialog.component';
 import {OasDocAddOperationDialogComponent} from '../oas-doc-add-operation-dialog/oas-doc-add-operation-dialog.component';
+import {OasDocHttpHeaderDialogComponent} from '../oas-doc-http-header-dialog/oas-doc-http-header-dialog.component';
 import {OasDocSecuritySchemeDialogComponent} from '../oas-doc-security-scheme-dialog/oas-doc-security-scheme-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {
@@ -37,7 +48,7 @@ import {
   OasDocConfirmMessageDialogResult
 } from '../oas-doc-confirm-message-dialog/oas-doc-confirm-message-dialog.component';
 import {OAS_DOC_BIE_TABLE} from '../domain/oas-doc-bie.table';
-import {createTableColumns, ScoreTableViewComponent} from '../../../common/score-table';
+import {createTableColumns, inMemoryLoad, ScoreTableViewComponent} from '../../../common/score-table';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 import {BieExpressOption} from '../../bie-express/domain/generate-expression';
 import {BusinessContextService} from '../../../context-management/business-context/domain/business-context.service';
@@ -51,6 +62,21 @@ import {setAppTitleIfPresent} from '../../../common/app-title.strategy';
 import {ReleaseSummary} from '../../../release-management/domain/release';
 import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
 
+/**
+ * Adding or removing an operation is saved at once when the server says that it can be (as it always was). Set to `false` to leave
+ * saving it to the user: it is then saved by Update like any other change.
+ */
+const UPDATE_AFTER_ADD = true;
+
+/**
+ * The fields of a document that no rule of the server is about (it only keeps them; the form of a URL or an e-mail address is the
+ * page's own check). A change of one of them is no reason to ask the server whether the change can be saved, so they are left out
+ * of what tells the page that the user has changed something the server has to judge. Update is judged when it is pressed anyway.
+ */
+const INFORMATIONAL_FIELDS: ReadonlySet<string> = new Set([
+  'contactName', 'contactUrl', 'contactEmail', 'licenseName', 'licenseUrl', 'termsOfService', 'description'
+]);
+
 @Component({
   standalone: false,
   selector: 'score-oas-doc-detail',
@@ -58,7 +84,7 @@ import {CompactRecord, memoizeRow} from '../../../common/record-compact-row';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./oas-doc-detail.component.css']
 })
-export class OasDocDetailComponent implements OnInit {
+export class OasDocDetailComponent implements OnInit, DoCheck, OnDestroy {
   private bizCtxService = inject(BusinessContextService);
   private openAPIService = inject(OpenAPIService);
   private accountService = inject(AccountListService);
@@ -98,42 +124,66 @@ export class OasDocDetailComponent implements OnInit {
 
   readonly columns = createTableColumns(OAS_DOC_BIE_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BieForOasDoc>>(ScoreTableViewComponent);
-  selection = new SelectionModel<BieForOasDoc>(true, [], true, (a, b) => a.oasOperationId === b.oasOperationId && a.messageBody === b.messageBody);
+  selection = new SelectionModel<BieForOasDoc>(true, [], true, (a, b) => a.rowId === b.rowId && a.messageBody === b.messageBody);
   readonly rowKey = (row: BieForOasDoc) => row;
   businessContextSelection = {};
   /** The list waits for the document. */
   readonly ready = signal(false);
-  /** The operations of the page that the table shows (edited in place). */
+  /**
+   * Every operation of the document, those that the user added and has not saved included: the page holds them all and pages
+   * them itself, so that an edit is never out of sight and the server is told of all of them at once. Nothing the user does
+   * with them is saved before Update.
+   */
   rows: BieForOasDoc[] = [];
+  /** The operations that the user removed: they are deleted by Update. */
+  removedRows: BieForOasDoc[] = [];
   /** The number of operations of the document. */
   totalRows = 0;
+  /** Whether every operation of the document is read from the server (again, after a save). */
+  private rowsLoaded = false;
+  /** The operations are being read from the server. */
+  private readonly rowsFetching = signal(false);
+  private rowKeySequence = 0;
   readonly rowClass = (row: BieForOasDoc) => ({'highlight': row.status === 'Duplication'});
-  readonly load = (params: HttpParams) => this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params.set('access', 'CanView')).pipe(
-    tap({
-      next: resp => {
-        this.totalRows = resp.length;
-        resp.list = resp.list.map((elm: BieForOasDoc) => {
-          elm = new BieForOasDoc(elm);
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
-          return elm;
-        });
-        this.rows = resp.list;
-        this.rows.forEach((elm: BieForOasDoc) => {
-          this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
-          // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
-          // cancelled CONFIRM_MESSAGE choice to its last committed value.
-          this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
-        });
-        this.recomputeOasValidation();
-      },
-      error: () => {
-        this.rows = [];
-        this.totalRows = 0;
-        this.businessContextSelection = {};
-      }
+  private readonly pageOfRows = inMemoryLoad(this.columns.def, () => this.rows, {branch: row => row.releaseNum});
+  readonly load = (params: HttpParams) => defer(() => this.rowsLoaded ? of(true) : this.fetchRows().pipe(map(() => true))).pipe(
+    switchMap(() => this.pageOfRows(params)),
+    tap(resp => {
+      this.totalRows = this.rows.length;
+      linkHeadersToRows(this.oasDoc, this.rows);
     })
   );
+
+  /** Every operation of the document, read from the server in one request (the server pages only when it is asked to). */
+  private fetchRows() {
+    const params = new HttpParams().set('access', 'CanView').set('pageIndex', '-1').set('pageSize', '-1')
+      .set('sortActives', '').set('sortDirections', '');
+    this.rowsFetching.set(true);
+    return this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params).pipe(
+      finalize(() => this.rowsFetching.set(false)),
+      tap({
+        next: resp => {
+          const added = this.rows.filter(row => row.isNew); // not saved: they stay while the saved ones are read again
+          this.rows = [...(resp.list || []).map((elm: BieForOasDoc) => {
+            elm = new BieForOasDoc(elm);
+            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+            elm.reset(); // reset the hashCode calculation when the bieForOasDoc is list and reloaded
+            this.businessContextSelection[elm.topLevelAsbiepId] = elm.businessContext;
+            // Issue #1347: seed the per-row baseline body type so the inline selector can revert a
+            // cancelled CONFIRM_MESSAGE choice to its last committed value.
+            this.committedErrorResponseBodyType.set(elm, elm.errorResponseBodyType || 'NONE');
+            return elm;
+          }), ...added];
+          this.rowsLoaded = true;
+        },
+        error: () => {
+          this.rows = [];
+          this.totalRows = 0;
+          this.businessContextSelection = {};
+        }
+      })
+    );
+  }
   loading = false;
   isUpdating: boolean;
   option: BieExpressOption;
@@ -156,22 +206,184 @@ export class OasDocDetailComponent implements OnInit {
   // to every operation at once via applyErrorResponseBodyTypeToAll().
   bulkErrorResponseBodyType = 'NONE';
 
-  // Issue #1732 / #1492 / #1757: operationId must be unique within a document, and each (Resource
-  // Name, Verb) owns at most one Request + one Response body. Both rules live in the shared
-  // OasOperationValidator (reused by the BIE-root OpenAPI panel) so they stay identical. User-entered
-  // values are never auto-corrected or blocked — the backend 400 is the source of truth.
-  readonly oasValidator = new OasOperationValidator();
+  // The rules about the operations and the entries of the document are the server's (an Operation ID that another operation
+  // has, a second Request body on an endpoint, a path parameter that the path does not have...): the page says what the user
+  // has changed, the server says whether it can be saved, and what it says is wrong is shown where it is. Only what the
+  // field itself needs (an Operation ID that is not blank) is the page's.
+  private readonly headerEdits = new OasDocHeaderEdits();
+  readonly changeChecker = new OasDocChangeChecker({
+    build: () => this.buildChangeSet(),
+    check: changeSet => this.openAPIService.checkChanges(this.oasDoc.oasDocId, changeSet),
+    onResult: (result, changeSet) => this.takeCheckResult(result, changeSet)
+  });
+  /** What the page was when the server was last asked, and when the last change was seen. */
+  private checkedFingerprint = '';
+  private lastFingerprint = '';
+  /** The fields of the document (not its entries) as saved. */
+  private savedFieldsHash: string;
+
+  /** What the server said is wrong with a cell of a row: the operation, and the Request or Response row when it says which. */
+  violationOf(row: BieForOasDoc, field: string): OasDocViolation | undefined {
+    return this.changeChecker.violations().find(violation => violation.scope === 'OPERATION'
+      && (row.isNew ? violation.clientKey === row.clientKey : !violation.clientKey && violation.oasOperationId === row.oasOperationId)
+      && violation.field === field
+      && (!violation.messageBody || violation.messageBody === row.messageBody));
+  }
+
+  /**
+   * What the violations say, each with the operation it is about (the operations of every page, not only the one that is shown),
+   * so that the same message of two operations can be told apart. A rule of the document, or of an entry that no operation
+   * has, has no operation to name. The same message of the same operation is said once.
+   */
+  violationLines(): { operation?: string; message: string }[] {
+    const seen = new Set<string>();
+    const lines: { operation?: string; message: string }[] = [];
+    for (const violation of this.changeChecker.violations()) {
+      const operation = this.violationOperation(violation);
+      const key = (operation ?? '') + '\n' + violation.message;
+      if (!seen.has(key)) {
+        seen.add(key);
+        lines.push({operation, message: violation.message});
+      }
+    }
+    return lines;
+  }
+
+  /** The operation that a violation is about, as the user sees it in the table: the verb, the Resource Name and the Message Body. */
+  private violationOperation(violation: OasDocViolation): string | undefined {
+    if (violation.scope === 'DOCUMENT' || (!violation.clientKey && !violation.oasOperationId)) {
+      return undefined;
+    }
+    const row = this.rows.find(candidate => (violation.clientKey ? candidate.clientKey === violation.clientKey
+        : !candidate.isNew && candidate.oasOperationId === violation.oasOperationId)
+      && (!violation.messageBody || candidate.messageBody === violation.messageBody));
+    if (!row) {
+      return undefined;
+    }
+    return [row.verb, row.resourceName, row.messageBody ? '(' + row.messageBody + ')' : ''].filter(part => !!part).join(' ');
+  }
 
   isDuplicateBodySlot(row: BieForOasDoc): boolean {
-    return this.oasValidator.isDuplicateBodySlot(row);
+    return !!this.violationOf(row, 'messageBody');
   }
 
   operationIdErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
-    return this.oasValidator.operationIdErrorStateMatcher(row);
+    return {isErrorState: () => !(row.operationId || '').trim() || !!this.violationOf(row, 'operationId')};
   }
 
   bodySlotErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
-    return this.oasValidator.bodySlotErrorStateMatcher(row);
+    return {isErrorState: () => !!this.violationOf(row, 'messageBody')};
+  }
+
+  /** The Resource Name is in error when it is not a path, and where it makes a second body of the endpoint. */
+  resourceNameErrorStateMatcher(row: BieForOasDoc): ErrorStateMatcher {
+    return {isErrorState: () => !!this.violationOf(row, 'resourceName') || !!this.violationOf(row, 'messageBody')};
+  }
+
+  /** Asks the server whenever the user has changed anything: of the document, of an operation of any page, or of the entries. */
+  ngDoCheck(): void {
+    if (!this.oasDoc?.oasDocId) {
+      return;
+    }
+    const fingerprint = this.changeFingerprint();
+    if (fingerprint !== this.lastFingerprint) {
+      this.lastFingerprint = fingerprint;
+      this.changeChecker.request();
+    }
+    this.updateAfterAdd();
+  }
+
+  /**
+   * What the user adds or removes is not saved before Update. So that adding is as it always was (it is there at once), the page
+   * presses Update by itself when the server says that what was added can be saved; when it cannot, the rows stay in the page,
+   * with what is wrong where it is, and the user presses Update when it is fixed. Set {@code UPDATE_AFTER_ADD} to false to leave
+   * it to the user.
+   */
+  private updateAfterAdd(): void {
+    if (!this.updateAfterAddPending) {
+      return;
+    }
+    switch (this.changeChecker.status()) {
+      case 'valid':
+        this.updateAfterAddPending = false;
+        if (this.isChanged() && !this.isDisabled(this.oasDoc)) {
+          this.saveChanges(() => this.snackBar.open(this.updateAfterAddMessage, '', {duration: 3000}));
+        }
+        break;
+      case 'invalid':
+      case 'failed':
+        this.updateAfterAddPending = false;
+        this.snackBar.open('It cannot be saved as it is. Fix what is marked, then click Update.', '', {duration: 5000});
+        break;
+      default:
+        break; // the server has not answered yet
+    }
+  }
+
+  private updateAfterAddPending = false;
+  private updateAfterAddMessage = 'Added';
+
+  /** The user added or removed operations: they are in the page, and are saved by Update. */
+  private changedOperations(message: string): void {
+    this.updateAfterAddMessage = message;
+    this.updateAfterAddPending = UPDATE_AFTER_ADD;
+    this.view().reload();
+  }
+
+  /** The rows that a dialog made for the user: the page holds them until Update. */
+  private addRows(rows: BieForOasDoc[]): void {
+    rows.forEach(row => {
+      row.clientKey = 'new-' + (++this.rowKeySequence);
+      row.oasDocId = this.oasDoc.oasDocId;
+    });
+    this.rows = [...this.rows, ...rows];
+    this.changedOperations('Added');
+  }
+
+  ngOnDestroy(): void {
+    this.changeChecker.destroy();
+  }
+
+  private changeFingerprint(): string {
+    return hashCode([Object.entries(this.oasDoc).filter(([name]) => !INFORMATIONAL_FIELDS.has(name)), this.rows.filter(row => row.isChanged).map(row => [row.rowId, row.messageBody, row.hashCode, row.touched]),
+      this.removedRows.map(row => [row.rowId, row.messageBody])]);
+  }
+
+  private fieldsHash(oasDoc: OasDoc): string {
+    return hashCode({...oasDoc, httpHeaders: undefined});
+  }
+
+  /** What the user has changed and has not saved (nothing, when the document is just opened: the server judges the document as it is). */
+  private buildChangeSet(): OasDocChangeSet {
+    this.headerEdits.observe(this.oasDoc.httpHeaders);
+    this.checkedFingerprint = this.changeFingerprint();
+    return {
+      document: this.fieldsHash(this.oasDoc) !== this.savedFieldsHash ? this.oasDoc : undefined,
+      operations: this.getChanged(),
+      headers: this.headerEdits.changes(),
+      added: this.rows.filter(row => row.isNew),
+      removed: this.removedRows
+    };
+  }
+
+  /**
+   * Takes the answer in: the entries of the page become what the server says they would be (those it registered for the
+   * operations included). An answer to what the page was before the user changed it again is not taken.
+   */
+  private takeCheckResult(result: OasDocChangeResult, changeSet: OasDocChangeSet): boolean {
+    if (this.changeFingerprint() !== this.checkedFingerprint) {
+      return false;
+    }
+    applyDerivedOperations(result.operations, [...changeSet.operations, ...(changeSet.added || [])], result.added); // whether or not it can be saved: it is what the user sees next to what is wrong
+    // the entries that follow the operations follow them whether or not the change can be saved; a server that did not make them (null) leaves the page's own
+    if (result.httpHeaders && this.isChanged()) {
+      this.oasDoc.httpHeaders = result.httpHeaders;
+      sortHeaders(this.oasDoc);
+      this.headerEdits.adopt(this.oasDoc.httpHeaders);
+      linkHeadersToRows(this.oasDoc, this.rows);
+    }
+    this.lastFingerprint = this.changeFingerprint(); // the answer is not a change of the user's
+    return true;
   }
 
   ngOnInit(): void {
@@ -230,14 +442,152 @@ export class OasDocDetailComponent implements OnInit {
     if (!oasDoc.securityRequirements) {
       oasDoc.securityRequirements = [];
     }
+    // Issue #1791: likewise for the HTTP headers.
+    if (!oasDoc.httpHeaders) {
+      oasDoc.httpHeaders = [];
+    }
     // Issue #1760: the version selector offers only the minor family (3.0 / 3.1). Fold any stored patch
     // value (including legacy 3.0.3 / 3.1.1) to its minor so the mat-select matches the loaded value and
     // the baseline hashCode reflects what is displayed (no spurious "changed" state).
     oasDoc.openAPIVersion = toMinorOpenApiVersion(oasDoc.openAPIVersion);
+    sortHeaders(oasDoc); // one order, so that enabling after disabling is no change
     this.hashCodeForOasDoc = hashCode(oasDoc);
+    this.savedHttpHeadersHash = hashCode(oasDoc.httpHeaders);
     this.oasDoc = oasDoc;
+    // The fields that are checked are controls: the document's value goes in here, and the control's goes back to the document on input.
+    this.contactUrl.setValue(oasDoc.contactUrl, {emitEvent: false});
+    this.contactEmail.setValue(oasDoc.contactEmail, {emitEvent: false});
+    this.licenseUrl.setValue(oasDoc.licenseUrl, {emitEvent: false});
+    this.termServiceUrl.setValue(oasDoc.termsOfService, {emitEvent: false});
+    this.savedFieldsHash = this.fieldsHash(oasDoc);
+    this.headerEdits.reset(oasDoc.httpHeaders);
+    this.changeChecker.reset();
+    this.lastFingerprint = this.changeFingerprint();
+    this.changeChecker.request(); // what the document is, saved or not, is judged when it is opened
     setAppTitleIfPresent(this.titleService, this.oasDoc.title, 'OpenAPI Document');
     this.isUpdating = false;
+    this.showValidationErrors();
+    this.refreshOperationIds();
+  }
+
+  // An invalid value that is already in the document (a Terms of Service that is not a URL, say) keeps Update disabled
+  // for every change. A field shows its error only once it is touched, so touch them: the reason is on the screen.
+  showValidationErrors() {
+    [this.contactUrl, this.contactEmail, this.licenseUrl, this.termServiceUrl].forEach(control => control.markAsTouched());
+  }
+
+  // Issue #1791: the traceparent header (a preset of the UI, the server knows no header by name) of the operations of the
+  // document. Enable gives every operation that has none a header of its own, Disable takes every one away. Either is a
+  // change of the document in the page: Update saves it. Enable is there while an operation lacks the header, Disable
+  // while any operation has it; a BIE that is added later lacks it until Enable is used again.
+  /** The operations of the document, of every page: the ones the table shows are only a page of them. */
+  operationIds: number[] = [];
+
+  private fetchOperationIds() {
+    const params = new HttpParams().set('access', 'CanView').set('pageIndex', '-1').set('pageSize', '-1')
+      .set('sortActives', '').set('sortDirections', '');
+    return this.openAPIService.getBieForOasDocPage(this.oasDoc.oasDocId, params).pipe(
+      map(resp => [...new Set((resp.list || []).map(row => row.oasOperationId).filter(id => !!id))]));
+  }
+
+  refreshOperationIds() {
+    this.fetchOperationIds().subscribe(ids => this.operationIds = ids);
+  }
+
+  get canEnableTraceparent(): boolean {
+    return !!this.oasDoc && lacksPreset(this.oasDoc, TRACEPARENT_PRESET, this.operationIds);
+  }
+
+  get canDisableTraceparent(): boolean {
+    return !!this.oasDoc && hasAnyPreset(this.oasDoc, TRACEPARENT_PRESET);
+  }
+
+  enableTraceparent() {
+    this.fetchOperationIds().subscribe(operationIds => {
+      this.operationIds = operationIds;
+      const {added, requestParameters, responseHeaders} = offerPreset(this.oasDoc, TRACEPARENT_PRESET, operationIds,
+        this.isOpenApi31());
+      linkHeadersToRows(this.oasDoc, this.rows);
+      this.snackBar.open(added.length === 0
+        ? 'Every operation has traceparent already.'
+        : 'traceparent is added (' + requestParameters + ' request parameter' + (requestParameters === 1 ? '' : 's')
+        + ' and ' + responseHeaders + ' response header' + (responseHeaders === 1 ? '' : 's') + ').', '', {duration: 4000});
+    });
+  }
+
+  /** The schemas of the preset headers are written in the form of the version: the example of 3.0, the examples of 3.1. */
+  onOpenApiVersionChange() {
+    adaptPresetSchemas(this.oasDoc, TRACEPARENT_PRESET, this.isOpenApi31());
+    linkHeadersToRows(this.oasDoc, this.rows);
+  }
+
+  disableTraceparent() {
+    const {removed, requestParameters, responseHeaders} = withdrawPreset(this.oasDoc, TRACEPARENT_PRESET);
+    linkHeadersToRows(this.oasDoc, this.rows);
+    this.snackBar.open(removed === 0
+      ? 'No operation has traceparent.'
+      : 'traceparent is removed (' + requestParameters + ' request parameter' + (requestParameters === 1 ? '' : 's')
+      + ' and ' + responseHeaders + ' response header' + (responseHeaders === 1 ? '' : 's') + ').', '', {duration: 4000});
+  }
+
+  headersOf = headersOf;
+
+  /** What follows the name of a parameter in the table: where it is, unless it is in a header, as most are. */
+  locationLabel(header: OasDocHttpHeader): string {
+    const location = locationOf(header);
+    return header.direction === 'REQUEST' && location !== 'header' ? ' (' + location + ')' : '';
+  }
+
+  // Issue #1791: the request parameters and the response headers of an operation are edited in a dialog, whatever they
+  // are: the + of a column of a row adds one of that direction to its operation (so a GET, which has no Request row,
+  // gets its request parameters here too), a click on one edits or deletes it. The dialog edits a copy; what it returns changes the document in
+  // the page (the objects of the rows are those of the document), and Update saves it.
+  addHttpHeader(row: BieForOasDoc, direction: OasHttpHeaderDirection, event?: Event) {
+    event?.stopPropagation();
+    this.openHttpHeaderDialog(row, undefined, direction);
+  }
+
+  editHttpHeader(row: BieForOasDoc, header: OasDocHttpHeader, event?: Event) {
+    event?.stopPropagation();
+    this.openHttpHeaderDialog(row, header, header.direction);
+  }
+
+  private openHttpHeaderDialog(row: BieForOasDoc, header: OasDocHttpHeader | undefined, direction: OasHttpHeaderDirection) {
+    const isNew = !header;
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      header: header ? JSON.parse(JSON.stringify(header)) : newHttpHeader(direction, row.oasOperationId),
+      isNew,
+      scopeLabel: header && !header.oasOperationId
+        ? 'This ' + directionLabel(direction).toLowerCase() + ' is one of the whole document: it applies to every operation.'
+        : 'Operation: ' + (row.operationId || row.oasOperationId),
+      others: (this.oasDoc.httpHeaders || []).filter(other => other !== header),
+      // the path as the generated document has it: the {version} of the path is the version of the document
+      resourcePath: this.oasDoc.version ? (row.resourceName || '').split('{version}').join(this.oasDoc.version) : row.resourceName,
+      openApiVersion: this.oasDoc.openAPIVersion
+    };
+    // wide for a wide screen, where the form is in two columns, and as narrow as it was for a narrow one
+    dialogConfig.width = window.innerWidth >= 1200 ? '1100px' : '720px';
+    dialogConfig.maxWidth = '95vw';
+    dialogConfig.maxHeight = '85vh';
+    dialogConfig.autoFocus = false;
+    this.dialog.open(OasDocHttpHeaderDialogComponent, dialogConfig).afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      this.oasDoc.httpHeaders = this.oasDoc.httpHeaders || [];
+      if (result.action === 'delete') {
+        this.oasDoc.httpHeaders = this.oasDoc.httpHeaders.filter(other => other !== header);
+      } else if (header) {
+        // the same object stays in the document, so that what shows it still shows it
+        Object.keys(header).forEach(key => delete (header as any)[key]);
+        Object.assign(header, result.header);
+      } else {
+        this.oasDoc.httpHeaders.push(result.header);
+      }
+      sortHeaders(this.oasDoc);
+      linkHeadersToRows(this.oasDoc, this.rows);
+    });
   }
 
   // Issue #1729: selectable security scheme types (OpenAPI 3.0).
@@ -641,41 +991,22 @@ export class OasDocDetailComponent implements OnInit {
       onDone();
       return;
     }
-    if (this.getChanged().some(e => !e.operationId || !e.operationId.trim())) {
-      this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+    if (this.updateDisabled) {
+      this.snackBar.open(this.cannotSaveMessage(), '', {duration: 5000});
       return;
     }
-    this.recomputeOasValidation();
-    if (this.oasValidator.duplicateBodySlots.size > 0) {
-      this.snackBar.open('Each (Resource Name, Verb) can have only one Request and one Response body.', '', {duration: 5000});
-      return;
-    }
-    const persistDetailsThen = (next: () => void) => {
-      if (this.getChanged().length === 0) {
-        next();
-        return;
-      }
-      const request = new BieForOasDocUpdateRequest();
-      request.oasDocId = this.oasDoc.oasDocId;
-      request.bieForOasDocList = this.getChanged();
-      this.loading = true;
-      this.openAPIService.updateDetails(request).pipe(finalize(() => this.loading = false))
-        .subscribe(() => next());
-    };
-    if (this.hashCodeForOasDoc !== hashCode(this.oasDoc)) {
-      // A doc-level change (title/version/security) must be saved first (mirrors doUpdate), then details.
-      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(() => {
-        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
-          if (reloaded) {
-            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
-            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
-          }
-          this.init(this.oasDoc);
-          persistDetailsThen(onDone);
-        });
-      });
-    } else {
-      persistDetailsThen(onDone);
+    this.saveChanges(() => onDone());
+  }
+
+  /** Why what the user has changed cannot be saved now. */
+  private cannotSaveMessage(): string {
+    switch (this.changeChecker.status()) {
+      case 'invalid':
+        return this.changeChecker.violations()[0]?.message || 'The changes are not valid.';
+      case 'failed':
+        return 'The changes could not be checked.';
+      default:
+        return 'The changes are being checked. Try again in a moment.';
     }
   }
 
@@ -744,24 +1075,54 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   loadBieListForOasDoc() {
+    // read again from the server: what was saved is there, and what the user added or removed was saved with it
+    this.rows = this.rows.filter(row => !row.isNew);
+    this.removedRows = [];
+    this.rowsLoaded = false;
     this.view().reload();
+    this.refreshOperationIds();
+    this.refreshHttpHeaders();
+  }
+
+  // Issue #1791: the server registers request parameters when the operations change (sinceLastDateTime of a GET that
+  // returns an array, the path parameters of a Resource Path), in the same step that changes the operation. The page
+  // takes them, or its next Update would save the headers it had before and take them away.
+  private savedHttpHeadersHash: any;
+
+  private refreshHttpHeaders() {
+    this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+      if (!reloaded) {
+        return;
+      }
+      const pageHasChanges = hashCode(this.oasDoc.httpHeaders) !== this.savedHttpHeadersHash;
+      const docWasUnchanged = this.hashCodeForOasDoc === hashCode(this.oasDoc);
+      adoptServerHeaders(this.oasDoc, reloaded.httpHeaders || [], pageHasChanges);
+      linkHeadersToRows(this.oasDoc, this.rows);
+      if (!pageHasChanges) {
+        this.savedHttpHeadersHash = hashCode(this.oasDoc.httpHeaders);
+        if (docWasUnchanged) {
+          this.hashCodeForOasDoc = hashCode(this.oasDoc);
+        }
+      }
+    });
   }
 
   getChanged(): BieForOasDoc[] {
-    return this.rows.filter(e => e.isChanged);
+    return this.rows.filter(row => row.isChanged && !row.isNew); // of every page
   }
 
   isChanged(): boolean {
     if (!this.oasDoc) {
       return false;
     }
-    return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0;
+    return this.hashCodeForOasDoc !== hashCode(this.oasDoc) || this.getChanged().length > 0
+      || this.rows.some(row => row.isNew) || this.removedRows.length > 0;
   }
 
   isDisabled(oasDoc1: OasDoc) {
     return (this.disabled) ||
       (oasDoc1.oasDocId === undefined || !oasDoc1.oasDocId) ||
-      (oasDoc1.title === undefined || oasDoc1.title === '') ||
+      (oasDoc1.title === undefined || oasDoc1.title.trim() === '') ||
       (oasDoc1.openAPIVersion === undefined || oasDoc1.openAPIVersion === '') ||
       (oasDoc1.version === undefined || oasDoc1.version === '') ||
       this.termServiceUrl.invalid || this.contactUrl.invalid ||
@@ -779,12 +1140,8 @@ export class OasDocDetailComponent implements OnInit {
       saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
     if (property === 'verb') {
-      // A request body is never valid for GET, so revert it to Response. A DELETE request body is kept
-      // in any version (Issue #1610): it is honored in OpenAPI 3.1 and dropped (with a banner) in 3.0.
-      if (source.messageBody === 'Request' && source.verb === 'GET') {
-        source.messageBody = 'Response';
-      }
-      this.updateOperationIdForVerb(source);
+      // The server makes the Operation ID of the new verb (and a GET has no Request body); the page says that the verb was changed.
+      source.touch('verb');
     }
   }
 
@@ -857,57 +1214,59 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   doUpdate() {
-    // See #isChanged for the conditions in this method.
-
-    // Issue #1732: never persist a blank operationId (it is required and NOT NULL in the DB).
-    const blankOperationId = this.getChanged().some(e => !e.operationId || !e.operationId.trim());
-    if (blankOperationId) {
-      this.snackBar.open('Operation ID is required.', '', {duration: 3000});
+    if (this.updateDisabled) {
       return;
     }
-
-    // Issue #1492 (Option 2): block an update that would leave two same-type bodies on one (path, verb).
-    // The backend rejects this with a 400 as well; this gives immediate feedback before the round trip.
-    this.recomputeOasValidation();
-    if (this.oasValidator.duplicateBodySlots.size > 0) {
-      this.snackBar.open('Each (Resource Name, Verb) can have only one Request and one Response body.', '', {duration: 5000});
-      return;
-    }
-
-    const docChanged = this.hashCodeForOasDoc !== hashCode(this.oasDoc);
-    const detailsChanged = this.getChanged().length > 0;
-
-    if (docChanged) {
-      // Persist the document (incl. its security schemes) FIRST, then the per-operation details.
-      // updateDetails() resolves each operation Security Requirement's scheme name to its
-      // oas_security_scheme_id from the database, so a renamed/added scheme must be committed before the
-      // operation rows are saved — otherwise the lookup misses and the requirement is silently dropped.
-      this.openAPIService.updateOasDoc(this.oasDoc).subscribe(_ => {
-        // Re-fetch the persisted document so its Security Schemes carry their freshly-assigned
-        // oas_security_scheme_id. A scheme added/edited in this session has no id yet; without it the
-        // NEXT updateOasDoc would send schemes with no id, and the backend (matching kept schemes by id)
-        // would treat every scheme as removed, delete-and-reinsert them, and wipe every operation's
-        // security override. Reloading the ids here keeps subsequent updates a stable in-place diff.
-        this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
-          if (reloaded) {
-            this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
-            this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+    this.saveChanges(changeSet => {
+      this.snackBar.open('Updated', '', {duration: 3000});
+      if (changeSet.operations.length > 0) {
+        this.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate(this.oasDoc).subscribe(resp => {
+          if (resp.errorMessages && resp.errorMessages.length > 0) {
+            this.snackBar.open(resp.errorMessages[0], '', {duration: 5000});
           }
-          this.init(this.oasDoc);
-          if (detailsChanged) {
-            // Pass a no-op callback so updateDetails() stays silent (it still persists the rows); this
-            // method shows the single 'Updated' snackBar below. Otherwise both fire and it shows twice.
-            this.updateDetails(() => {});
-          }
-          this.snackBar.open('Updated', '', {
-            duration: 3000,
-          });
+        }, _ => {
         });
-      });
-    } else if (detailsChanged) {
-      // No scheme change -> existing schemes are already persisted, so resolution is safe.
-      this.updateDetails();
+      }
+    });
+  }
+
+  /**
+   * Saves what the user has changed, all of it or nothing, once the server has said that it can be saved; the server says it
+   * again here, as what it said may be out of date. The page is then as saved: the Security Schemes with their ids, and the
+   * entries with those registered for the operations.
+   */
+  private saveChanges(onSaved: (changeSet: OasDocChangeSet) => void): void {
+    const changeSet = this.buildChangeSet();
+    if (!changeSet) {
+      return;
     }
+    this.loading = true;
+    this.isUpdating = true;
+    this.openAPIService.saveChanges(this.oasDoc.oasDocId, changeSet).pipe(finalize(() => {
+      this.isUpdating = false;
+      this.loading = false;
+    })).subscribe({
+      next: () => {
+        // What was saved is not a change any more, from now on: the rows are read again, and until they are, Generate and the
+        // like must not take them for unsaved.
+        changeSet.operations.forEach(operation => operation.reset());
+        this.reloadAfterSave(() => onSaved(changeSet));
+      },
+      error: err => this.showRefusal(err)
+    });
+  }
+
+  private reloadAfterSave(then: () => void): void {
+    this.openAPIService.getOasDoc(this.oasDoc.oasDocId).subscribe(reloaded => {
+      if (reloaded) {
+        this.oasDoc.securitySchemes = reloaded.securitySchemes || [];
+        this.oasDoc.securityRequirements = reloaded.securityRequirements || [];
+        this.oasDoc.httpHeaders = reloaded.httpHeaders || [];
+      }
+      this.init(this.oasDoc);
+      this.loadBieListForOasDoc();
+      then();
+    });
   }
 
   openDialogOasDocUpdate() {
@@ -991,7 +1350,7 @@ export class OasDocDetailComponent implements OnInit {
         return;
       }
 
-      this.loadBieListForOasDoc();
+      this.addRows(result.result?.rows || []);
     });
   }
 
@@ -1014,38 +1373,13 @@ export class OasDocDetailComponent implements OnInit {
         return;
       }
 
-      this.loadBieListForOasDoc();
+      this.addRows(result.rows || []);
     });
   }
 
-  // Recomputes the operationId + body-slot duplicate sets from the currently loaded rows. Delegates to
-  // the shared OasOperationValidator (the single source of truth, also used by the BIE-root panel).
-  recomputeOasValidation(): void {
-    this.oasValidator.recompute(this.rows);
-  }
-
-  // Issue #1732: keep the Operation ID's verb word in sync when the Verb changes. Rebuilds from the
-  // BIE's property term (the immutable name source), so a name that itself ends in "List" is not
-  // mistaken for the array marker; for a bodyless operation (no property term, issue #1730) it falls
-  // back to swapping only the leading verb word of the manually entered id. The frontend owns the
-  // operationId; the backend stores it verbatim on save.
-  updateOperationIdForVerb(element: BieForOasDoc): void {
-    element.operationId = recomputeOperationId(
-      element.verb, element.operationId, element.arrayIndicator, element.propertyTerm);
-    this.recomputeOasValidation();
-  }
-
-  // Issue #1732: when the Array Indicator toggles, rebuild the operationId's 'List' marker and the
-  // resource path's '-list' marker from the property term + the new indicator (the array checkbox is
-  // BIE-only, so a property term is always present here). Driving the marker from the boolean — not by
-  // inspecting the string — keeps the marker correct even for a term ending in "List" (e.g.
-  // "Price List" -> queryPriceListList / .../price-list-list). The frontend owns these; the backend
-  // stores them as-is.
-  updateOperationIdForArray(element: BieForOasDoc): void {
-    element.operationId = buildOperationId(element.verb, element.propertyTerm, element.arrayIndicator);
-    element.resourceName = applyResourceArrayMarker(
-      element.resourceName, element.propertyTerm, element.arrayIndicator);
-    this.recomputeOasValidation();
+  /** The array indicator was changed: the server makes the Operation ID and the marker of the Resource Name of it. */
+  touchArrayIndicator(element: BieForOasDoc): void {
+    element.touch('arrayIndicator');
   }
 
   isEditable(): boolean {
@@ -1093,10 +1427,7 @@ export class OasDocDetailComponent implements OnInit {
   }
 
   removeBieForOasDoc() {
-    const request = new BieForOasDocDeleteRequest();
     const nodes = this.selection.selected;
-    request.oasDocId = this.oasDoc.oasDocId;
-    request.bieForOasDocList = nodes;
 
     const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove selected BIE from the OpenAPI Doc?';
@@ -1106,61 +1437,40 @@ export class OasDocDetailComponent implements OnInit {
     this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.openAPIService.removeBieForOasDoc(request).subscribe(_ => {
-            this.snackBar.open('Removed', '', {
-              duration: 3000,
-            });
-            this.selection.clear();
-            this.view().reload();
-          });
+          // Not saved before Update: a row that was added is gone, a row of the document is deleted by Update.
+          this.removedRows = [...this.removedRows, ...nodes.filter(row => !row.isNew)];
+          this.rows = this.rows.filter(row => !nodes.includes(row));
+          this.selection.clear();
+          this.changedOperations('Removed');
         }
       });
   }
   get sizeOfChanges(): number {
-    return this.getChanged().length;
+    return this.getChanged().length + this.rows.filter(row => row.isNew).length + this.removedRows.length;
   }
 
+  /**
+   * The page is busy while it loads (the document, before it is shown, and its operations) or saves, and while it waits for the
+   * server to say whether what the user changed can be saved: a spinner covers the page then, so that nothing else is changed in
+   * the meantime. It is there from the moment the page is opened, not from the moment the document has come.
+   */
+  get isBusy(): boolean {
+    return this.loading || !this.ready() || this.rowsFetching() || this.changeChecker.status() === 'checking';
+  }
+
+  /** Update is there when something is changed and the server has said that it can be saved. */
   get updateDisabled(): boolean {
-    return !this.isChanged();
+    return !this.isChanged() || this.changeChecker.status() !== 'valid';
   }
 
-  updateDetails(callbackFn?) {
-    if (this.updateDisabled) {
-      if (callbackFn === undefined) {
-        return;
-      } else {
-        return callbackFn && callbackFn();
-      }
+  /** The server refused to save: what it says is wrong is shown where it is, and the first of it is said. */
+  private showRefusal(err: any) {
+    const result = err?.error as OasDocChangeResult | undefined;
+    if (result?.violations?.length) {
+      this.changeChecker.refuse(result.violations);
     }
-    const request = new BieForOasDocUpdateRequest();
-    const nodes = this.getChanged();
-    request.oasDocId = this.oasDoc.oasDocId;
-    request.bieForOasDocList = nodes;
-
-    this.loading = true;
-    this.isUpdating = true;
-    this.openAPIService.updateDetails(request).pipe(finalize(() => {
-      this.isUpdating = false;
-      this.loading = false;
-    })).subscribe(_ => {
-      this.loadBieListForOasDoc();
-      this.openAPIService.checkBIEReusedAcrossOperationsAfterUpdate(this.oasDoc).subscribe(
-        resp => {
-          if (resp.errorMessages && resp.errorMessages.length > 0) {
-            this.snackBar.open(resp.errorMessages[0], '', {
-              duration: 5000,
-            });
-          } else {
-          }
-        }, _ => {
-        });
+    this.snackBar.open(result?.violations?.[0]?.message || err?.headers?.get('x-error-message') || 'Failed to update.', '', {
+      duration: 5000,
     });
-    if (callbackFn === undefined) {
-      this.snackBar.open('Updated', '', {
-        duration: 3000,
-      });
-    } else {
-      return callbackFn && callbackFn();
-    }
   }
 }

@@ -21,14 +21,15 @@ public class TenantCommandService {
     public TenantId createTenant(ScoreUser requester, String name) {
         requireAdministrator(requester);
         var command = repositoryFactory.tenantCommandRepository(requester);
-        return command.createTenant(name);
+        // The name is stored without surrounding spaces: the column ignores trailing ones when comparing, so they would hide a rename.
+        return command.createTenant(name.strip());
     }
 
     public boolean updateTenant(
             ScoreUser requester, TenantId tenantId, String name) {
         requireAdministrator(requester);
         var command = repositoryFactory.tenantCommandRepository(requester);
-        return command.updateTenant(tenantId, name);
+        return command.updateTenant(tenantId, name.strip());
     }
 
     public void deleteTenant(

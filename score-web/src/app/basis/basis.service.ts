@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BoxColorSet, WebPageInfo} from './about/domain/about';
 import {Observable, tap} from 'rxjs';
+import {decodeUnicodeBase64, encodeUnicodeBase64} from '../common/utility';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,9 @@ export class WebPageInfoService {
   WEB_PAGE_INFO_KEY = 'X-Score-WebPageInfo';
 
   private fetching = false;
+
+  /** The page info that the stored text was last read as: a screen asks for it for every cell, and reading it (decoding and parsing the text) is not cheap. */
+  private cached?: { item: string; info: WebPageInfo };
 
   get webPageInfo(): WebPageInfo {
     let item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
@@ -32,11 +36,14 @@ export class WebPageInfoService {
       this.set(new WebPageInfo());
       item = localStorage.getItem(this.WEB_PAGE_INFO_KEY);
     }
-    return new WebPageInfo(JSON.parse(atob(item)));
+    if (this.cached?.item !== item) {
+      this.cached = {item, info: new WebPageInfo(JSON.parse(decodeUnicodeBase64(item)))};
+    }
+    return this.cached.info;
   }
 
   set(webPageInfo: WebPageInfo) {
-    localStorage.setItem(this.WEB_PAGE_INFO_KEY, btoa(JSON.stringify(webPageInfo)));
+    localStorage.setItem(this.WEB_PAGE_INFO_KEY, encodeUnicodeBase64(JSON.stringify(webPageInfo)));
   }
 
   reset() {
@@ -45,7 +52,11 @@ export class WebPageInfoService {
 
   load(): Observable<WebPageInfo> {
     return this.http.get<WebPageInfo>('api/info/webpages').pipe(tap(val => {
-      this.set(val);
+      try {
+        this.set(val);
+      } catch (ignore) {
+        // The stored copy is only a cache: the page info that was loaded is still returned.
+      }
       this.fetching = false;
     }));
   }

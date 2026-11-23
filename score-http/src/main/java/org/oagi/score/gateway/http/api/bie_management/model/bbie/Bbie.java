@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.BieAssociation;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.abie.AbieId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
@@ -152,6 +153,10 @@ public class Bbie implements BieAssociation {
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+    }
+
+    public ValueConstraint valueConstraint() {
+        return new ValueConstraint(defaultValue, fixedValue);
     }
 
     public BigInteger getFacetMinLength() {

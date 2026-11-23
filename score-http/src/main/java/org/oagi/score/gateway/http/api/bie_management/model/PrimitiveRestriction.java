@@ -24,4 +24,20 @@ public record PrimitiveRestriction(XbtManifestId xbtManifestId,
                 dtScAwdPri.agencyIdListManifestId());
     }
 
+    /**
+     * Whether no value domain (primitive, code list, or agency ID list) is assigned,
+     * in which case the default value domain of the Data Type applies.
+     */
+    public boolean isEmpty() {
+        return xbtManifestId == null && codeListManifestId == null && agencyIdListManifestId == null;
+    }
+
+    /**
+     * Whether the Data Type's default value domain is a code list or an agency ID list
+     * rather than a primitive.
+     */
+    public boolean isCodeListOrAgencyIdList() {
+        return xbtManifestId == null && (codeListManifestId != null || agencyIdListManifestId != null);
+    }
+
 }

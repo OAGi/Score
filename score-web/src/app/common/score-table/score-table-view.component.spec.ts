@@ -262,7 +262,7 @@ describe('ScoreTableViewComponent', () => {
 
     expect(el.querySelector('.plain score-search-bar')).toBeTruthy();
     expect(el.querySelector('.plain score-column-selector')).toBeTruthy();
-    expect(el.querySelector('.plain mat-paginator')).toBeTruthy();
+    expect(el.querySelector('.plain score-paginator')).toBeTruthy();
     expect(Array.from(el.querySelectorAll('th')).map(t => t.textContent.trim())).toEqual(['Name', 'Custom size']);
     expect(el.querySelector('td b.n').textContent).toBe('a');
     expect(fixture.componentInstance.requests).toEqual(['pageIndex=0&pageSize=10&orderBy=%2Bname']);
@@ -508,6 +508,23 @@ describe('ScoreTableViewComponent', () => {
       dataRow(fixture.nativeElement).click();
       expect(fixture.componentInstance.clicked).toEqual(['a']);
       expect(fixture.componentInstance.selection.selected).toEqual([]);
+    });
+
+    it('judges the header checkbox by the shown rows only, and keeps the selection of other pages', () => {
+      const fixture = TestBed.createComponent(RowsHostComponent);
+      const host = fixture.componentInstance;
+      host.selection.select('other-page');
+      fixture.detectChanges();
+      const view = fixture.debugElement.query(By.directive(ScoreTableViewComponent)).componentInstance as ScoreTableViewComponent;
+      expect(view.isAllSelected()).toBe(false);
+      expect(view.isSomeSelected()).toBe(false);
+
+      view.masterToggle();
+      expect(host.selection.selected.sort()).toEqual(['a', 'other-page']);
+      expect(view.isAllSelected()).toBe(true);
+
+      view.masterToggle();
+      expect(host.selection.selected).toEqual(['other-page']);
     });
   });
 

@@ -35,12 +35,14 @@ public class AppUserDetailsService implements UserDetailsService {
         String password = appUserRecord.getPassword();
         boolean isDeveloper = appUserRecord.getIsDeveloper() == 1;
         boolean isAdmin = appUserRecord.getIsAdmin() == 1;
+        // A disabled account is rejected by the password and passkey sign-in (DisabledException).
+        boolean isEnabled = Byte.valueOf((byte) 1).equals(appUserRecord.getIsEnabled());
 
         List<GrantedAuthority> authorities = new ArrayList();
         authorities.add(new SimpleGrantedAuthority((isDeveloper) ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY));
         if (isAdmin) {
             authorities.add(new SimpleGrantedAuthority(ADMIN_GRANTED_AUTHORITY));
         }
-        return new ScoreUserDetails(username, password, authorities);
+        return new ScoreUserDetails(username, password, isEnabled, true, true, true, authorities);
     }
 }

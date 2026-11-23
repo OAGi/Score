@@ -398,6 +398,43 @@ public class TC_21_1_ManageModuleSet extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_21_1_TA_4_g")
+    public void developer_cannot_enter_a_module_version_longer_than_45_characters() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetPage viewEditModuleSetPage = homePage.getModuleMenu().openViewEditModuleSetSubMenu();
+        CreateModuleSetPage createModuleSetPage = viewEditModuleSetPage.hitNewModuleSetButton();
+        String moduleSetName = "Test Module Set " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        createModuleSetPage.setName(moduleSetName);
+        createModuleSetPage.hitCreateButton();
+
+        EditModuleSetPage editModuleSetPage = viewEditModuleSetPage.openModuleSetByName(moduleSetName);
+        editModuleSetPage.addModule();
+        CreateModuleFileDialog createModuleFileDialog = editModuleSetPage.addNewModuleFile();
+        String moduleFileName = "New module file" + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        createModuleFileDialog.setModuleFileName(moduleFileName);
+        String tooLongVersion = RandomStringUtils.secure().nextAlphanumeric(46, 60);
+        createModuleFileDialog.setModuleFileVersionNumber(tooLongVersion);
+        // The input refuses the characters after the 45th one, so the 45-character column never receives more.
+        String expectedVersion = tooLongVersion.substring(0, 45);
+        assertEquals(expectedVersion, getText(createModuleFileDialog.getModuleFileVersionNumberField()));
+        createModuleFileDialog.createModuleFile();
+
+        EditModuleFileDialog editModuleFileDialog = editModuleSetPage.editModuleFile(moduleFileName);
+        assertEquals(expectedVersion, getText(editModuleFileDialog.getModuleFileVersionNumberField()));
+
+        String anotherTooLongVersion = RandomStringUtils.secure().nextAlphanumeric(46, 60);
+        editModuleFileDialog.setModuleFileVersionNumber(anotherTooLongVersion);
+        // The existing text is kept and the typed text is cut at the 45th character.
+        assertEquals(45, getText(editModuleFileDialog.getModuleFileVersionNumberField()).length());
+    }
+
+    @Test
     @DisplayName("TC_21_1_TA_5_a_and_b")
     public void manage_module_set_covers_ta_5_a_and_b() {
         AppUserObject developer;

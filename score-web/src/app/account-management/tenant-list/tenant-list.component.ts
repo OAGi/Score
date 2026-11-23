@@ -4,16 +4,14 @@ import {TenantListService} from '../domain/tenant-list.service';
 import {createTableColumns, defineTable} from '../../common/score-table';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 
-const TENANT_TABLE = defineTable({
+export const TENANT_TABLE = defineTable({
   storageKey: 'TableColumns-TenantPage',
   columns: [
     {id: 'name', label: 'Tenant Name', width: 0, sortable: true},
     {id: 'users', label: 'Users', width: 400},
     {id: 'businessContexts', label: 'Business Contexts', width: 400},
   ],
-  // The endpoint takes only the direction of the sort.
-  sortParam: 'sortDirection',
-  defaultSort: {active: 'sortActive', direction: 'asc'},
+  defaultSort: {active: 'name', direction: 'asc'},
   search: {key: 'name', placeholder: 'Search by Name'},
 });
 

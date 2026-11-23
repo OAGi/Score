@@ -19,6 +19,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtDetailsRecord;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtManifestId;
 import org.oagi.score.gateway.http.api.cc_management.model.dt.DtSummaryRecord;
 import org.oagi.score.gateway.http.api.cc_management.repository.BccpCommandRepository;
+import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -360,6 +361,12 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
         nextBccpRecord.setCreationTimestamp(timestamp);
         nextBccpRecord.setLastUpdateTimestamp(timestamp);
         nextBccpRecord.setPrevBccpId(valueOf(prevBccp.bccpId()));
+        // the Data Type is the latest record of the Data Type, which is what the manifest has
+        nextBccpRecord.setBdtId(dslContext().select(DT_MANIFEST.DT_ID)
+                .from(BCCP_MANIFEST)
+                .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(prevBccp.bccpManifestId())))
+                .fetchOneInto(ULong.class));
         BccpId nextBccpId = new BccpId(dslContext().insertInto(BCCP)
                 .set(nextBccpRecord)
                 .returning(BCCP.BCCP_ID)
@@ -372,6 +379,7 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
 
         dslContext().update(BCCP_MANIFEST)
                 .set(BCCP_MANIFEST.BCCP_ID, valueOf(nextBccpId))
+                .set(BCCP_MANIFEST.CONFLICT, (byte) 0)
                 .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(prevBccp.bccpManifestId())))
                 .execute();
 
@@ -391,6 +399,11 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
 
     @Override
     public void cancel(BccpManifestId bccpManifestId) {
+        cancel(bccpManifestId, false);
+    }
+
+    @Override
+    public void cancel(BccpManifestId bccpManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().bccpQueryRepository(requester());
         BccpDetailsRecord bccp = query.getBccpDetails(bccpManifestId);
@@ -412,22 +425,25 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
 
         // update BCCP MANIFEST's bccp_id
         if (prevBccpRecord.getBdtId() != null) {
-            DtRecord prevDtRecord = dslContext().selectFrom(DT)
-                    .where(DT.DT_ID.eq(prevBccpRecord.getBdtId()))
+            // the manifest, in this release, of the Data Type that the previous revision had (found by its GUID),
+            // with the name it gives
+            var prevDt = dslContext().select(DT_MANIFEST.DT_MANIFEST_ID, DT.QUALIFIER, DT.DATA_TYPE_TERM)
+                    .from(DT_MANIFEST)
+                    .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                    .where(and(
+                            DT_MANIFEST.RELEASE_ID.eq(valueOf(bccp.release().releaseId())),
+                            DT.GUID.eq(dslContext().select(DT.as("prev_dt").GUID).from(DT.as("prev_dt"))
+                                    .where(DT.as("prev_dt").DT_ID.eq(prevBccpRecord.getBdtId())))
+                    ))
                     .fetchOne();
+            if (prevDt == null) {
+                throw new IllegalArgumentException("Not found the Data Type of the previous revision in the release");
+            }
 
-            DtManifestId prevDtManifestId = new DtManifestId(
-                    dslContext().select(DT_MANIFEST.DT_MANIFEST_ID)
-                            .from(DT_MANIFEST)
-                            .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
-                            .where(and(
-                                    DT_MANIFEST.RELEASE_ID.eq(valueOf(bccp.release().releaseId())),
-                                    DT.GUID.eq(prevDtRecord.getGuid())
-                            ))
-                            .fetchOneInto(BigInteger.class)
-            );
+            moreStep.set(BCCP_MANIFEST.BDT_MANIFEST_ID, prevDt.value1());
 
-            moreStep.set(BCCP_MANIFEST.BDT_MANIFEST_ID, valueOf(prevDtManifestId));
+            // the name follows the Data Type it is restored to
+            moreStep.set(BCCP_MANIFEST.DEN, DenUtils.bccpDen(prevBccpRecord.getPropertyTerm(), prevDt.value2(), prevDt.value3()));
         }
 
         moreStep.where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccp.bccpManifestId())))
@@ -439,10 +455,32 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
                 .where(BCC.TO_BCCP_ID.eq(valueOf(bccp.bccpId())))
                 .execute();
 
+        // what refers to the BCCP was marked as in conflict when it was revised; now that it refers to the
+        // restored record again, it is not in conflict any more
+        dslContext().update(BCC_MANIFEST)
+                .set(BCC_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(valueOf(bccp.bccpManifestId())),
+                        BCC_MANIFEST.BCC_ID.in(dslContext().select(BCC.BCC_ID).from(BCC)
+                                .where(BCC.TO_BCCP_ID.eq(prevBccpRecord.getBccpId())))))
+                .execute();
+
         // unlink prev BCCP
         dslContext().update(BCCP)
                 .setNull(BCCP.NEXT_BCCP_ID)
                 .where(BCCP.BCCP_ID.eq(prevBccpRecord.getBccpId()))
+                .execute();
+
+        // the record it went back to may refer to an older record of the Data Type than the manifest does
+        dslContext().update(BCCP_MANIFEST)
+                .set(BCCP_MANIFEST.CONFLICT, (byte) (dslContext().selectCount().from(BCCP_MANIFEST)
+                        .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
+                        .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                        .where(and(
+                                BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccp.bccpManifestId())),
+                                BCCP.BDT_ID.notEqual(DT_MANIFEST.DT_ID)))
+                        .fetchOptionalInto(Integer.class).orElse(0) > 0 ? 1 : 0))
+                .where(BCCP_MANIFEST.BCCP_MANIFEST_ID.eq(valueOf(bccp.bccpManifestId())))
                 .execute();
 
         // clean logs up
@@ -452,7 +490,11 @@ public class JooqBccpCommandRepository extends JooqBaseRepository implements Bcc
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(bccp.guid(), CcType.BCCP);
+                .revertToStableStateByReference(bccp.guid(), CcType.BCCP, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().bccpQueryRepository(requester()).getBccpDetails(bccpManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added);
+                });
 
         dslContext().update(BCCP_MANIFEST)
                 .set(BCCP_MANIFEST.LOG_ID, valueOf(logId))

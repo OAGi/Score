@@ -85,6 +85,10 @@ class BieForOasDocFlipConversionTest {
             String s = ctx.sql().toLowerCase(Locale.ROOT);
             sql.add(s);
             boolean isSelect = s.startsWith("select");
+            // the request parameters the system registers for an operation (Issue #1791) read the document too: none here
+            if (isSelect && s.contains("`oas_doc`")) {
+                return empty();
+            }
             boolean isInsert = s.startsWith("insert");
 
             // INSERTs whose generated id is read back via returningResult(...).

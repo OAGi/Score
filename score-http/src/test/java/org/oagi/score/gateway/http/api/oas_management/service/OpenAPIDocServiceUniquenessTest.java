@@ -133,4 +133,19 @@ class OpenAPIDocServiceUniquenessTest {
         assertEquals(false, service.checkOasDocUniqueness(requester, oasDoc));
         verify(query).checkOasDocUniqueness(oasDoc);
     }
+
+    @Test
+    void createAndUpdateRejectABlankTitleAndSaveNothing() {
+        for (String title : new String[]{null, "", "   "}) {
+            CreateOasDocRequest create = createRequest("MIT");
+            create.setTitle(title);
+            UpdateOasDocRequest update = updateRequest("MIT");
+            update.setTitle(title);
+
+            assertThrows(IllegalArgumentException.class, () -> service.createOasDoc(requester, create));
+            assertThrows(IllegalArgumentException.class, () -> service.updateOasDoc(requester, update));
+        }
+        verify(command, never()).createOasDoc(any());
+        verify(command, never()).updateOasDoc(any());
+    }
 }

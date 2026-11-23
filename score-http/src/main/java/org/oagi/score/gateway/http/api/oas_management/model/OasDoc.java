@@ -28,6 +28,8 @@ public class OasDoc extends Auditable {
     // Empty/null with explicit schemes => no root-level `security` is emitted.
     // Ignored entirely when securitySchemes is empty (legacy default).
     private List<OasSecurityRequirement> securityRequirements;
+    // Issue #1791: the HTTP headers (request parameters and response headers) of the document. null = not given.
+    private List<OasDocHttpHeader> httpHeaders;
     private UserId ownerUserId;
     private Date lastUpdateTimestamp;
     private Date creationTimestamp;
@@ -35,6 +37,14 @@ public class OasDoc extends Auditable {
     private UserSummaryRecord lastUpdatedBy;
 
     public OasDoc() {
+    }
+
+    public List<OasDocHttpHeader> getHttpHeaders() {
+        return httpHeaders;
+    }
+
+    public void setHttpHeaders(List<OasDocHttpHeader> httpHeaders) {
+        this.httpHeaders = httpHeaders;
     }
 
     public BigInteger getOasDocId() {

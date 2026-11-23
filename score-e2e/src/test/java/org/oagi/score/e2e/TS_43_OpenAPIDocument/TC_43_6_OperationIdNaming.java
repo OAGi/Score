@@ -29,8 +29,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openqa.selenium.TimeoutException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oagi.score.e2e.impl.PageHelper.click;
 import static org.oagi.score.e2e.impl.PageHelper.getSnackBarMessage;
@@ -181,8 +184,9 @@ public class TC_43_6_OperationIdNaming extends BaseTest {
         String firstOperationId = editPage.getRowOperationId(firstRow);
 
         editPage.setRowOperationId(secondRow, firstOperationId);
-        assertEquals("Operation ID must be unique within the document.",
-                editPage.getRowOperationIdError(editPage.getTableRecordAtIndex(2)));
+        assertTrue(editPage.getRowOperationIdError(editPage.getTableRecordAtIndex(2))
+                        .contains("Operation ID must be unique within the document"),
+                "The server says that the Operation ID is already used");
     }
 
     @Test
@@ -202,9 +206,10 @@ public class TC_43_6_OperationIdNaming extends BaseTest {
 
         WebElement row = editPage.getTableRecordAtIndex(1);
         editPage.setRowOperationId(row, "");
-        click(editPage.getUpdateButton(true));
 
-        assertEquals("Operation ID is required.", getSnackBarMessage(getDriver()));
+        assertEquals("Operation ID is required.", editPage.getRowOperationIdError(row));
+        assertThrows(TimeoutException.class, () -> editPage.getUpdateButton(true),
+                "Update is not there while an Operation ID is blank");
     }
 
     @Test

@@ -11,6 +11,9 @@ import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.Duration.ofMillis;
 import static org.oagi.score.e2e.impl.PageHelper.*;
@@ -34,6 +37,9 @@ public class SelectBaseProfileBIEDialogImpl extends SearchBarPageImpl implements
 
     private static final By SELECT_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Select\")]//ancestor::button[1]");
+
+    private static final By TABLE_RECORD_OWNER_LOCATOR =
+            By.xpath("//mat-dialog-container//tr[contains(@class, \"element-row\")]/td[contains(@class, \"mat-column-owner\")]");
 
     private final BasePageImpl parent;
 
@@ -72,6 +78,19 @@ public class SelectBaseProfileBIEDialogImpl extends SearchBarPageImpl implements
         WebElement searchedSelectField = visibilityOfElementLocated(getDriver(),
                 By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]"));
         click(searchedSelectField);
+        escape(getDriver());
+    }
+
+    @Override
+    public void setOwners(List<String> owners) {
+        click(getOwnerSelectField());
+        for (String owner : owners) {
+            WebElement searchField = visibilityOfElementLocated(getDriver(), DROPDOWN_SEARCH_FIELD_LOCATOR);
+            searchField.clear();
+            sendKeys(searchField, owner);
+            click(visibilityOfElementLocated(getDriver(),
+                    By.xpath("//mat-option//span[contains(text(), \"" + owner + "\")]")));
+        }
         escape(getDriver());
     }
 
@@ -143,6 +162,18 @@ public class SelectBaseProfileBIEDialogImpl extends SearchBarPageImpl implements
         click(getSelectButton());
         click(getDialogButtonByName(getDriver(), "Proceed"));
         invisibilityOfLoadingContainerElement(getDriver());
+    }
+
+    @Override
+    public List<String> getOwnerLoginIdsOfTableRecords() {
+        try {
+            visibilityOfElementLocated(getDriver(), TABLE_RECORD_OWNER_LOCATOR);
+        } catch (TimeoutException e) {
+            return Collections.emptyList();
+        }
+        return getDriver().findElements(TABLE_RECORD_OWNER_LOCATOR).stream()
+                .map(e -> getText(e).trim())
+                .collect(Collectors.toList());
     }
 
     @Override

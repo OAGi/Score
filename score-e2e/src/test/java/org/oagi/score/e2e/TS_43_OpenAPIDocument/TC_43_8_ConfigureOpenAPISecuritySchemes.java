@@ -305,11 +305,12 @@ public class TC_43_8_ConfigureOpenAPISecuritySchemes extends BaseTest {
     @DisplayName("TC_43_8_12")
     public void generated_components_security_schemes_carry_type_specific_fields() {
         EditOpenAPIDocumentPage editPage = newDocument();
+        // An operation that is added is saved at once (with whatever else is not saved), so it is added before the schemes.
+        addBodylessOperation(editPage, "DELETE", "/widget/{id}", "deleteWidget");
         addApiKeyScheme(editPage);
         addHttpBearerScheme(editPage);
         addOauth2Scheme(editPage);
         addOpenIdScheme(editPage);
-        addBodylessOperation(editPage, "DELETE", "/widget/{id}", "deleteWidget");
         editPage.hitUpdateButton();
 
         OpenAPIDocumentExport export = OpenAPIDocumentExport.from(editPage.clickGenerateAndDownload());
@@ -435,8 +436,9 @@ public class TC_43_8_ConfigureOpenAPISecuritySchemes extends BaseTest {
     @DisplayName("TC_43_8_16")
     public void valid_security_update_shows_a_single_updated_message() {
         EditOpenAPIDocumentPage editPage = newDocument();
-        addApiKeyScheme(editPage);
+        // An operation that is added is saved at once (with whatever else is not saved), so it is added before the scheme.
         addBodylessOperation(editPage, "DELETE", "/order/{id}", "deleteOrder");
+        addApiKeyScheme(editPage);
 
         editPage.hitUpdateButton();
         assertEquals("Updated", getSnackBarMessage(getDriver()),

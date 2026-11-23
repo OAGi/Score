@@ -20,6 +20,7 @@ import org.oagi.score.gateway.http.common.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -76,6 +77,7 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         // Issue #1729: persist the configured Security Schemes (if any).
         saveSecuritySchemes(oasDocId, request.getSecuritySchemes(), requesterId, timestamp);
         saveDocSecurityRequirements(oasDocId, request.getSecurityRequirements(), requesterId, timestamp);
+        OasDocHttpHeaderStore.save(dslContext(), oasDocId, request.getHttpHeaders(), requesterId, timestamp);
         return new CreateOasDocResponse(oasDocId.toBigInteger());
     }
 
@@ -94,6 +96,7 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         if (record == null) {
             throw new ScoreDataAccessException(new IllegalArgumentException());
         }
+        String versionBefore = record.getVersion();
         List<Field<?>> changedField = new ArrayList();
         if (!StringUtils.equals(request.getTitle(), record.getTitle())) {
             record.setTitle(request.getTitle());
@@ -150,6 +153,11 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         // Issue #1729: replace the document's Security Schemes (independent of the doc-field changes above).
         saveSecuritySchemes(record.getOasDocId(), request.getSecuritySchemes(), requesterId, timestamp);
         saveDocSecurityRequirements(record.getOasDocId(), request.getSecurityRequirements(), requesterId, timestamp);
+        OasDocHttpHeaderStore.save(dslContext(), record.getOasDocId(), request.getHttpHeaders(), requesterId, timestamp);
+        if (!StringUtils.equals(versionBefore, record.getVersion())) {
+            // Issue #1791: the {version} of a path is the version of the document, so its path parameters change with it.
+            reconcileOperationParametersForVersion(record.getOasDocId(), versionBefore, record.getVersion(), requesterId, timestamp);
+        }
         return new UpdateOasDocResponse(
                 record.getOasDocId().toBigInteger(),
                 !changedField.isEmpty());
@@ -164,6 +172,9 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
         if (oasDocIdList == null || oasDocIdList.isEmpty()) {
             return new DeleteOasDocResponse(Collections.emptyList());
         }
+
+        // Issue #1791: the HTTP headers bound to the document or to its operations go first; they refer to both.
+        OasDocHttpHeaderStore.delete(dslContext(), OAS_DOC_HTTP_HEADER.OAS_DOC_ID.in(valueOf(oasDocIdList)));
 
         List<ULong> oasResourceIds = dslContext().select(OAS_RESOURCE.OAS_RESOURCE_ID)
                 .from(OAS_RESOURCE)
@@ -256,6 +267,19 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
 
         DeleteOasDocResponse response = new DeleteOasDocResponse(oasDocIdList);
         return response;
+    }
+
+    private void reconcileOperationParametersForVersion(ULong oasDocId, String versionBefore, String versionAfter,
+                                                        ULong requesterId, LocalDateTime timestamp) {
+        for (var operation : dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_OPERATION.VERB, OAS_RESOURCE.PATH)
+                .from(OAS_OPERATION).join(OAS_RESOURCE).on(OAS_RESOURCE.OAS_RESOURCE_ID.eq(OAS_OPERATION.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(oasDocId)).fetch()) {
+            ULong oasOperationId = operation.get(OAS_OPERATION.OAS_OPERATION_ID);
+            OasOperationParameters.apply(dslContext(), oasDocId, oasOperationId,
+                    OasOperationParameters.capture(dslContext(), oasOperationId, operation.get(OAS_OPERATION.VERB), operation.get(OAS_RESOURCE.PATH), versionBefore),
+                    OasOperationParameters.capture(dslContext(), oasOperationId, operation.get(OAS_OPERATION.VERB), operation.get(OAS_RESOURCE.PATH), versionAfter),
+                    requesterId, timestamp);
+        }
     }
 
     private void deleteOasTagByOperationIdList(List<ULong> oasOperationIdList) {
@@ -440,6 +464,38 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
     }
 
     @Override
+    public OasOperationParameterState captureOperationParameters(OasOperationId oasOperationId) {
+        return oasOperationId == null ? OasOperationParameterState.NONE
+                : OasOperationParameters.capture(dslContext(), valueOf(oasOperationId));
+    }
+
+    @Override
+    public void reconcileOperationParameters(OasOperationId oasOperationId, OasOperationParameterState before,
+                                             org.oagi.score.gateway.http.api.account_management.model.UserId userId) {
+        OasOperationParameters.reconcile(dslContext(), valueOf(oasOperationId), before,
+                ULong.valueOf(userId.value()), LocalDateTime.now());
+    }
+
+    @Override
+    public List<OasDocHttpHeader> applyHeaderChanges(OasDocId oasDocId, OasDocChangeSet.HeaderChanges changes) {
+        return OasDocHttpHeaderStore.applyChanges(dslContext(), valueOf(oasDocId), changes.upsertsOrEmpty(),
+                changes.removedOrEmpty(), ULong.valueOf(requester().userId().value()), LocalDateTime.now());
+    }
+
+    @Override
+    public Map<OasOperationId, String> findResolvedOperationPaths(OasDocId oasDocId) {
+        String documentVersion = dslContext().select(OAS_DOC.VERSION).from(OAS_DOC)
+                .where(OAS_DOC.OAS_DOC_ID.eq(valueOf(oasDocId))).fetchOne(OAS_DOC.VERSION);
+        Map<OasOperationId, String> paths = new java.util.LinkedHashMap<>();
+        dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_RESOURCE.PATH).from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_RESOURCE.OAS_RESOURCE_ID.eq(OAS_OPERATION.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .fetch().forEach(row -> paths.put(new OasOperationId(row.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger()),
+                        OasResourcePaths.resolve(row.get(OAS_RESOURCE.PATH), documentVersion)));
+        return paths;
+    }
+
+    @Override
     public boolean operationHasBody(OasOperationId oasOperationId, boolean isRequest) {
         if (oasOperationId == null) {
             return false;
@@ -480,6 +536,91 @@ public class JooqOasDocCommandRepository extends JooqBaseRepository
                 .limit(1)
                 .fetchOne(OAS_OPERATION.OAS_OPERATION_ID);
         return (oasOperationId == null) ? null : new OasOperationId(oasOperationId.toBigInteger());
+    }
+
+    @Override
+    public Set<OasOperationId> findOasOperationIdsAtEndpoint(OasDocId oasDocId, String path, String verb) {
+        if (oasDocId == null || path == null || verb == null) {
+            return Set.of();
+        }
+        return dslContext().select(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                        .and(OAS_RESOURCE.PATH.eq(path))
+                        .and(OAS_OPERATION.VERB.eq(verb)))
+                .fetch(OAS_OPERATION.OAS_OPERATION_ID).stream()
+                .map(id -> new OasOperationId(id.toBigInteger()))
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
+    public Set<OasOperationId> findOperationsWithBodyAtEndpoint(OasDocId oasDocId, String path, String verb, boolean isRequest) {
+        if (oasDocId == null || path == null || verb == null) {
+            return Set.of();
+        }
+        var body = isRequest ? OAS_REQUEST.OAS_OPERATION_ID : OAS_RESPONSE.OAS_OPERATION_ID;
+        return dslContext().selectDistinct(OAS_OPERATION.OAS_OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                        .and(OAS_RESOURCE.PATH.eq(path))
+                        .and(OAS_OPERATION.VERB.eq(verb))
+                        .and(OAS_OPERATION.OAS_OPERATION_ID.in(
+                                dslContext().select(body).from(isRequest ? OAS_REQUEST : OAS_RESPONSE))))
+                .fetch(OAS_OPERATION.OAS_OPERATION_ID).stream()
+                .map(id -> new OasOperationId(id.toBigInteger()))
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
+    public List<OasOperationEndpoint> findOperationEndpoints(OasDocId oasDocId) {
+        return dslContext().select(OAS_OPERATION.OAS_OPERATION_ID, OAS_RESOURCE.PATH, OAS_OPERATION.VERB, OAS_OPERATION.OPERATION_ID,
+                        org.jooq.impl.DSL.field(org.jooq.impl.DSL.exists(org.jooq.impl.DSL.selectOne().from(OAS_REQUEST)
+                                .where(OAS_REQUEST.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID)))).as("has_request"),
+                        org.jooq.impl.DSL.field(org.jooq.impl.DSL.exists(org.jooq.impl.DSL.selectOne().from(OAS_RESPONSE)
+                                .where(OAS_RESPONSE.OAS_OPERATION_ID.eq(OAS_OPERATION.OAS_OPERATION_ID)))).as("has_response"))
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId)))
+                .fetch(row -> new OasOperationEndpoint(row.get(OAS_OPERATION.OAS_OPERATION_ID).toBigInteger(),
+                        row.get(OAS_RESOURCE.PATH), row.get(OAS_OPERATION.VERB), row.get(OAS_OPERATION.OPERATION_ID),
+                        Boolean.TRUE.equals(row.get("has_request", Boolean.class)),
+                        Boolean.TRUE.equals(row.get("has_response", Boolean.class))));
+    }
+
+    @Override
+    public Set<String> findOperationIdsInOasDoc(OasDocId oasDocId, Collection<String> operationIds,
+                                                Collection<OasOperationId> excludedOasOperationIds) {
+        if (oasDocId == null || operationIds == null || operationIds.isEmpty()) {
+            return Set.of();
+        }
+        var condition = OAS_RESOURCE.OAS_DOC_ID.eq(valueOf(oasDocId))
+                .and(OAS_OPERATION.OPERATION_ID.in(operationIds));
+        if (excludedOasOperationIds != null && !excludedOasOperationIds.isEmpty()) {
+            condition = condition.and(OAS_OPERATION.OAS_OPERATION_ID.notIn(
+                    excludedOasOperationIds.stream().map(id -> valueOf(id)).toList()));
+        }
+        // The column's collation (utf8mb3_general_ci) ignores case, accents and trailing spaces, so the
+        // query only narrows the candidates; the exact comparison is done here.
+        List<String> candidates = dslContext().select(OAS_OPERATION.OPERATION_ID)
+                .from(OAS_OPERATION)
+                .join(OAS_RESOURCE).on(OAS_OPERATION.OAS_RESOURCE_ID.eq(OAS_RESOURCE.OAS_RESOURCE_ID))
+                .where(condition)
+                .fetch(OAS_OPERATION.OPERATION_ID);
+        return retainExactMatches(operationIds, candidates);
+    }
+
+    /** The requested operationIds that are present, character for character, among the candidates. */
+    static Set<String> retainExactMatches(Collection<String> requested, Collection<String> candidates) {
+        Set<String> candidateSet = new HashSet<>(candidates);
+        Set<String> result = new HashSet<>();
+        for (String operationId : requested) {
+            if (candidateSet.contains(operationId)) {
+                result.add(operationId);
+            }
+        }
+        return result;
     }
 
     @Override

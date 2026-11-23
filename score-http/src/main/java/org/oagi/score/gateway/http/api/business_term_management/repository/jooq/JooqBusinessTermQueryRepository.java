@@ -864,9 +864,11 @@ public class JooqBusinessTermQueryRepository
     private class AsbieListQueryBuilder {
 
         private AsbieBbieListFilterCriteria filterCriteria;
+        private final boolean usedOnly;
 
-        public AsbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria) {
+        public AsbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria, boolean usedOnly) {
             this.filterCriteria = filterCriteria;
+            this.usedOnly = usedOnly;
         }
 
         SelectOnConditionStep<? extends org.jooq.Record> select() {
@@ -915,6 +917,11 @@ public class JooqBusinessTermQueryRepository
 
         List<Condition> conditions() {
             List<Condition> conditions = new ArrayList();
+
+            if (usedOnly) {
+                // An association that is not used is not part of the BIE, so no business term is offered for it.
+                conditions.add(ASBIE.IS_USED.eq((byte) 1));
+            }
 
             if (filterCriteria.libraryId() != null) {
                 conditions.add(LIBRARY.LIBRARY_ID.eq(valueOf(filterCriteria.libraryId())));
@@ -1021,9 +1028,11 @@ public class JooqBusinessTermQueryRepository
     private class BbieListQueryBuilder {
 
         private AsbieBbieListFilterCriteria filterCriteria;
+        private final boolean usedOnly;
 
-        public BbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria) {
+        public BbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria, boolean usedOnly) {
             this.filterCriteria = filterCriteria;
+            this.usedOnly = usedOnly;
         }
 
         SelectOnConditionStep<? extends org.jooq.Record> select() {
@@ -1074,6 +1083,11 @@ public class JooqBusinessTermQueryRepository
 
         List<Condition> conditions() {
             List<Condition> conditions = new ArrayList();
+
+            if (usedOnly) {
+                // An association that is not used is not part of the BIE, so no business term is offered for it.
+                conditions.add(BBIE.IS_USED.eq((byte) 1));
+            }
 
             if (filterCriteria.libraryId() != null) {
                 conditions.add(LIBRARY.LIBRARY_ID.eq(valueOf(filterCriteria.libraryId())));
@@ -1179,16 +1193,22 @@ public class JooqBusinessTermQueryRepository
     private class AsbieBbieListQueryBuilder {
 
         private final AsbieBbieListFilterCriteria filterCriteria;
+        private final boolean usedOnly;
 
         public AsbieBbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria) {
+            this(filterCriteria, true);
+        }
+
+        private AsbieBbieListQueryBuilder(AsbieBbieListFilterCriteria filterCriteria, boolean usedOnly) {
             this.filterCriteria = filterCriteria;
+            this.usedOnly = usedOnly;
         }
 
         public AsbieBbieListQueryBuilder(Collection<AsbieId> asbieIdList, Collection<BbieId> bbieIdList) {
             this(AsbieBbieListFilterCriteria.builder()
                     .asbieIdList(asbieIdList)
                     .bbieIdList(bbieIdList)
-                    .build());
+                    .build(), false);
         }
 
         SelectOrderByStep<? extends org.jooq.Record> select() {
@@ -1197,13 +1217,13 @@ public class JooqBusinessTermQueryRepository
 
             if (filterCriteria.typeList() == null || filterCriteria.typeList().isEmpty() ||
                     filterCriteria.typeList().contains("ASBIE")) {
-                var queryBuilder = new AsbieListQueryBuilder(filterCriteria);
+                var queryBuilder = new AsbieListQueryBuilder(filterCriteria, usedOnly);
                 var where = queryBuilder.select().where(queryBuilder.conditions());
                 select = (select != null) ? select.union(where) : where;
             }
             if (filterCriteria.typeList() == null || filterCriteria.typeList().isEmpty() ||
                     filterCriteria.typeList().contains("BBIE")) {
-                var queryBuilder = new BbieListQueryBuilder(filterCriteria);
+                var queryBuilder = new BbieListQueryBuilder(filterCriteria, usedOnly);
                 var where = queryBuilder.select().where(queryBuilder.conditions());
                 select = (select != null) ? select.union(where) : where;
             }

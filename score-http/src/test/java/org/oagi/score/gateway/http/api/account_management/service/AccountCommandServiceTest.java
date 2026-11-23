@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.controller.payload.UpdateAccountRequest;
 import org.oagi.score.gateway.http.api.account_management.model.AccountDetailsRecord;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
@@ -78,6 +79,45 @@ class AccountCommandServiceTest {
         ArgumentCaptor<Boolean> adminCaptor = ArgumentCaptor.forClass(Boolean.class);
         verify(command).update(eq(userId), eq("user"), eq("User"), eq("Org"), adminCaptor.capture(), eq(null));
         assertThat(adminCaptor.getValue()).isTrue();
+    }
+
+    @Test
+    void updateRejectsNewPasswordOnOwnAccount() {
+        AccountCommandService service = new AccountCommandService();
+        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+        UserId userId = new UserId(BigInteger.ONE);
+        ScoreUser requester = new ScoreUser(
+                userId, "admin", "Admin", null, false, List.of(ScoreRole.END_USER, ScoreRole.ADMINISTRATOR));
+        UpdateAccountRequest request = new UpdateAccountRequest(
+                userId, "admin", true, "Admin", "Org", "newpass");
+
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+
+        assertThatThrownBy(() -> service.update(requester, request))
+                .isInstanceOf(DataAccessForbiddenException.class);
+        verify(repositoryFactory, never()).accountCommandRepository(eq(requester), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void updateByAdminCanResetNewPasswordOfAnotherAccount() {
+        AccountCommandService service = new AccountCommandService();
+        RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        AccountCommandRepository command = mock(AccountCommandRepository.class);
+        UserId adminId = new UserId(BigInteger.ONE);
+        UserId targetId = new UserId(BigInteger.TWO);
+        ScoreUser requester = new ScoreUser(
+                adminId, "admin", "Admin", null, false, List.of(ScoreRole.END_USER, ScoreRole.ADMINISTRATOR));
+        UpdateAccountRequest request = new UpdateAccountRequest(
+                targetId, "user", false, "User", "Org", "newpass");
+
+        ReflectionTestUtils.setField(service, "repositoryFactory", repositoryFactory);
+        ReflectionTestUtils.setField(service, "passwordEncoder", passwordEncoder);
+        when(repositoryFactory.accountCommandRepository(requester, passwordEncoder)).thenReturn(command);
+
+        service.update(requester, request);
+
+        verify(command).update(eq(targetId), eq("user"), eq("User"), eq("Org"), eq(false), eq("newpass"));
     }
 
     @Test

@@ -1,0 +1,18 @@
+
+/* A release that was left in the middle of a transition: what it is, and what recovering it does. */
+.release-in-progress {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid #ffe082;
+  border-left: 4px solid #f9a825;
+  border-radius: 4px;
+  background: #fff8e1;
+  color: #6d4c00;
+  font-size: 13px;
+}
+
+.release-in-progress-icon {
+  flex: none;
+  color: #f9a825;
+  margin-right: 8px;
+}

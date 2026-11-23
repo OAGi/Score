@@ -3,7 +3,7 @@
     <div class="oas-add-form">
       <mat-form-field class="oas-add-full-width">
         <mat-label>OpenAPI Document</mat-label>
-        <mat-select [(ngModel)]="selectedOasDoc" [panelWidth]="null">
+        <mat-select [(ngModel)]="selectedOasDoc" (ngModelChange)="propose()" [panelWidth]="null">
           <mat-option>
             <ngx-mat-select-search [formControl]="oasDocFilterCtrl"
               [placeholderLabel]="'Search...'"
@@ -19,7 +19,7 @@
       <div class="oas-add-row">
         <mat-form-field>
           <mat-label>Verb</mat-label>
-          <mat-select [(ngModel)]="verb" (ngModelChange)="onVerbChange()" [panelWidth]="null">
+          <mat-select [(ngModel)]="verb" (ngModelChange)="propose()" [panelWidth]="null">
             <mat-option value="GET">GET</mat-option>
             <mat-option value="PUT">PUT</mat-option>
             <mat-option value="POST">POST</mat-option>
@@ -30,7 +30,7 @@
 
         <mat-form-field>
           <mat-label>Message Body</mat-label>
-          <mat-select [(ngModel)]="messageBody" [panelWidth]="null">
+          <mat-select [(ngModel)]="messageBody" (ngModelChange)="propose()" [panelWidth]="null">
             <mat-option value="Request" [disabled]="verb === 'GET'">Request</mat-option>
             <mat-option value="Response">Response</mat-option>
           </mat-select>
@@ -39,8 +39,8 @@
 
       <!-- Issue #1492: the chosen (Verb, Message Body) would duplicate a body the BIE already has on the
            selected document. Mirrors the OpenAPI Document editor's Add dialog: shown inline and blocks Add. -->
-      @if (isDuplicateBodySlot()) {
-        <div class="oas-add-duplicate-error">This endpoint already has a {{ messageBody }} body.</div>
+      @for (problem of problems; track $index) {
+        <div class="oas-add-duplicate-error">{{ problem }}</div>
       }
 
       <!-- Resource Name and Operation ID are derived the same way the OpenAPI Document editor does
@@ -56,7 +56,7 @@
       </mat-form-field>
 
       <div class="oas-add-checkboxes">
-        <mat-checkbox [(ngModel)]="arrayIndicator">Make as an array</mat-checkbox>
+        <mat-checkbox [(ngModel)]="arrayIndicator" (ngModelChange)="propose()">Make as an array</mat-checkbox>
         <mat-checkbox [(ngModel)]="suppressRootIndicator">Suppress a root property</mat-checkbox>
       </div>
     </div>

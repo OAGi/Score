@@ -1,0 +1,156 @@
+<!-- A copy of the template of MatPaginator (Angular Material), with the field for a size of one's own in the list of the sizes. Take
+     the changes of the template of the Angular Material version in use to here when upgrading. -->
+<div class="mat-mdc-paginator-outer-container">
+  <div class="mat-mdc-paginator-container">
+    @if (!hidePageSize) {
+      <div class="mat-mdc-paginator-page-size">
+        <div class="mat-mdc-paginator-page-size-label" [attr.id]="_pageSizeLabelId" aria-hidden="true">
+          {{_intl.itemsPerPageLabel}}
+        </div>
+
+        <mat-form-field
+          [appearance]="_formFieldAppearance!"
+          [color]="color"
+          class="mat-mdc-paginator-page-size-select">
+          <mat-select
+            #selectRef
+            [value]="_isCustomPageSize() ? customValue : pageSize"
+            [disabled]="disabled"
+            [aria-labelledby]="_pageSizeLabelId"
+            [panelClass]="['score-paginator-select-panel', selectConfig.panelClass || '']"
+            [disableOptionCentering]="selectConfig.disableOptionCentering"
+            (selectionChange)="_changePageSize($event.value)"
+            panelWidth="9rem"
+            hideSingleSelectionIndicator>
+            <!-- The size shows whatever it is, in the list or typed in the last row of it (which is no option, so that none would show). -->
+            <mat-select-trigger>{{pageSize}}</mat-select-trigger>
+            @for (pageSizeOption of _listedPageSizes(); track pageSizeOption) {
+              <mat-option [value]="pageSizeOption">
+                {{pageSizeOption}}
+              </mat-option>
+            }
+            @if (_isCustomPageSize()) {
+              <!-- A typed size is no row of the list, but the select shows a selection only when it has an option for its value: this one, of the
+                   value that stands for the typed size (see `[value]` above), is not shown. -->
+              <mat-option [value]="customValue" disabled class="score-paginator-custom-option">{{pageSize}}</mat-option>
+            }
+            <!-- The last row of the list is the size of one's own: a row as the others (a click on it takes the size), whose number shows a field when the
+                 pointer is over it, to be typed over in place; with no size yet, the field is there at once. The keys typed in it are not for the select (it
+                 would look for an option by them). -->
+            <div class="mat-mdc-option mdc-list-item score-paginator-custom-size"
+                 [class.mdc-list-item--selected]="_isCustomPageSize()"
+                 [class.score-paginator-custom-size-empty]="_customFieldSize() === null"
+                 (click)="_selectCustomPageSize(selectRef)" (keydown)="$event.stopPropagation()">
+              <!-- What the row is for, as a small text at the top left of it (the row of the other sizes has none). -->
+              <span class="score-paginator-custom-size-label" aria-hidden="true">Custom</span>
+              <span class="score-paginator-custom-size-value" (click)="$event.stopPropagation()">
+                <span class="mdc-list-item__primary-text score-paginator-custom-size-text">{{ _customFieldSize() }}</span>
+                <span class="score-paginator-custom-size-edit">
+                  <input #customSizeInput type="number" min="1" [max]="maxPageSize" step="1"
+                         aria-label="Custom items per page"
+                         [value]="_customFieldSize() ?? ''"
+                         (keydown.enter)="_applyCustomPageSize(customSizeInput, selectRef)"
+                         (blur)="_applyCustomPageSize(customSizeInput)">
+                  @if (_customFieldSize() !== null) {
+                    <button type="button" class="score-paginator-custom-size-remove" aria-label="Remove custom items per page"
+                            (click)="_removeCustomPageSize(customSizeInput)">
+                      <svg viewBox="0 0 24 24" width="14" height="14" focusable="false" aria-hidden="true">
+                        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                      </svg>
+                    </button>
+                  }
+                </span>
+              </span>
+            </div>
+          </mat-select>
+          <div class="mat-mdc-paginator-touch-target" (click)="selectRef.open()"></div>
+        </mat-form-field>
+      </div>
+    }
+
+    <div class="mat-mdc-paginator-range-actions">
+      <div class="mat-mdc-paginator-range-label" aria-atomic="true" aria-live="polite" role="status">
+        {{_intl.getRangeLabel(pageIndex, pageSize, length)}}
+      </div>
+
+      <!--
+      The buttons use `disabledInteractive` so that they can retain focus if they become disabled,
+      otherwise focus is moved to the document body. However, users should not be able to navigate
+      into these buttons, so `tabindex` is set to -1 when disabled.
+      -->
+
+      @if (showFirstLastButtons) {
+        <button matIconButton type="button"
+                class="mat-mdc-paginator-navigation-first"
+                (click)="_buttonClicked(0, _previousButtonsDisabled())"
+                [attr.aria-label]="_intl.firstPageLabel"
+                [matTooltip]="_intl.firstPageLabel"
+                [matTooltipDisabled]="_previousButtonsDisabled()"
+                matTooltipPosition="above"
+                [disabled]="_previousButtonsDisabled()"
+                [tabindex]="_previousButtonsDisabled() ? -1 : null"
+                disabledInteractive>
+          <svg class="mat-mdc-paginator-icon"
+              viewBox="0 0 24 24"
+              focusable="false"
+              aria-hidden="true">
+            <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/>
+          </svg>
+        </button>
+      }
+      <button matIconButton type="button"
+              class="mat-mdc-paginator-navigation-previous"
+              (click)="_buttonClicked(pageIndex - 1, _previousButtonsDisabled())"
+              [attr.aria-label]="_intl.previousPageLabel"
+              [matTooltip]="_intl.previousPageLabel"
+              [matTooltipDisabled]="_previousButtonsDisabled()"
+              matTooltipPosition="above"
+              [disabled]="_previousButtonsDisabled()"
+              [tabindex]="_previousButtonsDisabled() ? -1 : null"
+              disabledInteractive>
+        <svg class="mat-mdc-paginator-icon"
+             viewBox="0 0 24 24"
+             focusable="false"
+             aria-hidden="true">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </button>
+      <button matIconButton type="button"
+              class="mat-mdc-paginator-navigation-next"
+              (click)="_buttonClicked(pageIndex + 1, _nextButtonsDisabled())"
+              [attr.aria-label]="_intl.nextPageLabel"
+              [matTooltip]="_intl.nextPageLabel"
+              [matTooltipDisabled]="_nextButtonsDisabled()"
+              matTooltipPosition="above"
+              [disabled]="_nextButtonsDisabled()"
+              [tabindex]="_nextButtonsDisabled() ? -1 : null"
+              disabledInteractive>
+        <svg class="mat-mdc-paginator-icon"
+             viewBox="0 0 24 24"
+             focusable="false"
+             aria-hidden="true">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </button>
+      @if (showFirstLastButtons) {
+        <button matIconButton type="button"
+                class="mat-mdc-paginator-navigation-last"
+                (click)="_buttonClicked(getNumberOfPages() - 1, _nextButtonsDisabled())"
+                [attr.aria-label]="_intl.lastPageLabel"
+                [matTooltip]="_intl.lastPageLabel"
+                [matTooltipDisabled]="_nextButtonsDisabled()"
+                matTooltipPosition="above"
+                [disabled]="_nextButtonsDisabled()"
+                [tabindex]="_nextButtonsDisabled() ? -1 : null"
+                disabledInteractive>
+          <svg class="mat-mdc-paginator-icon"
+              viewBox="0 0 24 24"
+              focusable="false"
+              aria-hidden="true">
+            <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+</div>

@@ -8,7 +8,7 @@
 #   - score-web: Node 22 (via nvm) + prebuilt docs at docs/user_guide/_build/html
 #   - score-http: Maven wrapper + mariadb JDBC driver in ~/.m2
 #
-# Usage: deploy/build-images.sh [version]
+# Usage: [IMAGES=web,http,repo] deploy/build-images.sh [version]   (IMAGES default: all three)
 #
 # Multi-architecture: PUSH_IMAGE=1 builds linux/amd64 + linux/arm64 and pushes the manifest list
 # straight to Docker Hub (a local image holds one platform only); push-images.sh then sees the tags
@@ -29,13 +29,22 @@ docker info >/dev/null 2>&1 || die "docker daemon not reachable (is Docker Deskt
 
 log "Building images for $VERSION (platforms $IMAGE_PLATFORMS)"
 
+normalize_images
+log "Selected images: $IMAGES"
+# Each module's build.sh takes its tag from its OWN VERSION file (the CLI arg is only a fallback),
+# so a build at a different tag would silently produce the wrong tag. Refuse instead.
+check_module_version() { # <image> <module-dir>
+  local mv; mv="$(tr -d '[:space:]' < "$REPO_ROOT/$2/VERSION")"
+  [ "$mv" = "$(tag_for "$1" "$VERSION")" ] || die "$2/VERSION is '$mv' but requested tag for $1 is '$(tag_for "$1" "$VERSION")'. A build always uses the module VERSION; to deploy an existing tag use --no-build, or bump VERSION first."
+}
+has_image repo && check_module_version repo score-repo
+has_image http && check_module_version http score-http
+has_image web  && check_module_version web  score-web
+
 # repo first (fast), then http (Maven), then web (Angular).
-log "[1/3] srt-repo"
-sh "$REPO_ROOT/score-repo/docker/build.sh" "$VERSION"
-log "[2/3] srt-http-gateway"
-sh "$REPO_ROOT/score-http/docker/build.sh" "$VERSION"
-log "[3/3] srt-web"
-sh "$REPO_ROOT/score-web/docker/build.sh" "$VERSION"
+has_image repo && { log "srt-repo"; sh "$REPO_ROOT/score-repo/docker/build.sh" "$(tag_for repo "$VERSION")"; }
+has_image http && { log "srt-http-gateway"; sh "$REPO_ROOT/score-http/docker/build.sh" "$(tag_for http "$VERSION")"; }
+has_image web  && { log "srt-web"; sh "$REPO_ROOT/score-web/docker/build.sh" "$(tag_for web "$VERSION")"; }
 
 log "Built:"
 docker images --format '  {{.Repository}}:{{.Tag}}\t{{.ID}}\t{{.Size}}' \

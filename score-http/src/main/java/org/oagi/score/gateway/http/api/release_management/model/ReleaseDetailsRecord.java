@@ -19,7 +19,18 @@ public record ReleaseDetailsRecord(ReleaseId releaseId, LibraryId libraryId, Gui
                                    WhoAndWhen created,
                                    WhoAndWhen lastUpdated,
                                    ReleaseSummaryRecord prev,
-                                   ReleaseSummaryRecord next) implements ReleaseBaseRecord {
+                                   ReleaseSummaryRecord next,
+                                   boolean busy) implements ReleaseBaseRecord {
+
+    /**
+     * The same release, told to be busy or not. A release is busy while a transaction holds it, which is while the work for it is going
+     * on (as opposed to a release that is in the middle of its work with nothing doing it, because the server stopped). It is not read
+     * with the rest of the release: it is only asked for a release that is in the middle of its work.
+     */
+    public ReleaseDetailsRecord withBusy(boolean busy) {
+        return new ReleaseDetailsRecord(releaseId, libraryId, guid, releaseNum, state, releaseNote, releaseLicense, namespaceId,
+                created, lastUpdated, prev, next, busy);
+    }
 
     /**
      * Determines if this release is the latest release in the sequence.

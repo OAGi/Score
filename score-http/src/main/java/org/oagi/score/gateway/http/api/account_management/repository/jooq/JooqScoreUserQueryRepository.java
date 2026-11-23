@@ -57,6 +57,39 @@ public class JooqScoreUserQueryRepository extends JooqBaseRepository implements 
     }
 
     @Override
+    public boolean isAccountDisabled(String username) {
+        return dslContext().fetchExists(
+                dslContext().selectOne().from(APP_USER)
+                        .where(and(APP_USER.LOGIN_ID.equalIgnoreCase(username), notEnabled())));
+    }
+
+    @Override
+    public boolean isOidcAccountDisabled(String providerName, String oidcSub) {
+        return dslContext().fetchExists(
+                dslContext().selectOne().from(APP_OAUTH2_USER)
+                        .join(APP_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID))
+                        .where(and(
+                                APP_OAUTH2_USER.SUB.equalIgnoreCase(oidcSub),
+                                (providerName != null) ? APP_OAUTH2_USER.OAUTH2_APP_ID.in(
+                                        dslContext().select(OAUTH2_APP.OAUTH2_APP_ID).from(OAUTH2_APP)
+                                                .where(OAUTH2_APP.PROVIDER_NAME.eq(providerName))) : noCondition(),
+                                notEnabled())));
+    }
+
+    @Override
+    public List<String> getOidcSubs(String username) {
+        return dslContext().select(APP_OAUTH2_USER.SUB)
+                .from(APP_OAUTH2_USER)
+                .join(APP_USER).on(APP_USER.APP_USER_ID.eq(APP_OAUTH2_USER.APP_USER_ID))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(username))
+                .fetch(APP_OAUTH2_USER.SUB);
+    }
+
+    private static Condition notEnabled() {
+        return APP_USER.IS_ENABLED.isNull().or(APP_USER.IS_ENABLED.ne((byte) 1));
+    }
+
+    @Override
     public List<ScoreUser> getScoreUsers() {
         var queryBuilder = new GetScoreUserQueryBuilder();
         return queryBuilder.select()

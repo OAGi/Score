@@ -5,11 +5,17 @@ import {HttpParams} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
-import {forkJoin} from 'rxjs';
-import {finalize} from 'rxjs/operators';
+import {forkJoin, of} from 'rxjs';
+import {catchError, take} from 'rxjs/operators';
 import {AccountList} from '../../account-management/domain/accounts';
 import {AuthService} from '../../authentication/auth.service';
 import {WebPageInfoService} from '../../basis/basis.service';
+import {GithubIntegrationService, GithubStatus} from '../../cc-management/domain/github-integration.service';
+import {
+  StateChangeDialogComponent,
+  StateChangeDialogResult,
+  usesStateChangeDialog
+} from '../../cc-management/state-change-dialog/state-change-dialog.component';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
@@ -65,11 +71,11 @@ export class CodeListListComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
+  private githubService = inject(GithubIntegrationService);
   webPageInfo = inject(WebPageInfoService);
 
   faLocationArrow = faLocationArrow;
   title = 'Code List';
-  canSelect = ['WIP', 'Deleted'];
   readonly libraryChoice = new LibraryChoice(this.auth);
   readonly releaseChoice = new ReleaseChoice(this.auth);
 
@@ -85,12 +91,10 @@ export class CodeListListComponent {
   readonly ready = signal(false);
   readonly extraParams = signal<Record<string, string>>({});
   readonly filterOptions = signal<Record<string, { value: string, label: string }[]>>({states: [], namespaces: []});
-  /** While a code list is being created. */
+  /** While a code list is being created, or the state of the selected ones is being changed. */
   readonly busy = signal(false);
 
   readonly load = (params: HttpParams) => this.service.getCodeListListPage(params);
-  readonly rowSelectable = (row: CodeListListEntry) =>
-    this.canSelect.indexOf(row.state) > -1 && !this.hasRevision(row) && row.owner.loginId === this.currentUser;
 
   constructor() {
     afterNextRender(() => this.start());
@@ -186,16 +190,136 @@ export class CodeListListComponent {
     return true;
   }
 
-  get showDiscardBtn(): boolean {
-    return this.selection.selected.length > 0 ?
-      this.selection.selected.filter(e => e.state === 'Deleted').length === 0 :
-      false;
+  /**
+   * Whether an action of the toolbar applies to every selected code list: the same rules as the core components
+   * (a state moves only for its owner, and Draft and Candidate only on the working branch, QA and Production only on a release).
+   */
+  canToolbarAction(action: string): boolean {
+    const selected = this.selection.selected;
+    if (selected.length === 0) {
+      return false;
+    }
+    const owned = (e: CodeListListEntry) => e.owner.loginId === this.currentUser;
+    switch (action) {
+      case 'WIP':
+        return selected.every(e => ['Draft', 'QA', 'Candidate'].includes(e.state) && owned(e));
+      case 'Draft':
+        return selected.every(e => e.state === 'WIP' && owned(e) && e.release.workingRelease);
+      case 'QA':
+        return selected.every(e => e.state === 'WIP' && owned(e) && !e.release.workingRelease);
+      case 'Candidate':
+        return selected.every(e => e.state === 'Draft' && owned(e) && e.release.workingRelease);
+      case 'Production':
+        return selected.every(e => e.state === 'QA' && owned(e) && !e.release.workingRelease);
+      case 'Transfer':
+        return selected.every(e => e.state === 'WIP' && owned(e));
+      case 'Delete':
+        return selected.every(e => e.state === 'WIP' && owned(e) && !this.hasRevision(e));
+      case 'Restore':
+      case 'Purge':
+        return selected.every(e => e.state === 'Deleted');
+      default:
+        return false;
+    }
   }
 
-  get showRestoreBtn(): boolean {
-    return this.selection.selected.length > 0 ?
-      this.selection.selected.filter(e => e.state === 'WIP').length === 0 :
-      false;
+  /** Moves the selected code lists to a state, after the confirmation (and the GitHub status posts, when that integration is on). */
+  multipleUpdateState(toState: string) {
+    const selected = this.selection.selected;
+    if (selected.length === 0) {
+      return;
+    }
+    if (toState !== 'WIP' && selected.some(e => !e.namespaceId)) {
+      this.snackBar.open('Namespace is required for all selected code lists before moving to Draft/QA.', '', {
+        duration: 3000
+      });
+      return;
+    }
+
+    const header = 'Update state to \'' + toState + '\'?';
+    const content = ['Are you sure you want to update the state to \'' + toState + '\'?'];
+    if (toState === 'Production') {
+      content.push('Once in the ' + toState + ' state it can no longer be changed or discarded.');
+    }
+    const action = (toState === 'Production') ? 'Update anyway' : 'Update';
+
+    // Either way, the confirmation updates ALL selected code lists (issue #1533 for the GitHub dialog).
+    this.githubService.getStatus()
+      .pipe(take(1), catchError(() => of({enabled: false, connected: false} as GithubStatus)))
+      .subscribe(status => {
+        const eligibleRows = selected.filter(e => usesStateChangeDialog(e.state, toState));
+        if (status.enabled && eligibleRows.length > 0) {
+          this.dialog.open(StateChangeDialogComponent, {
+            data: {
+              header, content, actionLabel: action, toState,
+              targets: eligibleRows.map(e => ({
+                ccType: 'code_list',
+                manifestId: e.codeListManifestId,
+                name: e.name,
+                state: e.state
+              }))
+            },
+            autoFocus: false
+          }).afterClosed().subscribe((result: StateChangeDialogResult | undefined) => {
+            if (result?.confirmed) {
+              this.doUpdateState(toState, result.comments, result.fieldOptionOverrides);
+            }
+          });
+        } else {
+          const dialogConfig = this.confirmDialogService.newConfig();
+          dialogConfig.data.header = header;
+          dialogConfig.data.content = content;
+          dialogConfig.data.action = action;
+          this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(result => {
+            if (result) {
+              this.doUpdateState(toState);
+            }
+          });
+        }
+      });
+  }
+
+  private doUpdateState(toState: string, comments?: { [key: string]: string },
+                        projectFieldOptionOverrides?: { [key: string]: string }) {
+    this.busy.set(true);
+    this.service.updateStateOnList(this.selection.selected, toState, comments, projectFieldOptionOverrides)
+      .subscribe(_ => {
+        this.busy.set(false);
+        this.snackBar.open('Updated', '', {
+          duration: 3000
+        });
+        this.selectionClear();
+        this.view().reload();
+      }, err => {
+        // The code lists before the failed one have moved: the list shows them as they are.
+        this.busy.set(false);
+        this.selectionClear();
+        this.view().reload();
+        throw err;
+      });
+  }
+
+  openTransferDialogMultiple() {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {roles: this.auth.getUserToken().roles};
+    const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result: AccountList) => {
+      if (result) {
+        this.service.transferOwnershipOnList(this.selection.selected, result.loginId).subscribe(_ => {
+          this.snackBar.open('Transferred', '', {
+            duration: 3000,
+          });
+          this.selectionClear();
+          this.view().reload();
+        });
+      }
+    });
   }
 
   openDialogCodeListListDelete() {

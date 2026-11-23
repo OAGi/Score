@@ -7,7 +7,7 @@ import {NamespaceService} from '../../../../namespace-management/domain/namespac
 import {ModuleElement, ModuleSetSummary, Tile} from '../../../domain/module';
 import {ModuleService} from '../../../domain/module.service';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
+import {ReplaySubject, Subscription} from 'rxjs';
 import {initFilter} from '../../../../common/utility';
 
 @Component({
@@ -47,6 +47,7 @@ export class ModuleAddDialogComponent implements OnInit {
   selected: ModuleElement;
   copySubModules = true;
   selectedModuleSetId: number;
+  private loadSubscription: Subscription;
 
   disableAnimation = true;
 
@@ -77,12 +78,19 @@ export class ModuleAddDialogComponent implements OnInit {
   }
 
   onModuleSetChange(moduleSetId: number) {
-    this.moduleService.getModules(moduleSetId).subscribe(resp => {
-      this.rootElement = resp as ModuleElement;
-      this.tiles = [];
-      this.tiles.push({elements: this.rootElement.children, current: undefined});
-      if (this.rootElement.children && this.rootElement.children.length > 0) {
-        this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
+    // Nothing of the previously chosen module set may stay selected while the new one loads or when it fails to load.
+    this.loadSubscription?.unsubscribe();
+    this.rootElement = undefined;
+    this.tiles = [];
+    this.selected = undefined;
+    this.loadSubscription = this.moduleService.getModules(moduleSetId).subscribe({
+      next: resp => {
+        this.rootElement = resp as ModuleElement;
+        this.tiles = [];
+        this.tiles.push({elements: this.rootElement.children, current: undefined});
+        if (this.rootElement.children && this.rootElement.children.length > 0) {
+          this.onClickElement(this.tiles[0], this.tiles[0].elements[0]);
+        }
       }
     });
   }

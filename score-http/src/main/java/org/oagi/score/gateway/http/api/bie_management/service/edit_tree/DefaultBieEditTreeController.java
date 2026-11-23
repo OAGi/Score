@@ -49,6 +49,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
 import org.oagi.score.gateway.http.common.model.AccessPrivilege;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.api.bie_management.model.PrimitiveRestriction;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.*;
 import org.oagi.score.gateway.http.common.util.Utility;
@@ -857,18 +858,16 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
         if (bbiepNode.getBbiepId() != null) {
             Record4<String, String, ULong, String> rs =
-                    dslContext.select(BBIEP.BIZ_TERM, BBIEP.REMARK, BCCP.BDT_ID, DT_MANIFEST.DEN)
+                    dslContext.select(BBIEP.BIZ_TERM, BBIEP.REMARK, DT_MANIFEST.DT_ID, DT_MANIFEST.DEN)
                             .from(BBIEP)
                             .join(BCCP_MANIFEST).on(BBIEP.BASED_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
-                            .join(BCCP).on(BCCP_MANIFEST.BCCP_ID.eq(BCCP.BCCP_ID))
                             .join(DT_MANIFEST).on(BCCP_MANIFEST.BDT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
-                            .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                             .where(BBIEP.BBIEP_ID.eq(ULong.valueOf(bbiepNode.getBbiepId().value())))
                             .fetchOne();
 
             detail.setBizTerm(rs.getValue(BBIEP.BIZ_TERM));
             detail.setRemark(rs.getValue(BBIEP.REMARK));
-            detail.setBdtId(rs.getValue(BCCP.BDT_ID).toBigInteger());
+            detail.setBdtId(rs.getValue(DT_MANIFEST.DT_ID).toBigInteger());
             detail.setBdtDen(rs.getValue(DT_MANIFEST.DEN).replaceAll("_ ", " "));
         } else {
             Record2<String, ULong> rs = dslContext.select(
@@ -882,8 +881,11 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbiepNode.getBbieId() == null) {
-            XbtManifestId defaultXbtManifestId = repository.getDefaultXbtManifestIdByDtManifestId(detail.getBdtManifestId());
-            detail.setXbtManifestId(defaultXbtManifestId);
+            PrimitiveRestriction defaultPrimitiveRestriction =
+                    repository.getDefaultPrimitiveRestriction(requester, detail.getBdtManifestId());
+            detail.setXbtManifestId(defaultPrimitiveRestriction.xbtManifestId());
+            detail.setCodeListManifestId(defaultPrimitiveRestriction.codeListManifestId());
+            detail.setAgencyIdListManifestId(defaultPrimitiveRestriction.agencyIdListManifestId());
         }
 
         if (bbiepNode.getBccManifestId() != null) {
@@ -1036,8 +1038,11 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbieScNode.getBbieScId() == null) {
-            XbtManifestId defaultXbtManifestId = repository.getDefaultXbtManifestIdByDtScManifestId(bbieScNode.getDtScManifestId());
-            detail.setXbtManifestId(defaultXbtManifestId);
+            PrimitiveRestriction defaultPrimitiveRestriction =
+                    repository.getDefaultPrimitiveRestrictionOfSc(requester, bbieScNode.getDtScManifestId());
+            detail.setXbtManifestId(defaultPrimitiveRestriction.xbtManifestId());
+            detail.setCodeListManifestId(defaultPrimitiveRestriction.codeListManifestId());
+            detail.setAgencyIdListManifestId(defaultPrimitiveRestriction.agencyIdListManifestId());
         }
 
         if (bbieScNode.getDtScManifestId() != null) {

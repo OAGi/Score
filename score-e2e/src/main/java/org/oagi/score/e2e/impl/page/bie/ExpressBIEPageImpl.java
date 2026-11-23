@@ -190,6 +190,23 @@ public class ExpressBIEPageImpl extends BaseSearchBarPageImpl implements Express
     }
 
     @Override
+    public String getShownBusinessContextName(TopLevelASBIEPObject topLevelAsbiep) {
+        WebElement tr = getTableRecordByValue(topLevelAsbiep.getDen());
+        return getText(getColumnByName(tr, "businessContexts")
+                .findElement(By.className("business-contexts-menu-label"))).trim();
+    }
+
+    @Override
+    public void chooseBusinessContext(TopLevelASBIEPObject topLevelAsbiep, String businessContextName) {
+        WebElement tr = getTableRecordByValue(topLevelAsbiep.getDen());
+        click(getDriver(), getColumnByName(tr, "businessContexts")
+                .findElement(By.className("business-contexts-menu-trigger")));
+        click(getDriver(), elementToBeClickable(getDriver(), By.xpath(
+                "//div[contains(@class, \"mat-mdc-menu-panel\")]//button[@mat-menu-item]"
+                        + "[normalize-space(.) = " + xpathLiteral(businessContextName) + "]")));
+    }
+
+    @Override
     public WebElement getColumnByName(WebElement tableRecord, String columnName) {
         return tableRecord.findElement(By.className("mat-column-" + columnName));
     }

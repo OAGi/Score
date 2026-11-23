@@ -1,5 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import {MatDialog} from '@angular/material/dialog';
+import {askToWriteNewLog, logOptions} from '../../common/log-not-found/log-not-found';
 import {forkJoin, Observable, of} from 'rxjs';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, DtFlatNode, DtScFlatNode} from './cc-flat-tree';
 import {
@@ -34,6 +36,7 @@ import {map} from 'rxjs/operators';
 @Injectable()
 export class CcNodeService {
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
 
 
   getAccDetails(manifestId): Observable<AccDetails> {
@@ -469,13 +472,14 @@ export class CcNodeService {
     return this.http.post<CcNodeUpdateResponse>(url, {});
   }
 
-  makeNewRevision(type: string, manifestId: number): Observable<any> {
+  makeNewRevision(type: string, manifestId: number, recreateLog = false): Observable<any> {
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/revise';
-    return this.http.patch<any>(url, {});
+    return this.http.patch<any>(url, {}, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.makeNewRevision(type, manifestId, true)));
   }
 
   cancelRevision(type: string, manifestId: number, comment?: string,
-                 projectFieldOptionOverride?: string): Observable<any> {
+                 projectFieldOptionOverride?: string, recreateLog = false): Observable<any> {
     const url = '/api/core-components/' + type.toLowerCase() + '/' + manifestId + '/cancel';
     // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
     // values are not sent (post nothing / use the configured fieldOption).
@@ -486,7 +490,8 @@ export class CcNodeService {
     if (projectFieldOptionOverride) {
       body.projectFieldOptionOverride = projectFieldOptionOverride;
     }
-    return this.http.patch<any>(url, body);
+    return this.http.patch<any>(url, body, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.cancelRevision(type, manifestId, comment, projectFieldOptionOverride, true)));
   }
 
   postComment(reference: string, text: string, prevCommentId?: number): Observable<any> {

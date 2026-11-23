@@ -150,6 +150,35 @@ export function toMinorOpenApiVersion(version: string): string {
   return (parts.length >= 2) ? parts[0] + '.' + parts[1] : version.trim();
 }
 
+// Issue #1791: an HTTP header of the document, generated either as a request parameter (in: header) or as a header of
+// every response of the operation: the two are separate entries, each with its own description, schema, example and
+// required. An operation of its own can be given (oasOperationId); without one it applies to the whole document.
+// A Schema Object: a JSON object. (OpenAPI 3.0 also allows a Reference Object, {"$ref": "#/components/schemas/X"}, in its
+// place; from 3.1 on, $ref is a keyword of the Schema Object.)
+export type OasHttpHeaderDirection = 'REQUEST' | 'RESPONSE';
+
+// The location of a request parameter: the `in` of the Parameter Object.
+export type OasParameterLocation = 'query' | 'header' | 'path' | 'cookie';
+
+export type OasSchemaObject = { [keyword: string]: any };
+
+export interface OasDocHttpHeader {
+  oasOperationId?: number;
+  name: string;
+  description?: string;
+  schema: OasSchemaObject;
+  example?: any; // the example of the Parameter / Header Object (not of its schema): any JSON value
+  direction: OasHttpHeaderDirection;
+  in?: OasParameterLocation; // of a request parameter only; a response header is always in a header
+  required: boolean;
+  // How the value is serialized: with a schema and a style (undefined = the default of the specification), or with
+  // `content`, a Media Type Object of this media type (then there is no style).
+  style?: string;
+  explode?: boolean;
+  allowReserved?: boolean; // a query parameter only
+  contentMediaType?: string;
+}
+
 export class OasDoc {
   oasDocId: number;
   guid: string;
@@ -169,6 +198,8 @@ export class OasDoc {
   // Issue #1729: the document's Security Schemes (empty = default OAuth2).
   securitySchemes: OasSecurityScheme[];
   securityRequirements: OasSecurityRequirement[];
+  // Issue #1791: the HTTP headers of the document.
+  httpHeaders: OasDocHttpHeader[];
   access: string;
   ownerUserId: string;
   lastUpdateTimestamp: Date;
@@ -366,6 +397,9 @@ export class BieForOasDoc {
   createdBy: ScoreUser;
   lastUpdatedBy: ScoreUser;
   businessContexts: BusinessContext[] = [];
+  // Issue #1791: the HTTP headers of the operation of this row. They are the objects of OasDoc.httpHeaders (see
+  // linkHeadersToRows), so they are not a part of the change tracking or of json: the document is what is saved.
+  httpHeaders: OasDocHttpHeader[] = [];
   private _resourceName: string;
   private _operationId: string;
   private _tagName: string;
@@ -414,14 +448,70 @@ export class BieForOasDoc {
     this.tagName = obj && obj.tagName || '';
     this.oasOperationId = obj && obj.oasOperationId || 0;
     this.oasResourceId = obj && obj.oasResourceId || 0;
+    this.clientKey = obj && obj.clientKey || undefined;
     this.lastUpdateTimestamp = obj && obj.lastUpdateTimestamp || undefined;
     this.createdBy = obj && obj.createdBy || undefined;
     this.lastUpdatedBy = obj && obj.lastUpdatedBy || undefined;
     this.businessContexts = obj && obj.businessContexts || [];
+    this.httpHeaders = obj && obj.httpHeaders || [];
+  }
+
+  /**
+   * What the user changed of the operation since the server last answered, that the server makes the Operation ID and the
+   * Resource Name of: the verb and the array indicator. The page does not make them: it says what the user did.
+   */
+  touched: string[] = [];
+
+  /**
+   * What the page calls a row that the user added and has not saved (it has no id yet), or `undefined` for a row of the document.
+   * The server answers by it, and says what is wrong with the row by it.
+   */
+  clientKey: string | undefined;
+  /** The summary and the description of an operation without a BIE that the user added. */
+  summary: string;
+  description: string;
+
+  get isNew(): boolean {
+    return !!this.clientKey;
+  }
+
+  /** The operation of the row that the page says it is, whether it is saved or not. */
+  get rowId(): string {
+    return this.clientKey ?? '' + this.oasOperationId;
+  }
+
+  /**
+   * What the server is told of a row that the user added. A name that the user did not give (the Resource Name and the Operation ID
+   * of a BIE) is the server's to make: it is not said, so that it is made again when the verb or the array indicator is changed.
+   */
+  get additionJson(): any {
+    return {
+      clientKey: this.clientKey,
+      topLevelAsbiepId: this.topLevelAsbiepId || null,
+      propertyTerm: this.propertyTerm,
+      verb: this.verb,
+      messageBody: this.messageBody,
+      arrayIndicator: this.arrayIndicator,
+      suppressRootIndicator: this.suppressRootIndicator,
+      resourceName: this.touched.includes('resourceName') ? this.resourceName : undefined,
+      operationId: this.touched.includes('operationId') ? this.operationId : undefined,
+      tagName: this.tagName,
+      httpStatusCode: this.httpStatusCode,
+      summary: this.summary,
+      description: this.description
+    };
+  }
+
+  touch(field: 'verb' | 'arrayIndicator' | 'operationId' | 'resourceName'): void {
+    if (!this.touched.includes(field)) {
+      this.touched.push(field);
+    }
   }
 
   get json(): any {
     return {
+      touched: this.touched,
+      propertyTerm: this.propertyTerm,
       oasDocId: this.oasDocId,
       topLevelAsbiepId: this.topLevelAsbiepId,
       oasResourceId: this.oasResourceId,
@@ -528,7 +618,7 @@ export class BieForOasDoc {
   }
 
   get isChanged(): boolean {
-    return this.$hashCode !== this.hashCode;
+    return this.isNew || this.$hashCode !== this.hashCode;
   }
 }
 

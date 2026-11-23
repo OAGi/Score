@@ -486,7 +486,8 @@ public class Utility {
     }
 
     public static String emptyToNull(String str) {
-        return str.equals("") ? null : str;
+        String trimmed = str.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     public static boolean isValidURI(String uri) {

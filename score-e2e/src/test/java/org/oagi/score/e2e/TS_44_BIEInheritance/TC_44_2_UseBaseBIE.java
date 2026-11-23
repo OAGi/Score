@@ -255,4 +255,49 @@ public class TC_44_2_UseBaseBIE extends BaseTest {
         assertEquals(effectivityContextDefinition, getText(baseEffectivityAsbiePanel.getContextDefinitionField()));
     }
 
+
+    @Test
+    @DisplayName("TC_44_2_4")
+    public void base_bie_list_leaves_out_the_bie_itself_and_the_bies_derived_from_it() {
+        AppUserObject targetOwner = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(targetOwner);
+        AppUserObject derivedOwner = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(derivedOwner);
+        AppUserObject indirectlyDerivedOwner = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(indirectlyDerivedOwner);
+        AppUserObject unrelatedOwner = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+        thisAccountWillBeDeletedAfterTests(unrelatedOwner);
+
+        BusinessContextObject randomBusinessContext =
+                getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(targetOwner);
+        LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+        ReleaseObject release = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, "10.11");
+        ASCCPObject asccp = getAPIFactory().getCoreComponentAPI()
+                .getASCCPByDENAndReleaseNum(library, "BOM Header. BOM Header", release.getReleaseNumber());
+
+        // The four BIEs are of the same ASCCP and release. The 2nd is derived from the 1st, the 3rd from the 2nd.
+        TopLevelASBIEPObject targetBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, targetOwner, "WIP");
+        TopLevelASBIEPObject derivedBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, derivedOwner, "WIP");
+        TopLevelASBIEPObject indirectlyDerivedBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, indirectlyDerivedOwner, "WIP");
+        TopLevelASBIEPObject unrelatedBIE = getAPIFactory().getBusinessInformationEntityAPI()
+                .generateRandomTopLevelASBIEP(Arrays.asList(randomBusinessContext), asccp, unrelatedOwner, "WIP");
+        getAPIFactory().getBusinessInformationEntityAPI().updateBasedTopLevelASBIEP(derivedBIE, targetBIE);
+        getAPIFactory().getBusinessInformationEntityAPI().updateBasedTopLevelASBIEP(indirectlyDerivedBIE, derivedBIE);
+
+        HomePage homePage = loginPage().signIn(targetOwner.getLoginId(), targetOwner.getPassword());
+        EditBIEPage editBIEPage = homePage.getBIEMenu().openViewEditBIESubMenu().openEditBIEPage(targetBIE);
+        SelectBaseProfileBIEDialog selectBaseProfileBIEDialog = editBIEPage.openUseBaseBIEDialog();
+
+        // Look for the BIEs of all four owners at once: only the unrelated one is left to select.
+        selectBaseProfileBIEDialog.showAdvancedSearchPanel();
+        selectBaseProfileBIEDialog.setOwners(Arrays.asList(targetOwner.getLoginId(), derivedOwner.getLoginId(),
+                indirectlyDerivedOwner.getLoginId(), unrelatedOwner.getLoginId()));
+        selectBaseProfileBIEDialog.hitSearchButton();
+        waitFor(ofMillis(1000L));
+
+        assertEquals(Arrays.asList(unrelatedOwner.getLoginId()), selectBaseProfileBIEDialog.getOwnerLoginIdsOfTableRecords());
+    }
 }

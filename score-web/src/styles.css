@@ -1170,7 +1170,8 @@ th.mat-mdc-header-cell:first-of-type, td.mat-mdc-cell:first-of-type, td.mat-mdc-
   border-top: 1px solid #e0e0e0;
 }
 
-mat-paginator .mat-mdc-select, mat-paginator .mat-mdc-select-value-text {
+mat-paginator .mat-mdc-select, mat-paginator .mat-mdc-select-value-text,
+score-paginator .mat-mdc-select, score-paginator .mat-mdc-select-value-text {
   font-size: 12px !important;
 }
 

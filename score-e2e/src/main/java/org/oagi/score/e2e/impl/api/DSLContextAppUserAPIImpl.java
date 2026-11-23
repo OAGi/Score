@@ -176,6 +176,10 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                         deleteNamespaceByAppUserId(txContext, appUserId);
                         deleteReleaseByAppUserId(txContext, appUserId);
 
+                        // what the application told the user, and what it recorded about the work it did for the user
+                        txContext.execute("delete from `message` where sender_id = ? or recipient_id = ?", appUserId, appUserId);
+                        txContext.execute("delete from `exception` where created_by = ?", appUserId);
+
                         txContext.deleteFrom(APP_USER)
                                 .where(APP_USER.APP_USER_ID.eq(appUserId))
                                 .execute();
@@ -1055,6 +1059,90 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
         }
     }
 
+    /** The tables of the manifests of every kind of component; the manifests are deleted with the release, after they are relinked. */
+    private static final List<String> MANIFEST_KINDS = List.of("acc", "ascc", "asccp", "bcc", "bccp", "dt", "dt_sc",
+            "code_list", "code_list_value", "agency_id_list", "agency_id_list_value", "xbt", "blob_content");
+
+    /** What the BIEs of the user own, which is deleted with them. */
+    private static final List<String> BIE_TABLES = List.of("abie", "asbie", "asbiep", "bbie", "bbiep", "bbie_sc", "top_level_asbiep");
+
+    /** The tables that have a release of their own, but are deleted in another place, or are not a part of it. */
+    private static final List<String> TABLES_OF_THE_RELEASE_DELETED_ELSEWHERE = List.of("release", "release_dep", "record_change_log",
+            "module_set_release", "top_level_asbiep");
+
+    /**
+     * Publishing a release moves the links to the issues of GitHub of the components it includes from 'Working' onto the release
+     * (the issues are carried by the published release from then on). Deleting the release must not lose them, so they are put
+     * back on the components of 'Working' that the manifests of the release were made from, unless they are there already.
+     */
+    private void giveTheLinksToGitHubIssuesBackToWorking(ULong releaseId) {
+        for (String kind : List.of("acc", "asccp", "bccp", "dt", "code_list", "agency_id_list")) {
+            String link = "`github_issue_" + kind + "_manifest`";
+            String id = "`" + kind + "_manifest_id`";
+            dslContext.execute("insert into " + link + " (" + id + ", github_issue_id, created_by, last_updated_by, "
+                    + "creation_timestamp, last_update_timestamp) "
+                    + "select w." + id + ", g.github_issue_id, g.created_by, g.last_updated_by, g.creation_timestamp, "
+                    + "g.last_update_timestamp from " + link + " g "
+                    + "join `" + kind + "_manifest` r on r." + id + " = g." + id + " and r.release_id = ? "
+                    + "join `" + kind + "_manifest` w on (w.`prev_" + kind + "_manifest_id` = r." + id + " or w." + id
+                    + " = r.`next_" + kind + "_manifest_id`) "
+                    + "join `release` wr on wr.release_id = w.release_id and wr.release_num = 'Working' "
+                    + "where not exists (select 1 from " + link + " x where x." + id + " = w." + id
+                    + " and x.github_issue_id = g.github_issue_id)", releaseId);
+        }
+    }
+
+    /**
+     * Deletes what belongs to a release, but is not a manifest: the rows that point at a manifest of the release (the tags, the
+     * orders of the children, the sequence keys, the links to the issues of GitHub, the manifests of the modules) and the rows that
+     * have the release itself (the allowed primitives of the data types). A release that is drafted copies all of them, and a
+     * clean-up that deletes the manifests only leaves them behind.
+     */
+    private void deleteWhatBelongsToRelease(ULong releaseId) {
+        giveTheLinksToGitHubIssuesBackToWorking(releaseId);
+        for (org.jooq.Record column : dslContext.fetch("select table_name, column_name from information_schema.columns "
+                + "where table_schema = database() and column_name regexp '(^|_)(" + String.join("|", MANIFEST_KINDS)
+                + ")_manifest_id$' order by table_name, column_name")) {
+            String table = column.get(0, String.class);
+            String name = column.get(1, String.class);
+            if (BIE_TABLES.contains(table) || (table.endsWith("_manifest") && MANIFEST_KINDS.contains(
+                    table.substring(0, table.length() - "_manifest".length())))) {
+                continue;
+            }
+            String kind = MANIFEST_KINDS.stream()
+                    .filter(k -> name.equals(k + "_manifest_id") || name.endsWith("_" + k + "_manifest_id"))
+                    .max(java.util.Comparator.comparingInt(String::length)).orElseThrow();
+            dslContext.execute("delete t from `" + table + "` t join `" + kind + "_manifest` m on m.`" + kind
+                    + "_manifest_id` = t.`" + name + "` where m.release_id = ?", releaseId);
+        }
+        for (org.jooq.Record table : dslContext.fetch("select table_name from information_schema.columns "
+                + "where table_schema = database() and column_name = 'release_id' order by table_name")) {
+            String name = table.get(0, String.class);
+            if (!TABLES_OF_THE_RELEASE_DELETED_ELSEWHERE.contains(name) && !name.endsWith("_manifest")) {
+                dslContext.execute("delete from `" + name + "` where release_id = ?", releaseId);
+            }
+        }
+    }
+
+    /**
+     * Takes the manifests of a release out of the chains of previous and next manifests before they are deleted, so that the
+     * manifests that stay (those of 'Working' and of the releases before) go back to what they pointed at. A manifest that has no
+     * previous or no next manifest (a component that is new in the release) must be handled as well: whatever points at it then
+     * points at nothing, and a join that needs both neighbours would leave it pointing at a deleted row.
+     *
+     * @param kind the kind of component: the table is {@code <kind>_manifest}
+     */
+    private void relinkManifests(String kind, ULong releaseId) {
+        String table = "`" + kind + "_manifest`";
+        String id = "`" + kind + "_manifest_id`";
+        String prev = "`prev_" + kind + "_manifest_id`";
+        String next = "`next_" + kind + "_manifest_id`";
+        dslContext.execute("update " + table + " w join " + table + " r on w." + prev + " = r." + id
+                + " set w." + prev + " = r." + prev + " where r.release_id = ?", releaseId);
+        dslContext.execute("update " + table + " p join " + table + " r on p." + next + " = r." + id
+                + " set p." + next + " = r." + next + " where r.release_id = ?", releaseId);
+    }
+
     private void revertWorkingRelease(ULong appUserId, ReleaseRecord publishedRelease) {
         dslContext.execute("SET FOREIGN_KEY_CHECKS = 0");
 
@@ -1068,16 +1156,10 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .fetchAnyInto(ULong.class);
         ULong releaseId = publishedRelease.getReleaseId();
 
+        deleteWhatBelongsToRelease(releaseId);
+
         // ACCs
-        dslContext.update(ACC_MANIFEST
-                        .join(ACC_MANIFEST.as("working"))
-                        .on(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("working").ACC_MANIFEST_ID))
-                        .join(ACC_MANIFEST.as("prev"))
-                        .on(ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID)))
-                .set(ACC_MANIFEST.as("working").PREV_ACC_MANIFEST_ID, ACC_MANIFEST.PREV_ACC_MANIFEST_ID)
-                .set(ACC_MANIFEST.as("prev").NEXT_ACC_MANIFEST_ID, ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)
-                .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("acc", releaseId);
         dslContext.deleteFrom(ACC_MANIFEST)
                 .where(ACC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1090,15 +1172,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // ASCCs
-        dslContext.update(ASCC_MANIFEST
-                        .join(ASCC_MANIFEST.as("working"))
-                        .on(ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("working").ASCC_MANIFEST_ID))
-                        .join(ASCC_MANIFEST.as("prev"))
-                        .on(ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID.eq(ASCC_MANIFEST.as("prev").ASCC_MANIFEST_ID)))
-                .set(ASCC_MANIFEST.as("working").PREV_ASCC_MANIFEST_ID, ASCC_MANIFEST.PREV_ASCC_MANIFEST_ID)
-                .set(ASCC_MANIFEST.as("prev").NEXT_ASCC_MANIFEST_ID, ASCC_MANIFEST.NEXT_ASCC_MANIFEST_ID)
-                .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("ascc", releaseId);
         dslContext.deleteFrom(ASCC_MANIFEST)
                 .where(ASCC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1111,15 +1185,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // BCCs
-        dslContext.update(BCC_MANIFEST
-                        .join(BCC_MANIFEST.as("working"))
-                        .on(BCC_MANIFEST.NEXT_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("working").BCC_MANIFEST_ID))
-                        .join(BCC_MANIFEST.as("prev"))
-                        .on(BCC_MANIFEST.PREV_BCC_MANIFEST_ID.eq(BCC_MANIFEST.as("prev").BCC_MANIFEST_ID)))
-                .set(BCC_MANIFEST.as("working").PREV_BCC_MANIFEST_ID, BCC_MANIFEST.PREV_BCC_MANIFEST_ID)
-                .set(BCC_MANIFEST.as("prev").NEXT_BCC_MANIFEST_ID, BCC_MANIFEST.NEXT_BCC_MANIFEST_ID)
-                .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("bcc", releaseId);
         dslContext.deleteFrom(BCC_MANIFEST)
                 .where(BCC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1132,15 +1198,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // ASCCPs
-        dslContext.update(ASCCP_MANIFEST
-                        .join(ASCCP_MANIFEST.as("working"))
-                        .on(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("working").ASCCP_MANIFEST_ID))
-                        .join(ASCCP_MANIFEST.as("prev"))
-                        .on(ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("prev").ASCCP_MANIFEST_ID)))
-                .set(ASCCP_MANIFEST.as("working").PREV_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.PREV_ASCCP_MANIFEST_ID)
-                .set(ASCCP_MANIFEST.as("prev").NEXT_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID)
-                .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("asccp", releaseId);
         dslContext.deleteFrom(ASCCP_MANIFEST)
                 .where(ASCCP_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1153,15 +1211,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // BCCPs
-        dslContext.update(BCCP_MANIFEST
-                        .join(BCCP_MANIFEST.as("working"))
-                        .on(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("working").BCCP_MANIFEST_ID))
-                        .join(BCCP_MANIFEST.as("prev"))
-                        .on(BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.as("prev").BCCP_MANIFEST_ID)))
-                .set(BCCP_MANIFEST.as("working").PREV_BCCP_MANIFEST_ID, BCCP_MANIFEST.PREV_BCCP_MANIFEST_ID)
-                .set(BCCP_MANIFEST.as("prev").NEXT_BCCP_MANIFEST_ID, BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)
-                .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("bccp", releaseId);
         dslContext.deleteFrom(BCCP_MANIFEST)
                 .where(BCCP_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1174,15 +1224,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // CODE_LISTs
-        dslContext.update(CODE_LIST_MANIFEST
-                        .join(CODE_LIST_MANIFEST.as("working"))
-                        .on(CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working").CODE_LIST_MANIFEST_ID))
-                        .join(CODE_LIST_MANIFEST.as("prev"))
-                        .on(CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID)))
-                .set(CODE_LIST_MANIFEST.as("working").PREV_CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID)
-                .set(CODE_LIST_MANIFEST.as("prev").NEXT_CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.NEXT_CODE_LIST_MANIFEST_ID)
-                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("code_list", releaseId);
         dslContext.deleteFrom(CODE_LIST_MANIFEST)
                 .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1195,15 +1237,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // CODE_LIST_VALUEs
-        dslContext.update(CODE_LIST_VALUE_MANIFEST
-                        .join(CODE_LIST_VALUE_MANIFEST.as("working"))
-                        .on(CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("working").CODE_LIST_VALUE_MANIFEST_ID))
-                        .join(CODE_LIST_VALUE_MANIFEST.as("prev"))
-                        .on(CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_VALUE_MANIFEST.as("prev").CODE_LIST_VALUE_MANIFEST_ID)))
-                .set(CODE_LIST_VALUE_MANIFEST.as("working").PREV_CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.PREV_CODE_LIST_VALUE_MANIFEST_ID)
-                .set(CODE_LIST_VALUE_MANIFEST.as("prev").NEXT_CODE_LIST_VALUE_MANIFEST_ID, CODE_LIST_VALUE_MANIFEST.NEXT_CODE_LIST_VALUE_MANIFEST_ID)
-                .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("code_list_value", releaseId);
         dslContext.deleteFrom(CODE_LIST_VALUE_MANIFEST)
                 .where(CODE_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1216,15 +1250,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // DTs
-        dslContext.update(DT_MANIFEST
-                        .join(DT_MANIFEST.as("working"))
-                        .on(DT_MANIFEST.NEXT_DT_MANIFEST_ID.eq(DT_MANIFEST.as("working").DT_MANIFEST_ID))
-                        .join(DT_MANIFEST.as("prev"))
-                        .on(DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID)))
-                .set(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID, DT_MANIFEST.PREV_DT_MANIFEST_ID)
-                .set(DT_MANIFEST.as("prev").NEXT_DT_MANIFEST_ID, DT_MANIFEST.NEXT_DT_MANIFEST_ID)
-                .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("dt", releaseId);
         dslContext.deleteFrom(DT_MANIFEST)
                 .where(DT_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1237,15 +1263,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         //DT_SCs
-        dslContext.update(DT_SC_MANIFEST
-                        .join(DT_SC_MANIFEST.as("working"))
-                        .on(DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("working").DT_SC_MANIFEST_ID))
-                        .join(DT_SC_MANIFEST.as("prev"))
-                        .on(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID)))
-                .set(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID)
-                .set(DT_SC_MANIFEST.as("prev").NEXT_DT_SC_MANIFEST_ID, DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID)
-                .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("dt_sc", releaseId);
         dslContext.deleteFrom(DT_SC_MANIFEST)
                 .where(DT_SC_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1258,15 +1276,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         //XBTs
-        dslContext.update(XBT_MANIFEST
-                        .join(XBT_MANIFEST.as("working"))
-                        .on(XBT_MANIFEST.NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working").XBT_MANIFEST_ID))
-                        .join(XBT_MANIFEST.as("prev"))
-                        .on(XBT_MANIFEST.PREV_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("prev").XBT_MANIFEST_ID)))
-                .set(XBT_MANIFEST.as("working").PREV_XBT_MANIFEST_ID, XBT_MANIFEST.PREV_XBT_MANIFEST_ID)
-                .set(XBT_MANIFEST.as("prev").NEXT_XBT_MANIFEST_ID, XBT_MANIFEST.NEXT_XBT_MANIFEST_ID)
-                .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("xbt", releaseId);
         dslContext.deleteFrom(XBT_MANIFEST)
                 .where(XBT_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1279,15 +1289,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // AGENCY_ID_LIST
-        dslContext.update(AGENCY_ID_LIST_MANIFEST
-                        .join(AGENCY_ID_LIST_MANIFEST.as("working"))
-                        .on(AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working").AGENCY_ID_LIST_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_MANIFEST.as("prev"))
-                        .on(AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID)))
-                .set(AGENCY_ID_LIST_MANIFEST.as("working").PREV_AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID)
-                .set(AGENCY_ID_LIST_MANIFEST.as("prev").NEXT_AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.NEXT_AGENCY_ID_LIST_MANIFEST_ID)
-                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("agency_id_list", releaseId);
         dslContext.deleteFrom(AGENCY_ID_LIST_MANIFEST)
                 .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();
@@ -1300,15 +1302,7 @@ public class DSLContextAppUserAPIImpl implements AppUserAPI {
                 .execute();
 
         // AGENCY_ID_LIST_VALUE
-        dslContext.update(AGENCY_ID_LIST_VALUE_MANIFEST
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("working"))
-                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("working").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev"))
-                        .on(AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
-                .set(AGENCY_ID_LIST_VALUE_MANIFEST.as("working").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID)
-                .set(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID)
-                .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
-                .execute();
+        relinkManifests("agency_id_list_value", releaseId);
         dslContext.deleteFrom(AGENCY_ID_LIST_VALUE_MANIFEST)
                 .where(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(releaseId))
                 .execute();

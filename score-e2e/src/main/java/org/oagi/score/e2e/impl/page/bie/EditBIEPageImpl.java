@@ -2027,13 +2027,24 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
             waitFor(ofMillis(300L));
         }
 
+        /**
+         * The error of a field. What is wrong with a binding is said by the server, which answers a moment after the user has
+         * changed it, so it is waited for (up to five seconds); an empty string when there is none.
+         */
         private String fieldError(WebElement card, String label) {
-            try {
-                return getText(card.findElement(By.xpath(
-                        ".//mat-form-field[.//mat-label[normalize-space(.) = \"" + label + "\"]]//mat-error")));
-            } catch (NoSuchElementException e) {
-                return "";
+            for (int attempt = 0; attempt < 20; attempt++) {
+                try {
+                    String text = getText(card.findElement(By.xpath(
+                            ".//mat-form-field[.//mat-label[normalize-space(.) = \"" + label + "\"]]//mat-error")));
+                    if (text != null && !text.isBlank()) {
+                        return text;
+                    }
+                } catch (NoSuchElementException e) {
+                    // not there (yet)
+                }
+                waitFor(ofMillis(250L));
             }
+            return "";
         }
 
         @Override
@@ -2219,9 +2230,17 @@ public class EditBIEPageImpl extends BasePageImpl implements EditBIEPage {
 
         @Override
         public boolean isUpdateButtonEnabled() {
-            List<WebElement> buttons = getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH +
-                    "//button[normalize-space(.) = \"Update OpenAPI Information\"]"));
-            return !buttons.isEmpty() && buttons.get(0).isEnabled();
+            // The button is there when the server has said that what was changed can be saved, a moment after the change: wait
+            // for it (up to five seconds).
+            for (int attempt = 0; attempt < 20; attempt++) {
+                List<WebElement> buttons = getDriver().findElements(By.xpath(OAS_INFO_PANEL_XPATH +
+                        "//button[normalize-space(.) = \"Update OpenAPI Information\"]"));
+                if (!buttons.isEmpty() && buttons.get(0).isEnabled()) {
+                    return true;
+                }
+                waitFor(ofMillis(250L));
+            }
+            return false;
         }
 
         @Override

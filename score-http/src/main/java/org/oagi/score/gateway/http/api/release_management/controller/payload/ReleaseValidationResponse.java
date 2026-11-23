@@ -28,10 +28,17 @@ public class ReleaseValidationResponse {
         ACC_Association,
         ASCCP_RoleOfAcc,
         BCCP_BDT,
+        DT_BasedDT,
+        DT_AllowedPrimitive,
+        STATE,
+        CODE_LIST_BasedCodeList,
+        CODE_LIST_AgencyIdList,
+        AGENCY_ID_LIST_BasedAgencyIdList,
+        AGENCY_ID_LIST_AgencyIdList,
         NAMESPACE
     }
 
-    private class ValidationMessage {
+    public class ValidationMessage {
         private ValidationMessageLevel level;
         private String message;
         private ValidationMessageCode code;

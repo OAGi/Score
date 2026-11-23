@@ -142,4 +142,38 @@ public class DSLContextReleaseAPIImpl implements ReleaseAPI {
         release.setState(releaseRecord.getState());
         return release;
     }
+
+    @Override
+    public void forceState(BigInteger releaseId, String state) {
+        dslContext.execute("update `release` set state = ? where release_id = ?", state, releaseId);
+    }
+
+    private static String failureTrigger(BigInteger releaseId) {
+        return "`e2e_fail_work_" + releaseId + "`";
+    }
+
+    @Override
+    public void makeTheWorkFail(BigInteger releaseId) {
+        makeTheWorkSucceedAgain(releaseId);
+        dslContext.execute("create trigger " + failureTrigger(releaseId) + " before update on `release` for each row begin "
+                + "if new.release_id = " + releaseId + " and ((old.state = 'Drafting' and new.state = 'Draft') "
+                + "or (old.state = 'Initializing' and new.state = 'Initialized') "
+                + "or (old.state = 'Publishing' and new.state = 'Published')) then "
+                + "signal sqlstate '45000' set message_text = 'e2e: the work of the release fails'; end if; end");
+    }
+
+    @Override
+    public void makeTheWorkSucceedAgain(BigInteger releaseId) {
+        dslContext.execute("drop trigger if exists " + failureTrigger(releaseId));
+    }
+
+    @Override
+    public int countManifests(BigInteger releaseId) {
+        int count = 0;
+        for (String kind : List.of("acc", "asccp", "bccp", "dt", "code_list", "agency_id_list")) {
+            count += dslContext.fetchOne("select count(*) from `" + kind + "_manifest` where release_id = ?", releaseId)
+                    .get(0, Integer.class);
+        }
+        return count;
+    }
 }

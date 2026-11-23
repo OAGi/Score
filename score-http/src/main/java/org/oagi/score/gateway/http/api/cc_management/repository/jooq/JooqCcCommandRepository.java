@@ -233,6 +233,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
 
         copySeqKeyRecordsFromWorking(releaseId);
         updateSeqKeyPrevNext(releaseId);
+        restoreAssociationsOfRevertedAccs(releaseId, workingReleaseId);
 
         copyXbtManifestRecordsFromWorking(releaseId, workingReleaseId, Collections.emptyList());
         updateXbtDependencies(releaseId);
@@ -251,6 +252,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
 
         copyDtAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
         copyDtScAwdPriFromWorking(releaseId, workingReleaseId, dtManifestIds);
+        restoreAllowedPrimitivesOfRevertedDts(releaseId, workingReleaseId);
     }
 
     @Override
@@ -1481,6 +1483,13 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         .where(ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))).execute();
     }
 
+    /**
+     * Points the allowed primitives of a Data Type to the manifests of the new release. A Code List, an Agency ID List or an XBT is
+     * found through the link the copy keeps from the manifest of the new release to the one of 'Working', not through the
+     * record the manifest holds: the record of a revised component that is not assigned to the release is that of its
+     * previous release, so the row would otherwise be dropped. A Code List or an Agency ID List of a release the library
+     * depends on has no manifest in the new release; the row keeps pointing to it as it is.
+     */
     private void copyDtAwdPriFromWorking(ReleaseId releaseId, ReleaseId workingReleaseId,
                                          List<DtManifestId> dtManifestIds) {
         dslContext().insertInto(DT_AWD_PRI,
@@ -1493,7 +1502,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
+                                coalesce(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("own_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
                         .join(DT_MANIFEST.as("target")).on(and(
@@ -1503,12 +1512,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("working").RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
                                 DT_MANIFEST.as("working").DT_ID.eq(DT_AWD_PRI.DT_ID)))
                         .join(XBT_MANIFEST.as("working_xbt")).on(DT_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID))
-                        .join(XBT_MANIFEST.as("target_xbt")).on(and(
-                                XBT_MANIFEST.as("target_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                        .leftJoin(XBT_MANIFEST.as("target_xbt")).on(and(
+                                XBT_MANIFEST.as("target_xbt").NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 XBT_MANIFEST.as("target_xbt").RELEASE_ID.eq(valueOf(releaseId))
+                        ))
+                        // the same XBT in the new release, when the allowed primitive points to an XBT of a release the library depends on
+                        .leftJoin(XBT_MANIFEST.as("own_xbt")).on(and(
+                                XBT_MANIFEST.as("own_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                                XBT_MANIFEST.as("own_xbt").RELEASE_ID.eq(valueOf(releaseId)),
+                                XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))
                         ))
                         .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_AWD_PRI.XBT_MANIFEST_ID.isNotNull(),
+                                // else kept as it is when it is in a release the library depends on and this release has no manifest of it
+                                or(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID.isNotNull(), XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
                                         DT_MANIFEST.as("working").DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 
@@ -1522,7 +1539,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID,
+                                coalesce(CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
                         .join(DT_MANIFEST.as("target")).on(and(
@@ -1532,12 +1549,14 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("working").RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
                                 DT_MANIFEST.as("working").DT_ID.eq(DT_AWD_PRI.DT_ID)))
                         .join(CODE_LIST_MANIFEST.as("working_code_list")).on(DT_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID))
-                        .join(CODE_LIST_MANIFEST.as("target_code_list")).on(and(
-                                CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_ID),
+                        .leftJoin(CODE_LIST_MANIFEST.as("target_code_list")).on(and(
+                                CODE_LIST_MANIFEST.as("target_code_list").NEXT_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID),
                                 CODE_LIST_MANIFEST.as("target_code_list").RELEASE_ID.eq(valueOf(releaseId))
                         ))
                         .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull(),
+                                // kept as it is when it is in a release the library depends on, which has no manifest in this release
+                                or(CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID.isNotNull(), CODE_LIST_MANIFEST.as("working_code_list").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
                                         DT_MANIFEST.as("working").DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 
@@ -1551,7 +1570,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("target").RELEASE_ID,
                                 DT_MANIFEST.as("target").DT_ID,
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID,
+                                coalesce(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_MANIFEST.as("working"))
                         .join(DT_MANIFEST.as("target")).on(and(
@@ -1561,12 +1580,14 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_MANIFEST.as("working").RELEASE_ID.eq(DT_AWD_PRI.RELEASE_ID),
                                 DT_MANIFEST.as("working").DT_ID.eq(DT_AWD_PRI.DT_ID)))
                         .join(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list")).on(DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list")).on(and(
-                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_ID),
+                        .leftJoin(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID),
                                 AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").RELEASE_ID.eq(valueOf(releaseId))
                         ))
                         .where(and(DT_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull(),
+                                // kept as it is when it is in a release the library depends on, which has no manifest in this release
+                                or(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_MANIFEST.as("working").PREV_DT_MANIFEST_ID.isNotNull(),
                                         DT_MANIFEST.as("working").DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
     }
@@ -1583,7 +1604,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID,
+                                coalesce(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("own_xbt").XBT_MANIFEST_ID, XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
                         .join(DT_SC_MANIFEST.as("target")).on(and(
@@ -1593,12 +1614,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("working").RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                                 DT_SC_MANIFEST.as("working").DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
                         .join(XBT_MANIFEST.as("working_xbt")).on(DT_SC_AWD_PRI.XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID))
-                        .join(XBT_MANIFEST.as("target_xbt")).on(and(
-                                XBT_MANIFEST.as("target_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                        .leftJoin(XBT_MANIFEST.as("target_xbt")).on(and(
+                                XBT_MANIFEST.as("target_xbt").NEXT_XBT_MANIFEST_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_MANIFEST_ID),
                                 XBT_MANIFEST.as("target_xbt").RELEASE_ID.eq(valueOf(releaseId))
+                        ))
+                        // the same XBT in the new release, when the allowed primitive points to an XBT of a release the library depends on
+                        .leftJoin(XBT_MANIFEST.as("own_xbt")).on(and(
+                                XBT_MANIFEST.as("own_xbt").XBT_ID.eq(XBT_MANIFEST.as("working_xbt").XBT_ID),
+                                XBT_MANIFEST.as("own_xbt").RELEASE_ID.eq(valueOf(releaseId)),
+                                XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))
                         ))
                         .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_SC_AWD_PRI.XBT_MANIFEST_ID.isNotNull(),
+                                // else kept as it is when it is in a release the library depends on and this release has no manifest of it
+                                or(XBT_MANIFEST.as("target_xbt").XBT_MANIFEST_ID.isNotNull(), XBT_MANIFEST.as("working_xbt").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
                                         DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 
@@ -1612,7 +1641,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID,
+                                coalesce(CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID, CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
                         .join(DT_SC_MANIFEST.as("target")).on(and(
@@ -1622,12 +1651,14 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("working").RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                                 DT_SC_MANIFEST.as("working").DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
                         .join(CODE_LIST_MANIFEST.as("working_code_list")).on(DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID))
-                        .join(CODE_LIST_MANIFEST.as("target_code_list")).on(and(
-                                CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_ID),
+                        .leftJoin(CODE_LIST_MANIFEST.as("target_code_list")).on(and(
+                                CODE_LIST_MANIFEST.as("target_code_list").NEXT_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("working_code_list").CODE_LIST_MANIFEST_ID),
                                 CODE_LIST_MANIFEST.as("target_code_list").RELEASE_ID.eq(valueOf(releaseId))
                         ))
                         .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID.isNotNull(),
+                                // kept as it is when it is in a release the library depends on, which has no manifest in this release
+                                or(CODE_LIST_MANIFEST.as("target_code_list").CODE_LIST_MANIFEST_ID.isNotNull(), CODE_LIST_MANIFEST.as("working_code_list").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
                                         DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
 
@@ -1641,7 +1672,7 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("target").RELEASE_ID,
                                 DT_SC_MANIFEST.as("target").DT_SC_ID,
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID,
+                                coalesce(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID, AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_MANIFEST.as("working"))
                         .join(DT_SC_MANIFEST.as("target")).on(and(
@@ -1651,12 +1682,14 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                                 DT_SC_MANIFEST.as("working").RELEASE_ID.eq(DT_SC_AWD_PRI.RELEASE_ID),
                                 DT_SC_MANIFEST.as("working").DT_SC_ID.eq(DT_SC_AWD_PRI.DT_SC_ID)))
                         .join(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list")).on(DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list")).on(and(
-                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_ID),
+                        .leftJoin(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").NEXT_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID),
                                 AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").RELEASE_ID.eq(valueOf(releaseId))
                         ))
                         .where(and(DT_SC_MANIFEST.as("working").RELEASE_ID.eq(valueOf(workingReleaseId)),
                                 DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID.isNotNull(),
+                                // kept as it is when it is in a release the library depends on, which has no manifest in this release
+                                or(AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list").AGENCY_ID_LIST_MANIFEST_ID.isNotNull(), AGENCY_ID_LIST_MANIFEST.as("working_agency_id_list").RELEASE_ID.ne(valueOf(workingReleaseId))),
                                 (or(DT_SC_MANIFEST.as("working").PREV_DT_SC_MANIFEST_ID.isNotNull(),
                                         DT_SC_MANIFEST.as("working").OWNER_DT_MANIFEST_ID.in(valueOf(dtManifestIds))))))).execute();
     }
@@ -1883,6 +1916,125 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         .join(SEQ_KEY).on(BCC_MANIFEST.BCC_MANIFEST_ID.eq(SEQ_KEY.BCC_MANIFEST_ID)))
                 .set(BCC_MANIFEST.SEQ_KEY_ID, SEQ_KEY.SEQ_KEY_ID)
                 .where(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))).execute();
+    }
+
+    /**
+     * A Data Type that has been revised in 'Working' and is not assigned to the release goes into the release as it was in the
+     * previous release, with the record of that release (see {@link #updateDtDependencies}). The allowed primitives copied from
+     * 'Working' are those of the revision, which the Data Type of the previous release did not have. This replaces the allowed
+     * primitives of such a Data Type and of its supplementary components by the ones of the previous release, each referring to
+     * its manifest of this release (an XBT, a Code List or an Agency ID List of a release the library depends on is kept).
+     */
+    private void restoreAllowedPrimitivesOfRevertedDts(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        BigInteger release = releaseId.value();
+        BigInteger working = workingReleaseId.value();
+        String reverted = "select m.dt_manifest_id from dt_manifest m "
+                + "join dt_manifest w on w.dt_manifest_id = m.next_dt_manifest_id and w.release_id = " + working + " "
+                + "where m.release_id = " + release + " and m.prev_dt_manifest_id is not null and w.dt_id <> m.dt_id";
+        if (dslContext().fetch(reverted + " limit 1").isEmpty()) {
+            return;
+        }
+        String s = "(select dt_manifest_id from (" + reverted + ") reverted)";
+
+        dslContext().execute("delete from dt_awd_pri where release_id = " + release
+                + " and dt_id in (select dt_id from dt_manifest where dt_manifest_id in " + s + ")");
+        dslContext().execute("delete from dt_sc_awd_pri where release_id = " + release
+                + " and dt_sc_id in (select dt_sc_id from dt_sc_manifest where release_id = " + release
+                + " and owner_dt_manifest_id in " + s + ")");
+
+        String mapped = "left join xbt_manifest x on x.prev_xbt_manifest_id = p.xbt_manifest_id and x.release_id = " + release + " "
+                + "left join code_list_manifest c on c.prev_code_list_manifest_id = p.code_list_manifest_id and c.release_id = " + release + " "
+                + "left join agency_id_list_manifest a on a.prev_agency_id_list_manifest_id = p.agency_id_list_manifest_id "
+                + "and a.release_id = " + release + " ";
+        String columns = "coalesce(x.xbt_manifest_id, p.xbt_manifest_id), coalesce(c.code_list_manifest_id, p.code_list_manifest_id), "
+                + "coalesce(a.agency_id_list_manifest_id, p.agency_id_list_manifest_id), p.is_default ";
+        dslContext().execute("insert into dt_awd_pri (release_id, dt_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, "
+                + "agency_id_list_manifest_id, is_default) select " + release + ", m1.dt_id, p.cdt_pri_id, " + columns
+                + "from dt_manifest m1 join dt_manifest m0 on m0.dt_manifest_id = m1.prev_dt_manifest_id "
+                + "join dt_awd_pri p on p.release_id = m0.release_id and p.dt_id = m0.dt_id " + mapped
+                + "where m1.dt_manifest_id in " + s);
+        dslContext().execute("insert into dt_sc_awd_pri (release_id, dt_sc_id, cdt_pri_id, xbt_manifest_id, code_list_manifest_id, "
+                + "agency_id_list_manifest_id, is_default) select " + release + ", s1.dt_sc_id, p.cdt_pri_id, " + columns
+                + "from dt_sc_manifest s1 join dt_sc_manifest s0 on s0.dt_sc_manifest_id = s1.prev_dt_sc_manifest_id "
+                + "join dt_sc_awd_pri p on p.release_id = s0.release_id and p.dt_sc_id = s0.dt_sc_id " + mapped
+                + "where s1.release_id = " + release + " and s1.owner_dt_manifest_id in " + s);
+    }
+
+    /**
+     * An ACC that has been revised in 'Working' and is not assigned to the release goes into the release as it was in the
+     * previous release: it holds the record of the previous release (see {@link #updateAccDependencies}). Its associations
+     * have to be those of the previous release too, which the copy of the associations of 'Working' does not give when an
+     * association has been removed, or added or re-ordered, since the revision. This replaces the associations (and their
+     * sequence) of such an ACC by the ones of the previous release's ACC, each following its own manifest of this release.
+     */
+    private void restoreAssociationsOfRevertedAccs(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        BigInteger release = releaseId.value();
+        BigInteger working = workingReleaseId.value();
+        String reverted = "select m.acc_manifest_id from acc_manifest m "
+                + "join acc_manifest w on w.acc_manifest_id = m.next_acc_manifest_id and w.release_id = " + working + " "
+                + "where m.release_id = " + release + " and m.prev_acc_manifest_id is not null and w.acc_id <> m.acc_id";
+        if (dslContext().fetch(reverted + " limit 1").isEmpty()) {
+            return;
+        }
+        // The ACC manifests are not changed below, so the subquery is stable; it is wrapped to be used in the UPDATE and DELETE.
+        String s = "(select acc_manifest_id from (" + reverted + ") reverted)";
+
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            dslContext().execute("update " + kind + "_manifest set seq_key_id = null where release_id = " + release
+                    + " and from_acc_manifest_id in " + s);
+        }
+        dslContext().execute("update seq_key set prev_seq_key_id = null, next_seq_key_id = null where from_acc_manifest_id in " + s);
+        dslContext().execute("delete from seq_key where from_acc_manifest_id in " + s);
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            String replacement = "replacement_" + kind + "_manifest_id";
+            dslContext().execute("update " + kind + "_manifest x join " + kind + "_manifest y on x." + replacement + " = y."
+                    + kind + "_manifest_id set x." + replacement + " = null where y.release_id = " + release
+                    + " and y.from_acc_manifest_id in " + s);
+            dslContext().execute("delete from " + kind + "_manifest where release_id = " + release
+                    + " and from_acc_manifest_id in " + s);
+        }
+
+        // the associations of the previous release's ACC
+        dslContext().execute("insert into ascc_manifest (release_id, ascc_id, from_acc_manifest_id, to_asccp_manifest_id, den, "
+                + "conflict, prev_ascc_manifest_id, next_ascc_manifest_id) "
+                + "select " + release + ", a.ascc_id, m.acc_manifest_id, coalesce(t.asccp_manifest_id, a.to_asccp_manifest_id), "
+                + "a.den, a.conflict, a.ascc_manifest_id, a.next_ascc_manifest_id "
+                + "from ascc_manifest a join acc_manifest m on m.prev_acc_manifest_id = a.from_acc_manifest_id "
+                + "and m.release_id = " + release + " and m.acc_manifest_id in " + s + " "
+                + "left join asccp_manifest t on t.prev_asccp_manifest_id = a.to_asccp_manifest_id and t.release_id = " + release);
+        dslContext().execute("insert into bcc_manifest (release_id, bcc_id, from_acc_manifest_id, to_bccp_manifest_id, den, "
+                + "conflict, prev_bcc_manifest_id, next_bcc_manifest_id) "
+                + "select " + release + ", a.bcc_id, m.acc_manifest_id, coalesce(t.bccp_manifest_id, a.to_bccp_manifest_id), "
+                + "a.den, a.conflict, a.bcc_manifest_id, a.next_bcc_manifest_id "
+                + "from bcc_manifest a join acc_manifest m on m.prev_acc_manifest_id = a.from_acc_manifest_id "
+                + "and m.release_id = " + release + " and m.acc_manifest_id in " + s + " "
+                + "left join bccp_manifest t on t.prev_bccp_manifest_id = a.to_bccp_manifest_id and t.release_id = " + release);
+
+        // their sequence, in the order of the previous release
+        dslContext().execute("insert into seq_key (from_acc_manifest_id, ascc_manifest_id) select from_acc_manifest_id, "
+                + "ascc_manifest_id from ascc_manifest where release_id = " + release + " and from_acc_manifest_id in " + s);
+        dslContext().execute("insert into seq_key (from_acc_manifest_id, bcc_manifest_id) select from_acc_manifest_id, "
+                + "bcc_manifest_id from bcc_manifest where release_id = " + release + " and from_acc_manifest_id in " + s);
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            dslContext().execute("update " + kind + "_manifest x join seq_key k on k." + kind + "_manifest_id = x."
+                    + kind + "_manifest_id set x.seq_key_id = k.seq_key_id where x.release_id = " + release
+                    + " and x.from_acc_manifest_id in " + s);
+        }
+        for (String kind : new String[]{"ascc", "bcc"}) {
+            for (String direction : new String[]{"prev", "next"}) {
+                // the key of the new association that follows the association the previous release's key links to
+                dslContext().execute("update seq_key k "
+                        + "join " + kind + "_manifest x on x." + kind + "_manifest_id = k." + kind + "_manifest_id "
+                        + "join " + kind + "_manifest a on a." + kind + "_manifest_id = x.prev_" + kind + "_manifest_id "
+                        + "join seq_key old on old.seq_key_id = a.seq_key_id "
+                        + "left join ascc_manifest oa on oa.seq_key_id = old." + direction + "_seq_key_id "
+                        + "left join bcc_manifest ob on ob.seq_key_id = old." + direction + "_seq_key_id "
+                        + "left join ascc_manifest na on na.prev_ascc_manifest_id = oa.ascc_manifest_id and na.release_id = " + release + " "
+                        + "left join bcc_manifest nb on nb.prev_bcc_manifest_id = ob.bcc_manifest_id and nb.release_id = " + release + " "
+                        + "set k." + direction + "_seq_key_id = ifnull(na.seq_key_id, nb.seq_key_id) "
+                        + "where x.release_id = " + release + " and k.from_acc_manifest_id in " + s);
+            }
+        }
     }
 
     private void updateSeqKeyPrevNext(ReleaseId releaseId) {
@@ -2172,6 +2324,23 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         ACC.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // An ACC that holds the record of its previous release (it went back to it above) goes back to the base it had there: the manifest of
+        // this release that follows the base manifest of the previous release, or that base itself when it is in a release the
+        // library depends on. The base the ACC has in Working may not be in this release (a new ACC that is not assigned), and
+        // the record of the previous release may have no base for the step below to follow.
+        dslContext().update(ACC_MANIFEST
+                        .join(ACC_MANIFEST.as("prev")).on(and(
+                                ACC_MANIFEST.PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").ACC_MANIFEST_ID),
+                                ACC_MANIFEST.ACC_ID.eq(ACC_MANIFEST.as("prev").ACC_ID)))
+                        .leftJoin(ACC_MANIFEST.as("prev_based_in_release")).on(and(
+                                ACC_MANIFEST.as("prev_based_in_release").PREV_ACC_MANIFEST_ID.eq(ACC_MANIFEST.as("prev").BASED_ACC_MANIFEST_ID),
+                                ACC_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(ACC_MANIFEST.BASED_ACC_MANIFEST_ID, coalesce(
+                        ACC_MANIFEST.as("prev_based_in_release").ACC_MANIFEST_ID,
+                        ACC_MANIFEST.as("prev").BASED_ACC_MANIFEST_ID))
+                .where(ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Issue #1552
         // Update ACC_MANIFEST.BASED_ACC_MANIFEST_ID if ACC_MANIFEST.BASED_MANIFEST.ACC_ID is not equal to ACC.BASED_ACC_ID
         dslContext().update(ACC_MANIFEST
@@ -2324,15 +2493,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
     }
 
     private void updateAsccDependencies(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        // The ACC and the ASCCP are mapped on their own: the ASCCP may be in a release the library depends on, which has no
+        // manifest of this release for it to be mapped to, and the ACC has to be mapped nevertheless.
         dslContext().update(ASCC_MANIFEST
                         .join(ACC_MANIFEST)
-                        .on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID))
+                        .on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)))
+                .set(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
+                .where(and(ASCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+        dslContext().update(ASCC_MANIFEST
                         .join(ASCCP_MANIFEST)
                         .on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.NEXT_ASCCP_MANIFEST_ID)))
-                .set(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
                 .set(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID, ASCCP_MANIFEST.ASCCP_MANIFEST_ID)
                 .where(and(ASCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         ASCCP_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
@@ -2386,14 +2560,17 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
     }
 
     private void updateBccDependencies(ReleaseId releaseId, ReleaseId workingReleaseId) {
+        // The ACC and the BCCP are mapped on their own, as for the ASCC (see updateAsccDependencies).
         dslContext().update(BCC_MANIFEST.join(ACC_MANIFEST)
-                        .on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID))
-                        .join(BCCP_MANIFEST)
-                        .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)))
+                        .on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.NEXT_ACC_MANIFEST_ID)))
                 .set(BCC_MANIFEST.FROM_ACC_MANIFEST_ID, ACC_MANIFEST.ACC_MANIFEST_ID)
+                .where(and(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
+                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+        dslContext().update(BCC_MANIFEST.join(BCCP_MANIFEST)
+                        .on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.NEXT_BCCP_MANIFEST_ID)))
                 .set(BCC_MANIFEST.TO_BCCP_MANIFEST_ID, BCCP_MANIFEST.BCCP_MANIFEST_ID)
                 .where(and(BCC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
-                        ACC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         BCCP_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
@@ -2464,6 +2641,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         DT.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // A Data Type that holds the record of its previous release (it went back to it above) goes back to the base it had
+        // there, as an ACC does (see updateAccDependencies): the base in Working may not be in this release, and the record of
+        // the previous release may have no base for the step below to follow.
+        dslContext().update(DT_MANIFEST
+                        .join(DT_MANIFEST.as("prev")).on(and(
+                                DT_MANIFEST.PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").DT_MANIFEST_ID),
+                                DT_MANIFEST.DT_ID.eq(DT_MANIFEST.as("prev").DT_ID)))
+                        .leftJoin(DT_MANIFEST.as("prev_based_in_release")).on(and(
+                                DT_MANIFEST.as("prev_based_in_release").PREV_DT_MANIFEST_ID.eq(DT_MANIFEST.as("prev").BASED_DT_MANIFEST_ID),
+                                DT_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(DT_MANIFEST.BASED_DT_MANIFEST_ID, coalesce(
+                        DT_MANIFEST.as("prev_based_in_release").DT_MANIFEST_ID,
+                        DT_MANIFEST.as("prev").BASED_DT_MANIFEST_ID))
+                .where(DT_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Issue #1552
         // Update DT_MANIFEST.BASED_DT_MANIFEST_ID if DT_MANIFEST.BASED_MANIFEST.DT_ID is not equal to DT.BASED_DT_ID
         dslContext().update(DT_MANIFEST
@@ -2527,6 +2720,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         DT.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // A supplementary component that holds the record of its previous release (it went back to it above) goes back to the
+        // base it had there, as an ACC does (see updateAccDependencies): the manifest of this release that follows the base of
+        // the previous release, or that base itself when it is in a release the library depends on.
+        dslContext().update(DT_SC_MANIFEST
+                        .join(DT_SC_MANIFEST.as("prev")).on(and(
+                                DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC_MANIFEST.as("prev").DT_SC_ID)))
+                        .leftJoin(DT_SC_MANIFEST.as("prev_based_in_release")).on(and(
+                                DT_SC_MANIFEST.as("prev_based_in_release").PREV_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("prev").BASED_DT_SC_MANIFEST_ID),
+                                DT_SC_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID, coalesce(
+                        DT_SC_MANIFEST.as("prev_based_in_release").DT_SC_MANIFEST_ID,
+                        DT_SC_MANIFEST.as("prev").BASED_DT_SC_MANIFEST_ID))
+                .where(DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Update replacement
         dslContext().update(DT_SC_MANIFEST.as("working")
                         .join(DT_SC_MANIFEST.as("release")).on(and(
@@ -2575,6 +2784,22 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                 .set(CODE_LIST_MANIFEST.LOG_ID, CODE_LIST_MANIFEST.as("prev").LOG_ID)
                 .where(and(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         CODE_LIST.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
+                .execute();
+
+        // A Code List that holds the record of its previous release (it went back to it above) goes back to the base it had
+        // there: the manifest of this release that follows the base manifest of the previous release, or that base itself
+        // when it is in a release the library depends on.
+        dslContext().update(CODE_LIST_MANIFEST
+                        .join(CODE_LIST_MANIFEST.as("prev")).on(and(
+                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_ID)))
+                        .leftJoin(CODE_LIST_MANIFEST.as("prev_based_in_release")).on(and(
+                                CODE_LIST_MANIFEST.as("prev_based_in_release").PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").BASED_CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(CODE_LIST_MANIFEST.BASED_CODE_LIST_MANIFEST_ID, coalesce(
+                        CODE_LIST_MANIFEST.as("prev_based_in_release").CODE_LIST_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.as("prev").BASED_CODE_LIST_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
                 .execute();
 
         // Update replacement
@@ -2655,6 +2880,20 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         AGENCY_ID_LIST.STATE.notIn(Arrays.asList(CcState.ReleaseDraft, CcState.Published))))
                 .execute();
 
+        // An Agency ID List that holds the record of its previous release goes back to the base it had there.
+        dslContext().update(AGENCY_ID_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_MANIFEST.as("prev")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").BASED_AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(AGENCY_ID_LIST_MANIFEST.BASED_AGENCY_ID_LIST_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_MANIFEST.as("prev_based_in_release").AGENCY_ID_LIST_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.as("prev").BASED_AGENCY_ID_LIST_MANIFEST_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
         // Update replacement
         dslContext().update(AGENCY_ID_LIST_MANIFEST.as("working")
                         .join(AGENCY_ID_LIST_MANIFEST.as("release")).on(and(
@@ -2702,14 +2941,43 @@ public class JooqCcCommandRepository extends JooqBaseRepository implements CcCom
                         AGENCY_ID_LIST_VALUE_MANIFEST.as("value").RELEASE_ID.eq(valueOf(releaseId))))
                 .execute();
 
-        // To update `code_list_manifest`.`agency_id_list_value_manifest_id`
+        // To update `code_list_manifest`.`agency_id_list_value_manifest_id`: found through the link the copy keeps to the
+        // manifest of 'Working', not through the record, which is the one of the previous release when the Agency ID List
+        // is revised and not assigned. A value of a release the library depends on has no copy, and is kept as it is.
         dslContext().update(CODE_LIST_MANIFEST
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev")).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
-                        .join(AGENCY_ID_LIST_VALUE).on(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID))
-                        .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(AGENCY_ID_LIST_VALUE.AGENCY_ID_LIST_VALUE_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_ID)))
+                        .join(AGENCY_ID_LIST_VALUE_MANIFEST).on(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_VALUE_MANIFEST.NEXT_AGENCY_ID_LIST_VALUE_MANIFEST_ID)))
                 .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, AGENCY_ID_LIST_VALUE_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID)
                 .where(and(AGENCY_ID_LIST_VALUE_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)),
                         CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId))))
+                .execute();
+
+        // What the agency of a Code List or of an Agency ID List that holds the record of its previous release was there: the
+        // value of this release that follows the value of the previous release, or that value itself when it is in a release
+        // the library depends on.
+        dslContext().update(CODE_LIST_MANIFEST
+                        .join(CODE_LIST_MANIFEST.as("prev")).on(and(
+                                CODE_LIST_MANIFEST.PREV_CODE_LIST_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_MANIFEST_ID),
+                                CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST_MANIFEST.as("prev").CODE_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release")).on(and(
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(CODE_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(CODE_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        CODE_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .where(CODE_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
+                .execute();
+
+        dslContext().update(AGENCY_ID_LIST_MANIFEST
+                        .join(AGENCY_ID_LIST_MANIFEST.as("prev")).on(and(
+                                AGENCY_ID_LIST_MANIFEST.PREV_AGENCY_ID_LIST_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_MANIFEST_ID),
+                                AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_ID)))
+                        .leftJoin(AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release")).on(and(
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").PREV_AGENCY_ID_LIST_VALUE_MANIFEST_ID.eq(AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID),
+                                AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").RELEASE_ID.eq(valueOf(releaseId)))))
+                .set(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_VALUE_MANIFEST_ID, coalesce(
+                        AGENCY_ID_LIST_VALUE_MANIFEST.as("prev_value_in_release").AGENCY_ID_LIST_VALUE_MANIFEST_ID,
+                        AGENCY_ID_LIST_MANIFEST.as("prev").AGENCY_ID_LIST_VALUE_MANIFEST_ID))
+                .where(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(valueOf(releaseId)))
                 .execute();
 
         // Update replacement

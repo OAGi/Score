@@ -95,6 +95,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSe
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurity;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocSecurityScope;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocTag;
@@ -222,6 +223,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ModuleSetReleaseRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.ModuleXbtManifestRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.NamespaceRecord;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocHttpHeaderRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocSecurityRecord;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.OasDocSecurityScopeRecord;
@@ -386,6 +388,7 @@ public class Keys {
     public static final UniqueKey<NamespaceRecord> KEY_NAMESPACE_NAMESPACE_UK1 = Internal.createUniqueKey(Namespace.NAMESPACE, DSL.name("KEY_namespace_namespace_uk1"), new TableField[] { Namespace.NAMESPACE.LIBRARY_ID, Namespace.NAMESPACE.URI }, true);
     public static final UniqueKey<NamespaceRecord> KEY_NAMESPACE_PRIMARY = Internal.createUniqueKey(Namespace.NAMESPACE, DSL.name("KEY_namespace_PRIMARY"), new TableField[] { Namespace.NAMESPACE.NAMESPACE_ID }, true);
     public static final UniqueKey<OasDocRecord> KEY_OAS_DOC_PRIMARY = Internal.createUniqueKey(OasDoc.OAS_DOC, DSL.name("KEY_oas_doc_PRIMARY"), new TableField[] { OasDoc.OAS_DOC.OAS_DOC_ID }, true);
+    public static final UniqueKey<OasDocHttpHeaderRecord> KEY_OAS_DOC_HTTP_HEADER_PRIMARY = Internal.createUniqueKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("KEY_oas_doc_http_header_PRIMARY"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.OAS_DOC_HTTP_HEADER_ID }, true);
     public static final UniqueKey<OasDocSecurityRecord> KEY_OAS_DOC_SECURITY_OAS_DOC_SECURITY_DOC_GROUP_SCHEME_UK = Internal.createUniqueKey(OasDocSecurity.OAS_DOC_SECURITY, DSL.name("KEY_oas_doc_security_oas_doc_security_doc_group_scheme_uk"), new TableField[] { OasDocSecurity.OAS_DOC_SECURITY.OAS_DOC_ID, OasDocSecurity.OAS_DOC_SECURITY.REQUIREMENT_GROUP, OasDocSecurity.OAS_DOC_SECURITY.OAS_SECURITY_SCHEME_ID }, true);
     public static final UniqueKey<OasDocSecurityRecord> KEY_OAS_DOC_SECURITY_PRIMARY = Internal.createUniqueKey(OasDocSecurity.OAS_DOC_SECURITY, DSL.name("KEY_oas_doc_security_PRIMARY"), new TableField[] { OasDocSecurity.OAS_DOC_SECURITY.OAS_DOC_SECURITY_ID }, true);
     public static final UniqueKey<OasDocSecurityScopeRecord> KEY_OAS_DOC_SECURITY_SCOPE_OAS_DOC_SECURITY_SCOPE_ENTRY_NAME_UK = Internal.createUniqueKey(OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE, DSL.name("KEY_oas_doc_security_scope_oas_doc_security_scope_entry_name_uk"), new TableField[] { OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE.OAS_DOC_SECURITY_ID, OasDocSecurityScope.OAS_DOC_SECURITY_SCOPE.SCOPE_NAME }, true);
@@ -824,6 +827,12 @@ public class Keys {
     public static final ForeignKey<NamespaceRecord, AppUserRecord> NAMESPACE_OWNER_USER_ID_FK = ForeignKeys0.NAMESPACE_OWNER_USER_ID_FK;
     public static final ForeignKey<OasDocRecord, AppUserRecord> OAS_DOC_CREATED_BY_FK = ForeignKeys0.OAS_DOC_CREATED_BY_FK;
     public static final ForeignKey<OasDocRecord, AppUserRecord> OAS_DOC_LAST_UPDATED_BY_FK = ForeignKeys0.OAS_DOC_LAST_UPDATED_BY_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, AppUserRecord> OAS_DOC_HTTP_HEADER_CREATED_BY_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_CREATED_BY_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, AppUserRecord> OAS_DOC_HTTP_HEADER_LAST_UPDATED_BY_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_LAST_UPDATED_BY_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, OasDocRecord> OAS_DOC_HTTP_HEADER_OAS_DOC_ID_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_OAS_DOC_ID_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, OasHttpHeaderRecord> OAS_DOC_HTTP_HEADER_OAS_HTTP_HEADER_ID_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_OAS_HTTP_HEADER_ID_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, OasOperationRecord> OAS_DOC_HTTP_HEADER_OAS_OPERATION_ID_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_OAS_OPERATION_ID_FK;
+    public static final ForeignKey<OasDocHttpHeaderRecord, OasParameterRecord> OAS_DOC_HTTP_HEADER_OAS_PARAMETER_ID_FK = ForeignKeys1.OAS_DOC_HTTP_HEADER_OAS_PARAMETER_ID_FK;
     public static final ForeignKey<OasDocRecord, AppUserRecord> OAS_DOC_OWNER_USER_ID_FK = ForeignKeys0.OAS_DOC_OWNER_USER_ID_FK;
     public static final ForeignKey<OasDocSecurityRecord, AppUserRecord> OAS_DOC_SECURITY_CREATED_BY_FK = ForeignKeys0.OAS_DOC_SECURITY_CREATED_BY_FK;
     public static final ForeignKey<OasDocSecurityRecord, AppUserRecord> OAS_DOC_SECURITY_LAST_UPDATED_BY_FK = ForeignKeys0.OAS_DOC_SECURITY_LAST_UPDATED_BY_FK;
@@ -1462,6 +1471,12 @@ public class Keys {
     }
 
     private static class ForeignKeys1 {
+        public static final ForeignKey<OasDocHttpHeaderRecord, AppUserRecord> OAS_DOC_HTTP_HEADER_CREATED_BY_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_created_by_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.CREATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<OasDocHttpHeaderRecord, AppUserRecord> OAS_DOC_HTTP_HEADER_LAST_UPDATED_BY_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_last_updated_by_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<OasDocHttpHeaderRecord, OasDocRecord> OAS_DOC_HTTP_HEADER_OAS_DOC_ID_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_oas_doc_id_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.OAS_DOC_ID }, Keys.KEY_OAS_DOC_PRIMARY, new TableField[] { OasDoc.OAS_DOC.OAS_DOC_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<OasDocHttpHeaderRecord, OasHttpHeaderRecord> OAS_DOC_HTTP_HEADER_OAS_HTTP_HEADER_ID_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_oas_http_header_id_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.OAS_HTTP_HEADER_ID }, Keys.KEY_OAS_HTTP_HEADER_PRIMARY, new TableField[] { OasHttpHeader.OAS_HTTP_HEADER.OAS_HTTP_HEADER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<OasDocHttpHeaderRecord, OasOperationRecord> OAS_DOC_HTTP_HEADER_OAS_OPERATION_ID_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_oas_operation_id_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.OAS_OPERATION_ID }, Keys.KEY_OAS_OPERATION_PRIMARY, new TableField[] { OasOperation.OAS_OPERATION.OAS_OPERATION_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
+        public static final ForeignKey<OasDocHttpHeaderRecord, OasParameterRecord> OAS_DOC_HTTP_HEADER_OAS_PARAMETER_ID_FK = Internal.createForeignKey(OasDocHttpHeader.OAS_DOC_HTTP_HEADER, DSL.name("oas_doc_http_header_oas_parameter_id_fk"), new TableField[] { OasDocHttpHeader.OAS_DOC_HTTP_HEADER.OAS_PARAMETER_ID }, Keys.KEY_OAS_PARAMETER_PRIMARY, new TableField[] { OasParameter.OAS_PARAMETER.OAS_PARAMETER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, AppUserRecord> XBT_LAST_UPDATED_BY_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_last_updated_by_fk"), new TableField[] { Xbt.XBT.LAST_UPDATED_BY }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, AppUserRecord> XBT_OWNER_USER_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_owner_user_id_fk"), new TableField[] { Xbt.XBT.OWNER_USER_ID }, Keys.KEY_APP_USER_PRIMARY, new TableField[] { AppUser.APP_USER.APP_USER_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);
         public static final ForeignKey<XbtRecord, XbtRecord> XBT_SUBTYPE_OF_XBT_ID_FK = Internal.createForeignKey(Xbt.XBT, DSL.name("xbt_subtype_of_xbt_id_fk"), new TableField[] { Xbt.XBT.SUBTYPE_OF_XBT_ID }, Keys.KEY_XBT_PRIMARY, new TableField[] { Xbt.XBT.XBT_ID }, true, ForeignKeyRule.RESTRICT, ForeignKeyRule.RESTRICT);

@@ -112,7 +112,7 @@ export class AssignedBusinessTermDetailComponent implements OnInit {
       return this.service.findIfPrimaryExist(_assignedBusinessTerm.bieId,
         _assignedBusinessTerm.bieType, _assignedBusinessTerm.primaryIndicator)
         .subscribe(resp => {
-        if (resp && resp.length > 0) {
+        if (resp && resp.list && resp.list.some(entry => entry.assignedBizTermId !== _assignedBusinessTerm.assignedBizTermId)) {
           const dialogConfig = this.confirmDialogService.newConfig();
           dialogConfig.data.header = 'Overwrite previous preferred business term?';
           dialogConfig.data.content = [

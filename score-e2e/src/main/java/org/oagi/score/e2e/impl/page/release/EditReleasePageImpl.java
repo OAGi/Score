@@ -35,6 +35,12 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     private static final By PUBLISH_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Publish\")]//ancestor::button[1]");
 
+    private static final By IN_PROGRESS_NOTICE_LOCATOR = By.className("release-in-progress");
+    private static final By RECOVER_BUTTON_LOCATOR =
+            By.xpath("//span[contains(text(), \"Recover\")]//ancestor::button[1]");
+    private static final By RECOVER_BUTTON_IN_DIALOG_LOCATOR =
+            By.xpath("//mat-dialog-container//span[contains(text(), \"Recover\")]//ancestor::button");
+
     private final ReleaseObject release;
 
     public EditReleasePageImpl(BasePage parent, ReleaseObject release) {
@@ -163,6 +169,23 @@ public class EditReleasePageImpl extends BasePageImpl implements EditReleasePage
     public void publish() {
         click(getPublishButton());
         click(elementToBeClickable(getDriver(), CONTINUE_TO_UPDATE_BUTTON_IN_DIALOG_LOCATOR));
+    }
+
+    @Override
+    public WebElement getInProgressNotice() {
+        return visibilityOfElementLocated(getDriver(), IN_PROGRESS_NOTICE_LOCATOR);
+    }
+
+    @Override
+    public WebElement getRecoverButton() {
+        return elementToBeClickable(getDriver(), RECOVER_BUTTON_LOCATOR);
+    }
+
+    @Override
+    public void recover() {
+        click(getRecoverButton());
+        click(elementToBeClickable(getDriver(), RECOVER_BUTTON_IN_DIALOG_LOCATOR));
+        invisibilityOfLoadingContainerElement(getDriver());
     }
 
 }

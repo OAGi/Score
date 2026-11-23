@@ -99,6 +99,7 @@ export class BieUpliftProfileBieComponent {
     saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
 
     this.targetRelease = undefined;
+    this.selection.clear();
     this.applySourceRelease();
     this.view().onSearch();
 
@@ -113,6 +114,10 @@ export class BieUpliftProfileBieComponent {
 
   initReleases(releases: ReleaseSummary[]) {
     this.releases = releases.filter(e => !e.workingRelease);
+    // The branches of the previous library must not stay when this library has none to choose.
+    this.sourceRelease = undefined;
+    this.targetRelease = undefined;
+    this.selection.clear();
     if (this.releases.length > 0) {
       const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
       if (savedReleaseId) {
@@ -132,6 +137,9 @@ export class BieUpliftProfileBieComponent {
       if (targetReleaseList.length > 0) {
         this.targetRelease = targetReleaseList[0];
       }
+    } else {
+      initFilter(this.sourceReleaseListFilterCtrl, this.sourceReleaseFilteredList, [], (e) => e.releaseNum);
+      initFilter(this.targetReleaseListFilterCtrl, this.targetReleaseFilteredList, [], (e) => e.releaseNum);
     }
     this.applySourceRelease();
   }

@@ -11,6 +11,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {decodeUnicodeBase64, encodeUnicodeBase64} from '../common/utility';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, of, throwError} from 'rxjs';
@@ -130,7 +131,7 @@ export class AuthService implements OnInit, CanActivate {
   }
 
   storeUserInfo(res: UserToken) {
-    localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
+    localStorage.setItem(this.USER_INFO_KEY, encodeUnicodeBase64(JSON.stringify(res)));
   }
 
   /**
@@ -145,7 +146,7 @@ export class AuthService implements OnInit, CanActivate {
   getUserToken(): UserToken {
     let value;
     try {
-      value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
+      value = JSON.parse(decodeUnicodeBase64(localStorage.getItem(this.USER_INFO_KEY)));
 
       if (!value.tenant) {
         value.tenant = new TenantProperties();
@@ -316,6 +317,9 @@ export class XhrInterceptor implements HttpInterceptor {
 
 export const SUPPRESS_ERROR_ALERT = new HttpContextToken<boolean>(() => false);
 
+/** The request asks the user itself what to do when the history (log) of a component cannot be found. */
+export const LOG_NOT_FOUND_HANDLED = new HttpContextToken<boolean>(() => false);
+
 @Injectable()
 export class ErrorAlertInterceptor implements HttpInterceptor {
   private auth = inject(AuthService);
@@ -331,6 +335,11 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
           return throwError(error);
         }
 
+        if (req.context.get(LOG_NOT_FOUND_HANDLED) && req.params.get('recreateLog') !== 'true'
+            && error?.headers?.get('x-error-code') === 'LOG_NOT_FOUND') {
+          return throwError(error);
+        }
+
         if (error instanceof HttpErrorResponse || error.name === 'HttpErrorResponse') {
           if (this.auth.isServiceUnavailableFailure(error, req.url)) {
             this.router.navigate(['/service-unavailable'], {
@@ -342,6 +351,7 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
           switch (error.status) {
             case 400:
             case 403:
+            case 409:
             case 500:
               const errorMessageId = error.headers.get('x-error-message-id');
               const errorMessage = error.headers.get('x-error-message');

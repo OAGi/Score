@@ -46,7 +46,11 @@ export class SettingsPreferencesComponent implements OnInit {
 
   updateBrowserView(value: boolean) {
     this.preferencesInfo.viewSettingsInfo.pageSettings.browserViewMode = value;
-    this.updatePreferences();
+    this.preferencesService.updateBrowserViewMode(this.auth.getUserToken(), value).subscribe(_ => {
+      this.snackBar.open('Updated', '', {
+        duration: 3000,
+      });
+    });
   }
 
   get isBrowserViewEnabled(): boolean {

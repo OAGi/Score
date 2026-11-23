@@ -1,6 +1,7 @@
 import {Component, Inject, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {OasOAuthFlow, OasSecurityScheme} from '../domain/openapi-doc';
+import {scopeNameError, securitySchemeNameError} from '../domain/oas-security-names';
 
 /**
  * Issue #1729: dialog to add or edit a single OpenAPI Security Scheme. For oauth2 schemes it embeds a
@@ -217,10 +218,18 @@ export class OasDocSecuritySchemeDialogComponent {
     return flowType === 'deviceAuthorization';
   }
 
+  scopeError(scopeName: string | undefined): string {
+    return scopeNameError(scopeName);
+  }
+
+  get schemeNameError(): string {
+    return securitySchemeNameError(this.scheme.schemeName);
+  }
+
   get isValid(): boolean {
     const s = this.scheme;
     const name = (s.schemeName || '').trim();
-    if (!name || this.existingNames.includes(name)) {
+    if (!name || this.existingNames.includes(name) || this.schemeNameError) {
       return false;
     }
     if (!s.type) {
@@ -257,7 +266,7 @@ export class OasDocSecuritySchemeDialogComponent {
         }
         if (f.scopes) {
           for (const sc of f.scopes) {
-            if (!sc.scopeName || !sc.scopeName.trim()) {
+            if (!sc.scopeName || !sc.scopeName.trim() || scopeNameError(sc.scopeName)) {
               return false;
             }
           }

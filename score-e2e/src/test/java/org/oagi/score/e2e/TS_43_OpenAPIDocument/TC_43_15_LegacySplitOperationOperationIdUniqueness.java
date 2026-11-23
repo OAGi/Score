@@ -64,7 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_43_15_LegacySplitOperationOperationIdUniqueness extends BaseTest {
 
-    private static final String OPERATION_ID_UNIQUE_ERROR = "Operation ID must be unique within the document.";
+    private static final String OPERATION_ID_UNIQUE_ERROR = "Operation ID must be unique within the document";
 
     private final List<AppUserObject> randomAccounts = new ArrayList<>();
 
@@ -181,12 +181,15 @@ public class TC_43_15_LegacySplitOperationOperationIdUniqueness extends BaseTest
         for (WebElement card : cards) {
             assertEquals(sharedOperationId, panel.getOperationId(card),
                     "Both operations carry the same hand-set Operation ID");
-            assertEquals(OPERATION_ID_UNIQUE_ERROR, panel.getOperationIdError(card),
-                    "A genuine cross-operation Operation ID collision must still be flagged (Issue #1757)");
         }
 
-        // A benign edit cannot be saved while the genuine duplicate stands (the error, not the lack of a
-        // change, is what blocks the Update button).
+        // The server judges the bindings as they are, as soon as they are shown: a genuine duplicate is flagged at both bindings
+        // before anything is edited, and while it stands a benign edit cannot be saved (the error, not the lack of a change,
+        // is what blocks the Update button).
+        for (WebElement card : cards) {
+            assertTrue(panel.getOperationIdError(card).contains(OPERATION_ID_UNIQUE_ERROR),
+                    "A genuine cross-operation Operation ID collision must still be flagged (Issue #1757)");
+        }
         panel.setTag(panel.getBindingCards().get(0), "TC431515Tag");
         assertFalse(panel.isUpdateButtonEnabled(),
                 "A genuine duplicate Operation ID must keep the Update OpenAPI Information button disabled (Issue #1757)");

@@ -16,6 +16,13 @@ describe('ReuseBieDialogComponent', () => {
     expect(params['ownedByDeveloper']).toBeUndefined();
   });
 
+  it('leaves out the BIEs derived from the BIE only when a base BIE is selected', () => {
+    expect(reuseBieParams({libraryId: 3, releaseId: 4, topLevelAsbiepId: 9}, false)['excludeDerivedFromTopLevelAsbiepIds'])
+      .toBeUndefined();
+    expect(reuseBieParams({libraryId: 3, releaseId: 4, topLevelAsbiepId: 9, excludeDerived: true}, false)['excludeDerivedFromTopLevelAsbiepIds'])
+      .toBe('9');
+  });
+
   it('asks for the BIEs that are based on a BIE only when there is one, and for the developers\' only of a developer', () => {
     const params = reuseBieParams({libraryId: 3, releaseId: 4, topLevelAsbiepId: 9, basedTopLevelAsbiepId: 10}, true);
 

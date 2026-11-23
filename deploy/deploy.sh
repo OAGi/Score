@@ -12,6 +12,9 @@
 #     --no-build     skip local image build (reuse already-built images)
 #     --no-push      skip docker push
 #     --no-db        do not bump/recreate the db container (frontend + backend only)
+#     --images=LIST  roll only these images: comma list of web,http,repo (default: all three);
+#                    e.g. --images=http (backend only), --images=web,http
+#                    per-image tags: TAG_WEB / TAG_HTTP / TAG_REPO env (default <version>)
 #     --remote-only  == --no-build --no-push (just roll + verify using existing pushed images)
 #     -y, --yes      do not prompt for confirmation
 #
@@ -34,6 +37,7 @@ for arg in "$@"; do
     --no-build)    DO_BUILD=0 ;;
     --no-push)     DO_PUSH=0 ;;
     --no-db)       WITH_DB=0 ;;
+    --images=*)    IMAGES="${arg#--images=}" ;;
     --remote-only) DO_BUILD=0; DO_PUSH=0 ;;
     -y|--yes)      ASSUME_YES=1 ;;
     -h|--help)     grep -E '^#( |$)' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -48,12 +52,14 @@ done
 VERSION="${VERSION:-$(default_version)}"
 require_release_version "$VERSION"   # abort before build/push if VERSION looks like a dev/snapshot build
 HOST="$(instance_host "$INSTANCE")" || exit 1
+export WITH_DB IMAGES
+normalize_images
 
 echo "-------------------------------------------------------------"
 echo " instance : $INSTANCE ($HOST)"
 echo " version  : $VERSION"
 echo " steps    : $([ $DO_SG = 1 ] && echo -n 'open-sg ')$([ $DO_BUILD = 1 ] && echo -n 'build ')$([ $DO_PUSH = 1 ] && echo -n 'push ')roll verify"
-echo " with_db  : $WITH_DB"
+echo " images   : $IMAGES"
 echo "-------------------------------------------------------------"
 if [ "$ASSUME_YES" != 1 ]; then
   printf 'Proceed? [y/N] '; read -r ans; case "$ans" in y|Y|yes) ;; *) die "aborted." ;; esac
@@ -62,6 +68,6 @@ fi
 [ "$DO_SG"    = 1 ] && "$DEPLOY_DIR/open-sg.sh"
 [ "$DO_BUILD" = 1 ] && "$DEPLOY_DIR/build-images.sh" "$VERSION"
 [ "$DO_PUSH"  = 1 ] && "$DEPLOY_DIR/push-images.sh" "$VERSION"
-WITH_DB="$WITH_DB" "$DEPLOY_DIR/remote-deploy.sh" "$INSTANCE" "$VERSION"
+"$DEPLOY_DIR/remote-deploy.sh" "$INSTANCE" "$VERSION"
 
 log "Deploy of $VERSION to '$INSTANCE' complete."

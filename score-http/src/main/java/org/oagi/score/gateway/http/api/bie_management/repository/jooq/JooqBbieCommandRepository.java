@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.repository.jooq;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpsertBbieRequest;
+import org.oagi.score.gateway.http.api.bie_management.model.BieValueConstraintUpdates;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bbie.BbieNode;
@@ -155,14 +156,7 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
                 BccpSummaryRecord bccpRecord = bccpQuery.getBccpSummary(bccRecord.toBccpManifestId());
 
                 var dtQuery = repositoryFactory().dtQueryRepository(requester());
-                List<DtAwdPriSummaryRecord> dtAwdPriList = dtQuery.getDtAwdPriSummaryList(bccpRecord.dtManifestId());
-                dtAwdPriList = dtAwdPriList.stream().filter(e -> e.isDefault())
-                        .collect(Collectors.toList());
-                if (dtAwdPriList.size() != 1) {
-                    throw new IllegalArgumentException();
-                }
-
-                DtAwdPriSummaryRecord defaultBdtPriRestri = dtAwdPriList.get(0);
+                DtAwdPriSummaryRecord defaultBdtPriRestri = dtQuery.getDefaultDtAwdPriSummary(bccpRecord.dtManifestId());
                 if (defaultBdtPriRestri.codeListManifestId() != null) {
                     bbieRecord.setXbtManifestId(null);
                     bbieRecord.setCodeListManifestId(valueOf(defaultBdtPriRestri.codeListManifestId()));
@@ -268,7 +262,7 @@ public class JooqBbieCommandRepository extends JooqBaseRepository implements Bbi
                 bbieRecord.setRemark(emptyToNull(bbie.getRemark()));
             }
 
-            BieValueConstraintUpdates.apply(bbie.getDefaultValue(), bbie.getFixedValue(),
+            BieValueConstraintUpdates.apply(bbie.valueConstraint(),
                     bbieRecord::setDefaultValue, bbieRecord::setFixedValue);
 
             if (!bbie.isEmptyPrimitive()) {

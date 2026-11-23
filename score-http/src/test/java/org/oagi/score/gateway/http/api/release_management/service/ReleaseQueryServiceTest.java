@@ -91,7 +91,7 @@ class ReleaseQueryServiceTest {
 
     private ReleaseDetailsRecord details(ReleaseSummaryRecord next) {
         return new ReleaseDetailsRecord(null, null, null, null, null,
-                null, null, null, null, null, null, next);
+                null, null, null, null, null, null, next, false);
     }
 
     private ReleaseSummaryRecord next(ReleaseId releaseId) {

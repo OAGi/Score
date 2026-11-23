@@ -53,7 +53,8 @@ public class JooqTenantCommandRepository extends JooqBaseRepository implements T
         var query = repositoryFactory().tenantQueryRepository(requester());
         TenantInfo tenant = query.getTenantById(tenantId);
 
-        if (tenant != null && !checkIfTenantNameExists(name) && !tenant.name().equals(name)) {
+        // The tenant itself is left out of the name check: its own name always matches.
+        if (tenant != null && !checkIfOtherTenantNameExists(tenantId, name) && !tenant.name().equals(name)) {
             dslContext().update(TENANT).set(TENANT.NAME, name).where(TENANT.TENANT_ID.eq(valueOf(tenantId)))
                     .execute();
 
@@ -112,6 +113,11 @@ public class JooqTenantCommandRepository extends JooqBaseRepository implements T
                 .where(USER_TENANT.TENANT_ID.eq(valueOf(tenantId)))
                 .and(USER_TENANT.APP_USER_ID.eq(valueOf(addUserId))).fetchOne(USER_TENANT.USER_TENANT_ID);
         return userTenant != null ? true : false;
+    }
+
+    private boolean checkIfOtherTenantNameExists(TenantId tenantId, String name) {
+        return dslContext().fetchExists(dslContext().selectOne().from(TENANT)
+                .where(TENANT.NAME.eq(name)).and(TENANT.TENANT_ID.ne(valueOf(tenantId))));
     }
 
     private boolean checkIfTenantNameExists(String name) {

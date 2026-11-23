@@ -302,10 +302,40 @@ export class SettingsApplicationSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** The stored SMTP password is never sent to the browser; this tells that an empty box is not an empty password. */
+  authPasswordCleared = false;
+
+  get authPasswordPlaceholder(): string {
+    if (this.authPasswordCleared) {
+      return 'The password will be cleared';
+    }
+    return this.applicationSettingsInfo?.smtpSettingsInfo?.authPasswordSet ? 'Unchanged' : '';
+  }
+
+  clearAuthPassword() {
+    this.applicationSettingsInfo.smtpSettingsInfo.authPassword = '';
+    this.authPasswordCleared = true;
+  }
+
   updateApplicationSettingsInfo() {
-    this.settingsService.update({
-      smtpSettingsInfo: this.applicationSettingsInfo.smtpSettingsInfo
-    } as ApplicationSettingsInfo).subscribe(_ => {
+    const smtpSettingsInfo = {...this.applicationSettingsInfo.smtpSettingsInfo};
+    // Omitted keeps the stored password; only a typed one replaces it and an empty one (Clear) removes it.
+    if (!smtpSettingsInfo.authPassword) {
+      if (this.authPasswordCleared) {
+        smtpSettingsInfo.authPassword = '';
+      } else {
+        delete smtpSettingsInfo.authPassword;
+      }
+    }
+    delete smtpSettingsInfo.authPasswordSet;
+
+    this.settingsService.update({smtpSettingsInfo} as ApplicationSettingsInfo).subscribe(_ => {
+      const stored = this.applicationSettingsInfo.smtpSettingsInfo;
+      if (smtpSettingsInfo.authPassword !== undefined) {
+        stored.authPasswordSet = smtpSettingsInfo.authPassword !== '';
+      }
+      stored.authPassword = undefined;
+      this.authPasswordCleared = false;
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });

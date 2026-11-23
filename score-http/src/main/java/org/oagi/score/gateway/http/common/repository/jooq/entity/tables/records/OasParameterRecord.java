@@ -138,19 +138,41 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
     }
 
     /**
-     * Setter for <code>oas_parameter.schema_type_reference</code>. A reference
-     * of the schema defining the type used for the parameter.
+     * Setter for <code>oas_parameter.schema_type_reference</code>. REQUIRED.
+     * The schema defining the type used for the parameter, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
     public void setSchemaTypeReference(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>oas_parameter.schema_type_reference</code>. A reference
-     * of the schema defining the type used for the parameter.
+     * Getter for <code>oas_parameter.schema_type_reference</code>. REQUIRED.
+     * The schema defining the type used for the parameter, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
     public String getSchemaTypeReference() {
         return (String) get(6);
+    }
+
+    /**
+     * Setter for <code>oas_parameter.example</code>. Example of the parameter's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public void setExample(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oas_parameter.example</code>. Example of the parameter's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public String getExample() {
+        return (String) get(7);
     }
 
     /**
@@ -161,7 +183,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * default value is false.
      */
     public void setAllowReserved(Byte value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
@@ -172,7 +194,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * default value is false.
      */
     public Byte getAllowReserved() {
-        return (Byte) get(7);
+        return (Byte) get(8);
     }
 
     /**
@@ -181,7 +203,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * value is false.
      */
     public void setDeprecated(Byte value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
@@ -190,7 +212,71 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * value is false.
      */
     public Byte getDeprecated() {
-        return (Byte) get(8);
+        return (Byte) get(9);
+    }
+
+    /**
+     * Setter for <code>oas_parameter.style</code>. Describes how the parameter
+     * value will be serialized depending on the type of the parameter value
+     * (matrix, label, simple, form, spaceDelimited, pipeDelimited or
+     * deepObject). NULL for the default of the location: form for query and
+     * cookie, simple for path and header. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public void setStyle(String value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oas_parameter.style</code>. Describes how the parameter
+     * value will be serialized depending on the type of the parameter value
+     * (matrix, label, simple, form, spaceDelimited, pipeDelimited or
+     * deepObject). NULL for the default of the location: form for query and
+     * cookie, simple for path and header. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public String getStyle() {
+        return (String) get(10);
+    }
+
+    /**
+     * Setter for <code>oas_parameter.explode</code>. When true, parameter
+     * values of type array or object generate separate parameters for each
+     * value of the array or key-value pair of the map. NULL for the default of
+     * the style: true for form, false for all other styles. Not used with
+     * CONTENT_MEDIA_TYPE.
+     */
+    public void setExplode(Byte value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>oas_parameter.explode</code>. When true, parameter
+     * values of type array or object generate separate parameters for each
+     * value of the array or key-value pair of the map. NULL for the default of
+     * the style: true for form, false for all other styles. Not used with
+     * CONTENT_MEDIA_TYPE.
+     */
+    public Byte getExplode() {
+        return (Byte) get(11);
+    }
+
+    /**
+     * Setter for <code>oas_parameter.content_media_type</code>. The media type
+     * of the content (for example text/plain) that serializes the parameter
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the parameter is serialized with a schema.
+     */
+    public void setContentMediaType(String value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>oas_parameter.content_media_type</code>. The media type
+     * of the content (for example text/plain) that serializes the parameter
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the parameter is serialized with a schema.
+     */
+    public String getContentMediaType() {
+        return (String) get(12);
     }
 
     /**
@@ -198,7 +284,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * Then select from OAS_HTTP_HEADER table
      */
     public void setOasHttpHeaderId(ULong value) {
-        set(9, value);
+        set(13, value);
     }
 
     /**
@@ -206,7 +292,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * Then select from OAS_HTTP_HEADER table
      */
     public ULong getOasHttpHeaderId() {
-        return (ULong) get(9);
+        return (ULong) get(13);
     }
 
     /**
@@ -214,7 +300,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * the record.
      */
     public void setCreatedBy(ULong value) {
-        set(10, value);
+        set(14, value);
     }
 
     /**
@@ -222,7 +308,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * the record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(10);
+        return (ULong) get(14);
     }
 
     /**
@@ -230,7 +316,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(11, value);
+        set(15, value);
     }
 
     /**
@@ -238,7 +324,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * updates the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(11);
+        return (ULong) get(15);
     }
 
     /**
@@ -246,7 +332,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(12, value);
+        set(16, value);
     }
 
     /**
@@ -254,7 +340,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(16);
     }
 
     /**
@@ -262,7 +348,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(13, value);
+        set(17, value);
     }
 
     /**
@@ -270,7 +356,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(13);
+        return (LocalDateTime) get(17);
     }
 
     // -------------------------------------------------------------------------
@@ -296,7 +382,7 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
     /**
      * Create a detached, initialised OasParameterRecord
      */
-    public OasParameterRecord(ULong oasParameterId, String guid, String name, String in, Byte required, String description, String schemaTypeReference, Byte allowReserved, Byte deprecated, ULong oasHttpHeaderId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public OasParameterRecord(ULong oasParameterId, String guid, String name, String in, Byte required, String description, String schemaTypeReference, String example, Byte allowReserved, Byte deprecated, String style, Byte explode, String contentMediaType, ULong oasHttpHeaderId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(OasParameter.OAS_PARAMETER);
 
         setOasParameterId(oasParameterId);
@@ -306,8 +392,12 @@ public class OasParameterRecord extends UpdatableRecordImpl<OasParameterRecord> 
         setRequired(required);
         setDescription(description);
         setSchemaTypeReference(schemaTypeReference);
+        setExample(example);
         setAllowReserved(allowReserved);
         setDeprecated(deprecated);
+        setStyle(style);
+        setExplode(explode);
+        setContentMediaType(contentMediaType);
         setOasHttpHeaderId(oasHttpHeaderId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);

@@ -35,6 +35,7 @@ import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.AppUser.AppUserPath;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader.OasDocHttpHeaderPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasOperationSecurity.OasOperationSecurityPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasParameterLink.OasParameterLinkPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasRequest.OasRequestPath;
@@ -293,6 +294,19 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
             _oasResource = new OasResourcePath(this, Keys.OAS_OPERATION_OAS_RESOURCE_ID_FK, null);
 
         return _oasResource;
+    }
+
+    private transient OasDocHttpHeaderPath _oasDocHttpHeader;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>oas_doc_http_header</code> table
+     */
+    public OasDocHttpHeaderPath oasDocHttpHeader() {
+        if (_oasDocHttpHeader == null)
+            _oasDocHttpHeader = new OasDocHttpHeaderPath(this, null, Keys.OAS_DOC_HTTP_HEADER_OAS_OPERATION_ID_FK.getInverseKey());
+
+        return _oasDocHttpHeader;
     }
 
     private transient OasOperationSecurityPath _oasOperationSecurity;

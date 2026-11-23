@@ -12,9 +12,9 @@
         <span class="bie-state {{ element.reusingState }}"
           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusingState).background,
           'color': webPageInfo.getComponentStateColorSet(element.reusingState).font}">{{ element.reusingState }}</span>
-        @if (element.deprecated) {
+        @if (element.reusingDeprecated) {
           <span class="bie-state Deprecated"
-            [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+            [matTooltip]="(!element.reusingDeprecatedReason ? '' : ('&#x2022; ' + element.reusingDeprecatedReason + '\n')) + (!element.reusingDeprecatedRemark ? '' : ('&#x2022; ' + element.reusingDeprecatedRemark))"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
         }
@@ -70,9 +70,9 @@
         <span class="bie-state {{ element.reusedState }}"
           [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(element.reusedState).background,
           'color': webPageInfo.getComponentStateColorSet(element.reusedState).font}">{{ element.reusedState }}</span>
-        @if (element.deprecated) {
+        @if (element.reusedDeprecated) {
           <span class="bie-state Deprecated"
-            [matTooltip]="(!element.deprecatedReason ? '' : ('&#x2022; ' + element.deprecatedReason + '\n')) + (!element.deprecatedRemark ? '' : ('&#x2022; ' + element.deprecatedRemark))"
+            [matTooltip]="(!element.reusedDeprecatedReason ? '' : ('&#x2022; ' + element.reusedDeprecatedReason + '\n')) + (!element.reusedDeprecatedRemark ? '' : ('&#x2022; ' + element.reusedDeprecatedRemark))"
               [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet('Deprecated').background,
               'color': webPageInfo.getComponentStateColorSet('Deprecated').font}">Deprecated</span>
         }

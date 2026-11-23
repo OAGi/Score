@@ -153,6 +153,21 @@ public class ModuleSetReleaseQueryController {
         return response;
     }
 
+    @GetMapping(value = "/check-name-uniqueness")
+    public boolean checkNameUniqueness(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+
+            @RequestParam(name = "releaseId") ReleaseId releaseId,
+
+            @RequestParam(name = "moduleSetReleaseId", required = false)
+            ModuleSetReleaseId moduleSetReleaseId,
+
+            @RequestParam(name = "moduleSetReleaseName") String moduleSetReleaseName) {
+
+        return moduleSetReleaseQueryService.hasSameNameModuleSetRelease(sessionService.asScoreUser(user),
+                releaseId, moduleSetReleaseId, moduleSetReleaseName);
+    }
+
     @GetMapping(value = "/{moduleSetReleaseId:[\\d]+}/validate")
     public ValidateModuleSetReleaseResponse validateModuleSetRelease(
             @AuthenticationPrincipal AuthenticatedPrincipal user,

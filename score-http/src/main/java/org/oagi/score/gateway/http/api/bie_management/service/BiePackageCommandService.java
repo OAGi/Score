@@ -4,6 +4,7 @@ import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.bie_management.controller.payload.CopyBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.CreateBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.DiscardBiePackageRequest;
 import org.oagi.score.gateway.http.api.bie_management.controller.payload.UpdateBiePackageRequest;
@@ -12,8 +13,10 @@ import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageDetailsRecord;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageId;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BiePackageSummaryRecord;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_package.BieReplacementRecord;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageCommandRepository;
 import org.oagi.score.gateway.http.api.bie_management.repository.BiePackageQueryRepository;
+import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
@@ -25,7 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -142,7 +148,25 @@ public class BiePackageCommandService {
         return biePackage;
     }
 
-    public void copy(ScoreUser requester, Collection<BiePackageId> biePackageIdList) {
+    /**
+     * Copies BIE packages by the same rule as copying a BIE: a package can be copied when it is in QA or
+     * Production, or when the requester owns it. Another user's WIP package is not. Every package is
+     * checked before any is copied.
+     */
+    public void copy(ScoreUser requester, CopyBiePackageRequest request) {
+        Collection<BiePackageId> biePackageIdList = request.biePackageIdList();
+        for (BiePackageId biePackageId : biePackageIdList) {
+            BiePackageSummaryRecord source = query(requester).getBiePackageSummary(biePackageId);
+            if (source == null) {
+                throw new NotFoundException("The BIE package to copy does not exist.");
+            }
+            boolean copyable = source.state() == BieState.QA || source.state() == Production
+                    || requester.userId().equals(source.owner().userId());
+            if (!copyable) {
+                throw new DataAccessForbiddenException(
+                        "Not allowed to copy the BIE package in '" + source.state() + "' state owned by another user.");
+            }
+        }
         for (BiePackageId biePackageId : biePackageIdList) {
             command(requester).copy(biePackageId);
         }
@@ -234,6 +258,9 @@ public class BiePackageCommandService {
         if (Production != biePackage.state()) {
             throw new IllegalArgumentException("Only the BIE package in 'Production' state can be revised.");
         }
+        if (!query.getBiePackagesReferencingAsPrevious(List.of(biePackageId)).isEmpty()) {
+            throw new IllegalArgumentException("This BIE package already has a newer revision.");
+        }
 
         String versionId = biePackage.versionId();
         while (true) {
@@ -281,7 +308,34 @@ public class BiePackageCommandService {
 
         BiePackageDetailsRecord biePackage = ensureBiePackageIsUpdatable(requester, biePackageId, true);
 
+        if (prevTopLevelAsbiepId != null && topLevelAsbiepId != null &&
+            isInReplacementChain(topLevelAsbiepId, prevTopLevelAsbiepId,
+                    query(requester).getBieReplacementListInBiePackage(biePackage.biePackageId()))) {
+            throw new IllegalArgumentException(
+                    "The BIE to replace with is already in the replacement chain of the replaced BIE.");
+        }
+
         command(requester).replaceBieInBiePackage(biePackage.biePackageId(), prevTopLevelAsbiepId, topLevelAsbiepId);
+    }
+
+    /**
+     * Whether the BIE is the given replaced BIE or one that the replaced BIE has replaced (directly or through
+     * a chain). Replacing with such a BIE would make {@code prev_top_level_asbiep_id} cyclic.
+     */
+    static boolean isInReplacementChain(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId replacedTopLevelAsbiepId,
+                                        List<BieReplacementRecord> replacements) {
+        // replacing BIE -> the BIE it replaces
+        Map<TopLevelAsbiepId, TopLevelAsbiepId> replacedByReplacing = replacements.stream()
+                .collect(Collectors.toMap(
+                        BieReplacementRecord::topLevelAsbiepId, BieReplacementRecord::prevTopLevelAsbiepId));
+        Set<TopLevelAsbiepId> visited = new HashSet<>();
+        for (TopLevelAsbiepId id = replacedTopLevelAsbiepId; id != null && visited.add(id);
+             id = replacedByReplacing.get(id)) {
+            if (id.equals(topLevelAsbiepId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void deleteBieInBiePackage(

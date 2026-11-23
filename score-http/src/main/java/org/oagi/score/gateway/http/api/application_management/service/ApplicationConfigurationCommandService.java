@@ -105,7 +105,11 @@ public class ApplicationConfigurationCommandService {
             command.upsertBooleanConfiguration("score.mail.smtp.starttls.enable", smtpSettingsInfo.isStartTlsEnable());
             command.upsertConfiguration("score.mail.smtp.auth.method", smtpSettingsInfo.getAuthMethod());
             command.upsertConfiguration("score.mail.smtp.auth.username", smtpSettingsInfo.getAuthUsername());
-            command.upsertConfiguration("score.mail.smtp.auth.password", smtpSettingsInfo.getAuthPassword());
+            // The password is never returned, so an update that does not send it keeps the stored one.
+            // An empty password clears it, which an authentication method without a password needs.
+            if (smtpSettingsInfo.getAuthPassword() != null) {
+                command.upsertConfiguration("score.mail.smtp.auth.password", smtpSettingsInfo.getAuthPassword());
+            }
         }
 
         if (applicationSettingsInfo.getBieSchemaFilenameExpression() != null) {

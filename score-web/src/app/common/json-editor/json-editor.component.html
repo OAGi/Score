@@ -1,0 +1,20 @@
+<div class="json-editor" [class.json-editor-focused]="focused" [class.json-editor-disabled]="disabled">
+  <div class="json-editor-bar">
+    @if (label()) {
+      <span class="json-editor-label">{{ label() }}</span>
+    }
+    <span class="json-editor-spacer"></span>
+    @if (status) {
+      <span class="json-editor-status" [class.json-editor-status-error]="status.error">{{ status.text }}</span>
+    }
+    <button mat-icon-button mat-medium-icon-button type="button" class="json-editor-action" (click)="format()" [disabled]="disabled"
+            matTooltip="Format (Shift+Alt+F)" aria-label="Format JSON">
+      <mat-icon>format_align_left</mat-icon>
+    </button>
+    <button mat-icon-button mat-medium-icon-button type="button" class="json-editor-action" (click)="minify()" [disabled]="disabled"
+            matTooltip="Put on one line" aria-label="Put JSON on one line">
+      <mat-icon>compress</mat-icon>
+    </button>
+  </div>
+  <div #host class="json-editor-host"></div>
+</div>

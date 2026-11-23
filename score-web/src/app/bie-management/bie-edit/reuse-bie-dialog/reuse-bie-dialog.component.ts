@@ -21,6 +21,10 @@ export function reuseBieParams(data: any, isDeveloper: boolean): Record<string, 
     releaseIds: '' + data.releaseId,
     excludeTopLevelAsbiepIds: '' + data.topLevelAsbiepId
   };
+  // A base BIE must not be derived from the BIE: the server refuses it, so the list leaves it out.
+  if (data.excludeDerived) {
+    params['excludeDerivedFromTopLevelAsbiepIds'] = '' + data.topLevelAsbiepId;
+  }
   if (data.asccpManifestId) {
     params['asccpManifestId'] = '' + data.asccpManifestId;
   }

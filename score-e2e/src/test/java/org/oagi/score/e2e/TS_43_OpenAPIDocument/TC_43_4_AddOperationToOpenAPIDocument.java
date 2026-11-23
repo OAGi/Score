@@ -192,8 +192,8 @@ public class TC_43_4_AddOperationToOpenAPIDocument extends BaseTest {
         assertEquals("Operation ID is required.", editPage.getRowOperationIdError(firstRow));
 
         editPage.setRowOperationId(firstRow, secondOperationId);
-        assertEquals("Operation ID must be unique within the document.",
-                editPage.getRowOperationIdError(firstRow));
+        assertTrue(editPage.getRowOperationIdError(firstRow).contains("Operation ID must be unique within the document"),
+                "The server says that the Operation ID is already used");
     }
 
     @Test

@@ -130,7 +130,7 @@ describe('resource path construction (#1732)', () => {
   });
 
   it('buildResourcePath includes the version segment only when present', () => {
-    expect(buildResourcePath('My Company', '1.0', 'Purchase Order', false)).toBe('/my-company/1.0/purchase-order');
+    expect(buildResourcePath('My Company', '1.0', 'Purchase Order', false)).toBe('/my-company/{version}/purchase-order'); // the placeholder (Issue #1715)
     expect(buildResourcePath('My Company', '', 'Price List', true)).toBe('/my-company/price-list-list');
   });
 

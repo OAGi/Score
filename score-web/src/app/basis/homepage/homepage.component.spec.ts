@@ -1,5 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
+import {EMPTY} from 'rxjs';
+import {MatTableDataSource} from '@angular/material/table';
 import {HomepageComponent} from './homepage.component';
 
 describe('HomepageComponent', () => {
@@ -35,5 +37,30 @@ describe('HomepageComponent', () => {
     expect(atob(withRelease)).toBe('states=WIP&releaseId=7');
     self.workingRelease = undefined;
     expect(atob(HomepageComponent.prototype.ccQ.call(self, [{key: 'states', value: 'WIP'}]))).toBe('states=WIP');
+  });
+
+  it('wires the paginator, multi-user filter and sort of the Core Components by users table', () => {
+    const paginator: any = {page: EMPTY, initialized: EMPTY};
+    const sort: any = {sortChange: EMPTY, initialized: EMPTY};
+    const recentSort: any = {sortChange: EMPTY, initialized: EMPTY};
+    const self: any = {
+      numberOfBiesByUsersAndStates: new MatTableDataSource<any>(),
+      myRecentBIEs: new MatTableDataSource<any>(),
+      numberOfCcExtsByUsersAndStates: new MatTableDataSource<any>(),
+      myExtensionsUnusedInBIEs: new MatTableDataSource<any>(),
+      numberOfCCsByUsersAndStates: new MatTableDataSource<any>(),
+      numberOfCCsByUsersAndStatesPaginator: paginator,
+      numberOfCCsByUsersAndStatesSort: sort,
+      myRecentCCs: new MatTableDataSource<any>(),
+      myRecentCCsSort: recentSort,
+    };
+    HomepageComponent.prototype.ngAfterViewInit.call(self);
+    expect(self.numberOfCCsByUsersAndStates.paginator).toBe(paginator);
+    expect(self.numberOfCCsByUsersAndStates.sort).toBe(sort);
+    expect(self.myRecentCCs.sort).toBe(recentSort);
+    const predicate = self.numberOfCCsByUsersAndStates.filterPredicate;
+    expect(predicate({username: 'a'}, 'a,b')).toBe(true);
+    expect(predicate({username: 'b'}, 'a,b')).toBe(true);
+    expect(predicate({username: 'c'}, 'a,b')).toBe(false);
   });
 });

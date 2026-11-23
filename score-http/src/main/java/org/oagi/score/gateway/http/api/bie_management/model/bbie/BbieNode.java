@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListMa
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.api.bie_management.model.bbiep.BbiepId;
 import org.oagi.score.gateway.http.api.cc_management.model.CcState;
+import org.oagi.score.gateway.http.api.cc_management.model.ValueConstraint;
 import org.oagi.score.gateway.http.api.cc_management.model.bcc.BccManifestId;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.xbt_management.model.XbtManifestId;
@@ -69,6 +70,10 @@ public class BbieNode {
 
         public boolean isEmptyPrimitive() {
             return (xbtManifestId == null && codeListManifestId == null && agencyIdListManifestId == null);
+        }
+
+        public ValueConstraint valueConstraint() {
+            return new ValueConstraint(defaultValue, fixedValue);
         }
     }
 

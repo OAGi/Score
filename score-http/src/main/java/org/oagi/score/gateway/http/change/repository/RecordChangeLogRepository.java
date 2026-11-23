@@ -30,4 +30,14 @@ public interface RecordChangeLogRepository {
      * @return whether it was done
      */
     boolean restartNumbering();
+
+    /**
+     * Makes the triggers write nothing to the log for what the current session (the connection of the transaction that is active)
+     * writes from now on, until {@link #resumeWriting}. The connection goes back to the pool afterwards, so the caller resumes
+     * whatever happens.
+     */
+    void stopWriting();
+
+    /** Makes the triggers write the log again for the current session. */
+    void resumeWriting();
 }

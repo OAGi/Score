@@ -112,4 +112,12 @@ public class JooqTopLevelAsbiepCommandRepository extends JooqBaseRepository impl
                 .execute();
     }
 
+    @Override
+    public void updateBasedTopLevelAsbiepId(TopLevelAsbiepId topLevelAsbiepId, TopLevelAsbiepId basedTopLevelAsbiepId) {
+        dslContext().update(TOP_LEVEL_ASBIEP)
+                .set(TOP_LEVEL_ASBIEP.BASED_TOP_LEVEL_ASBIEP_ID, valueOf(basedTopLevelAsbiepId))
+                .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(valueOf(topLevelAsbiepId)))
+                .execute();
+    }
+
 }

@@ -43,7 +43,7 @@ const BIE_PACKAGE_TABLE = defineTable({
     {type: 'updater', key: 'ownerLoginIdList', label: 'Owner'},
     {type: 'updater', key: 'updaterLoginIdList', label: 'Updater'},
     {type: 'dateRange', key: 'updatedDate', label: 'Updated', httpParam: 'lastUpdatedOn'},
-    {type: 'text', key: 'businessTerm', label: 'BIE Business Term'},
+    {type: 'text', key: 'businessContext', label: 'BIE Business Context'},
     {type: 'text', key: 'version', label: 'BIE Version'},
     {type: 'text', key: 'remark', label: 'BIE Remark'},
     // The branches are chosen beside the search box; they are part of the query.

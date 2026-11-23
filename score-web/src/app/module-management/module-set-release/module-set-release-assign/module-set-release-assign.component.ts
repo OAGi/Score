@@ -158,6 +158,8 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     if (element.directory) {
       this.tiles.push({elements: element.children.sort(this._moduleSort), current: undefined});
     } else {
+      // The rows of the other module are not shown any more, so their selection must not be unassigned.
+      this.rightSelection.clear();
       this.isUpdating = true;
       this.moduleService.getAssigned(this.moduleSetRelease.moduleSetReleaseId, element.moduleId)
         .pipe(finalize(() => {
@@ -317,9 +319,12 @@ export class ModuleSetReleaseAssignComponent implements OnInit {
     if (this.rightSelection.selected.length === 0) {
       return;
     }
-    const items = this.rightSelection.selected;
-    const leftItems = this.leftDataSource.data;
     const rightItems = this.rightDataSource.data;
+    const items = this.rightSelection.selected.filter(e => rightItems.includes(e));
+    if (items.length === 0) {
+      return;
+    }
+    const leftItems = this.leftDataSource.data;
 
     this.isUpdating = true;
     this.moduleService.discardAssign(this.moduleSetRelease, this.selectedModuleElement.moduleId, items)

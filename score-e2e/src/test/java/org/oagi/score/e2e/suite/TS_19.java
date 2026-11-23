@@ -5,12 +5,14 @@ import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 import org.oagi.score.e2e.TS_19_ReleaseManagement.TC_19_1_ReleaseManagement;
 import org.oagi.score.e2e.TS_19_ReleaseManagement.TC_19_2_BieViewOrderReleaseForwarding;
+import org.oagi.score.e2e.TS_19_ReleaseManagement.TC_19_3_ReleaseWorkIsAllOrNothing;
 
 @Suite
 @SuiteDisplayName("Test Suite 19")
 @SelectClasses({
         TC_19_1_ReleaseManagement.class,
-        TC_19_2_BieViewOrderReleaseForwarding.class
+        TC_19_2_BieViewOrderReleaseForwarding.class,
+        TC_19_3_ReleaseWorkIsAllOrNothing.class
 })
 public class TS_19 {
 }

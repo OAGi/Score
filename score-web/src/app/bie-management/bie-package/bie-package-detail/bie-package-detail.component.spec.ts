@@ -20,7 +20,7 @@ describe('BiePackageDetailComponent', () => {
  * The component uses inject() in its field initializers, so it cannot be `new`-ed outside an
  * injection context; instead update()/updateDisabled are invoked against a hand-built `this`.
  */
-describe('BiePackageDetailComponent.update guards empty required fields (#20)', () => {
+describe('BiePackageDetailComponent.update guards empty required fields', () => {
   function updateCtx(biePackage: any, hashedBiePackage: any = biePackage): any {
     const svc: any = {update: vi.fn(() => of(biePackage))};
     const ctx: any = {

@@ -135,19 +135,39 @@ public class BieOpenAPIDocumentAddDialogImpl implements BieOpenAPIDocumentAddDia
 
     @Override
     public String getResourceNamePreview() {
-        return visibilityOfElementLocated(getDriver(), RESOURCE_NAME_FIELD_LOCATOR).getAttribute("value");
+        return awaitValue(RESOURCE_NAME_FIELD_LOCATOR);
     }
 
     @Override
     public String getOperationIdPreview() {
-        return visibilityOfElementLocated(getDriver(), OPERATION_ID_FIELD_LOCATOR).getAttribute("value");
+        return awaitValue(OPERATION_ID_FIELD_LOCATOR);
+    }
+
+    /** What the dialog shows of the operation is made by the server, which answers a moment after a choice: wait for it (up to five seconds). */
+    private String awaitValue(By locator) {
+        String value = "";
+        for (int attempt = 0; attempt < 20 && value.isEmpty(); attempt++) {
+            value = visibilityOfElementLocated(getDriver(), locator).getAttribute("value");
+            if (value == null || value.isEmpty()) {
+                value = "";
+                waitFor(ofMillis(250L));
+            }
+        }
+        return value;
     }
 
     @Override
     public String getDuplicateBodyError() {
-        java.util.List<WebElement> errors = getDriver().findElements(
-                By.xpath(BASE_XPATH + "//div[contains(@class, \"oas-add-duplicate-error\")]"));
-        return (errors.isEmpty() || !errors.get(0).isDisplayed()) ? "" : errors.get(0).getText();
+        // what the server says is wrong with adding the BIE as it is chosen; it answers a moment after the choice
+        for (int attempt = 0; attempt < 20; attempt++) {
+            java.util.List<WebElement> errors = getDriver().findElements(
+                    By.xpath(BASE_XPATH + "//div[contains(@class, \"oas-add-duplicate-error\")]"));
+            if (!errors.isEmpty() && errors.get(0).isDisplayed()) {
+                return errors.get(0).getText();
+            }
+            waitFor(ofMillis(250L));
+        }
+        return "";
     }
 
     @Override

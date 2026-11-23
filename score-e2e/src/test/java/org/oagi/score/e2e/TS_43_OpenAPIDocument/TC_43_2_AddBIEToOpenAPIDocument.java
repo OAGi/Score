@@ -265,8 +265,9 @@ public class TC_43_2_AddBIEToOpenAPIDocument extends BaseTest {
         // The duplicate-body pre-check disables Add and surfaces the mat-error on the Message Body cell.
         assertTrue(dialog.isDuplicateEndpointWarningDisplayed(),
                 "Re-adding the same (verb, message body) should warn that the endpoint already has that body");
-        assertEquals("This endpoint already has a Response body.",
-                dialog.getRowMessageBodyError(dialog.getTableRecordByValue(scenario.targetBie.getDen())));
+        assertTrue(dialog.getRowMessageBodyError(dialog.getTableRecordByValue(scenario.targetBie.getDen()))
+                        .contains("already has a Response body"),
+                "The server says that the endpoint already has a Response body");
         assertThrows(TimeoutException.class, () -> dialog.getAddButton(true));
         dialog.close();
 

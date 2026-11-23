@@ -1585,7 +1585,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     public String setCodeListRestrictionAttr(BbieSummaryRecord bbie) {
         DtAwdPriSummaryRecord dtAwdPri =
                 generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
-        if (dtAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtAwdPri.xbtManifestId() == null) {
             return "xsd:token";
         } else {
             XbtSummaryRecord xbt = generationContext.getXbt(dtAwdPri.xbtManifestId());
@@ -1597,7 +1598,8 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     public String setCodeListRestrictionAttr(BbieScSummaryRecord bbieSc) {
         DtScAwdPriSummaryRecord dtScAwdPri =
                 generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
-        if (dtScAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtScAwdPri.xbtManifestId() == null) {
             return "xsd:token";
         } else {
             XbtSummaryRecord xbt = generationContext.getXbt(dtScAwdPri.xbtManifestId());

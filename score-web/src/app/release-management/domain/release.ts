@@ -28,6 +28,8 @@ export class ReleaseDetails {
   libraryName: string;
   namespaceId: number;
   latestRelease: boolean;
+  /** A transaction holds the release: the work for it is going on (not left so, because the server stopped). */
+  busy: boolean;
 }
 
 export class ReleaseResponse {

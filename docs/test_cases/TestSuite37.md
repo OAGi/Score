@@ -322,3 +322,47 @@ A custom Agency ID List selected on a BBIE_SC inside a reused BIE is included wh
 3. Create an end-user BIE with a compatible Token-based BBIE_SC, assign the custom Agency ID List to `/BOM/BOM Option/Identifier/Scheme Agency Identifier`, save and reopen the BIE, and verify the list remains assigned while the list-level value remains unset. (Assertion [#37.8.1](#test-assertion-3781))
 4. Generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro expressions through the single-BIE flow. Verify every format produces valid non-empty output. Check that XSD, JSON Schema, and OpenAPI schemas include the custom Agency ID List value; verify ODS and Avro contain the `Scheme Agency Identifier` BBIE_SC field and do not serialize the custom value as an enum. Generate OpenAPI with GET and POST operation templates enabled and check its component schema. No format returns a 500 error. This is the Issue #1805 reproduction. (Assertions [#37.8.2](#test-assertion-3782), [#37.8.3](#test-assertion-3783))
 5. Create a second BIE that inherits from the BIE with the custom Agency ID List and generate XSD, JSON Schema, OpenAPI, ODS, and Avro. Verify XSD, JSON Schema, and OpenAPI retain the custom allowed value, while ODS and Avro contain the `Scheme Agency Identifier` BBIE_SC field without the list enum. Then assign a custom Agency ID List to a BBIE_SC in a Party BIE, reuse that Party BIE under `/BOM Item Data/Party`, and reuse the BOM Item Data BIE under `/BOM/BOM Item Data`. Generate the top-level BIE and verify the same value is available through the nested reused subtree in XSD, JSON Schema, and OpenAPI; verify ODS and Avro contain the nested field without the list enum. (Assertions [#37.8.5](#test-assertion-3785), [#37.8.6](#test-assertion-3786))
+
+## Test Case 37.9
+
+**Cancelling the amendment of an end user Agency ID List**
+
+Pre-condition: The end user is on a non-working branch and a production Agency ID List of another end user has a value.
+
+
+### Test Assertion:
+
+#### Test Assertion #37.9.1
+In an amendment the Agency ID List Value of the list itself cannot be changed. When the end user cancels the amendment after changing the version, the list is `Production` with revision `1`, with its version and its Agency ID List Value as they were.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on a non-working branch and a production Agency ID List of another end user has a value.
+2. The users, branches, releases, and records needed to exercise "Cancelling the amendment of an end user Agency ID List" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as an end user, open a production Agency ID List, and note its Agency ID List Value.
+2. Amend the list and verify that the Agency ID List Value is disabled.
+3. Change the version and update; cancel the amendment; verify the state, the revision number, the version, and the Agency ID List Value. (Assertion [#37.9.1](#test-assertion-3791))
+
+## Test Case 37.10
+
+**Cancelling an amendment of an Agency ID List when the log to go back to is gone**
+
+Pre-condition: The end user is on the right branch and a Agency ID List is in amendment, and the log the Agency ID List was in before has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #37.10.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the end user does not let it, nothing is changed and the Agency ID List stays `WIP`. If the end user lets it, the Agency ID List is cancelled to `Production` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on the right branch and a Agency ID List is in amendment, and the log the Agency ID List was in before has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling an amendment of an Agency ID List when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in, amend the Agency ID List, and have the logs from before removed from the database.
+2. Cancel and confirm; verify the dialog asks whether to create a new log, and decline; verify the Agency ID List is still `WIP`.
+3. Cancel again, confirm, and let the new log be created; verify the Agency ID List is `Production` with revision `1`. (Assertion [#37.10.1](#test-assertion-37101))

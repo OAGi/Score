@@ -334,6 +334,9 @@ The end user can generate an expression of multiple BIEs, in Open API 3.0 in JSO
 #### Test Assertion #6.3.48
 For a BIE whose BBIE_SC uses a custom Agency ID List with no list-level Agency ID List Value selected, the end user can generate valid non-empty XML Schema, JSON Schema, OpenAPI, Open Document Spreadsheet, and Avro outputs. XML Schema includes the custom Agency ID List values, and none of the formats returns a server error.
 
+#### Test Assertion #6.3.49
+The Business Context that the end user chose in the Business Contexts column of a BIE with multiple business contexts stays chosen when the list is loaded again by searching or by changing the page size. The first Business Context is shown only when none was chosen or the chosen one is no longer one of the BIE's.
+
 ### Test Step Pre-condition:
 
 1. The tests create end-user-owned and developer-owned BIEs in multiple releases and states as needed for each expression-generation scenario.
@@ -352,3 +355,4 @@ For a BIE whose BBIE_SC uses a custom Agency ID List with no list-level Agency I
 8. The test generates OpenAPI 3.0 YAML and JSON expressions across the supported combinations, including code-generation-friendly mode, GET and POST operation templates, single-file and multi-file output, and Meta Header / Pagination Response / Make Array option combinations. (Assertions [#23](#test-assertion-6323), [#24](#test-assertion-6324), [#28](#test-assertion-6328), [#29](#test-assertion-6329), [#30](#test-assertion-6330), [#31](#test-assertion-6331), [#32](#test-assertion-6332), [#33](#test-assertion-6333), [#34](#test-assertion-6334), [#35](#test-assertion-6335), [#36](#test-assertion-6336), [#37](#test-assertion-6337), [#38](#test-assertion-6338), [#39](#test-assertion-6339), [#40](#test-assertion-6340), [#41](#test-assertion-6341), [#42](#test-assertion-6342), [#43](#test-assertion-6343), [#44](#test-assertion-6344), [#45](#test-assertion-6345), [#46](#test-assertion-6346), [#47](#test-assertion-6347))
 9. The test also verifies reuse handling during expression generation when the same reused BIE is referenced in multiple places. (Assertion [#27](#test-assertion-6327))
 10. For a BIE whose `Scheme Agency Identifier` BBIE_SC uses a custom Agency ID List with the list-level Agency ID List Value unset, generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro outputs. Verify each output is valid and non-empty and the XML Schema includes the custom Agency ID List value. (Assertion [#48](#test-assertion-6348))
+11. For a `WIP` end-user BIE with two business contexts, open the `Express BIE` page, choose the Business Context that is not shown first in the Business Contexts column, then search again and change the page size. Verify the chosen Business Context is shown after each reload. (Assertion [#49](#test-assertion-6349))

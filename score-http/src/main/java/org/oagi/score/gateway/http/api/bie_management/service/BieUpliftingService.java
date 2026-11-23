@@ -606,11 +606,9 @@ public class BieUpliftingService {
                                         targetCcDocument.getBccp(targetBcc.toBccpManifestId());
                                 DtSummaryRecord targetDtManifest =
                                         targetCcDocument.getDt(targetBccp.dtManifestId());
-                                DtAwdPriSummaryRecord targetDefaultDtAwdPri =
-                                targetCcDocument.getDtAwdPriList(targetDtManifest.dtManifestId()).stream()
-                                                .filter(Objects::nonNull)
-                                                .filter(e -> e.isDefault())
-                                                .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no default primitive."));
+                                DtAwdPriSummaryRecord targetDefaultDtAwdPri = DefaultAwdPriRule.select(
+                                        targetDtManifest.dataTypeTerm(),
+                                        targetCcDocument.getDtAwdPriList(targetDtManifest.dtManifestId()));
 
                                 Bbie targetBbie = new Bbie();
                                 targetBbie.setGuid(ScoreGuidUtils.randomGuid());
@@ -618,6 +616,8 @@ public class BieUpliftingService {
                                 targetBbie.setPath(mapping.getTargetPath());
                                 targetBbie.setHashPath(sha256(targetBbie.getPath()));
                                 targetBbie.setXbtManifestId(targetDefaultDtAwdPri.xbtManifestId());
+                                targetBbie.setCodeListManifestId(targetDefaultDtAwdPri.codeListManifestId());
+                                targetBbie.setAgencyIdListManifestId(targetDefaultDtAwdPri.agencyIdListManifestId());
                                 if (targetBcc.valueConstraint() != null) {
                                     if (targetBcc.valueConstraint().hasFixedValue()) {
                                         targetBbie.setFixedValue(targetBcc.valueConstraint().fixedValue());
@@ -649,11 +649,9 @@ public class BieUpliftingService {
                             case "BBIE_SC":
                                 DtScSummaryRecord targetDtSc =
                                         targetCcDocument.getDtSc(new DtScManifestId(mapping.getTargetManifestId()));
-                                DtScAwdPriSummaryRecord targetDefaultDtScAwdPri =
-                                targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                                .filter(Objects::nonNull)
-                                                .filter(e -> e.isDefault())
-                                                .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no default primitive."));
+                                DtScAwdPriSummaryRecord targetDefaultDtScAwdPri = DefaultAwdPriRule.selectForSc(
+                                        targetDtSc.representationTerm(),
+                                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()));
 
                                 BbieSc targetBbieSc = new BbieSc();
                                 targetBbieSc.setGuid(ScoreGuidUtils.randomGuid());
@@ -661,6 +659,8 @@ public class BieUpliftingService {
                                 targetBbieSc.setPath(mapping.getTargetPath());
                                 targetBbieSc.setHashPath(sha256(targetBbieSc.getPath()));
                                 targetBbieSc.setXbtManifestId(targetDefaultDtScAwdPri.xbtManifestId());
+                                targetBbieSc.setCodeListManifestId(targetDefaultDtScAwdPri.codeListManifestId());
+                                targetBbieSc.setAgencyIdListManifestId(targetDefaultDtScAwdPri.agencyIdListManifestId());
                                 if (targetDtSc.valueConstraint() != null) {
                                     if (targetDtSc.valueConstraint().hasFixedValue()) {
                                         targetBbieSc.setFixedValue(targetDtSc.valueConstraint().fixedValue());
@@ -1104,7 +1104,6 @@ public class BieUpliftingService {
                                     List<CodeListSummaryRecord> sourceCodeListList,
                                     List<AgencyIdListSummaryRecord> sourceAgencyIdListList) {
 
-            DtAwdPriSummaryRecord targetDefaultDtAwdPri;
             DtSummaryRecord targetDt = targetCcDocument.getDt(targetDtManifestId);
 
             if (sourceBbie.getXbtManifestId() != null) {
@@ -1143,32 +1142,13 @@ public class BieUpliftingService {
             if (targetBbie.getXbtManifestId() == null &&
                     targetBbie.getCodeListManifestId() == null &&
                     targetBbie.getAgencyIdListManifestId() == null) {
-                if ("Date Time".equals(targetDt.dataTypeTerm())) {
-                            targetDefaultDtAwdPri =
-                            targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date time"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
-                } else if ("Date".equals(targetDt.dataTypeTerm())) {
-                            targetDefaultDtAwdPri =
-                            targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
-                } else if ("Time".equals(targetDt.dataTypeTerm())) {
-                            targetDefaultDtAwdPri =
-                            targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "time"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no compatible default primitive."));
-                } else {
-                            targetDefaultDtAwdPri =
-                            targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> e.isDefault())
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT has no default primitive."));
-                }
+                DtAwdPriSummaryRecord targetDefaultDtAwdPri = DefaultAwdPriRule.select(
+                        targetDt.dataTypeTerm(),
+                        targetCcDocument.getDtAwdPriList(targetDt.dtManifestId()).stream()
+                                .filter(Objects::nonNull).collect(Collectors.toList()));
                 targetBbie.setXbtManifestId(targetDefaultDtAwdPri.xbtManifestId());
+                targetBbie.setCodeListManifestId(targetDefaultDtAwdPri.codeListManifestId());
+                targetBbie.setAgencyIdListManifestId(targetDefaultDtAwdPri.agencyIdListManifestId());
             }
             return targetBbie;
         }
@@ -1180,7 +1160,6 @@ public class BieUpliftingService {
                                       List<CodeListSummaryRecord> sourceCodeListList,
                                       List<AgencyIdListSummaryRecord> sourceAgencyIdListList) {
 
-            DtScAwdPriSummaryRecord targetDefaultDtScAwdPri;
             DtScSummaryRecord targetDtSc = targetCcDocument.getDtSc(dtScManifestId);
 
             if (sourceBbieSc.getXbtManifestId() != null) {
@@ -1219,32 +1198,13 @@ public class BieUpliftingService {
             if (targetBbieSc.getXbtManifestId() == null &&
                     targetBbieSc.getCodeListManifestId() == null &&
                     targetBbieSc.getAgencyIdListManifestId() == null) {
-                if ("Date Time".equals(targetDtSc.representationTerm())) {
-                            targetDefaultDtScAwdPri =
-                            targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date time"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
-                } else if ("Date".equals(targetDtSc.representationTerm())) {
-                            targetDefaultDtScAwdPri =
-                            targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "date"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
-                } else if ("Time".equals(targetDtSc.representationTerm())) {
-                            targetDefaultDtScAwdPri =
-                            targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> isXbtNamed(targetCcDocument, e.xbtManifestId(), "time"))
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no compatible default primitive."));
-                } else {
-                            targetDefaultDtScAwdPri =
-                            targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
-                                    .filter(Objects::nonNull)
-                                    .filter(e -> e.isDefault())
-                                    .findFirst().orElseThrow(() -> new IllegalStateException("Target DT_SC has no default primitive."));
-                }
+                DtScAwdPriSummaryRecord targetDefaultDtScAwdPri = DefaultAwdPriRule.selectForSc(
+                        targetDtSc.representationTerm(),
+                        targetCcDocument.getDtScAwdPriList(targetDtSc.dtScManifestId()).stream()
+                                .filter(Objects::nonNull).collect(Collectors.toList()));
                 targetBbieSc.setXbtManifestId(targetDefaultDtScAwdPri.xbtManifestId());
+                targetBbieSc.setCodeListManifestId(targetDefaultDtScAwdPri.codeListManifestId());
+                targetBbieSc.setAgencyIdListManifestId(targetDefaultDtScAwdPri.agencyIdListManifestId());
             }
             return targetBbieSc;
         }
@@ -1975,11 +1935,6 @@ public class BieUpliftingService {
 
     private String sourceName(XbtSummaryRecord sourceXbt) {
         return sourceXbt != null ? sourceXbt.name() : "unknown";
-    }
-
-    private boolean isXbtNamed(CcDocument ccDocument, XbtManifestId xbtManifestId, String name) {
-        XbtSummaryRecord xbt = xbtManifestId != null ? ccDocument.getXbt(xbtManifestId) : null;
-        return xbt != null && xbt.name() != null && xbt.name().equalsIgnoreCase(name);
     }
 
 }

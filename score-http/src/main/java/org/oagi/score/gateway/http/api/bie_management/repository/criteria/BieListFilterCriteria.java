@@ -31,6 +31,7 @@ public record BieListFilterCriteria(
         @Nullable Collection<TopLevelAsbiepId> topLevelAsbiepIdList,
         @Nullable Collection<TopLevelAsbiepId> basedTopLevelAsbiepIdList,
         @Nullable Collection<TopLevelAsbiepId> excludeTopLevelAsbiepIdList,
+        @Nullable Collection<TopLevelAsbiepId> excludeDerivedFromTopLevelAsbiepIdList,
 
         @Nullable Boolean deprecated,
         @Nullable Boolean ownedByDeveloper,
@@ -62,6 +63,7 @@ public record BieListFilterCriteria(
         private Collection<TopLevelAsbiepId> topLevelAsbiepIdList;
         private Collection<TopLevelAsbiepId> basedTopLevelAsbiepIdList;
         private Collection<TopLevelAsbiepId> excludeTopLevelAsbiepIdList;
+        private Collection<TopLevelAsbiepId> excludeDerivedFromTopLevelAsbiepIdList;
 
         private Boolean deprecated;
         private Boolean ownedByDeveloper;
@@ -132,6 +134,11 @@ public record BieListFilterCriteria(
             return this;
         }
 
+        public Builder excludeDerivedFromTopLevelAsbiepIdList(Collection<TopLevelAsbiepId> excludeDerivedFromTopLevelAsbiepIdList) {
+            this.excludeDerivedFromTopLevelAsbiepIdList = excludeDerivedFromTopLevelAsbiepIdList;
+            return this;
+        }
+
         public Builder excludeTopLevelAsbiepIdList(Collection<TopLevelAsbiepId> excludeTopLevelAsbiepIdList) {
             this.excludeTopLevelAsbiepIdList = excludeTopLevelAsbiepIdList;
             return this;
@@ -184,6 +191,7 @@ public record BieListFilterCriteria(
                     topLevelAsbiepIdList,
                     basedTopLevelAsbiepIdList,
                     excludeTopLevelAsbiepIdList,
+                    excludeDerivedFromTopLevelAsbiepIdList,
                     deprecated,
                     ownedByDeveloper,
                     tenantEnabled,

@@ -306,7 +306,8 @@ public class BieOpenApiSchemaBuilder {
                 generationContext.findDtAwdPriByBbieAndDefaultIsTrue(bbie);
 
         Map<String, Object> properties;
-        if (dtAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -322,7 +323,8 @@ public class BieOpenApiSchemaBuilder {
                 generationContext.findDtScAwdPriByBbieScAndDefaultIsTrue(bbieSc);
 
         Map<String, Object> properties;
-        if (dtScAwdPri.codeListManifestId() != null) {
+        // The default is a code list or an agency ID list when it is not a primitive.
+        if (dtScAwdPri.xbtManifestId() == null) {
             properties = new LinkedHashMap();
             properties.put("type", "string");
         } else {
@@ -545,12 +547,23 @@ public class BieOpenApiSchemaBuilder {
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
     }
 
-    private Object exampleValue(XbtSummaryRecord xbt, String exampleText) {
+    // The date and time formats of the XBTs reject an empty string, so an empty example is omitted instead.
+    private static final Set<String> NO_EMPTY_EXAMPLE_FORMATS = Set.of("date-time", "date", "time");
+
+    Object exampleValue(XbtSummaryRecord xbt, String exampleText) {
         // Issue #1405
-        return StringUtils.hasLength(exampleText) ? exampleText : emptyExample(xbt);
+        String format = xbt == null ? null : (String) toProperties(xbt).get("format");
+        if (!StringUtils.hasLength(exampleText)) {
+            return format != null && NO_EMPTY_EXAMPLE_FORMATS.contains(format) ? BieOpenApiDialect.NO_EXAMPLE : emptyExample(xbt);
+        }
+        return exampleText;
     }
 
     Object emptyExample(XbtSummaryRecord xbt) {
+        if (xbt == null) {
+            // A code list or an agency ID list value is a string.
+            return "";
+        }
         Map<String, Object> properties = toProperties(xbt);
         Object type = properties.getOrDefault("type", "string");
         if ("boolean".equals(type)) {

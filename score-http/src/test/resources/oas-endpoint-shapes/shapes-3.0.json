@@ -1,0 +1,1449 @@
+{
+ "openapi": "3.0",
+ "operations": [
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "updateManufacturing",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "productionRunId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "wipStatusWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "WIP Status"
+    ]
+   },
+   "path": "/manufacturing/V1/facility/{facilityId}/production-runs/{productionRunId}/wip-status",
+   "refs": [],
+   "verb": "patch"
+  },
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "queryProductionOrder",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "productionOrderRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Production Orders"
+    ]
+   },
+   "path": "/manufacturing/V1/facility/{facilityId}/production-orders/{id}",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "queryProductionOrderList",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "productionOrderHeaderRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Production Orders"
+    ]
+   },
+   "path": "/manufacturing/V1/facility/{facilityId}/production-orders",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "queryInventoryMovement",
+    "parameters": [
+     {
+      "description": "Returns resources that have been updated since the last time the endpoint has been called",
+      "in": "query",
+      "name": "sinceLastDateTime",
+      "required": false,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "palletId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "moveInventoryLineRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Inventory Movements"
+    ]
+   },
+   "path": "/manufacturing/V1/facility/{facilityId}/inventory-movements/{palletId}",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "updateInventoryMovement",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "palletId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "itemInstanceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Inventory Movements"
+    ]
+   },
+   "path": "/manufacturing/V1/facility/{facilityId}/inventory-movements/{palletId}",
+   "refs": [],
+   "verb": "patch"
+  },
+  {
+   "doc": 3,
+   "operation": {
+    "description": "",
+    "operationId": "updateProductionOrder",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "facilityId",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "itemInstanceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Production Orders"
+    ]
+   },
+   "path": "manufacturing/V1/facility/{facilityId}/production-orders/{id}",
+   "refs": [],
+   "verb": "patch"
+  },
+  {
+   "doc": 4,
+   "operation": {
+    "description": "",
+    "operationId": "createShippedItemInstanceList",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "shippedItemInstanceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Retailer Shipment"
+    ]
+   },
+   "path": "/in-field-product-id/V4/shipped-item-instance-list",
+   "refs": [],
+   "verb": "post"
+  },
+  {
+   "doc": 4,
+   "operation": {
+    "description": "",
+    "operationId": "replaceShippedItemInstanceList",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "shippedItemInstanceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Retailer Shipment"
+    ]
+   },
+   "path": "/in-field-product-id/V4/shipped-item-instance-list",
+   "refs": [],
+   "verb": "put"
+  },
+  {
+   "doc": 4,
+   "operation": {
+    "description": "",
+    "operationId": "queryShippedItemInstanceList",
+    "parameters": [
+     {
+      "description": "Returns resources that have been updated since the last time the endpoint has been called",
+      "in": "query",
+      "name": "sinceLastDateTime",
+      "required": false,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "shippedItemInstanceRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Farmer Receipt"
+    ]
+   },
+   "path": "/in-field-product-id/V4/shipped-item-instance-list",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 4,
+   "operation": {
+    "description": "",
+    "operationId": "updateShipmentReferenceList",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "415": {
+      "description": "Unsupported Media Type"
+     },
+     "422": {
+      "description": "Unprocessable Content"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "shipmentReferenceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Farmer Receipt"
+    ]
+   },
+   "path": "/in-field-product-id/V4/shipped-item-instance-list/shipment-reference-list",
+   "refs": [],
+   "verb": "patch"
+  },
+  {
+   "doc": 4,
+   "operation": {
+    "description": "",
+    "operationId": "deleteShipmentReferenceList",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "409": {
+      "description": "Conflict"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "shipmentReferenceWrite"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Retailer Shipment"
+    ]
+   },
+   "path": "/in-field-product-id/V4/shipment-reference-list",
+   "refs": [],
+   "verb": "delete"
+  },
+  {
+   "doc": 6,
+   "operation": {
+    "description": "",
+    "operationId": "queryCatalog",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "catalogRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Product Catalog"
+    ]
+   },
+   "path": "/crop-protection-application/v3.0/catalog",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 6,
+   "operation": {
+    "description": "",
+    "operationId": "querySubstanceList",
+    "parameters": [
+     {
+      "description": "Returns resources that have been updated since the last time the endpoint has been called",
+      "in": "query",
+      "name": "sinceLastDateTime",
+      "required": false,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     },
+     {
+      "description": "",
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "description": "Bad Request"
+     },
+     "401": {
+      "description": "Unauthorized"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "500": {
+      "description": "Internal Server Error"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "503": {
+      "description": "Service Unavailable"
+     },
+     "504": {
+      "description": "Gateway Timeout"
+     }
+    },
+    "security": [
+     {
+      "OAuth2": [
+       "substanceRead"
+      ]
+     }
+    ],
+    "summary": "",
+    "tags": [
+     "Substance"
+    ]
+   },
+   "path": "/crop-protection-application/v3.0/product/{id}/substance-list",
+   "refs": [],
+   "verb": "get"
+  },
+  {
+   "doc": 7,
+   "operation": {
+    "description": "",
+    "operationId": "updateResults",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "$ref": "#/components/responses/400_BadRequest"
+     },
+     "401": {
+      "$ref": "#/components/responses/401_Unauthorized"
+     },
+     "403": {
+      "$ref": "#/components/responses/403_Forbidden"
+     },
+     "404": {
+      "$ref": "#/components/responses/404_NotFound"
+     },
+     "409": {
+      "$ref": "#/components/responses/409_Conflict"
+     },
+     "415": {
+      "$ref": "#/components/responses/415_UnsupportedMediaType"
+     },
+     "422": {
+      "$ref": "#/components/responses/422_UnprocessableContent"
+     },
+     "500": {
+      "$ref": "#/components/responses/500_InternalServerError"
+     },
+     "502": {
+      "$ref": "#/components/responses/502_BadGateway"
+     },
+     "503": {
+      "$ref": "#/components/responses/503_ServiceUnavailable"
+     },
+     "504": {
+      "$ref": "#/components/responses/504_GatewayTimeout"
+     }
+    },
+    "summary": "",
+    "tags": [
+     "Delivery Updates"
+    ]
+   },
+   "path": "/ag-delivery/v1.3/scale-tickets/{id}/lab-results",
+   "refs": [
+    "400_BadRequest",
+    "401_Unauthorized",
+    "403_Forbidden",
+    "404_NotFound",
+    "409_Conflict",
+    "415_UnsupportedMediaType",
+    "422_UnprocessableContent",
+    "500_InternalServerError",
+    "502_BadGateway",
+    "503_ServiceUnavailable",
+    "504_GatewayTimeout"
+   ],
+   "verb": "patch"
+  },
+  {
+   "doc": 7,
+   "operation": {
+    "description": "",
+    "operationId": "direct_createScaleTicket",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Stub"
+       }
+      }
+     },
+     "description": ""
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "$ref": "#/components/responses/400_BadRequest"
+     },
+     "401": {
+      "$ref": "#/components/responses/401_Unauthorized"
+     },
+     "403": {
+      "$ref": "#/components/responses/403_Forbidden"
+     },
+     "409": {
+      "$ref": "#/components/responses/409_Conflict"
+     },
+     "415": {
+      "$ref": "#/components/responses/415_UnsupportedMediaType"
+     },
+     "422": {
+      "$ref": "#/components/responses/422_UnprocessableContent"
+     },
+     "500": {
+      "$ref": "#/components/responses/500_InternalServerError"
+     },
+     "502": {
+      "$ref": "#/components/responses/502_BadGateway"
+     },
+     "503": {
+      "$ref": "#/components/responses/503_ServiceUnavailable"
+     },
+     "504": {
+      "$ref": "#/components/responses/504_GatewayTimeout"
+     }
+    },
+    "summary": "",
+    "tags": [
+     "Direct Ship to End Customer"
+    ]
+   },
+   "path": "/ag-delivery/v1.3/direct-ship/scale-tickets",
+   "refs": [
+    "400_BadRequest",
+    "401_Unauthorized",
+    "403_Forbidden",
+    "409_Conflict",
+    "415_UnsupportedMediaType",
+    "422_UnprocessableContent",
+    "500_InternalServerError",
+    "502_BadGateway",
+    "503_ServiceUnavailable",
+    "504_GatewayTimeout"
+   ],
+   "verb": "post"
+  },
+  {
+   "doc": 7,
+   "operation": {
+    "description": "",
+    "operationId": "direct_queryScaleTicketList",
+    "parameters": [
+     {
+      "description": "Returns resources that have been updated since the last time the endpoint has been called",
+      "in": "query",
+      "name": "sinceLastDateTime",
+      "required": false,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "400": {
+      "$ref": "#/components/responses/400_BadRequest"
+     },
+     "401": {
+      "$ref": "#/components/responses/401_Unauthorized"
+     },
+     "403": {
+      "$ref": "#/components/responses/403_Forbidden"
+     },
+     "500": {
+      "$ref": "#/components/responses/500_InternalServerError"
+     },
+     "502": {
+      "$ref": "#/components/responses/502_BadGateway"
+     },
+     "503": {
+      "$ref": "#/components/responses/503_ServiceUnavailable"
+     },
+     "504": {
+      "$ref": "#/components/responses/504_GatewayTimeout"
+     }
+    },
+    "summary": "",
+    "tags": [
+     "Direct Ship to End Customer"
+    ]
+   },
+   "path": "/ag-delivery/v1.3/direct-ship/scale-tickets",
+   "refs": [
+    "400_BadRequest",
+    "401_Unauthorized",
+    "403_Forbidden",
+    "500_InternalServerError",
+    "502_BadGateway",
+    "503_ServiceUnavailable",
+    "504_GatewayTimeout"
+   ],
+   "verb": "get"
+  },
+  {
+   "doc": 7,
+   "operation": {
+    "description": "",
+    "operationId": "direct_queryScaleTicket",
+    "parameters": [
+     {
+      "description": "",
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "$ref": "#/components/schemas/Stub"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Stub"
+        }
+       }
+      },
+      "description": ""
+     },
+     "401": {
+      "$ref": "#/components/responses/401_Unauthorized"
+     },
+     "403": {
+      "$ref": "#/components/responses/403_Forbidden"
+     },
+     "404": {
+      "$ref": "#/components/responses/404_NotFound"
+     },
+     "500": {
+      "$ref": "#/components/responses/500_InternalServerError"
+     },
+     "502": {
+      "$ref": "#/components/responses/502_BadGateway"
+     },
+     "503": {
+      "$ref": "#/components/responses/503_ServiceUnavailable"
+     },
+     "504": {
+      "$ref": "#/components/responses/504_GatewayTimeout"
+     }
+    },
+    "summary": "",
+    "tags": [
+     "Direct Ship to End Customer"
+    ]
+   },
+   "path": "/ag-delivery/v1.3/direct-ship/scale-tickets/{id}",
+   "refs": [
+    "401_Unauthorized",
+    "403_Forbidden",
+    "404_NotFound",
+    "500_InternalServerError",
+    "502_BadGateway",
+    "503_ServiceUnavailable",
+    "504_GatewayTimeout"
+   ],
+   "verb": "get"
+  }
+ ],
+ "responses": {
+  "400_BadRequest": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server cannot process the request due to malformed request syntax.",
+      "instance": "",
+      "status": 400,
+      "title": "Bad Request"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Bad Request"
+  },
+  "401_Unauthorized": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The request lacks valid authentication credentials.",
+      "instance": "",
+      "status": 401,
+      "title": "Unauthorized"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Unauthorized"
+  },
+  "403_Forbidden": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server understood the request but refuses to authorize it.",
+      "instance": "",
+      "status": 403,
+      "title": "Forbidden"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Forbidden"
+  },
+  "404_NotFound": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The origin server did not find a current representation for the target resource.",
+      "instance": "",
+      "status": 404,
+      "title": "Not Found"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Not Found"
+  },
+  "409_Conflict": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The request could not be completed due to a conflict with the current state of the resource.",
+      "instance": "",
+      "status": 409,
+      "title": "Conflict"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Conflict"
+  },
+  "415_UnsupportedMediaType": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The origin server refuses to service the request because the payload is in an unsupported media type.",
+      "instance": "",
+      "status": 415,
+      "title": "Unsupported Media Type"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Unsupported Media Type"
+  },
+  "422_UnprocessableContent": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server was unable to process the contained instructions.",
+      "instance": "",
+      "status": 422,
+      "title": "Unprocessable Content"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Unprocessable Content"
+  },
+  "500_InternalServerError": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server encountered an unexpected condition.",
+      "instance": "",
+      "status": 500,
+      "title": "Internal Server Error"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Internal Server Error"
+  },
+  "502_BadGateway": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server received an invalid response from an upstream server.",
+      "instance": "",
+      "status": 502,
+      "title": "Bad Gateway"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Bad Gateway"
+  },
+  "503_ServiceUnavailable": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server is currently unable to handle the request due to maintenance.",
+      "instance": "",
+      "status": 503,
+      "title": "Service Unavailable"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Service Unavailable"
+  },
+  "504_GatewayTimeout": {
+   "content": {
+    "application/problem+json": {
+     "example": {
+      "detail": "The server did not receive a timely response from an upstream server.",
+      "instance": "",
+      "status": 504,
+      "title": "Gateway Timeout"
+     },
+     "schema": {
+      "$ref": "#/components/schemas/Stub"
+     }
+    }
+   },
+   "description": "Gateway Timeout"
+  }
+ }
+}

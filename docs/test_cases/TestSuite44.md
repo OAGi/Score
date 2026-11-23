@@ -54,6 +54,9 @@ After assigning a Base BIE, existing editable top-level values on the target BIE
 #### Test Assertion #44.2.3
 Inherited child ASBIE values from the assigned Base BIE are applied, while the Base-value panels are displayed as non-editable.
 
+#### Test Assertion #44.2.4
+The `Select Base Profile BIE` dialog does not list the BIE itself nor the BIEs derived from it, directly or through other BIEs, so a Base BIE can not make a cycle of Base BIEs. The BIEs that are not related to it are still listed.
+
 ### Test Step Pre-condition:
 1. The stated test-case pre-condition is satisfied: two end users can create and edit BIEs.
 2. A business context exists or can be created for both BIEs.
@@ -72,6 +75,16 @@ Inherited child ASBIE values from the assigned Base BIE are applied, while the B
 10. Verify that the target BIE remains editable at the top level and that its own existing top-level values are retained instead of being overwritten by the Base BIE. (Assertion [#2](#test-assertion-4422))
 11. Verify that the inherited child ASBIE values from the Base BIE are applied to the target BIE. (Assertion [#3](#test-assertion-4423))
 12. Verify that the Base-value panels for the assigned Base BIE are displayed and are non-editable. (Assertion [#3](#test-assertion-4423))
+
+### Test Step Pre-condition (Assertion #44.2.4):
+1. Four end users exist, and a business context exists for them.
+2. Four BIEs in `WIP` state of the same `BOM Header. BOM Header` ASCCP and release exist, one for each end user: the target BIE, a BIE derived from the target BIE (its Base BIE is the target BIE), a BIE derived from that derived BIE, and a BIE that is not related to the others.
+
+### Test Step (Assertion #44.2.4):
+1. Sign in to connectCenter as the owner of the target BIE.
+2. Open the target BIE and use the `Use Base BIE` action.
+3. In the advanced search of the `Select Base Profile BIE` dialog, select the owners of all four BIEs and search.
+4. Verify that only the BIE that is not related to the target BIE is listed, and that the target BIE, the derived BIE, and the BIE derived from the derived BIE are not. (Assertion [#4](#test-assertion-4424))
 
 ## Test Case 44.3
 

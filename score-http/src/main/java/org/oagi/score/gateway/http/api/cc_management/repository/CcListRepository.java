@@ -948,10 +948,10 @@ public class CcListRepository {
                 String dtType = dtTypes.get(0);
                 switch (dtType) {
                     case "CDT":
-                        conditions.add(DT.BASED_DT_ID.isNull());
+                        conditions.add(DT_MANIFEST.BASED_DT_MANIFEST_ID.isNull());
                         break;
                     case "BDT":
-                        conditions.add(DT.BASED_DT_ID.isNotNull());
+                        conditions.add(DT_MANIFEST.BASED_DT_MANIFEST_ID.isNotNull());
                         break;
                 }
             }

@@ -4,7 +4,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -106,28 +108,29 @@ public class BusinessTermImportFileParser {
             List<Map<String, String>> rows = new ArrayList<>();
             if (sheet != null) {
                 DataFormatter formatter = new DataFormatter();
+                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
                 for (Row row : sheet) {
                     if (headers == null) {
-                        if (isBlank(row, formatter)) {
+                        if (isBlank(row, formatter, evaluator)) {
                             continue; // skip leading blank rows
                         }
                         int columnCount = Math.max(0, row.getLastCellNum());
                         List<String> raw = new ArrayList<>();
                         for (int c = 0; c < columnCount; c++) {
                             Cell cell = row.getCell(c);
-                            raw.add(cell == null ? "" : formatter.formatCellValue(cell));
+                            raw.add(cell == null ? "" : cellText(cell, formatter, evaluator));
                         }
                         headers = dedupeHeaders(raw);
                         continue;
                     }
-                    if (isBlank(row, formatter)) {
+                    if (isBlank(row, formatter, evaluator)) {
                         continue;
                     }
                     assertWithinRowLimit(rows.size());
                     Map<String, String> map = new LinkedHashMap<>();
                     for (int c = 0; c < headers.size(); c++) {
                         Cell cell = row.getCell(c);
-                        String value = (cell == null) ? "" : formatter.formatCellValue(cell);
+                        String value = (cell == null) ? "" : cellText(cell, formatter, evaluator);
                         map.put(headers.get(c), normalizeCell(value));
                     }
                     rows.add(map);
@@ -222,15 +225,38 @@ public class BusinessTermImportFileParser {
         return true;
     }
 
-    private boolean isBlank(Row row, DataFormatter formatter) {
+    private boolean isBlank(Row row, DataFormatter formatter, FormulaEvaluator evaluator) {
         if (row == null) {
             return true;
         }
         for (Cell cell : row) {
-            if (cell != null && !formatter.formatCellValue(cell).trim().isEmpty()) {
+            if (cell != null && !cellText(cell, formatter, evaluator).trim().isEmpty()) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * The text a cell shows in Excel. A formula cell yields its evaluated value, not its formula source;
+     * when the formula cannot be evaluated (e.g. an unsupported function or an external link), the value
+     * Excel stored with the file is used instead.
+     */
+    private String cellText(Cell cell, DataFormatter formatter, FormulaEvaluator evaluator) {
+        try {
+            return formatter.formatCellValue(cell, evaluator);
+        } catch (RuntimeException e) {
+            if (cell.getCellType() != CellType.FORMULA) {
+                throw e;
+            }
+            return switch (cell.getCachedFormulaResultType()) {
+                case STRING -> cell.getStringCellValue();
+                case NUMERIC -> formatter.formatRawCellContents(
+                        cell.getNumericCellValue(), cell.getCellStyle().getDataFormat(),
+                        cell.getCellStyle().getDataFormatString());
+                case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+                default -> "";
+            };
+        }
     }
 }

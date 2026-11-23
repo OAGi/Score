@@ -149,7 +149,7 @@ public class AccountQueryController {
             @PathVariable("loginId") String loginId) {
 
         ScoreUser requester = sessionService.asScoreUser(user);
-        return accountQueryService.getAccountDetails(requester, loginId) != null;
+        return accountQueryService.getAccountDetailsByLoginId(requester, loginId) != null;
     }
 
 }

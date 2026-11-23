@@ -61,6 +61,7 @@ class ReleaseCommandServiceTest {
         when(repositories.namespaceQueryRepository(any())).thenReturn(namespaceQuery);
         ReleaseCommandService service = new ReleaseCommandService();
         ReflectionTestUtils.setField(service, "repositoryFactory", repositories);
+        ReflectionTestUtils.setField(service, "changeNotifier", mock(ReleaseChangeNotifier.class));
 
         CreateReleaseRequest request = new CreateReleaseRequest(libraryB, namespaceId, "2.0", null, null);
 
@@ -142,6 +143,7 @@ class ReleaseCommandServiceTest {
         when(repositories.namespaceQueryRepository(any())).thenReturn(namespaceQuery);
         ReleaseCommandService service = new ReleaseCommandService();
         ReflectionTestUtils.setField(service, "repositoryFactory", repositories);
+        ReflectionTestUtils.setField(service, "changeNotifier", mock(ReleaseChangeNotifier.class));
 
         UpdateReleaseRequest request = new UpdateReleaseRequest(releaseId, namespaceId, "1.1", null, null);
 
@@ -188,6 +190,7 @@ class ReleaseCommandServiceTest {
         when(repositories.releaseCommandRepository(any())).thenReturn(command);
         ReleaseCommandService service = new ReleaseCommandService();
         ReflectionTestUtils.setField(service, "repositoryFactory", repositories);
+        ReflectionTestUtils.setField(service, "changeNotifier", mock(ReleaseChangeNotifier.class));
         return service;
     }
 

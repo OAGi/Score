@@ -1,7 +1,7 @@
 import {CodeListDetailComponent} from './code-list-detail.component';
-import {ReplaySubject} from 'rxjs';
+import {of, ReplaySubject} from 'rxjs';
 import {AgencyIdListSummary, AgencyIdListValueSummary} from '../../agency-id-list-management/domain/agency-id-list';
-import {CodeListDetails} from '../domain/code-list';
+import {CodeListDetails, CodeListValueDetails} from '../domain/code-list';
 
 describe('CodeListDetailComponent', () => {
   it('should be defined', () => {
@@ -87,5 +87,48 @@ describe('CodeListDetailComponent', () => {
     component.codeList.state = 'QA';
     component.updateState('WIP');
     expect(open).toHaveBeenLastCalledWith('Namespace is required', '', {duration: 3000});
+  });
+
+  describe('the Code List value dialog', () => {
+    function open(existing: string, typed: string, valueToEdit?: CodeListValueDetails) {
+      const component = Object.create(CodeListDetailComponent.prototype) as CodeListDetailComponent;
+      const row = new CodeListValueDetails();
+      row.guid = 'g1';
+      row.value = existing;
+      component.values = [row];
+      component.codeList = new CodeListDetails();
+      component.codeList.valueList = component.values;
+      const result = new CodeListValueDetails();
+      result.guid = valueToEdit ? valueToEdit.guid : undefined as any;
+      result.value = typed;
+      const snackBar = {open: vi.fn()};
+      (component as any).snackBar = snackBar;
+      (component as any).dialog = {open: () => ({afterClosed: () => of(result)})};
+      (component as any).view = () => undefined;
+      component.isEditable = () => true;
+      component.openDialog(valueToEdit);
+      return {component, snackBar};
+    }
+
+    it('rejects an added Code that differs from an existing one only by surrounding spaces', () => {
+      const {component, snackBar} = open('EA', 'EA ');
+      expect(snackBar.open).toHaveBeenCalled();
+      expect(component.values.length).toBe(1);
+    });
+
+    it('adds the Code without its surrounding spaces', () => {
+      const {component, snackBar} = open('EA', ' KG ');
+      expect(snackBar.open).not.toHaveBeenCalled();
+      expect(component.values.map(v => v.value)).toEqual(['EA', 'KG']);
+    });
+
+    it('rejects an edited Code that becomes a duplicate of another value after trimming', () => {
+      const other = new CodeListValueDetails();
+      other.guid = 'g2';
+      other.value = 'KG';
+      const {component, snackBar} = open('EA', 'EA ', other);
+      expect(snackBar.open).toHaveBeenCalled();
+      expect(component.values.length).toBe(1);
+    });
   });
 });

@@ -3189,6 +3189,49 @@ public class TC_6_3_EndUserAuthorizedAccessToBIEExpressionGeneration extends Bas
         }
     }
 
+    @Test
+    @DisplayName("TC_6_3_TA_49")
+    public void end_user_keeps_chosen_business_context_of_bie_when_list_is_loaded_again() {
+        AppUserObject usera;
+        TopLevelASBIEPObject bie;
+        BusinessContextObject contextOne;
+        BusinessContextObject contextTwo;
+        {
+            LibraryObject library = getAPIFactory().getLibraryAPI().getLibraryByName("connectSpec");
+            ReleaseObject releaseOne = getAPIFactory().getReleaseAPI().getReleaseByReleaseNumber(library, this.release);
+            usera = getAPIFactory().getAppUserAPI().createRandomEndUserAccount(false);
+            thisAccountWillBeDeletedAfterTests(usera);
+
+            CoreComponentAPI coreComponentAPI = getAPIFactory().getCoreComponentAPI();
+            NamespaceObject namespace = getAPIFactory().getNamespaceAPI().getNamespaceByURI(library, "http://www.openapplications.org/oagis/10");
+            ACCObject acc = coreComponentAPI.createRandomACC(usera, releaseOne, namespace, "Published");
+            ASCCPObject asccp = coreComponentAPI.createRandomASCCP(acc, usera, namespace, "Published");
+
+            contextOne = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            contextTwo = getAPIFactory().getBusinessContextAPI().createRandomBusinessContext(usera);
+            bie = getAPIFactory().getBusinessInformationEntityAPI().
+                    generateRandomTopLevelASBIEP(Arrays.asList(contextOne, contextTwo), asccp, usera, "WIP");
+        }
+
+        HomePage homePage = loginPage().signIn(usera.getLoginId(), usera.getPassword());
+        ExpressBIEPage expressBIEPage = homePage.getBIEMenu().openExpressBIESubMenu();
+        expressBIEPage.selectBIEForExpression(bie);
+
+        // Choose the Business Context that is not the one shown first.
+        String chosen = contextOne.getName().equals(expressBIEPage.getShownBusinessContextName(bie))
+                ? contextTwo.getName() : contextOne.getName();
+        expressBIEPage.chooseBusinessContext(bie, chosen);
+        assertEquals(chosen, expressBIEPage.getShownBusinessContextName(bie));
+
+        // Searching again loads the list again; the chosen Business Context stays.
+        expressBIEPage.hitSearchButton();
+        assertEquals(chosen, expressBIEPage.getShownBusinessContextName(bie));
+
+        // So does changing the page size.
+        expressBIEPage.setItemsPerPage(50);
+        assertEquals(chosen, expressBIEPage.getShownBusinessContextName(bie));
+    }
+
     @AfterEach
     public void tearDown() {
         super.tearDown();

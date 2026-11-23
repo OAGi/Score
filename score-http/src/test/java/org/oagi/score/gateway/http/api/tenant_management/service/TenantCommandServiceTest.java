@@ -64,6 +64,18 @@ class TenantCommandServiceTest {
     }
 
     @Test
+    void createTenant_drops_the_spaces_around_the_name() {
+        service.createTenant(administrator, " Acme ");
+        verify(command).createTenant("Acme");
+    }
+
+    @Test
+    void updateTenant_drops_the_spaces_around_the_name() {
+        service.updateTenant(administrator, TENANT_ID, " ACME ");
+        verify(command).updateTenant(TENANT_ID, "ACME");
+    }
+
+    @Test
     void updateTenant_rejects_a_non_administrator() {
         assertThrows(AccessControlException.class, () -> service.updateTenant(endUser, TENANT_ID, "Acme"));
         verify(command, never()).updateTenant(any(), any());

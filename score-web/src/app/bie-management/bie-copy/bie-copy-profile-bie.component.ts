@@ -115,6 +115,8 @@ export class BieCopyProfileBieComponent {
 
   /** The branches that are chosen go to the query: searching is the user's (or the library's change's) call. */
   applyReleases() {
+    // The list is about to show other BIEs: one that was selected from the previous list must not be copied.
+    this.selection.clear();
     this.view().setFilter('releaseIds', this.selectedReleases.map(e => '' + e.releaseId));
   }
 

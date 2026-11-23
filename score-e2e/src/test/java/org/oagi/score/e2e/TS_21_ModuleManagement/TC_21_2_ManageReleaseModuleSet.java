@@ -416,4 +416,71 @@ public class TC_21_2_ManageReleaseModuleSet extends BaseTest {
         validateDialog.hitCopyToClipboardButton();
         assertTrue(getSnackBarMessage(getDriver()).equals("Copied to clipboard"));
     }
+
+    private void createModuleSetRelease(ViewEditModuleSetReleasePage viewEditModuleSetReleasePage, String name) {
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        createModuleSetReleasePage.setName(name);
+        createModuleSetReleasePage.setModuleSet("10.7.3");
+        createModuleSetReleasePage.setRelease("10.7.3");
+        createModuleSetReleasePage.hitCreateButton();
+        waitFor(ofMillis(500L));
+        viewEditModuleSetReleasePage.openPage();
+    }
+
+    private void assertSameNameWarningAndCancel(String expectedName) {
+        WebElement confirmDialogContent = visibilityOfElementLocated(getDriver(),
+                By.xpath("//score-confirm-dialog//div[contains(@class, \"content\")]"));
+        String content = getText(confirmDialogContent);
+        assertTrue(content.contains("There is another same module set release"), content);
+        assertTrue(content.contains("'" + expectedName + "'"), content);
+
+        click(elementToBeClickable(getDriver(), By.xpath(
+                "//mat-dialog-container//span[contains(text(), \"Cancel\")]//ancestor::button[1]")));
+        waitFor(ofMillis(500L));
+    }
+
+    @Test
+    @DisplayName("TC_21_2_TA_9")
+    public void developer_is_warned_of_a_release_module_set_with_the_same_name_in_the_release() {
+        AppUserObject developer;
+        {
+            developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+            thisAccountWillBeDeletedAfterTests(developer);
+        }
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditModuleSetReleasePage viewEditModuleSetReleasePage = homePage.getModuleMenu().openViewEditModuleSetReleaseSubMenu();
+
+        String name = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+        // The name of the other release only contains the name, and it is the more recently updated of the two.
+        String nameContainingName = name + " Extra";
+        String otherName = "Test Module Set Release " + RandomStringUtils.secure().nextAlphanumeric(5, 10);
+
+        createModuleSetRelease(viewEditModuleSetReleasePage, name);
+        // A name that merely contains the name of another one is not the same name, so there is no warning.
+        createModuleSetRelease(viewEditModuleSetReleasePage, nameContainingName);
+
+        // Create: the same name as that of another one in the release warns, and it can be cancelled.
+        CreateModuleSetReleasePage createModuleSetReleasePage = viewEditModuleSetReleasePage.hitNewModuleSetReleaseButton();
+        createModuleSetReleasePage.setName(name);
+        createModuleSetReleasePage.setModuleSet("10.7.3");
+        createModuleSetReleasePage.setRelease("10.7.3");
+        assertThrows(TimeoutException.class, () -> createModuleSetReleasePage.hitCreateButton());
+        assertSameNameWarningAndCancel(name);
+
+        // Update: renaming the more recent release into the exact name warns even though it is found among
+        // the names that contain it, and the warning can be cancelled.
+        viewEditModuleSetReleasePage.openPage();
+        EditModuleSetReleasePage editModuleSetReleasePage =
+                viewEditModuleSetReleasePage.openModuleSetReleaseByName(nameContainingName);
+        editModuleSetReleasePage.setName(name);
+        EditModuleSetReleasePage finalEditModuleSetReleasePage = editModuleSetReleasePage;
+        assertThrows(TimeoutException.class, () -> finalEditModuleSetReleasePage.hitUpdateButton());
+        assertSameNameWarningAndCancel(name);
+
+        // Update: a name that no other release has is saved without a warning.
+        editModuleSetReleasePage.setName(otherName);
+        editModuleSetReleasePage.hitUpdateButton();
+        assertEquals("Updated", getSnackBarMessage(getDriver()));
+    }
 }

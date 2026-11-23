@@ -33,6 +33,22 @@ class CaffeineRecordCacheTest {
     }
 
     @Test
+    void forgettingEverythingTakesEveryEntryAndRejectsWhatWasReadBefore() {
+        CaffeineRecordCache cache = cache();
+        long readIn = cache.epoch();
+        cache.putAll(readIn, java.util.Map.of("acc:1", "a", "acc:2", "b"));
+
+        cache.invalidateAll();
+
+        assertNull(cache.get("acc:1"));
+        assertNull(cache.get("acc:2"));
+        cache.put(readIn, "acc:1", "stale");
+        assertNull(cache.get("acc:1"), "a reader that began before cannot put its value back");
+        cache.put(cache.epoch(), "acc:1", "fresh");
+        assertEquals("fresh", cache.get("acc:1"));
+    }
+
+    @Test
     void forgettingTouchesOnlyTheNamedEntriesAndRejectsWhatWasReadBefore() {
         CaffeineRecordCache cache = cache();
         long readIn = cache.epoch();

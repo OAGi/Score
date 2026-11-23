@@ -2,6 +2,7 @@ package org.oagi.score.gateway.http.api.cc_management.repository.jooq;
 
 import jakarta.annotation.Nullable;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.jooq.types.ULong;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.agency_id_management.model.AgencyIdListManifestId;
@@ -10,6 +11,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.*;
 import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.DtCommandRepository;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
+import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
@@ -23,13 +25,23 @@ import org.oagi.score.gateway.http.common.util.ScoreGuidUtils;
 import org.oagi.score.gateway.http.common.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.coalesce;
 import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.notExists;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.selectOne;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc.ACC;
 import static org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bccp.BCCP;
@@ -60,6 +72,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         DtDetailsRecord basedDt = query.getDtDetails(basedDtManifestId);
         List<DtScDetailsRecord> basedDtScList = query.getDtScDetailsList(basedDt.dtManifestId());
+
+        assertAllowedPrimitivesOfDtAvailableInRelease(releaseId, basedDt.dtManifestId());
 
         DtRecord dt = new DtRecord();
         dt.setGuid(ScoreGuidUtils.randomGuid());
@@ -174,9 +188,9 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtId)),
                                 DT_AWD_PRI.CDT_PRI_ID,
-                                DT_AWD_PRI.XBT_MANIFEST_ID,
-                                DT_AWD_PRI.CODE_LIST_MANIFEST_ID,
-                                DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                                xbtManifestIdInRelease(releaseId, DT_AWD_PRI.XBT_MANIFEST_ID),
+                                codeListManifestIdInRelease(releaseId, DT_AWD_PRI.CODE_LIST_MANIFEST_ID),
+                                agencyIdListManifestIdInRelease(releaseId, DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_AWD_PRI.IS_DEFAULT)
                         .from(DT_AWD_PRI)
                         .join(DT_MANIFEST).on(and(
@@ -201,9 +215,9 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                                 inline(valueOf(releaseId)),
                                 inline(valueOf(dtScId)),
                                 DT_SC_AWD_PRI.CDT_PRI_ID,
-                                DT_SC_AWD_PRI.XBT_MANIFEST_ID,
-                                DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID,
-                                DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                                xbtManifestIdInRelease(releaseId, DT_SC_AWD_PRI.XBT_MANIFEST_ID),
+                                codeListManifestIdInRelease(releaseId, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID),
+                                agencyIdListManifestIdInRelease(releaseId, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID),
                                 DT_SC_AWD_PRI.IS_DEFAULT)
                         .from(DT_SC_AWD_PRI)
                         .join(DT_SC_MANIFEST).on(and(
@@ -212,6 +226,197 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         ))
                         .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(basedDtScManifestId))))
                 .execute();
+    }
+
+    /**
+     * The XBT, Code List and Agency ID List manifests that an allowed primitive (DT_AWD_PRI, DT_SC_AWD_PRI) points to
+     * are the ones of {@code releaseId}, or of a release it depends on (release_dep, transitively), which are referenced
+     * as they are. A Data Type created from a base (or revised) in {@code releaseId} therefore points to the manifest of
+     * the same record in {@code releaseId}; a manifest of a release it depends on is kept. A record the base uses whose
+     * manifest is neither of these cannot be pointed to, so the operation fails with the reason, instead of leaving the
+     * allowed primitive pointing to a manifest of an unrelated release or dropping it.
+     * <p>
+     * Checks the allowed primitives of the Data Type and of its supplementary components.
+     */
+    private void assertAllowedPrimitivesOfDtAvailableInRelease(ReleaseId releaseId, DtManifestId baseDtManifestId) {
+        List<String> missing = new ArrayList<>();
+        collectMissing(missing, releaseId, "the Data Type",
+                DT_AWD_PRI.join(DT_MANIFEST).on(and(
+                        DT_AWD_PRI.RELEASE_ID.eq(DT_MANIFEST.RELEASE_ID),
+                        DT_AWD_PRI.DT_ID.eq(DT_MANIFEST.DT_ID))),
+                DT_AWD_PRI.XBT_MANIFEST_ID, DT_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(baseDtManifestId)));
+        collectMissing(missing, releaseId, "a supplementary component",
+                DT_SC_AWD_PRI.join(DT_SC_MANIFEST).on(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID),
+                        DT_SC_AWD_PRI.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))),
+                DT_SC_AWD_PRI.XBT_MANIFEST_ID, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(baseDtManifestId)));
+        failIfAnyMissing(releaseId, "Data Type", missing);
+    }
+
+    /** Checks the allowed primitives of the supplementary component, as {@link #assertAllowedPrimitivesOfDtAvailableInRelease}. */
+    private void assertAllowedPrimitivesOfDtScAvailableInRelease(ReleaseId releaseId, DtScManifestId baseDtScManifestId) {
+        List<String> missing = new ArrayList<>();
+        collectMissing(missing, releaseId, "the supplementary component",
+                DT_SC_AWD_PRI.join(DT_SC_MANIFEST).on(and(
+                        DT_SC_AWD_PRI.RELEASE_ID.eq(DT_SC_MANIFEST.RELEASE_ID),
+                        DT_SC_AWD_PRI.DT_SC_ID.eq(DT_SC_MANIFEST.DT_SC_ID))),
+                DT_SC_AWD_PRI.XBT_MANIFEST_ID, DT_SC_AWD_PRI.CODE_LIST_MANIFEST_ID, DT_SC_AWD_PRI.AGENCY_ID_LIST_MANIFEST_ID,
+                DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(baseDtScManifestId)));
+        failIfAnyMissing(releaseId, "supplementary component", missing);
+    }
+
+    private void failIfAnyMissing(ReleaseId releaseId, String base, List<String> missing) {
+        if (missing.isEmpty()) {
+            return;
+        }
+
+        String releaseNum = dslContext().select(RELEASE.RELEASE_NUM).from(RELEASE)
+                .where(RELEASE.RELEASE_ID.eq(valueOf(releaseId))).fetchOptional()
+                .map(r -> r.get(RELEASE.RELEASE_NUM)).orElse(String.valueOf(releaseId));
+        throw new IllegalArgumentException("The allowed primitives of the base " + base
+                + " use records that neither release '" + releaseNum + "' nor the releases it depends on have a manifest of: " + String.join(", ", missing)
+                + ". The allowed primitives of a Data Type or of a supplementary component have to point to manifests of"
+                + " the release they belong to or to a release it depends on, so make these records available in release '" + releaseNum + "' first.");
+    }
+
+    private void collectMissing(List<String> missing, ReleaseId releaseId, String owner, Table<?> allowedPrimitives,
+                                Field<ULong> xbtManifestId, Field<ULong> codeListManifestId,
+                                Field<ULong> agencyIdListManifestId, Condition ofBase) {
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        if (dependencies.isEmpty()) {
+            dependencies.add(ULong.valueOf(0));
+        }
+        var baseXbt = XBT_MANIFEST.as("base_xbt");
+        var targetXbt = XBT_MANIFEST.as("target_xbt");
+        dslContext().selectDistinct(XBT.NAME, XBT.BUILTIN_TYPE)
+                .from(allowedPrimitives)
+                .join(baseXbt).on(baseXbt.XBT_MANIFEST_ID.eq(xbtManifestId))
+                .join(XBT).on(XBT.XBT_ID.eq(baseXbt.XBT_ID))
+                .where(and(ofBase, baseXbt.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetXbt).where(and(
+                        targetXbt.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetXbt.XBT_ID.eq(baseXbt.XBT_ID))))))
+                .forEach(r -> missing.add("XBT '" + r.get(XBT.NAME) + "' (" + r.get(XBT.BUILTIN_TYPE)
+                        + ") allowed for " + owner));
+
+        var baseCodeList = CODE_LIST_MANIFEST.as("base_code_list");
+        var targetCodeList = CODE_LIST_MANIFEST.as("target_code_list");
+        dslContext().selectDistinct(CODE_LIST.NAME)
+                .from(allowedPrimitives)
+                .join(baseCodeList).on(baseCodeList.CODE_LIST_MANIFEST_ID.eq(codeListManifestId))
+                .join(CODE_LIST).on(CODE_LIST.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))
+                .where(and(ofBase, baseCodeList.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetCodeList).where(and(
+                        targetCodeList.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetCodeList.CODE_LIST_ID.eq(baseCodeList.CODE_LIST_ID))))))
+                .forEach(r -> missing.add("Code List '" + r.get(CODE_LIST.NAME) + "' allowed for " + owner));
+
+        var baseAgencyIdList = AGENCY_ID_LIST_MANIFEST.as("base_agency_id_list");
+        var targetAgencyIdList = AGENCY_ID_LIST_MANIFEST.as("target_agency_id_list");
+        dslContext().selectDistinct(AGENCY_ID_LIST.NAME)
+                .from(allowedPrimitives)
+                .join(baseAgencyIdList).on(baseAgencyIdList.AGENCY_ID_LIST_MANIFEST_ID.eq(agencyIdListManifestId))
+                .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))
+                .where(and(ofBase, baseAgencyIdList.RELEASE_ID.notIn(dependencies), notExists(selectOne().from(targetAgencyIdList).where(and(
+                        targetAgencyIdList.RELEASE_ID.eq(valueOf(releaseId)),
+                        targetAgencyIdList.AGENCY_ID_LIST_ID.eq(baseAgencyIdList.AGENCY_ID_LIST_ID))))))
+                .forEach(r -> missing.add("Agency ID List '" + r.get(AGENCY_ID_LIST.NAME) + "' allowed for " + owner));
+    }
+
+    /**
+     * The release itself and the releases it depends on (release_dep, transitively): records of these releases can be
+     * referenced as they are.
+     */
+    private List<ULong> releasesAvailableTo(ReleaseId releaseId) {
+        List<ULong> releases = new ArrayList<>();
+        releases.add(valueOf(releaseId));
+        for (int i = 0; i < releases.size(); i++) {
+            dslContext().select(RELEASE_DEP.DEPEND_ON_RELEASE_ID).from(RELEASE_DEP)
+                    .where(RELEASE_DEP.RELEASE_ID.eq(releases.get(i)))
+                    .fetch(RELEASE_DEP.DEPEND_ON_RELEASE_ID).forEach(id -> {
+                        if (!releases.contains(id)) {
+                            releases.add(id);
+                        }
+                    });
+        }
+        return releases;
+    }
+
+    /**
+     * The manifest of the same record in {@code releaseId}, for the manifest an allowed primitive of a base points to
+     * (see {@link #assertAllowedPrimitivesOfDtAvailableInRelease}, which fails when there is none).
+     */
+    private Field<ULong> xbtManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseXbtManifestId) {
+        var inRelease = XBT_MANIFEST.as("in_release");
+        var base = XBT_MANIFEST.as("base");
+        var baseInDependency = XBT_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.XBT_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.XBT_ID.eq(inRelease.XBT_ID))
+                .where(and(
+                        base.XBT_MANIFEST_ID.eq(baseXbtManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.XBT_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.XBT_MANIFEST_ID.eq(baseXbtManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
+    }
+
+    private Field<ULong> codeListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseCodeListManifestId) {
+        var inRelease = CODE_LIST_MANIFEST.as("in_release");
+        var base = CODE_LIST_MANIFEST.as("base");
+        var baseInDependency = CODE_LIST_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.CODE_LIST_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.CODE_LIST_ID.eq(inRelease.CODE_LIST_ID))
+                .where(and(
+                        base.CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.CODE_LIST_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.CODE_LIST_MANIFEST_ID.eq(baseCodeListManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
+    }
+
+    private Field<ULong> agencyIdListManifestIdInRelease(ReleaseId releaseId, Field<ULong> baseAgencyIdListManifestId) {
+        var inRelease = AGENCY_ID_LIST_MANIFEST.as("in_release");
+        var base = AGENCY_ID_LIST_MANIFEST.as("base");
+        var baseInDependency = AGENCY_ID_LIST_MANIFEST.as("base_in_dependency");
+        List<ULong> dependencies = releasesAvailableTo(releaseId);
+        dependencies.remove(valueOf(releaseId));
+        Field<ULong> ofRelease = select(max(inRelease.AGENCY_ID_LIST_MANIFEST_ID))
+                .from(inRelease)
+                .join(base).on(base.AGENCY_ID_LIST_ID.eq(inRelease.AGENCY_ID_LIST_ID))
+                .where(and(
+                        base.AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
+                        inRelease.RELEASE_ID.eq(valueOf(releaseId)))).asField();
+        if (dependencies.isEmpty()) {
+            return ofRelease;
+        }
+        // the manifest of the base itself when it belongs to a release this release depends on
+        Field<ULong> asIs = select(baseInDependency.AGENCY_ID_LIST_MANIFEST_ID)
+                .from(baseInDependency)
+                .where(and(
+                        baseInDependency.AGENCY_ID_LIST_MANIFEST_ID.eq(baseAgencyIdListManifestId),
+                        baseInDependency.RELEASE_ID.in(dependencies))).asField();
+        return coalesce(ofRelease, asIs);
     }
 
     @Override
@@ -355,6 +560,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
             throw new IllegalArgumentException("DT_SC record not found.");
         }
 
+        assertAllowedPrimitivesOfDtScAvailableInRelease(dt.release().releaseId(), basedDtSc.dtScManifestId());
+
         DtScRecord dtScRecord = new DtScRecord();
         dtScRecord.setGuid(basedDtSc.guid().value());
         dtScRecord.setObjectClassTerm(basedDtSc.objectClassTerm());
@@ -388,7 +595,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                         .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
                         .fetchOne().getDtScManifestId().toBigInteger());
 
-        copyDtScAwdPriFromBase(basedDtSc.release().releaseId(), dtScId, basedDtSc.dtScManifestId());
+        copyDtScAwdPriFromBase(dt.release().releaseId(), dtScId, basedDtSc.dtScManifestId());
 
         return dtScManifestId;
     }
@@ -842,6 +1049,16 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtScManifestId)))
                 .execute();
 
+        // the revisions around the record that is deleted are not linked to it any more
+        dslContext().update(DT_SC)
+                .setNull(DT_SC.NEXT_DT_SC_ID)
+                .where(DT_SC.NEXT_DT_SC_ID.eq(valueOf(dtSc.dtScId())))
+                .execute();
+        dslContext().update(DT_SC)
+                .setNull(DT_SC.PREV_DT_SC_ID)
+                .where(DT_SC.PREV_DT_SC_ID.eq(valueOf(dtSc.dtScId())))
+                .execute();
+
         dslContext().deleteFrom(DT_SC)
                 .where(DT_SC.DT_SC_ID.eq(valueOf(dtSc.dtScId())))
                 .execute();
@@ -855,6 +1072,8 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         var query = repositoryFactory().dtQueryRepository(requester());
         DtDetailsRecord prevDt = query.getDtDetails(dtManifestId);
 
+        assertAllowedPrimitivesOfDtAvailableInRelease(prevDt.release().releaseId(), prevDt.dtManifestId());
+
         // creates new bdt for revised record.
         DtRecord nextDtRecord = dslContext().selectFrom(DT)
                 .where(DT.DT_ID.eq(valueOf(prevDt.dtId())))
@@ -867,6 +1086,12 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         nextDtRecord.setCreationTimestamp(timestamp);
         nextDtRecord.setLastUpdateTimestamp(timestamp);
         nextDtRecord.setPrevDtId(valueOf(prevDt.dtId()));
+        // the base is the latest record of the base, which is what the manifest has
+        nextDtRecord.setBasedDtId(dslContext().select(DT_MANIFEST.as("based").DT_ID)
+                .from(DT_MANIFEST)
+                .join(DT_MANIFEST.as("based")).on(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(DT_MANIFEST.as("based").DT_MANIFEST_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId())))
+                .fetchOptionalInto(ULong.class).orElse(null));
         DtId nextDtId = new DtId(dslContext().insertInto(DT)
                 .set(nextDtRecord)
                 .returning(DT.DT_ID)
@@ -881,19 +1106,31 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
         dslContext().update(DT_MANIFEST)
                 .set(DT_MANIFEST.DT_ID, valueOf(nextDtId))
+                .set(DT_MANIFEST.CONFLICT, (byte) 0)
                 .where(DT_MANIFEST.DT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId())))
                 .execute();
 
-        // revise DT_SCs
+        // revise DT_SCs: the records they are made from, and the latest record of what each is based on (which is what
+        // the manifest has), are read at once
+        Map<ULong, DtScRecord> dtScRecords = dslContext().selectFrom(DT_SC)
+                .where(DT_SC.DT_SC_ID.in(dslContext().select(DT_SC_MANIFEST.DT_SC_ID).from(DT_SC_MANIFEST)
+                        .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId())))))
+                .fetchMap(DT_SC.DT_SC_ID);
+        Map<ULong, ULong> basedDtScIds = new HashMap<>();
+        dslContext().select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC_MANIFEST.as("based").DT_SC_ID)
+                .from(DT_SC_MANIFEST)
+                .join(DT_SC_MANIFEST.as("based")).on(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("based").DT_SC_MANIFEST_ID))
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId())))
+                .fetch()
+                .forEach(e -> basedDtScIds.put(e.value1(), e.value2()));
         for (DtScSummaryRecord dtSc : query.getDtScSummaryList(prevDt.dtManifestId())) {
 
-            DtScRecord prevDtSc = dslContext().selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(valueOf(dtSc.dtScId())))
-                    .fetchOne();
+            DtScRecord prevDtSc = dtScRecords.get(valueOf(dtSc.dtScId()));
 
             DtScRecord nextDtSc = prevDtSc.copy();
             nextDtSc.setOwnerDtId(valueOf(nextDtId));
             nextDtSc.setPrevDtScId(prevDtSc.getDtScId());
+            nextDtSc.setBasedDtScId(basedDtScIds.get(valueOf(dtSc.dtScManifestId())));
             DtScId nextDtScId = new DtScId(
                     dslContext().insertInto(DT_SC)
                             .set(nextDtSc)
@@ -909,13 +1146,41 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
 
             dslContext().update(DT_SC_MANIFEST)
                     .set(DT_SC_MANIFEST.DT_SC_ID, valueOf(nextDtScId))
+                    .set(DT_SC_MANIFEST.CONFLICT, (byte) 0)
                     .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(valueOf(dtSc.dtScManifestId())))
                     .execute();
+
+            // what is based on the supplementary component still refers to the previous record
+            dslContext().update(DT_SC_MANIFEST)
+                    .set(DT_SC_MANIFEST.CONFLICT, (byte) 1)
+                    .where(and(
+                            DT_SC_MANIFEST.RELEASE_ID.eq(valueOf(prevDt.release().releaseId())),
+                            DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(valueOf(dtSc.dtScManifestId()))))
+                    .execute();
         }
+
+        // what refers to the Data Type still refers to the previous record
+        dslContext().update(BCCP_MANIFEST)
+                .set(BCCP_MANIFEST.CONFLICT, (byte) 1)
+                .where(and(
+                        BCCP_MANIFEST.RELEASE_ID.eq(valueOf(prevDt.release().releaseId())),
+                        BCCP_MANIFEST.BDT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId()))))
+                .execute();
+        dslContext().update(DT_MANIFEST)
+                .set(DT_MANIFEST.CONFLICT, (byte) 1)
+                .where(and(
+                        DT_MANIFEST.RELEASE_ID.eq(valueOf(prevDt.release().releaseId())),
+                        DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(valueOf(prevDt.dtManifestId()))))
+                .execute();
     }
 
     @Override
     public void cancel(DtManifestId dtManifestId) {
+        cancel(dtManifestId, false);
+    }
+
+    @Override
+    public void cancel(DtManifestId dtManifestId, boolean recreateLog) {
 
         var query = repositoryFactory().dtQueryRepository(requester());
         DtDetailsRecord dt = query.getDtDetails(dtManifestId);
@@ -932,6 +1197,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
             throw new IllegalArgumentException("Not found previous revision");
         }
 
+        List<DtScManifestRecord> dtScManifestRecords = dslContext().selectFrom(DT_SC_MANIFEST)
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(dtManifestId))).fetch();
+
+        assertNothingIsBasedOnSupplementaryComponentsAddedInRevision(dt, dtScManifestRecords);
+
         UpdateSetMoreStep moreStep = dslContext().update(DT_MANIFEST)
                 .set(DT_MANIFEST.DT_ID, prevDtRecord.getDtId());
 
@@ -944,14 +1214,29 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .where(DT.DT_ID.eq(prevDtRecord.getDtId()))
                 .execute();
 
-        List<DtScManifestRecord> dtScManifestRecords = dslContext().selectFrom(DT_SC_MANIFEST)
-                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(dtManifestId))).fetch();
+        // what refers to the record that is discarded goes back to the previous one
+        dslContext().update(BCCP)
+                .set(BCCP.BDT_ID, prevDtRecord.getDtId())
+                .where(BCCP.BDT_ID.eq(valueOf(dt.dtId())))
+                .execute();
+        dslContext().update(DT)
+                .set(DT.BASED_DT_ID, prevDtRecord.getDtId())
+                .where(DT.BASED_DT_ID.eq(valueOf(dt.dtId())))
+                .execute();
 
-        // remove revised DT_SCs and any supplementary components added only in this revision
+        // remove revised DT_SCs and any supplementary components added only in this revision; the current and the
+        // previous records are read at once
+        Map<ULong, DtScRecord> currentDtScs = dslContext().selectFrom(DT_SC)
+                .where(DT_SC.DT_SC_ID.in(dslContext().select(DT_SC_MANIFEST.DT_SC_ID).from(DT_SC_MANIFEST)
+                        .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(dtManifestId)))))
+                .fetchMap(DT_SC.DT_SC_ID);
+        Map<ULong, DtScRecord> prevDtScs = dslContext().selectFrom(DT_SC)
+                .where(DT_SC.DT_SC_ID.in(dslContext().select(DT_SC.as("current").PREV_DT_SC_ID).from(DT_SC.as("current"))
+                        .join(DT_SC_MANIFEST).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.as("current").DT_SC_ID))
+                        .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(dtManifestId)))))
+                .fetchMap(DT_SC.DT_SC_ID);
         for (DtScManifestRecord dtScManifestRecord : dtScManifestRecords) {
-            DtScRecord currentDtSc = dslContext().selectFrom(DT_SC)
-                    .where(DT_SC.DT_SC_ID.eq(dtScManifestRecord.getDtScId()))
-                    .fetchOne();
+            DtScRecord currentDtSc = currentDtScs.get(dtScManifestRecord.getDtScId());
 
             if (currentDtSc == null) {
                 throw new IllegalStateException("DT_SC record not found for manifest ID " + dtScManifestRecord.getDtScManifestId());
@@ -961,9 +1246,7 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 // This DT_SC was added only in the current revision, so cancel removes its manifest and row outright.
                 dtScManifestRecord.delete();
             } else {
-                DtScRecord prevDtSc = dslContext().selectFrom(DT_SC)
-                        .where(DT_SC.DT_SC_ID.eq(currentDtSc.getPrevDtScId()))
-                        .fetchOne();
+                DtScRecord prevDtSc = prevDtScs.get(currentDtSc.getPrevDtScId());
 
                 if (prevDtSc == null) {
                     throw new IllegalStateException("Previous DT_SC record not found for DT_SC manifest ID "
@@ -973,6 +1256,12 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 // This DT_SC came from a previous revision, so cancel rebinds the manifest back to the previous row.
                 prevDtSc.setNextDtScId(null);
                 prevDtSc.update(DT_SC.NEXT_DT_SC_ID);
+
+                // what is based on the record that is discarded goes back to the previous one
+                dslContext().update(DT_SC)
+                        .set(DT_SC.BASED_DT_SC_ID, prevDtSc.getDtScId())
+                        .where(DT_SC.BASED_DT_SC_ID.eq(currentDtSc.getDtScId()))
+                        .execute();
 
                 dtScManifestRecord.setDtScId(prevDtSc.getDtScId());
                 dtScManifestRecord.update(DT_SC_MANIFEST.DT_SC_ID);
@@ -989,6 +1278,10 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
             currentDtSc.delete();
         }
 
+        restoreDeletedSupplementaryComponents(dt, prevDtRecord);
+
+        markWhatRefersToAnOlderRecordInConflict(dt, prevDtRecord);
+
         // clean logs up
         dslContext().update(DT_MANIFEST)
                 .setNull(DT_MANIFEST.LOG_ID)
@@ -996,7 +1289,11 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
                 .execute();
 
         LogId logId = repositoryFactory().logCommandRepository(requester())
-                .revertToStableStateByReference(dt.guid(), CcType.DT);
+                .revertToStableStateByReference(dt.guid(), CcType.DT, recreateLog, () -> {
+                    // the history is gone: the component as it is now is revision 1
+                    var details = repositoryFactory().dtQueryRepository(requester()).getDtDetails(dtManifestId);
+                    return repositoryFactory().logCommandRepository(requester()).create(details, LogAction.Added);
+                });
 
         dslContext().update(DT_MANIFEST)
                 .set(DT_MANIFEST.LOG_ID, valueOf(logId))
@@ -1015,6 +1312,207 @@ public class JooqDtCommandRepository extends JooqBaseRepository implements DtCom
         dslContext().deleteFrom(DT)
                 .where(DT.DT_ID.eq(valueOf(dt.dtId())))
                 .execute();
+    }
+
+    /**
+     * The records that the Data Type and its supplementary components went back to may refer to an older record of
+     * what their manifests refer to, which is what the marker says; the revision had cleared it. What refers to the
+     * Data Type goes back to the record it referred to, so it is not in conflict any more.
+     */
+    private void markWhatRefersToAnOlderRecordInConflict(DtDetailsRecord dt, DtRecord prevDtRecord) {
+        ULong manifestId = valueOf(dt.dtManifestId());
+
+        Record2<ULong, ULong> base = dslContext().select(DT.BASED_DT_ID, DT_MANIFEST.as("based").DT_ID)
+                .from(DT_MANIFEST)
+                .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
+                .leftJoin(DT_MANIFEST.as("based")).on(DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(DT_MANIFEST.as("based").DT_MANIFEST_ID))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(manifestId))
+                .fetchOne();
+        dslContext().update(DT_MANIFEST)
+                .set(DT_MANIFEST.CONFLICT, referencesAnOlderRecord(base.value1(), base.value2()))
+                .where(DT_MANIFEST.DT_MANIFEST_ID.eq(manifestId))
+                .execute();
+
+        dslContext().select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID, DT_SC.BASED_DT_SC_ID, DT_SC_MANIFEST.as("based").DT_SC_ID)
+                .from(DT_SC_MANIFEST)
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .join(DT_SC_MANIFEST.as("based")).on(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.eq(DT_SC_MANIFEST.as("based").DT_SC_MANIFEST_ID))
+                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(manifestId))
+                .fetch()
+                .forEach(e -> dslContext().update(DT_SC_MANIFEST)
+                        .set(DT_SC_MANIFEST.CONFLICT, referencesAnOlderRecord(e.value2(), e.value3()))
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(e.value1()))
+                        .execute());
+
+        // what refers to the Data Type refers to the record it went back to
+        dslContext().update(BCCP_MANIFEST)
+                .set(BCCP_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        BCCP_MANIFEST.BDT_MANIFEST_ID.eq(manifestId),
+                        BCCP_MANIFEST.BCCP_ID.in(dslContext().select(BCCP.BCCP_ID).from(BCCP)
+                                .where(BCCP.BDT_ID.eq(prevDtRecord.getDtId())))))
+                .execute();
+        dslContext().update(DT_MANIFEST)
+                .set(DT_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        DT_MANIFEST.BASED_DT_MANIFEST_ID.eq(manifestId),
+                        DT_MANIFEST.DT_ID.in(dslContext().select(DT.DT_ID).from(DT)
+                                .where(DT.BASED_DT_ID.eq(prevDtRecord.getDtId())))))
+                .execute();
+        dslContext().update(DT_SC_MANIFEST)
+                .set(DT_SC_MANIFEST.CONFLICT, (byte) 0)
+                .where(and(
+                        DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.in(dslContext().select(DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
+                                .from(DT_SC_MANIFEST).where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(manifestId))),
+                        DT_SC_MANIFEST.DT_SC_ID.in(dslContext().select(DT_SC.DT_SC_ID).from(DT_SC)
+                                .where(DT_SC.BASED_DT_SC_ID.in(dslContext().select(DT_SC.DT_SC_ID).from(DT_SC)
+                                        .where(DT_SC.OWNER_DT_ID.eq(prevDtRecord.getDtId())))))))
+                .execute();
+    }
+
+    private static byte referencesAnOlderRecord(ULong recordReference, ULong manifestReference) {
+        return (byte) ((recordReference != null && manifestReference != null && !recordReference.equals(manifestReference)) ? 1 : 0);
+    }
+
+    /**
+     * A supplementary component of the previous revision that was deleted in this revision has no manifest to go back
+     * to, so it gets one again: of the same Data Type and release, based on the same supplementary component, linked
+     * with the same supplementary component of the previous and the next release.
+     */
+    private void restoreDeletedSupplementaryComponents(DtDetailsRecord dt, DtRecord prevDtRecord) {
+        ULong dtManifestId = valueOf(dt.dtManifestId());
+
+        // the supplementary components, with the GUID of the one each is based on
+        List<DtScRecord> deleted = new ArrayList<>();
+        Map<ULong, String> basedGuids = new HashMap<>();
+        for (org.jooq.Record r : dslContext().select(DT_SC.fields()).select(DT_SC.as("based").GUID.as("based_guid"))
+                .from(DT_SC)
+                .leftJoin(DT_SC.as("based")).on(DT_SC.as("based").DT_SC_ID.eq(DT_SC.BASED_DT_SC_ID))
+                .where(and(
+                        DT_SC.OWNER_DT_ID.eq(prevDtRecord.getDtId()),
+                        DT_SC.DT_SC_ID.notIn(dslContext().select(DT_SC_MANIFEST.DT_SC_ID).from(DT_SC_MANIFEST)
+                                .where(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(dtManifestId)))))
+                .fetch()) {
+            DtScRecord dtSc = r.into(DT_SC);
+            deleted.add(dtSc);
+            basedGuids.put(dtSc.getDtScId(), r.get("based_guid", String.class));
+        }
+        if (deleted.isEmpty()) {
+            return;
+        }
+
+        // a supplementary component shares its GUID with the one of the base it is based on, so the base is looked
+        // for in the Data Type that is the base, not in the release
+        Map<String, ULong> basedManifests = dt.based() == null
+                ? Collections.emptyMap()
+                : dtScManifestsByGuid(dt.based().dtManifestId(), basedGuids.values());
+        List<String> guids = deleted.stream().map(DtScRecord::getGuid).toList();
+        Map<String, ULong> prevManifests = dtScManifestsByGuid(dt.prevDtManifestId(), guids);
+        Map<String, ULong> nextManifests = dtScManifestsByGuid(dt.nextDtManifestId(), guids);
+
+        for (DtScRecord dtSc : deleted) {
+            ULong basedDtScManifestId = null;
+            if (dtSc.getBasedDtScId() != null) {
+                basedDtScManifestId = basedManifests.get(basedGuids.get(dtSc.getDtScId()));
+                if (basedDtScManifestId == null) {
+                    throw new IllegalArgumentException("Not found the base of the supplementary component deleted in this "
+                            + "revision, so it cannot be restored");
+                }
+            }
+
+            ULong prevManifestId = prevManifests.get(dtSc.getGuid());
+            ULong nextManifestId = nextManifests.get(dtSc.getGuid());
+
+            DtScManifestRecord restored = new DtScManifestRecord();
+            restored.setDtScId(dtSc.getDtScId());
+            restored.setReleaseId(valueOf(dt.release().releaseId()));
+            restored.setOwnerDtManifestId(dtManifestId);
+            restored.setBasedDtScManifestId(basedDtScManifestId);
+            restored.setPrevDtScManifestId(prevManifestId);
+            restored.setNextDtScManifestId(nextManifestId);
+            ULong restoredId = dslContext().insertInto(DT_SC_MANIFEST).set(restored)
+                    .returning(DT_SC_MANIFEST.DT_SC_MANIFEST_ID).fetchOne().getDtScManifestId();
+            if (prevManifestId != null) {
+                dslContext().update(DT_SC_MANIFEST).set(DT_SC_MANIFEST.NEXT_DT_SC_MANIFEST_ID, restoredId)
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(prevManifestId)).execute();
+            }
+            if (nextManifestId != null) {
+                dslContext().update(DT_SC_MANIFEST).set(DT_SC_MANIFEST.PREV_DT_SC_MANIFEST_ID, restoredId)
+                        .where(DT_SC_MANIFEST.DT_SC_MANIFEST_ID.eq(nextManifestId)).execute();
+            }
+        }
+    }
+
+    /** The manifest of each supplementary component (by GUID) in the Data Type of the previous or the next release, or in a base. */
+    private Map<String, ULong> dtScManifestsByGuid(DtManifestId ownerDtManifestId, Collection<String> guids) {
+        Map<String, ULong> manifests = new HashMap<>();
+        List<String> distinctGuids = guids.stream().filter(Objects::nonNull).distinct().toList();
+        if (ownerDtManifestId == null || distinctGuids.isEmpty()) {
+            return manifests;
+        }
+        dslContext().select(DT_SC.GUID, DT_SC_MANIFEST.DT_SC_MANIFEST_ID)
+                .from(DT_SC_MANIFEST)
+                .join(DT_SC).on(DT_SC_MANIFEST.DT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .where(and(
+                        DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(valueOf(ownerDtManifestId)),
+                        DT_SC.GUID.in(distinctGuids)))
+                .fetch()
+                .forEach(e -> manifests.put(e.value1(), e.value2()));
+        return manifests;
+    }
+
+    /**
+     * A supplementary component that was added in the revision has no previous record to go back to, so a
+     * Data Type (or a BIE) that is based on it has to be deleted, or cancelled, first.
+     */
+    private void assertNothingIsBasedOnSupplementaryComponentsAddedInRevision(
+            DtDetailsRecord dt, List<DtScManifestRecord> dtScManifestRecords) {
+
+        List<String> dependents = new ArrayList<>();
+
+        // the supplementary components added in this revision, which have no previous record
+        Map<ULong, DtScRecord> addedDtScs = dslContext().selectFrom(DT_SC)
+                .where(and(
+                        DT_SC.DT_SC_ID.in(dtScManifestRecords.stream().map(DtScManifestRecord::getDtScId).toList()),
+                        DT_SC.PREV_DT_SC_ID.isNull()))
+                .fetchMap(DT_SC.DT_SC_ID);
+        List<ULong> addedManifestIds = dtScManifestRecords.stream()
+                .filter(e -> addedDtScs.containsKey(e.getDtScId()))
+                .map(DtScManifestRecord::getDtScManifestId)
+                .toList();
+        if (!addedManifestIds.isEmpty()) {
+            // what is based on them, and the BIEs that use them, read at once
+            Map<ULong, List<String>> derivedDens = new HashMap<>();
+            dslContext().select(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID, DT_MANIFEST.DEN)
+                    .from(DT_SC_MANIFEST)
+                    .join(DT_MANIFEST).on(DT_SC_MANIFEST.OWNER_DT_MANIFEST_ID.eq(DT_MANIFEST.DT_MANIFEST_ID))
+                    .where(DT_SC_MANIFEST.BASED_DT_SC_MANIFEST_ID.in(addedManifestIds))
+                    .fetch()
+                    .forEach(e -> derivedDens.computeIfAbsent(e.value1(), k -> new ArrayList<>()).add(e.value2()));
+            Map<ULong, Integer> bbieScCounts = dslContext().select(BBIE_SC.BASED_DT_SC_MANIFEST_ID, DSL.count())
+                    .from(BBIE_SC)
+                    .where(BBIE_SC.BASED_DT_SC_MANIFEST_ID.in(addedManifestIds))
+                    .groupBy(BBIE_SC.BASED_DT_SC_MANIFEST_ID)
+                    .fetchMap(r -> r.value1(), r -> r.value2());
+            for (DtScManifestRecord dtScManifestRecord : dtScManifestRecords) {
+                DtScRecord dtSc = addedDtScs.get(dtScManifestRecord.getDtScId());
+                if (dtSc == null) {
+                    continue;
+                }
+                derivedDens.getOrDefault(dtScManifestRecord.getDtScManifestId(), List.of())
+                        .forEach(den -> dependents.add("the Data Type '" + den + "'"));
+                int bbieScs = bbieScCounts.getOrDefault(dtScManifestRecord.getDtScManifestId(), 0);
+                if (bbieScs > 0) {
+                    dependents.add(bbieScs + " BIE(s) using the supplementary component '"
+                            + dtSc.getPropertyTerm() + "'");
+                }
+            }
+        }
+        if (!dependents.isEmpty()) {
+            throw new IllegalArgumentException("The DT '" + dt.den() + "' cannot be cancelled because "
+                    + "a supplementary component added in this revision is used by "
+                    + String.join(", ", dependents) + ". Delete or cancel them first.");
+        }
     }
 
     @Override

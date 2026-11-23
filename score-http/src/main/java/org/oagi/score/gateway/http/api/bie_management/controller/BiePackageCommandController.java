@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @Tag(name = "BIE Package - Commands", description = "API for creating, updating, and deleting BIE packages")
@@ -52,12 +53,14 @@ public class BiePackageCommandController {
                 sessionService.asScoreUser(user), request.withBiePackageId(biePackageId));
     }
 
-    @PostMapping(value = "/bie-packages/copy")
+    @PostMapping(value = "/{biePackageId:[\\d]+}/copy")
     public ResponseEntity copy(
             @AuthenticationPrincipal AuthenticatedPrincipal user,
-            @RequestBody CopyBiePackageRequest request) {
+            @PathVariable("biePackageId") BiePackageId biePackageId) {
 
-        biePackageCommandService.copy(sessionService.asScoreUser(user), request.biePackageIdList());
+        // A single package for now; the request keeps the bulk form for a later bulk copy.
+        biePackageCommandService.copy(sessionService.asScoreUser(user),
+                new CopyBiePackageRequest(List.of(biePackageId)));
 
         return ResponseEntity.accepted().build();
     }

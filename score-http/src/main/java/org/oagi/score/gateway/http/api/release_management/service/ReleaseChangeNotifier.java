@@ -1,0 +1,60 @@
+package org.oagi.score.gateway.http.api.release_management.service;
+
+import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
+import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
+import org.oagi.score.gateway.http.common.async.StompNotifier;
+import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+
+/**
+ * Tells the screens that show the releases of a library that a release has changed (created, discarded, or moved to
+ * another state), so that they load the list again by themselves. It is sent once the surrounding transaction has
+ * committed: a screen that loads the list at once reads what was written, and a transition that is rolled back tells
+ * no one. The message holds no more than which release of which library, since every signed-in user may read the list.
+ */
+@Component
+public class ReleaseChangeNotifier {
+
+    public static final String TOPIC = "/topic/release";
+
+    /** What is announced to everyone: which release, of which library (none when it is not known). Nothing more. */
+    public record Change(LibraryId libraryId, ReleaseId releaseId) {
+    }
+
+    /** The event of {@link Failure}, as the screens that read the topic of an account tell it from a message. */
+    public static final String RELEASE_FAILED = "releaseFailed";
+
+    /**
+     * What is told to the user who asked for a release, and to no one else, when the work for it failed: on the topic of
+     * their own account, which no one else may subscribe to. Not why: that is in the message sent to the user.
+     */
+    public record Failure(String event, LibraryId libraryId, ReleaseId releaseId) {
+    }
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final StompNotifier stompNotifier;
+    private final RepositoryFactory repositoryFactory;
+
+    public ReleaseChangeNotifier(StompNotifier stompNotifier, RepositoryFactory repositoryFactory) {
+        this.stompNotifier = stompNotifier;
+        this.repositoryFactory = repositoryFactory;
+    }
+
+    /** Call it before the release is deleted: the library is found from the release. */
+    public void changed(ReleaseId releaseId) {
+        try {
+            LibraryId libraryId = repositoryFactory.releaseProgressRepository().libraryOfRelease(releaseId).orElse(null);
+            changed(libraryId, releaseId);
+        } catch (RuntimeException e) {
+            logger.warn("The change of the release " + releaseId + " could not be announced: " + e.getMessage());
+        }
+    }
+
+    public void changed(LibraryId libraryId, ReleaseId releaseId) {
+        stompNotifier.toTopic(TOPIC, new Change(libraryId, releaseId));
+    }
+}

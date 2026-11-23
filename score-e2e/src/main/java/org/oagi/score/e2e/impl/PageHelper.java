@@ -425,6 +425,33 @@ public abstract class PageHelper {
     }
 
     /**
+     * Wait, up to fifteen seconds, until what was added to an OpenAPI Document in a dialog has settled: the page saves it by itself
+     * when the server says that it can be saved (a snackbar says "Added"), or it says that it cannot (a snackbar that it cannot be
+     * saved as it is, or the list of what is wrong above the table).
+     */
+    public static void waitForAddToSettle(WebDriver driver) {
+        By settled = By.xpath("//simple-snack-bar//*[contains(., \"Added\") or contains(., \"cannot be saved\")]"
+                + " | //*[contains(@class, \"oas-change-violations\")]");
+        for (int attempt = 0; attempt < 60; attempt++) {
+            if (!driver.findElements(settled).isEmpty()) {
+                // the page reads the document again after it saved: let the rows be drawn again before they are used
+                try {
+                    Thread.sleep(1500L);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                return;
+            }
+            try {
+                Thread.sleep(250L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+    }
+
+    /**
      * Return the UI element of the snackbar with the given text message that contains in the snackbar.
      *
      * @param driver  web driver

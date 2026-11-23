@@ -122,17 +122,13 @@ public class CcListService {
                         ASCCP_MANIFEST.as("bie_manifest").DEN,
                         ASCCP_MANIFEST.DEN,
                         ASBIE.SEQ_KEY)
-                .from(ASCC)
-                .join(ASCC_MANIFEST).on(ASCC_MANIFEST.ASCC_ID.eq(ASCC.ASCC_ID))
-                .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
-                .join(ACC_MANIFEST).on(and(
-                        ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID),
-                        ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
+                .from(ASCC_MANIFEST)
+                .join(ACC_MANIFEST).on(ASCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
                 .join(ASBIE).on(and(ASCC_MANIFEST.ASCC_MANIFEST_ID.eq(ASBIE.BASED_ASCC_MANIFEST_ID), ASBIE.IS_USED.eq(isUsed)))
                 .join(ASCCP_MANIFEST).on(ASCC_MANIFEST.TO_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
-                .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(TOP_LEVEL_ASBIEP).on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
@@ -182,17 +178,13 @@ public class CcListService {
                         ASCCP_MANIFEST.as("bie_manifest").DEN,
                         BCCP_MANIFEST.DEN,
                         BBIE.SEQ_KEY)
-                .from(BCC)
-                .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
-                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .from(BCC_MANIFEST)
+                .join(ACC_MANIFEST).on(BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID))
+                .join(ACC).on(ACC_MANIFEST.ACC_ID.eq(ACC.ACC_ID))
                 .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
                 .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
-                .join(BCC_MANIFEST).on(and(
-                        BCC.BCC_ID.eq(BCC_MANIFEST.BCC_ID),
-                        BCC_MANIFEST.FROM_ACC_MANIFEST_ID.eq(ACC_MANIFEST.ACC_MANIFEST_ID)))
                 .join(BBIE).on(and(BCC_MANIFEST.BCC_MANIFEST_ID.eq(BBIE.BASED_BCC_MANIFEST_ID), BBIE.IS_USED.eq(isUsed)))
                 .join(BCCP_MANIFEST).on(BCC_MANIFEST.TO_BCCP_MANIFEST_ID.eq(BCCP_MANIFEST.BCCP_MANIFEST_ID))
-                .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
                 .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
                 .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
                 .join(TOP_LEVEL_ASBIEP).on(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))

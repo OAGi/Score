@@ -89,7 +89,8 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Setter for <code>oas_http_header.agency_id_list_value_id</code>. A
-     * reference of the agency id list value
+     * reference of the agency id list value. NULL when the header is not taken
+     * from a list of agency ID values.
      */
     public void setAgencyIdListValueId(ULong value) {
         set(4, value);
@@ -97,7 +98,8 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Getter for <code>oas_http_header.agency_id_list_value_id</code>. A
-     * reference of the agency id list value
+     * reference of the agency id list value. NULL when the header is not taken
+     * from a list of agency ID values.
      */
     public ULong getAgencyIdListValueId() {
         return (ULong) get(4);
@@ -105,8 +107,9 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Setter for <code>oas_http_header.schema_type_reference</code>. REQUIRED.
-     * The schema defining the type used for the header using the reference
-     * string, $ref.
+     * The schema defining the type used for the header, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
     public void setSchemaTypeReference(String value) {
         set(5, value);
@@ -114,11 +117,104 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Getter for <code>oas_http_header.schema_type_reference</code>. REQUIRED.
-     * The schema defining the type used for the header using the reference
-     * string, $ref.
+     * The schema defining the type used for the header, as a JSON object: a
+     * Schema Object (OpenAPI 3.0 also allows a Reference Object such as
+     * {"$ref": "#/components/schemas/X"}).
      */
     public String getSchemaTypeReference() {
         return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>oas_http_header.example</code>. Example of the header's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public void setExample(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>oas_http_header.example</code>. Example of the header's
+     * potential value, as a JSON literal. It overrides any example in the
+     * schema. NULL when there is none.
+     */
+    public String getExample() {
+        return (String) get(6);
+    }
+
+    /**
+     * Setter for <code>oas_http_header.required</code>. Determines whether this
+     * header is mandatory. The default value is false.
+     */
+    public void setRequired(Byte value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>oas_http_header.required</code>. Determines whether this
+     * header is mandatory. The default value is false.
+     */
+    public Byte getRequired() {
+        return (Byte) get(7);
+    }
+
+    /**
+     * Setter for <code>oas_http_header.style</code>. Describes how the header
+     * value will be serialized. The only style of a header is simple, which is
+     * the default; NULL for it. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public void setStyle(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>oas_http_header.style</code>. Describes how the header
+     * value will be serialized. The only style of a header is simple, which is
+     * the default; NULL for it. Not used with CONTENT_MEDIA_TYPE.
+     */
+    public String getStyle() {
+        return (String) get(8);
+    }
+
+    /**
+     * Setter for <code>oas_http_header.explode</code>. When true, header values
+     * of type array or object generate separate values for each value of the
+     * array or key-value pair of the map. NULL for the default, false. Not used
+     * with CONTENT_MEDIA_TYPE.
+     */
+    public void setExplode(Byte value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>oas_http_header.explode</code>. When true, header values
+     * of type array or object generate separate values for each value of the
+     * array or key-value pair of the map. NULL for the default, false. Not used
+     * with CONTENT_MEDIA_TYPE.
+     */
+    public Byte getExplode() {
+        return (Byte) get(9);
+    }
+
+    /**
+     * Setter for <code>oas_http_header.content_media_type</code>. The media
+     * type of the content (for example text/plain) that serializes the header
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the header is serialized with a schema.
+     */
+    public void setContentMediaType(String value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>oas_http_header.content_media_type</code>. The media
+     * type of the content (for example text/plain) that serializes the header
+     * instead of a style: the schema and the example then belong to this Media
+     * Type Object. NULL when the header is serialized with a schema.
+     */
+    public String getContentMediaType() {
+        return (String) get(10);
     }
 
     /**
@@ -126,7 +222,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * the record.
      */
     public void setOwnerUserId(ULong value) {
-        set(6, value);
+        set(11, value);
     }
 
     /**
@@ -134,7 +230,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * the record.
      */
     public ULong getOwnerUserId() {
-        return (ULong) get(6);
+        return (ULong) get(11);
     }
 
     /**
@@ -142,7 +238,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * the record.
      */
     public void setCreatedBy(ULong value) {
-        set(7, value);
+        set(12, value);
     }
 
     /**
@@ -150,7 +246,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * the record.
      */
     public ULong getCreatedBy() {
-        return (ULong) get(7);
+        return (ULong) get(12);
     }
 
     /**
@@ -158,7 +254,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * last updates the record.
      */
     public void setLastUpdatedBy(ULong value) {
-        set(8, value);
+        set(13, value);
     }
 
     /**
@@ -166,7 +262,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * last updates the record.
      */
     public ULong getLastUpdatedBy() {
-        return (ULong) get(8);
+        return (ULong) get(13);
     }
 
     /**
@@ -174,7 +270,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * when the record is created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
-        set(9, value);
+        set(14, value);
     }
 
     /**
@@ -182,7 +278,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * when the record is created.
      */
     public LocalDateTime getCreationTimestamp() {
-        return (LocalDateTime) get(9);
+        return (LocalDateTime) get(14);
     }
 
     /**
@@ -190,7 +286,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * timestamp when the record is last updated.
      */
     public void setLastUpdateTimestamp(LocalDateTime value) {
-        set(10, value);
+        set(15, value);
     }
 
     /**
@@ -198,7 +294,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
      * timestamp when the record is last updated.
      */
     public LocalDateTime getLastUpdateTimestamp() {
-        return (LocalDateTime) get(10);
+        return (LocalDateTime) get(15);
     }
 
     // -------------------------------------------------------------------------
@@ -224,7 +320,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
     /**
      * Create a detached, initialised OasHttpHeaderRecord
      */
-    public OasHttpHeaderRecord(ULong oasHttpHeaderId, String guid, String header, String description, ULong agencyIdListValueId, String schemaTypeReference, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
+    public OasHttpHeaderRecord(ULong oasHttpHeaderId, String guid, String header, String description, ULong agencyIdListValueId, String schemaTypeReference, String example, Byte required, String style, Byte explode, String contentMediaType, ULong ownerUserId, ULong createdBy, ULong lastUpdatedBy, LocalDateTime creationTimestamp, LocalDateTime lastUpdateTimestamp) {
         super(OasHttpHeader.OAS_HTTP_HEADER);
 
         setOasHttpHeaderId(oasHttpHeaderId);
@@ -233,6 +329,11 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
         setDescription(description);
         setAgencyIdListValueId(agencyIdListValueId);
         setSchemaTypeReference(schemaTypeReference);
+        setExample(example);
+        setRequired(required);
+        setStyle(style);
+        setExplode(explode);
+        setContentMediaType(contentMediaType);
         setOwnerUserId(ownerUserId);
         setCreatedBy(createdBy);
         setLastUpdatedBy(lastUpdatedBy);

@@ -359,6 +359,21 @@ public class JooqModuleSetReleaseQueryRepository extends JooqBaseRepository impl
     }
 
     @Override
+    public boolean hasSameNameModuleSetRelease(ReleaseId releaseId, ModuleSetReleaseId moduleSetReleaseId,
+                                               String moduleSetReleaseName) {
+
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(MODULE_SET_RELEASE.RELEASE_ID.eq(valueOf(releaseId)));
+        conditions.add(MODULE_SET_RELEASE.NAME.eq(moduleSetReleaseName.trim()));
+        if (moduleSetReleaseId != null) {
+            conditions.add(MODULE_SET_RELEASE.MODULE_SET_RELEASE_ID.ne(valueOf(moduleSetReleaseId)));
+        }
+
+        return dslContext().fetchExists(
+                dslContext().selectOne().from(MODULE_SET_RELEASE).where(conditions));
+    }
+
+    @Override
     public String getDefaultName(ModuleSetId moduleSetId) {
         String moduleSetReleaseName = dslContext().select(MODULE_SET.NAME)
                 .from(MODULE_SET)

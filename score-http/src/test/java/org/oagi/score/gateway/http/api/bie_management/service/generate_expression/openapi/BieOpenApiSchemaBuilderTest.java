@@ -19,6 +19,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +68,20 @@ class BieOpenApiSchemaBuilderTest {
             assertEquals(false, builder.emptyExample(bool));
             assertNull(builder.emptyExample(integer), "the integer empty example is null");
         }
+    }
+
+    @Test
+    void exampleValue_omitsEmptyExampleForDateAndTimeFormats_andKeepsEnteredValue() {
+        BieOpenApiSchemaBuilder builder = builder(BieOpenApi31Dialect.INSTANCE);
+        XbtSummaryRecord noFormat = xbt("{\"type\":\"string\"}", "{\"type\":\"string\"}");
+        XbtSummaryRecord dateTime = xbt("{\"type\":\"string\",\"format\":\"date-time\"}",
+                "{\"type\":\"string\",\"format\":\"date-time\"}");
+
+        assertEquals("", builder.exampleValue(noFormat, ""), "no format: empty string as before");
+        assertEquals("", builder.exampleValue(null, null), "no xbt: empty string as before");
+        assertSame(BieOpenApiDialect.NO_EXAMPLE, builder.exampleValue(dateTime, ""), "date-time: no empty example");
+        assertEquals("2023-07-23 11:34:01-05:00", builder.exampleValue(dateTime, "2023-07-23 11:34:01-05:00"),
+                "a user-entered example is never adjusted");
     }
 
     // ---- a nillable ASBIE that reuses another BIE -----------------------------------------------------------------

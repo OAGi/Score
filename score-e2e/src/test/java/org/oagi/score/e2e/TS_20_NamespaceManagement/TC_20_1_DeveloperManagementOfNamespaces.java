@@ -129,6 +129,36 @@ public class TC_20_1_DeveloperManagementOfNamespaces extends BaseTest {
     }
 
     @Test
+    @DisplayName("TC_20_1_TA_2_a")
+    public void developer_cannot_enter_a_namespace_uri_longer_than_100_characters() {
+        AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);
+        thisAccountWillBeDeletedAfterTests(developer);
+
+        HomePage homePage = loginPage().signIn(developer.getLoginId(), developer.getPassword());
+        ViewEditNamespacePage viewEditNamespacePage = homePage.getCoreComponentMenu().openViewEditNamespaceSubMenu();
+        CreateNamespacePage createNamespacePage = viewEditNamespacePage.hitNewNamespaceButton();
+
+        String tooLongURI = "https://test." + RandomStringUtils.secure().nextAlphabetic(101, 120);
+        createNamespacePage.setURI(tooLongURI);
+        // The input refuses the characters after the 100th one, so the 100-character column never receives more.
+        String expectedURI = tooLongURI.substring(0, 100);
+        assertEquals(expectedURI, getText(createNamespacePage.getURIField()));
+        String prefix = RandomStringUtils.secure().nextAlphabetic(5, 10);
+        createNamespacePage.setPrefix(prefix);
+        createNamespacePage.hitCreateButton();
+
+        viewEditNamespacePage.openPage();
+        viewEditNamespacePage.setURI(expectedURI);
+        viewEditNamespacePage.hitSearchButton();
+        EditNamespacePage editNamespacePage = viewEditNamespacePage.openNamespaceByURIAndOwner(expectedURI, developer.getLoginId());
+        assertEquals(expectedURI, getText(editNamespacePage.getURIField()));
+
+        editNamespacePage.getURIField().clear();
+        editNamespacePage.setURI("https://test." + RandomStringUtils.secure().nextAlphabetic(101, 120));
+        assertEquals(100, getText(editNamespacePage.getURIField()).length());
+    }
+
+    @Test
     @DisplayName("TC_20_1_TA_3_and_TA_5")
     public void developer_management_of_namespaces_the_developer_and_end_user_who_does_not_own_the_namespace() {
         AppUserObject developer = getAPIFactory().getAppUserAPI().createRandomDeveloperAccount(false);

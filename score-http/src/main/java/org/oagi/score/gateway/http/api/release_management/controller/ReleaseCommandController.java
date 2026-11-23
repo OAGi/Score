@@ -71,6 +71,13 @@ public class ReleaseCommandController {
         releaseCommandService.transitState(sessionService.asScoreUser(user), request);
     }
 
+    /** Gives back a release that has been left being drafted or published to the state it was in before. */
+    @PostMapping(value = "/{releaseId:[\\d]+}/recover")
+    public void recover(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                        @PathVariable("releaseId") ReleaseId releaseId) {
+        releaseCommandService.recover(sessionService.asScoreUser(user), releaseId);
+    }
+
     @PostMapping(value = "/{releaseId:[\\d]+}/validate")
     public ReleaseValidationResponse validate(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                               @PathVariable("releaseId") ReleaseId releaseId,

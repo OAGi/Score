@@ -69,7 +69,7 @@ export class UpdateTenantComponent implements OnInit {
           duration: 3000,
         });
       } else {
-        this.snackBar.open(`There is a problem with creation of tenant with name ${this.tenant.name}`, '', {
+        this.snackBar.open(`There is a problem with update of tenant with name ${this.tenant.name}`, '', {
           duration: 3000,
         });
       }

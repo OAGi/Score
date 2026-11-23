@@ -683,7 +683,7 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
         dummyLogRecord.setRevisionTrackingNum(UInteger.valueOf(1));
         dummyLogRecord.setLogAction("Added");
         dummyLogRecord.setReference(bdt.getGuid());
-        dummyLogRecord.setSnapshot("{}");
+        dummyLogRecord.setSnapshot("{\"component\": \"dt\"}");
         dummyLogRecord.setCreatedBy(ULong.valueOf(bdt.getCreatedBy()));
         dummyLogRecord.setCreationTimestamp(bdt.getCreationTimestamp());
 
@@ -1738,6 +1738,37 @@ public class DSLContextCoreComponentAPIImpl implements CoreComponentAPI {
                 .join(DT).on(DT_MANIFEST.DT_ID.eq(DT.DT_ID))
                 .where(DT.PREV_DT_ID.eq(ULong.valueOf(previousDT.getDtId())))
                 .fetchOne(record -> dtMapper(record));
+    }
+
+    @Override
+    public void deleteLogsBeforeTheLatestRevision(String guid) {
+        Integer latest = dslContext.select(DSL.max(LOG.REVISION_NUM)).from(LOG)
+                .where(LOG.REFERENCE.eq(guid)).fetchOne(0, Integer.class);
+        if (latest == null) {
+            return;
+        }
+        removeLogs(dslContext.select(LOG.LOG_ID).from(LOG)
+                .where(and(LOG.REFERENCE.eq(guid), LOG.REVISION_NUM.lt(UInteger.valueOf(latest)))).fetch(LOG.LOG_ID));
+    }
+
+    @Override
+    public void deleteLogs(String guid) {
+        removeLogs(dslContext.select(LOG.LOG_ID).from(LOG).where(LOG.REFERENCE.eq(guid)).fetch(LOG.LOG_ID));
+    }
+
+    private void removeLogs(List<ULong> logIds) {
+        if (logIds.isEmpty()) {
+            return;
+        }
+        dslContext.update(ACC_MANIFEST).setNull(ACC_MANIFEST.LOG_ID).where(ACC_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(ASCCP_MANIFEST).setNull(ASCCP_MANIFEST.LOG_ID).where(ASCCP_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(BCCP_MANIFEST).setNull(BCCP_MANIFEST.LOG_ID).where(BCCP_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(DT_MANIFEST).setNull(DT_MANIFEST.LOG_ID).where(DT_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(CODE_LIST_MANIFEST).setNull(CODE_LIST_MANIFEST.LOG_ID).where(CODE_LIST_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(AGENCY_ID_LIST_MANIFEST).setNull(AGENCY_ID_LIST_MANIFEST.LOG_ID).where(AGENCY_ID_LIST_MANIFEST.LOG_ID.in(logIds)).execute();
+        dslContext.update(LOG).setNull(LOG.PREV_LOG_ID).where(LOG.PREV_LOG_ID.in(logIds)).execute();
+        dslContext.update(LOG).setNull(LOG.NEXT_LOG_ID).where(LOG.NEXT_LOG_ID.in(logIds)).execute();
+        dslContext.deleteFrom(LOG).where(LOG.LOG_ID.in(logIds)).execute();
     }
 
     @Override

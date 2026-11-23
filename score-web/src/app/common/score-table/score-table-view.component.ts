@@ -13,6 +13,7 @@ import {
   contentChild,
   contentChildren,
   inject,
+  NgZone,
   Injector,
   input,
   output,
@@ -31,6 +32,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DataSource, SelectionModel} from '@angular/cdk/collections';
 import {MatPaginator} from '@angular/material/paginator';
+import {ScorePaginator} from '../score-paginator/score-paginator.component';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {MatMultiSort, MatMultiSortTableDataSource, TableData} from 'ngx-mat-multi-sort';
@@ -86,7 +88,7 @@ import {TableDef, TableFilterDef, TableFilterOption} from './table-def';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     AsyncPipe, NgClass, NgTemplateOutlet, ScoreDefaultHeaderDirective, ScoreHeaderCellDirective, ScoreTableDirective, FormsModule, ReactiveFormsModule, MaterialModule, ColumnSelectorModule, SearchBarModule,
-    ScoreCommonModule, TranslatePipe
+    ScoreCommonModule, TranslatePipe, ScorePaginator
   ],
   providers: [{provide: ScoreTableViewRef, useExisting: forwardRef(() => ScoreTableViewComponent)}],
   styleUrl: './score-table-view.component.css',
@@ -100,6 +102,7 @@ import {TableDef, TableFilterDef, TableFilterOption} from './table-def';
 })
 export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentInit {
   private readonly injector = inject(Injector);
+  private readonly ngZone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
@@ -127,6 +130,8 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   readonly compactBelow = input(1024);
   /** Highlights the row under the pointer. */
   readonly rowHover = input(false, {transform: booleanAttribute});
+  /** A table wider than the screen (many columns) scrolls sideways instead of cutting its cells. */
+  readonly scrollable = input(false, {transform: booleanAttribute});
   /** The choices of the `select` filters that have no `options` in the definition, by the filter's key. */
   readonly filterOptions = input<Record<string, readonly TableFilterOption[]>>({});
   /**
@@ -185,6 +190,10 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
   protected readonly compactDef = contentChild(ScoreCompactDefDirective);
   private readonly tableWrapper = viewChild<ElementRef<HTMLElement>>('tableWrapper');
   private readonly tableWidth = signal(0);
+  private readonly tableScroll = viewChild<ElementRef<HTMLElement>>('tableScroll');
+  /** A `scrollable` table has columns out of view at the left / at the right: the frame draws a shadow there. */
+  protected readonly moreStart = signal(false);
+  protected readonly moreEnd = signal(false);
   /** The table is too narrow for its columns, and the screen says how to draw a row then. */
   protected readonly compact = computed(() => !!this.compactDef() && this.tableWidth() > 0 && this.tableWidth() <= this.compactBelow());
   /** The row whose detail row is open. */
@@ -249,8 +258,10 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
       });
       onCleanup(() => subscription?.unsubscribe());
     });
-    // The table is in an `@if`, so its sort is known only after the first render.
-    afterNextRender(() => this.start());
+    // The table is in an `@if`, so its sort is known only after the first render. After-render hooks run outside the Angular zone:
+    // what is started there (the request, and so the rows with their links) would be in the root zone, and a click on a row link would
+    // then start the navigation, and so create the next screen, outside the zone, where nothing a click changes is drawn.
+    afterNextRender(() => this.ngZone.run(() => this.start()));
     // The width of the table decides between the columns and the compact row.
     afterNextRender(() => {
       const wrapper = this.tableWrapper()?.nativeElement;
@@ -259,6 +270,29 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
         observer.observe(wrapper);
         this.destroyRef.onDestroy(() => observer.disconnect());
       }
+    });
+    // The shadows at the sides of a `scrollable` table: where the columns go on out of view.
+    effect(onCleanup => {
+      const scroller = this.tableScroll()?.nativeElement;
+      if (!scroller || !this.scrollable()) {
+        this.moreStart.set(false);
+        this.moreEnd.set(false);
+        return;
+      }
+      const update = () => {
+        this.moreStart.set(scroller.scrollLeft > 1);
+        this.moreEnd.set(scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1);
+      };
+      update();
+      scroller.addEventListener('scroll', update, {passive: true});
+      // The columns change the width of the table (a resize, a reset, a column shown), and so does the window the width of the frame.
+      const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : undefined;
+      observer?.observe(scroller);
+      Array.from(scroller.children).forEach(child => observer?.observe(child));
+      onCleanup(() => {
+        scroller.removeEventListener('scroll', update);
+        observer?.disconnect();
+      });
     });
     // The screen decides again: search again.
     effect(() => {
@@ -516,16 +550,25 @@ export class ScoreTableViewComponent<T = any> implements OnInit, AfterContentIni
     return this.selection().isSelected(this.rowKey()(row));
   }
 
-  /** Whether all the rows that can be selected are. */
+  /** Whether all the rows that can be selected are. Only the shown rows count: the selection may also hold the rows of other pages. */
   isAllSelected(): boolean {
-    return this.selection().selected.length === this.selectableRows().filter(row => this.rowSelectable()(row)).length;
+    const rows = this.selectableRows().filter(row => this.rowSelectable()(row));
+    return rows.length > 0 && rows.every(row => this.isSelected(row));
+  }
+
+  /** Whether some, but not all, of the rows that can be selected are. */
+  isSomeSelected(): boolean {
+    return !this.isAllSelected() && this.selectableRows().some(row => this.rowSelectable()(row) && this.isSelected(row));
   }
 
   masterToggle() {
+    const rows = this.selectableRows().filter(row => this.rowSelectable()(row));
     if (this.isAllSelected()) {
-      this.selection().clear();
+      // Only the shown rows: the rows of other pages stay selected.
+      this.selection().deselect(...rows.map(row => this.rowKey()(row)));
     } else {
-      this.selectableRows().forEach(row => this.select(row));
+      // One call, so `changed` is emitted once: a call per row would draw the whole table once per row.
+      this.selection().select(...rows.map(row => this.rowKey()(row)));
     }
   }
 

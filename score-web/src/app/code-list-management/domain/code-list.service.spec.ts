@@ -33,3 +33,31 @@ describe('CodeListService.checkUniqueness', () => {
     expect(check({agencyIdListValueManifestId: 9}).get('agencyIdListValueManifestId')).toBe('9');
   });
 });
+
+describe('CodeListService.deleteComment', () => {
+  let service: CodeListService;
+  let http: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({providers: [CodeListService, provideHttpClient(), provideHttpClientTesting()]});
+    service = TestBed.inject(CodeListService);
+    http = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => http.verify());
+
+  it('edits a comment with PUT /api/comments/{commentId}', () => {
+    service.editComment(7, 'text').subscribe();
+    const req = http.expectOne('/api/comments/7');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body.text).toBe('text');
+    req.flush(null);
+  });
+
+  it('sends DELETE /api/comments/{commentId} without a body', () => {
+    service.deleteComment({commentId: 7} as any).subscribe();
+    const req = http.expectOne('/api/comments/7');
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+});

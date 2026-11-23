@@ -1647,3 +1647,53 @@ The developer user can restore a deleted BCCP whose BDT is deleted. The UI displ
 5. The developer visits the CC list page and opens the BCCP21024devxdel.
 6. He restores it.
 7. Verify that the BCCP21024devxdel has been restored and is in WIP state. (Assertion [#1](#test-assertion-10241))
+
+## Test Case 10.25
+
+**Cancelling a revision brings back what was changed**
+
+Pre-condition: The developer is on the Working branch and owns published ASCCP, BCCP and ACC components.
+
+
+### Test Assertion:
+
+#### Test Assertion #10.25.1
+The developer can cancel the revision of an ASCCP after changing the ACC it is the role of. The ASCCP is the role of the ACC it was, its DEN is as it was, and it is `Published` with revision `1`.
+
+#### Test Assertion #10.25.2
+The developer can cancel the revision of a BCCP after changing its DT. The BCCP is on the DT it was, its DEN is as it was, and it is `Published` with revision `1`.
+
+#### Test Assertion #10.25.3
+The developer can cancel the revision of an ACC after removing its base ACC and appending an association. The base ACC is back and the appended association is gone.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns published ASCCP, BCCP and ACC components.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision brings back what was changed" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, revise an ASCCP, change its ACC, cancel the revision, and verify the role-of ACC and the DEN. (Assertion [#10.25.1](#test-assertion-10251))
+2. Revise a BCCP, change its DT, cancel the revision, and verify the DT, the DEN, the state and the revision number. (Assertion [#10.25.2](#test-assertion-10252))
+3. Revise an ACC that has a base ACC, remove the base ACC, append an ASCCP, cancel the revision, and verify the base ACC and the associations. (Assertion [#10.25.3](#test-assertion-10253))
+
+## Test Case 10.26
+
+**Cancelling a revision when the log to go back to is gone**
+
+Pre-condition: The developer is on the Working branch and owns a published ACC that is revised, and the log the ACC was in before the revision has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #10.26.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the developer does not let it, nothing is changed and the ACC stays in revision. If the developer lets it, the ACC is cancelled to `Published` with revision `1`, and a revision after that is revision `2`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published ACC that is revised, and the log the ACC was in before the revision has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, revise an ACC, and have the logs from before the revision removed from the database.
+2. Cancel the revision and confirm; verify the dialog asks whether to create a new log, and decline; verify the ACC is still `WIP`.
+3. Cancel the revision again, confirm, and let the new log be created; verify the ACC is `Published` with revision `1`, and that revising it again gives revision `2`. (Assertion [#10.26.1](#test-assertion-10261))

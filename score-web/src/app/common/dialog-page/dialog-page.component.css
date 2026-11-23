@@ -34,8 +34,9 @@
 .dialog-close {
   flex: none;
   outline: none;
-  /* The icon sits inside the button's own padding; pull the button out so that the X ends where the text below ends. */
-  margin-right: -10px;
+  /* The icon sits inside the button's own padding (5px of the small button, 26px with an icon of 16px); pull the button out so
+     that the X ends where the text below ends. */
+  margin-right: -5px;
 }
 
 .dialog-body {

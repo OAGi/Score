@@ -1,6 +1,8 @@
 package org.oagi.score.e2e.impl.page.context;
 
 import org.oagi.score.e2e.impl.page.BasePageImpl;
+import org.oagi.score.e2e.impl.page.ConfirmDialogImpl;
+import org.oagi.score.e2e.page.ConfirmDialog;
 import org.oagi.score.e2e.obj.ContextCategoryObject;
 import org.oagi.score.e2e.obj.ContextSchemeObject;
 import org.oagi.score.e2e.obj.ContextSchemeValueObject;
@@ -319,4 +321,8 @@ public class EditContextSchemePageImpl extends BasePageImpl implements EditConte
         return visibilityOfElementLocated(getDriver(), CONFIRMATION_DIALOG_MESSAGE_LOCATOR).getText();
     }
 
+    @Override
+    public ConfirmDialog getConfirmDialog() {
+        return new ConfirmDialogImpl(getDriver());
+    }
 }

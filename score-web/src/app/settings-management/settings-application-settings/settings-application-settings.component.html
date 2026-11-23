@@ -146,8 +146,12 @@
                         <div class="subsubhead">
                           <h5 class="subsubhead-heading">Auth Password</h5>
                         </div>
-                        <input type="password" class="width-max"
+                        <input type="password" class="width-max" autocomplete="new-password"
+                          [placeholder]="authPasswordPlaceholder"
                           [(ngModel)]="applicationSettingsInfo.smtpSettingsInfo.authPassword" />
+                        @if (applicationSettingsInfo.smtpSettingsInfo.authPasswordSet && !authPasswordCleared) {
+                          <button mat-button type="button" (click)="clearAuthPassword()">Clear password</button>
+                        }
                       </div>
                     </div>
                     <div class="actions pt-4">

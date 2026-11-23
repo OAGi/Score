@@ -142,13 +142,14 @@ export function resourcePathLeaf(propertyTerm: string, isArray: boolean): string
   return isArray ? term + '-list' : term;
 }
 
-// Full resource path rule: /<business-context>/<document-version>/<leaf>. The version segment is
-// omitted when the document has no version. Used by the Add dialogs' path preview.
+// Full resource path rule: /<business-context>/{version}/<leaf>. The segment is the placeholder {version}, not the version:
+// the generator puts the version of the document in its place (Issue #1715). It is omitted when the document has no version.
+// Used by the Add dialogs' path preview.
 export function buildResourcePath(
   businessContextName: string, version: string, propertyTerm: string, isArray: boolean): string {
   const bc = (businessContextName || '').toLowerCase().replace(/ /g, '-');
   const leaf = resourcePathLeaf(propertyTerm, isArray);
-  return version ? `/${bc}/${version}/${leaf}` : `/${bc}/${leaf}`;
+  return version ? `/${bc}/{version}/${leaf}` : `/${bc}/${leaf}`;
 }
 
 // Resource Name (Path) validity. The path becomes a key of `paths` in the generated

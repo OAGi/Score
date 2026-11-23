@@ -21,8 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +48,11 @@ public class OpenAPIDocService {
     private static final int LICENSE_URL_MAX_LENGTH = OAS_DOC.LICENSE_URL.getDataType().length();
     // Issue #1729
     private static final int SCHEME_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.SCHEME_NAME.getDataType().length();
+    // Issue #1891: the key of the components.securitySchemes map, per the Components Object of the OpenAPI Specification.
+    private static final Pattern SCHEME_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9.\\-_]+");
+    // Issue #1891: a scope of an oauth2 or openIdConnect scheme is an OAuth 2.0 scope token: printable ASCII without a space,
+    // a double quote and a backslash (RFC 6749 section 3.3).
+    private static final Pattern SCOPE_NAME_PATTERN = Pattern.compile("[\\x21\\x23-\\x5B\\x5D-\\x7E]+");
     private static final int API_KEY_NAME_MAX_LENGTH = OAS_SECURITY_SCHEME.API_KEY_NAME.getDataType().length();
     private static final int BEARER_FORMAT_MAX_LENGTH = OAS_SECURITY_SCHEME.BEARER_FORMAT.getDataType().length();
     private static final int OPEN_ID_CONNECT_URL_MAX_LENGTH = OAS_SECURITY_SCHEME.OPEN_ID_CONNECT_URL.getDataType().length();
@@ -84,6 +93,7 @@ public class OpenAPIDocService {
 
     @Transactional
     public CreateOasDocResponse createOasDoc(ScoreUser requester, CreateOasDocRequest request) {
+        validateOasDocTitle(request.getTitle());
         validateOasDocRequest(
                 request.getOpenAPIVersion(),
                 request.getTermsOfService(),
@@ -93,6 +103,7 @@ public class OpenAPIDocService {
                 request.getLicenseUrl());
         validateSecuritySchemes(request.getSecuritySchemes());
         validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
+        OasDocHttpHeaderPolicy.validate(request.getHttpHeaders(), request.getOpenAPIVersion());
         // Enforce document uniqueness server-side (the frontend's check_uniqueness is advisory only).
         assertOasDocUnique(requester, null,
                 request.getTitle(), request.getOpenAPIVersion(), request.getVersion());
@@ -102,6 +113,7 @@ public class OpenAPIDocService {
 
     @Transactional
     public UpdateOasDocResponse updateOasDoc(ScoreUser requester, UpdateOasDocRequest request) {
+        validateOasDocTitle(request.getTitle());
         validateOasDocRequest(
                 request.getOpenAPIVersion(),
                 request.getTermsOfService(),
@@ -111,6 +123,7 @@ public class OpenAPIDocService {
                 request.getLicenseUrl());
         validateSecuritySchemes(request.getSecuritySchemes());
         validateSecurityRequirements(request.getSecuritySchemes(), request.getSecurityRequirements());
+        OasDocHttpHeaderPolicy.validate(request.getHttpHeaders(), request.getOpenAPIVersion());
         // Enforce document uniqueness server-side, excluding this document's own id (the frontend's
         // check_uniqueness is advisory only).
         assertOasDocUnique(requester,
@@ -211,12 +224,21 @@ public class OpenAPIDocService {
                 request.getDescriptionForOperation(), request.isDeprecatedForOperation());
         OasOperationId oasOperationId = shell.operationId();
 
+        if (!request.isOperationIdJudgedLater() && !shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+            assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()),
+                    endpointOf(oasOperationId, request.getPath(), request.getVerb()));
+        }
+
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
 
         // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
         attachTagIfNew(command, userId, shell.operationExisted(), request.getTagName(), oasOperationId);
+
+        // Issue #1791: what the operation was, before the body that may make it a GET that returns an array
+        OasOperationParameterState parametersBefore = shell.operationExisted()
+                ? command.captureOperationParameters(oasOperationId) : OasOperationParameterState.NONE;
 
         OasRequestId oasRequestId = null;
         OasResponseId oasResponseId = null;
@@ -246,6 +268,8 @@ public class OpenAPIDocService {
                     .setTimestamp(millis)
                     .execute();
         }
+        command.reconcileOperationParameters(oasOperationId, parametersBefore, userId);
+
         // Issue #1347: a NEWLY created operation inherits the document's prevailing error-response body
         // type (all-PROBLEM_DETAILS -> PROBLEM_DETAILS; all-CONFIRM_MESSAGE -> the release-matched
         // ConfirmMessage BIE if unambiguous; otherwise No Response Body). Reusing an existing operation
@@ -276,6 +300,9 @@ public class OpenAPIDocService {
         if (request.getVerb() == null) {
             throw new IllegalArgumentException("`verb` parameter must not be null.");
         }
+        OasOperationNaming.resourcePathError(request.getPath()).ifPresent(error -> {
+            throw new IllegalArgumentException(error);
+        });
 
         long millis = System.currentTimeMillis();
 
@@ -295,12 +322,21 @@ public class OpenAPIDocService {
                 request.getOperationId(), request.getSummary(), request.getDescription(), false);
         OasOperationId oasOperationId = shell.operationId();
 
+        if (!request.isOperationIdJudgedLater() && !shell.operationExisted() && request.getOperationId() != null && !request.getOperationId().isBlank()) {
+            assertOperationIdsAvailable(command, request.getOasDocId(), Map.of(oasOperationId, request.getOperationId()),
+                    endpointOf(oasOperationId, request.getPath(), request.getVerb()));
+        }
+
         // Issue #1492: reject a 2nd Request (or 2nd Response) on a (path, verb) that already has one.
         assertOperationHasNoBodyOfType(command, oasOperationId, request.isOasRequest(),
                 request.getVerb(), request.getPath());
 
         // Issue #1492: only tag a NEWLY created operation; do not duplicate tags on an existing op.
         attachTagIfNew(command, userId, shell.operationExisted(), request.getTagName(), oasOperationId);
+
+        // Issue #1791: what the operation was, before the body that may make it a GET that returns an array
+        OasOperationParameterState parametersBefore = shell.operationExisted()
+                ? command.captureOperationParameters(oasOperationId) : OasOperationParameterState.NONE;
 
         OasRequestId oasRequestId = null;
         OasResponseId oasResponseId = null;
@@ -339,6 +375,8 @@ public class OpenAPIDocService {
                     .execute();
         }
 
+        command.reconcileOperationParameters(oasOperationId, parametersBefore, userId);
+
         // Issue #1347: a NEWLY created (bodyless) operation inherits the document's prevailing
         // error-response body type. A bodyless operation has no release, so it can only inherit
         // PROBLEM_DETAILS, or a single unambiguous ConfirmMessage BIE used across the document.
@@ -362,6 +400,146 @@ public class OpenAPIDocService {
                     "This operation (" + verbLabel + " " + path + ") already has a " + bodyType
                             + " body. An operation can have at most one Request and one Response body.");
         }
+    }
+
+    private static Map<OasOperationId, Endpoint> endpointOf(OasOperationId oasOperationId, String path, String verb) {
+        Endpoint endpoint = Endpoint.of(path, verb);
+        return (endpoint == null) ? Map.of() : Map.of(oasOperationId, endpoint);
+    }
+
+    /** The path and verb each submitted operation ends up with, where the rows say it. */
+    private static Map<OasOperationId, Endpoint> submittedEndpoints(UpdateBieForOasDocRequest request) {
+        Map<OasOperationId, Endpoint> endpoints = new LinkedHashMap<>();
+        if (request.getBieForOasDocList() != null) {
+            for (BieForOasDoc row : request.getBieForOasDocList()) {
+                Endpoint endpoint = (row == null || row.getOasOperationId() == null)
+                        ? null : Endpoint.of(row.getResourceName(), row.getVerb());
+                if (endpoint != null) {
+                    endpoints.putIfAbsent(row.getOasOperationId(), endpoint);
+                }
+            }
+        }
+        return endpoints;
+    }
+
+    /**
+     * The operationId each submitted operation ends up with. An operation appears as up to two rows
+     * (Request and Response) that carry the same operationId.
+     */
+    private static Map<OasOperationId, String> submittedOperationIds(UpdateBieForOasDocRequest request) {
+        Map<OasOperationId, String> operationIds = new LinkedHashMap<>();
+        if (request.getBieForOasDocList() != null) {
+            for (BieForOasDoc row : request.getBieForOasDocList()) {
+                if (row != null && row.getOasOperationId() != null
+                        && row.getOperationId() != null && !row.getOperationId().isBlank()) {
+                    operationIds.putIfAbsent(row.getOasOperationId(), row.getOperationId());
+                }
+            }
+        }
+        return operationIds;
+    }
+
+    /** An OpenAPI operation: a verb on a path. {@code null} when the row does not say which. */
+    private record Endpoint(String path, String verb) {
+        static Endpoint of(String path, String verb) {
+            return (path == null || path.isBlank() || verb == null || verb.isBlank())
+                    ? null : new Endpoint(path.trim(), verb.trim().toUpperCase());
+        }
+    }
+
+    /**
+     * The operationId must be unique among the operations of a document, and it is case-sensitive
+     * (OpenAPI specification). An operation of the specification is a verb on a path, to which the Request
+     * BIE gives the requestBody and the Response BIE the responses; those two can be stored as separate
+     * rows, so rows on the same path and verb are one operation and share their operationId.
+     * {@code operationIds} maps each row being added or changed to the operationId it will have and
+     * {@code endpoints} to its path and verb; an operationId must not span two endpoints, nor be the
+     * operationId of an operation on another endpoint that is left as it is. Throws an
+     * {@link IllegalArgumentException} (mapped to HTTP 400) otherwise.
+     */
+    private void assertOperationIdsAvailable(OasDocCommandRepository command, OasDocId oasDocId,
+                                             Map<OasOperationId, String> operationIds,
+                                             Map<OasOperationId, Endpoint> endpoints) {
+        List<OasDocViolation> violations = operationIdViolations(command, oasDocId, operationIds, endpoints);
+        if (!violations.isEmpty()) {
+            throw new OasDocViolationException(violations);
+        }
+    }
+
+    /** Every operationId that is used twice among the rows or by an operation of another endpoint that is left as it is. */
+    private List<OasDocViolation> operationIdViolations(OasDocCommandRepository command, OasDocId oasDocId,
+                                                        Map<OasOperationId, String> operationIds,
+                                                        Map<OasOperationId, Endpoint> endpoints) {
+        Map<String, Object> endpointOfOperationId = new HashMap<>();
+        Set<String> seen = new LinkedHashSet<>();
+        Set<String> used = new LinkedHashSet<>();
+        for (Map.Entry<OasOperationId, String> entry : operationIds.entrySet()) {
+            Endpoint endpoint = endpoints.get(entry.getKey());
+            Object identity = (endpoint != null) ? endpoint : entry.getKey();
+            Object previous = endpointOfOperationId.putIfAbsent(entry.getValue(), identity);
+            if (previous != null && !previous.equals(identity)) {
+                used.add(entry.getValue());
+            }
+            seen.add(entry.getValue());
+        }
+        Set<OasOperationId> excluded = new HashSet<>(operationIds.keySet());
+        for (Endpoint endpoint : new HashSet<>(endpoints.values())) {
+            if (endpoint != null) {
+                excluded.addAll(command.findOasOperationIdsAtEndpoint(oasDocId, endpoint.path(), endpoint.verb()));
+            }
+        }
+        used.addAll(command.findOperationIdsInOasDoc(oasDocId, seen, excluded));
+        List<OasDocViolation> violations = new ArrayList<>();
+        for (String operationId : used) {
+            violations.addAll(operationIdInUse(operationId, targetsOf(operationIds, operationId)).violations());
+        }
+        return violations;
+    }
+
+    /** The operations being added or changed that have the operationId. */
+    private static List<OasOperationId> targetsOf(Map<OasOperationId, String> operationIds, String operationId) {
+        return operationIds.entrySet().stream().filter(e -> operationId.equals(e.getValue())).map(Map.Entry::getKey).toList();
+    }
+
+    /** The violation says which operations have the operationId, so that the client shows it there. */
+    private static OasDocViolationException operationIdInUse(String operationId, List<OasOperationId> targets) {
+        String message = "Operation ID must be unique within the document.";
+        if (targets.isEmpty()) {
+            return new OasDocViolationException(OasDocViolation.of(OasDocViolation.Scope.OPERATION, message));
+        }
+        return new OasDocViolationException(targets.stream()
+                .map(target -> OasDocViolation.ofOperation(target.value(), "operationId", message)).toList());
+    }
+
+    /**
+     * An operation (a verb on a path) has at most one Request body and one Response body. The rows being changed are
+     * checked against each other where they are saved; this is the check against the operations of the document that
+     * are left as they are, which may be on another page of the client.
+     */
+    private List<OasDocViolation> bodySlotViolations(OasDocCommandRepository command, OasDocId oasDocId, UpdateBieForOasDocRequest request) {
+        List<OasDocViolation> violations = new ArrayList<>();
+        if (request.getBieForOasDocList() == null) {
+            return violations;
+        }
+        Set<OasOperationId> submitted = new HashSet<>(submittedOperationIds(request).keySet());
+        Set<String> seen = new HashSet<>();
+        for (BieForOasDoc row : request.getBieForOasDocList()) {
+            Endpoint endpoint = (row == null) ? null : Endpoint.of(row.getResourceName(), row.getVerb());
+            boolean isRequest = row != null && "Request".equals(row.getMessageBody());
+            if (endpoint == null || !(isRequest || "Response".equals(row.getMessageBody()))) {
+                continue;
+            }
+            boolean takenByRowsOfTheRequest = !seen.add(endpoint.path() + "|" + endpoint.verb() + "|" + row.getMessageBody());
+            Set<OasOperationId> others = new HashSet<>(command.findOperationsWithBodyAtEndpoint(
+                    oasDocId, endpoint.path(), endpoint.verb(), isRequest));
+            others.removeAll(submitted);
+            if (takenByRowsOfTheRequest || !others.isEmpty()) {
+                violations.add(new OasDocViolation(OasDocViolation.Scope.OPERATION,
+                        row.getOasOperationId() == null ? null : row.getOasOperationId().value(), row.getMessageBody(),
+                        "messageBody", "This endpoint already has a " + row.getMessageBody() + " body."));
+            }
+        }
+        return violations;
     }
 
     /**
@@ -435,6 +613,12 @@ public class OpenAPIDocService {
         }
     }
 
+    private void validateOasDocTitle(String title) {
+        if (isBlank(title)) {
+            throw new IllegalArgumentException("`title` must not be blank.");
+        }
+    }
+
     private void validateOasDocRequest(String openApiVersion,
                                        String termsOfService,
                                        String version,
@@ -467,6 +651,10 @@ public class OpenAPIDocService {
             // Scheme Name is optional; a blank falls back to a unique type-derived default at persist time.
             if (!isBlank(name)) {
                 validateMaxLength("schemeName", name, SCHEME_NAME_MAX_LENGTH);
+                if (!SCHEME_NAME_PATTERN.matcher(name.trim()).matches()) {
+                    throw new IllegalArgumentException("Invalid security scheme name: '" + name.trim()
+                            + "'. A name has only letters, digits, '.', '-' and '_'.");
+                }
                 if (!explicitNames.add(name.trim())) {
                     throw new IllegalArgumentException("Duplicate security scheme name: " + name.trim());
                 }
@@ -542,6 +730,13 @@ public class OpenAPIDocService {
      * `flows: {}`). Each flow needs a valid, unique type and the URLs that its type requires per
      * OpenAPI 3.0.3 (deviceAuthorization is 3.2 and is gated out of the generated output).
      */
+    private void validateScopeName(String scopeName) {
+        if (!isBlank(scopeName) && !SCOPE_NAME_PATTERN.matcher(scopeName.trim()).matches()) {
+            throw new IllegalArgumentException("Invalid scope name: '" + scopeName.trim()
+                    + "'. A scope has only ASCII letters, digits and symbols, without a space, a double quote or a backslash.");
+        }
+    }
+
     private void validateOAuthFlows(List<OasOAuthFlow> flows) {
         if (flows == null || flows.isEmpty()) {
             throw new IllegalArgumentException("An oauth2 security scheme requires at least one OAuth flow.");
@@ -569,6 +764,13 @@ public class OpenAPIDocService {
             }
             if ("deviceAuthorization".equals(ft) && isBlank(flow.getDeviceAuthorizationUrl())) {
                 throw new IllegalArgumentException("`deviceAuthorizationUrl` is required for the deviceAuthorization flow.");
+            }
+            if (flow.getScopes() != null) {
+                for (OasOAuthScope scope : flow.getScopes()) {
+                    if (scope != null) {
+                        validateScopeName(scope.getScopeName());
+                    }
+                }
             }
         }
     }
@@ -602,10 +804,14 @@ public class OpenAPIDocService {
                         && requirementScheme.getScopes() != null && !requirementScheme.getScopes().isEmpty()) {
                     throw new IllegalArgumentException("Scopes are only allowed for oauth2 or openIdConnect security schemes.");
                 }
+                if ("openIdConnect".equals(scheme.getType()) && requirementScheme.getScopes() != null) {
+                    requirementScheme.getScopes().forEach(this::validateScopeName);
+                }
                 if ("oauth2".equals(scheme.getType())) {
                     Set<String> declaredScopes = collectOAuthScopeNames(scheme);
                     if (requirementScheme.getScopes() != null) {
                         for (String scope : requirementScheme.getScopes()) {
+                            validateScopeName(scope);
                             if (!isBlank(scope) && !declaredScopes.contains(scope.trim())) {
                                 throw new IllegalArgumentException("Unknown OAuth2 scope: " + scope);
                             }
@@ -706,6 +912,8 @@ public class OpenAPIDocService {
 
     @Transactional
     public UpdateBieForOasDocResponse updateDetails(ScoreUser requester, UpdateBieForOasDocRequest request) {
+        // Every rule that the rows break is said at once, each with the row it is about.
+        List<OasDocViolation> violations = new ArrayList<>();
 
         // Issue #1729: per-operation security overrides are persisted through this path (not the OasDoc
         // create/update path), so validate them against the document's declared schemes the same way the
@@ -720,10 +928,23 @@ public class OpenAPIDocService {
                 List<OasSecurityScheme> schemes = (oasDoc == null) ? null : oasDoc.getSecuritySchemes();
                 for (BieForOasDoc bieForOasDoc : request.getBieForOasDocList()) {
                     if (bieForOasDoc != null && bieForOasDoc.isSecurityOverridden()) {
-                        validateSecurityRequirements(schemes, bieForOasDoc.getSecurityRequirements());
+                        try {
+                            validateSecurityRequirements(schemes, bieForOasDoc.getSecurityRequirements());
+                        } catch (IllegalArgumentException e) {
+                            violations.add(new OasDocViolation(OasDocViolation.Scope.OPERATION,
+                                    bieForOasDoc.getOasOperationId() == null ? null : bieForOasDoc.getOasOperationId().value(),
+                                    bieForOasDoc.getMessageBody(), "securityRequirements", e.getMessage()));
+                        }
                     }
                 }
             }
+        }
+
+        violations.addAll(operationIdViolations(command(requester), request.getOasDocId(), submittedOperationIds(request),
+                submittedEndpoints(request)));
+        violations.addAll(bodySlotViolations(command(requester), request.getOasDocId(), request));
+        if (!violations.isEmpty()) {
+            throw new OasDocViolationException(violations);
         }
 
         UpdateBieForOasDocResponse response =

@@ -41,6 +41,7 @@ import org.springframework.security.oauth2.jwt.JwtTypeValidator;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -210,6 +211,17 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * What a disabled account may still reach, so that the web app can show the "Account is disabled" page and the user
+     * can leave or sign in as another account: the sign-in page's own requests, {@code /state}, and the sign-out and
+     * sign-in paths. Not every permitAll path is listed: {@code /ai/**} and the GitHub callback are open on the chain
+     * but their endpoints work for the signed-in user, so a disabled account must not reach them.
+     */
+    private static final List<String> DISABLED_ACCOUNT_EXEMPT_PATHS = List.of(
+            "/favicon.ico", "/resources/**", "/error", "/health", "/info/**", "/oauth2/**",
+            "/webauthn/authenticate/options", "/login/webauthn",
+            "/state", "/logout", "/login");
+
     @Bean
     @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -279,6 +291,8 @@ public class SecurityConfiguration {
                 })
                 // CSRF tokens are not used (the web app sends none); state-changing requests are checked by Origin.
                 .addFilterBefore(new SameOriginRequestFilter(corsConfigurationSource()), CorsFilter.class)
+                // A disabled account is refused on every request, whichever way its session was created.
+                .addFilterAfter(new DisabledAccountFilter(sessionService, DISABLED_ACCOUNT_EXEMPT_PATHS), SecurityContextHolderFilter.class)
                 .rememberMe(rememberMeConfigurer -> {
                     rememberMeConfigurer.rememberMeServices(rememberMeServices());
                 })

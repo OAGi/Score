@@ -18,6 +18,14 @@ public record UpdateContextSchemeRequest(
         String schemeVersionId,
         Collection<UpdateContextSchemeValueRequest> contextSchemeValueList) {
 
+    // Stored and compared without the surrounding spaces, so a leading space cannot bypass the duplicate check.
+    public UpdateContextSchemeRequest {
+        schemeId = ContextSchemeText.trimOrNull(schemeId);
+        schemeName = ContextSchemeText.trimOrNull(schemeName);
+        schemeAgencyId = ContextSchemeText.trimOrNull(schemeAgencyId);
+        schemeVersionId = ContextSchemeText.trimOrNull(schemeVersionId);
+    }
+
     public Collection<UpdateContextSchemeValueRequest> contextSchemeValueList() {
         if (contextSchemeValueList == null) {
             return Collections.emptyList();

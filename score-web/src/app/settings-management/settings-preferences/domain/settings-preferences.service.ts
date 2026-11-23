@@ -37,4 +37,13 @@ export class SettingsPreferencesService {
       subscriber.complete();
     });
   }
+
+  updateBrowserViewMode(userToken: UserToken, browserViewMode: boolean): Observable<any> {
+    return new Observable(subscriber => {
+      saveBooleanProperty(userToken, this.PAGE_SETTINGS_BROWSER_VIEW_MODE_PROPERTY_KEY, browserViewMode);
+
+      subscriber.next(undefined);
+      subscriber.complete();
+    });
+  }
 }

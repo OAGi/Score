@@ -199,6 +199,9 @@ class BieForOasDocDeletePathTest {
         // The operation and resource are NOT deleted (a sibling Response still uses the operation).
         assertFalse(provider.sql.stream().anyMatch(s -> s.startsWith("delete") && s.contains("`oas_operation`")),
                 "oas_operation must NOT be deleted while a sibling body remains");
+        // Issue #1791: the HTTP headers bound to the operation stay with it.
+        assertFalse(provider.sql.stream().anyMatch(s -> s.startsWith("delete") && s.contains("`oas_doc_http_header`")),
+                "the HTTP headers of the operation must NOT be deleted while the operation remains");
         assertFalse(provider.sql.stream().anyMatch(s -> s.startsWith("delete") && s.contains("`oas_resource`")
                         && !s.contains("oas_resource_tag")),
                 "oas_resource must NOT be deleted while the operation remains");
@@ -218,6 +221,24 @@ class BieForOasDocDeletePathTest {
         assertTrue(provider.sql.stream().anyMatch(s -> s.startsWith("delete") && s.contains("`oas_resource`")
                         && !s.contains("oas_resource_tag")),
                 "oas_resource must be deleted when its last operation is removed");
+    }
+
+    /**
+     * Issue #1791: the HTTP headers bound to an operation refer to it, so they are deleted before the operation.
+     */
+    @Test
+    void removingLastBodyOfOperation_deletesItsHttpHeaderBindingsBeforeTheOperation() {
+        RecordingProvider provider = new RecordingProvider(/* siblingResponseExists */ false);
+        repo(provider).deleteBieForOasDoc(deleteRequestForRequestBody());
+
+        int bindingsDelete = indexOfFirst(provider.sql,
+                s -> s.startsWith("delete") && s.contains("`oas_doc_http_header`") && s.contains("`oas_operation_id`"));
+        int operationDelete = indexOfFirst(provider.sql,
+                s -> s.startsWith("delete") && s.contains("`oas_operation`"));
+
+        assertTrue(bindingsDelete >= 0, "the HTTP header bindings of the operation must be deleted");
+        assertTrue(operationDelete >= 0 && bindingsDelete < operationDelete,
+                "the bindings must be deleted before the operation they refer to");
     }
 
     /**

@@ -15,7 +15,9 @@ import org.oagi.score.e2e.TS_37_ReleaseBranchAgencyIDListManagementEndUser.*;
         TC_37_5_EndUserAgencyIDListStateManagement.class,
         TC_37_6_DeletingEndUserAgencyIDList.class,
         TC_37_7_RestoringEndUserAgencyIDList.class,
-        TC_37_8_UsingCustomEndUserAgencyIDListInBIEExpression.class
+        TC_37_8_UsingCustomEndUserAgencyIDListInBIEExpression.class,
+        TC_37_9_AgencyIDListValueIsFixedInAnAmendmentAndCancelBringsBackTheRest.class,
+        TC_37_10_CancelWhenTheLogIsGone.class
 })
 public class TS_37 {
 }

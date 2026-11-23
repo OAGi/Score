@@ -11,19 +11,21 @@ import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
 
+import org.oagi.score.e2e.impl.page.SearchBarPageImpl;
+
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
 import static org.oagi.score.e2e.impl.PageHelper.*;
 
 public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAssignmentPage {
     private static final By DEN_FIELD_LOCATOR =
-            By.xpath("//mat-label[contains(text(), \"DEN\")]//ancestor::mat-form-field//input");
+            By.xpath("//score-search-bar//div[contains(@class, \"main-search\")]//mat-form-field//input");
     private static final By TYPE_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Type\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By OWNER_SELECT_FIELD_LOCATOR =
             By.xpath("//*[contains(text(),\"Owner\")]//ancestor::mat-form-field[1]//mat-select");
     private static final By SEARCH_BUTTON_LOCATOR =
-            By.xpath("//span[contains(text(), \"Search\")]//ancestor::button[1]");
+            By.xpath("//score-search-bar//div[contains(@class, \"main-search\")]//button[1]");
     private static final By CREATE_BUTTON_LOCATOR =
             By.xpath("//span[contains(text(), \"Create\")]//ancestor::button[1]");
     private static final By ASSIGN_ALL_BUTTON_LOCATOR =
@@ -70,6 +72,7 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
 
     @Override
     public WebElement getTypeSelectField() {
+        new SearchBarPageImpl(getDriver()).showAdvancedSearchPanel();
         return visibilityOfElementLocated(getDriver(), TYPE_SELECT_FIELD_LOCATOR);
     }
 
@@ -87,12 +90,14 @@ public class ReleaseAssignmentPageImpl extends BasePageImpl implements ReleaseAs
 
     @Override
     public WebElement getOwnerSelectField() {
+        new SearchBarPageImpl(getDriver()).showAdvancedSearchPanel();
         return visibilityOfElementLocated(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
     }
 
     @Override
     public void setOwner(String owner) {
         retry(() -> {
+            new SearchBarPageImpl(getDriver()).showAdvancedSearchPanel();
             WebElement ownerSelect = openMatSelect(getDriver(), OWNER_SELECT_FIELD_LOCATOR);
             WebElement searchField = matSelectSearchField(getDriver(), ownerSelect);
             clear(searchField);

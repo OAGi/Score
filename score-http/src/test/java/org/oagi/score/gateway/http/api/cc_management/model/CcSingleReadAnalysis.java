@@ -138,6 +138,16 @@ class CcSingleReadAnalysis {
         }
 
         @Override
+        public void invalidateAll() {
+            inner.invalidateAll();
+        }
+
+        @Override
+        public void bulkChange(Runnable action) {
+            inner.bulkChange(action);
+        }
+
+        @Override
         public boolean isBypassed() {
             return inner.isBypassed();
         }

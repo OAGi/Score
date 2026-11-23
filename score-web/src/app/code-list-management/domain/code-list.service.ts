@@ -1,6 +1,8 @@
 import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
+import {askToWriteNewLog, logOptions} from '../../common/log-not-found/log-not-found';
 import {CodeListCreateResponse, CodeListDetails, CodeListListEntry, CodeListListEntryRequest, CodeListSummary} from './code-list';
 import {PageResponse} from '../../basis/basis';
 import {Comment} from '../../cc-management/domain/core-component-node';
@@ -12,6 +14,7 @@ import {SUPPRESS_ERROR_ALERT} from '../../authentication/auth.service';
 @Injectable()
 export class CodeListService {
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
 
 
   getCodeListSummaries(releaseId: number): Observable<CodeListSummary[]> {
@@ -168,6 +171,30 @@ export class CodeListService {
     return this.update(codeList, state, comment, projectFieldOptionOverride);
   }
 
+  /** Moves several code lists to a state; the comments and the overrides are keyed 'code_list:<manifestId>'. */
+  updateStateOnList(codeLists: CodeListListEntry[], toState: string,
+                    comments?: { [key: string]: string },
+                    projectFieldOptionOverrides?: { [key: string]: string }): Observable<any> {
+    const body: any = {
+      toState,
+      codeListManifestIds: codeLists.map(e => e.codeListManifestId)
+    };
+    if (comments && Object.keys(comments).length > 0) {
+      body.comments = comments;
+    }
+    if (projectFieldOptionOverrides && Object.keys(projectFieldOptionOverrides).length > 0) {
+      body.projectFieldOptionOverrides = projectFieldOptionOverrides;
+    }
+    return this.http.patch<any>('/api/code-lists/state', body);
+  }
+
+  transferOwnershipOnList(codeLists: CodeListListEntry[], targetLoginId: string): Observable<any> {
+    return this.http.patch<any>('/api/code-lists/transfer', {
+      targetLoginId,
+      codeListManifestIds: codeLists.map(e => e.codeListManifestId)
+    });
+  }
+
   delete(...codeListManifestIds): Observable<any> {
     return this.http.patch<any>('/api/code-lists/mark-as-deleted', {
       codeListManifestIds
@@ -214,11 +241,13 @@ export class CodeListService {
     return this.http.get<boolean>('/api/code-lists/check-name-uniqueness', {params});
   }
 
-  makeNewRevision(codeList: CodeListDetails): Observable<any> {
-    return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/revise', {});
+  makeNewRevision(codeList: CodeListDetails, recreateLog = false): Observable<any> {
+    return this.http.patch('/api/code-lists/' + codeList.codeListManifestId + '/revise', {}, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.makeNewRevision(codeList, true)));
   }
 
-  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string): Observable<any> {
+  cancelRevision(manifestId: number, comment?: string, projectFieldOptionOverride?: string,
+                 recreateLog = false): Observable<any> {
     const url = '/api/code-lists/' + manifestId + '/cancel';
     // An optional comment + project board fieldOption override travel with the request (issue #1533). Blank
     // values are not sent (post nothing / use the configured fieldOption).
@@ -229,7 +258,8 @@ export class CodeListService {
     if (projectFieldOptionOverride) {
       body.projectFieldOptionOverride = projectFieldOptionOverride;
     }
-    return this.http.patch<any>(url, body);
+    return this.http.patch<any>(url, body, logOptions(recreateLog)).pipe(
+      askToWriteNewLog(this.dialog, () => this.cancelRevision(manifestId, comment, projectFieldOptionOverride, true)));
   }
 
   transferOwnership(manifestId: number, targetLoginId: string): Observable<any> {
@@ -261,10 +291,7 @@ export class CodeListService {
   }
 
   deleteComment(comment: Comment): Observable<any> {
-    return this.http.put('/api/comments/' + comment.commentId, {
-      commentId: comment.commentId,
-      delete: true,
-    });
+    return this.http.delete('/api/comments/' + comment.commentId);
   }
 
   getComments(reference): Observable<Comment[]> {

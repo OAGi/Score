@@ -1,3 +1,8 @@
+@if (isBusy) {
+  <div class="oas-busy-overlay" role="progressbar" aria-busy="true" aria-label="Please wait">
+    <mat-spinner [diameter]="56"></mat-spinner>
+  </div>
+}
 <score-detail-page [showActions]="false">
   <ng-container ngProjectAs="[detailTitle]">
     <span class="title">{{ title }}</span>
@@ -7,7 +12,7 @@
   </ng-container>
   <ng-container ngProjectAs="[detailToolbar]">
     <button mat-raised-button class="ms-2" color="primary" (click)="update()"
-            [disabled]="!isChanged() || isDisabled(oasDoc)">
+            [disabled]="updateDisabled || isDisabled(oasDoc)">
       Update
     </button>
   </ng-container>
@@ -20,7 +25,7 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>OpenAPI Version</mat-label>
-                  <mat-select required [(value)]="oasDoc.openAPIVersion">
+                  <mat-select required [(value)]="oasDoc.openAPIVersion" (selectionChange)="onOpenApiVersionChange()">
                     <mat-option [value]="'3.0'">3.0</mat-option>
                     <mat-option [value]="'3.1'">3.1</mat-option>
                   </mat-select>
@@ -49,7 +54,7 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Contact URL</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.contactUrl" [formControl]="contactUrl" maxlength="255">
+                  <input matInput [formControl]="contactUrl" (input)="oasDoc.contactUrl = contactUrl.value" maxlength="255">
                   @if (contactUrl.hasError('url')) {
                     <mat-error>The contact URL must be a valid URL</mat-error>
                   }
@@ -58,7 +63,7 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Contact Email</mat-label>
-                  <input matInput type="email" [(ngModel)]="oasDoc.contactEmail" [formControl]="contactEmail" maxlength="255">
+                  <input matInput type="email" [formControl]="contactEmail" (input)="oasDoc.contactEmail = contactEmail.value" maxlength="255">
                   @if (contactEmail.hasError('email')) {
                     <mat-error>The contact email must be in the form of an email address</mat-error>
                   }
@@ -75,7 +80,7 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>License URL</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.licenseUrl" [formControl]="licenseUrl" maxlength="255">
+                  <input matInput [formControl]="licenseUrl" (input)="oasDoc.licenseUrl = licenseUrl.value" maxlength="255">
                   @if (licenseUrl.hasError('url')) {
                     <mat-error>The license URL must be a valid URL</mat-error>
                   }
@@ -84,7 +89,7 @@
               <div class="col-4">
                 <mat-form-field>
                   <mat-label>Terms of Service</mat-label>
-                  <input matInput [(ngModel)]="oasDoc.termsOfService" [formControl]="termServiceUrl" maxlength="255">
+                  <input matInput [formControl]="termServiceUrl" (input)="oasDoc.termsOfService = termServiceUrl.value" maxlength="255">
                   @if (termServiceUrl.hasError('url')) {
                     <mat-error>The terms of service must be a valid URL</mat-error>
                   }
@@ -106,21 +111,23 @@
              (apiKey | http | oauth2 with full OAuth Flows + scopes | openIdConnect). -->
         <div class="row">
           <div class="col-12">
-            <div class="d-flex align-items-center pb-2">
-              <span style="font-size: 14px; font-weight: 500;">Security Schemes</span>
-              <button mat-stroked-button class="ms-3" type="button" (click)="addSecurityScheme()">
-                <mat-icon>add</mat-icon>
-                Add Security Scheme
-              </button>
-              <button mat-stroked-button class="ms-2 oas-doc-security-btn" type="button"
-                      (click)="openDocumentSecurityDialog()"
-                      [disabled]="securitySchemes.length === 0 && (oasDoc.securityRequirements?.length || 0) === 0"
-                      matTooltip="Edit the document-level (global) security requirement">
-                <mat-icon>security</mat-icon>
-                <span class="oas-doc-security-label">Document Security: {{ documentSecuritySummary() }}</span>
-              </button>
+            <div class="oas-doc-section-row">
+              <span class="oas-doc-section-label">Security Schemes</span>
+              <div class="oas-doc-section-actions">
+                <button mat-stroked-button type="button" (click)="addSecurityScheme()">
+                  <mat-icon>add</mat-icon>
+                  Add Security Scheme
+                </button>
+                <button mat-stroked-button class="oas-doc-security-btn" type="button"
+                        (click)="openDocumentSecurityDialog()"
+                        [disabled]="securitySchemes.length === 0 && (oasDoc.securityRequirements?.length || 0) === 0"
+                        matTooltip="Edit the document-level (global) security requirement">
+                  <mat-icon>security</mat-icon>
+                  <span class="oas-doc-security-label">Document Security: {{ documentSecuritySummary() }}</span>
+                </button>
+              </div>
               @if (securitySchemes.length === 0) {
-                <span class="ms-3" style="font-size: 12px; color: #767676;">
+                <span class="oas-doc-section-hint">
                   No scheme configured — the default OAuth 2.0 scheme will be used.
                 </span>
               }
@@ -147,16 +154,35 @@
             </div>
           </div>
         </div>
+        <!-- Issue #1791: the traceparent header (W3C Trace Context) of the operations that the document has now: a request
+             parameter and a response header. Enable fills the Request Parameters and Response Headers of the operations that lack it, Disable takes it
+             away from all; Update saves it. What is added later lacks it until Enable is used again. -->
+        <div class="row">
+          <div class="col-12">
+            <div class="oas-doc-section-row">
+              <span class="oas-doc-section-label">Parameters &amp; Headers</span>
+              <div class="oas-doc-section-actions">
+                <button mat-stroked-button type="button" (click)="enableTraceparent()"
+                        [disabled]="disabled || !canEnableTraceparent"
+                        matTooltip="Adds traceparent (W3C Trace Context) to every operation that does not have it: an optional request header parameter and a response header. Available while an operation lacks it.">
+                  <mat-icon>add</mat-icon>
+                  Enable traceparent
+                </button>
+                <button mat-stroked-button type="button" (click)="disableTraceparent()"
+                        [disabled]="disabled || !canDisableTraceparent"
+                        matTooltip="Removes traceparent, the request parameter and the response header, from every operation. Available while an operation has it.">
+                  <mat-icon>remove</mat-icon>
+                  Disable traceparent
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
   </mat-card>
 
   <mat-card class="pt-0">
-    @if (loading) {
-      <div class="loading-container">
-        <mat-spinner [diameter]="40"></mat-spinner>
-      </div>
-    }
     <mat-card-header class="align-items-baseline">
       <mat-toolbar class="bg-white p-0 oas-endpoint-toolbar" style="box-shadow: none;">
         <span class="title">Endpoint Details</span>
@@ -210,6 +236,29 @@
     <mat-card-content class="mat-card-container">
       <!-- Issue #1610 / #1760: a DELETE request body is honored only from OpenAPI 3.1. When the document
            targets 3.0, warn that the body on any DELETE operation is ignored during generation. -->
+      <!-- What the server says is wrong with what the user has changed, wherever it is: a row of another page, the document,
+           or an entry. The cells of the rows on this page show their own. -->
+      @if (changeChecker.status() === 'invalid') {
+        <div class="oas-change-violations d-flex align-items-center">
+          <mat-icon class="oas-change-violations-icon">error</mat-icon>
+          <ul>
+            @for (line of violationLines(); track $index) {
+              <li>
+                @if (line.operation) {
+                  <span class="oas-change-violation-operation">{{ line.operation }}</span>
+                }
+                {{ line.message }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+      @if (changeChecker.status() === 'failed') {
+        <div class="oas-change-violations d-flex align-items-center">
+          <mat-icon class="oas-change-violations-icon">error</mat-icon>
+          <span>The changes could not be checked, so they cannot be saved now. Change something to try again.</span>
+        </div>
+      }
       @if (hasIgnoredDeleteRequestBody()) {
         <div class="oas-delete-body-warning d-flex align-items-center">
           <mat-icon class="oas-delete-body-warning-icon">warning</mat-icon>
@@ -234,7 +283,7 @@
 
       <ng-template #arrayControl let-element>
       <mat-checkbox [(ngModel)]="element.arrayIndicator"
-                    (ngModelChange)="updateOperationIdForArray(element)"
+                    (ngModelChange)="touchArrayIndicator(element)"
                     [disabled]="!element.topLevelAsbiepId"></mat-checkbox>
       </ng-template>
 
@@ -245,7 +294,6 @@
 
       <ng-template #messageBodyControl let-element>
       <mat-select [(ngModel)]="element.messageBody" [panelWidth]="null" [disabled]="!element.topLevelAsbiepId"
-                  (ngModelChange)="recomputeOasValidation()"
                   [class.oas-body-slot-error]="isDuplicateBodySlot(element)">
         <!-- Issue #1610: GET never carries a request body. DELETE may, in any version; in 3.0
              it is dropped from the generated document (see the banner above the table). -->
@@ -260,24 +308,22 @@
 
       <ng-template #resourceNameControl let-element>
       <mat-form-field>
-        <input matInput [(ngModel)]="element.resourceName"
-               (ngModelChange)="recomputeOasValidation()"
-               [errorStateMatcher]="bodySlotErrorStateMatcher(element)">
+        <input matInput [(ngModel)]="element.resourceName" (ngModelChange)="element.touch('resourceName')"
+               [errorStateMatcher]="resourceNameErrorStateMatcher(element)">
         <!-- Issue #1492 (Option 2): the resource name is part of the (path, verb) key, so a
              duplicate body slot is surfaced here too. -->
-        <mat-error>Each (Resource Name, Verb) can have only one Request and one Response body.</mat-error>
+        <mat-error>{{ violationOf(element, 'resourceName')?.message || 'Each (Resource Name, Verb) can have only one Request and one Response body.' }}</mat-error>
       </mat-form-field>
       </ng-template>
 
       <ng-template #operationIdControl let-element>
       <mat-form-field>
-        <input matInput [(ngModel)]="element.operationId"
-               (ngModelChange)="recomputeOasValidation()"
+        <input matInput [(ngModel)]="element.operationId" (ngModelChange)="element.touch('operationId')"
                [errorStateMatcher]="operationIdErrorStateMatcher(element)">
         @if (!element.operationId || !element.operationId.trim()) {
           <mat-error>Operation ID is required.</mat-error>
         } @else {
-          <mat-error>Operation ID must be unique within the document.</mat-error>
+          <mat-error>{{ violationOf(element, 'operationId')?.message }}</mat-error>
         }
       </mat-form-field>
       </ng-template>
@@ -286,6 +332,20 @@
       <mat-form-field>
         <input matInput [(ngModel)]="element.tagName">
       </mat-form-field>
+      </ng-template>
+
+      <!-- Issue #1791: the request parameters / response headers of the operation: a click on one edits or deletes it, the + adds one. -->
+      <ng-template #httpHeadersControl let-element let-direction="direction">
+        <div class="oas-headers-cell">
+          @for (header of headersOf(element.httpHeaders, direction); track header) {
+            <span class="oas-header-chip" (click)="editHttpHeader(element, header, $event)"
+                  [matTooltip]="header.oasOperationId ? 'Edit or delete this ' + (direction === 'REQUEST' ? 'request parameter' : 'response header') : 'Of the whole document: edit or delete it'">{{ header.name }}{{ locationLabel(header) }}</span>
+          }
+          <button mat-icon-button type="button" class="oas-header-add" (click)="addHttpHeader(element, direction, $event)"
+                  [matTooltip]="direction === 'REQUEST' ? 'Add an HTTP request parameter (in: header) to this operation' : 'Add an HTTP response header to this operation'">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </ng-template>
 
       <ng-template #securityControl let-element>
@@ -336,7 +396,7 @@
       }
       </ng-template>
 
-      <score-table-view emptyMessage="No Profile BIE Added" [table]="columns" [load]="load" [ready]="ready()" multiSort [selection]="selection" [rowKey]="rowKey"
+      <score-table-view emptyMessage="No Profile BIE Added" scrollable [table]="columns" [load]="load" [ready]="ready()" multiSort [selection]="selection" [rowKey]="rowKey"
         [selectAll]="false" [selectOnRowClick]="false" [rowClass]="rowClass">
 
         <ng-container scoreColumnDef="branch">
@@ -421,6 +481,18 @@
           </td>
         </ng-container>
 
+        <ng-container scoreColumnDef="requestParameters">
+          <td score-cell *scoreCellDef="let element">
+            <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'REQUEST'}"/>
+          </td>
+        </ng-container>
+
+        <ng-container scoreColumnDef="responseHeaders">
+          <td score-cell *scoreCellDef="let element">
+            <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'RESPONSE'}"/>
+          </td>
+        </ng-container>
+
         <ng-container scoreColumnDef="errorResponse">
           <td score-cell *scoreCellDef="let element">
             <ng-container *ngTemplateOutlet="errorResponseControl; context: {$implicit: element}"/>
@@ -453,6 +525,14 @@
                     <div class="compact-field">
                       <span class="compact-label">Security</span>
                       <ng-container *ngTemplateOutlet="securityControl; context: {$implicit: element}"/>
+                    </div>
+                    <div class="compact-field">
+                      <span class="compact-label">Request Parameters</span>
+                      <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'REQUEST'}"/>
+                    </div>
+                    <div class="compact-field">
+                      <span class="compact-label">Response Headers</span>
+                      <ng-container *ngTemplateOutlet="httpHeadersControl; context: {$implicit: element, direction: 'RESPONSE'}"/>
                     </div>
                     <div class="compact-field">
                       <span class="compact-label">Error Response</span>

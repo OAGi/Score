@@ -1,3 +1,4 @@
+import {of} from 'rxjs';
 import {AgencyIdListDetailComponent} from './agency-id-list-detail.component';
 import {AgencyIdListDetails, AgencyIdListValueDetails} from '../domain/agency-id-list';
 
@@ -47,6 +48,44 @@ describe('AgencyIdListDetailComponent', () => {
       const value = new AgencyIdListValueDetails();
       value.agencyIdListValueManifestId = 1;
       expect(create(1).isAvailable(value)).toBe(false);
+    });
+  });
+
+  describe('openDialog', () => {
+    const create = (result: AgencyIdListValueDetails, existing: AgencyIdListValueDetails[]) => {
+      const component = Object.create(AgencyIdListDetailComponent.prototype) as AgencyIdListDetailComponent;
+      const open = vi.fn();
+      (component as any).snackBar = {open};
+      (component as any).auth = {getUserToken: () => ({roles: []})};
+      (component as any).dialog = {open: () => ({afterClosed: () => of(result)})};
+      component.agencyIdList = new AgencyIdListDetails();
+      component.values = existing;
+      component.isEditable = () => true;
+      component._updateDataSource = vi.fn() as any;
+      return {component, open};
+    };
+
+    const value = (guid: string, text: string, developerDefault: boolean) => {
+      const v = new AgencyIdListValueDetails();
+      v.guid = guid;
+      v.value = text;
+      v.developerDefault = developerDefault;
+      return v;
+    };
+
+    it('keeps the defaults of other values when the added value is a duplicate', () => {
+      const existing = [value('a', 'A', true), value('b', 'B', false)];
+      const {component, open} = create(value(undefined as any, 'B', true), existing);
+      component.openDialog();
+      expect(open).toHaveBeenCalled();
+      expect(existing[0].developerDefault).toBe(true);
+    });
+
+    it('clears the defaults of other values when the added value is accepted', () => {
+      const existing = [value('a', 'A', true)];
+      const {component} = create(value(undefined as any, 'C', true), existing);
+      component.openDialog();
+      expect(existing[0].developerDefault).toBe(false);
     });
   });
 });

@@ -15,6 +15,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt.DtDetailsRecord;
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListDetailsRecord;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
+import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
 import org.oagi.score.gateway.http.api.log_management.model.LogUtils;
 import org.oagi.score.gateway.http.api.log_management.repository.LogCommandRepository;
@@ -32,12 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.gateway.http.common.model.SortDirection.ASC;
 import static org.oagi.score.gateway.http.common.model.SortDirection.DESC;
-import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.LOG;
+import static org.oagi.score.gateway.http.common.repository.jooq.entity.Tables.*;
 
 public class JooqLogCommandRepository extends JooqBaseRepository implements LogCommandRepository {
 
@@ -169,7 +171,76 @@ public class JooqLogCommandRepository extends JooqBaseRepository implements LogC
 
     @Override
     public LogId revertToStableStateByReference(Guid reference, CcType ccType) {
-        List<LogRecord> logRecordList = getSortedLogListByReference(reference, DESC, ccType);
+        // The logs of a component are told apart by the component in what they hold. When none is found that way, the
+        // logs by the reference alone are followed, as a log that does not say what it is must not stop the revert.
+        LogId logId = revertToStableState(reference, ccType, true);
+        if (logId == null) {
+            logId = revertToStableState(reference, ccType, false);
+        }
+        if (logId == null) {
+            throw new LogNotFoundException("The history (log) that this " + ccType.name() +
+                    " was in before the revision cannot be found.");
+        }
+        return logId;
+    }
+
+    @Override
+    public LogId revertToStableStateByReference(Guid reference, CcType ccType,
+                                                boolean recreateLog, Supplier<LogId> createFirstLog) {
+        try {
+            return revertToStableStateByReference(reference, ccType);
+        } catch (LogNotFoundException e) {
+            if (!recreateLog) {
+                throw e;
+            }
+            deleteLogsNotUsedByAnyManifest(reference, ccType);
+            return createFirstLog.get();
+        }
+    }
+
+    /**
+     * Deletes what is left of the history of a component, except the logs that a manifest still refers to, which are
+     * those of the other releases that hold the component.
+     */
+    private void deleteLogsNotUsedByAnyManifest(Guid reference, CcType ccType) {
+        Field<ULong> usedLogId = switch (ccType) {
+            case ACC -> ACC_MANIFEST.LOG_ID;
+            case ASCCP -> ASCCP_MANIFEST.LOG_ID;
+            case BCCP -> BCCP_MANIFEST.LOG_ID;
+            case DT -> DT_MANIFEST.LOG_ID;
+            case CODE_LIST -> CODE_LIST_MANIFEST.LOG_ID;
+            case AGENCY_ID_LIST -> AGENCY_ID_LIST_MANIFEST.LOG_ID;
+            default -> throw new IllegalArgumentException("A new history cannot be written for " + ccType.name() + ".");
+        };
+        var usedBy = switch (ccType) {
+            case ACC -> ACC_MANIFEST;
+            case ASCCP -> ASCCP_MANIFEST;
+            case BCCP -> BCCP_MANIFEST;
+            case CODE_LIST -> CODE_LIST_MANIFEST;
+            case AGENCY_ID_LIST -> AGENCY_ID_LIST_MANIFEST;
+            default -> DT_MANIFEST;
+        };
+        List<ULong> targets = dslContext().select(LOG.LOG_ID).from(LOG)
+                .where(and(
+                        LOG.REFERENCE.eq(reference.value()),
+                        LOG.LOG_ID.notIn(dslContext().select(usedLogId).from(usedBy).where(usedLogId.isNotNull()))
+                ))
+                .fetch(LOG.LOG_ID);
+        if (targets.isEmpty()) {
+            return;
+        }
+        // To avoid a foreign key constraint
+        dslContext().update(LOG).setNull(LOG.PREV_LOG_ID).where(LOG.PREV_LOG_ID.in(targets)).execute();
+        dslContext().update(LOG).setNull(LOG.NEXT_LOG_ID).where(LOG.NEXT_LOG_ID.in(targets)).execute();
+        dslContext().deleteFrom(LOG).where(LOG.LOG_ID.in(targets)).execute();
+    }
+
+    /**
+     * Deletes the logs of the revision that is cancelled, and returns the log the component was in before it, or
+     * null (nothing is changed) when there is none.
+     */
+    private LogId revertToStableState(Guid reference, CcType ccType, boolean byComponent) {
+        List<LogRecord> logRecordList = getSortedLogListByReference(reference, DESC, ccType, byComponent);
 
         LogRecord logRecordInStableState = null;
         List<ULong> deleteTargetLogIdList = new ArrayList();
@@ -188,7 +259,7 @@ public class JooqLogCommandRepository extends JooqBaseRepository implements LogC
         }
 
         if (logRecordInStableState == null) {
-            throw new IllegalStateException();
+            return null;
         }
 
         // To avoid a foreign key constraint
@@ -219,10 +290,16 @@ public class JooqLogCommandRepository extends JooqBaseRepository implements LogC
         return new LogId(logRecordInStableState.getLogId().toBigInteger());
     }
 
+
     public List<LogRecord> getSortedLogListByReference(Guid reference, SortDirection sortDirection, CcType ccType) {
+        return getSortedLogListByReference(reference, sortDirection, ccType, true);
+    }
+
+    private List<LogRecord> getSortedLogListByReference(Guid reference, SortDirection sortDirection, CcType ccType,
+                                                        boolean byComponent) {
         List<LogRecord> logRecordList;
 
-        if (ccType.equals(CcType.CODE_LIST) || ccType.equals(CcType.AGENCY_ID_LIST)) {
+        if (!byComponent || ccType.equals(CcType.CODE_LIST) || ccType.equals(CcType.AGENCY_ID_LIST)) {
             logRecordList =
                     dslContext().select(LOG.LOG_ID, LOG.HASH, LOG.REVISION_NUM, LOG.REVISION_TRACKING_NUM,
                                     LOG.LOG_ACTION, LOG.REFERENCE, LOG.PREV_LOG_ID, LOG.NEXT_LOG_ID,

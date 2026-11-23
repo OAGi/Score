@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
+import {CARDINALITY_MAX_PATTERN} from '../../common/cardinality-max-pattern';
+import { ChangeDetectorRef, Component, DoCheck, ElementRef, HostListener, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, inject, ChangeDetectionStrategy } from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {faRecycle, faSitemap} from '@fortawesome/free-solid-svg-icons';
 import {BieEditService} from '../bie-edit/domain/bie-edit.service';
@@ -54,7 +55,7 @@ import {AssignedBtListRequest, AssignedBusinessTermDetails, AssignedBusinessTerm
 import {BieBusinessTermAssignDialogComponent} from './bie-business-term-assign-dialog/bie-business-term-assign-dialog.component';
 import {CdkOverlayOrigin, ConnectedPosition} from '@angular/cdk/overlay';
 import {AuthService} from '../../authentication/auth.service';
-import {loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
+import {hashCode, loadBooleanProperty, saveBooleanProperty, UnboundedPipe} from '../../common/utility';
 import {PageRequest} from '../../basis/basis';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
@@ -83,12 +84,10 @@ import {
   OasSecurityScheme
 } from '../openapi-doc/domain/openapi-doc';
 import {
-  applyResourceArrayMarker,
-  buildOperationId,
-  OasOperationValidator,
-  recomputeOperationId
 } from '../openapi-doc/domain/oas-operation-validation';
 import {OpenAPIService} from '../openapi-doc/domain/openapi.service';
+import {OasDocChangeChecker} from '../openapi-doc/domain/oas-doc-change-checker';
+import {applyDerivedOperations, OasDocChangeResult, OasDocChangeSet, OasDocViolation} from '../openapi-doc/domain/oas-doc-change';
 import {BieOasDocAddDialogComponent} from './bie-oas-doc-add-dialog/bie-oas-doc-add-dialog.component';
 import {OasDocSecurityRequirementDialogComponent} from '../openapi-doc/oas-doc-security-requirement-dialog/oas-doc-security-requirement-dialog.component';
 import {
@@ -100,6 +99,12 @@ import {TreeNodeDecorator} from '../../common/tree-viewport/tree-decorator';
 import {BieStatusDecorator} from '../domain/bie-tree-decorators';
 
 
+/**
+ * Adding or removing a binding is saved at once when the server says that it can be (as it always was). Set to `false` to leave saving
+ * it to the user: it is then saved by Update like any other change.
+ */
+const UPDATE_OAS_AFTER_ADD = true;
+
 @Component({
   standalone: false,
   selector: 'score-bie-edit',
@@ -107,7 +112,7 @@ import {BieStatusDecorator} from '../domain/bie-tree-decorators';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bie-edit.component.css']
 })
-export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, BieTreeRowHost {
+export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListener<BieFlatNode>, BieTreeRowHost {
   private service = inject(BieEditService);
   private ccNodeService = inject(CcNodeService);
   private bieViewOrderService = inject(BieViewOrderService);
@@ -434,9 +439,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     this.rootNode = new BieEditAbieNode(rootNode);
     setAppTitleIfPresent(this.titleService, this.rootNode.name, 'BIE');
     this.rootNode.reset();
-    // Issue #1519: seed the per-document uniqueness sets + the committed Error Response types, and pre-fetch
-    // each bound document's security schemes for the Security cell.
-    this.recomputeOasValidation();
+    // Issue #1519: seed the committed Error Response types, and pre-fetch each bound document's security schemes
+    // for the Security cell.
+    this.resetOasChanges();
     this.seedOasCommittedErrorTypes();
     this.loadOasDocSecuritySchemes();
     this.loadOasDocExistence();
@@ -1491,6 +1496,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
       data: {
         title: 'Select Base Profile BIE',
+        excludeDerived: true,
         asccpManifestId: abieNode.asccpNode.manifestId,
         den: abieNode.asccpNode.den,
         libraryId: this.rootNode.libraryId,
@@ -2339,7 +2345,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
         disabled
       }, [
         Validators.required,
-        Validators.pattern('[0-9]+|-1|unbounded'),
+        Validators.pattern(CARDINALITY_MAX_PATTERN),
         this.nonWhitespaceValidator,
         // validatorFn for minimum value
         (control: AbstractControl): ValidationErrors | null => {
@@ -3221,61 +3227,171 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     return (this.rootNode && this.rootNode.bieForOasDocList) || [];
   }
 
-  // Issue #1519 / #1757: operationId uniqueness + one-Request/one-Response-per-(Resource Name, Verb)
-  // are enforced by the SHARED OasOperationValidator (same rules as the OpenAPI Document editor). The
-  // panel spans multiple documents, but the validator's keys already include the document id, so a
-  // legitimate Request+Response pair — even one whose bodies live in two separate oas_operation rows —
-  // collapses to one operation and is never a false duplicate.
-  readonly oasValidator = new OasOperationValidator();
+  // Issue #1519 / #1757: the rules about the bindings (an Operation ID that another operation of the document has, a second
+  // Request or Response body on an endpoint, a Resource Name that is not a path...) are the server's, as in the OpenAPI
+  // Document editor: the panel says what the user changed of the bindings, document by document, and the server says whether
+  // it can be saved and what it makes of the verb or the array indicator that was changed.
+  readonly oasChecker = new OasDocChangeChecker({
+    build: () => this.buildOasChangeSet(),
+    check: changeSet => this.checkOasBindings(changeSet),
+    onResult: (result, changeSet) => this.takeOasCheckResult(result, changeSet)
+  });
+  private oasCheckedFingerprint = '';
+  private oasLastFingerprint = '';
 
-  recomputeOasValidation(): void {
-    this.oasValidator.recompute(this.oasBindings);
+  private oasFingerprint(): string {
+    return hashCode([this.oasBindings.filter(b => b.isChanged).map(b => [b.rowId, b.messageBody, b.hashCode, b.touched]),
+      this.removedOasBindings.map(b => [b.rowId, b.messageBody])]);
+  }
+
+  /** Asks the server whenever the user has changed a binding. */
+  ngDoCheck(): void {
+    if (!this.rootNode) {
+      return;
+    }
+    const fingerprint = this.oasFingerprint();
+    if (fingerprint !== this.oasLastFingerprint) {
+      this.oasLastFingerprint = fingerprint;
+      this.oasChecker.request();
+    }
+    this.updateOasAfterAdd();
+  }
+
+  /** The bindings that the user removed: they are removed by Update, as what is added is added by it. */
+  removedOasBindings: BieForOasDoc[] = [];
+  private oasUpdateAfterAddPending = false;
+  /** What is said when the page presses Update by itself, in place of what Update says. */
+  private oasUpdateMessage: string | undefined;
+  private oasKeySequence = 0;
+
+  /**
+   * Adding or removing a binding is not saved before Update. So that it is as it always was (it is there at once), Update is pressed
+   * by the page when the server says that what was added or removed can be saved; when it cannot, the rows stay in the panel with what
+   * is wrong where it is. Set {@code UPDATE_OAS_AFTER_ADD} to false to leave it to the user.
+   */
+  private updateOasAfterAdd(): void {
+    if (!this.oasUpdateAfterAddPending) {
+      return;
+    }
+    switch (this.oasChecker.status()) {
+      case 'valid':
+        this.oasUpdateAfterAddPending = false;
+        this.updateOasDocInformation();
+        break;
+      case 'invalid':
+      case 'failed':
+        this.oasUpdateAfterAddPending = false;
+        this.snackBar.open('It cannot be saved as it is. Fix what is marked, then click Update.', '', {duration: 5000});
+        break;
+      default:
+        break;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.oasChecker.destroy();
+  }
+
+  /** The bindings are loaded or saved: there is nothing changed, and nothing to wait for. */
+  private resetOasChanges(): void {
+    this.removedOasBindings = [];
+    this.oasChecker.reset();
+    this.oasLastFingerprint = this.oasFingerprint();
+    this.oasChecker.request(); // the bindings as they are, saved or not, are judged when they are shown
+  }
+
+  /** What the user has changed of the bindings: nothing, when they are just shown (the server judges them as they are). */
+  private buildOasChangeSet(): OasDocChangeSet {
+    this.oasCheckedFingerprint = this.oasFingerprint();
+    return {
+      operations: this.oasBindings.filter(b => b.isChanged && !b.isNew), headers: {upserts: [], removed: []},
+      added: this.oasBindings.filter(b => b.isNew), removed: this.removedOasBindings
+    };
+  }
+
+  /** The change set of one document: a binding is of one document. */
+  private oasChangeSetOf(oasDocId: number): OasDocChangeSet {
+    return {
+      operations: this.oasBindings.filter(b => b.oasDocId === oasDocId && b.isChanged && !b.isNew), headers: {upserts: [], removed: []},
+      added: this.oasBindings.filter(b => b.oasDocId === oasDocId && b.isNew),
+      removed: this.removedOasBindings.filter(b => b.oasDocId === oasDocId)
+    };
+  }
+
+  private oasDocIds(): number[] {
+    return [...new Set([...this.oasBindings, ...this.removedOasBindings].map(b => b.oasDocId))];
+  }
+
+  /** One check for each document that a binding is of, with the changes of the bindings of it. */
+  private checkOasBindings(changeSet: OasDocChangeSet): Observable<OasDocChangeResult> {
+    const oasDocIds = this.oasDocIds();
+    if (oasDocIds.length === 0) {
+      return of({valid: true, violations: [], httpHeaders: [], operations: []});
+    }
+    return forkJoin(oasDocIds.map(oasDocId => this.openAPIService.checkChanges(oasDocId, this.oasChangeSetOf(oasDocId)))).pipe(
+      map(results => ({
+        valid: results.every(result => result.valid),
+        violations: results.flatMap(result => result.violations || []),
+        httpHeaders: [],
+        operations: results.flatMap(result => result.operations || []),
+        added: results.flatMap(result => result.added || [])
+      })));
+  }
+
+  private takeOasCheckResult(result: OasDocChangeResult, changeSet: OasDocChangeSet): boolean {
+    if (this.oasFingerprint() !== this.oasCheckedFingerprint) {
+      return false; // the user changed it again: another question is on its way
+    }
+    applyDerivedOperations(result.operations, [...changeSet.operations, ...(changeSet.added || [])], result.added);
+    this.oasLastFingerprint = this.oasFingerprint(); // the answer is not a change of the user's
+    return true;
+  }
+
+  /** What the server said is wrong with a cell of a binding. */
+  private oasViolationOf(b: BieForOasDoc, field: string): OasDocViolation | undefined {
+    return this.oasChecker.violations().find(violation => violation.scope === 'OPERATION'
+      && (b.isNew ? violation.clientKey === b.clientKey : !violation.clientKey && violation.oasOperationId === b.oasOperationId)
+      && violation.field === field
+      && (!violation.messageBody || violation.messageBody === b.messageBody));
+  }
+
+  oasViolationMessage(b: BieForOasDoc, ...fields: string[]): string {
+    return fields.map(field => this.oasViolationOf(b, field)?.message).find(message => !!message) ?? '';
   }
 
   isOasOperationIdDuplicate(b: BieForOasDoc): boolean {
-    return this.oasValidator.isDuplicateOperationId(b);
+    return !!this.oasViolationOf(b, 'operationId');
   }
 
   isOasBodySlotDuplicate(b: BieForOasDoc): boolean {
-    return this.oasValidator.isDuplicateBodySlot(b);
+    return !!this.oasViolationOf(b, 'messageBody') || !!this.oasViolationOf(b, 'resourceName');
   }
 
   oasOperationIdErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
-    return this.oasValidator.operationIdErrorStateMatcher(b);
+    return {isErrorState: () => !(b.operationId || '').trim() || this.isOasOperationIdDuplicate(b)};
   }
 
   oasBodySlotErrorStateMatcher(b: BieForOasDoc): ErrorStateMatcher {
-    return this.oasValidator.bodySlotErrorStateMatcher(b);
+    return {isErrorState: () => this.isOasBodySlotDuplicate(b)};
   }
 
-  // A request body is never valid for GET, so revert it to Response; then resync the operation id's
-  // leading verb word (#1732). Rebuilds from the BIE's property term (the immutable name source) so a
-  // name ending in "List" is never confused with the array marker.
+  /** The verb was changed: the server makes the Operation ID of it (and a GET has no Request body). */
   onOasVerbChange(b: BieForOasDoc): void {
-    if (b.messageBody === 'Request' && b.verb === 'GET') {
-      b.messageBody = 'Response';
-    }
-    b.operationId = recomputeOperationId(b.verb, b.operationId, b.arrayIndicator, b.propertyTerm);
-    this.recomputeOasValidation();
+    b.touch('verb');
   }
 
-  // The array indicator rebuilds both the operation id ('List') and the resource path ('-list') markers
-  // from the property term + the new indicator (a BIE binding always has a property term). Driving the
-  // marker from the boolean — not by inspecting the string — keeps it correct even for a term ending in
-  // "List" (e.g. "Price List" -> queryPriceListList / .../price-list-list).
+  /** The array indicator was changed: the server makes the Operation ID and the marker of the Resource Name of it. */
   onOasArrayChange(b: BieForOasDoc): void {
-    b.operationId = buildOperationId(b.verb, b.propertyTerm, b.arrayIndicator);
-    b.resourceName = applyResourceArrayMarker(b.resourceName, b.propertyTerm, b.arrayIndicator);
-    this.recomputeOasValidation();
+    b.touch('arrayIndicator');
   }
 
   hasOasChanges(): boolean {
-    return this.oasBindings.some(b => b.isChanged);
+    return this.oasBindings.some(b => b.isChanged) || this.removedOasBindings.length > 0;
   }
 
+  /** Update is not there while an Operation ID is blank, or until the server has said that what is changed can be saved. */
   hasOasErrors(): boolean {
-    return this.oasBindings.some(b =>
-      !b.operationId || !b.operationId.trim() || this.isOasOperationIdDuplicate(b) || this.isOasBodySlotDuplicate(b));
+    return this.oasBindings.some(b => !b.operationId || !b.operationId.trim()) || this.oasChecker.status() !== 'valid';
   }
 
   /**
@@ -3285,7 +3401,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
   private reloadOasBindings(done?: () => void): void {
     this.service.getRootNode(this.topLevelAsbiepId).subscribe(rootNode => {
       this.rootNode.bieForOasDocList = new BieEditAbieNode(rootNode).bieForOasDocList;
-      this.recomputeOasValidation();
+      this.resetOasChanges();
       this.seedOasCommittedErrorTypes();
       this.loadOasDocSecuritySchemes();
       if (done) {
@@ -3311,21 +3427,13 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
       if (!result) {
         return;
       }
-      const request = new BieForOasDocDeleteRequest();
-      request.oasDocId = b.oasDocId;
-      request.bieForOasDocList = [b];
-      this.loading = true;
-      this.openAPIService.removeBieForOasDoc(request).pipe(finalize(() => this.loading = false)).subscribe({
-        next: () => {
-          this.snackBar.open('Removed from OpenAPI Document.', '', {duration: 3000});
-          this.reloadOasBindings();
-        },
-        error: (err: HttpErrorResponse) => {
-          const message = (err && err.error && err.error.message)
-            ? err.error.message : 'Failed to remove from OpenAPI Document.';
-          this.snackBar.open(message, '', {duration: 5000});
-        }
-      });
+      // Not saved before Update: a binding that was added is gone, a binding of the document is removed by Update.
+      if (!b.isNew) {
+        this.removedOasBindings = [...this.removedOasBindings, b];
+      }
+      this.rootNode.bieForOasDocList = this.oasBindings.filter(binding => binding !== b);
+      this.oasUpdateMessage = 'Removed from OpenAPI Document.';
+      this.oasUpdateAfterAddPending = UPDATE_OAS_AFTER_ADD;
     });
   }
 
@@ -3341,7 +3449,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
       return;
     }
     const bindings = this.oasBindings;
-    const changedDocIds = Array.from(new Set(bindings.filter(b => b.isChanged).map(b => b.oasDocId)));
+    const changedDocIds = this.oasDocIds().filter(oasDocId => {
+      const changeSet = this.oasChangeSetOf(oasDocId);
+      return changeSet.operations.length + changeSet.added.length + changeSet.removed.length > 0;
+    });
     if (changedDocIds.length === 0) {
       return;
     }
@@ -3349,13 +3460,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     // A document that fails keeps its in-memory edits (so the user can correct and retry just that one)
     // while documents that did persist are marked clean; the panel only fully reloads when all succeeded.
     const requests = changedDocIds.map(oasDocId => {
-      const request = new BieForOasDocUpdateRequest();
-      request.oasDocId = oasDocId;
-      // Send only the changed rows of this document, exactly as the OpenAPI Document editor does (so an
-      // unchanged operation's per-op security/error response is never needlessly re-persisted). Cross-row
-      // duplicate detection happens client-side over the full union (recomputeOasValidation / hasOasErrors).
-      request.bieForOasDocList = bindings.filter(b => b.oasDocId === oasDocId && b.isChanged);
-      return this.openAPIService.updateDetails(request).pipe(
+      // Send only what was changed of this document, exactly as the OpenAPI Document editor does (so an unchanged operation's
+      // per-op security/error response is never needlessly re-persisted). The server checks them again as it saves.
+      return this.openAPIService.saveChanges(oasDocId, this.oasChangeSetOf(oasDocId)).pipe(
         map(() => ({oasDocId, ok: true, error: null as HttpErrorResponse})),
         catchError((error: HttpErrorResponse) => of({oasDocId, ok: false, error}))
       );
@@ -3364,7 +3471,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     forkJoin(requests).pipe(finalize(() => this.loading = false)).subscribe(resultsByDoc => {
       const failures = resultsByDoc.filter(r => !r.ok);
       if (failures.length === 0) {
-        this.snackBar.open('Updated OpenAPI Document information.', '', {duration: 3000});
+        this.snackBar.open(this.oasUpdateMessage ?? 'Updated OpenAPI Document information.', '', {duration: 3000});
+        this.oasUpdateMessage = undefined;
         this.reloadOasBindings();
         return;
       }
@@ -3372,10 +3480,9 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
       // the failed documents' rows dirty so only those remain editable/resubmittable.
       resultsByDoc.filter(r => r.ok).forEach(r =>
         bindings.filter(b => b.oasDocId === r.oasDocId).forEach(b => b.reset()));
-      this.recomputeOasValidation();
       const firstError = failures[0].error;
-      const message = (firstError && firstError.error && firstError.error.message)
-        ? firstError.error.message : 'Failed to update OpenAPI Document information.';
+      const message = (firstError && firstError.error && (firstError.error.violations?.[0]?.message || firstError.error.message))
+        ? (firstError.error.violations?.[0]?.message || firstError.error.message) : 'Failed to update OpenAPI Document information.';
       this.snackBar.open(message, '', {duration: 5000});
     });
   }
@@ -3389,33 +3496,18 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode>, Bi
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
       topLevelAsbiepId: this.topLevelAsbiepId,
-      propertyTerm: this.rootNode.name,
-      // The backend derives the resource path from the BIE's first business context (matches the
-      // OpenAPI Document editor's Add flow); pass it so the dialog can preview the same path.
-      businessContextName: (this.businessContexts && this.businessContexts.length > 0)
-        ? this.businessContexts[0].name : '',
-      // Issue #1492: hand the dialog this BIE's current bindings so it can pre-check (client-side, like the
-      // OpenAPI Document editor's Add dialog) that the chosen (Verb, Message Body) does not duplicate a body
-      // the BIE already has on the selected document.
-      existingBindings: this.oasBindings
+      propertyTerm: this.rootNode.name
     };
     this.dialog.open(BieOasDocAddDialogComponent, dialogConfig).afterClosed()
-      .subscribe((payload: AssignBieForOasDoc) => {
-        if (!payload) {
+      .subscribe((row: BieForOasDoc) => {
+        if (!row) {
           return;
         }
-        this.loading = true;
-        this.openAPIService.assignBieForOasDoc(payload).pipe(finalize(() => this.loading = false)).subscribe({
-          next: () => {
-            this.snackBar.open('Added to OpenAPI Document.', '', {duration: 3000});
-            this.reloadOasBindings();
-          },
-          error: (err: HttpErrorResponse) => {
-            const message = (err && err.error && err.error.message)
-              ? err.error.message : 'Failed to add to OpenAPI Document.';
-            this.snackBar.open(message, '', {duration: 5000});
-          }
-        });
+        // Not saved before Update: the binding is in the panel, and Update is pressed when the server says that it can be saved.
+        row.clientKey = 'new-' + (++this.oasKeySequence);
+        this.rootNode.bieForOasDocList = [...this.oasBindings, row];
+        this.oasUpdateMessage = 'Added to OpenAPI Document.';
+        this.oasUpdateAfterAddPending = UPDATE_OAS_AFTER_ADD;
       });
   }
 

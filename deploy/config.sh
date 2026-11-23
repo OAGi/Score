@@ -20,6 +20,27 @@ IMAGE_WEB="${IMAGE_WEB:-oagi1docker/srt-web}"
 IMAGE_HTTP="${IMAGE_HTTP:-oagi1docker/srt-http-gateway}"
 IMAGE_REPO="${IMAGE_REPO:-oagi1docker/srt-repo}"
 
+# --- Image selection ---
+# IMAGES = comma list of {web,http,repo}; default = all three. WITH_DB=0 drops "repo".
+# Per-image tag overrides (TAG_WEB/TAG_HTTP/TAG_REPO) default to the deploy version, because
+# srt-repo has its own VERSION cadence (score-repo/VERSION) that can differ from http/web.
+IMAGES="${IMAGES:-web,http,repo}"
+normalize_images() { # validate + canonicalise $IMAGES (web,http,repo order); honours WITH_DB=0
+  local x out=""
+  case "$IMAGES" in *[!a-z,]*|"") die "IMAGES='$IMAGES' invalid (use a comma list of: web,http,repo)." ;; esac
+  for x in ${IMAGES//,/ }; do
+    case "$x" in web|http|repo) ;; *) die "unknown image '$x' in IMAGES (allowed: web,http,repo)." ;; esac
+  done
+  for x in web http repo; do
+    case ",$IMAGES," in *",$x,"*) [ "$x" = repo ] && [ "${WITH_DB:-1}" = 0 ] && continue; out="${out:+$out,}$x" ;; esac
+  done
+  [ -n "$out" ] || die "no images selected (IMAGES='$IMAGES', WITH_DB='${WITH_DB:-1}')."
+  IMAGES="$out"
+}
+has_image() { case ",$IMAGES," in *",$1,"*) return 0 ;; *) return 1 ;; esac; }
+# tag_for <web|http|repo> <default-version>
+tag_for() { local v="TAG_$(echo "$1" | tr a-z A-Z)"; echo "${!v:-$2}"; }
+
 # --- SSH / instances ---
 # SSH_KEY (the .pem path) lives in deploy.env, not in committed source.
 SSH_KEY="${SSH_KEY:-}"

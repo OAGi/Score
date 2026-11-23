@@ -111,7 +111,7 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
 
   /** The values that the table lists. */
   values: CodeListValueDetails[] = [];
-  readonly load = inMemoryLoad<CodeListValueDetails>(() => this.values, {
+  readonly load = inMemoryLoad(CODE_LIST_VALUE_TABLE, (): CodeListValueDetails[] => this.values, {
     definition: row => row.definition?.content,
     definitionSource: row => row.definition?.source
   }, (row, params) => codeListValueMatches(row, params.get('search')));
@@ -366,6 +366,11 @@ export class CodeListDetailComponent implements OnInit, OnDestroy {
     })).subscribe(result => {
       if (!result) {
         return;
+      }
+
+      // The backend saves the trimmed Code, so compare and keep the trimmed one.
+      if (typeof result.value === 'string') {
+        result.value = result.value.trim();
       }
 
       const data = this.values;

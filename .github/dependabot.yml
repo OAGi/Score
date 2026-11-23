@@ -110,6 +110,9 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Python 3.14 and later has not been tried on a deployed instance yet; stay on 3.13 until it has.
+      - dependency-name: "python"
+        versions: [">=3.14"]
 
   - package-ecosystem: github-actions
     directory: /

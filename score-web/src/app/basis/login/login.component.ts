@@ -99,6 +99,7 @@ export class LoginComponent implements OnDestroy {
     this.credentials.username = username;
     if (this.showPasskey && this.step !== 'username' && this.step !== 'passkey') {
       this.step = 'username';
+      this.credentials.password = '';
     }
     this.changeDetectorRef.markForCheck();
   }

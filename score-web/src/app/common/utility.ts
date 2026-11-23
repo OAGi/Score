@@ -150,7 +150,7 @@ export function loadProperty(userToken: UserToken, key: string, defaultValue: st
 
   const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
   try {
-    return JSON.parse(atob(localStorage.getItem(itemKey))).value;
+    return JSON.parse(decodeUnicodeBase64(localStorage.getItem(itemKey))).value;
   } catch (ignore) {
     return defaultValue;
   }
@@ -161,7 +161,31 @@ export function saveProperty(userToken: UserToken, key: string, value: string) {
     return;
   }
   const itemKey = 'X-Score-' + key + '[' + userToken.username + ']';
-  localStorage.setItem(itemKey, btoa(JSON.stringify({value})));
+  localStorage.setItem(itemKey, encodeUnicodeBase64(JSON.stringify({value})));
+}
+
+/**
+ * Base64-encodes the UTF-8 bytes of the text, because `btoa` throws for characters above U+00FF.
+ * For ASCII text the result is identical to `btoa`.
+ */
+export function encodeUnicodeBase64(text: string): string {
+  let binary = '';
+  new TextEncoder().encode(text).forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
+/**
+ * Decodes the text encoded by `encodeUnicodeBase64`. A value that is not valid UTF-8 was stored by the plain `btoa`
+ * (Latin-1) and is decoded as it is.
+ */
+export function decodeUnicodeBase64(encoded: string): string {
+  const binary = atob(encoded);
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+  try {
+    return new TextDecoder('utf-8', {fatal: true}).decode(bytes);
+  } catch (ignore) {
+    return binary;
+  }
 }
 
 export function loadLibrary(userToken: UserToken): number | undefined {
@@ -289,22 +313,25 @@ export class HighlightSearch implements PipeTransform {
       return value;
     }
 
-    // Escape HTML special characters in value
-    const escapedValue = this.escapeHtml(value);
-
     if (!keyword) {
-      return escapedValue;
+      return this.escapeHtml(value);
     }
 
-    // Escape HTML special characters and special regex characters in the keyword
-    const escapedKeyword = this.escapeHtml(keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(escapedKeyword, 'gi');
+    // Match the keyword against the raw value, so it never hits the inside of an escaped entity
+    const re = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
 
-    // Replace matched keyword with <mark> tags
-    const highlightedValue = escapedValue.replace(
-      re,
-      match => `<mark${classes ? ` class="${classes.join(' ')}"` : ''}>${match}</mark>`
-    );
+    // Escape each piece of the value separately and wrap the matched keyword with <mark> tags
+    let highlightedValue = '';
+    let lastIndex = 0;
+    for (const match of value.matchAll(re)) {
+      if (match[0].length === 0) {
+        continue;
+      }
+      highlightedValue += this.escapeHtml(value.substring(lastIndex, match.index));
+      highlightedValue += `<mark${classes ? ` class="${classes.join(' ')}"` : ''}>${this.escapeHtml(match[0])}</mark>`;
+      lastIndex = match.index + match[0].length;
+    }
+    highlightedValue += this.escapeHtml(value.substring(lastIndex));
 
     // Return the sanitized HTML to Angular
     return this.sanitizer.bypassSecurityTrustHtml(highlightedValue);

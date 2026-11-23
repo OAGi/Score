@@ -1,11 +1,15 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SelectionModel} from '@angular/cdk/collections';
 import {HttpParams} from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
-import {finalize} from 'rxjs/operators';
+import {debounceTime, filter, finalize, map} from 'rxjs/operators';
+import {Message} from '@stomp/stompjs';
 import {AuthService} from '../../authentication/auth.service';
+import {messageTopicOf} from '../../basis/navbar/navbar.component';
+import {RxStompService} from '../../common/score-rx-stomp';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, defineTable, ScoreTableViewComponent} from '../../common/score-table';
 import {LibrarySummary} from '../../library-management/domain/library';
@@ -16,6 +20,15 @@ import {ReleaseListEntry, WorkingRelease} from '../domain/release';
 import {ReleaseService} from '../domain/release.service';
 import {ReleaseDiagramDialogComponent} from '../release-diagram-dialog/release-diagram-dialog.component';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
+
+/** What the server announces to everyone of a release. */
+interface ReleaseChange {
+  libraryId: number;
+  releaseId: number;
+}
+
+/** How long the list waits for more changes before it is loaded again. */
+const RELOAD_DELAY_MS = 300;
 
 const RELEASE_STATES = ['Initialized', 'Draft', 'Published'];
 
@@ -56,15 +69,25 @@ export class ReleaseListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private confirmDialogService = inject(ConfirmDialogService);
   private router = inject(Router);
+  private stompService = inject(RxStompService);
+  private destroyRef = inject(DestroyRef);
 
   title = 'Release';
+
+  /** A release is being drafted, published or taken back to 'Initialized' (or was left being processed by an earlier version): it shows a spinner, and its detail is where it is recovered if it was left so. */
+  isProcessing(state: string): boolean {
+    return state === 'Processing' || state === 'Drafting' || state === 'Publishing' || state === 'Initializing';
+  }
+
   readonly libraryChoice = new LibraryChoice(this.auth);
 
-  /** What the compact row shows of a release: made once for a row. A release that is being processed is not a link. */
+  /** What the compact row shows of a release: made once for a row. */
   readonly compactRecord = memoizeRow((release: ReleaseListEntry): CompactRecord => ({
-    badges: [{text: release.state, kind: 'state', cssClass: 'release-state', colors: 'release', state: release.state}],
+    badges: [{text: release.state, kind: 'state', cssClass: 'release-state', colors: 'release',
+      state: this.isProcessing(release.state) ? 'Processing' : release.state}],
     title: release.releaseNum,
-    link: release.state === 'Processing' ? undefined : '/release/' + release.releaseId,
+    // also while it is being processed: a release that was left so is recovered in its detail
+    link: '/release/' + release.releaseId,
     subtitle: release.guid,
     created: release.created ? {when: release.created.when, by: release.created.who?.loginId, label: 'Created'} : undefined,
     updated: release.lastUpdated ? {when: release.lastUpdated.when, by: release.lastUpdated.who?.loginId} : undefined
@@ -91,6 +114,8 @@ export class ReleaseListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.watchReleaseChanges();
+    this.watchFailuresOfMyReleases();
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
       this.libraryChoice.init(libraries);
       const libraryId = this.libraryChoice.library?.libraryId;
@@ -106,6 +131,45 @@ export class ReleaseListComponent implements OnInit {
     });
   }
 
+  /**
+   * A release of the library is created, discarded, or moved to another state, e.g. when a release that was
+   * 'Processing' is a draft or published (or was given back after it failed): the list is loaded again, keeping the page,
+   * the sort and the filters, without the user pressing the search button. The server announces it once the change is
+   * committed. Changes in quick succession (a release and its components) are loaded once.
+   */
+  private watchReleaseChanges() {
+    this.stompService.watch('/topic/release').pipe(
+      map((message: Message) => JSON.parse(message.body) as ReleaseChange),
+      filter(change => this.ready() && this.isOfChosenLibrary(change.libraryId)),
+      debounceTime(RELOAD_DELAY_MS),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.view().reload());
+  }
+
+  /**
+   * The work for a release failed and the release was given back: the server tells the user who asked for it, on the topic
+   * of their own account, and no one else. What went wrong is in the message sent to the user.
+   */
+  private watchFailuresOfMyReleases() {
+    const username = this.auth.getUserToken()?.username;
+    if (!username) {
+      return;
+    }
+    this.stompService.watch(messageTopicOf(username)).pipe(
+      map((message: Message) => JSON.parse(message.body)),
+      filter(data => data.event === 'releaseFailed'),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.snackBar.open('A release could not be processed. See your messages for the details.', 'Messages', {duration: 10000})
+        .onAction().subscribe(() => this.router.navigateByUrl('/message'));
+    });
+  }
+
+  /** A change that does not say which library it is of (0) is taken as of this one. */
+  private isOfChosenLibrary(libraryId: number): boolean {
+    return !libraryId || libraryId === this.libraryChoice.library?.libraryId;
+  }
+
   private updateExtraParams() {
     this.extraParams.set({
       libraryId: '' + this.libraryChoice.library?.libraryId,
@@ -115,7 +179,16 @@ export class ReleaseListComponent implements OnInit {
 
   onLibraryChange(library?: LibrarySummary) {
     this.libraryChoice.choose(library);
-    this.updateExtraParams();
+    if (!library?.libraryId) {
+      this.updateExtraParams();
+      return;
+    }
+    // The namespaces of the previous library are not offered, and a chosen one is not sent with the new library.
+    this.namespaceService.getNamespaceSummaries(library.libraryId).subscribe(namespaces => {
+      this.view().setFilter('namespaces', []);
+      this.filterOptions.set({namespaces: namespaces.map(e => ({value: '' + e.namespaceId, label: e.uri}))});
+      this.updateExtraParams();
+    });
   }
 
   isSelectable(row: ReleaseListEntry) {

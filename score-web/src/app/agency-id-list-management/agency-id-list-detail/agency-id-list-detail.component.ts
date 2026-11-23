@@ -97,7 +97,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
 
   /** The values that the table lists. */
   values: AgencyIdListValueDetails[] = [];
-  readonly load = inMemoryLoad<AgencyIdListValueDetails>(() => this.values, {
+  readonly load = inMemoryLoad(AGENCY_ID_LIST_VALUE_TABLE, (): AgencyIdListValueDetails[] => this.values, {
     definition: row => row.definition?.content,
     definitionSource: row => row.definition?.source
   }, (row, params) => agencyIdListValueMatches(row, params.get('search')));
@@ -284,12 +284,14 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       }
 
       const data = this.values;
-      if (result.developerDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
-      }
-      if (result.userDefault) {
-        data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
-      }
+      const clearOtherDefaults = () => {
+        if (result.developerDefault) {
+          data.filter(e => e.guid !== result.guid).forEach(e => e.developerDefault = false);
+        }
+        if (result.userDefault) {
+          data.filter(e => e.guid !== result.guid).forEach(e => e.userDefault = false);
+        }
+      };
 
       if (isAddAction) {
         for (const value of data) {
@@ -302,6 +304,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
           }
         }
 
+        clearOtherDefaults();
         result.guid = uuid();
         data.push(result);
 
@@ -316,6 +319,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
           }
         }
 
+        clearOtherDefaults();
         this._updateDataSource(data.map(row => {
           if (row.guid === result.guid) {
             return result;
@@ -439,7 +443,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    if (!this.agencyIdList.versionId) {
+    if (!this.agencyIdList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });
@@ -532,7 +536,7 @@ export class AgencyIdListDetailComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    if (!this.agencyIdList.versionId) {
+    if (!this.agencyIdList.versionId?.trim()) {
       this.snackBar.open('Version is required', '', {
         duration: 3000,
       });

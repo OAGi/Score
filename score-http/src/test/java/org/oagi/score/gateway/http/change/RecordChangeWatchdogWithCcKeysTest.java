@@ -39,6 +39,14 @@ class RecordChangeWatchdogWithCcKeysTest {
         int restarts;
 
         @Override
+        public void stopWriting() {
+        }
+
+        @Override
+        public void resumeWriting() {
+        }
+
+        @Override
         public long maxSeq() {
             check();
             return visible.stream().mapToLong(ChangeLogEntry::seq).max().orElse(0);
@@ -282,6 +290,16 @@ class RecordChangeWatchdogWithCcKeysTest {
             }
 
             @Override
+            public void invalidateAll() {
+                cache.invalidateAll();
+            }
+
+            @Override
+            public void bulkChange(Runnable action) {
+                cache.bulkChange(action);
+            }
+
+            @Override
             public boolean isBypassed() {
                 return cache.isBypassed();
             }
@@ -337,6 +355,16 @@ class RecordChangeWatchdogWithCcKeysTest {
         public void invalidate(Collection<String> keys) {
             calls.add(new TreeSet<>(keys));
             inner.invalidate(keys);
+        }
+
+        @Override
+        public void invalidateAll() {
+            inner.invalidateAll();
+        }
+
+        @Override
+        public void bulkChange(Runnable action) {
+            inner.bulkChange(action);
         }
 
         @Override

@@ -93,6 +93,10 @@ export class AccountDetailComponent implements OnInit {
     }
   }
 
+  get isOwnAccount(): boolean {
+    return !!this.account && this.account.loginId === this.auth.getUserToken()?.username;
+  }
+
   get isAdmin(): boolean {
     return this.auth.isAdmin();
   }

@@ -28,7 +28,7 @@ describe('BiePackageBieDialogComponent', () => {
     expect(data.excludeTopLevelAsbiepIds).toEqual([7]);
   });
 
-  it('Add data after Replace data is not contaminated (#293)', () => {
+  it('Add data after Replace data is not contaminated', () => {
     const replace = replaceDialogData(biePackage, webPageInfo, selected);
     const add = addDialogData(biePackage, webPageInfo);
     expect(add).not.toBe(replace);

@@ -209,3 +209,47 @@ A developer Agency ID List cannot be deleted regardless of its state since its r
 ### Test Step:
 1. Sign in as a developer and open the Agency ID List detail page for a revision greater than 1.
 2. Verify the delete action is unavailable.
+
+## Test Case 34.7
+
+**Cancelling the revision of a developer Agency ID List**
+
+Pre-condition: The developer is on the Working branch and owns a published Agency ID List that has a value.
+
+
+### Test Assertion:
+
+#### Test Assertion #34.7.1
+In a revision the Agency ID List Value of the list itself cannot be changed. When the developer cancels the revision after changing the version, the list is `Published` with revision `1`, with its version and its Agency ID List Value as they were.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the Working branch and owns a published Agency ID List that has a value.
+2. The users, branches, releases, and records needed to exercise "Cancelling the revision of a developer Agency ID List" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as a developer, open a published Agency ID List, and note its Agency ID List Value.
+2. Revise the list and verify that the Agency ID List Value is disabled.
+3. Change the version and update; cancel the revision; verify the state, the revision number, the version, and the Agency ID List Value. (Assertion [#34.7.1](#test-assertion-3471))
+
+## Test Case 34.8
+
+**Cancelling a revision of an Agency ID List when the log to go back to is gone**
+
+Pre-condition: The developer is on the right branch and a Agency ID List is in revision, and the log the Agency ID List was in before has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #34.8.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the developer does not let it, nothing is changed and the Agency ID List stays `WIP`. If the developer lets it, the Agency ID List is cancelled to `Published` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The developer is on the right branch and a Agency ID List is in revision, and the log the Agency ID List was in before has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling a revision of an Agency ID List when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in, revise the Agency ID List, and have the logs from before removed from the database.
+2. Cancel and confirm; verify the dialog asks whether to create a new log, and decline; verify the Agency ID List is still `WIP`.
+3. Cancel again, confirm, and let the new log be created; verify the Agency ID List is `Published` with revision `1`. (Assertion [#34.8.1](#test-assertion-3481))

@@ -139,6 +139,47 @@ class RedisRecordCacheTest {
     }
 
     @Test
+    void forgettingEverythingIsSeenByEveryInstanceAndRejectsWhatWasReadBefore() {
+        RedisRecordCache other = new RedisRecordCache(factory, prefix, RecordCacheStatus.alwaysReady(), Duration.ofSeconds(60));
+        long before = cache.epoch();
+        cache.putAll(before, Map.of("acc:1", tag(1), "acc:2", tag(2)));
+        assertEquals(tag(2), other.get("acc:2"));
+
+        cache.invalidateAll();
+
+        assertNull(cache.get("acc:1"));
+        assertNull(other.get("acc:1"), "the other instance does not read what was there before");
+        assertNull(other.get("acc:2"));
+        cache.put(before, "acc:1", tag(9));
+        assertNull(cache.get("acc:1"), "a reader that began before cannot put its value back");
+        other.put(other.epoch(), "acc:1", tag(1));
+        assertEquals(tag(1), cache.get("acc:1"), "what is stored after is read by every instance");
+        // the unrelated keys of the Redis are not touched: it is a new generation, not a scan
+        cache.invalidate(List.of("acc:1"));
+        assertNull(other.get("acc:1"));
+    }
+
+    @Test
+    void forgettingEverythingLeavesTheOtherKeysOfTheRedisAlone() {
+        // what else uses the Redis (the sessions of the users) must stay: the cache only counts, it never deletes by scanning
+        String session = "zz-session-test:" + UUID.randomUUID();
+        byte[] sessionKey = session.getBytes();
+        try (RedisConnection connection = factory.getConnection()) {
+            connection.stringCommands().set(sessionKey, "a session".getBytes());
+            try {
+                cache.putAll(cache.epoch(), Map.of("acc:1", tag(1)));
+
+                cache.invalidateAll();
+
+                assertNull(cache.get("acc:1"));
+                assertArrayEquals("a session".getBytes(), connection.stringCommands().get(sessionKey));
+            } finally {
+                connection.keyCommands().del(sessionKey);
+            }
+        }
+    }
+
+    @Test
     void aTransactionBypassesTheCacheFromItsFirstWriteUntilItEnds() {
         TransactionSynchronizationManager.initSynchronization();
 
@@ -163,7 +204,8 @@ class RedisRecordCacheTest {
 
         try (RedisConnection connection = factory.getConnection()) {
             // what FLUSHALL does at the start of an instance
-            connection.keyCommands().del((prefix + "epoch").getBytes(), (prefix + "acc:1").getBytes());
+            Set<byte[]> keys = connection.keyCommands().keys((prefix + "*").getBytes());
+            connection.keyCommands().del(keys.toArray(new byte[0][]));
         }
 
         long afterwards = cache.epoch();
@@ -207,7 +249,7 @@ class RedisRecordCacheTest {
         String key = "prefix-test:" + UUID.randomUUID();
         RedisRecordCache byDefault = new RedisRecordCache(factory,
                 new org.springframework.beans.factory.support.StaticListableBeanFactory().getBeanProvider(org.springframework.boot.info.BuildProperties.class),
-                org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady(), Duration.ofSeconds(60));
+                org.oagi.score.gateway.http.cache.RecordCacheStatus.alwaysReady(), Duration.ofSeconds(60), null);
         byDefault.put(byDefault.epoch(), key, "value");
         try (RedisConnection connection = factory.getConnection()) {
             Set<byte[]> found = connection.keyCommands().keys(("score:cache:*" + key).getBytes());

@@ -39,6 +39,7 @@ import org.oagi.score.gateway.http.api.graph.model.CoreComponentGraphContext;
 import org.oagi.score.gateway.http.api.graph.model.Node;
 import org.oagi.score.gateway.http.api.graph.repository.GraphContextRepository;
 import org.oagi.score.gateway.http.api.log_management.model.LogAction;
+import org.oagi.score.gateway.http.api.log_management.model.LogNotFoundException;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.model.LogUtils;
 import org.oagi.score.gateway.http.api.namespace_management.model.NamespaceId;
@@ -200,6 +201,27 @@ public class CcCommandService {
                     + "Only ACCs in the 'WIP' state can be updated.");
         }
         if (!requester.isAdministrator() && !acc.owner().userId().equals(requester.userId())) {
+            throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
+        }
+    }
+
+    /**
+     * A refactor moves an association into the destination ACC, which changes its content. An administrator can
+     * change the state of a core component but not its structure (that needs the ownership to be transferred
+     * first), so the destination must be a WIP ACC owned by the requester. Called before anything is discarded
+     * so a rejected request changes nothing.
+     */
+    private void assertAccRefactorDestination(ScoreUser requester, AccManifestId accManifestId) {
+        AccSummaryRecord acc = repositoryFactory.accQueryRepository(requester).getAccSummary(accManifestId);
+        if (acc == null) {
+            throw new IllegalArgumentException("Destination ACC does not exist.");
+        }
+        if (CcState.WIP != acc.state()) {
+            throw new IllegalArgumentException("The ACC '" + acc.den() + "' cannot be updated " +
+                    "because it is in the '" + acc.state() + "' state. "
+                    + "Only ACCs in the 'WIP' state can be updated.");
+        }
+        if (!acc.owner().userId().equals(requester.userId())) {
             throw new IllegalArgumentException("It only allows to modify the core component by the owner.");
         }
     }
@@ -2113,6 +2135,10 @@ public class CcCommandService {
     }
 
     public void reviseAcc(ScoreUser requester, AccManifestId accManifestId) {
+        reviseAcc(requester, accManifestId, false);
+    }
+
+    public void reviseAcc(ScoreUser requester, AccManifestId accManifestId, boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2155,6 +2181,14 @@ public class CcCommandService {
             throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
         }
 
+        // a revision goes on from the log the component is in now
+        if (repositoryFactory.accQueryRepository(requester).getAccDetails(accManifestId).log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this ACC cannot be found.");
+            }
+            makeLog(requester, accManifestId, LogAction.Added);
+        }
+
         repositoryFactory.accCommandRepository(requester).revise(accManifestId);
         makeLog(requester, accManifestId, LogAction.Revised);
         // Revising creates a new WIP revision from the released state — publish it so the GitHub
@@ -2164,6 +2198,11 @@ public class CcCommandService {
     }
 
     public void cancelAcc(ScoreUser requester, AccManifestId accManifestId, String comment, String projectFieldOptionOverride) {
+        cancelAcc(requester, accManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancelAcc(ScoreUser requester, AccManifestId accManifestId, String comment, String projectFieldOptionOverride,
+                          boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2188,21 +2227,21 @@ public class CcCommandService {
         ReleaseId targetReleaseId = prevAcc.release().releaseId();
         if (requester.isDeveloper()) {
             if (!targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in 'Working' branch for developers.");
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
             }
         } else {
             if (targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in non-'Working' branch for end-users.");
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
             }
         }
 
         boolean ownerIsDeveloper = prevAcc.owner().isDeveloper();
 
         if (requester.isDeveloper() != ownerIsDeveloper) {
-            throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
         }
 
-        repositoryFactory.accCommandRepository(requester).cancel(accManifestId);
+        repositoryFactory.accCommandRepository(requester).cancel(accManifestId, recreateLog);
 
         // Cancelling reverts WIP to the previously released revision. Publish it like an explicit state
         // change so any linked GitHub issues get the user-edited status comment (issue #1533 follow-up).
@@ -2212,6 +2251,10 @@ public class CcCommandService {
     }
 
     public void reviseAsccp(ScoreUser requester, AsccpManifestId asccpManifestId) {
+        reviseAsccp(requester, asccpManifestId, false);
+    }
+
+    public void reviseAsccp(ScoreUser requester, AsccpManifestId asccpManifestId, boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2254,6 +2297,14 @@ public class CcCommandService {
             throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
         }
 
+        // a revision goes on from the log the component is in now
+        if (repositoryFactory.asccpQueryRepository(requester).getAsccpDetails(asccpManifestId).log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this ASCCP cannot be found.");
+            }
+            makeLog(requester, asccpManifestId, LogAction.Added);
+        }
+
         repositoryFactory.asccpCommandRepository(requester).revise(asccpManifestId);
         makeLog(requester, asccpManifestId, LogAction.Revised);
         // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
@@ -2263,6 +2314,11 @@ public class CcCommandService {
     }
 
     public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId, String comment, String projectFieldOptionOverride) {
+        cancelAsccp(requester, asccpManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancelAsccp(ScoreUser requester, AsccpManifestId asccpManifestId, String comment, String projectFieldOptionOverride,
+                            boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2287,21 +2343,21 @@ public class CcCommandService {
         ReleaseId targetReleaseId = prevAsccp.release().releaseId();
         if (requester.isDeveloper()) {
             if (!targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in 'Working' branch for developers.");
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
             }
         } else {
             if (targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in non-'Working' branch for end-users.");
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
             }
         }
 
         boolean ownerIsDeveloper = prevAsccp.owner().isDeveloper();
 
         if (requester.isDeveloper() != ownerIsDeveloper) {
-            throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
         }
 
-        repositoryFactory.asccpCommandRepository(requester).cancel(asccpManifestId);
+        repositoryFactory.asccpCommandRepository(requester).cancel(asccpManifestId, recreateLog);
 
         CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
         stateChangeEventPublisher.publish(
@@ -2309,6 +2365,10 @@ public class CcCommandService {
     }
 
     public void reviseBccp(ScoreUser requester, BccpManifestId bccpManifestId) {
+        reviseBccp(requester, bccpManifestId, false);
+    }
+
+    public void reviseBccp(ScoreUser requester, BccpManifestId bccpManifestId, boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2351,6 +2411,14 @@ public class CcCommandService {
             throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
         }
 
+        // a revision goes on from the log the component is in now
+        if (repositoryFactory.bccpQueryRepository(requester).getBccpDetails(bccpManifestId).log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this BCCP cannot be found.");
+            }
+            makeLog(requester, bccpManifestId, LogAction.Added);
+        }
+
         repositoryFactory.bccpCommandRepository(requester).revise(bccpManifestId);
         makeLog(requester, bccpManifestId, LogAction.Revised);
         // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
@@ -2360,6 +2428,11 @@ public class CcCommandService {
     }
 
     public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId, String comment, String projectFieldOptionOverride) {
+        cancelBccp(requester, bccpManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancelBccp(ScoreUser requester, BccpManifestId bccpManifestId, String comment, String projectFieldOptionOverride,
+                           boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2384,21 +2457,21 @@ public class CcCommandService {
         ReleaseId targetReleaseId = prevBccp.release().releaseId();
         if (requester.isDeveloper()) {
             if (!targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in 'Working' branch for developers.");
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
             }
         } else {
             if (targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in non-'Working' branch for end-users.");
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
             }
         }
 
         boolean ownerIsDeveloper = prevBccp.owner().isDeveloper();
 
         if (requester.isDeveloper() != ownerIsDeveloper) {
-            throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
         }
 
-        repositoryFactory.bccpCommandRepository(requester).cancel(bccpManifestId);
+        repositoryFactory.bccpCommandRepository(requester).cancel(bccpManifestId, recreateLog);
 
         CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
         stateChangeEventPublisher.publish(
@@ -2406,6 +2479,10 @@ public class CcCommandService {
     }
 
     public void reviseDt(ScoreUser requester, DtManifestId dtManifestId) {
+        reviseDt(requester, dtManifestId, false);
+    }
+
+    public void reviseDt(ScoreUser requester, DtManifestId dtManifestId, boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2448,6 +2525,14 @@ public class CcCommandService {
             throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
         }
 
+        // a revision goes on from the log the component is in now
+        if (repositoryFactory.dtQueryRepository(requester).getDtDetails(dtManifestId).log() == null) {
+            if (!recreateLog) {
+                throw new LogNotFoundException("The history (log) of this DT cannot be found.");
+            }
+            makeLog(requester, dtManifestId, LogAction.Added);
+        }
+
         repositoryFactory.dtCommandRepository(requester).revise(dtManifestId);
         makeLog(requester, dtManifestId, LogAction.Revised);
         // Publish the revise (released -> WIP) so the GitHub project fieldOption sync moves the linked issue
@@ -2457,6 +2542,11 @@ public class CcCommandService {
     }
 
     public void cancelDt(ScoreUser requester, DtManifestId dtManifestId, String comment, String projectFieldOptionOverride) {
+        cancelDt(requester, dtManifestId, comment, projectFieldOptionOverride, false);
+    }
+
+    public void cancelDt(ScoreUser requester, DtManifestId dtManifestId, String comment, String projectFieldOptionOverride,
+                         boolean recreateLog) {
 
         if (requester == null) {
             throw new IllegalArgumentException("'requester' must not be null.");
@@ -2481,21 +2571,21 @@ public class CcCommandService {
         ReleaseId targetReleaseId = prevDt.release().releaseId();
         if (requester.isDeveloper()) {
             if (!targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in 'Working' branch for developers.");
+                throw new IllegalArgumentException("It only allows to cancel the component in 'Working' branch for developers.");
             }
         } else {
             if (targetReleaseId.equals(workingRelease.releaseId())) {
-                throw new IllegalArgumentException("It only allows to revise the component in non-'Working' branch for end-users.");
+                throw new IllegalArgumentException("It only allows to cancel the component in non-'Working' branch for end-users.");
             }
         }
 
         boolean ownerIsDeveloper = prevDt.owner().isDeveloper();
 
         if (requester.isDeveloper() != ownerIsDeveloper) {
-            throw new IllegalArgumentException("It only allows to revise the component for users in the same roles.");
+            throw new IllegalArgumentException("It only allows to cancel the component for users in the same roles.");
         }
 
-        repositoryFactory.dtCommandRepository(requester).cancel(dtManifestId);
+        repositoryFactory.dtCommandRepository(requester).cancel(dtManifestId, recreateLog);
 
         CcState revertedTo = requester.isDeveloper() ? CcState.Published : CcState.Production;
         stateChangeEventPublisher.publish(
@@ -2885,6 +2975,8 @@ public class CcCommandService {
 
     public AsccManifestId refactorAscc(ScoreUser requester, AsccManifestId asccManifestId, AccManifestId accManifestId) {
 
+        assertAccRefactorDestination(requester, accManifestId);
+
         var accQuery = repositoryFactory.accQueryRepository(requester);
         AsccSummaryRecord targetAscc = accQuery.getAsccSummary(asccManifestId);
 
@@ -2904,6 +2996,8 @@ public class CcCommandService {
     }
 
     public BccManifestId refactorBcc(ScoreUser requester, BccManifestId bccManifestId, AccManifestId accManifestId) {
+
+        assertAccRefactorDestination(requester, accManifestId);
 
         var accQuery = repositoryFactory.accQueryRepository(requester);
         BccSummaryRecord targetBcc = accQuery.getBccSummary(bccManifestId);

@@ -307,3 +307,47 @@ A custom Code List and its managing custom Agency ID List remain available to an
 5. Generate XML Schema, JSON Schema, OpenAPI 3.1 YAML, ODS, and Avro expressions for each BIE using the single-BIE flow and default annotations. Verify a valid non-empty output for each format. In XSD and JSON Schema, verify that the BBIE and BBIE_SC resolve to the selected list and that custom and inherited values are present. Verify that ODS contains the `DefaultIndicator` BBIE and Language Code BBIE_SC fields and that Avro contains corresponding fields. Confirm that ODS and Avro do not serialize custom or inherited Code List values as enums. Verify the OpenAPI GET/POST templates and confirm component schemas include custom and inherited values. (Assertion [#17.8.3](#test-assertion-1783))
 6. Open Code List details and verify Agency ID List and Agency ID List Value are not marked required while the pair is empty. Save with both empty and verify it succeeds; select a list and verify its value field becomes required and only its values are available, and that selecting a different list clears an incompatible value. Verify update and ordinary state changes, including returning to WIP, are blocked while Namespace is empty; deletion and restoration remain available. (Assertion [#17.8.4](#test-assertion-1784))
 7. Create a custom Agency ID List and value, associate that pair with a custom Code List, and assign the Code List to the BBIE and BBIE_SC. Generate the BIE expression and verify the generated Code List type name uses the selected Agency ID List Value and the enum contains the custom Code List values. Make a second BIE inherit from the configured BIE and confirm the expression keeps those value domains. (Assertions [#17.8.5](#test-assertion-1785), [#17.8.6](#test-assertion-1786))
+
+## Test Case 17.9
+
+**Cancelling the amendment of an end user code list**
+
+Pre-condition: The end user is on a non-working branch and a production code list of another end user has an Agency ID and a value.
+
+
+### Test Assertion:
+
+#### Test Assertion #17.9.1
+In an amendment the Agency ID List and the Agency ID List Value of the code list cannot be changed. When the end user cancels the amendment after changing the version and adding a value, the code list is `Production` with revision `1`, with its version, its Agency ID and its values as they were, and without the added value.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on a non-working branch and a production code list of another end user has an Agency ID and a value.
+2. The users, branches, releases, and records needed to exercise "Cancelling the amendment of an end user code list" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in as an end user, open a production code list, and note its Agency ID List and Agency ID List Value.
+2. Amend the code list and verify that the Agency ID List and the Agency ID List Value are disabled.
+3. Change the version, add a value, and update; cancel the amendment; verify the state, the revision number, the version, the Agency ID, and the values. (Assertion [#17.9.1](#test-assertion-1791))
+
+## Test Case 17.10
+
+**Cancelling an amendment of a code list when the log to go back to is gone**
+
+Pre-condition: The end user is on the right branch and a code list is in amendment, and the log the code list was in before has been removed from the database.
+
+
+### Test Assertion:
+
+#### Test Assertion #17.10.1
+When the log to go back to cannot be found, the cancel asks whether a new log may be written ("Log information not found"). If the end user does not let it, nothing is changed and the code list stays `WIP`. If the end user lets it, the code list is cancelled to `Production` with revision `1`.
+
+### Test Step Pre-condition:
+1. The stated test-case pre-condition is satisfied: The end user is on the right branch and a code list is in amendment, and the log the code list was in before has been removed from the database.
+2. The users, branches, releases, and records needed to exercise "Cancelling an amendment of a code list when the log to go back to is gone" are available in connectCenter.
+
+
+### Test Step:
+1. Sign in, amend the code list, and have the logs from before removed from the database.
+2. Cancel and confirm; verify the dialog asks whether to create a new log, and decline; verify the code list is still `WIP`.
+3. Cancel again, confirm, and let the new log be created; verify the code list is `Production` with revision `1`. (Assertion [#17.10.1](#test-assertion-17101))
