@@ -20,7 +20,7 @@
           }
         </mat-autocomplete>
         @if (searcher.isSearching) {
-          <mat-hint matSuffix class="tree-search-count" align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount + searcher.pendingMatchCount }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}+ {{ searcher.searchedUnit }}</span>}</mat-hint>
+          <mat-hint matSuffix class="tree-search-count" align="end">{{ searcher.resultCount ? searcher.searchIndex + 1 : 0 }}/{{ searcher.resultCount }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}+ {{ searcher.searchedUnit }}</span>}</mat-hint>
         }
         @if (!searcher.isSearching && searcher.searchKeyword && searcher.resultCount > 0) {
           <mat-hint matSuffix class="tree-search-count" align="end">{{searcher.searchIndex + 1}}/{{searcher.resultCount}}{{ searcher.fullSearched ? '' : '+' }}@if (searcher.searchedUnit) {<span class="tree-search-count-detail"> in {{ searcher.searchedItemCount | number }}{{ searcher.fullSearched ? '' : '+' }} {{ searcher.searchedUnit }}</span>}</mat-hint>

@@ -9,7 +9,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {of} from 'rxjs';
 import {By} from '@angular/platform-browser';
 import {Location} from '@angular/common';
-import {ChangeDetectorRef, signal} from '@angular/core';
+import {ChangeDetectorRef} from '@angular/core';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {ListPageComponent} from '../list-page/list-page.component';
 import {ScoreTableViewComponent} from './score-table-view.component';
@@ -38,7 +38,7 @@ const cells = `
   </ng-container>`;
 
 abstract class Base {
-  columns = new TableColumnsState(TABLE, {username: 'view-spec'} as UserToken);
+  columns: TableColumnsState<any> = new TableColumnsState(TABLE, {username: 'view-spec'} as UserToken);
   requests: string[] = [];
   load = (params: HttpParams) => {
     this.requests.push(params.toString());

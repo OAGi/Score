@@ -54,4 +54,25 @@ describe('satisfiesServerPredicate', () => {
     expect(satisfiesServerPredicate('a', predicate('NOT_EQUALS', 'b'), false)).toBe(true);
     expect(satisfiesServerPredicate(undefined, predicate('NOT_EQUALS', 'b'), false)).toBe(false);
   });
+
+  it('does not tell a letter with an accent from one without when case does not matter, as the backend does', () => {
+    const holds = (text: string, operator: string, value: string) => satisfiesServerPredicate(text, predicate(operator, value), false);
+    expect(holds('café', 'CONTAINS', 'cafe')).toBe(true);
+    expect(holds('cafe', 'CONTAINS', 'café')).toBe(true);
+    expect(holds('CAFÉ', 'CONTAINS', 'café')).toBe(true);
+    expect(holds('café', 'EQUALS', 'cafe')).toBe(true);
+    expect(holds('café', 'STARTS_WITH', 'cafe')).toBe(true);
+    expect(holds('café', 'ENDS_WITH', 'fe')).toBe(true);
+    expect(holds('Müller', 'CONTAINS', 'muller')).toBe(true);
+    expect(holds('ÀÉÎ', 'EQUALS', 'aei')).toBe(true);
+    expect(holds('résumé', 'NOT_EQUALS', 'resume')).toBe(false);
+  });
+
+  it('keeps what the backend collation keeps apart, and compares a case sensitive predicate as it is', () => {
+    expect(satisfiesServerPredicate('straße', predicate('CONTAINS', 'strasse'), false)).toBe(false);
+    expect(satisfiesServerPredicate('한글', predicate('CONTAINS', '하'), false)).toBe(false);
+    expect(satisfiesServerPredicate('한글', predicate('CONTAINS', '한'), false)).toBe(true);
+    expect(satisfiesServerPredicate('café', predicate('CONTAINS', 'cafe'), true)).toBe(false);
+    expect(satisfiesServerPredicate('café', predicate('CONTAINS', 'café'), true)).toBe(true);
+  });
 });

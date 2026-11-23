@@ -7,10 +7,10 @@ function graphWithUserExtensionAssociationWithoutTargetAcc(): CcGraph {
     graph: {
       nodes: {
         'ACC-1': {
-          type: 'ACC', manifestId: 1, objectClassTerm: 'Extension', deprecated: false
+          type: 'ACC', manifestId: 1, objectClassTerm: 'Extension', deprecated: false, state: 'Published'
         },
         'ASCCP-3': {
-          type: 'ASCCP', manifestId: 3, propertyTerm: 'Enterprise Unit User Extension Group', deprecated: false
+          type: 'ASCCP', manifestId: 3, propertyTerm: 'Enterprise Unit User Extension Group', deprecated: false, state: 'Published'
         }
       },
       edges: {
@@ -23,10 +23,10 @@ function graphWithUserExtensionAssociationWithoutTargetAcc(): CcGraph {
 function graphWithUserExtensionAssociationWithTargetAcc(): CcGraph {
   const graph = graphWithUserExtensionAssociationWithoutTargetAcc();
   graph.graph.nodes['ACC-4'] = {
-    type: 'ACC', manifestId: 4, objectClassTerm: 'Enterprise Unit User Extension Group', deprecated: false
+    type: 'ACC', manifestId: 4, objectClassTerm: 'Enterprise Unit User Extension Group', deprecated: false, state: 'Published'
   };
   graph.graph.nodes['ASCCP-5'] = {
-    type: 'ASCCP', manifestId: 5, propertyTerm: 'Product Classification', deprecated: false
+    type: 'ASCCP', manifestId: 5, propertyTerm: 'Product Classification', deprecated: false, state: 'Published'
   };
   graph.graph.edges['ASCCP-3'] = {targets: ['ACC-4']};
   graph.graph.edges['ACC-4'] = {targets: ['ASCCP-5']};

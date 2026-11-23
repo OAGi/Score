@@ -222,7 +222,7 @@
                               (closed)="validation.close()"
                               [height]="validation.panelHeight" (heightChange)="validation.resizePanel($event)"
                               [decision]="!!validation.decision" [note]="validation.decision?.note ?? ''"
-                              (proceed)="validation.proceedWithChange()" (cancel)="validation.cancelChange()">
+                              (proceed)="validation.proceedWithChange()" (cancelled)="validation.cancelChange()">
     </score-validation-panel>
   }
 </score-sidenav-page>

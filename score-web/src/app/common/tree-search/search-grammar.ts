@@ -7,6 +7,58 @@ export class ParseError extends Error {
   }
 }
 
+/** Where the brackets of an expression are, as offsets into the scanned text. */
+export interface BracketScan {
+  /** The `/` outside every bracket and quote. */
+  slashes: number[];
+  /** The outermost `[` ... `]` pairs, in order (`close` is the offset of the `]`). */
+  brackets: {open: number, close: number}[];
+}
+
+/**
+ * Finds the brackets of an expression the way its steps are read: a quote (`"` or `'`, ended by the same character, no
+ * escapes, as the lexer reads a string) hides what is inside it, but only inside a bracket, where text is quoted at all.
+ * Every place that cuts an expression at its brackets or slashes uses this one scan. `offset` is where the text begins
+ * in the whole expression, and is only used to place an error.
+ */
+export function scanBrackets(text: string, offset = 0): BracketScan {
+  const slashes: number[] = [];
+  const brackets: {open: number, close: number}[] = [];
+  let depth = 0;
+  let quote = '';
+  let open = 0;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quote) {
+      if (c === quote) {
+        quote = '';
+      }
+    } else if (depth > 0 && (c === '"' || c === '\'')) {
+      quote = c;
+    } else if (c === '[') {
+      if (depth++ === 0) {
+        open = i;
+      }
+    } else if (c === ']') {
+      if (--depth < 0) {
+        throw new ParseError('Unexpected ]', offset + i);
+      }
+      if (depth === 0) {
+        brackets.push({open, close: i});
+      }
+    } else if (c === '/' && depth === 0) {
+      slashes.push(i);
+    }
+  }
+  if (quote) {
+    throw new ParseError('Unterminated string', offset + text.length);
+  }
+  if (depth > 0) {
+    throw new ParseError('Missing ]', offset + text.length);
+  }
+  return {slashes, brackets};
+}
+
 // ---- tokens ----------------------------------------------------------------------------------------------------------
 
 const WhiteSpace = createToken({name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED});

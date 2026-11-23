@@ -1,5 +1,4 @@
 import {DagSearchResult, DagSearchScope} from './dag-path-search';
-import {PathPatternMode} from './path-pattern';
 import {GraphSearchHost, GraphSearchMessage, GraphSearchReply} from './graph-search-host';
 import {SearchDag} from './search-dag';
 
@@ -9,7 +8,7 @@ export interface GraphSearchSession {
   /** Hands over the DAG to search (replacing the previous one). */
   load(dag: SearchDag): void;
 
-  search(expr: string, caseSensitive: boolean, mode: PathPatternMode, scope: DagSearchScope, onProgress?: (visited: number) => void): Promise<DagSearchResult>;
+  search(expr: string, caseSensitive: boolean, scope: DagSearchScope, onProgress?: (visited: number) => void): Promise<DagSearchResult>;
 
   /** The path (child indexes below the scope node) of the n-th match of the latest search. */
   locate(k: number): Promise<number[] | undefined>;
@@ -60,9 +59,9 @@ function sessionOver(calls: SessionCalls, send: (message: GraphSearchMessage) =>
   const session = calls.session;
   return {
     load: dag => send({type: 'load', session, dag}),
-    search: (expr, caseSensitive, mode, scope, onProgress) =>
+    search: (expr, caseSensitive, scope, onProgress) =>
       calls.call<Extract<GraphSearchReply, {type: 'result'}>>(
-        id => ({type: 'search', session, id, expr, caseSensitive, mode, scope}), onProgress).then(r => r.result),
+        id => ({type: 'search', session, id, expr, caseSensitive, scope}), onProgress).then(r => r.result),
     locate: k => calls.call<Extract<GraphSearchReply, {type: 'located'}>>(
       id => ({type: 'locate', session, id, k})).then(r => r.path),
     close: () => send({type: 'close', session})

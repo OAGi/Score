@@ -52,8 +52,6 @@ export interface TreeSearcher<N = any> {
   searchedItemCount: number;
   fullSearched: boolean;
   isSearching: boolean;
-  /** Matches found by the search in progress, not yet in `searchResult`. */
-  pendingMatchCount: number;
   /** The node attributes a search expression may ask about; the field suggests them as the user types. */
   searchAttributes?: SearchAttribute[];
   /** Why the keyword is not a valid search expression, when it is not. */

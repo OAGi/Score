@@ -92,7 +92,7 @@ describe('PathPattern', () => {
   });
 
   it('finds a node whose own name has camel case in it by that name', () => {
-    const pattern = new PathPattern('/newDerivedDT_ Code. Type/Code. List. Identifier', false, {exact: true});
+    const pattern = new PathPattern('/newDerivedDT_ Code. Type/Code. List. Identifier');
     const root = pattern.step(pattern.initialMask, 'newDerivedDT_ Code. Type');
     expect(pattern.isMatch(pattern.step(root, 'Code. List. Identifier'))).toBe(true);
     expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Other. Type'), 'Code. List. Identifier'))).toBe(false);
@@ -100,15 +100,17 @@ describe('PathPattern', () => {
     expect(loose.isMatch(loose.step(0, 'newDerivedDT_ Code. Type'))).toBe(true);
   });
 
-  it('reads an exact pattern as whole names', () => {
-    const pattern = new PathPattern('/Root/Header', false, {exact: true});
+  it('matches the names of a path from the root by what they contain, as it does anywhere else', () => {
+    const pattern = new PathPattern('/Root/Header');
     expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Root'), 'Header'))).toBe(true);
-    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'The Root'), 'Header'))).toBe(false);
-    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Root'), 'Sub Header'))).toBe(false);
+    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'The Root'), 'Header'))).toBe(true);
+    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Root'), 'Sub Header'))).toBe(true);
+    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Other'), 'Header'))).toBe(false);
+    expect(pattern.isMatch(pattern.step(pattern.step(pattern.initialMask, 'Root'), 'Footer'))).toBe(false);
   });
 
   it('starts an anchored pattern at the root only', () => {
-    const pattern = new PathPattern('/Header/Item', false, {});
+    const pattern = new PathPattern('/Header/Item');
     const root = pattern.step(pattern.initialMask, 'Root');
     expect(pattern.isMatch(pattern.step(pattern.step(root, 'Header'), 'Item'))).toBe(false);
     const header = pattern.step(pattern.initialMask, 'Header');
@@ -169,11 +171,11 @@ describe('DagPathSearch', () => {
   it('only finds an anchored path from the root', () => {
     // 0 Root -> 1 Header, 2 Other ; 1 Header -> 3 Item ; 2 Other -> 1 Header
     const dag = dagOf([['Root', [1, 2]], ['Header', [3]], ['Other', [1]], ['Item', []]]);
-    const anchored = new PathPattern('/Root/Header/Item', false, {exact: true});
+    const anchored = new PathPattern('/Root/Header/Item');
     const result = new DagPathSearch(dag, anchored).search({ancestors: [], record: 0, mask: anchored.stepAll([dag.names[0]])});
     expect(result.total).toBe(1);
 
-    const unanchoredPartial = new PathPattern('/Header/Item', false, {exact: true});
+    const unanchoredPartial = new PathPattern('/Header/Item');
     const none = new DagPathSearch(dag, unanchoredPartial).search({ancestors: [], record: 0, mask: unanchoredPartial.stepAll([dag.names[0]])});
     expect(none.total).toBe(0);
   });

@@ -173,9 +173,9 @@ describe('OasDoc HTTP header dialog: every combination (#1791)', () => {
       ['{"$ref":"#/components/schemas/X","x-note":"n"}', true, true]
     ];
     for (const [text, ok30, ok31] of schemas) {
-      expect(schemaVersionError(JSON.parse(text), '3.0') === undefined).withContext(text + ' 3.0').toBe(ok30);
-      expect(schemaVersionError(JSON.parse(text), '3.0.4') === undefined).withContext(text + ' 3.0.4').toBe(ok30);
-      expect(schemaVersionError(JSON.parse(text), '3.1') === undefined).withContext(text + ' 3.1').toBe(ok31);
+      expect(schemaVersionError(JSON.parse(text), '3.0') === undefined, text + ' 3.0').toBe(ok30);
+      expect(schemaVersionError(JSON.parse(text), '3.0.4') === undefined, text + ' 3.0.4').toBe(ok30);
+      expect(schemaVersionError(JSON.parse(text), '3.1') === undefined, text + ' 3.1').toBe(ok31);
       expect(schemaVersionError(JSON.parse(text), undefined)).toBeUndefined();
     }
   });

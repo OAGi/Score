@@ -159,7 +159,7 @@ describe('CcTreeValidation', () => {
       validation.apply(reportOf(onBcc('ERROR', 'Twice')));
       validation.close();
 
-      validation.decorationsFor(bcc)[0].onClick();
+      validation.decorationsFor(bcc)[0].onClick(new MouseEvent('click'));
 
       expect(validation.panelOpen).toBe(true);
       expect(validation.focusAddress).toBe('ACC-1>BCC-7');
@@ -175,7 +175,7 @@ describe('CcTreeValidation', () => {
       expect(buttons[0].id).toBe('cc-validation-show');
       expect(buttons[0].icon).toBe('error');
       expect(buttons[0].tooltip).toBe('Show validation results');
-      buttons[0].onClick();
+      buttons[0].onClick(new MouseEvent('click'));
       expect(validation.panelOpen).toBe(true);
       expect(validation.focusAddress).toBeNull();
     });

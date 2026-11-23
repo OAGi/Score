@@ -52,8 +52,8 @@ describe('parseSearchExpression', () => {
   it('reports where a malformed predicate goes wrong, and gives no steps', () => {
     for (const [expr, position] of [['Code[used =]', 11], ['Code[used', 9], ['Code[contains(a)]', 5], ['Code[foo(a, b)]', 5], ['Code[]', 5]]) {
       const parsed = parseSearchExpression(expr as string);
-      expect(parsed.error).withContext(expr as string).toBeDefined();
-      expect(parsed.error.position).withContext(expr as string).toBe(position);
+      expect(parsed.error, expr as string).toBeDefined();
+      expect(parsed.error.position, expr as string).toBe(position);
       expect(parsed.steps).toEqual([]);
     }
   });
@@ -63,7 +63,7 @@ describe('parseSearchExpression with an unfinished path in a predicate', () => {
   it('reports an error instead of throwing when the path ends with a slash', () => {
     for (const expr of ['*[a/]', '*[./]', '*[a//]', '*[x = a/]', 'A[b/]/C']) {
       const parsed = parseSearchExpression(expr);
-      expect(parsed.error).withContext(expr).toBeDefined();
+      expect(parsed.error, expr).toBeDefined();
       expect(parsed.steps).toEqual([]);
     }
   });

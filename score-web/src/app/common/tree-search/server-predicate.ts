@@ -1,5 +1,5 @@
 import {CstElement, CstNode, IToken} from 'chevrotain';
-import {Ident, NumberLit, ParseError, StringLit, parsePredicate} from './search-grammar';
+import {Ident, NumberLit, ParseError, StringLit, parsePredicate, scanBrackets} from './search-grammar';
 
 /** How a server predicate compares the stored text with its value. */
 export type ServerOperator = 'EQUALS' | 'NOT_EQUALS' | 'CONTAINS' | 'STARTS_WITH' | 'ENDS_WITH';
@@ -60,9 +60,18 @@ export function splitServerPredicates(expression: string, serverAttributes: Read
     return added;
   };
 
+  let brackets: {open: number, close: number}[];
+  try {
+    brackets = scanBrackets(expression).brackets;
+  } catch (e) {
+    if (e instanceof ParseError) {
+      return unchanged;
+    }
+    throw e;
+  }
   let result = '';
   let copied = 0;
-  for (const bracket of outerBrackets(expression)) {
+  for (const bracket of brackets) {
     const inner = expression.substring(bracket.open + 1, bracket.close);
     const base = bracket.open + 1;
     let cst: CstNode;
@@ -91,12 +100,24 @@ export function splitServerPredicates(expression: string, serverAttributes: Read
   return {expression: result + expression.substring(copied), predicates};
 }
 
-/** Whether the text a node holds satisfies the predicate (what the backend would answer, for a value not yet saved). */
+/**
+ * The text the way the backend's collation sees it when case does not matter: upper and lower case letters, and a letter
+ * with an accent and without one, are the same (`café` is `CAFE`). The accents are taken off through the decomposed form
+ * and the text is composed again, so that what is not an accent (a Hangul syllable) stays as it was.
+ */
+function foldedText(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}/gu, '').normalize('NFC').toLowerCase();
+}
+
+/**
+ * Whether the text a node holds satisfies the predicate (what the backend would answer, for a value not yet saved). A
+ * case sensitive predicate compares the texts as they are, as the backend compares binary strings.
+ */
 export function satisfiesServerPredicate(text: string | undefined, predicate: ServerPredicate, caseSensitive: boolean): boolean {
   if (text === undefined || text === null) {
     return false;
   }
-  const fold = (s: string) => caseSensitive ? s : s.toLowerCase();
+  const fold = (s: string) => caseSensitive ? s : foldedText(s);
   const stored = fold(text);
   const wanted = fold(predicate.value);
   switch (predicate.operator) {
@@ -114,31 +135,6 @@ export function satisfiesServerPredicate(text: string | undefined, predicate: Se
 }
 
 // ---- reading the expression ------------------------------------------------------------------------------------------
-
-/** The outermost `[...]` of the expression, skipping the quoted text inside them. */
-function outerBrackets(expression: string): {open: number, close: number}[] {
-  const found: {open: number, close: number}[] = [];
-  let depth = 0;
-  let quote = '';
-  let open = 0;
-  for (let i = 0; i < expression.length; i++) {
-    const c = expression[i];
-    if (quote) {
-      if (c === quote) {
-        quote = '';
-      }
-    } else if (depth > 0 && (c === '"' || c === '\'')) {
-      quote = c;
-    } else if (c === '[') {
-      if (depth++ === 0) {
-        open = i;
-      }
-    } else if (c === ']' && depth > 0 && --depth === 0) {
-      found.push({open, close: i});
-    }
-  }
-  return found;
-}
 
 interface Edit {
   start: number;

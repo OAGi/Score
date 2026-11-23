@@ -1,13 +1,15 @@
 import {componentsOf, DagSearchResult, DagSearchScope} from './dag-path-search';
 import {DagContextHost, DagNodeContext} from './dag-node-context';
 import {GraphSearchSession, openGraphSearchSession} from './graph-search-session';
-import {PathPattern, PathPatternMode} from './path-pattern';
+import {PathPattern} from './path-pattern';
 import {SearchDag, sameSearchDag} from './search-dag';
 import {AttrLookup, AttrValue} from './search-expression';
+import {IdentifiableNode, identityOfNode} from './tree-node-identity';
 
 /** The node shape a tree must offer to be searched through its DAG. */
-export interface GraphSearchNode {
+export interface GraphSearchNode extends IdentifiableNode {
   parent?: GraphSearchNode;
+  self?: GraphSearchNode;
 }
 
 /**
@@ -36,19 +38,47 @@ export interface TreeGraphAdapter<N extends GraphSearchNode> {
 
   /** The node's children as the tree shows them (loading them if needed). */
   childrenOf(node: N): N[];
-
-  /**
-   * Whether an expression starting with `/` is a full path from the root that has to name every node exactly (as
-   * opposed to the end of a path whose steps are contained in the names).
-   */
-  readonly strictRootedPaths?: boolean;
-
-  /**
-   * What makes two nodes the same one when a node can be wrapped (the parent of a wrapper is the wrapped node's own
-   * parent, never a wrapper). Default: the node itself.
-   */
-  identityOf?(node: N): object;
 }
+
+/** The graph a tree builds of itself: the DAG, and the record each of its nodes is in. */
+export interface TreeSearchGraph<N> {
+  dag: SearchDag;
+  recordOf(node: N): number;
+}
+
+/** What a tree supplies to be searched; every tree is described to the search through `describeTree`, the same way. */
+export interface TreeGraphSource<N extends GraphSearchNode, G extends TreeSearchGraph<N>> {
+  /** The graph of the tree as it is now, or undefined when the tree cannot be described. */
+  graph(): G | undefined;
+
+  namesOf(node: N): string[] | undefined;
+
+  /** What a predicate may ask about the node; `graph` is the one the latest `dag()` was made from. */
+  attributesOf(node: N, graph: G | undefined): Record<string, AttrValue>;
+
+  childrenOf(node: N): N[];
+}
+
+/**
+ * The adapter the search reads a tree through. The DAG of a tree is made again whenever the search asks for it, and what
+ * the graph says about nodes (their records, what it flags on them) is the one of the latest DAG.
+ */
+export function describeTree<N extends GraphSearchNode, G extends TreeSearchGraph<N>>(source: TreeGraphSource<N, G>): TreeGraphAdapter<N> {
+  let graph: G | undefined;
+  return {
+    dag: () => {
+      graph = source.graph();
+      return graph?.dag;
+    },
+    recordOf: node => graph ? graph.recordOf(node) : -1,
+    namesOf: node => source.namesOf(node),
+    attributesOf: node => source.attributesOf(node, graph),
+    childrenOf: node => source.childrenOf(node)
+  };
+}
+
+/** Why a tree could not be searched through its DAG, so that it was walked instead. */
+export type GraphRefusal = 'unsupported-expression' | 'no-dag' | 'scope-not-in-graph';
 
 /**
  * One tree's searching through its DAG: it prepares the search (the DAG, the pattern and where the search starts),
@@ -64,8 +94,9 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
   private scope: DagSearchScope | undefined;
   private expr: string | undefined;
   private caseSensitive = false;
-  private mode: PathPatternMode = {};
   private highlighted = new WeakMap<object, boolean>();
+  /** Why the latest `prepare` returned false; undefined after one that went through. */
+  refusal: GraphRefusal | undefined;
 
   constructor(private readonly adapter: TreeGraphAdapter<N>) {
   }
@@ -75,14 +106,15 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
    * tree is unknown to the DAG), in which case nothing has changed.
    */
   prepare(expr: string, caseSensitive: boolean, scopeNode: N): boolean {
-    const mode: PathPatternMode = this.adapter.strictRootedPaths && expr.startsWith('/') ? {exact: true} : {};
-    const pattern = new PathPattern(expr, caseSensitive, mode);
+    const pattern = new PathPattern(expr, caseSensitive);
     const dag = this.adapter.dag();
-    if (!pattern.supported || !dag) {
+    this.refusal = !pattern.supported ? 'unsupported-expression' : !dag ? 'no-dag' : undefined;
+    if (this.refusal) {
       return false;
     }
     const scope = this.scopeOf(pattern, dag, scopeNode);
     if (!scope) {
+      this.refusal = 'scope-not-in-graph';
       return false;
     }
     if (!this.session) {
@@ -97,7 +129,6 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
     this.scope = scope;
     this.expr = expr;
     this.caseSensitive = caseSensitive;
-    this.mode = mode;
     this.highlighted = new WeakMap();
     return true;
   }
@@ -131,7 +162,7 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
   }
 
   run(onProgress: (visited: number) => void): Promise<DagSearchResult> {
-    return this.session.search(this.expr, this.caseSensitive, this.mode, this.scope, onProgress);
+    return this.session.search(this.expr, this.caseSensitive, this.scope, onProgress);
   }
 
   /** The n-th match (0-based) of the latest search, in the order the tree shows its nodes. */
@@ -204,7 +235,7 @@ export class GraphTreeSearch<N extends GraphSearchNode> {
   }
 
   private identityOf(node: N): object {
-    return this.adapter.identityOf ? this.adapter.identityOf(node) : node;
+    return identityOfNode(node);
   }
 
   /**
