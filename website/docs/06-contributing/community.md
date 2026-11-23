@@ -37,6 +37,34 @@ For broader CCS / CCTS (Core Component Specification) standards questions that g
 beyond the tooling itself, the [OAGi community](https://oagi.org) is the right
 audience.
 
+## Slack
+
+The OAGi connectCenter (Score) Slack channel is a place for interactive discussion and clarification
+about the issues filed in GitHub. Use it when a short conversation is easier than a long issue
+thread. Bug reports and feature requests should still be filed as
+[GitHub issues](https://github.com/OAGi/Score/issues) so they can be tracked.
+
+The connectCenter channel is `score-tool-general` in the **OAGi Slack workspace**.
+
+| Step | What to do | Details |
+|---|---|---|
+| 1 | **Request an invitation** | Email **member.services@oagi.org** from the email address you want to use on Slack. The OAGi Slack workspace is joined by request. |
+| 2 | **Install Slack** | Download the app from [slack.com/downloads](https://slack.com/downloads), or use Slack in your web browser. |
+| 3 | **Join the OAGi workspace** | Follow the instructions you receive from OAGi in reply to your email, and sign in with the same email address you used to request access. |
+| 4 | **Join the `score-tool-general` channel** | In Slack, open **Channels → Browse channels** (or search for `score-tool-general`) and select **Join**. |
+
+For more about the community, see [Join Us On Slack](https://oagi.org/pages/join-us-on-slack) on the
+OAGi website. The workspace is not limited to connectCenter. Besides the `score-tool-general`
+channel, it offers quick help from other users and experts, release management channels for
+connectSpec and connectCore, best-practice discussions, channels for each active working group, and
+direct chat with other OAGi community members.
+
+Tips for asking in the channel:
+
+- Mention the GitHub issue number (for example, `#123`) when your question is about an existing issue.
+- State the connectCenter version you are using.
+- For anything that needs to be tracked or fixed, [file a GitHub issue](https://github.com/OAGi/Score/issues/new) as well.
+
 ## How to be a good community member
 
 - **Search before you post.** Check open and closed

@@ -40,7 +40,7 @@ not a hyphen). The standalone `docker-compose` v1 binary is deprecated.
 - Network access to [Docker Hub](https://hub.docker.com/u/oagi1docker) to pull the
   `oagi1docker/*` images, which are hosted under the `oagi1docker` organization. You may
   need to `docker login` and have access to those repositories to pull them — if you cannot
-  see them, request access from OAGi
+  see them, request access by emailing **member.services@oagi.org**
   ([OAGi Score repositories](https://hub.docker.com/u/oagi1docker)).
 
 ## The four core services
@@ -53,6 +53,8 @@ A standard connectCenter deployment runs four containers that the Compose file w
 | `backend` | `oagi1docker/srt-http-gateway:3.5.3` | REST API gateway (`score-http`, Spring Boot) | `8080` → `8080` |
 | `db` | `oagi1docker/srt-repo:3.5.3` | MySQL/MariaDB-compatible database with the schema preloaded (`score-repo`) | `3306` → `3306` |
 | `redis` | `redis:7.4` | Session store and cache | `6379` → `6379` |
+
+![Structure of connectCenter deployed with Docker](/img/score-deployment-structure.png)
 
 The `frontend` reaches the API through `GATEWAY_HOST`/`GATEWAY_PORT`, and the `backend`
 reaches the database and Redis through `DB_HOST`/`DB_PORT` and `REDIS_HOST`/`REDIS_PORT`.
@@ -155,6 +157,25 @@ To stop the stack (keeping data volumes):
 docker compose down
 ```
 
+## Managing the containers
+
+Run these commands in the directory containing `docker-compose.yml`.
+
+| Task | Command |
+|---|---|
+| Stop the containers, keeping them and their data | `docker compose stop` |
+| Start them again | `docker compose start` |
+| Stop and remove the containers, keeping the data volumes | `docker compose down` |
+| Remove the containers **and delete all data** | `docker compose down -v` |
+| Show the logs of one service (for example the backend) | `docker compose logs -f backend` |
+
+:::caution[Do not move or rename the directory of the Compose file]
+Docker Compose names containers and volumes with a prefix taken from the name of the directory that
+contains the compose file. If you move or rename that directory, a new, empty set of volumes is
+created and your existing data is no longer used. If you are not familiar with managing volumes, do
+not change the location or name of that directory.
+:::
+
 ## Optional: OIDC setup (SSO)
 
 Out of the box, users sign in with local accounts, so connecting an Identity Provider is
@@ -217,6 +238,16 @@ release notes specify rather than guessing.
 Like the frontend, the `external-api` container listens on port `3000` by default; expose it
 behind an HTTPS URL in your environment so clients can reach it. Depending on your network you
 may also need proxy-related environment variables.
+
+### external-api settings
+
+| Variable | Service | Description | Default |
+|---|---|---|---|
+| `RS_JWK_SET_URI` | `backend` | The JWK endpoint (`jwks_uri`) of your OIDC provider, used to validate the tokens presented to the external-api. | (none; required) |
+| `RS_ALLOWED_TYPES` | `backend` | The token types accepted by the backend, separated by commas. | `JWT,at+jwt` |
+| `backend_server` | `external-api` | The address of the connectCenter backend that the external-api calls. | (none; required) |
+| `api_port` | `external-api` | The port the external-api listens on. | `3000` |
+| `default_library` | `external-api` | The name of the library used when a request does not specify one. | `connectSpec` |
 
 ## Next steps
 

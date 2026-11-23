@@ -200,6 +200,16 @@ for setup details.
   rest of the platform and requires Python 3.11+ (and Node.js for its docs site). See
   `connect-center-api/README.md`.
 
+### Troubleshooting
+
+| Symptom | What to check |
+|---|---|
+| The backend fails to start with a database connection error | The `srt-repo` container may still be loading its initial data. Check `docker logs srt-repo`, and confirm that the host port and the `DB_PORT` value match. |
+| `Port already in use` for `3306`, `6379`, `9000`, or `4200` | Another program uses the port. Stop it, or publish the container on another port (`-p 3307:3306`) and set `DB_PORT` / `REDIS_PORT` accordingly. |
+| `npm install` or `npm start` fails with an engine error | The Node.js version does not match `score-web/package.json`. Use the version in `score-web/.nvmrc`. |
+| The Maven wrapper reports an unsupported Java version | `java -version` must report 21 or later. Set `JAVA_HOME` to a matching JDK installation. |
+| The browser shows the page but requests to `/api` fail | The backend is not running on port `9000`. Check the backend terminal for errors. |
+
 ## Repositories and modules
 
 A contribution usually touches one or more of these modules. See the

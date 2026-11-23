@@ -168,6 +168,52 @@ After the backend reconnects, the application is available again. Because Redis 
 A dump is tied to the database schema version it was taken from. Restore it into a `db` image of the matching version whenever you can. If the dump is older than the application, there is normally nothing to run by hand: since **3.5.0** the backend applies its bundled **Flyway** migrations automatically on startup and brings the restored schema up to date. See [Database Migration](./database-migration.md) and [Upgrading connectCenter](./upgrade.md).
 :::
 
+## Using a graphical SQL client
+
+Any graphical SQL client that works with MariaDB can make the dump. MySQL Workbench is used as the
+example here; other clients, such as DBeaver or HeidiSQL, have equivalent export and import
+functions. Make sure nobody is using connectCenter while the dump is being made, or use the
+single-transaction option (*Create Dump in a Single Transaction* in MySQL Workbench) as described
+under [Online / hot backups](#online--hot-backups). Make sure triggers and routines are included:
+enable *Dump Stored Procedures and Functions* and *Dump Triggers*, and do **not** select
+*Skip Triggers*.
+
+### Connect to the database
+
+Connect to the database server where connectCenter's database is installed. The default
+connection values are:
+
+| Setting | Default |
+|---|---|
+| Host | `127.0.0.1` |
+| Port | `3306` |
+| User | `oagi` |
+| Password | The password set for your installation. Ask your connectCenter administrator if you do not know it. |
+| Default Schema | `oagi` |
+
+If the `db` service publishes the database on another host port, use the host port of its `ports`
+entry.
+
+### Export (back up)
+
+In MySQL Workbench:
+
+1. Go to **Server > Data Export**.
+2. Select the `oagi` schema and check all of its tables.
+3. Choose **Export to Self-Contained File**. The path in the text field is where the dump will be written.
+4. Make sure triggers and routines are included.
+5. Click **Start Export**.
+6. When it finishes, find the dump file at the path you specified.
+
+### Import (restore)
+
+In MySQL Workbench:
+
+1. Go to **Server > Data Import**.
+2. Choose **Import from Self-Contained File** and select the dump file you exported.
+3. Select the `oagi` schema as the target.
+4. Click **Start Import**.
+
 ## Online / hot backups
 
 If you cannot stop the application tiers, take a transaction-consistent dump instead. For the InnoDB tables that connectCenter uses, `--single-transaction` produces a consistent snapshot without locking out writers:
