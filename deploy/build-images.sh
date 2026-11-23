@@ -41,6 +41,21 @@ has_image repo && check_module_version repo score-repo
 has_image http && check_module_version http score-http
 has_image web  && check_module_version web  score-web
 
+# A PUSH_IMAGE=1 build publishes the multi-arch manifest itself and leaves no local image. A stale
+# single-platform local image under the same tag would otherwise be pushed by push-images.sh over
+# that manifest, so drop it first and always build fresh.
+if [ "${PUSH_IMAGE:-0}" = 1 ] || [ "${PUSH_IMAGE:-0}" = true ]; then
+  for sel in repo http web; do
+    has_image "$sel" || continue
+    case "$sel" in repo) base="$IMAGE_REPO" ;; http) base="$IMAGE_HTTP" ;; web) base="$IMAGE_WEB" ;; esac
+    ref="$base:$(tag_for "$sel" "$VERSION")"
+    if docker image inspect "$ref" >/dev/null 2>&1; then
+      log "removing stale local image $ref (multi-arch build will be pushed directly)"
+      docker rmi "$ref" >/dev/null
+    fi
+  done
+fi
+
 # repo first (fast), then http (Maven), then web (Angular).
 has_image repo && { log "srt-repo"; sh "$REPO_ROOT/score-repo/docker/build.sh" "$(tag_for repo "$VERSION")"; }
 has_image http && { log "srt-http-gateway"; sh "$REPO_ROOT/score-http/docker/build.sh" "$(tag_for http "$VERSION")"; }
