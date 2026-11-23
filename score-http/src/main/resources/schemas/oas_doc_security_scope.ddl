@@ -3,7 +3,7 @@ CREATE TABLE `oas_doc_security_scope`
     `oas_doc_security_scope_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
     `guid`                      varchar(41) NOT NULL COMMENT 'The GUID of the record.',
     `oas_doc_security_id`       bigint(20) unsigned NOT NULL COMMENT 'The owning root-level security entry.',
-    `scope_name`                varchar(200) NOT NULL COMMENT 'A scope name required by this entry (oauth2: from the scheme''s flows; openIdConnect: from the provider).',
+    `scope_name`                varchar(200) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'A scope name required by this entry (oauth2: from the scheme''s flows; openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).',
     `created_by`                bigint(20) unsigned NOT NULL COMMENT 'The user who creates the record.',
     `last_updated_by`           bigint(20) unsigned NOT NULL COMMENT 'The user who last updates the record.',
     `creation_timestamp`        datetime(6) NOT NULL COMMENT 'The timestamp when the record is created.',

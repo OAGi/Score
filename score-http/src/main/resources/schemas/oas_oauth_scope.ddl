@@ -3,7 +3,7 @@ CREATE TABLE `oas_oauth_scope`
     `oas_oauth_scope_id`    bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
     `guid`                  varchar(41) NOT NULL COMMENT 'The GUID of the record.',
     `oas_oauth_flow_id`     bigint(20) unsigned NOT NULL COMMENT 'The owning OAuth flow; one entry of that flow''s scopes map.',
-    `scope_name`            varchar(200) NOT NULL COMMENT 'REQUIRED. The scope name (the scopes map key). Unique within a flow.',
+    `scope_name`            varchar(200) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'REQUIRED. The scope name (the scopes map key). Unique within a flow; case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).',
     `description`           text DEFAULT NULL COMMENT 'REQUIRED. A short description of the scope (the scopes map value).',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'The user who creates the record.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'The user who last updates the record.',

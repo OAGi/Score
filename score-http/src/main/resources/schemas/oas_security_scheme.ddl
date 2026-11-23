@@ -3,7 +3,7 @@ CREATE TABLE `oas_security_scheme`
     `oas_security_scheme_id`   bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
     `guid`                     varchar(41) NOT NULL COMMENT 'The GUID of the record.',
     `oas_doc_id`               bigint(20) unsigned NOT NULL COMMENT 'Owning OpenAPI document; one entry of that doc components.securitySchemes map.',
-    `scheme_name`              varchar(100) NOT NULL COMMENT 'REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc.',
+    `scheme_name`              varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc; case-sensitive, so Auth and auth are two names. Only letters, digits, ''.'', ''-'' and ''_'' (the Components Object).',
     `type`                     varchar(20) NOT NULL COMMENT 'REQUIRED. Security Scheme type: apiKey | http | oauth2 | openIdConnect | mutualTLS. mutualTLS requires OpenAPI 3.1+ output; enforced by the service layer per the doc open_api_version.',
     `description`              text DEFAULT NULL COMMENT 'Optional (all types). Short description; CommonMark MAY be used.',
     `api_key_name`             varchar(200) DEFAULT NULL COMMENT 'REQUIRED when type=apiKey: header/query/cookie parameter name. NULL otherwise.',

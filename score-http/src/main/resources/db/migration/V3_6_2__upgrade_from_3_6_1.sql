@@ -62,5 +62,25 @@ CREATE TABLE `named_lock`
 
 INSERT INTO `named_lock` (`lock_name`) VALUES ('write_gate');
 
+-- ------------------------------------------------------------------
+-- One check of the JSON snapshot of a log
+-- ------------------------------------------------------------------
+
+-- The column-level check `snapshot` of log.snapshot is the one to keep (V3_6_0 states it on the column).
+-- A database made from the 3.4.0 baseline also has the table-level check `log_chk_1` of the same condition, which is dropped here.
+-- A database that never had it is left as it is.
+ALTER TABLE `log` DROP CONSTRAINT IF EXISTS `log_chk_1`;
+
+-- ------------------------------------------------------------------
+-- The primitive of an XBT manifest moved to the allowed primitives of a data type
+-- ------------------------------------------------------------------
+
+-- The CDT_PRI_ID of XBT_MANIFEST is not used any more: how a data type maps to a CDT primitive is kept in DT_AWD_PRI and DT_SC_AWD_PRI.
+-- A database upgraded from before 3.4.0 still has the column (and its key and foreign key); one made from the 3.4.0 baseline does not.
+ALTER TABLE `xbt_manifest`
+    DROP FOREIGN KEY IF EXISTS `xbt_manifest_cdt_pri_id_fk`,
+    DROP INDEX IF EXISTS `xbt_manifest_cdt_pri_id_fk`,
+    DROP COLUMN IF EXISTS `cdt_pri_id`;
+
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET SQL_NOTES = @OLD_SQL_NOTES;

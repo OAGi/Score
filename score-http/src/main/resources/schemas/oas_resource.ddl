@@ -2,7 +2,7 @@ CREATE TABLE `oas_resource`
 (
     `oas_resource_id`       bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'The primary key of the record.',
     `oas_doc_id`            bigint(20) unsigned DEFAULT NULL COMMENT 'A reference of the doc record.',
-    `path`                  text NOT NULL COMMENT 'The OpenAPI path (resource name) for this resource; defaults to the BIE name.',
+    `path`                  text CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL COMMENT 'The OpenAPI path (resource name) for this resource; by default made from the business context and the BIE name. Case-sensitive: /Pets and /pets are two paths.',
     `ref`                   text DEFAULT NULL COMMENT 'An optional reference ($ref) to an externally defined Path Item Object for this resource.',
     `created_by`            bigint(20) unsigned NOT NULL COMMENT 'The user who creates the record.',
     `last_updated_by`       bigint(20) unsigned NOT NULL COMMENT 'The user who last updates the record.',
