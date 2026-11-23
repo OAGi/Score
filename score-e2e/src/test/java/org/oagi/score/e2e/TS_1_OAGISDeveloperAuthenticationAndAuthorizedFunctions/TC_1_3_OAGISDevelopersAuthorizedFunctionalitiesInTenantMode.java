@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.oagi.score.e2e.BaseTest;
 import org.oagi.score.e2e.menu.BIEMenu;
 import org.oagi.score.e2e.obj.AppUserObject;
@@ -14,6 +15,7 @@ import org.oagi.score.e2e.page.HomePage;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Isolated("Multi-tenant mode is a global application setting used by other E2E tests")
 @Execution(ExecutionMode.SAME_THREAD)
 public class TC_1_3_OAGISDevelopersAuthorizedFunctionalitiesInTenantMode extends BaseTest {
 
