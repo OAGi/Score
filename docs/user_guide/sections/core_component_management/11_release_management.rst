@@ -307,3 +307,38 @@ The script contains all developer records, including core components, code lists
    check the *Include sibling view order* checkbox next to the button.
 
 3. Click the "Generate Migration Script" button.
+
+Update from a release package
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Administrators can update the standard Core Components of a running connectCenter from a release package (a ``.zip`` file of a release) instead of re-installing the database.
+The "Update from Release Package" button is on the "Release" page and is shown to administrators only.
+The database account of the application has to be allowed to create databases; if it is not, the dialog says so and the update cannot be done.
+
+.. warning::
+   Make a backup of the database before updating from a release package.
+
+To update from a release package:
+
+1. On the "Release" page, click the "Update from Release Package" button.
+
+2. Drop the release package (``.zip``) in the dialog, or click it to choose the file.
+   The dialog shows how much of the file has been sent.
+
+3. The package is then looked at; nothing is changed by that.
+   The dialog shows the format version and, for each library, the latest release in the package and the latest release now in use.
+   If the package cannot be loaded (for example, it is behind this database in a library), the dialog lists what is in the way.
+   Click "Back" to choose another file or "Check again" once the problem is solved.
+
+4. Click the "Update" button.
+   The package is loaded into a schema of its own beside the data in use, updated to this version of the application, checked, and put in place at the end, in the background.
+   The dialog shows the step the update is in and "Progress details" with the messages of the server.
+   You can close the dialog; the update goes on, and you can open it again from the release list to follow it.
+
+While the work of the users is copied and the loaded data is put in place, users cannot save for a short while.
+Their work is kept.
+Only one update runs at a time.
+
+When the update is done, the release list is loaded again.
+If the update fails, the data in use is not changed, unless the message of the dialog says otherwise.
+The dialog shows an "Undo" button for the latest update that succeeded; it brings back the data from before the update.
