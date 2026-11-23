@@ -104,6 +104,16 @@ export class LoginComponent implements OnDestroy {
     this.changeDetectorRef.markForCheck();
   }
 
+  /** With the password field shown, Enter in the username moves on to the password instead of submitting the form. */
+  onUsernameEnter(event: Event) {
+    const form = (event.target as HTMLInputElement).form;
+    const passwordField = form?.elements.namedItem('password') as HTMLInputElement | null;
+    if (this.showPasswordFields && passwordField && !this.credentials.password) {
+      event.preventDefault();
+      passwordField.focus();
+    }
+  }
+
   /** Whether the password field and the Sign in button are shown. */
   get showPasswordFields(): boolean {
     return !this.showPasskey || this.step === 'password';

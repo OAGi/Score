@@ -125,6 +125,29 @@ describe('LoginComponent passkey sign-in', () => {
     });
   });
 
+  describe('Enter in the username field with passkeys off', () => {
+    const passwordInput = () => el().querySelector('#password') as HTMLInputElement;
+    const pressEnter = () => {
+      const event = new KeyboardEvent('keydown', {key: 'Enter', bubbles: true, cancelable: true});
+      usernameInput().dispatchEvent(event);
+      return event;
+    };
+
+    it('moves on to the password instead of submitting the form', () => {
+      setup({enabled: false});
+      const event = pressEnter();
+      expect(event.defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(passwordInput());
+    });
+
+    it('leaves Enter alone once a password has been entered', async () => {
+      setup({enabled: false});
+      fixture.componentInstance.credentials.password = 'secret';
+      const event = pressEnter();
+      expect(event.defaultPrevented).toBe(false);
+    });
+  });
+
   describe('brand logo', () => {
     it('shows the administrator-defined SVG above the welcome title', () => {
       setup({enabled: false, brand: '<svg class="custom-logo" width="160" height="26"></svg>'});
