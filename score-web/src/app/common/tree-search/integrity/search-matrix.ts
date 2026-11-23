@@ -11,7 +11,7 @@ import {Rows} from './cc-tree-oracle';
 export type Test = (rows: Rows) => boolean;
 
 export interface Case {
-  /** The kind of case, for the report. */
+  /** The type of case, for the report. */
   group: string;
   /** The condition, to be written between the brackets of `//*[...]`. */
   condition: string;

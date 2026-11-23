@@ -38,7 +38,7 @@ export function serverFlagName(id: string): string {
 /**
  * Splits an expression into what the graph search can judge and what the backend has to: every condition on a server
  * attribute (`remark contains "x"`, `contains(remark, "x")`, `remark = "x"`) is replaced by the test of a flag that the
- * answer of the backend sets on the places it holds for, so `and`, `or` and `not` mix both kinds as they always did.
+ * answer of the backend sets on the places it holds for, so `and`, `or` and `not` mix both types as they always did.
  *
  * An expression that does not parse is returned as it is, to be reported by the ordinary parse. A server attribute
  * that is used in a way the backend cannot answer (ordered with `<`, or not compared with anything) is a `ParseError`.

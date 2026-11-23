@@ -46,7 +46,7 @@ describe('TreeSearchBarComponent', () => {
   });
 
   it('puts the caret between the parentheses of a function that takes arguments, and after one that does not', () => {
-    const attribute = {name: 'den', kind: 'text', description: 'den'};
+    const attribute = {name: 'den', type: 'text', description: 'den'};
     const ctx = bar({
       searcher: {searchAttributes: [attribute], isSearching: false},
       searchInput: {nativeElement: {value: '*[', selectionStart: 2}},
@@ -64,7 +64,7 @@ describe('TreeSearchBarComponent', () => {
   it('makes the suggestion panel as wide as the search bar', () => {
     const widthOf = (width: number) => {
       const ctx = bar({
-        searcher: {searchAttributes: [{name: 'used', kind: 'flag', description: 'used'}], isSearching: false},
+        searcher: {searchAttributes: [{name: 'used', type: 'flag', description: 'used'}], isSearching: false},
         searchInput: {nativeElement: {value: '*[', selectionStart: 2}},
         host: {nativeElement: {getBoundingClientRect: () => ({width})}},
         suggestions: []

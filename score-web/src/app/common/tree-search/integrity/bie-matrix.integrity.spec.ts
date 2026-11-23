@@ -9,23 +9,23 @@ import {ENABLED, lit, sql} from './integrity-env';
  * place whose row keeps none says those of its core component, which `cc-matrix` holds with the rows of the BIE (fourth part of a root).
  */
 
-/** For each attribute: the node kind, and the row (with the column) a node of that kind keeps its text in. `{c}` is the column test. */
-const SOURCES: Record<string, {kind: string, from: string, key: string, column: string, where?: string}[]> = {
+/** For each attribute: the node type, and the row (with the column) a node of that type keeps its text in. `{c}` is the column test. */
+const SOURCES: Record<string, {type: string, from: string, key: string, column: string, where?: string}[]> = {
   definition: [
-    {kind: 'ASBIEP', from: 'asbie c', key: 'c.asbie_id', column: 'c.definition'},
-    {kind: 'BBIEP', from: 'bbie c', key: 'c.bbie_id', column: 'c.definition'},
-    {kind: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.definition'},
-    {kind: 'ABIE', from: 'asbiep c join top_level_asbiep t on t.asbiep_id = c.asbiep_id', key: '0', column: 'c.definition'}
+    {type: 'ASBIEP', from: 'asbie c', key: 'c.asbie_id', column: 'c.definition'},
+    {type: 'BBIEP', from: 'bbie c', key: 'c.bbie_id', column: 'c.definition'},
+    {type: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.definition'},
+    {type: 'ABIE', from: 'asbiep c join top_level_asbiep t on t.asbiep_id = c.asbiep_id', key: '0', column: 'c.definition'}
   ],
   remark: [
-    {kind: 'ASBIEP', from: 'asbie c join asbiep p on p.asbiep_id = c.to_asbiep_id', key: 'c.asbie_id', column: 'p.remark'},
-    {kind: 'BBIEP', from: 'bbie c join bbiep p on p.bbiep_id = c.to_bbiep_id', key: 'c.bbie_id', column: 'p.remark'},
-    {kind: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.remark'},
-    {kind: 'ABIE', from: 'asbiep c join top_level_asbiep t on t.asbiep_id = c.asbiep_id', key: '0', column: 'c.remark'}
+    {type: 'ASBIEP', from: 'asbie c join asbiep p on p.asbiep_id = c.to_asbiep_id', key: 'c.asbie_id', column: 'p.remark'},
+    {type: 'BBIEP', from: 'bbie c join bbiep p on p.bbiep_id = c.to_bbiep_id', key: 'c.bbie_id', column: 'p.remark'},
+    {type: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.remark'},
+    {type: 'ABIE', from: 'asbiep c join top_level_asbiep t on t.asbiep_id = c.asbiep_id', key: '0', column: 'c.remark'}
   ],
   example: [
-    {kind: 'BBIEP', from: 'bbie c', key: 'c.bbie_id', column: 'c.example'},
-    {kind: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.example'}
+    {type: 'BBIEP', from: 'bbie c', key: 'c.bbie_id', column: 'c.example'},
+    {type: 'BBIE_SC', from: 'bbie_sc c', key: 'c.bbie_sc_id', column: 'c.example'}
   ]
 };
 
@@ -43,13 +43,13 @@ function test(column: string, op: Op, value: string): string {
   }
 }
 
-/** How many nodes of the BIE have text in the attribute that satisfies the operator, optionally only the nodes of a kind. */
-function count(owner: number, attribute: string, op: Op, value: string, kinds?: string[]): number {
+/** How many nodes of the BIE have text in the attribute that satisfies the operator, optionally only the nodes of a type. */
+function count(owner: number, attribute: string, op: Op, value: string, types?: string[]): number {
   const keys = new Set<string>();
-  for (const s of SOURCES[attribute].filter(x => !kinds || kinds.includes(x.kind))) {
-    const root = s.kind === 'ABIE' ? ` and t.asbiep_id = c.asbiep_id` : '';
+  for (const s of SOURCES[attribute].filter(x => !types || types.includes(x.type))) {
+    const root = s.type === 'ABIE' ? ` and t.asbiep_id = c.asbiep_id` : '';
     for (const [key] of sql(`select distinct ${s.key} from ${s.from} where c.owner_top_level_asbiep_id = ${owner}${root} and (${test(s.column, op, value)})`)) {
-      keys.add(s.kind + key);
+      keys.add(s.type + key);
     }
   }
   return keys.size;
@@ -59,7 +59,7 @@ function samples(owner: number, attribute: string): string[] {
   const out = new Set<string>();
   for (const s of SOURCES[attribute]) {
     for (const [v] of sql(`select left(replace(replace(replace(${s.column}, char(10), ' '), char(13), ' '), char(9), ' '), 14) from ${s.from} ` +
-      `where c.owner_top_level_asbiep_id = ${owner} and ${s.column} is not null and char_length(${s.column}) > 5 ${s.kind === 'ABIE' ? 'and t.asbiep_id = c.asbiep_id' : ''} order by md5(${s.key}) limit 3`)) {
+      `where c.owner_top_level_asbiep_id = ${owner} and ${s.column} is not null and char_length(${s.column}) > 5 ${s.type === 'ABIE' ? 'and t.asbiep_id = c.asbiep_id' : ''} order by md5(${s.key}) limit 3`)) {
       if (!v.includes('"') && !v.includes('\'') && !v.includes('\\')) { out.add(v); }
     }
   }
@@ -89,11 +89,11 @@ describe.skipIf(!ENABLED || !process.env['SEARCH_BIE_MATRIX_OUT'])('matrix of th
             add(attribute + ' ends piece', `ends-with(${attribute}, "${piece}")`, count(owner, attribute, 'ends', piece));
           }
         }
-        // restricted to a kind of node, and joined with another condition
-        for (const kind of ['ASBIEP', 'BBIEP', 'BBIE_SC', 'ABIE']) {
-          if (SOURCES[attribute].some(s => s.kind === kind)) {
-            add(attribute + ' and type', `type = ${kind} and contains(${attribute}, "e")`, count(owner, attribute, 'contains', 'e', [kind]));
-            add(attribute + ' or type', `type = ${kind} or contains(${attribute}, "zzqq")`, -2);
+        // restricted to a type of node, and joined with another condition
+        for (const type of ['ASBIEP', 'BBIEP', 'BBIE_SC', 'ABIE']) {
+          if (SOURCES[attribute].some(s => s.type === type)) {
+            add(attribute + ' and type', `type = ${type} and contains(${attribute}, "e")`, count(owner, attribute, 'contains', 'e', [type]));
+            add(attribute + ' or type', `type = ${type} or contains(${attribute}, "zzqq")`, -2);
           }
         }
       }

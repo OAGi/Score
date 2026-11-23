@@ -18,7 +18,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -103,6 +105,21 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
             IllegalArgumentException ex, WebRequest webRequest) {
         logger.debug(ex.getMessage(), ex);
         return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /**
+     * A request body that names something the server does not know (an attribute a search cannot look in, a malformed id)
+     * is refused by the converter of that value, with the reason: it is told the way an {@link IllegalArgumentException}
+     * of the request is, instead of by "Failed to read request".
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        if (ex.getMostSpecificCause() instanceof IllegalArgumentException reason && reason.getMessage() != null) {
+            logger.debug(reason.getMessage(), ex);
+            return (ResponseEntity) errorResponse(HttpStatus.BAD_REQUEST, reason.getMessage());
+        }
+        return super.handleHttpMessageNotReadable(ex, headers, status, request);
     }
 
     /**

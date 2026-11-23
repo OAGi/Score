@@ -18,7 +18,7 @@ const AXIS_DETAILS: [string, string][] = [
 export interface SearchAttribute {
   name: string;
   /** `text` is free text or an enum, `number` compares numerically, `flag` is true/false. */
-  kind: 'text' | 'number' | 'flag';
+  type: 'text' | 'number' | 'flag';
   /**
    * Where the value is looked up: `graph` attributes travel with the search graph and are judged in the browser (the
    * default), `server` attributes are searched by the backend and only the matches reach the graph. Text that differs
@@ -44,7 +44,7 @@ export interface SearchSuggestion {
   label: string;
   insert: string;
   detail: string;
-  kind: 'attribute' | 'function' | 'operator' | 'keyword' | 'value' | 'snippet';
+  type: 'attribute' | 'function' | 'operator' | 'keyword' | 'value' | 'snippet';
   /** How many characters before the end of `insert` the caret goes (inside the parentheses of `count()`); the end when absent. */
   caretBack?: number;
 }
@@ -78,13 +78,13 @@ const FUNCTION_DETAILS: Record<string, string> = {
 
 /** What an argument of a function is: an attribute (or `text()`), a quoted text, or a path. */
 interface FunctionParameter {
-  kind: 'value' | 'text' | 'path';
+  type: 'value' | 'text' | 'path';
   detail: string;
 }
 
 const TEXT_FUNCTION_PARAMETERS: FunctionParameter[] = [
-  {kind: 'value', detail: 'the attribute (or text()) whose value is searched'},
-  {kind: 'text', detail: 'the text to look for in it'}
+  {type: 'value', detail: 'the attribute (or text()) whose value is searched'},
+  {type: 'text', detail: 'the text to look for in it'}
 ];
 
 /** The arguments each function takes, in order; a function without any is completed with its parentheses. */
@@ -93,25 +93,25 @@ const FUNCTION_PARAMETERS: Record<string, FunctionParameter[]> = {
   'text': [],
   'position': [],
   'last': [],
-  'count': [{kind: 'path', detail: 'the path whose nodes are counted: * for every child, or e.g. Code, ../Code, descendant-or-self::Code'}]
+  'count': [{type: 'path', detail: 'the path whose nodes are counted: * for every child, or e.g. Code, ../Code, descendant-or-self::Code'}]
 };
 
 /** What the field offers while it is empty: examples of the expressions it understands. */
 export function searchSyntaxHints(attributes: SearchAttribute[]): SearchSuggestion[] {
-  const flag = attributes.find(a => a.kind === 'flag');
+  const flag = attributes.find(a => a.type === 'flag');
   const hints: SearchSuggestion[] = [
-    {label: '*', insert: '*', detail: 'any node; Parent/Child searches a path, a leading / anchors it at the root, // reaches any depth', kind: 'snippet'}
+    {label: '*', insert: '*', detail: 'any node; Parent/Child searches a path, a leading / anchors it at the root, // reaches any depth', type: 'snippet'}
   ];
   if (flag) {
-    hints.push({label: `*[${flag.name} = true]`, insert: `*[${flag.name} = true]`, detail: 'nodes by attribute', kind: 'snippet'});
+    hints.push({label: `*[${flag.name} = true]`, insert: `*[${flag.name} = true]`, detail: 'nodes by attribute', type: 'snippet'});
   }
   if (attributes.length > 0) {
     const example = '*[contains(text(), "id")]';
-    hints.push({label: example, insert: example, detail: 'text() is the text the node shows; combine conditions with and, or, not', kind: 'snippet'});
+    hints.push({label: example, insert: example, detail: 'text() is the text the node shows; combine conditions with and, or, not', type: 'snippet'});
   }
   hints.push(
-    {label: '*[../Code]', insert: '*[../Code]', detail: 'a node whose parent has a child with Code in its name (so it and its siblings); also ancestor::, following-sibling::, preceding-sibling::', kind: 'snippet'},
-    {label: '*[2]', insert: '*[2]', detail: 'the 2nd of the siblings; also position() and last()', kind: 'snippet'}
+    {label: '*[../Code]', insert: '*[../Code]', detail: 'a node whose parent has a child with Code in its name (so it and its siblings); also ancestor::, following-sibling::, preceding-sibling::', type: 'snippet'},
+    {label: '*[2]', insert: '*[2]', detail: 'the 2nd of the siblings; also position() and last()', type: 'snippet'}
   );
   return hints;
 }
@@ -181,29 +181,29 @@ function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[]
     items.push(...axisSuggestions());
   }
   if (next.has('any') && !afterOp) {
-    items.push({label: '*', insert: '*', detail: 'any node', kind: 'snippet'});
+    items.push({label: '*', insert: '*', detail: 'any node', type: 'snippet'});
   }
   if (last?.type === 'DotDot' && beforeLast?.type === 'NumberLit') {
-    return [{label: '*', insert: '*', detail: 'no upper limit, e.g. 1..*', kind: 'snippet'}];
+    return [{label: '*', insert: '*', detail: 'no upper limit, e.g. 1..*', type: 'snippet'}];
   }
   if (next.has('parent') && !afterOp) {
     items.push(last?.type === 'NumberLit' ?
-      {label: '..', insert: '..', detail: 'a range, e.g. 0..1 or 1..*', kind: 'snippet'} : upSuggestions()[0]);
+      {label: '..', insert: '..', detail: 'a range, e.g. 0..1 or 1..*', type: 'snippet'} : upSuggestions()[0]);
   }
   if (next.has('self') && !afterOp) {
     items.push(upSuggestions()[1]);
   }
   if (next.has('name') && !afterOp && !inPath) {
-    items.push({label: 'not', insert: 'not ', detail: 'negate the condition', kind: 'keyword'});
+    items.push({label: 'not', insert: 'not ', detail: 'negate the condition', type: 'keyword'});
   }
   const known = last?.type === 'Ident' ? attributeOf(last.text) : undefined;
   if (next.has('op') && (known || last?.type === 'RParen')) {
     items.push(...operatorSuggestions(known));
   }
   if (!next.has('name')) {
-    for (const [kind, label, detail] of JOINS) {
-      if (next.has(kind)) {
-        items.push({label, insert: label + ' ', detail, kind: 'keyword'});
+    for (const [type, label, detail] of JOINS) {
+      if (next.has(type)) {
+        items.push({label, insert: label + ' ', detail, type: 'keyword'});
       }
     }
   }
@@ -212,24 +212,24 @@ function predicateSuggestions(tail: PredicateTail, attributes: SearchAttribute[]
     || last?.type === 'Ident' && ['Slash', 'SlashSlash', 'DoubleColon'].includes(beforeLast?.type);
   if (afterStep) {
     if (next.has('slash')) {
-      items.push({label: '/', insert: '/', detail: 'go on to a child node', kind: 'operator'});
+      items.push({label: '/', insert: '/', detail: 'go on to a child node', type: 'operator'});
     }
     if (next.has('descendant')) {
-      items.push({label: '//', insert: '//', detail: 'go on to a node at any depth below', kind: 'operator'});
+      items.push({label: '//', insert: '//', detail: 'go on to a node at any depth below', type: 'operator'});
     }
     if (next.has('predicate')) {
-      items.push({label: '[', insert: '[', detail: 'one more condition on this node', kind: 'operator'});
+      items.push({label: '[', insert: '[', detail: 'one more condition on this node', type: 'operator'});
     }
   }
   if (next.has('comma')) {
-    items.push({label: ',', insert: ', ', detail: 'the next argument', kind: 'operator'});
+    items.push({label: ',', insert: ', ', detail: 'the next argument', type: 'operator'});
   }
   // the `)` of `count()` is there already when the caret is between the parentheses
   if (next.has('closeParen') && !after.trimStart().startsWith(')')) {
-    items.push({label: ')', insert: ')', detail: 'end of the arguments or of the group', kind: 'operator'});
+    items.push({label: ')', insert: ')', detail: 'end of the arguments or of the group', type: 'operator'});
   }
   if (complete && !next.has('name') || next.has('closeBracket')) {
-    items.push({label: ']', insert: ']', detail: 'end of the condition', kind: 'operator'});
+    items.push({label: ']', insert: ']', detail: 'end of the condition', type: 'operator'});
   }
   const call = last?.type === 'LParen' || last?.type === 'Comma' ? enclosingCall(tokens) : undefined;
   const parameter = call ? FUNCTION_PARAMETERS[call.name.toLowerCase()]?.[call.index] : undefined;
@@ -306,17 +306,17 @@ function fits(searchFunction: string, typed: string, value: string): boolean {
 /** What may be written where a function's argument begins: only what the argument is (a path, an attribute, a text). */
 function argumentSuggestions(parameter: FunctionParameter, items: SearchSuggestion[], tokens: {type: string, text: string}[],
                              index: number, attributes: SearchAttribute[]): SearchSuggestion[] {
-  switch (parameter.kind) {
+  switch (parameter.type) {
     case 'path':
       return items.filter(i => i.label.endsWith('::') || ['*', '..', '.'].includes(i.label))
         .map(i => i.label === '*' ? {...i, detail: parameter.detail} : i);
     case 'value':
-      return items.filter(i => i.kind === 'attribute' || i.label === 'text()');
+      return items.filter(i => i.type === 'attribute' || i.label === 'text()');
     default: {
       // the text a function looks for: the values of the attribute it searches, when it has a fixed set of them
       const searched = attributes.find(a => a.name.toLowerCase() === tokens[tokens.length - 2]?.text.toLowerCase());
-      const values = searched?.kind === 'text' ? valueSuggestions({...searched, bare: false}, true).map(v => ({...v, insert: v.insert.trimEnd()})) : [];
-      return [{label: '"text"', insert: '""', detail: parameter.detail, kind: 'snippet', caretBack: 1}, ...values];
+      const values = searched?.type === 'text' ? valueSuggestions({...searched, bare: false}, true).map(v => ({...v, insert: v.insert.trimEnd()})) : [];
+      return [{label: '"text"', insert: '""', detail: parameter.detail, type: 'snippet', caretBack: 1}, ...values];
     }
   }
 }
@@ -382,22 +382,22 @@ function stepSuggestions(before: string, caret: number, attributes: SearchAttrib
   const step = before.substring(stepStart);
   if (step.trim().endsWith(']')) {
     return {from: caret, to: caret, items: [
-      {label: '/', insert: '/', detail: 'go on to a child node', kind: 'operator'},
-      {label: '//', insert: '//', detail: 'go on to a node at any depth below', kind: 'operator'},
-      {label: '[', insert: '[', detail: 'one more condition on this node', kind: 'operator'}
+      {label: '/', insert: '/', detail: 'go on to a child node', type: 'operator'},
+      {label: '//', insert: '//', detail: 'go on to a node at any depth below', type: 'operator'},
+      {label: '[', insert: '[', detail: 'one more condition on this node', type: 'operator'}
     ]};
   }
   const axisTyped = /^\s*[A-Za-z-]+::/.test(step);
   if (axisTyped) {
-    return {from: stepStart + step.indexOf('::') + 2, to: caret, items: [{label: '*', insert: '*', detail: 'any node', kind: 'snippet'}]};
+    return {from: stepStart + step.indexOf('::') + 2, to: caret, items: [{label: '*', insert: '*', detail: 'any node', type: 'snippet'}]};
   }
   if (!step.trim()) {
-    const items: SearchSuggestion[] = [{label: '*', insert: '*', detail: 'any node', kind: 'snippet'}];
+    const items: SearchSuggestion[] = [{label: '*', insert: '*', detail: 'any node', type: 'snippet'}];
     if (attributes.length > 0) {
-      items.push({label: '*[', insert: '*[', detail: 'any node that satisfies a condition', kind: 'snippet'});
+      items.push({label: '*[', insert: '*[', detail: 'any node that satisfies a condition', type: 'snippet'});
     }
     if (stepStart > 0) {
-      items.push(...axisSuggestions(), {label: '..', insert: '..', detail: 'the parent of the step before', kind: 'snippet'});
+      items.push(...axisSuggestions(), {label: '..', insert: '..', detail: 'the parent of the step before', type: 'snippet'});
     }
     return {from: stepStart, to: caret, items};
   }
@@ -405,59 +405,59 @@ function stepSuggestions(before: string, caret: number, attributes: SearchAttrib
     return NO_SUGGESTIONS;
   }
   return {from: caret, to: caret, items: [
-    {label: '[', insert: '[', detail: 'add a condition on the node\'s attributes', kind: 'operator'},
-    {label: '/', insert: '/', detail: 'go on to a child node', kind: 'operator'},
-    {label: '//', insert: '//', detail: 'go on to a node at any depth below', kind: 'operator'}
+    {label: '[', insert: '[', detail: 'add a condition on the node\'s attributes', type: 'operator'},
+    {label: '/', insert: '/', detail: 'go on to a child node', type: 'operator'},
+    {label: '//', insert: '//', detail: 'go on to a node at any depth below', type: 'operator'}
   ]};
 }
 
 function attributeSuggestions(attributes: SearchAttribute[]): SearchSuggestion[] {
   return attributes.map(a => ({
-    label: a.name, insert: a.name + ' ', detail: a.description + (a.kind === 'flag' ? ' (true/false)' : '') + (a.source === 'server' ? ' [searched on the server, saved text only]' : ''), kind: 'attribute' as const
+    label: a.name, insert: a.name + ' ', detail: a.description + (a.type === 'flag' ? ' (true/false)' : '') + (a.source === 'server' ? ' [searched on the server, saved text only]' : ''), type: 'attribute' as const
   }));
 }
 
 function functionSuggestions(): SearchSuggestion[] {
   return Object.entries(FUNCTION_PARAMETERS).map(([name, parameters]) => ({
-    label: name + '()', insert: name + '()', detail: FUNCTION_DETAILS[name] ?? name, kind: 'function' as const,
+    label: name + '()', insert: name + '()', detail: FUNCTION_DETAILS[name] ?? name, type: 'function' as const,
     // a function that takes arguments is completed with its parentheses and the caret goes between them
     caretBack: parameters.length > 0 ? 1 : undefined
   }));
 }
 
 function axisSuggestions(): SearchSuggestion[] {
-  return AXIS_DETAILS.map(([axis, detail]) => ({label: axis + '::', insert: axis + '::', detail, kind: 'keyword' as const}));
+  return AXIS_DETAILS.map(([axis, detail]) => ({label: axis + '::', insert: axis + '::', detail, type: 'keyword' as const}));
 }
 
 /** The short ways to go to the node itself and to its parent. */
 function upSuggestions(): SearchSuggestion[] {
   return [
-    {label: '..', insert: '..', detail: 'the parent (parent::*), e.g. ../Code: a child of the parent with Code in its name', kind: 'snippet'},
-    {label: '.', insert: '.', detail: 'the node itself (self::*), e.g. .//Code (a descendant)', kind: 'snippet'}
+    {label: '..', insert: '..', detail: 'the parent (parent::*), e.g. ../Code: a child of the parent with Code in its name', type: 'snippet'},
+    {label: '.', insert: '.', detail: 'the node itself (self::*), e.g. .//Code (a descendant)', type: 'snippet'}
   ];
 }
 
 function operatorSuggestions(attribute: SearchAttribute | undefined): SearchSuggestion[] {
-  const equalityOnly = attribute?.kind === 'flag' || RANGE_ATTRIBUTES.includes(attribute?.name.toLowerCase());
+  const equalityOnly = attribute?.type === 'flag' || RANGE_ATTRIBUTES.includes(attribute?.name.toLowerCase());
   return COMPARISONS
     .filter(c => c.flag || !equalityOnly)
-    .map(c => ({label: c.op, insert: c.op + ' ', detail: c.detail, kind: 'operator' as const}));
+    .map(c => ({label: c.op, insert: c.op + ' ', detail: c.detail, type: 'operator' as const}));
 }
 
 function valueSuggestions(attribute: SearchAttribute | undefined, quoted: boolean, closing = '"'): SearchSuggestion[] {
   if (!attribute) {
     return [];
   }
-  if (attribute.kind === 'flag') {
-    return ['true', 'false'].map(v => ({label: v, insert: v + ' ', detail: attribute.name, kind: 'value' as const}));
+  if (attribute.type === 'flag') {
+    return ['true', 'false'].map(v => ({label: v, insert: v + ' ', detail: attribute.name, type: 'value' as const}));
   }
   return (attribute.values ?? []).flatMap(v => {
     // a text has no escape for its own quote: inside a quoted text only the values without the closing quote can go on
     if (!quoted) {
-      return v.includes(closing) ? [] : [{label: v, insert: `${v}${closing}`, detail: attribute.name, kind: 'value' as const}];
+      return v.includes(closing) ? [] : [{label: v, insert: `${v}${closing}`, detail: attribute.name, type: 'value' as const}];
     }
     const quote = attribute.bare ? '' : ['"', '\''].find(q => !v.includes(q));
-    return quote === undefined ? [] : [{label: v, insert: `${quote}${v}${quote} `, detail: attribute.name, kind: 'value' as const}];
+    return quote === undefined ? [] : [{label: v, insert: `${quote}${v}${quote} `, detail: attribute.name, type: 'value' as const}];
   });
 }
 
@@ -497,39 +497,39 @@ function rank(word: string, wordStart: number, caret: number, items: SearchSugge
 const COMPONENT_TYPES = ['Base', 'Semantics', 'Extension', 'SemanticGroup', 'UserExtensionGroup', 'Embedded', 'OAGIS10Nouns',
   'OAGIS10BODs', 'BOD', 'Verb', 'Noun', 'Choice', 'AttributeGroup'];
 
-/** The columns of the core component a node shows; a component has only its own kind's (a test on another's is false). */
+/** The columns of the core component a node shows; a component has only its own type's (a test on another's is false). */
 const COMPONENT_COLUMNS: SearchAttribute[] = [
-  {name: 'object_class_term', kind: 'text', description: 'ACC / DT_SC: the object class term'},
-  {name: 'property_term', kind: 'text', description: 'ASCCP / BCCP / DT_SC: the property term'},
-  {name: 'den', kind: 'text', description: 'ACC / ASCCP / BCCP / DT: the dictionary entry name'},
-  {name: 'data_type_term', kind: 'text', description: 'DT: the data type term'},
-  {name: 'representation_term', kind: 'text', description: 'DT_SC: the representation term'},
-  {name: 'qualifier', kind: 'text', description: 'DT: the qualifier'},
+  {name: 'object_class_term', type: 'text', description: 'ACC / DT_SC: the object class term'},
+  {name: 'property_term', type: 'text', description: 'ASCCP / BCCP / DT_SC: the property term'},
+  {name: 'den', type: 'text', description: 'ACC / ASCCP / BCCP / DT: the dictionary entry name'},
+  {name: 'data_type_term', type: 'text', description: 'DT: the data type term'},
+  {name: 'representation_term', type: 'text', description: 'DT_SC: the representation term'},
+  {name: 'qualifier', type: 'text', description: 'DT: the qualifier'},
   {
-    name: 'component_type', kind: 'text', description: 'ACC: the component type (Extension, SemanticGroup, ...)',
+    name: 'component_type', type: 'text', description: 'ACC: the component type (Extension, SemanticGroup, ...)',
     values: COMPONENT_TYPES
   },
-  {name: 'entity_type', kind: 'text', description: 'BCCP: whether the BCC is an Element or an Attribute', values: ['Element', 'Attribute']},
+  {name: 'entity_type', type: 'text', description: 'BCCP: whether the BCC is an Element or an Attribute', values: ['Element', 'Attribute']},
   {
-    name: 'cardinality', kind: 'text', bare: true, values: ['Optional', 'Required', 'Prohibited', '0..1', '1..1', '0..*', '1..*'],
+    name: 'cardinality', type: 'text', bare: true, values: ['Optional', 'Required', 'Prohibited', '0..1', '1..1', '0..*', '1..*'],
     description: 'ASCC / BCC / DT_SC (BIE: ASBIE / BBIE / BBIE_SC): min..max; = and != only'
   },
-  {name: 'cardinality_min', kind: 'text', description: 'the minimum of the cardinality, e.g. cardinality_min = 1'},
-  {name: 'cardinality_max', kind: 'text', description: 'the maximum of the cardinality (unbounded is above any number), e.g. cardinality_max < 10'},
-  {name: 'state', kind: 'text', description: 'the state of the component (WIP, Draft, Published, ...)'},
-  {name: 'guid', kind: 'text', description: 'the GUID of the component'},
-  {name: 'deprecated', kind: 'flag', description: 'the component is deprecated'},
-  {name: 'tag', kind: 'text', multiple: true, description: 'the tags of the component, e.g. tag = "Core"'}
+  {name: 'cardinality_min', type: 'text', description: 'the minimum of the cardinality, e.g. cardinality_min = 1'},
+  {name: 'cardinality_max', type: 'text', description: 'the maximum of the cardinality (unbounded is above any number), e.g. cardinality_max < 10'},
+  {name: 'state', type: 'text', description: 'the state of the component (WIP, Draft, Published, ...)'},
+  {name: 'guid', type: 'text', description: 'the GUID of the component'},
+  {name: 'deprecated', type: 'flag', description: 'the component is deprecated'},
+  {name: 'tag', type: 'text', multiple: true, description: 'the tags of the component, e.g. tag = "Core"'}
 ];
 
 /** The columns of the core components that only the trees of core components show (the BIE trees show them of the BIE). */
 const CC_ONLY_COLUMNS: SearchAttribute[] = [
-  {name: 'object_class_qualifier', kind: 'text', description: 'ACC: the object class qualifier'},
-  {name: 'abstract', kind: 'flag', description: 'ACC: the component is abstract'},
-  {name: 'reusable', kind: 'flag', description: 'ASCCP: the component is reusable'},
-  {name: 'commonly_used', kind: 'flag', description: 'DT: the data type is commonly used'},
+  {name: 'object_class_qualifier', type: 'text', description: 'ACC: the object class qualifier'},
+  {name: 'abstract', type: 'flag', description: 'ACC: the component is abstract'},
+  {name: 'reusable', type: 'flag', description: 'ASCCP: the component is reusable'},
+  {name: 'commonly_used', type: 'flag', description: 'DT: the data type is commonly used'},
   {
-    name: 'nillable', kind: 'flag',
+    name: 'nillable', type: 'flag',
     description: 'ASCCP / BCCP / BCC: the component, or the association that ties the node to its parent, is nillable'
   }
 ];
@@ -537,30 +537,30 @@ const CC_ONLY_COLUMNS: SearchAttribute[] = [
 /** The definitions of the core components a row of the component tree (or the model browser) shows. */
 const CC_DEFINITION_COLUMNS: SearchAttribute[] = [
   {
-    name: 'definition', kind: 'text', source: 'server',
+    name: 'definition', type: 'text', source: 'server',
     description: 'the definition of what the node is: its ASCC or BCC when it is tied to its parent by one, else its component; only the ones that have one are found, and = and != compare the whole text'
   },
-  {name: 'definition_source', kind: 'text', source: 'server', description: 'the source of that definition'},
+  {name: 'definition_source', type: 'text', source: 'server', description: 'the source of that definition'},
   {
-    name: 'association_definition', kind: 'text', source: 'server',
+    name: 'association_definition', type: 'text', source: 'server',
     description: 'ASCCP / BCCP: the definition of the ASCC or BCC that ties it to its parent'
   },
-  {name: 'component_definition', kind: 'text', source: 'server', description: 'ASCCP / BCCP: the definition of the ASCCP or BCCP'},
-  {name: 'type_definition', kind: 'text', source: 'server', description: 'BCCP: the definition of its data type'},
+  {name: 'component_definition', type: 'text', source: 'server', description: 'ASCCP / BCCP: the definition of the ASCCP or BCCP'},
+  {name: 'type_definition', type: 'text', source: 'server', description: 'BCCP: the definition of its data type'},
   {
-    name: 'default_value', kind: 'text', source: 'server',
+    name: 'default_value', type: 'text', source: 'server',
     description: 'BCC / BCCP / DT_SC: the default value (the BCC\'s when the node is tied to its parent by one)'
   },
   {
-    name: 'fixed_value', kind: 'text', source: 'server',
+    name: 'fixed_value', type: 'text', source: 'server',
     description: 'BCC / BCCP / DT_SC: the fixed value (the BCC\'s when the node is tied to its parent by one)'
   },
-  {name: 'content_component_definition', kind: 'text', source: 'server', description: 'DT: the definition of the content component'}
+  {name: 'content_component_definition', type: 'text', source: 'server', description: 'DT: the definition of the content component'}
 ];
 
 /** The attributes of the nodes of a core component tree (the ACC, ASCCP, BCCP, DT and extension screens). */
 export const COMPONENT_SEARCH_ATTRIBUTES: SearchAttribute[] = [
-  {name: 'type', kind: 'text', description: 'the kind of node', values: ['ACC', 'ASCCP', 'BCCP', 'DT', 'DT_SC']},
+  {name: 'type', type: 'text', description: 'the type of node', values: ['ACC', 'ASCCP', 'BCCP', 'DT', 'DT_SC']},
   ...COMPONENT_COLUMNS,
   ...CC_ONLY_COLUMNS,
   ...CC_DEFINITION_COLUMNS
@@ -568,7 +568,7 @@ export const COMPONENT_SEARCH_ATTRIBUTES: SearchAttribute[] = [
 
 /** The attributes of the nodes of a tree that shows core components the way a BIE is shown (the model browser). */
 export const MODEL_BROWSER_SEARCH_ATTRIBUTES: SearchAttribute[] = [
-  {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
+  {name: 'type', type: 'text', description: 'the type of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
   ...COMPONENT_COLUMNS,
   ...CC_ONLY_COLUMNS,
   ...CC_DEFINITION_COLUMNS
@@ -576,38 +576,38 @@ export const MODEL_BROWSER_SEARCH_ATTRIBUTES: SearchAttribute[] = [
 
 /** The attributes of the nodes of a BIE tree. */
 export const BIE_SEARCH_ATTRIBUTES: SearchAttribute[] = [
-  {name: 'type', kind: 'text', description: 'the kind of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
-  {name: 'display_name', kind: 'text', description: 'ASBIEP / BBIEP / BBIE_SC: the display name set on the BIE'},
+  {name: 'type', type: 'text', description: 'the type of node', values: ['ABIE', 'ASBIEP', 'BBIEP', 'BBIE_SC']},
+  {name: 'display_name', type: 'text', description: 'ASBIEP / BBIEP / BBIE_SC: the display name set on the BIE'},
   {
-    name: 'definition', kind: 'text', source: 'server',
+    name: 'definition', type: 'text', source: 'server',
     description: 'the definition set on the BIE (its Context Definition); only the BIEs that have one are found, and = and != compare the whole text'
   },
-  {name: 'remark', kind: 'text', source: 'server', description: 'the remark set on the BIE'},
-  {name: 'example', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the example set on the BIE'},
-  {name: 'fixed_value', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the fixed value set on the BIE'},
-  {name: 'default_value', kind: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the default value set on the BIE'},
+  {name: 'remark', type: 'text', source: 'server', description: 'the remark set on the BIE'},
+  {name: 'example', type: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the example set on the BIE'},
+  {name: 'fixed_value', type: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the fixed value set on the BIE'},
+  {name: 'default_value', type: 'text', source: 'server', description: 'BBIEP / BBIE_SC: the default value set on the BIE'},
   {
-    name: 'business_term', kind: 'text', source: 'server', multiple: true,
+    name: 'business_term', type: 'text', source: 'server', multiple: true,
     description: 'the business terms of the BIE: the assigned ones when Business Term is enabled, else the business term text set on it'
   },
   {
-    name: 'value_domain_restriction', kind: 'text', source: 'server', values: ['Primitive', 'Code List', 'Agency ID List'],
-    description: 'BBIEP / BBIE_SC: the kind of value domain the BIE restricts its value to'
+    name: 'value_domain_restriction', type: 'text', source: 'server', values: ['Primitive', 'Code List', 'Agency ID List'],
+    description: 'BBIEP / BBIE_SC: the type of value domain the BIE restricts its value to'
   },
   {
-    name: 'value_domain', kind: 'text', source: 'server',
+    name: 'value_domain', type: 'text', source: 'server',
     description: 'BBIEP / BBIE_SC: the name of the primitive, code list or agency ID list the BIE restricts its value to; without value_domain_restriction all three are searched'
   },
-  {name: 'association_definition', kind: 'text', source: 'server', description: 'ASBIEP / BBIEP: the definition of the ASCC or BCC that ties it to its parent'},
-  {name: 'component_definition', kind: 'text', source: 'server', description: 'ABIE / ASBIEP / BBIEP / BBIE_SC: the definition of the ASCCP, BCCP or DT_SC it profiles'},
-  {name: 'type_definition', kind: 'text', source: 'server', description: 'ABIE / ASBIEP: the definition of its ACC'},
+  {name: 'association_definition', type: 'text', source: 'server', description: 'ASBIEP / BBIEP: the definition of the ASCC or BCC that ties it to its parent'},
+  {name: 'component_definition', type: 'text', source: 'server', description: 'ABIE / ASBIEP / BBIEP / BBIE_SC: the definition of the ASCCP, BCCP or DT_SC it profiles'},
+  {name: 'type_definition', type: 'text', source: 'server', description: 'ABIE / ASBIEP: the definition of its ACC'},
   ...COMPONENT_COLUMNS.map(column => column.name === 'deprecated' ?
     {...column, description: 'the BIE or the core component it profiles is deprecated'} : column),
   {
-    name: 'nillable', kind: 'flag',
+    name: 'nillable', type: 'flag',
     description: 'ASBIEP / BBIEP: the BIE is nillable, or the core component (or the association that ties the node to its parent) is'
   },
-  {name: 'used', kind: 'flag', description: 'the node is used in the BIE'},
-  {name: 'inherited', kind: 'flag', description: 'the node is inherited'},
-  {name: 'reused', kind: 'flag', description: 'the node is a reused BIE'}
+  {name: 'used', type: 'flag', description: 'the node is used in the BIE'},
+  {name: 'inherited', type: 'flag', description: 'the node is inherited'},
+  {name: 'reused', type: 'flag', description: 'the node is a reused BIE'}
 ];

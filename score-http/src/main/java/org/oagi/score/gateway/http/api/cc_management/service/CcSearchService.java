@@ -7,6 +7,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.cc_search.CcSearchRes
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.NotFoundException;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
+import org.oagi.score.gateway.http.common.model.TextSearchPredicates;
 import org.oagi.score.gateway.http.common.repository.jooq.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,24 +24,14 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class CcSearchService {
 
-    /** More predicates or longer text than a person types into a search bar is a mistake, or an attack. */
-    static final int MAX_PREDICATES = 20;
-    static final int MAX_VALUE_LENGTH = 1000;
-
     @Autowired
     private RepositoryFactory repositoryFactory;
 
     public CcSearchResponse searchNodes(ScoreUser requester, CcSearchRequest request) {
-        if (request == null || request.predicates() == null || request.predicates().size() > MAX_PREDICATES) {
-            throw new IllegalArgumentException("A search has at most " + MAX_PREDICATES + " server predicates.");
+        if (requester == null) {
+            throw new IllegalArgumentException("`requester` must not be null.");
         }
-        for (CcSearchPredicate predicate : request.predicates()) {
-            if (predicate.id() == null || predicate.id().isEmpty() || predicate.operator() == null
-                    || predicate.value() == null || predicate.value().length() > MAX_VALUE_LENGTH) {
-                throw new IllegalArgumentException("A server predicate needs an id, an operator and a value of at most "
-                        + MAX_VALUE_LENGTH + " characters.");
-            }
-        }
+        TextSearchPredicates.validate(request == null ? null : request.predicates());
 
         var query = repositoryFactory.ccSearchQueryRepository(requester);
         ReleaseId releaseId = query.getReleaseOfRoot(request);

@@ -1973,7 +1973,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
    * the order the tree shows them, so that a search can run on the thousands of components rather than on the
    * millions of nodes they unfold into. Built from the tree's own `children()` (one representative node per
    * component), so the names and the order are exactly the tree's; rebuilt when the sibling order changes. Undefined
-   * when the tree cannot be described (a node of a kind the graph does not know).
+   * when the tree cannot be described (a node of a type the graph does not know).
    */
   searchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
     if (!this._searchGraph || this._searchGraph.version !== this._viewOrderVersion || this._searchGraph.root !== root
@@ -2001,7 +2001,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     const keyOf = (node: T): string => {
       const key = this.searchKey(node);
       if (key === undefined) {
-        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+        throw new Error('A node of an unknown type cannot be searched through its graph.');
       }
       return key;
     };
@@ -2133,26 +2133,26 @@ function browserPlace(node: ModelBrowserNode): CcPlace {
   const self = node.self;
   const association = browserAssociation(node);
   const associationKey: CcKey | undefined = association ?
-    {kind: self instanceof ModelBrowserBccpNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
-  const component: CcKey | undefined = self instanceof ModelBrowserBccpNode ? {kind: 'bccp', manifestId: self.bccpNode.manifestId}
-    : self instanceof ModelBrowserBdtScNode ? {kind: 'dtSc', manifestId: self.bdtScNode.manifestId}
-      : self instanceof ModelBrowserAsccpNode ? {kind: 'asccp', manifestId: self.asccpNode.manifestId}
-        : self instanceof ModelBrowserAccNode ? {kind: 'acc', manifestId: self.accNode.manifestId} : undefined;
+    {type: self instanceof ModelBrowserBccpNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
+  const component: CcKey | undefined = self instanceof ModelBrowserBccpNode ? {type: 'bccp', manifestId: self.bccpNode.manifestId}
+    : self instanceof ModelBrowserBdtScNode ? {type: 'dtSc', manifestId: self.bdtScNode.manifestId}
+      : self instanceof ModelBrowserAsccpNode ? {type: 'asccp', manifestId: self.asccpNode.manifestId}
+        : self instanceof ModelBrowserAccNode ? {type: 'acc', manifestId: self.accNode.manifestId} : undefined;
   return {
     own: associationKey ?? component,
     association: associationKey,
     component: self instanceof ModelBrowserAsccpNode || self instanceof ModelBrowserBccpNode ? component : undefined,
-    type: self instanceof ModelBrowserBccpNode ? {kind: 'dt', manifestId: self.bdtNode.manifestId} : undefined
+    type: self instanceof ModelBrowserBccpNode ? {type: 'dt', manifestId: self.bdtNode.manifestId} : undefined
   };
 }
 
-/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+/** The ASCC or BCC that ties a node to its parent (the other types have none). */
 function browserAssociation(node: ModelBrowserNode): CcGraphNode | undefined {
   const self = node.self;
   return self instanceof ModelBrowserBccpNode ? self.bccNode : self instanceof ModelBrowserAsccpNode ? self.asccNode : undefined;
 }
 
-/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */
+/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other types have none). */
 function browserCardinality(node: ModelBrowserNode): NodeCardinality | undefined {
   const self = node.self;
   const edge = self instanceof ModelBrowserBccpNode ? self.bccNode : self instanceof ModelBrowserBdtScNode ? self.bdtScNode

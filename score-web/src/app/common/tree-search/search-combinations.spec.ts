@@ -240,7 +240,7 @@ function truth(tree: Tree, fact: Node): boolean {
 }
 
 describe('every boolean tree of the conditions', () => {
-  it('selects what the tree says, for every parenthesization and every kind of not', () => {
+  it('selects what the tree says, for every parenthesization and every type of not', () => {
     const all = trees(2);
     expect(all.length).toBeGreaterThan(300);
     for (const tree of all) {

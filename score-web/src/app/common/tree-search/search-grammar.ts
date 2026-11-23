@@ -361,7 +361,7 @@ function syntaxError(error: IRecognitionException, offset: number, end: number):
 /** The attributes whose value is a `min..max` range: they are compared with `=` and `!=` only. */
 export const RANGE_ATTRIBUTES = ['cardinality'];
 
-/** What can follow the text of a predicate, as a kind of token; each kind is tried with one example. */
+/** What can follow the text of a predicate, as a type of token; each type is tried with one example. */
 export type Continuation = 'or' | 'and' | 'not' | 'name' | 'call' | 'axis' | 'op' | 'slash' | 'descendant' | 'predicate' | 'parent'
   | 'self' | 'any' | 'closeParen' | 'comma' | 'closeBracket';
 
@@ -379,16 +379,16 @@ function canContinue(tokens: IToken[]): boolean {
 }
 
 export interface PredicateTail {
-  /** The last tokens of the text (the kind of each and what it spells). */
+  /** The last tokens of the text (the type of each and what it spells). */
   tokens: {type: string, text: string}[];
-  /** The kinds of token the parser would accept after the text. */
+  /** The types of token the parser would accept after the text. */
   next: Set<Continuation>;
   /** Whether the text is a whole condition already. */
   complete: boolean;
 }
 
 /**
- * What the grammar allows after the text of a predicate written so far: each kind of token is appended to the text and
+ * What the grammar allows after the text of a predicate written so far: each type of token is appended to the text and
  * the parser says whether it could still be the beginning of a predicate. Nothing is returned for text that cannot be read
  * (a lexical error), nor for one that is already wrong.
  */
@@ -399,10 +399,10 @@ export function predicateTail(text: string): PredicateTail | undefined {
   }
   const complete = lexed.tokens.length > 0 && parser.errors.length === 0;
   const next = new Set<Continuation>();
-  for (const [kind, example] of Object.entries(EXAMPLES)) {
+  for (const [type, example] of Object.entries(EXAMPLES)) {
     const tried = lexer.tokenize(text + ' ' + example);
     if (tried.errors.length === 0 && canContinue(tried.tokens)) {
-      next.add(kind as Continuation);
+      next.add(type as Continuation);
     }
   }
   return {tokens: lexed.tokens.map(t => ({type: t.tokenType.name, text: t.image})), next, complete};

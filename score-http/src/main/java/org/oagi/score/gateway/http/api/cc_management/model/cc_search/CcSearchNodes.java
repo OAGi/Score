@@ -10,7 +10,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.dt_sc.DtScManifestId;
 
 import java.util.List;
 
-/** The components of a release that a predicate holds for, by kind. */
+/** The components of a release that a predicate holds for, by type. */
 public record CcSearchNodes(List<AccManifestId> accs, List<AsccManifestId> asccs, List<AsccpManifestId> asccps,
                             List<BccManifestId> bccs, List<BccpManifestId> bccps, List<DtManifestId> dts,
                             List<DtScManifestId> dtScs) {

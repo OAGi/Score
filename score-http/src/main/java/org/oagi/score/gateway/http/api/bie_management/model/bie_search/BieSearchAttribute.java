@@ -1,5 +1,8 @@
 package org.oagi.score.gateway.http.api.bie_management.model.bie_search;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -16,7 +19,7 @@ public enum BieSearchAttribute {
     DEFAULT_VALUE("default_value"),
     /** The terms assigned to an ASBIE or a BBIE together with the `biz_term` text of the other nodes. */
     BUSINESS_TERM("business_term"),
-    /** The kind of value domain a BBIE or BBIE_SC restricts its value to: Primitive, Code List or Agency ID List. */
+    /** The type of value domain a BBIE or BBIE_SC restricts its value to: Primitive, Code List or Agency ID List. */
     VALUE_DOMAIN_RESTRICTION("value_domain_restriction"),
     /** The name of the primitive, code list or agency ID list that a BBIE or BBIE_SC restricts its value to. */
     VALUE_DOMAIN("value_domain");
@@ -27,8 +30,16 @@ public enum BieSearchAttribute {
         this.attributeName = attributeName;
     }
 
+    @JsonValue
     public String attributeName() {
         return attributeName;
+    }
+
+    /** What a request names an attribute by; a name that is none of them is refused. */
+    @JsonCreator
+    public static BieSearchAttribute from(String attributeName) {
+        return of(attributeName)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown search attribute: " + attributeName));
     }
 
     public static Optional<BieSearchAttribute> of(String attributeName) {

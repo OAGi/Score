@@ -1003,7 +1003,7 @@ export class CcFlatNodeDatabase<T extends CcFlatNode> {
     const keyOf = (node: T): string => {
       const key = this.searchKey(node);
       if (key === undefined) {
-        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+        throw new Error('A node of an unknown type cannot be searched through its graph.');
       }
       return key;
     };
@@ -1513,32 +1513,32 @@ function ccSearchAttributes(node: CcFlatNode, text: string, marks?: CcServerMark
 
 /** The component a node shows, as the backend names it. */
 function ccComponentKey(node: CcFlatNode): CcKey | undefined {
-  return node instanceof AccFlatNode ? {kind: 'acc', manifestId: node.accNode.manifestId}
-    : node instanceof AsccpFlatNode ? {kind: 'asccp', manifestId: node.asccpNode.manifestId}
-      : node instanceof BccpFlatNode ? {kind: 'bccp', manifestId: node.bccpNode.manifestId}
-        : node instanceof DtFlatNode ? {kind: 'dt', manifestId: node.dtNode.manifestId}
-          : node instanceof DtScFlatNode ? {kind: 'dtSc', manifestId: node.dtScNode.manifestId} : undefined;
+  return node instanceof AccFlatNode ? {type: 'acc', manifestId: node.accNode.manifestId}
+    : node instanceof AsccpFlatNode ? {type: 'asccp', manifestId: node.asccpNode.manifestId}
+      : node instanceof BccpFlatNode ? {type: 'bccp', manifestId: node.bccpNode.manifestId}
+        : node instanceof DtFlatNode ? {type: 'dt', manifestId: node.dtNode.manifestId}
+          : node instanceof DtScFlatNode ? {type: 'dtSc', manifestId: node.dtScNode.manifestId} : undefined;
 }
 
 /** What the backend is asked about for a node: the components its definitions are those of. */
 function ccPlace(node: CcFlatNode): CcPlace {
   const association = ccAssociation(node);
   const associationKey: CcKey | undefined = association ?
-    {kind: node instanceof AsccpFlatNode ? 'ascc' : 'bcc', manifestId: association.manifestId} : undefined;
+    {type: node instanceof AsccpFlatNode ? 'ascc' : 'bcc', manifestId: association.manifestId} : undefined;
   const component = ccComponentKey(node);
   return {
     own: associationKey ?? component,
     association: associationKey,
     component: node instanceof AsccpFlatNode || node instanceof BccpFlatNode ? component : undefined,
-    type: node instanceof BccpFlatNode ? {kind: 'dt', manifestId: node.bdtNode.manifestId} : undefined
+    type: node instanceof BccpFlatNode ? {type: 'dt', manifestId: node.bdtNode.manifestId} : undefined
   };
 }
 
 /** The tree's root as the backend is told about it. */
 function ccSearchRoot(node: CcFlatNode | undefined): CcSearchRoot | undefined {
   const key = node && ccComponentKey(node);
-  const types: Partial<Record<CcKey['kind'], CcSearchRoot['type']>> = {acc: 'ACC', asccp: 'ASCCP', bccp: 'BCCP', dt: 'DT'};
-  return key && types[key.kind] ? {type: types[key.kind], manifestId: key.manifestId} : undefined;
+  const types: Partial<Record<CcKey['type'], CcSearchRoot['type']>> = {acc: 'ACC', asccp: 'ASCCP', bccp: 'BCCP', dt: 'DT'};
+  return key && types[key.type] ? {type: types[key.type], manifestId: key.manifestId} : undefined;
 }
 
 /**
@@ -1588,12 +1588,12 @@ function ccUnsavedFlags(node: CcFlatNode, marks: CcServerMarks): Record<string, 
   return Object.keys(flags).length > 0 ? flags : undefined;
 }
 
-/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+/** The ASCC or BCC that ties a node to its parent (the other types have none). */
 function ccAssociation(node: CcFlatNode): CcGraphNode | undefined {
   return node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode : undefined;
 }
 
-/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other kinds have none). */
+/** The cardinality of the ASCC, BCC or DT_SC that ties a node to its parent (the other types have none). */
 function ccCardinality(node: CcFlatNode): NodeCardinality | undefined {
   const edge = node instanceof AsccpFlatNode ? node.asccNode : node instanceof BccpFlatNode ? node.bccNode
     : node instanceof DtScFlatNode ? node.dtScNode : undefined;

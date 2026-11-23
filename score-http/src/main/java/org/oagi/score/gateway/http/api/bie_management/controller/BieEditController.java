@@ -26,6 +26,7 @@ import org.oagi.score.gateway.http.api.bie_management.model.bie_edit.tree.BieEdi
 import org.oagi.score.gateway.http.api.bie_management.service.BieCreateFromExistingBieService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieEditService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieSearchService;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchAttribute;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchRequest;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchResponse;
 import org.oagi.score.gateway.http.api.bie_management.service.state_transition.BieStateTransitionService;
@@ -99,7 +100,7 @@ public class BieEditController {
                                             @PathVariable("topLevelAsbiepId") TopLevelAsbiepId topLevelAsbiepId,
                                             @RequestParam("attribute") String attribute,
                                             @RequestParam(value = "text", defaultValue = "") String text) {
-        return bieSearchService.suggestValues(sessionService.asScoreUser(user), topLevelAsbiepId, attribute, text);
+        return bieSearchService.suggestValues(sessionService.asScoreUser(user), topLevelAsbiepId, BieSearchAttribute.from(attribute), text);
     }
 
     @GetMapping(value = "/profile_bie/{topLevelAsbiepId:[\\d]+}/abie/{manifestId:[\\d]+}")

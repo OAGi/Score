@@ -8,6 +8,7 @@ import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
+import org.oagi.score.gateway.http.api.cc_management.model.cc_search.CcSearchAttribute;
 import org.oagi.score.gateway.http.api.cc_management.model.cc_search.CcSearchPredicate;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
@@ -46,11 +47,11 @@ class JooqCcSearchQueryRepositoryTest {
     }
 
     private static CcSearchPredicate predicate(String attribute, TextSearchOperator operator, String value) {
-        return new CcSearchPredicate("p", attribute, operator, value, false);
+        return new CcSearchPredicate("p", CcSearchAttribute.from(attribute), operator, value, false);
     }
 
     @Test
-    void definitionReadsEveryKindOfComponentOfTheRelease() {
+    void definitionReadsEveryTypeOfComponentOfTheRelease() {
         repository().searchNodes(RELEASE, predicate("definition", TextSearchOperator.CONTAINS, "price"));
 
         assertEquals(7, sql.size());
@@ -58,7 +59,7 @@ class JooqCcSearchQueryRepositoryTest {
     }
 
     @Test
-    void theOtherDefinitionsReadOnlyTheKindsThatHaveThem() {
+    void theOtherDefinitionsReadOnlyTheTypesThatHaveThem() {
         repository().searchNodes(RELEASE, predicate("association_definition", TextSearchOperator.EQUALS, "x"));
         assertEquals(2, sql.size());
         assertTrue(sql.stream().anyMatch(s -> s.contains("`ascc_manifest`")) && sql.stream().anyMatch(s -> s.contains("`bcc_manifest`")));
@@ -80,7 +81,7 @@ class JooqCcSearchQueryRepositoryTest {
     }
 
     @Test
-    void theValuesAreReadFromTheKindsThatHaveThem() {
+    void theValuesAreReadFromTheTypesThatHaveThem() {
         repository().searchNodes(RELEASE, predicate("default_value", TextSearchOperator.EQUALS, "x"));
         assertEquals(3, sql.size());
         assertTrue(sql.stream().anyMatch(s -> s.contains("`bcc`.`default_value`")) && sql.stream().anyMatch(s -> s.contains("`bccp`.`default_value`"))
@@ -133,10 +134,8 @@ class JooqCcSearchQueryRepositoryTest {
         var picked = new org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord(
                 new org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriId(BigInteger.valueOf(7)), RELEASE,
                 new org.oagi.score.gateway.http.api.cc_management.model.dt.DtId(BigInteger.valueOf(5)), "Token", null, "token", null, null, null, null, true);
-        var other = new org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriSummaryRecord(
-                new org.oagi.score.gateway.http.api.cc_management.model.dt.DtAwdPriId(BigInteger.valueOf(8)), RELEASE,
-                new org.oagi.score.gateway.http.api.cc_management.model.dt.DtId(BigInteger.valueOf(5)), "String", null, "string", null, null, null, null, false);
-        org.mockito.Mockito.when(dtQuery.getDtAwdPriSummaryList(RELEASE)).thenReturn(List.of(other, picked));
+        // the data type query holds the rule that picks the default among the allowed primitives; the search takes what it picked
+        org.mockito.Mockito.when(dtQuery.getDefaultDtAwdPriSummaryMap(RELEASE)).thenReturn(java.util.Map.of(picked.dtId(), picked));
         var factory = mock(RepositoryFactory.class);
         org.mockito.Mockito.when(factory.dtQueryRepository(org.mockito.ArgumentMatchers.any())).thenReturn(dtQuery);
         sql.clear();
