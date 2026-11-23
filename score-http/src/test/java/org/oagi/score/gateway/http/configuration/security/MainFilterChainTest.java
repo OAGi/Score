@@ -139,6 +139,10 @@ class MainFilterChainTest {
                 new User("alice", new BCryptPasswordEncoder().encode("secret"),
                         List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))));
 
+        when(userDetailsService.loadUserByUsername("bob")).thenReturn(
+                new User("bob", new BCryptPasswordEncoder().encode("secret"), false, true, true, true,
+                        List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))));
+
         securityConfiguration = new SecurityConfiguration();
         ReflectionTestUtils.setField(securityConfiguration, "userDetailsService", userDetailsService);
         ReflectionTestUtils.setField(securityConfiguration, "sessionService", sessionService);
@@ -181,6 +185,17 @@ class MainFilterChainTest {
                 .andReturn().getRequest().getSession();
         mvc.perform(withOrigin(get("/stub/read"), session, null)).andExpect(status().isOk());
         return session;
+    }
+
+    // ---- sign-in failure ----
+
+    @Test
+    void aDisabledAccountIsToldApartFromWrongCredentials() throws Exception {
+        MockMvc mvc = mvc();
+        mvc.perform(post("/login").secure(true).header("Host", "score.example.org")
+                        .param("username", "bob").param("password", "secret"))
+                .andExpect(status().isForbidden());
+        mvc.perform(login(APP, "wrong")).andExpect(status().isUnauthorized());
     }
 
     // ---- login CSRF ----
