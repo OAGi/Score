@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -72,7 +72,7 @@
         <lombok.version>1.18.48</lombok.version>
         <mariadb-client.version>3.5.11</mariadb-client.version>
         <log4j.version>2.26.1</log4j.version>
-        <jOOQ.version>3.21.9</jOOQ.version>
+        <jOOQ.version>3.21.10</jOOQ.version>
         <guava.version>33.8.0-jre</guava.version>
         <gson.version>2.15.0</gson.version>
         <jdom2.version>2.0.6.1</jdom2.version>
@@ -88,7 +88,7 @@
         <json-schema-validator.version>2.0.8</json-schema-validator.version>
         <saxon.version>10.9</saxon.version>
         <xsom.version>4.0.9</xsom.version>
-        <spring-ai.version>2.0.2</spring-ai.version>
+        <spring-ai.version>2.1.0</spring-ai.version>
     </properties>
 
     <dependencies>
