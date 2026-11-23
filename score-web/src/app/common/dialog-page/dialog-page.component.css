@@ -82,3 +82,43 @@
 .dialog-body ::ng-deep .dialog-form {
   padding: 0 var(--score-dialog-padding);
 }
+
+/* A screen narrower than a desktop (phone, tablet), a dialog whose action needs a selection: the bar sticks to the bottom of the dialog (and to the end of the list, once
+   scrolled there), and slides up when something is selected and down when nothing is. */
+@media (max-width: 1023.98px) {
+  :host(.actions-conditional) .dialog-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-top: var(--score-dialog-padding);
+    background: var(--mat-sys-surface, #fff);
+    transition: transform .2s ease-out, visibility .2s, box-shadow .3s ease-out;
+  }
+
+  :host(.actions-conditional.actions-floating) .dialog-actions {
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, .15);
+  }
+
+  /* The bar's own top padding is the space above it, floating or at the end of the content, so that nothing moves when it lands. */
+  :host(.actions-conditional) .dialog-body {
+    padding-bottom: 0;
+  }
+
+  :host(.actions-conditional:not(.actions-shown)) .dialog-actions {
+    transform: translateY(100%);
+    visibility: hidden;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 1023.98px) and (prefers-reduced-motion: reduce) {
+  :host(.actions-conditional) .dialog-actions {
+    transition: none;
+  }
+}
+
+.actions-sentinel {
+  height: 1px;
+  margin-bottom: -1px;
+  pointer-events: none;
+}

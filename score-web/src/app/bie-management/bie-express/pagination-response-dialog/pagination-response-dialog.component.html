@@ -1,4 +1,4 @@
-<score-dialog-page title="Include Pagination Response Profile BIE">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Include Pagination Response Profile BIE">
   <score-table-view emptyMessage="No Pagination Response Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
         [selection]="selection" [rowKey]="rowKey" singleSelect searchDisabled [syncUrl]="false" advancedSearchOffset="11.5rem"
         rowHover>

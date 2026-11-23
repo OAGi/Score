@@ -1887,6 +1887,12 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
     if (!event.isPointerOverContainer) {
       return;
     }
+    if (!this.isEditable()) {
+      this.snackBar.open('Only the owner can reorder associations while the ACC is in WIP state.', '', {
+        duration: 3000,
+      });
+      return;
+    }
 
     const nodes = this.dataSource.data;
 
@@ -1932,7 +1938,7 @@ export class AccDetailComponent implements OnInit, OnDestroy, CcTreeValidationHo
     }
   }
 
-  readonly isDraggableNode = (node: CcFlatNode) => this.isDraggable(node);
+  readonly isDraggableNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
   readonly showDragHandleNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
 
   cancelRevision(): void {

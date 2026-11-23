@@ -1,4 +1,4 @@
-<score-dialog-page>
+<score-dialog-page [actionsShown]="!selection.isEmpty()">
   <score-title-with-library-selector dialogTitle [title]="title"
       [libraries]="libraryChoice.mappedLibraries"
       (libraryChange)="onLibraryChange($event)"/>

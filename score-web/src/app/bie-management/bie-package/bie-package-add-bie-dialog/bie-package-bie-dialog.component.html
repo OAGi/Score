@@ -1,4 +1,4 @@
-<score-dialog-page title="{{ action }} BIE">
+<score-dialog-page [actionsShown]="!selection.isEmpty()" title="{{ action }} BIE">
   <score-table-view emptyMessage="No Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams" [ready]="ready()"
         [filterOptions]="filterOptions()" [selection]="selection" [rowKey]="rowKey" multiSort [syncUrl]="false"
         searchClearsSort rowHover>

@@ -1,4 +1,4 @@
-<score-dialog-page title="Refactor to Base" subtitle='Select a base ACC to move "{{title}}"'>
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Refactor to Base" subtitle='Select a base ACC to move "{{title}}"'>
   @if (loading) {
     <div class="loading-container">
       <mat-spinner [diameter]="40"></mat-spinner>

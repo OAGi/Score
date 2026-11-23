@@ -1587,7 +1587,7 @@ export class ExtensionDetailComponent implements OnInit, OnDestroy, CcTreeValida
     }
   }
 
-  readonly isDraggableNode = (node: CcFlatNode) => this.isDraggable(node);
+  readonly isDraggableNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
   readonly showDragHandleNode = (node: CcFlatNode) => this.isEditable() && this.isDraggable(node);
 
   cancelRevision(): void {

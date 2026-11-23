@@ -25,7 +25,9 @@ score-tree-detail .tree-detail-search {
 
 score-tree-detail .tree-detail-actions {
   flex: 0 1 auto;
-  margin-left: auto;
+  /* The same space above and below the actions, wrapped under the search or not (no breakpoint: the row does not grow when they wrap
+     except by the line they take). */
+  margin: 5px 0 5px auto;
   min-width: 0;
 }
 

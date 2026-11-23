@@ -7,7 +7,7 @@
     <div *cdkVirtualFor="let node of dataSource" class="example-item"
          (mouseover)="node.showCopyLinkIcon = true" (mouseout)="node.showCopyLinkIcon = false"
          cdkDrag [cdkDragData]="node"
-         [cdkDragDisabled]="!isDraggable(node)"
+         [cdkDragDisabled]="!isDraggable(node) || !showDragHandle(node)"
          (cdkDragStarted)="dragStarted.emit(node)" (cdkDragMoved)="dragMoved.emit($event)"
          (cdkDragEnded)="dragEnded.emit()">
       <div class="dragPlaceholder" [class.dragPlaceholder-invalid]="dropInvalid" *cdkDragPlaceholder></div>

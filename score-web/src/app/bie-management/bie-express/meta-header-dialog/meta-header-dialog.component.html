@@ -1,4 +1,4 @@
-<score-dialog-page title="Include Meta Header Profile BIE">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Include Meta Header Profile BIE">
   <score-table-view emptyMessage="No Meta Header Profile BIE" #tableView [table]="columns" [load]="load" [extraParams]="extraParams()" [ready]="ready()"
         [selection]="selection" [rowKey]="rowKey" singleSelect searchDisabled [syncUrl]="false" advancedSearchOffset="11.5rem"
         rowHover>

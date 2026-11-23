@@ -1,4 +1,4 @@
-<score-dialog-page title="Select DT to {{this.action}} BCCP">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Select DT to {{this.action}} BCCP">
   <score-table-view emptyMessage="No DT" #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
         searchClearsSort pageFromResponse rowHover advancedSearchOpen>

@@ -1,4 +1,4 @@
-<score-dialog-page title="Select Base Verb to {{this.action}} Verb">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Select Base Verb to {{this.action}} Verb">
   <score-table-view emptyMessage="No Base Verb" #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
         searchClearsSort pageFromResponse rowHover >

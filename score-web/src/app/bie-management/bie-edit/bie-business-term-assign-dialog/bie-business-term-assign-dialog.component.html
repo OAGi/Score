@@ -1,4 +1,4 @@
-<score-dialog-page title="Assign Business Term">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Assign Business Term">
   <div class="bt-assign-form">
     <score-table-view emptyMessage="No Business Term" #tableView [table]="columns" [load]="load" [selection]="selection" [rowKey]="rowKey" multiSort
       [syncUrl]="false" searchClearsSort rowHover [busy]="busy()">

@@ -1,4 +1,4 @@
-<score-dialog-page title="Select ACC to {{this.action}} a base ACC">
+<score-dialog-page [actionsShown]="selection.selected.length > 0" title="Select ACC to {{this.action}} a base ACC">
   <score-table-view emptyMessage="No ACC" #tableView [table]="columns" [load]="load" [selection]="selection" singleSelect
         [syncUrl]="false" [extraParams]="extraParams()" [ready]="ready()" [filterOptions]="filterOptions()"
         searchClearsSort pageFromResponse rowHover >
