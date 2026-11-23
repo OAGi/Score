@@ -6,9 +6,9 @@ import {CcKey, CcPlace, CcSearchRoot, CcServerMarks, CcServerSearch} from './cc-
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {TreeFilterChange, TreeFilterSet} from '../../common/tree-viewport/tree-filter';
 import {CcHideProhibitedFilter, HIDE_PROHIBITED_FILTER} from './cc-tree-filters';
-import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {describeTree, TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
-import {TreeNodeSearcher, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
+import {TreeNodeSearcher} from '../../common/tree-search/tree-node-searcher';
 import {FlatNode, getKey, next} from '../../common/flat-tree';
 import {
   BccpDetails,
@@ -1476,38 +1476,21 @@ export class CcFlatNodeDataSourceSearcher<T extends CcFlatNode>
   }
 
   protected override graphAdapter(): TreeGraphAdapter<T> {
-    let graph: ReturnType<CcFlatNodeDatabase<T>['searchGraph']>;
-    return {
-      dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0], this.serverMarks);
-        return graph?.dag;
-      },
-      recordOf: node => graph ? graph.recordOf(node) : -1,
+    return describeTree<T, NonNullable<ReturnType<CcFlatNodeDatabase<T>['searchGraph']>>>({
+      graph: () => this.database.searchGraph(this.dataSource.data[0], this.serverMarks),
       namesOf: node => [node.name],
       attributesOf: node => ({
         ...ccSearchAttributes(node, node.name, this.serverMarks),
         ...(this.serverMarks && ccUnsavedFlags(node, this.serverMarks))
       }),
       childrenOf: node => this.database.children(node)
-    };
+    });
   }
 
   onChange(entity: CcFlatNodeDataSource<T>, propertyName: string, val: any) {
     if (propertyName === HIDE_PROHIBITED_FILTER) {
       this.resetSearch();
     }
-  }
-
-  protected override visit(node: T): TreeSearchVisit<T> {
-    const expanded = node.expandable;
-    if (expanded) {
-      this.database.loadChildren(node);
-    }
-    return {children: node.children as T[], expanded};
-  }
-
-  protected visibleIndex(node: T): number {
-    return this.dataSource.data.map(e => e.hashPath).indexOf(node.hashPath);
   }
 
 }

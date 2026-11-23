@@ -16,9 +16,10 @@ import {
   DtScSummary
 } from '../../cc-management/domain/core-component-node';
 import {hashCode4Array, hashCode4String, sha256} from '../../common/utility';
-import {TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {describeTree, TreeGraphAdapter} from '../../common/tree-search/graph-tree-search';
+import {findRowIndex} from '../../common/tree-search/tree-node-identity';
 import {SearchDag, SearchDagBuilder} from '../../common/tree-search/search-dag';
-import {TreeNodeSearcher, TreeSearchLimits, TreeSearchVisit} from '../../common/tree-search/tree-node-searcher';
+import {TreeNodeSearcher} from '../../common/tree-search/tree-node-searcher';
 import {TreeFilterChange, TreeFilterSet} from '../../common/tree-viewport/tree-filter';
 import {BieHideUnusedFilter, HIDE_UNUSED_FILTER} from './bie-tree-filters';
 import {FlatNode, getKey} from '../../common/flat-tree';
@@ -3801,23 +3802,7 @@ export class BieFlatNodeDataSource<T extends BieFlatNode> implements DataSource<
   }
 
   getNodeIndex(node: T): number {
-    const directIndex = this.data.indexOf(node);
-    if (directIndex > -1) {
-      return directIndex;
-    }
-
-    const rawNode = node?.self;
-    const rawIndex = rawNode
-      ? this.data.findIndex(candidate => candidate.self === rawNode)
-      : -1;
-    if (rawIndex > -1) {
-      return rawIndex;
-    }
-
-    const queryPathMatches = this.data
-      .map((candidate, index) => candidate.queryPath === node?.queryPath ? index : -1)
-      .filter(index => index > -1);
-    return queryPathMatches.length === 1 ? queryPathMatches[0] : -1;
+    return findRowIndex(this.data, node);
   }
 
   loadDetails(node: T, callbackFn?) {
@@ -4150,18 +4135,13 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
    * `reused`). A filter changes what the DAG holds, not how it is searched.
    */
   protected override graphAdapter(): TreeGraphAdapter<T> {
-    let graph: ReturnType<BieFlatNodeDatabase<T>['searchGraph']>;
-    return {
-      dag: () => {
-        graph = this.database.searchGraph(this.dataSource.data[0], this.serverMarks, this.componentMarks);
-        return graph?.dag;
-      },
-      recordOf: node => graph ? graph.recordOf(node) : -1,
+    return describeTree<T, NonNullable<ReturnType<BieFlatNodeDatabase<T>['searchGraph']>>>({
+      graph: () => this.database.searchGraph(this.dataSource.data[0], this.serverMarks, this.componentMarks),
       namesOf: node => {
         const raw = node.self || node;
         return raw.isGroup ? undefined : [raw.name, raw.displayName].filter(name => !!name);
       },
-      attributesOf: node => {
+      attributesOf: (node, graph) => {
         const raw = node.self || node;
         return {
           ...bieSearchAttributes(raw, raw.displayName || raw.name),
@@ -4169,10 +4149,8 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
           ...graph?.flagsOf(node)
         };
       },
-      childrenOf: node => this.database.children(node),
-      identityOf: node => node.self || node,
-      strictRootedPaths: true
-    };
+      childrenOf: node => this.database.children(node)
+    });
   }
 
   onChange(entity: BieFlatNodeDataSource<T>, propertyName: string, val: any) {
@@ -4181,37 +4159,6 @@ export class BieFlatNodeDataSourceSearcher<T extends BieFlatNode>
     }
   }
 
-  protected override isMatchable(node: T): boolean {
-    return !node.isGroup;
-  }
-
-  /** A path keyword (`/a/b`) follows one branch, so it needs far fewer matches and expansions. */
-  protected override limits(keyword: string): TreeSearchLimits {
-    return keyword.charAt(0) === '/' ? {threshold: 1, expandLimit: 1000} : super.limits(keyword);
-  }
-
-  protected override visit(node: T, keyword: string): TreeSearchVisit<T> {
-    const isPathSearch = keyword.charAt(0) === '/';
-    const normalizedPath = keyword.replace(/\s+/g, '').toLowerCase();
-    const canDescendantsMatch = !isPathSearch ||
-      normalizedPath.startsWith('/' + (node.queryPath || '').toLowerCase()) ||
-      node.isGroup;
-    if (!node.expandable || !canDescendantsMatch) {
-      return {children: [], expanded: false};
-    }
-    if (node.children.length === 0) {
-      this.database.loadChildren(node);
-    }
-    return {children: node.children as T[], expanded: true};
-  }
-
-  protected override sameNode(a: T, b: T): boolean {
-    return a === b || (!!a.self && !!b.self && a.self === b.self) || (!!a.queryPath && a.queryPath === b.queryPath);
-  }
-
-  protected visibleIndex(node: T): number {
-    return this.dataSource.getNodeIndex(node);
-  }
 
 }
 

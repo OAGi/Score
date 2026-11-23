@@ -12,7 +12,6 @@ import {BieViewOrderEntry} from '../../cc-management/model-browser/domain/bie-vi
 import {of} from 'rxjs';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
 import {PathPattern} from '../../common/tree-search/path-pattern';
-import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 
 /**
  * #1638 BIE-editor wiring tests. The editor reads the SAME instance-level sibling order as the model
@@ -224,31 +223,43 @@ describe('BieFlatNodeDataSource inherited reused details', () => {
   });
 });
 
-describe('PatternExpressionEvaluator on BIE nodes', () => {
+describe('PathPattern on a chain of BIE nodes', () => {
   const adapter = {
     namesOf: (n: any) => n.isGroup ? undefined : [n.name, n.displayName].filter(name => !!name),
     attributesOf: (n: any) => ({name: n.name, displayName: n.displayName || n.name, used: !!n.used}),
-    strictRootedPaths: true
   };
 
-  it('matches path segments exactly so Party does not resolve to Manufacturing Party', () => {
+  /** Whether the node is where the expression matches, judged by the chain of nodes down to it. */
+  const evaluate = (expr: string, node: any): boolean => {
+    const pattern = new PathPattern(expr);
+    const chain: any[] = [];
+    for (let n = node; n; n = n.parent) {
+      if (adapter.namesOf(n)) {
+        chain.unshift(n);
+      }
+    }
+    const lookups = chain.map(n => (attribute: string) => (adapter.attributesOf(n) as Record<string, any>)[attribute]);
+    return pattern.isMatch(pattern.stepAll(chain.map(n => adapter.namesOf(n)), lookups));
+  };
+
+  it('finds every node under the parent whose name contains the step, Manufacturing Party as well as Party', () => {
     const parent = {name: 'BOM Item Data', parent: undefined, isGroup: false} as any;
     const party = {name: 'Party', parent, isGroup: false} as any;
     const manufacturingParty = {name: 'Manufacturing Party', parent, isGroup: false} as any;
-    const evaluator = new PatternExpressionEvaluator('/BOM Item Data/Party', adapter);
+    const other = {name: 'Item', parent, isGroup: false} as any;
 
-    expect(evaluator.eval(party)).toBe(true);
-    expect(evaluator.eval(manufacturingParty)).toBe(false);
+    expect(evaluate('/BOM Item Data/Party', party)).toBe(true);
+    expect(evaluate('/BOM Item Data/Party', manufacturingParty)).toBe(true);
+    expect(evaluate('/BOM Item Data/Party', other)).toBe(false);
   });
 
   it('judges a step by its predicates on the node', () => {
     const parent = {name: 'Sender', parent: undefined, isGroup: false} as any;
     const used = {name: 'Code', parent, isGroup: false, used: true} as any;
     const unused = {name: 'Code', parent, isGroup: false, used: false} as any;
-    const evaluator = new PatternExpressionEvaluator('Sender/Code[used = true]', adapter);
 
-    expect(evaluator.eval(used)).toBe(true);
-    expect(evaluator.eval(unused)).toBe(false);
+    expect(evaluate('Sender/Code[used = true]', used)).toBe(true);
+    expect(evaluate('Sender/Code[used = true]', unused)).toBe(false);
   });
 });
 
@@ -552,11 +563,11 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     return copy;
   }
 
-  function search(db: FixedDatabase, root: any, expr: string, mode = {}, options?: {hideUnused?: boolean, marks?: BieServerMarks}) {
+  function search(db: FixedDatabase, root: any, expr: string, options?: {hideUnused?: boolean, marks?: BieServerMarks}) {
     // the tree answers for its own filters: the search does not pass its state in
     db.filters.setActive('hideUnused', !!options?.hideUnused);
     const graph = db.searchGraph(root, options?.marks);
-    const pattern = new PathPattern(expr, false, mode);
+    const pattern = new PathPattern(expr);
     const names = [root].map(n => [n.name, n.displayName].filter(x => !!x));
     const attributes = [(a: string) => ({name: root.name, displayName: root.displayName || root.name, used: !!root.used})[a]];
     const found = new DagPathSearch(graph.dag, pattern)
@@ -699,22 +710,22 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     item2.used = true;
 
     const all = search(new FixedDatabase(), root, 'Item');
-    const hidden = search(new FixedDatabase(), root, 'Item', {}, {hideUnused: true});
+    const hidden = search(new FixedDatabase(), root, 'Item', {hideUnused: true});
 
     expect(all.found.total).toBe(2);
     expect(hidden.found.total).toBe(1);
     // Root, Box (leads to a used node), Item (used)
     expect(hidden.graph.dag.names.length).toBe(3);
-    expect(search(new FixedDatabase(), root, 'Code', {}, {hideUnused: true}).found.total).toBe(0);
-    expect(search(new FixedDatabase(), root, 'Box/Item', {}, {hideUnused: true}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Code', {hideUnused: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, 'Box/Item', {hideUnused: true}).found.total).toBe(1);
   });
 
-  it('reads a root path as whole names from the root', () => {
+  it('matches the names of a path from the root by what they contain, and starts at the root', () => {
     const {root} = tree();
 
-    expect(search(new FixedDatabase(), root, '/Parent-1/Box/Item/Code', {exact: true, anchored: true}).found.total).toBe(1);
-    expect(search(new FixedDatabase(), root, '/Box/Item', {exact: true, anchored: true}).found.total).toBe(0);
-    expect(search(new FixedDatabase(), root, '/Parent-1/Bo', {exact: true, anchored: true}).found.total).toBe(0);
+    expect(search(new FixedDatabase(), root, '/Parent-1/Box/Item/Code').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, '/Parent-1/Bo').found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, '/Box/Item').found.total).toBe(0);
   });
 
   const serverPredicate = (operator: ServerPredicate['operator'], value: string, attribute = 'definition'): ServerPredicate =>
@@ -726,13 +737,13 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
       matches: {'0': [{table: 'asbie', hashPath: item2.asbieHashPath, path: item2.asbiePath}]}
     }, false);
 
-    const found = (expr: string) => search(new FixedDatabase(), root, expr, {}, {marks}).found.total;
+    const found = (expr: string) => search(new FixedDatabase(), root, expr, {marks}).found.total;
     expect(found('Item')).toBe(2);
     expect(found('Item[srv_0]')).toBe(1);
     expect(found('Item[not(srv_0)]')).toBe(1);
     expect(found('Box/Item[srv_0]/Code')).toBe(1);
     // the place without a match shares the record of its component, the other is a record of its own
-    const {graph} = search(new FixedDatabase(), root, 'Item', {}, {marks});
+    const {graph} = search(new FixedDatabase(), root, 'Item', {marks});
     expect(graph.recordOf(item2)).not.toBe(graph.recordOf(item));
     expect(graph.flagsOf(item2)).toEqual({srv_0: true});
     expect(graph.flagsOf(item)).toEqual({});
@@ -747,11 +758,11 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     item2.children[0].used = false;
     const code = item2.children[0];
     const marks = new BieServerMarks([serverPredicate('EQUALS', 'token', 'value_domain')], {
-      matches: {'0': [{table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath}]}
+      matches: {'0': [{table: 'bbie', hashPath: (code as any).bbieHashPath, path: (code as any).bbiePath}]}
     }, false);
 
-    expect(search(new FixedDatabase(), root, 'Box/Item/Code[srv_0]', {}, {marks}).found.total).toBe(1);
-    expect(search(new FixedDatabase(), root, 'Code[srv_0 and not(used)]', {}, {marks}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Box/Item/Code[srv_0]', {marks}).found.total).toBe(1);
+    expect(search(new FixedDatabase(), root, 'Code[srv_0 and not(used)]', {marks}).found.total).toBe(1);
   });
 
   it('puts nothing of the BIE text into the graph when the backend has not been asked', () => {
@@ -771,7 +782,7 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     // the backend knows the old text; the editor has the new one
     item2._detail = {isChanged: true, asbie: {definition: 'New text'}, asbiep: {}} as any;
 
-    const foundBy = (predicate: ServerPredicate, saved: boolean) => search(new FixedDatabase(), root, 'Item[srv_0]', {}, {
+    const foundBy = (predicate: ServerPredicate, saved: boolean) => search(new FixedDatabase(), root, 'Item[srv_0]', {
       marks: new BieServerMarks([predicate], {matches: {'0': saved ? [savedElsewhere] : []}}, false)
     }).found.total;
 
@@ -823,8 +834,8 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     (item2.children[0] as any)._bbiePath = top + '>ASCC-11>ASCC-12>BCC-20';
     const predicates = [{id: '0', flag: 'srv_0', attribute: 'value_domain', operator: 'EQUALS', value: 'token'}] as any;
     // the data type of Code starts with token; the row of the first Code says something else
-    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [code.bccpNode.manifestId]}}}, false);
-    const row = {table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath};
+    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [(code as any).bccpNode.manifestId]}}}, false);
+    const row = {table: 'bbie', hashPath: (code as any).bbieHashPath, path: (code as any).bbiePath};
     const found = (expr: string, ownRow: boolean) => {
       const marks = new BieServerMarks([...predicates, BIE_VALUE_DOMAIN_ROW_PREDICATE],
         {matches: {'0': [], [BIE_VALUE_DOMAIN_ROW_PREDICATE.id]: ownRow ? [row] : []}}, false);
@@ -855,8 +866,8 @@ describe('BieFlatNodeDatabase.searchGraph', () => {
     const [fixedRow, defaultRow] = BIE_VALUE_CONSTRAINT_ROW_PREDICATES;
     const predicates = [{id: '0', flag: 'srv_0', attribute: 'fixed_value', operator: 'EQUALS', value: 'X'}] as any;
     // the BCCP of Code has the fixed value X, the BIE row of its first place has another fixed value (or a default value)
-    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [code.bccpNode.manifestId]}}}, false);
-    const row = {table: 'bbie', hashPath: code.bbieHashPath, path: code.bbiePath};
+    const ccMarks = new CcServerMarks(predicates, {matches: {'0': {...none, bccps: [(code as any).bccpNode.manifestId]}}}, false);
+    const row = {table: 'bbie', hashPath: (code as any).bbieHashPath, path: (code as any).bbiePath};
     const found = (expr: string, rows: {row: boolean, kind: 'fixed' | 'default'}) => {
       const matches: Record<string, any[]> = {'0': []};
       matches[fixedRow.id] = rows.row && rows.kind === 'fixed' ? [row] : [];

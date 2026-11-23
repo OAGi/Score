@@ -2,7 +2,7 @@ import {writeFileSync} from 'node:fs';
 import {describe, it} from 'vitest';
 import {ENABLED, sql} from './integrity-env';
 import {CcRelease} from './cc-sql-oracle';
-import {BieRow, CcTreeOracle, ONode, RowTrail, viewOf as viewOfCc} from './cc-tree-oracle';
+import {BieRow, CcTreeOracle, ONode, Rows, RowTrail, viewOf as viewOfCc} from './cc-tree-oracle';
 import {Case, attributeCases, booleanCases} from './search-matrix';
 
 /**

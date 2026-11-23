@@ -1,7 +1,6 @@
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeDatabase} from './cc-flat-tree';
 import {CcAccNodeInfo, CcAsccpNodeInfo, CcBccpNodeInfo, CcGraph, CcGraphNode} from './core-component-node';
 import {DagPathSearch} from '../../common/tree-search/dag-path-search';
-import {PatternExpressionEvaluator} from '../../common/tree-search/pattern-expression-evaluator';
 import {PathPattern} from '../../common/tree-search/path-pattern';
 import {CcServerMarks} from './cc-server-search';
 import {ServerPredicate} from '../../common/tree-search/server-predicate';
@@ -11,13 +10,13 @@ function graphWithUserExtensionAssociationWithoutTargetAcc(): CcGraph {
     graph: {
       nodes: {
         'ACC-1': {
-          type: 'ACC', manifestId: 1, objectClassTerm: 'Extension', deprecated: false
+          type: 'ACC', manifestId: 1, objectClassTerm: 'Extension', deprecated: false, state: 'Published'
         },
         'ASCC-2': {
-          type: 'ASCC', manifestId: 2, deprecated: false
+          type: 'ASCC', manifestId: 2, deprecated: false, state: 'Published'
         },
         'ASCCP-3': {
-          type: 'ASCCP', manifestId: 3, propertyTerm: 'Enterprise Unit User Extension Group', deprecated: false
+          type: 'ASCCP', manifestId: 3, propertyTerm: 'Enterprise Unit User Extension Group', deprecated: false, state: 'Published'
         }
       },
       edges: {
@@ -93,11 +92,18 @@ describe('CcFlatNodeDatabase.searchGraph', () => {
     } as unknown as CcGraph;
   }
 
-  /** The reference: every node of the unfolded tree that the evaluator matches (the tree here has no cycle). */
+  /** The reference: every node of the unfolded tree that the pattern matches, judged by the chain down to it (the tree here has no cycle). */
   function walkedMatches(database: CcFlatNodeDatabase<CcFlatNode>, root: CcFlatNode, expr: string): number {
-    const evaluator = new PatternExpressionEvaluator<CcFlatNode>(expr, {namesOf: n => [n.name]});
+    const pattern = new PathPattern(expr);
+    const matches = (node: CcFlatNode): boolean => {
+      const chain: CcFlatNode[] = [];
+      for (let n = node; n; n = n.parent as CcFlatNode) {
+        chain.unshift(n);
+      }
+      return pattern.isMatch(pattern.stepAll(chain.map(n => [n.name])));
+    };
     const walk = (node: CcFlatNode): number =>
-      (evaluator.eval(node) ? 1 : 0) + database.getChildren(node).reduce((sum, child) => sum + walk(child), 0);
+      (matches(node) ? 1 : 0) + database.getChildren(node).reduce((sum, child) => sum + walk(child), 0);
     return walk(root);
   }
 

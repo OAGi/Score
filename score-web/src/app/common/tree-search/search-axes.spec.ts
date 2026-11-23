@@ -43,8 +43,8 @@ function tree(): SearchDag {
 function count(expr: string, caseSensitive = false): number {
   const dag = tree();
   const pattern = new PathPattern(expr, caseSensitive);
-  expect(pattern.error).withContext(expr).toBeUndefined();
-  expect(pattern.supported).withContext(expr).toBe(true);
+  expect(pattern.error, expr).toBeUndefined();
+  expect(pattern.supported, expr).toBe(true);
   const search = new DagPathSearch(dag, pattern);
   const root = new DagNodeContext(search as DagContextHost, 0, undefined, 0, false, pattern.initialMask);
   const mask = pattern.stepContext(pattern.initialMask, root);
@@ -191,7 +191,7 @@ describe('searching with paths', () => {
 
   it('refuses a cardinality it cannot read', () => {
     for (const expr of ['*[cardinality < 1..1]', '*[cardinality = 2]', '*[cardinality = Maybe]', '*[cardinality = "a..b"]']) {
-      expect(new PathPattern(expr).error).withContext(expr).toBeDefined();
+      expect(new PathPattern(expr).error, expr).toBeDefined();
     }
   });
 
@@ -211,7 +211,7 @@ describe('searching with paths', () => {
   it('refuses what it cannot search', () => {
     for (const expr of ['/Root/..', '/Root/Body/ancestor::Root', 'Id/ancestor::*[1]', 'Body/descendant::Id[2]', '*[Id/child::Code = 1]',
       '*[ancestor::A[ancestor::B]]', '*[parent::*/parent::*]', 'Foo::Bar', '*[count(x) > 1]']) {
-      expect(new PathPattern(expr).error).withContext(expr).toBeDefined();
+      expect(new PathPattern(expr).error, expr).toBeDefined();
     }
   });
 });

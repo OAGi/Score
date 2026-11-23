@@ -212,7 +212,7 @@
           <score-cc-value-domain [detail]="asBdtDetail()" kind="dt" [dataSource]="restrictionDataSource"
             [editable]="isEditable()" [hasToken]="hasTokenPrimitive(asBdtDetail())" [selected]="selectedValueDomain"
             [filteredCodeLists]="filteredCodeLists" [filteredAgencyIdLists]="filteredAgencyIdLists"
-            (add)="addValueDomain(asBdtDetail())" (discard)="deleteValueDomain(asBdtDetail())" (toggle)="toggleValueDomain($event)"
+            (add)="addValueDomain(asBdtDetail())" (discard)="deleteValueDomain(asBdtDetail())" (toggled)="toggleValueDomain($event)"
             (valueDomainChange)="onChangeValueDomain(asBdtDetail())"></score-cc-value-domain>
         </score-cc-bdt-panel>
       }
@@ -228,7 +228,7 @@
           <score-cc-value-domain [detail]="asDtScDetail()" kind="dtSc" [dataSource]="restrictionDataSource"
             [editable]="isEditable()" [hasToken]="hasTokenPrimitive(asDtScDetail())" [selected]="selectedValueDomain"
             [filteredCodeLists]="filteredCodeLists" [filteredAgencyIdLists]="filteredAgencyIdLists"
-            (add)="addValueDomain(asDtScDetail())" (discard)="deleteValueDomain(asDtScDetail())" (toggle)="toggleValueDomain($event)"
+            (add)="addValueDomain(asDtScDetail())" (discard)="deleteValueDomain(asDtScDetail())" (toggled)="toggleValueDomain($event)"
             (valueDomainChange)="onChangeValueDomain(asDtScDetail())"></score-cc-value-domain>
         </score-cc-bdt-sc-panel>
       }

@@ -39,7 +39,7 @@ export class ValueDomainComponent {
 
   @Output() add = new EventEmitter<void>();
   @Output() discard = new EventEmitter<void>();
-  @Output() toggle = new EventEmitter<any>();
+  @Output() toggled = new EventEmitter<any>();
   @Output() valueDomainChange = new EventEmitter<void>();
 
   protected get awdPri(): 'dtAwdPri' | 'dtScAwdPri' {

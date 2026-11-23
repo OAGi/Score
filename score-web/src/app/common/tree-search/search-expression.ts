@@ -4,7 +4,7 @@ import {
 } from './search-eval';
 
 import type {CstNode, IToken} from 'chevrotain';
-import {Dot, Ident, NumberLit, ParseError, Star, StringLit, parsePredicate} from './search-grammar';
+import {Dot, Ident, NumberLit, ParseError, Star, StringLit, parsePredicate, scanBrackets} from './search-grammar';
 
 export type {AttrLookup, AttrValue} from './search-eval';
 
@@ -141,33 +141,10 @@ interface RawStep {
 /** Cuts the expression at the `/` that are outside brackets and quotes (`//` leaves an empty piece between). */
 function splitSteps(body: string, offset: number): {text: string, position: number}[] {
   const steps: {text: string, position: number}[] = [];
-  let depth = 0;
-  let quote = '';
   let start = 0;
-  for (let i = 0; i < body.length; i++) {
-    const c = body[i];
-    if (quote) {
-      if (c === quote) {
-        quote = '';
-      }
-    } else if (depth > 0 && (c === '"' || c === '\'')) {
-      quote = c;
-    } else if (c === '[') {
-      depth++;
-    } else if (c === ']') {
-      if (--depth < 0) {
-        throw new ParseError('Unexpected ]', offset + i);
-      }
-    } else if (c === '/' && depth === 0) {
-      steps.push({text: body.substring(start, i), position: offset + start});
-      start = i + 1;
-    }
-  }
-  if (quote) {
-    throw new ParseError('Unterminated string', offset + body.length);
-  }
-  if (depth > 0) {
-    throw new ParseError('Missing ]', offset + body.length);
+  for (const slash of scanBrackets(body, offset).slashes) {
+    steps.push({text: body.substring(start, slash), position: offset + start});
+    start = slash + 1;
   }
   steps.push({text: body.substring(start), position: offset + start});
   return steps;
@@ -209,17 +186,20 @@ function readStep(text: string, position: number, sep: '/' | '//', state: Compil
   }
   const raw: RawStep = {sep, axis, test: nameTest(name), predicates: [], flags: stepFlags(), position};
   let at = open < 0 ? text.length : open;
-  while (at < text.length) {
-    const close = closingBracket(text, at);
-    const inner = text.substring(at + 1, close);
-    const base = position + at + 1;
-    const compiled = new PredicateCompiler(state, base).compile(parsePredicate(inner, base, position + close));
-    raw.predicates.push(compiled.predicate);
-    mergeFlags(raw.flags, compiled.flags);
-    at = close + 1;
-    if (at < text.length && text[at] !== '[') {
+  // the pieces come from `splitSteps`, which has already checked that their brackets are balanced
+  for (const bracket of scanBrackets(text, position).brackets) {
+    if (bracket.open !== at) {
       throw new ParseError('Expected [ or / after ]', position + at);
     }
+    const inner = text.substring(bracket.open + 1, bracket.close);
+    const base = position + bracket.open + 1;
+    const compiled = new PredicateCompiler(state, base).compile(parsePredicate(inner, base, position + bracket.close));
+    raw.predicates.push(compiled.predicate);
+    mergeFlags(raw.flags, compiled.flags);
+    at = bracket.close + 1;
+  }
+  if (at < text.length) {
+    throw new ParseError('Expected [ or / after ]', position + at);
   }
   return raw;
 }
@@ -234,27 +214,6 @@ function mergeFlags(into: Partial<CompiledStep>, from: Partial<CompiledStep>) {
   into.ancestral = !!into.ancestral || !!from.ancestral;
   into.local = into.local !== false && from.local !== false;
   into.literals = [...(into.literals ?? []), ...(from.literals ?? [])];
-}
-
-/** The `]` that closes the `[` at `open`, with nested brackets and quoted text skipped. */
-function closingBracket(text: string, open: number): number {
-  let quote = '';
-  let depth = 0;
-  for (let i = open; i < text.length; i++) {
-    const c = text[i];
-    if (quote) {
-      if (c === quote) {
-        quote = '';
-      }
-    } else if (c === '"' || c === '\'') {
-      quote = c;
-    } else if (c === '[') {
-      depth++;
-    } else if (c === ']' && --depth === 0) {
-      return i;
-    }
-  }
-  throw new ParseError('Missing ]', text.length);
 }
 
 // ---- turning raw steps into the steps the search runs ----------------------------------------------------------------

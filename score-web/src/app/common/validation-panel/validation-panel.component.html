@@ -49,7 +49,7 @@
   @if (decision) {
     <div class="panel-footer">
       <span class="footer-text">Make the change all the same?</span>
-      <button mat-stroked-button id="validation-cancel" (click)="cancel.emit()">Cancel</button>
+      <button mat-stroked-button id="validation-cancel" (click)="cancelled.emit()">Cancel</button>
       <button mat-flat-button color="warn" id="validation-proceed" (click)="proceed.emit()">Proceed anyway</button>
     </div>
   }

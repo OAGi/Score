@@ -47,11 +47,9 @@ export interface NodeContext {
   remember(test: number, found: boolean): void;
 }
 
-/** How names are matched and what case means; fixed for a whole search. */
+/** What case means in a search; fixed for a whole search. A name is always matched by containing the step's text. */
 export interface Env {
   caseSensitive: boolean;
-  /** Names must equal the step's name instead of containing it. */
-  exact: boolean;
 }
 
 /** The node a predicate judges and where it stands among the nodes the step selected (`position()`, `last()`). */
@@ -107,9 +105,6 @@ function holds(name: string, token: string, env: Env): boolean {
     return false;
   }
   const tokenNoSpace = token.replace(/\s+/g, '');
-  if (env.exact) {
-    return env.caseSensitive ? name === token : name.toLowerCase() === token.toLowerCase();
-  }
   if (env.caseSensitive) {
     return name.indexOf(token) > -1 || name.indexOf(tokenNoSpace) > -1;
   }

@@ -40,7 +40,7 @@ export class ValidationPanelComponent {
   @Output() closed = new EventEmitter<void>();
   @Output() heightChange = new EventEmitter<number>();
   @Output() proceed = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
   readonly minHeight = 96;
 
@@ -112,7 +112,7 @@ export class ValidationPanelComponent {
   /** Closing the panel of a question that is not answered is answering it: the change is not made. */
   dismiss() {
     if (this.decision) {
-      this.cancel.emit();
+      this.cancelled.emit();
     } else {
       this.closed.emit();
     }

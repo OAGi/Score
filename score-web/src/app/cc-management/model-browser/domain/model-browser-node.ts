@@ -5,9 +5,9 @@ import {ServerPredicate} from '../../../common/tree-search/server-predicate';
 import {CcKey, CcPlace, CcSearchRoot, CcServerMarks, CcServerSearch} from '../../domain/cc-server-search';
 import {CollectionViewer, DataSource, SelectionChange} from '@angular/cdk/collections';
 import {ChangeListener} from '../../../bie-management/domain/bie-flat-tree';
-import {TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
+import {describeTree, TreeGraphAdapter} from '../../../common/tree-search/graph-tree-search';
 import {SearchDag, SearchDagBuilder} from '../../../common/tree-search/search-dag';
-import {TreeNodeSearcher, TreeSearchVisit} from '../../../common/tree-search/tree-node-searcher';
+import {TreeNodeSearcher} from '../../../common/tree-search/tree-node-searcher';
 import {FlatNode, getKey} from '../../../common/flat-tree';
 import {BehaviorSubject, forkJoin, Observable, Subject} from 'rxjs';
 import {
@@ -1972,12 +1972,18 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
    * The tree as a `SearchDag`: one record per component (ASCCP, BCCP or supplementary component) with its children in
    * the order the tree shows them, so that a search can run on the thousands of components rather than on the
    * millions of nodes they unfold into. Built from the tree's own `children()` (one representative node per
-   * component), so the names and the order are exactly the tree's; rebuilt when the sibling order changes.
+   * component), so the names and the order are exactly the tree's; rebuilt when the sibling order changes. Undefined
+   * when the tree cannot be described (a node of a kind the graph does not know).
    */
-  searchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, recordOf: (node: T) => number} {
+  searchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, recordOf: (node: T) => number} | undefined {
     if (!this._searchGraph || this._searchGraph.version !== this._viewOrderVersion || this._searchGraph.root !== root
       || this._searchGraph.marks !== marks) {
-      this._searchGraph = {version: this._viewOrderVersion, root, marks, ...this.buildSearchGraph(root, marks)};
+      try {
+        this._searchGraph = {version: this._viewOrderVersion, root, marks, ...this.buildSearchGraph(root, marks)};
+      } catch (e) {
+        this._searchGraph = undefined;
+        return undefined;
+      }
     }
     const builder = this._searchGraph.builder;
     return {
@@ -1992,8 +1998,15 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
   private buildSearchGraph(root: T, marks?: CcServerMarks): {dag: SearchDag, builder: SearchDagBuilder} {
     const builder = new SearchDagBuilder();
     const representatives: T[] = [];
+    const keyOf = (node: T): string => {
+      const key = this.searchKey(node);
+      if (key === undefined) {
+        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+      }
+      return key;
+    };
     const record = (node: T): number => {
-      const {index, created} = builder.record(this.searchKey(node), [node.name], this.identityKey(node), browserSearchAttributes(node, marks));
+      const {index, created} = builder.record(keyOf(node), [node.name], this.identityKey(node), browserSearchAttributes(node, marks));
       if (created) {
         representatives.push(node);
       }
@@ -2002,7 +2015,7 @@ export class ModelBrowserNodeDatabase<T extends ModelBrowserNode> {
     record(root);
     for (let i = 0; i < representatives.length; i++) {
       const node = representatives[i];
-      builder.setChildren(builder.indexOf(this.searchKey(node)), this.children(node).map(child => record(child)));
+      builder.setChildren(builder.indexOf(keyOf(node)), this.children(node).map(child => record(child)));
     }
     return {dag: builder.build(), builder};
   }
@@ -2082,31 +2095,15 @@ export class ModelBrowserNodeDataSourceSearcher<T extends ModelBrowserNode>
   }
 
   protected override graphAdapter(): TreeGraphAdapter<T> {
-    const graph = () => this.database.searchGraph(this.dataSource.data[0], this.serverMarks);
-    return {
-      dag: () => graph().dag,
-      recordOf: node => graph().recordOf(node),
+    return describeTree<T, NonNullable<ReturnType<ModelBrowserNodeDatabase<T>['searchGraph']>>>({
+      graph: () => this.database.searchGraph(this.dataSource.data[0], this.serverMarks),
       namesOf: node => node.isGroup || node.isChoice ? undefined : [node.name],
       attributesOf: node => browserSearchAttributes(node, this.serverMarks),
       childrenOf: node => this.database.children(node)
-    };
+    });
   }
 
   onChange(entity: ModelBrowserNodeDataSource<T>, propertyName: string, val: any) {
-  }
-
-  protected override isMatchable(node: T): boolean {
-    return !node.isGroup && !node.isChoice;
-  }
-
-  protected override visit(node: T): TreeSearchVisit<T> {
-    // Reading `expandable` loads the children, so it has to come before reading them.
-    const expanded = node.expandable;
-    return {children: node.children as T[], expanded};
-  }
-
-  protected visibleIndex(node: T): number {
-    return this.dataSource.data.indexOf(node);
   }
 
 }

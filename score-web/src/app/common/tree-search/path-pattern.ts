@@ -19,20 +19,6 @@ export function nameContainsToken(name: string, token: string, caseSensitive: bo
   return nameLower.indexOf(token.toLowerCase()) > -1 || nameLower.indexOf(tokenNoSpace.toLowerCase()) > -1;
 }
 
-/** Whether a node name is the token (exactly, apart from case unless asked for). */
-export function nameEqualsToken(name: string, token: string, caseSensitive: boolean): boolean {
-  if (!name) {
-    return false;
-  }
-  return caseSensitive ? name === token : name.toLowerCase() === token.toLowerCase();
-}
-
-/** How strictly a pattern is read. */
-export interface PathPatternMode {
-  /** Steps must equal the node names instead of being contained in them. */
-  exact?: boolean;
-}
-
 /**
  * A search expression (see `parseSearchExpression`) as a matcher that is fed the nodes of a path top-down. A step
  * names the nodes it accepts and may judge them by their attributes and surroundings; it follows the node the step
@@ -66,7 +52,7 @@ export class PathPattern {
   private readonly ancestorBit: number[];
   private readonly simple = new SimpleNodeContext();
 
-  constructor(expr: string, readonly caseSensitive = false, readonly mode: PathPatternMode = {}) {
+  constructor(expr: string, readonly caseSensitive = false) {
     this.expression = parseSearchExpression(expr);
     this.rooted = this.expression.rooted;
     this.anchored = this.expression.anchored;
@@ -74,7 +60,7 @@ export class PathPattern {
     this.error = this.expression.error;
     this.needsContext = this.expression.needsContext;
     this.tokens = this.steps.map(step => step.tests.map(test => test.token).join(' '));
-    this.env = {caseSensitive, exact: !!mode.exact};
+    this.env = {caseSensitive};
     let bits = this.steps.length + 1;
     this.stickyBit = this.steps.map((step, j) => j > 0 && (step.axis === 'descendant' || step.axis === 'descendant-or-self') ? bits++ : -1);
     this.ancestorBit = this.expression.ancestorTests.map(() => bits++);

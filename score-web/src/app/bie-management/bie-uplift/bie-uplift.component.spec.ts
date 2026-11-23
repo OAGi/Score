@@ -9,6 +9,7 @@ import {sha256} from '../../common/utility';
 
 type TestNode = {
   level: number;
+  name?: string;
   type: string;
   bieType: string;
   parent?: TestNode;
@@ -25,12 +26,12 @@ type TestNode = {
   children: TestNode[];
 };
 
-function createNode(level: number, type: string, parent?: TestNode, isGroup = false): TestNode {
+function createNode(level: number, type: string, parent?: TestNode | BieFlatNode, isGroup = false): TestNode {
   return {
     level,
     type,
     bieType: type,
-    parent,
+    parent: parent as TestNode,
     isGroup,
     fixed: false,
     used: true,
@@ -1053,7 +1054,7 @@ describe('BieUpliftComponent', () => {
     const sourceDatabase = new BieUpliftSourceFlatNodeDatabase(graph, {} as any, 10, [usedBbieSc], []);
     const sourceParent = new BieUpliftSourceFlatNode(rawParent);
     sourceDatabase.loadChildren(sourceParent as any);
-    const sourceChild = sourceParent.children[0];
+    const sourceChild = sourceParent.children[0] as any;
 
     expect(sourceChild.name).toBe('Scheme Agency Identifier');
     expect(sourceChild.used).toBe(true);
@@ -1065,7 +1066,7 @@ describe('BieUpliftComponent', () => {
     const targetDatabase = new BieUpliftTargetFlatNodeDatabase(graph, {} as any, 10, [usedBbieSc], []);
     const targetParent = new BieUpliftTargetFlatNode(rawParent);
     targetDatabase.loadChildren(targetParent as any);
-    const targetChild = targetParent.children[0];
+    const targetChild = targetParent.children[0] as any;
 
     expect(targetChild.path).toBe(persistedPath);
     expect(targetChild.used).toBe(true);
@@ -1125,7 +1126,7 @@ describe('BieUpliftComponent', () => {
     const wrappedParent = new BieUpliftSourceFlatNode(rawParent);
     database.loadChildren(wrappedParent as any);
 
-    const child = wrappedParent.children[0];
+    const child = wrappedParent.children[0] as any;
     expect(child.inherited).toBe(true);
     expect(child.basedTopLevelAsbiepId).toBe(20);
     expect(wrappedParent.children).toHaveLength(1);
@@ -1179,7 +1180,7 @@ describe('BieUpliftComponent', () => {
     source.fixed = true;
     originalTarget.source = source;
     (component as any).detachTargetMappings(originalTarget);
-    const createUpliftBie = vi.fn(() => of({topLevelAsbiepId: 99}));
+    const createUpliftBie = vi.fn((..._args: unknown[]) => of({topLevelAsbiepId: 99}));
     (component as any).sourceDataSource = {data: [source]};
     (component as any).targetDataSource = {data: []};
     (component as any).bieUpliftService = {createUpliftBie};

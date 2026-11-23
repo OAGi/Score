@@ -28,7 +28,7 @@ function reportOf(...violations: Violation[]): ValidationReport {
     <score-validation-panel [session]="session" [title]="title" [height]="height" [decision]="decision" [note]="note"
                             (locationSelect)="selected.push($event)" (closed)="closed = closed + 1"
                             (heightChange)="heights.push($event)" (proceed)="proceeded = proceeded + 1"
-                            (cancel)="cancelled = cancelled + 1"/>`
+                            (cancelled)="cancelled = cancelled + 1"/>`
 })
 class HostComponent {
   session = new ValidationSession();

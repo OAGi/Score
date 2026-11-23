@@ -1,7 +1,7 @@
 import {FlatNode} from '../flat-tree';
 import {TreeGraphAdapter} from './graph-tree-search';
 import {SearchDag, SearchDagBuilder} from './search-dag';
-import {TreeNodeSearcher, TreeSearchDataSource, TreeSearchVisit} from './tree-node-searcher';
+import {TreeNodeSearcher, TreeSearchDataSource} from './tree-node-searcher';
 
 interface Node extends FlatNode {
   key: string;
@@ -59,6 +59,10 @@ class TestDataSource implements TreeSearchDataSource<Node> {
 class GraphSearcher extends TreeNodeSearcher<Node, TestDataSource> {
   /** Replaces what the tree reports as its structure, as when the sibling order changes after a search. */
   reorder: ((keys: string[]) => string[]) | undefined;
+  /** What the tree says when it cannot describe itself. */
+  withoutDag = false;
+  asked: string[][] = [];
+  serverError: Error | undefined;
 
   constructor(dataSource: TestDataSource, private readonly forest: Forest, private readonly shape: {[key: string]: string[]}) {
     super(dataSource);
@@ -71,7 +75,7 @@ class GraphSearcher extends TreeNodeSearcher<Node, TestDataSource> {
     Object.entries(this.shape).forEach(([key, children]) => builder.setChildren(builder.indexOf(key), children.map(c => builder.indexOf(c))));
     const dag = builder.build();
     return {
-      dag: () => dag,
+      dag: () => this.withoutDag ? undefined : dag,
       recordOf: node => builder.indexOf(node.key) ?? -1,
       namesOf: node => node.group ? undefined : [node.name],
       childrenOf: node => {
@@ -85,13 +89,20 @@ class GraphSearcher extends TreeNodeSearcher<Node, TestDataSource> {
     return this.dataSource.data.indexOf(node);
   }
 
-  protected visit(): TreeSearchVisit<Node> {
-    throw new Error('the node walk must not be used for a tree that has a graph');
+  protected override serverAttributes(): ReadonlySet<string> {
+    return new Set(['remark']);
+  }
+
+  protected override async resolveServerPredicates(predicates: {value: string}[]): Promise<void> {
+    this.asked.push(predicates.map(p => p.value));
+    if (this.serverError) {
+      throw this.serverError;
+    }
   }
 }
 
-function drain(searcher: GraphSearcher, keyword: string, force = false): Promise<number> {
-  return new Promise((resolve, reject) => searcher.search(keyword, undefined, false, force)
+function drain(searcher: GraphSearcher, keyword: string, force = false, from?: Node): Promise<number> {
+  return new Promise((resolve, reject) => searcher.search(keyword, from, false, force)
     .subscribe({next: resolve, error: reject, complete: () => resolve(undefined)}));
 }
 
@@ -127,7 +138,7 @@ describe('TreeNodeSearcher on a graph', () => {
     const third = await drain(searcher, 'Identifier');
     const wrapped = await drain(searcher, 'Identifier');
 
-    expect([second, third, wrapped].map(i => dataSource.data[i].parent.key)).toEqual(['a', 'b', 'a']);
+    expect([second, third, wrapped].map(i => (dataSource.data[i].parent as Node).key)).toEqual(['a', 'b', 'a']);
     expect(searcher.searchIndex).toBe(0);
   });
 
@@ -137,15 +148,15 @@ describe('TreeNodeSearcher on a graph', () => {
 
     expect(searcher.resultCount).toBe(1);
     expect(dataSource.data[index].key).toBe('x');
-    expect(dataSource.data[index].parent.parent.key).toBe('b');
+    expect((dataSource.data[index].parent.parent as Node).key).toBe('b');
   });
 
   it('marks the matches that are on screen, and only those', async () => {
     const {searcher, dataSource} = setup(shape, names);
     await drain(searcher, 'Alpha/Identifier');
 
-    const y = dataSource.data.find(n => n.key === 'y' && n.parent.key === 'a');
-    const otherY = dataSource.data.find(n => n.key === 'y' && n.parent.key === 'b') ?? dataSource.forestChild?.(y);
+    const y = dataSource.data.find(n => n.key === 'y' && (n.parent as Node).key === 'a');
+    const otherY = dataSource.data.find(n => n.key === 'y' && (n.parent as Node).key === 'b');
     expect(searcher.isSearchResult(y)).toBe(true);
     expect(searcher.isCurrentSearchIndex(y)).toBe(true);
     expect(otherY === undefined || !searcher.isSearchResult(otherY)).toBe(true);
@@ -179,6 +190,100 @@ describe('TreeNodeSearcher on a graph', () => {
     expect(await pending).toBeUndefined();
     expect(searcher.resultCount).toBe(0);
   });
+
+  it('matches the names of a path by what they contain, from the root as anywhere else', async () => {
+    const {searcher} = setup(shape, names);
+
+    // the root and the step after it are contained in the names, and the path begins at the root
+    expect(await drain(searcher, '/roo/Alp/Identifier')).toBeGreaterThanOrEqual(0);
+    expect(searcher.resultCount).toBe(1);
+
+    expect(await drain(searcher, '/Alp/Identifier', true)).toBe(-1);
+    expect(searcher.resultCount).toBe(0);
+
+    // without the leading slash the path may begin at any node
+    expect(await drain(searcher, 'Alp/Identifier', true)).toBeGreaterThanOrEqual(0);
+    expect(searcher.resultCount).toBe(2);
+  });
+
+  it('says why a search was refused: too many steps for the matcher', async () => {
+    const {searcher} = setup(shape, names);
+
+    await drain(searcher, 'Identifier');
+    expect(searcher.graphRefusal).toBeUndefined();
+
+    // more steps that reach any depth than the matcher state has bits for
+    expect(await drain(searcher, '//a'.repeat(17), true)).toBe(-1);
+    expect(searcher.graphRefusal).toBe('unsupported-expression');
+    expect(searcher.expressionError).toBe('This expression is too complex to search here');
+    expect(searcher.isSearching).toBe(false);
+
+    searcher.resetSearch();
+    expect(searcher.graphRefusal).toBeUndefined();
+  });
+
+  it('says so when the tree cannot describe itself, and leaves the search ready for the next one', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const {searcher} = setup(shape, names);
+    searcher.withoutDag = true;
+
+    expect(await drain(searcher, 'Identifier')).toBe(-1);
+    expect(searcher.graphRefusal).toBe('no-dag');
+    expect(searcher.expressionError).toBe('The tree cannot be searched');
+    expect(searcher.isSearching).toBe(false);
+    expect(error).toHaveBeenCalledTimes(1);
+
+    searcher.withoutDag = false;
+    expect(await drain(searcher, 'Identifier', true)).toBeGreaterThanOrEqual(0);
+    expect(searcher.expressionError).toBeUndefined();
+    error.mockRestore();
+  });
+
+  it('searches from the root when the node it was asked to start from is no longer in the tree', async () => {
+    const {searcher, forest} = setup(shape, names);
+    const hidden = forest.make('hidden');
+
+    expect(await drain(searcher, 'Identifier', false, hidden)).toBeGreaterThanOrEqual(0);
+    expect(searcher.graphRefusal).toBeUndefined();
+    expect(searcher.resultCount).toBe(3);
+  });
+
+  it('does not ask the server about an expression that has no server attribute', async () => {
+    const {searcher} = setup(shape, names);
+    await drain(searcher, 'Identifier');
+
+    expect(searcher.asked).toEqual([]);
+  });
+
+  it('asks the server once for the conditions on server attributes, and searches on with the flags it set', async () => {
+    const {searcher} = setup(shape, names);
+
+    await drain(searcher, '//*[remark = "x" or contains(remark, "y")]');
+
+    expect(searcher.asked).toEqual([['x', 'y']]);
+    expect(searcher.expressionError).toBeUndefined();
+    expect(searcher.isSearching).toBe(false);
+  });
+
+  it('reports a server that fails and leaves the search ready for the next one', async () => {
+    const {searcher} = setup(shape, names);
+    searcher.serverError = new Error('down');
+
+    expect(await drain(searcher, '//*[remark = "x"]')).toBe(-1);
+    expect(searcher.expressionError).toBe('The server could not search this expression');
+    expect(searcher.isSearching).toBe(false);
+
+    searcher.serverError = undefined;
+    expect(await drain(searcher, 'Identifier')).toBeGreaterThanOrEqual(0);
+  });
+
+  it('refuses a server attribute that is ordered or has no value to compare with', async () => {
+    const {searcher} = setup(shape, names);
+
+    expect(await drain(searcher, '//*[remark < "x"]')).toBe(-1);
+    expect(searcher.expressionError).toContain('= and != only');
+    expect(searcher.asked).toEqual([]);
+  });
 });
 
 /** A tree whose components have a definition that can be edited, as the BIE tree's nodes have. */
@@ -211,10 +316,6 @@ class EditableSearcher extends TreeNodeSearcher<Node, TestDataSource> {
 
   protected visibleIndex(node: Node): number {
     return this.dataSource.data.indexOf(node);
-  }
-
-  protected visit(): TreeSearchVisit<Node> {
-    throw new Error('the node walk must not be used for a tree that has a graph');
   }
 }
 

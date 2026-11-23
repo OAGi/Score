@@ -3,6 +3,7 @@ import {
   ModelBrowserAsccpNode,
   ModelBrowserAsccpNodeDetail,
   ModelBrowserBccpNode,
+  ModelBrowserNode,
   ModelBrowserNodeDatabase,
   ModelBrowserNodeDataSource
 } from './model-browser-node';
@@ -18,7 +19,7 @@ import {PathPattern} from '../../../common/tree-search/path-pattern';
  */
 
 /** A bare ACC view parent: expandable short-circuited, just enough of a graph node to derive a path. */
-function accParent(accManifestId: number, children: ModelBrowserAccNode[] = []): ModelBrowserAccNode {
+function accParent(accManifestId: number, children: ModelBrowserNode[] = []): ModelBrowserAccNode {
   const n = new ModelBrowserAccNode();
   n.name = 'Parent-' + accManifestId;
   n.level = 0;
@@ -340,5 +341,17 @@ describe('ModelBrowserNodeDatabase.searchGraph with the answer of the backend', 
     expect(found('ViaDataType[deprecated]')).toBe(1);
     expect(found('ViaAscc[deprecated]')).toBe(1);
     expect(found('Plain[deprecated]')).toBe(0);
+  });
+
+  it('says it cannot describe a tree that has a node of a kind it does not know, as the other trees do', () => {
+    const db = new FixedDatabase();
+    const unknown = {name: 'Odd', self: {}, children: []} as any;
+    const root = accParent(1, [asccChild('Beta', 2), unknown]);
+
+    expect(db.searchGraph(root)).toBeUndefined();
+
+    // a tree that was described before is described again once it can be
+    const fixed = accParent(1, [asccChild('Beta', 2)]);
+    expect(db.searchGraph(fixed)).toBeDefined();
   });
 });

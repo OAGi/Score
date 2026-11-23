@@ -294,7 +294,7 @@ Keywords and paths
 An expression with no ``[``, ``::``, ``//``, or ``..`` is read as before: the names between the ``/`` characters are matched in order, and a name may contain spaces (e.g., ``Release ID``).
 A name matches every node whose name *contains* the text, so ``Sender`` also finds *Sender Party* and *Message Sender*.
 In the table below, "a node named Sender" therefore means a node whose name contains "Sender".
-In the BIE editor and the BIE uplift trees, a path that starts with ``/`` is the exception: its names must equal the node names, apart from case.
+This holds in every tree, and for a path that starts with ``/`` or ``//`` as well: ``/BOM/Party`` finds every node whose name contains "Party" and whose parent is the root, if the name of the root contains "BOM".
 
 .. list-table::
    :header-rows: 1

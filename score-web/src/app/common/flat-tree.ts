@@ -54,10 +54,3 @@ export function getKey(node: CcGraphNode): string {
 export function next(ccGraph: CcGraph, node: CcGraphNode): CcGraphNode {
   return ccGraph.graph.nodes[ccGraph.graph.edges[getKey(node)].targets[0]];
 }
-
-
-export interface ExpressionEvaluator<T extends FlatNode> {
-  range(data: T[], current: T): T[];
-  eval(node: T): boolean;
-  keywordForHighlight(): string;
-}
