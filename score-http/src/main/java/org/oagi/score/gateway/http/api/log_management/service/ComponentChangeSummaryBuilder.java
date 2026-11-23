@@ -26,7 +26,9 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListSummar
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListValueDetailsRecord;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChangeSummary;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChildChange;
-import org.oagi.score.gateway.http.api.log_management.model.ComponentChildSummary;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentChildItem;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueChange;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueItem;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentFieldChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentSummaryField;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
@@ -80,7 +82,7 @@ final class ComponentChangeSummaryBuilder {
             addField(fields, "Definition", content(current.definition()));
             addField(fields, "Definition Source", source(current.definition()));
 
-            List<ComponentChildSummary> children = new ArrayList<>();
+            List<ComponentChildItem> children = new ArrayList<>();
             for (CcAssociation association : nonNull(current.associations())) {
                 children.add(associationSummary(association));
             }
@@ -99,8 +101,8 @@ final class ComponentChangeSummaryBuilder {
         addChange(changes, "Definition", content(prev.definition()), content(current.definition()));
         addChange(changes, "Definition Source", source(prev.definition()), source(current.definition()));
 
-        List<ComponentChildSummary> added = List.of();
-        List<ComponentChildSummary> removed = List.of();
+        List<ComponentChildItem> added = List.of();
+        List<ComponentChildItem> removed = List.of();
         List<ComponentChildChange> changed = new ArrayList<>();
 
         if (!sameManifestPrev) {
@@ -113,14 +115,14 @@ final class ComponentChangeSummaryBuilder {
             added = diff.added().stream()
                     .map(ComponentChangeSummaryBuilder::associationSummary).collect(Collectors.toList());
             removed = diff.removed().stream()
-                    .map(a -> new ComponentChildSummary(associationKind(a), associationName(a), List.of()))
+                    .map(a -> new ComponentChildItem(associationType(a), associationName(a), List.of()))
                     .collect(Collectors.toList());
 
             for (GuidPair<CcAssociation> pair : diff.matched()) {
                 List<ComponentFieldChange> childChanges = associationChanges(pair.current(), pair.prev());
                 if (!childChanges.isEmpty()) {
                     changed.add(new ComponentChildChange(
-                            associationKind(pair.current()), associationName(pair.current()), childChanges));
+                            associationType(pair.current()), associationName(pair.current()), childChanges));
                 }
             }
 
@@ -152,8 +154,8 @@ final class ComponentChangeSummaryBuilder {
         throw new IllegalArgumentException("Unsupported association type: " + association.getClass());
     }
 
-    private static String associationKind(CcAssociation association) {
-        return association.isAscc() ? "ASCC" : "BCC";
+    private static CcType associationType(CcAssociation association) {
+        return association.isAscc() ? CcType.ASCC : CcType.BCC;
     }
 
     private static String associationName(CcAssociation association) {
@@ -163,7 +165,7 @@ final class ComponentChangeSummaryBuilder {
         return ((BccSummaryRecord) association).den();
     }
 
-    private static ComponentChildSummary associationSummary(CcAssociation association) {
+    private static ComponentChildItem associationSummary(CcAssociation association) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         if (association instanceof AsccSummaryRecord ascc) {
             addField(fields, "Cardinality", cardinality(ascc.cardinality()));
@@ -180,7 +182,7 @@ final class ComponentChangeSummaryBuilder {
             addField(fields, "Definition", content(bcc.definition()));
             addField(fields, "Definition Source", source(bcc.definition()));
         }
-        return new ComponentChildSummary(associationKind(association), associationName(association), fields);
+        return new ComponentChildItem(associationType(association), associationName(association), fields);
     }
 
     private static List<ComponentFieldChange> associationChanges(CcAssociation current, CcAssociation prev) {
@@ -307,12 +309,11 @@ final class ComponentChangeSummaryBuilder {
             addField(fields, "Definition", content(current.definition()));
             addField(fields, "Definition Source", source(current.definition()));
             addField(fields, "Content Component Definition", current.contentComponentDefinition());
+            List<ValueDomain> domains = dtValueDomains(current.dtAwdPriList());
+            addField(fields, "Value Domains", domainNames(domains));
+            addField(fields, "Default Value Domain", defaultDomainName(domains));
 
-            List<ComponentChildSummary> children = new ArrayList<>();
-            for (ValueDomain domain : dtValueDomains(current.dtAwdPriList())) {
-                children.add(new ComponentChildSummary("Value Domain", domain.name(),
-                        domain.isDefault() ? List.of(new ComponentSummaryField("Default", "Yes")) : List.of()));
-            }
+            List<ComponentChildItem> children = new ArrayList<>();
             for (DtScDetailsRecord sc : nonNull(currentScList)) {
                 children.add(dtScSummary(sc));
             }
@@ -332,13 +333,14 @@ final class ComponentChangeSummaryBuilder {
         addChange(changes, "Definition Source", source(prev.definition()), source(current.definition()));
         addChange(changes, "Content Component Definition",
                 prev.contentComponentDefinition(), current.contentComponentDefinition());
+        List<ValueDomain> prevDomains = dtValueDomains(prev.dtAwdPriList());
+        List<ValueDomain> currentDomains = dtValueDomains(current.dtAwdPriList());
+        addChange(changes, "Value Domains", domainNames(prevDomains), domainNames(currentDomains));
+        addChange(changes, "Default Value Domain", defaultDomainName(prevDomains), defaultDomainName(currentDomains));
 
-        List<ComponentChildSummary> added = new ArrayList<>();
-        List<ComponentChildSummary> removed = new ArrayList<>();
+        List<ComponentChildItem> added = new ArrayList<>();
+        List<ComponentChildItem> removed = new ArrayList<>();
         List<ComponentChildChange> changed = new ArrayList<>();
-
-        diffValueDomains(changes, added, removed,
-                dtValueDomains(current.dtAwdPriList()), dtValueDomains(prev.dtAwdPriList()));
 
         if (prevScList != null) {
             GuidDiff<DtScDetailsRecord> diff = diffByGuid(nonNull(currentScList), prevScList,
@@ -347,12 +349,12 @@ final class ComponentChangeSummaryBuilder {
                 added.add(dtScSummary(sc));
             }
             for (DtScDetailsRecord sc : diff.removed()) {
-                removed.add(new ComponentChildSummary("Supplementary Component", sc.den(), List.of()));
+                removed.add(new ComponentChildItem(CcType.DT_SC, sc.den(), List.of()));
             }
             for (GuidPair<DtScDetailsRecord> pair : diff.matched()) {
                 List<ComponentFieldChange> childChanges = dtScChanges(pair.current(), pair.prev());
                 if (!childChanges.isEmpty()) {
-                    changed.add(new ComponentChildChange("Supplementary Component",
+                    changed.add(new ComponentChildChange(CcType.DT_SC,
                             pair.current().den(), childChanges));
                 }
             }
@@ -362,7 +364,7 @@ final class ComponentChangeSummaryBuilder {
             for (DtScDetailsRecord sc : nonNull(currentScList)) {
                 if (sc.prevCardinality() != null
                         && !Objects.equals(cardinality(sc.prevCardinality()), cardinality(sc.cardinality()))) {
-                    changed.add(new ComponentChildChange("Supplementary Component", sc.den(),
+                    changed.add(new ComponentChildChange(CcType.DT_SC, sc.den(),
                             List.of(new ComponentFieldChange("Cardinality",
                                     cardinality(sc.prevCardinality()), cardinality(sc.cardinality())))));
                 }
@@ -373,14 +375,14 @@ final class ComponentChangeSummaryBuilder {
                 revisionNum(current.log()), revisionNum(current.log()) - 1, changes, added, removed, changed);
     }
 
-    private static ComponentChildSummary dtScSummary(DtScDetailsRecord sc) {
+    private static ComponentChildItem dtScSummary(DtScDetailsRecord sc) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Cardinality", cardinality(sc.cardinality()));
         addField(fields, "Value Constraint", valueConstraint(sc.valueConstraint()));
         addFlag(fields, "Deprecated", sc.deprecated());
         addField(fields, "Definition", content(sc.definition()));
         addField(fields, "Definition Source", source(sc.definition()));
-        return new ComponentChildSummary("Supplementary Component", sc.den(), fields);
+        return new ComponentChildItem(CcType.DT_SC, sc.den(), fields);
     }
 
     private static List<ComponentFieldChange> dtScChanges(DtScDetailsRecord current, DtScDetailsRecord prev) {
@@ -437,28 +439,6 @@ final class ComponentChangeSummaryBuilder {
                 : "Primitive \"" + name + "\" (" + cdtPriName + ")";
     }
 
-    private static void diffValueDomains(List<ComponentFieldChange> changes,
-                                         List<ComponentChildSummary> added, List<ComponentChildSummary> removed,
-                                         List<ValueDomain> current, List<ValueDomain> prev) {
-        Map<String, ValueDomain> prevByName = prev.stream()
-                .collect(Collectors.toMap(ValueDomain::name, Function.identity(), (a, b) -> a, LinkedHashMap::new));
-        Map<String, ValueDomain> currentByName = current.stream()
-                .collect(Collectors.toMap(ValueDomain::name, Function.identity(), (a, b) -> a, LinkedHashMap::new));
-
-        for (ValueDomain domain : current) {
-            if (!prevByName.containsKey(domain.name())) {
-                added.add(new ComponentChildSummary("Value Domain", domain.name(),
-                        domain.isDefault() ? List.of(new ComponentSummaryField("Default", "Yes")) : List.of()));
-            }
-        }
-        for (ValueDomain domain : prev) {
-            if (!currentByName.containsKey(domain.name())) {
-                removed.add(new ComponentChildSummary("Value Domain", domain.name(), List.of()));
-            }
-        }
-        addChange(changes, "Default Value Domain", defaultDomainName(prev), defaultDomainName(current));
-    }
-
     private static String defaultDomainName(List<ValueDomain> domains) {
         return domains.stream().filter(ValueDomain::isDefault).map(ValueDomain::name).findFirst().orElse(null);
     }
@@ -485,11 +465,11 @@ final class ComponentChangeSummaryBuilder {
             addField(fields, "Definition Source", source(current.definition()));
             addField(fields, "Remark", current.remark());
 
-            List<ComponentChildSummary> children = new ArrayList<>();
+            List<ComponentValueItem> children = new ArrayList<>();
             for (CodeListValueDetailsRecord value : nonNull(current.valueList())) {
                 children.add(codeListValueSummary(value));
             }
-            return ComponentChangeSummary.newComponent(CcType.CODE_LIST, current.name(), guid(current.guid()),
+            return ComponentChangeSummary.newList(CcType.CODE_LIST, current.name(), guid(current.guid()),
                     revisionNum(current.log()), fields, children);
         }
 
@@ -511,12 +491,12 @@ final class ComponentChangeSummaryBuilder {
         GuidDiff<CodeListValueDetailsRecord> diff = diffByGuid(
                 nonNull(current.valueList()), nonNull(prev.valueList()), v -> guid(v.guid()));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentValueItem> added = diff.added().stream()
                 .map(ComponentChangeSummaryBuilder::codeListValueSummary).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(v -> new ComponentChildSummary("Value", v.value(), List.of()))
+        List<ComponentValueItem> removed = diff.removed().stream()
+                .map(v -> new ComponentValueItem(v.value(), List.of()))
                 .collect(Collectors.toList());
-        List<ComponentChildChange> changed = new ArrayList<>();
+        List<ComponentValueChange> changed = new ArrayList<>();
         for (GuidPair<CodeListValueDetailsRecord> pair : diff.matched()) {
             List<ComponentFieldChange> childChanges = new ArrayList<>();
             addChange(childChanges, "Code", pair.prev().value(), pair.current().value());
@@ -525,21 +505,21 @@ final class ComponentChangeSummaryBuilder {
             addChange(childChanges, "Definition Source", source(pair.prev().definition()), source(pair.current().definition()));
             addFlagChange(childChanges, "Deprecated", pair.prev().deprecated(), pair.current().deprecated());
             if (!childChanges.isEmpty()) {
-                changed.add(new ComponentChildChange("Value", pair.current().value(), childChanges));
+                changed.add(new ComponentValueChange(pair.current().value(), childChanges));
             }
         }
 
-        return ComponentChangeSummary.revised(CcType.CODE_LIST, current.name(), guid(current.guid()),
+        return ComponentChangeSummary.revisedList(CcType.CODE_LIST, current.name(), guid(current.guid()),
                 revisionNum(current.log()), revisionNum(current.log()) - 1, changes, added, removed, changed);
     }
 
-    private static ComponentChildSummary codeListValueSummary(CodeListValueDetailsRecord value) {
+    private static ComponentValueItem codeListValueSummary(CodeListValueDetailsRecord value) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Meaning", value.meaning());
         addFlag(fields, "Deprecated", value.deprecated());
         addField(fields, "Definition", content(value.definition()));
         addField(fields, "Definition Source", source(value.definition()));
-        return new ComponentChildSummary("Value", value.value(), fields);
+        return new ComponentValueItem(value.value(), fields);
     }
 
     // ----- Agency ID list -----
@@ -558,11 +538,11 @@ final class ComponentChangeSummaryBuilder {
             addField(fields, "Definition Source", source(current.definition()));
             addField(fields, "Remark", current.remark());
 
-            List<ComponentChildSummary> children = new ArrayList<>();
+            List<ComponentValueItem> children = new ArrayList<>();
             for (AgencyIdListValueDetailsRecord value : nonNull(current.valueList())) {
                 children.add(agencyIdListValueSummary(value));
             }
-            return ComponentChangeSummary.newComponent(CcType.AGENCY_ID_LIST, current.name(), guid(current.guid()),
+            return ComponentChangeSummary.newList(CcType.AGENCY_ID_LIST, current.name(), guid(current.guid()),
                     revisionNum(current.log()), fields, children);
         }
 
@@ -584,12 +564,12 @@ final class ComponentChangeSummaryBuilder {
         GuidDiff<AgencyIdListValueDetailsRecord> diff = diffByGuid(
                 nonNull(current.valueList()), nonNull(prev.valueList()), v -> guid(v.guid()));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentValueItem> added = diff.added().stream()
                 .map(ComponentChangeSummaryBuilder::agencyIdListValueSummary).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(v -> new ComponentChildSummary("Value", v.value(), List.of()))
+        List<ComponentValueItem> removed = diff.removed().stream()
+                .map(v -> new ComponentValueItem(v.value(), List.of()))
                 .collect(Collectors.toList());
-        List<ComponentChildChange> changed = new ArrayList<>();
+        List<ComponentValueChange> changed = new ArrayList<>();
         for (GuidPair<AgencyIdListValueDetailsRecord> pair : diff.matched()) {
             List<ComponentFieldChange> childChanges = new ArrayList<>();
             addChange(childChanges, "Value", pair.prev().value(), pair.current().value());
@@ -600,15 +580,15 @@ final class ComponentChangeSummaryBuilder {
             addFlagChange(childChanges, "Developer Default", pair.prev().isDeveloperDefault(), pair.current().isDeveloperDefault());
             addFlagChange(childChanges, "User Default", pair.prev().isUserDefault(), pair.current().isUserDefault());
             if (!childChanges.isEmpty()) {
-                changed.add(new ComponentChildChange("Value", pair.current().value(), childChanges));
+                changed.add(new ComponentValueChange(pair.current().value(), childChanges));
             }
         }
 
-        return ComponentChangeSummary.revised(CcType.AGENCY_ID_LIST, current.name(), guid(current.guid()),
+        return ComponentChangeSummary.revisedList(CcType.AGENCY_ID_LIST, current.name(), guid(current.guid()),
                 revisionNum(current.log()), revisionNum(current.log()) - 1, changes, added, removed, changed);
     }
 
-    private static ComponentChildSummary agencyIdListValueSummary(AgencyIdListValueDetailsRecord value) {
+    private static ComponentValueItem agencyIdListValueSummary(AgencyIdListValueDetailsRecord value) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Meaning", value.name());
         addFlag(fields, "Deprecated", value.deprecated());
@@ -616,7 +596,7 @@ final class ComponentChangeSummaryBuilder {
         addFlag(fields, "User Default", value.isUserDefault());
         addField(fields, "Definition", content(value.definition()));
         addField(fields, "Definition Source", source(value.definition()));
-        return new ComponentChildSummary("Value", value.value(), fields);
+        return new ComponentValueItem(value.value(), fields);
     }
 
     private static String agencyIdValue(AgencyIdListValueSummaryRecord value) {

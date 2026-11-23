@@ -25,6 +25,7 @@ import org.oagi.score.gateway.http.api.code_list_management.model.CodeListValueD
 import org.oagi.score.gateway.http.api.log_management.model.ChangeSummaryType;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChangeSummary;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChildChange;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentFieldChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentSummaryField;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
@@ -268,9 +269,9 @@ class ComponentChangeSummaryBuilderTest {
                 null, false);
 
         assertThat(summary.children()).hasSize(2);
-        assertThat(summary.children().get(0).kind()).isEqualTo("ASCC");
+        assertThat(summary.children().get(0).type()).isEqualTo(CcType.ASCC);
         assertThat(summary.children().get(0).name()).isEqualTo("Header. Header");
-        assertThat(summary.children().get(1).kind()).isEqualTo("BCC");
+        assertThat(summary.children().get(1).type()).isEqualTo(CcType.BCC);
         assertThat(summary.children().get(1).fields()).contains(
                 new ComponentSummaryField("Cardinality", "0..unbounded"),
                 new ComponentSummaryField("Entity Type", "Element"));
@@ -293,7 +294,7 @@ class ComponentChangeSummaryBuilderTest {
         assertThat(summary.childrenRemoved()).hasSize(1);
         assertThat(summary.childrenRemoved().get(0).name()).isEqualTo("Status. Code");
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("BCC", "Identifier. Identifier",
+                new ComponentChildChange(CcType.BCC, "Identifier. Identifier",
                         List.of(new ComponentFieldChange("Cardinality", "0..1", "1..1"))));
     }
 
@@ -369,12 +370,12 @@ class ComponentChangeSummaryBuilderTest {
 
         assertThat(summary.fieldChanges()).containsExactly(
                 new ComponentFieldChange("Version", "1", "2"));
-        assertThat(summary.childrenAdded()).hasSize(1);
-        assertThat(summary.childrenAdded().get(0).name()).isEqualTo("Critical");
-        assertThat(summary.childrenRemoved()).hasSize(1);
-        assertThat(summary.childrenRemoved().get(0).name()).isEqualTo("Low");
-        assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Value", "None",
+        assertThat(summary.valuesAdded()).hasSize(1);
+        assertThat(summary.valuesAdded().get(0).name()).isEqualTo("Critical");
+        assertThat(summary.valuesRemoved()).hasSize(1);
+        assertThat(summary.valuesRemoved().get(0).name()).isEqualTo("Low");
+        assertThat(summary.valuesChanged()).containsExactly(
+                new ComponentValueChange("None",
                         List.of(new ComponentFieldChange("Meaning", "No risk", "Risk not assessed"))));
     }
 
@@ -383,8 +384,8 @@ class ComponentChangeSummaryBuilderTest {
         ComponentChangeSummary summary = ComponentChangeSummaryBuilder.codeList(
                 codeList(1, "1", List.of(codeListValue('a', "High", "High risk", "Highest tier."))), null);
 
-        assertThat(summary.children()).hasSize(1);
-        assertThat(summary.children().get(0).fields()).containsExactly(
+        assertThat(summary.values()).hasSize(1);
+        assertThat(summary.values().get(0).fields()).containsExactly(
                 new ComponentSummaryField("Meaning", "High risk"),
                 new ComponentSummaryField("Definition", "Highest tier."));
     }
@@ -397,15 +398,15 @@ class ComponentChangeSummaryBuilderTest {
                 agencyIdList(2, List.of(agencyIdListValue('a', "6", "United Nations", true))),
                 agencyIdList(1, List.of(agencyIdListValue('a', "6", "United Nations", false))));
 
-        assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Value", "6",
+        assertThat(summary.valuesChanged()).containsExactly(
+                new ComponentValueChange("6",
                         List.of(new ComponentFieldChange("User Default", "No", "Yes"))));
     }
 
     // ----- DT -----
 
     @Test
-    void newDtListsValueDomainsAndSupplementaryComponents() {
+    void newDtListsValueDomainsAsFieldsAndSupplementaryComponentsAsChildren() {
         ComponentChangeSummary summary = ComponentChangeSummaryBuilder.dt(
                 dt(1, "3a5b7c", List.of(primitiveDomain("Decimal", "Decimal", true))),
                 List.of(dtSc('a', "Currency. Code", new Cardinality(0, 1), null, null)),
@@ -413,13 +414,11 @@ class ComponentChangeSummaryBuilderTest {
 
         assertThat(summary.fields()).contains(
                 new ComponentSummaryField("Data Type Term", "Amount"),
-                new ComponentSummaryField("Six Hexadecimal Identifier", "3a5b7c"));
-        assertThat(summary.children()).hasSize(2);
-        assertThat(summary.children().get(0).kind()).isEqualTo("Value Domain");
-        assertThat(summary.children().get(0).name()).isEqualTo("Primitive \"Decimal\"");
-        assertThat(summary.children().get(0).fields()).containsExactly(
-                new ComponentSummaryField("Default", "Yes"));
-        assertThat(summary.children().get(1).kind()).isEqualTo("Supplementary Component");
+                new ComponentSummaryField("Six Hexadecimal Identifier", "3a5b7c"),
+                new ComponentSummaryField("Value Domains", "Primitive \"Decimal\""),
+                new ComponentSummaryField("Default Value Domain", "Primitive \"Decimal\""));
+        assertThat(summary.children()).hasSize(1);
+        assertThat(summary.children().get(0).type()).isEqualTo(CcType.DT_SC);
     }
 
     @Test
@@ -439,9 +438,10 @@ class ComponentChangeSummaryBuilderTest {
                 List.of(),
                 dt(1, null, List.of(primitiveDomain("Token", true))), List.of());
 
-        assertThat(summary.childrenAdded()).hasSize(1);
-        assertThat(summary.childrenAdded().get(0).name()).isEqualTo("Primitive \"Decimal\"");
+        assertThat(summary.childrenAdded()).isEmpty();
         assertThat(summary.fieldChanges()).containsExactly(
+                new ComponentFieldChange("Value Domains",
+                        "Primitive \"Token\" (Decimal)", "Primitive \"Decimal\", Primitive \"Token\" (Decimal)"),
                 new ComponentFieldChange("Default Value Domain",
                         "Primitive \"Token\" (Decimal)", "Primitive \"Decimal\""));
     }
@@ -457,10 +457,11 @@ class ComponentChangeSummaryBuilderTest {
                 List.of(),
                 dt(1, null, List.of(primitiveDomain("Decimal", "Token", true))), List.of());
 
-        assertThat(summary.childrenAdded()).hasSize(1);
-        assertThat(summary.childrenAdded().get(0).name()).isEqualTo("Primitive \"Token\" (Integer)");
+        assertThat(summary.childrenAdded()).isEmpty();
         assertThat(summary.childrenRemoved()).isEmpty();
-        assertThat(summary.fieldChanges()).isEmpty();
+        assertThat(summary.fieldChanges()).hasSize(1);
+        assertThat(summary.fieldChanges().get(0).label()).isEqualTo("Value Domains");
+        assertThat(summary.fieldChanges().get(0).after()).contains("Primitive \"Token\" (Integer)");
     }
 
     @Test
@@ -478,7 +479,7 @@ class ComponentChangeSummaryBuilderTest {
         assertThat(summary.childrenRemoved()).hasSize(1);
         assertThat(summary.childrenRemoved().get(0).name()).isEqualTo("Scheme. Identifier");
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Supplementary Component", "Currency. Code",
+                new ComponentChildChange(CcType.DT_SC, "Currency. Code",
                         List.of(new ComponentFieldChange("Cardinality", "1..1", "0..1"))));
     }
 
@@ -492,7 +493,7 @@ class ComponentChangeSummaryBuilderTest {
                         List.of(scPrimitiveDomain("Token", true), scPrimitiveDomain("Decimal", false)))));
 
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Supplementary Component", "Currency. Code",
+                new ComponentChildChange(CcType.DT_SC, "Currency. Code",
                         List.of(new ComponentFieldChange("Default Value Domain",
                                 "Primitive \"Token\"", "Primitive \"Decimal\""))));
     }
@@ -508,7 +509,7 @@ class ComponentChangeSummaryBuilderTest {
         assertThat(summary.childrenAdded()).isEmpty();
         assertThat(summary.childrenRemoved()).isEmpty();
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Supplementary Component", "Currency. Code",
+                new ComponentChildChange(CcType.DT_SC, "Currency. Code",
                         List.of(new ComponentFieldChange("Cardinality", "1..1", "0..1"))));
     }
 

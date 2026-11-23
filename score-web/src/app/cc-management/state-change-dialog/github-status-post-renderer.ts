@@ -1,9 +1,13 @@
 import {
+  childTypeLabel,
   ComponentChangeSummary,
   ComponentChildChange,
-  ComponentChildSummary,
+  ComponentChildItem,
+  ComponentChildType,
   ComponentFieldChange,
-  ComponentSummaryField
+  ComponentSummaryField,
+  ComponentValueChange,
+  ComponentValueItem
 } from '../../log-management/domain/log';
 
 /**
@@ -37,6 +41,7 @@ export function candidatePost(summary: ComponentChangeSummary): string {
     out += '\n';
     out += renderFields(summary.fields || []);
     out += renderCollapsedChildren(summary.children || []);
+    out += renderBucket('Values', summary.values || [], true);
   } else {
     out += '### ' + typeName(summary) + ' "' + summary.name
       + '" (rev. ' + summary.revisionNum + ') moved to Candidate\n';
@@ -119,7 +124,11 @@ function isEmpty(summary: ComponentChangeSummary): boolean {
     && (summary.fieldChanges || []).length === 0
     && (summary.childrenAdded || []).length === 0
     && (summary.childrenRemoved || []).length === 0
-    && (summary.childrenChanged || []).length === 0;
+    && (summary.childrenChanged || []).length === 0
+    && (summary.values || []).length === 0
+    && (summary.valuesAdded || []).length === 0
+    && (summary.valuesRemoved || []).length === 0
+    && (summary.valuesChanged || []).length === 0;
 }
 
 function renderChangeBody(summary: ComponentChangeSummary): string {
@@ -137,11 +146,15 @@ function renderChangeBody(summary: ComponentChangeSummary): string {
   out += renderBucket('Added', summary.childrenAdded || [], true);
   out += renderBucket('Removed', summary.childrenRemoved || [], false);
   out += renderChangedBucket(summary.childrenChanged || []);
+  out += renderBucket('Added', summary.valuesAdded || [], true);
+  out += renderBucket('Removed', summary.valuesRemoved || [], false);
+  out += renderChangedBucket(summary.valuesChanged || []);
   return out;
 }
 
 /** One child bucket as a `<details>` block; `withFields` lists each entry's fields. */
-function renderBucket(label: string, children: ComponentChildSummary[], withFields: boolean): string {
+function renderBucket(label: string, children: Array<ComponentChildItem | ComponentValueItem>,
+                      withFields: boolean): string {
   if (children.length === 0) {
     return '';
   }
@@ -152,7 +165,7 @@ function renderBucket(label: string, children: ComponentChildSummary[], withFiel
       out += '- … and ' + (children.length - MAX_ITEMS_PER_GROUP) + ' more\n';
       break;
     }
-    out += '- ' + child.kind + ' "' + child.name + '"\n';
+    out += '- ' + itemLabel(child) + ' "' + child.name + '"\n';
     if (withFields) {
       for (const field of (child.fields || [])) {
         out += '  - ' + field.label + ': ' + clip(field.value) + '\n';
@@ -163,7 +176,12 @@ function renderBucket(label: string, children: ComponentChildSummary[], withFiel
   return out;
 }
 
-function renderChangedBucket(children: ComponentChildChange[]): string {
+/** The label shown before an entry's name: its child type, or "Value" for a list value. */
+function itemLabel(item: ComponentChildItem | ComponentChildChange | ComponentValueItem | ComponentValueChange): string {
+  return 'type' in item ? childTypeLabel(item.type) : 'Value';
+}
+
+function renderChangedBucket(children: Array<ComponentChildChange | ComponentValueChange>): string {
   if (children.length === 0) {
     return '';
   }
@@ -174,7 +192,7 @@ function renderChangedBucket(children: ComponentChildChange[]): string {
       out += '- … and ' + (children.length - MAX_ITEMS_PER_GROUP) + ' more\n';
       break;
     }
-    out += '- ' + child.kind + ' "' + child.name + '"\n';
+    out += '- ' + itemLabel(child) + ' "' + child.name + '"\n';
     for (const change of (child.changes || [])) {
       out += '  - ' + changeText(change) + '\n';
     }
@@ -197,13 +215,13 @@ function renderFields(fields: ComponentSummaryField[]): string {
  * Folds the child elements into one `<details>` block per group ("Associations",
  * "Supplementary Components", "Values", …) with the count in the visible summary line.
  */
-function renderCollapsedChildren(children: ComponentChildSummary[]): string {
+function renderCollapsedChildren(children: ComponentChildItem[]): string {
   if (children.length === 0) {
     return '';
   }
-  const groups = new Map<string, ComponentChildSummary[]>();
+  const groups = new Map<string, ComponentChildItem[]>();
   for (const child of children) {
-    const label = groupLabel(child.kind);
+    const label = groupLabel(child.type);
     const group = groups.get(label);
     if (group) {
       group.push(child);
@@ -218,19 +236,13 @@ function renderCollapsedChildren(children: ComponentChildSummary[]): string {
   return out;
 }
 
-function groupLabel(kind: string): string {
-  switch (kind) {
+function groupLabel(type: ComponentChildType): string {
+  switch (type) {
     case 'ASCC':
     case 'BCC':
       return 'Associations';
-    case 'Supplementary Component':
+    case 'DT_SC':
       return 'Supplementary Components';
-    case 'Value Domain':
-      return 'Value Domains';
-    case 'Value':
-      return 'Values';
-    default:
-      return kind + 's';
   }
 }
 
