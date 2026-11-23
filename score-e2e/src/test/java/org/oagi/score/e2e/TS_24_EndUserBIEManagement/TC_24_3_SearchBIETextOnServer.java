@@ -49,7 +49,8 @@ public class TC_24_3_SearchBIETextOnServer extends BaseTest {
     private void assertMatchCount(String expected) {
         WebElement count = visibilityOfElementLocated(getDriver(), By.xpath(
                 "//div[contains(@class, \"tree-search-box\")]//*[normalize-space(text()) = \"" + expected + "\"]"));
-        assertEquals(expected, count.getText().trim());
+        // the count may be followed by how much was searched, e.g. "1/1 in 2 nodes"
+        assertEquals(expected, count.getText().trim().split(" in ")[0]);
     }
 
     private void search(EditBIEPage editBIEPage, String expression) {
