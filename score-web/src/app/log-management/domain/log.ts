@@ -394,14 +394,33 @@ export interface ComponentFieldChange {
   after?: string;
 }
 
-export interface ComponentChildSummary {
-  kind: string;
+/** The type of a child element: an ACC association (ASCC, BCC) or a DT supplementary component (DT_SC). */
+export type ComponentChildType = 'ASCC' | 'BCC' | 'DT_SC';
+
+/** The human-readable label of a child element's type. */
+export function childTypeLabel(type: ComponentChildType): string {
+  return type === 'DT_SC' ? 'Supplementary Component' : type;
+}
+
+export interface ComponentChildItem {
+  type: ComponentChildType;
   name: string;
   fields: ComponentSummaryField[];
 }
 
 export interface ComponentChildChange {
-  kind: string;
+  type: ComponentChildType;
+  name: string;
+  changes: ComponentFieldChange[];
+}
+
+/** A value of a code list or an agency ID list; an attribute of the list, not a child component. */
+export interface ComponentValueItem {
+  name: string;
+  fields: ComponentSummaryField[];
+}
+
+export interface ComponentValueChange {
   name: string;
   changes: ComponentFieldChange[];
 }
@@ -419,10 +438,15 @@ export interface ComponentChangeSummary {
   summaryType: 'NEW' | 'REVISED';
 
   fields: ComponentSummaryField[];
-  children: ComponentChildSummary[];
+  children: ComponentChildItem[];
 
   fieldChanges: ComponentFieldChange[];
-  childrenAdded: ComponentChildSummary[];
-  childrenRemoved: ComponentChildSummary[];
+  childrenAdded: ComponentChildItem[];
+  childrenRemoved: ComponentChildItem[];
   childrenChanged: ComponentChildChange[];
+
+  values: ComponentValueItem[];
+  valuesAdded: ComponentValueItem[];
+  valuesRemoved: ComponentValueItem[];
+  valuesChanged: ComponentValueChange[];
 }

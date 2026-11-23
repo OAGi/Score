@@ -27,10 +27,22 @@
           }
           @for (child of summary.children; track child.name) {
             <li>
-              <span class="kind">{{ child.kind }}</span> "{{ child.name }}"
+              <span class="type">{{ childTypeLabel(child.type) }}</span> "{{ child.name }}"
               @if (child.fields.length) {
                 <ul>
                   @for (field of child.fields; track field.label) {
+                    <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
+                  }
+                </ul>
+              }
+            </li>
+          }
+          @for (value of summary.values; track value.name) {
+            <li>
+              <span class="type">Value</span> "{{ value.name }}"
+              @if (value.fields.length) {
+                <ul>
+                  @for (field of value.fields; track field.label) {
                     <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
                   }
                 </ul>
@@ -47,7 +59,7 @@
           }
           @for (child of summary.childrenAdded; track child.name) {
             <li class="added">
-              <span class="bucket">Added</span> {{ child.kind }} "{{ child.name }}"
+              <span class="bucket">Added</span> {{ childTypeLabel(child.type) }} "{{ child.name }}"
               @if (child.fields.length) {
                 <ul>
                   @for (field of child.fields; track field.label) {
@@ -59,14 +71,41 @@
           }
           @for (child of summary.childrenRemoved; track child.name) {
             <li class="removed">
-              <span class="bucket">Removed</span> {{ child.kind }} "{{ child.name }}"
+              <span class="bucket">Removed</span> {{ childTypeLabel(child.type) }} "{{ child.name }}"
             </li>
           }
           @for (child of summary.childrenChanged; track child.name) {
             <li class="changed">
-              <span class="bucket">Changed</span> {{ child.kind }} "{{ child.name }}"
+              <span class="bucket">Changed</span> {{ childTypeLabel(child.type) }} "{{ child.name }}"
               <ul>
                 @for (change of child.changes; track change.label) {
+                  <li>{{ changeText(change) }}</li>
+                }
+              </ul>
+            </li>
+          }
+          @for (value of summary.valuesAdded; track value.name) {
+            <li class="added">
+              <span class="bucket">Added</span> Value "{{ value.name }}"
+              @if (value.fields.length) {
+                <ul>
+                  @for (field of value.fields; track field.label) {
+                    <li><span class="field-label">{{ field.label }}</span>: {{ field.value }}</li>
+                  }
+                </ul>
+              }
+            </li>
+          }
+          @for (value of summary.valuesRemoved; track value.name) {
+            <li class="removed">
+              <span class="bucket">Removed</span> Value "{{ value.name }}"
+            </li>
+          }
+          @for (value of summary.valuesChanged; track value.name) {
+            <li class="changed">
+              <span class="bucket">Changed</span> Value "{{ value.name }}"
+              <ul>
+                @for (change of value.changes; track change.label) {
                   <li>{{ changeText(change) }}</li>
                 }
               </ul>

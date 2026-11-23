@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {finalize} from 'rxjs/operators';
-import {ComponentChangeSummary, ComponentFieldChange} from '../domain/log';
+import {childTypeLabel, ComponentChangeSummary, ComponentFieldChange} from '../domain/log';
 import {LogService} from '../domain/log.service';
 
 /**
@@ -47,8 +47,13 @@ export class LogChangeSummaryDialogComponent implements OnInit {
       && this.summary.fieldChanges.length === 0
       && this.summary.childrenAdded.length === 0
       && this.summary.childrenRemoved.length === 0
-      && this.summary.childrenChanged.length === 0;
+      && this.summary.childrenChanged.length === 0
+      && this.summary.valuesAdded.length === 0
+      && this.summary.valuesRemoved.length === 0
+      && this.summary.valuesChanged.length === 0;
   }
+
+  readonly childTypeLabel = childTypeLabel;
 
   valueOrNone(value: string | undefined): string {
     return (value === undefined || value === null) ? '(none)' : '"' + value + '"';

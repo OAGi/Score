@@ -5,6 +5,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.log_management.model.ChangeSummaryType;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChangeSummary;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChildChange;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentFieldChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentSummaryField;
 
@@ -98,7 +99,7 @@ class SnapshotChangeSummaryBuilderTest {
         assertThat(summary.prevRevisionNum()).isEqualTo(8);
         assertThat(summary.fieldChanges()).isEmpty();
         assertThat(summary.childrenAdded()).hasSize(1);
-        assertThat(summary.childrenAdded().get(0).kind()).isEqualTo("ASCC");
+        assertThat(summary.childrenAdded().get(0).type()).isEqualTo(CcType.ASCC);
         assertThat(summary.childrenAdded().get(0).name())
                 .isEqualTo("Sales Party Reference. Sales Party Reference");
         assertThat(summary.childrenAdded().get(0).fields()).contains(
@@ -123,7 +124,7 @@ class SnapshotChangeSummaryBuilderTest {
         assertThat(summary.childrenRemoved()).hasSize(1);
         assertThat(summary.childrenRemoved().get(0).name()).isEqualTo("Note. Note");
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("BCC", "Identifier. Text", List.of(
+                new ComponentChildChange(CcType.BCC, "Identifier. Text", List.of(
                         new ComponentFieldChange("Cardinality", "0..1", "1..1"),
                         new ComponentFieldChange("Value Constraint", null, "fixed \"ID\""))));
     }
@@ -224,10 +225,10 @@ class SnapshotChangeSummaryBuilderTest {
         assertThat(summary.ccType()).isEqualTo(CcType.CODE_LIST);
         assertThat(summary.name()).isEqualTo("oacl_RiskCode");
         assertThat(summary.fieldChanges()).containsExactly(new ComponentFieldChange("Version", "1", "2"));
-        assertThat(summary.childrenAdded()).hasSize(1);
-        assertThat(summary.childrenAdded().get(0).name()).isEqualTo("Critical");
-        assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Value", "None", List.of(
+        assertThat(summary.valuesAdded()).hasSize(1);
+        assertThat(summary.valuesAdded().get(0).name()).isEqualTo("Critical");
+        assertThat(summary.valuesChanged()).containsExactly(
+                new ComponentValueChange("None", List.of(
                         new ComponentFieldChange("Meaning", "No risk", "Risk not assessed"))));
     }
 
@@ -273,7 +274,7 @@ class SnapshotChangeSummaryBuilderTest {
         assertThat(summary.childrenAdded()).hasSize(1);
         assertThat(summary.childrenAdded().get(0).name()).isEqualTo("Unit. Code");
         assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Supplementary Component", "Currency. Code", List.of(
+                new ComponentChildChange(CcType.DT_SC, "Currency. Code", List.of(
                         new ComponentFieldChange("Cardinality", "1..1", "0..1"))));
     }
 
@@ -299,8 +300,8 @@ class SnapshotChangeSummaryBuilderTest {
                 template.formatted(guid('f'), guid('5'), guid('a'), "United Nations"), 2, 1);
 
         assertThat(summary.ccType()).isEqualTo(CcType.AGENCY_ID_LIST);
-        assertThat(summary.childrenChanged()).containsExactly(
-                new ComponentChildChange("Value", "6", List.of(
+        assertThat(summary.valuesChanged()).containsExactly(
+                new ComponentValueChange("6", List.of(
                         new ComponentFieldChange("Meaning", "UN", "United Nations"))));
     }
 
@@ -327,7 +328,7 @@ class SnapshotChangeSummaryBuilderTest {
         assertThat(across.revisionNum()).isEqualTo(9);
         assertThat(across.prevRevisionNum()).isEqualTo(8);
         assertThat(across.childrenChanged()).containsExactly(
-                new ComponentChildChange("ASCC", "Header. Header", List.of(
+                new ComponentChildChange(CcType.ASCC, "Header. Header", List.of(
                         new ComponentFieldChange("Cardinality", "1..1", "0..1"))));
     }
 }

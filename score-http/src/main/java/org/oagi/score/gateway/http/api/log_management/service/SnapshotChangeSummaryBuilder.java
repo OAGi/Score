@@ -8,7 +8,9 @@ import com.google.gson.JsonParser;
 import org.oagi.score.gateway.http.api.cc_management.model.CcType;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChangeSummary;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentChildChange;
-import org.oagi.score.gateway.http.api.log_management.model.ComponentChildSummary;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentChildItem;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueChange;
+import org.oagi.score.gateway.http.api.log_management.model.ComponentValueItem;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentFieldChange;
 import org.oagi.score.gateway.http.api.log_management.model.ComponentSummaryField;
 
@@ -87,7 +89,8 @@ final class SnapshotChangeSummaryBuilder {
         }
 
         List<ComponentSummaryField> fields = new ArrayList<>();
-        List<ComponentChildSummary> children = new ArrayList<>();
+        List<ComponentChildItem> children = new ArrayList<>();
+        List<ComponentValueItem> values = new ArrayList<>();
         CcType ccType;
         String name;
         switch (component) {
@@ -162,7 +165,7 @@ final class SnapshotChangeSummaryBuilder {
                 addField(fields, "Definition", str(doc, "definition"));
                 addField(fields, "Definition Source", str(doc, "definitionSource"));
                 addField(fields, "Remark", str(doc, "remark"));
-                objects(doc, "values").forEach(v -> children.add(listValueSummary(v, "meaning")));
+                objects(doc, "values").forEach(v -> values.add(listValueSummary(v, "meaning")));
             }
             case "agencyIdList" -> {
                 ccType = CcType.AGENCY_ID_LIST;
@@ -176,10 +179,13 @@ final class SnapshotChangeSummaryBuilder {
                 addField(fields, "Namespace", nestedStr(doc, "namespace", "uri"));
                 addField(fields, "Definition", str(doc, "definition"));
                 addField(fields, "Definition Source", str(doc, "definitionSource"));
-                objects(doc, "values").forEach(v -> children.add(listValueSummary(v, "name")));
+                objects(doc, "values").forEach(v -> values.add(listValueSummary(v, "name")));
             }
             default -> throw new IllegalArgumentException(
                     "Unsupported component type for a change summary: " + component);
+        }
+        if (ccType == CcType.CODE_LIST || ccType == CcType.AGENCY_ID_LIST) {
+            return ComponentChangeSummary.newList(ccType, name, str(doc, "guid"), revisionNum, fields, values);
         }
         return ComponentChangeSummary.newComponent(ccType, name, str(doc, "guid"), revisionNum, fields, children);
     }
@@ -204,10 +210,10 @@ final class SnapshotChangeSummaryBuilder {
         List<JsonObject> afterAssociations = objects(after, "associations");
         GuidDiff<JsonObject> diff = diffByGuid(afterAssociations, beforeAssociations, a -> str(a, "guid"));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentChildItem> added = diff.added().stream()
                 .map(SnapshotChangeSummaryBuilder::associationSummary).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(a -> new ComponentChildSummary(associationKind(a), associationName(a), List.of()))
+        List<ComponentChildItem> removed = diff.removed().stream()
+                .map(a -> new ComponentChildItem(associationType(a), associationName(a), List.of()))
                 .collect(Collectors.toList());
 
         List<ComponentChildChange> changed = new ArrayList<>();
@@ -215,7 +221,7 @@ final class SnapshotChangeSummaryBuilder {
             List<ComponentFieldChange> childChanges = associationChanges(pair.current(), pair.prev());
             if (!childChanges.isEmpty()) {
                 changed.add(new ComponentChildChange(
-                        associationKind(pair.current()), associationName(pair.current()), childChanges));
+                        associationType(pair.current()), associationName(pair.current()), childChanges));
             }
         }
 
@@ -240,8 +246,8 @@ final class SnapshotChangeSummaryBuilder {
         return (den != null) ? den : str(snapshot, "objectClassTerm");
     }
 
-    private static String associationKind(JsonObject association) {
-        return "ascc".equals(str(association, "component")) ? "ASCC" : "BCC";
+    private static CcType associationType(JsonObject association) {
+        return "ascc".equals(str(association, "component")) ? CcType.ASCC : CcType.BCC;
     }
 
     private static String associationName(JsonObject association) {
@@ -256,7 +262,7 @@ final class SnapshotChangeSummaryBuilder {
         return str(association, "guid");
     }
 
-    private static ComponentChildSummary associationSummary(JsonObject association) {
+    private static ComponentChildItem associationSummary(JsonObject association) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Cardinality", cardinality(association));
         if ("bcc".equals(str(association, "component"))) {
@@ -267,7 +273,7 @@ final class SnapshotChangeSummaryBuilder {
         addFlag(fields, "Deprecated", bool(association, "deprecated"));
         addField(fields, "Definition", str(association, "definition"));
         addField(fields, "Definition Source", str(association, "definitionSource"));
-        return new ComponentChildSummary(associationKind(association), associationName(association), fields);
+        return new ComponentChildItem(associationType(association), associationName(association), fields);
     }
 
     private static List<ComponentFieldChange> associationChanges(JsonObject after, JsonObject before) {
@@ -360,10 +366,10 @@ final class SnapshotChangeSummaryBuilder {
                 objects(after, "supplementaryComponents"), objects(before, "supplementaryComponents"),
                 sc -> str(sc, "guid"));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentChildItem> added = diff.added().stream()
                 .map(SnapshotChangeSummaryBuilder::dtScSummary).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(sc -> new ComponentChildSummary("Supplementary Component", dtScName(sc), List.of()))
+        List<ComponentChildItem> removed = diff.removed().stream()
+                .map(sc -> new ComponentChildItem(CcType.DT_SC, dtScName(sc), List.of()))
                 .collect(Collectors.toList());
 
         List<ComponentChildChange> changed = new ArrayList<>();
@@ -379,7 +385,7 @@ final class SnapshotChangeSummaryBuilder {
             addChange(childChanges, "Definition Source",
                     str(pair.prev(), "definitionSource"), str(pair.current(), "definitionSource"));
             if (!childChanges.isEmpty()) {
-                changed.add(new ComponentChildChange("Supplementary Component", dtScName(pair.current()), childChanges));
+                changed.add(new ComponentChildChange(CcType.DT_SC, dtScName(pair.current()), childChanges));
             }
         }
 
@@ -398,13 +404,13 @@ final class SnapshotChangeSummaryBuilder {
         return (propertyTerm != null) ? propertyTerm : str(sc, "guid");
     }
 
-    private static ComponentChildSummary dtScSummary(JsonObject sc) {
+    private static ComponentChildItem dtScSummary(JsonObject sc) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Cardinality", cardinality(sc));
         addField(fields, "Value Constraint", valueConstraint(sc));
         addField(fields, "Definition", str(sc, "definition"));
         addField(fields, "Definition Source", str(sc, "definitionSource"));
-        return new ComponentChildSummary("Supplementary Component", dtScName(sc), fields);
+        return new ComponentChildItem(CcType.DT_SC, dtScName(sc), fields);
     }
 
     // ----- Code list -----
@@ -428,13 +434,13 @@ final class SnapshotChangeSummaryBuilder {
         GuidDiff<JsonObject> diff = diffByGuid(
                 objects(after, "values"), objects(before, "values"), v -> str(v, "guid"));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentValueItem> added = diff.added().stream()
                 .map(v -> listValueSummary(v, "meaning")).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(v -> new ComponentChildSummary("Value", str(v, "value"), List.of()))
+        List<ComponentValueItem> removed = diff.removed().stream()
+                .map(v -> new ComponentValueItem(str(v, "value"), List.of()))
                 .collect(Collectors.toList());
 
-        List<ComponentChildChange> changed = new ArrayList<>();
+        List<ComponentValueChange> changed = new ArrayList<>();
         for (GuidPair<JsonObject> pair : diff.matched()) {
             List<ComponentFieldChange> childChanges = new ArrayList<>();
             addChange(childChanges, "Code", str(pair.prev(), "value"), str(pair.current(), "value"));
@@ -444,11 +450,11 @@ final class SnapshotChangeSummaryBuilder {
                     str(pair.prev(), "definitionSource"), str(pair.current(), "definitionSource"));
             addFlagChange(childChanges, "Deprecated", bool(pair.prev(), "deprecated"), bool(pair.current(), "deprecated"));
             if (!childChanges.isEmpty()) {
-                changed.add(new ComponentChildChange("Value", str(pair.current(), "value"), childChanges));
+                changed.add(new ComponentValueChange(str(pair.current(), "value"), childChanges));
             }
         }
 
-        return ComponentChangeSummary.revised(CcType.CODE_LIST, str(after, "name"), str(after, "guid"),
+        return ComponentChangeSummary.revisedList(CcType.CODE_LIST, str(after, "name"), str(after, "guid"),
                 revisionNum, prevRevisionNum, changes, added, removed, changed);
     }
 
@@ -472,13 +478,13 @@ final class SnapshotChangeSummaryBuilder {
         GuidDiff<JsonObject> diff = diffByGuid(
                 objects(after, "values"), objects(before, "values"), v -> str(v, "guid"));
 
-        List<ComponentChildSummary> added = diff.added().stream()
+        List<ComponentValueItem> added = diff.added().stream()
                 .map(v -> listValueSummary(v, "name")).collect(Collectors.toList());
-        List<ComponentChildSummary> removed = diff.removed().stream()
-                .map(v -> new ComponentChildSummary("Value", str(v, "value"), List.of()))
+        List<ComponentValueItem> removed = diff.removed().stream()
+                .map(v -> new ComponentValueItem(str(v, "value"), List.of()))
                 .collect(Collectors.toList());
 
-        List<ComponentChildChange> changed = new ArrayList<>();
+        List<ComponentValueChange> changed = new ArrayList<>();
         for (GuidPair<JsonObject> pair : diff.matched()) {
             List<ComponentFieldChange> childChanges = new ArrayList<>();
             addChange(childChanges, "Value", str(pair.prev(), "value"), str(pair.current(), "value"));
@@ -488,21 +494,21 @@ final class SnapshotChangeSummaryBuilder {
                     str(pair.prev(), "definitionSource"), str(pair.current(), "definitionSource"));
             addFlagChange(childChanges, "Deprecated", bool(pair.prev(), "deprecated"), bool(pair.current(), "deprecated"));
             if (!childChanges.isEmpty()) {
-                changed.add(new ComponentChildChange("Value", str(pair.current(), "value"), childChanges));
+                changed.add(new ComponentValueChange(str(pair.current(), "value"), childChanges));
             }
         }
 
-        return ComponentChangeSummary.revised(CcType.AGENCY_ID_LIST, str(after, "name"), str(after, "guid"),
+        return ComponentChangeSummary.revisedList(CcType.AGENCY_ID_LIST, str(after, "name"), str(after, "guid"),
                 revisionNum, prevRevisionNum, changes, added, removed, changed);
     }
 
-    private static ComponentChildSummary listValueSummary(JsonObject value, String meaningKey) {
+    private static ComponentValueItem listValueSummary(JsonObject value, String meaningKey) {
         List<ComponentSummaryField> fields = new ArrayList<>();
         addField(fields, "Meaning", str(value, meaningKey));
         addFlag(fields, "Deprecated", bool(value, "deprecated"));
         addField(fields, "Definition", str(value, "definition"));
         addField(fields, "Definition Source", str(value, "definitionSource"));
-        return new ComponentChildSummary("Value", str(value, "value"), fields);
+        return new ComponentValueItem(str(value, "value"), fields);
     }
 
     private static String agencyIdValue(JsonObject snapshot, String key) {
