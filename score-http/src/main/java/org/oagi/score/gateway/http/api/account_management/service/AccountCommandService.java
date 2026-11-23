@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
-import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
+import org.springframework.security.crypto.encrypt.AesGcmBytesEncryptor;
 import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -184,9 +184,9 @@ public class AccountCommandService {
             throw new IllegalStateException("Failed to write an email validation info.", e);
         }
 
-        BytesEncryptor encryptor = new AesBytesEncryptor(
+        BytesEncryptor encryptor = emailValidationEncryptor(
                 (oAuth2User != null) ? oAuth2User.sub() : query.getEncodedPassword(accountDetails.userId()),
-                Hex.encodeHexString(accountDetails.loginId().getBytes()));
+                accountDetails.loginId());
         byte[] encryptedObj = encryptor.encrypt(bytes);
         String q = Base64.encodeBase64String(encryptedObj);
 
@@ -194,6 +194,11 @@ public class AccountCommandService {
         sendMailRequest.getParameters().put("email_validation_link",
                 emailValidationLink + "?q=" + URLEncoder.encode(q, StandardCharsets.UTF_8));
         mailService.sendMail(requester, sendMailRequest);
+    }
+
+    /** AES-GCM, so a link that was changed on the way is refused when it is decrypted, not read as something else. */
+    private static BytesEncryptor emailValidationEncryptor(String password, String loginId) {
+        return AesGcmBytesEncryptor.withPassword(password, Hex.encodeHexString(loginId.getBytes())).build();
     }
 
     public void verifyEmailValidation(ScoreUser requester, String q) {
@@ -204,9 +209,9 @@ public class AccountCommandService {
 
         byte[] decryptedObj;
         try {
-            BytesEncryptor encryptor = new AesBytesEncryptor(
+            BytesEncryptor encryptor = emailValidationEncryptor(
                     (oAuth2User != null) ? oAuth2User.sub() : query.getEncodedPassword(accountDetails.userId()),
-                    Hex.encodeHexString(accountDetails.loginId().getBytes()));
+                    accountDetails.loginId());
             byte[] decQ = Base64.decodeBase64(q);
             decryptedObj = encryptor.decrypt(decQ);
         } catch (Exception e) {

@@ -67,6 +67,9 @@ class ReleasePackageLoadJobRepositoryDbTest {
         String migration = new ClassPathResource("db/migration/V3_6_2__upgrade_from_3_6_1.sql")
                 .getContentAsString(StandardCharsets.UTF_8);
         try (var con = pool.getConnection(); var statement = con.createStatement()) {
+            // The migration also drops leftovers of two other tables, which a schema made for this test does not have.
+            statement.execute("CREATE TABLE `log` (`log_id` BIGINT PRIMARY KEY)");
+            statement.execute("CREATE TABLE `xbt_manifest` (`xbt_manifest_id` BIGINT PRIMARY KEY)");
             statement.execute(migration);
         }
         jobs = new JooqReleasePackageLoadJobRepository(dsl, null, null);

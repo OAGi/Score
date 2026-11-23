@@ -37,6 +37,22 @@ import static org.mockito.Mockito.when;
 class AccountCommandServiceTest {
 
     @Test
+    void emailValidationTokenRoundTripsAndRefusesTamperingOrAnotherKey() {
+        byte[] token = ReflectionTestUtils.<org.springframework.security.crypto.encrypt.BytesEncryptor>invokeMethod(
+                AccountCommandService.class, "emailValidationEncryptor", "secret", "login").encrypt("payload".getBytes());
+        var same = ReflectionTestUtils.<org.springframework.security.crypto.encrypt.BytesEncryptor>invokeMethod(
+                AccountCommandService.class, "emailValidationEncryptor", "secret", "login");
+        var other = ReflectionTestUtils.<org.springframework.security.crypto.encrypt.BytesEncryptor>invokeMethod(
+                AccountCommandService.class, "emailValidationEncryptor", "other", "login");
+
+        assertThat(same.decrypt(token)).isEqualTo("payload".getBytes());
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> other.decrypt(token));
+        byte[] tampered = token.clone();
+        tampered[tampered.length - 1] ^= 1;
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> same.decrypt(tampered));
+    }
+
+    @Test
     void updateByNonAdminDoesNotWriteAdminFlag() {
         AccountCommandService service = new AccountCommandService();
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
