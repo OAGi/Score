@@ -55,7 +55,7 @@ export class AuthService implements OnInit, CanActivate {
       return false;
     }
 
-    if ([0, 503, 504].includes(error.status)) {
+    if ([0, 502, 503, 504].includes(error.status)) {
       return true;
     }
 
