@@ -1,0 +1,17 @@
+<div class="auth-shell">
+  <div class="auth-hero">
+    <h1 class="auth-hero-title">
+      <span>NIST/OAGi</span>
+      <span class="auth-hero-product">connectCenter<span class="auth-hero-former">(formerly Score)</span></span>
+    </h1>
+    <div class="auth-version">Version {{ version }}</div>
+  </div>
+  <div class="auth-panel">
+    <div class="auth-content">
+      @if ((brand | async); as brandLogo) {
+        <div class="auth-brand" [innerHTML]="brandLogo"></div>
+      }
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

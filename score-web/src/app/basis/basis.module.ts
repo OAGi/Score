@@ -5,6 +5,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
 
 import {HomepageComponent} from './homepage/homepage.component';
+import {AuthShellComponent} from './auth-shell/auth-shell.component';
 import {LoginComponent} from './login/login.component';
 import {PasskeyOfferDialogComponent} from './passkey-offer/passkey-offer-dialog.component';
 import {JoinComponent} from './join/join.component';
@@ -70,6 +71,7 @@ const routes: Routes = [
     ServiceUnavailableComponent,
   ],
   declarations: [
+    AuthShellComponent,
     HomepageComponent,
     LoginComponent,
     PasskeyOfferDialogComponent,

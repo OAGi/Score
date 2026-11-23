@@ -1,15 +1,6 @@
-<section class="container-fluid">
-  <div class="row">
-    <div class="col-4" style="margin: 50px auto;">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Account is disabled</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Your account is disabled by the administrator. Contact the administrator for help.</p>
-          <p>To sign in to another account, please click <a href="/api/oauth2/logout" class="pointer btn-link">here</a>.</p>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
-</section>
+<score-auth-shell>
+  <h2 class="auth-form-title">Account Disabled</h2>
+  <p class="auth-form-subtitle">Your account cannot be used right now</p>
+  <p class="auth-form-text">Your account is disabled by the administrator. Contact the administrator for help.</p>
+  <a href="/api/oauth2/logout" class="auth-form-button">Sign in to another account</a>
+</score-auth-shell>

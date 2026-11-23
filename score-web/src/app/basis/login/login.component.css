@@ -1,105 +1,6 @@
-.login-page {
-  /* oagi.org palette */
-  --login-navy: #051e38;
-  --login-blue: #0077b6;
-  --login-cyan: #00b4d8;
-  --login-divider: #d9ebf4;
-  --login-border: #dfe3e8;
-  --login-muted: #5b6877;
-  --login-ink: #1f2d3d;
-
-  display: grid;
-  grid-template-columns: minmax(320px, 5fr) 6fr;
-  min-height: 100vh;
-}
-
-.login-hero {
-  background-color: var(--login-navy);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  justify-content: center;
-  padding: 48px 56px;
-  position: relative;
-}
-
-.login-hero-title {
-  color: inherit;
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.3px;
-  align-items: flex-start;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.3em;
-  line-height: 1.3;
-  margin: 0;
-}
-
-.login-hero-product {
-  display: flex;
-  flex-direction: column;
-}
-
-.login-hero-former {
-  color: inherit;
-  opacity: 0.7;
-  display: block;
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0;
-  margin-top: 4px;
-}
-
-.login-version {
-  bottom: 24px;
-  color: inherit;
-  opacity: 0.6;
-  font-size: 12px;
-  left: 56px;
-  position: absolute;
-}
-
-.login-panel {
-  align-items: center;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 48px 32px;
-}
-
 .auth-form {
   max-width: 100%;
-  width: 380px;
-}
-
-/* The logo is administrator-defined SVG of unknown colors, so it sits on the white panel (as in the navbar), not the navy hero. */
-.login-brand {
-  margin-bottom: 28px;
-}
-
-.login-brand ::ng-deep svg {
-  display: block;
-  height: 26px;
-  max-width: 100%;
-  width: auto;
-}
-
-.auth-form-title {
-  color: var(--login-blue);
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -0.6px;
-  line-height: 1.15;
-  margin: 0 0 6px;
-}
-
-.auth-form-subtitle {
-  color: var(--login-muted);
-  font-size: 14px;
-  margin: 0 0 20px;
+  width: 100%;
 }
 
 .auth-form-body, .oauth2-form-body {
@@ -111,45 +12,6 @@
   font-size: 13px;
   margin-top: 28px;
   max-width: 380px;
-}
-
-@media (max-width: 767px) {
-  .login-page {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-  }
-
-  .login-hero {
-    padding: 24px 20px;
-  }
-
-  /* One line: the former name sits to the right of connectCenter. */
-  .login-hero-title {
-    align-items: baseline;
-    flex-wrap: nowrap;
-    font-size: clamp(15px, 4.7vw, 22px);
-    white-space: nowrap;
-  }
-
-  .login-hero-product {
-    align-items: baseline;
-    flex-direction: row;
-    gap: 0.4em;
-  }
-
-  .login-hero-former {
-    font-size: 0.6em;
-    margin-top: 0;
-  }
-
-  .login-version {
-    display: none;
-  }
-
-  .login-panel {
-    padding: 28px 20px;
-  }
 }
 
 .auth-form label {
@@ -224,10 +86,6 @@ label {
 
 .auth-form .passkey-choice-grid .btn {
   margin-top: 0;
-}
-
-.login-page, .login-page input, .login-page button, .login-page .btn {
-  font-family: "DM Sans", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .auth-form .form-control,

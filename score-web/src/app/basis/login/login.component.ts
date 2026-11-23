@@ -6,12 +6,10 @@ import {OAuth2AppInfo, UserToken} from '../../authentication/domain/auth';
 import {PasskeyService} from '../../authentication/passkey/passkey.service';
 import {PasskeyCancelledError} from '../../authentication/passkey/passkey';
 import {PasskeyOfferService} from '../passkey-offer/passkey-offer.service';
-import {catchError, map, Observable, of, shareReplay} from 'rxjs';
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {catchError, Observable, of, shareReplay} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WebPageInfo} from '../about/domain/about';
 import {WebPageInfoService} from '../basis.service';
-import {projectVersion} from '../../../environments/version';
 
 @Component({
   standalone: false,
@@ -24,7 +22,6 @@ export class LoginComponent implements OnDestroy {
   auth = inject(AuthService);
   private webPageInfoService = inject(WebPageInfoService);
   private snackBar = inject(MatSnackBar);
-  private sanitizer = inject(DomSanitizer);
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -32,8 +29,6 @@ export class LoginComponent implements OnDestroy {
   private passkeyOffer = inject(PasskeyOfferService);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
-
-  version = projectVersion;
 
   credentials = {username: '', password: ''};
   next = '';
@@ -53,8 +48,6 @@ export class LoginComponent implements OnDestroy {
 
   oauth2AppInfos: Observable<OAuth2AppInfo[]>;
   webPageInfo: Observable<WebPageInfo>;
-  /** The administrator's brand logo (SVG markup); trusted like the navbar's, as only administrators can set it. */
-  brand: Observable<SafeHtml | undefined>;
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -69,8 +62,6 @@ export class LoginComponent implements OnDestroy {
 
     this.oauth2AppInfos = this.auth.getOAuth2AppInfos();
     this.webPageInfo = this.webPageInfoService.load().pipe(shareReplay(1));
-    this.brand = this.webPageInfo.pipe(
-      map(info => info?.brand ? this.sanitizer.bypassSecurityTrustHtml(info.brand) : undefined));
 
     if (this.passkey.supported) {
       this.passkey.getInfo().subscribe(info => {
