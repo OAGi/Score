@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -90,7 +91,7 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
     }
 
     private BccpManifestTag(Name alias, Table<BccpManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table that assigns TAG rows to BCCP_MANIFEST rows, allowing a many-to-many relationship between tags and BCCP manifests."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table that assigns TAG rows to BCCP_MANIFEST rows, allowing a many-to-many relationship between tags and BCCP manifests."), TableOptions.table(), where);
     }
 
     /**
@@ -143,7 +144,7 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
 
         @Override
         public BccpManifestTagPath as(Table<?> alias) {
-            return new BccpManifestTagPath(alias.getQualifiedName(), this);
+            return new BccpManifestTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -210,7 +211,7 @@ public class BccpManifestTag extends TableImpl<BccpManifestTagRecord> {
 
     @Override
     public BccpManifestTag as(Table<?> alias) {
-        return new BccpManifestTag(alias.getQualifiedName(), this);
+        return new BccpManifestTag(alias.getUnqualifiedName(), this);
     }
 
     /**

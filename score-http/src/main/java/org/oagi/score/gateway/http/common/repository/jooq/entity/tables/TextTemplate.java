@@ -22,6 +22,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -88,7 +89,7 @@ public class TextTemplate extends TableImpl<TextTemplateRecord> {
     }
 
     private TextTemplate(Name alias, Table<TextTemplateRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores named text templates, each with a subject, content type, and body containing placeholders that are substituted at rendering time. Templates are looked up by name to compose output such as email messages."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores named text templates, each with a subject, content type, and body containing placeholders that are substituted at rendering time. Templates are looked up by name to compose output such as email messages."), TableOptions.table(), where);
     }
 
     /**
@@ -139,7 +140,7 @@ public class TextTemplate extends TableImpl<TextTemplateRecord> {
 
     @Override
     public TextTemplate as(Table<?> alias) {
-        return new TextTemplate(alias.getQualifiedName(), this);
+        return new TextTemplate(alias.getUnqualifiedName(), this);
     }
 
     /**

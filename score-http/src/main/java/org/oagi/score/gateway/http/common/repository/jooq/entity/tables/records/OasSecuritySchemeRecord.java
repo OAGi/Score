@@ -71,7 +71,8 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
      * Setter for <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
      * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
      * also the schemeName used in Security Requirement Objects. Unique within
-     * an oas_doc.
+     * an oas_doc; case-sensitive, so Auth and auth are two names. Only letters,
+     * digits, '.', '-' and '_' (the Components Object).
      */
     public void setSchemeName(String value) {
         set(3, value);
@@ -81,7 +82,8 @@ public class OasSecuritySchemeRecord extends UpdatableRecordImpl<OasSecuritySche
      * Getter for <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
      * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
      * also the schemeName used in Security Requirement Objects. Unique within
-     * an oas_doc.
+     * an oas_doc; case-sensitive, so Auth and auth are two names. Only letters,
+     * digits, '.', '-' and '_' (the Components Object).
      */
     public String getSchemeName() {
         return (String) get(3);

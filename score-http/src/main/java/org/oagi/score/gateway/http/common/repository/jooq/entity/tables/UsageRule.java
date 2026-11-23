@@ -26,6 +26,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -85,7 +86,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
     }
 
     private UsageRule(Name alias, Table<UsageRuleRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type."), TableOptions.table(), where);
     }
 
     /**
@@ -138,7 +139,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
         @Override
         public UsageRulePath as(Table<?> alias) {
-            return new UsageRulePath(alias.getQualifiedName(), this);
+            return new UsageRulePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -208,7 +209,7 @@ public class UsageRule extends TableImpl<UsageRuleRecord> {
 
     @Override
     public UsageRule as(Table<?> alias) {
-        return new UsageRule(alias.getQualifiedName(), this);
+        return new UsageRule(alias.getUnqualifiedName(), this);
     }
 
     /**

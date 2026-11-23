@@ -70,29 +70,11 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
     }
 
     /**
-     * Setter for <code>xbt_manifest.cdt_pri_id</code>. Foreign key referencing
-     * the CDT_PRI table. Specifies how the current record maps to allowed
-     * primitives in CDT.
-     */
-    public void setCdtPriId(ULong value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>xbt_manifest.cdt_pri_id</code>. Foreign key referencing
-     * the CDT_PRI table. Specifies how the current record maps to allowed
-     * primitives in CDT.
-     */
-    public ULong getCdtPriId() {
-        return (ULong) get(3);
-    }
-
-    /**
      * Setter for <code>xbt_manifest.conflict</code>. This indicates that there
      * is a conflict between self and relationship.
      */
     public void setConflict(Byte value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
@@ -100,7 +82,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * is a conflict between self and relationship.
      */
     public Byte getConflict() {
-        return (Byte) get(4);
+        return (Byte) get(3);
     }
 
     /**
@@ -108,7 +90,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * log for the current record.
      */
     public void setLogId(ULong value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
@@ -116,7 +98,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * log for the current record.
      */
     public ULong getLogId() {
-        return (ULong) get(5);
+        return (ULong) get(4);
     }
 
     /**
@@ -125,7 +107,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * release (revision chain). NULL for the first revision.
      */
     public void setPrevXbtManifestId(ULong value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
@@ -134,7 +116,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * release (revision chain). NULL for the first revision.
      */
     public ULong getPrevXbtManifestId() {
-        return (ULong) get(6);
+        return (ULong) get(5);
     }
 
     /**
@@ -143,7 +125,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * release (revision chain). NULL for the latest revision.
      */
     public void setNextXbtManifestId(ULong value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
@@ -152,7 +134,7 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
      * release (revision chain). NULL for the latest revision.
      */
     public ULong getNextXbtManifestId() {
-        return (ULong) get(7);
+        return (ULong) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -178,13 +160,12 @@ public class XbtManifestRecord extends UpdatableRecordImpl<XbtManifestRecord> {
     /**
      * Create a detached, initialised XbtManifestRecord
      */
-    public XbtManifestRecord(ULong xbtManifestId, ULong releaseId, ULong xbtId, ULong cdtPriId, Byte conflict, ULong logId, ULong prevXbtManifestId, ULong nextXbtManifestId) {
+    public XbtManifestRecord(ULong xbtManifestId, ULong releaseId, ULong xbtId, Byte conflict, ULong logId, ULong prevXbtManifestId, ULong nextXbtManifestId) {
         super(XbtManifest.XBT_MANIFEST);
 
         setXbtManifestId(xbtManifestId);
         setReleaseId(releaseId);
         setXbtId(xbtId);
-        setCdtPriId(cdtPriId);
         setConflict(conflict);
         setLogId(logId);
         setPrevXbtManifestId(prevXbtManifestId);

@@ -14,7 +14,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Ascc;
 
 /**
  * An ASCC represents a relationship/association between two ACCs through an
- * ASCCP. 
+ * ASCCP.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
@@ -128,7 +128,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Setter for <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
      * an ASCCP table record. It is basically pointing to a child data element
-     * of the FROM_ACC_ID. 
+     * of the FROM_ACC_ID.
      */
     public void setToAsccpId(ULong value) {
         set(6, value);
@@ -137,7 +137,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Getter for <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
      * an ASCCP table record. It is basically pointing to a child data element
-     * of the FROM_ACC_ID. 
+     * of the FROM_ACC_ID.
      */
     public ULong getToAsccpId() {
         return (ULong) get(6);
@@ -222,7 +222,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Setter for <code>ascc.created_by</code>. A foreign key to the APP_USER
      * table referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -234,7 +234,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Getter for <code>ascc.created_by</code>. A foreign key to the APP_USER
      * table referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -247,9 +247,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
      * Setter for <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
         set(12, value);
@@ -259,9 +259,9 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
      * Getter for <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(12);
@@ -269,8 +269,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
 
     /**
      * Setter for <code>ascc.last_updated_by</code>. A foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -280,8 +280,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
 
     /**
      * Getter for <code>ascc.last_updated_by</code>. A foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -291,8 +291,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
 
     /**
      * Setter for <code>ascc.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCC was created. 
-     * 
+     * revision of the ASCC was created.
+     *
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -301,8 +301,8 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
 
     /**
      * Getter for <code>ascc.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCC was created. 
-     * 
+     * revision of the ASCC was created.
+     *
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -312,7 +312,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Setter for <code>ascc.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -324,7 +324,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
     /**
      * Getter for <code>ascc.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -337,7 +337,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
      * Setter for <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -349,7 +349,7 @@ public class AsccRecord extends UpdatableRecordImpl<AsccRecord> {
      * Getter for <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */

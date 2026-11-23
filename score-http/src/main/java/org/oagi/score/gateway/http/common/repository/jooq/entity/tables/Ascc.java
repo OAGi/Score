@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -46,7 +47,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 
 /**
  * An ASCC represents a relationship/association between two ACCs through an
- * ASCCP. 
+ * ASCCP.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Ascc extends TableImpl<AsccRecord> {
@@ -109,7 +110,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     /**
      * The column <code>ascc.to_asccp_id</code>. TO_ASCCP_ID is a foreign key to
      * an ASCCP table record. It is basically pointing to a child data element
-     * of the FROM_ACC_ID. 
+     * of the FROM_ACC_ID.
      */
     public final TableField<AsccRecord, ULong> TO_ASCCP_ID = createField(DSL.name("to_asccp_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "TO_ASCCP_ID is a foreign key to an ASCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. ");
 
@@ -146,7 +147,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     /**
      * The column <code>ascc.created_by</code>. A foreign key to the APP_USER
      * table referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -157,16 +158,16 @@ public class Ascc extends TableImpl<AsccRecord> {
      * The column <code>ascc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public final TableField<AsccRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
      * The column <code>ascc.last_updated_by</code>. A foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -174,8 +175,8 @@ public class Ascc extends TableImpl<AsccRecord> {
 
     /**
      * The column <code>ascc.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCC was created. 
-     * 
+     * revision of the ASCC was created.
+     *
      * This never change for a revision.
      */
     public final TableField<AsccRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the ASCC was created. \n\nThis never change for a revision.");
@@ -183,7 +184,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     /**
      * The column <code>ascc.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -194,7 +195,7 @@ public class Ascc extends TableImpl<AsccRecord> {
      * The column <code>ascc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -217,7 +218,7 @@ public class Ascc extends TableImpl<AsccRecord> {
     }
 
     private Ascc(Name alias, Table<AsccRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("An ASCC represents a relationship/association between two ACCs through an ASCCP. "), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("An ASCC represents a relationship/association between two ACCs through an ASCCP. "), TableOptions.table(), where);
     }
 
     /**
@@ -270,7 +271,7 @@ public class Ascc extends TableImpl<AsccRecord> {
 
         @Override
         public AsccPath as(Table<?> alias) {
-            return new AsccPath(alias.getQualifiedName(), this);
+            return new AsccPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -438,7 +439,7 @@ public class Ascc extends TableImpl<AsccRecord> {
 
     @Override
     public Ascc as(Table<?> alias) {
-        return new Ascc(alias.getQualifiedName(), this);
+        return new Ascc(alias.getUnqualifiedName(), this);
     }
 
     /**

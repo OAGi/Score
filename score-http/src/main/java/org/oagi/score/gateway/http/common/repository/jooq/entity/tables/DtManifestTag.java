@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -90,7 +91,7 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
     }
 
     private DtManifestTag(Name alias, Table<DtManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A many-to-many join table that assigns TAG rows to DT_MANIFEST rows, attaching tags to the release-specific manifest of a data type (DT)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A many-to-many join table that assigns TAG rows to DT_MANIFEST rows, attaching tags to the release-specific manifest of a data type (DT)."), TableOptions.table(), where);
     }
 
     /**
@@ -143,7 +144,7 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
 
         @Override
         public DtManifestTagPath as(Table<?> alias) {
-            return new DtManifestTagPath(alias.getQualifiedName(), this);
+            return new DtManifestTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -210,7 +211,7 @@ public class DtManifestTag extends TableImpl<DtManifestTagRecord> {
 
     @Override
     public DtManifestTag as(Table<?> alias) {
-        return new DtManifestTag(alias.getQualifiedName(), this);
+        return new DtManifestTag(alias.getUnqualifiedName(), this);
     }
 
     /**

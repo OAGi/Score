@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -113,7 +114,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
     }
 
     private GithubIssueCodeListManifest(Name alias, Table<GithubIssueCodeListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Links a code list manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Links a code list manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
     }
 
     /**
@@ -168,7 +169,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
 
         @Override
         public GithubIssueCodeListManifestPath as(Table<?> alias) {
-            return new GithubIssueCodeListManifestPath(alias.getQualifiedName(), this);
+            return new GithubIssueCodeListManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -259,7 +260,7 @@ public class GithubIssueCodeListManifest extends TableImpl<GithubIssueCodeListMa
 
     @Override
     public GithubIssueCodeListManifest as(Table<?> alias) {
-        return new GithubIssueCodeListManifest(alias.getQualifiedName(), this);
+        return new GithubIssueCodeListManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

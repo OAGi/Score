@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -141,7 +142,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
     }
 
     private BccpManifest(Name alias, Table<BccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A BCCP_MANIFEST is a release-specific handle to a BCCP record, pinning it to a RELEASE and carrying the revision chain to the corresponding BCCP_MANIFEST in the previous and next releases. A BCCP specifies a property concept and the data type associated with it, which can then be added as a property of an ACC; the manifest also binds the BCCP to the BDT that specifies its data format through BDT_MANIFEST_ID (DT_MANIFEST)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A BCCP_MANIFEST is a release-specific handle to a BCCP record, pinning it to a RELEASE and carrying the revision chain to the corresponding BCCP_MANIFEST in the previous and next releases. A BCCP specifies a property concept and the data type associated with it, which can then be added as a property of an ACC; the manifest also binds the BCCP to the BDT that specifies its data format through BDT_MANIFEST_ID (DT_MANIFEST)."), TableOptions.table(), where);
     }
 
     /**
@@ -194,7 +195,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
 
         @Override
         public BccpManifestPath as(Table<?> alias) {
-            return new BccpManifestPath(alias.getQualifiedName(), this);
+            return new BccpManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -395,7 +396,7 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
 
     @Override
     public BccpManifest as(Table<?> alias) {
-        return new BccpManifest(alias.getQualifiedName(), this);
+        return new BccpManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

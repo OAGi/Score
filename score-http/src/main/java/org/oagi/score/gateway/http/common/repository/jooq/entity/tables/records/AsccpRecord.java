@@ -52,7 +52,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Setter for <code>asccp.type</code>. The Type of the ASCCP. List: Default,
-     * Extension 
+     * Extension
      */
     public void setType(String value) {
         set(2, value);
@@ -60,7 +60,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Getter for <code>asccp.type</code>. The Type of the ASCCP. List: Default,
-     * Extension 
+     * Extension
      */
     public String getType() {
         return (String) get(2);
@@ -134,8 +134,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Setter for <code>asccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -146,8 +146,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Getter for <code>asccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -160,9 +160,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
      * Setter for <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
         set(8, value);
@@ -172,9 +172,9 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
      * Getter for <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(8);
@@ -182,8 +182,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Setter for <code>asccp.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -193,8 +193,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Getter for <code>asccp.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -204,8 +204,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Setter for <code>asccp.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCCP was created. 
-     * 
+     * revision of the ASCCP was created.
+     *
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -214,8 +214,8 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
     /**
      * Getter for <code>asccp.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCCP was created. 
-     * 
+     * revision of the ASCCP was created.
+     *
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -225,7 +225,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     /**
      * Setter for <code>asccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -237,7 +237,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     /**
      * Getter for <code>asccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -250,7 +250,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
      * Setter for <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -262,7 +262,7 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
      * Getter for <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */

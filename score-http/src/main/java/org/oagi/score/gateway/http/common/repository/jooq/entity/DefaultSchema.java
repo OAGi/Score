@@ -94,6 +94,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleDt
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSet;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleSetRelease;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleXbtManifest;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.NamedLock;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Namespace;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDoc;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasDocHttpHeader;
@@ -128,6 +129,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Oauth2Ap
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordChangeLog;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Release;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ReleaseDep;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ReleasePackageLoadJob;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.SeqKey;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Tag;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Tenant;
@@ -160,7 +162,7 @@ public class DefaultSchema extends SchemaImpl {
      * contextualized ACC. The context is represented by the BUSINESS_CTX_ID
      * column that refers to a business context. Each ABIE must have a business
      * context and a based ACC.
-     * 
+     *
      * It should be noted that, per design document, there is no corresponding
      * ABIE created for an ACC which will not show up in the instance document
      * such as ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP",
@@ -172,11 +174,11 @@ public class DefaultSchema extends SchemaImpl {
      * The ACC table holds information about complex data structured concepts.
      * For example, OAGIS's Components, Nouns, and BODs are captured in the ACC
      * table.
-     * 
+     *
      * Note that only Extension is supported when deriving ACC from another ACC.
      * (So if there is a restriction needed, maybe that concept should placed
      * higher in the derivation hierarchy rather than lower.)
-     * 
+     *
      * In OAGIS, all XSD extensions will be treated as a qualification of an
      * ACC.
      */
@@ -272,7 +274,7 @@ public class DefaultSchema extends SchemaImpl {
 
     /**
      * An ASCC represents a relationship/association between two ACCs through an
-     * ASCCP. 
+     * ASCCP.
      */
     public final Ascc ASCC = Ascc.ASCC;
 
@@ -333,7 +335,7 @@ public class DefaultSchema extends SchemaImpl {
      * Because there is no single table that is a contextualized counterpart of
      * the DT table (which stores both CDT and BDT), The context specific
      * constraints associated with the DT are stored in the BBIE table, while
-     * this table stores the constraints associated with the DT's SCs. 
+     * this table stores the constraints associated with the DT's SCs.
      */
     public final BbieSc BBIE_SC = BbieSc.BBIE_SC;
 
@@ -345,7 +347,7 @@ public class DefaultSchema extends SchemaImpl {
 
     /**
      * A BCC represents a relationship/association between an ACC and a BCCP. It
-     * creates a data element for an ACC. 
+     * creates a data element for an ACC.
      */
     public final Bcc BCC = Bcc.BCC;
 
@@ -590,7 +592,7 @@ public class DefaultSchema extends SchemaImpl {
      * This table represents the supplementary component (SC) of a DT. Revision
      * is not tracked at the supplementary component. It is considered intrinsic
      * part of the DT. In other words, when a new revision of a DT is created a
-     * new set of supplementary components is created along with it. 
+     * new set of supplementary components is created along with it.
      */
     public final DtSc DT_SC = DtSc.DT_SC;
 
@@ -781,6 +783,12 @@ public class DefaultSchema extends SchemaImpl {
      * generation.
      */
     public final ModuleXbtManifest MODULE_XBT_MANIFEST = ModuleXbtManifest.MODULE_XBT_MANIFEST;
+
+    /**
+     * The rows that are locked, by name, to coordinate processes through the
+     * database. A lock whose row is missing does not lock anything.
+     */
+    public final NamedLock NAMED_LOCK = NamedLock.NAMED_LOCK;
 
     /**
      * This table stores information about a namespace. Namespace is the
@@ -1033,6 +1041,12 @@ public class DefaultSchema extends SchemaImpl {
     public final ReleaseDep RELEASE_DEP = ReleaseDep.RELEASE_DEP;
 
     /**
+     * The loads of release packages, each into a schema of its own, to be
+     * swapped for the schema the application serves.
+     */
+    public final ReleasePackageLoadJob RELEASE_PACKAGE_LOAD_JOB = ReleasePackageLoadJob.RELEASE_PACKAGE_LOAD_JOB;
+
+    /**
      * This table stores the ordering of the associations (ASCC and BCC) that
      * belong to an ACC. Each record points, through FROM_ACC_MANIFEST_ID, to
      * the owning ACC via ACC_MANIFEST and, through exactly one of
@@ -1217,6 +1231,7 @@ public class DefaultSchema extends SchemaImpl {
             ModuleSet.MODULE_SET,
             ModuleSetRelease.MODULE_SET_RELEASE,
             ModuleXbtManifest.MODULE_XBT_MANIFEST,
+            NamedLock.NAMED_LOCK,
             Namespace.NAMESPACE,
             OasDoc.OAS_DOC,
             OasDocHttpHeader.OAS_DOC_HTTP_HEADER,
@@ -1251,6 +1266,7 @@ public class DefaultSchema extends SchemaImpl {
             RecordChangeLog.RECORD_CHANGE_LOG,
             Release.RELEASE,
             ReleaseDep.RELEASE_DEP,
+            ReleasePackageLoadJob.RELEASE_PACKAGE_LOAD_JOB,
             SeqKey.SEQ_KEY,
             Tag.TAG,
             Tenant.TENANT,

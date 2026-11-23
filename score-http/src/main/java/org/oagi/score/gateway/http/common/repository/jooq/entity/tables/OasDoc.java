@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -180,7 +181,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
     }
 
     private OasDoc(Name alias, Table<OasDocRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The root of the OpenAPI Specification document object model that the other OAS_* tables hang off; each row is an OpenAPI Object holding the openapi version string together with the Info Object metadata (title, description, terms of service, version, and contact and license details)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The root of the OpenAPI Specification document object model that the other OAS_* tables hang off; each row is an OpenAPI Object holding the openapi version string together with the Info Object metadata (title, description, terms of service, version, and contact and license details)."), TableOptions.table(), where);
     }
 
     /**
@@ -233,7 +234,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
 
         @Override
         public OasDocPath as(Table<?> alias) {
-            return new OasDocPath(alias.getQualifiedName(), this);
+            return new OasDocPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -411,7 +412,7 @@ public class OasDoc extends TableImpl<OasDocRecord> {
 
     @Override
     public OasDoc as(Table<?> alias) {
-        return new OasDoc(alias.getQualifiedName(), this);
+        return new OasDoc(alias.getUnqualifiedName(), this);
     }
 
     /**

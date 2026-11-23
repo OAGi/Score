@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -109,7 +110,7 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
     }
 
     private BlobContentManifest(Name alias, Table<BlobContentManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The BLOB_CONTENT_MANIFEST table is a release-specific handle to a BLOB_CONTENT record, which stores a schema whose content is only imported as a whole and is represented in Blob. It pins the BLOB_CONTENT to a RELEASE and carries the revision chain via its previous and next manifest self-references across releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The BLOB_CONTENT_MANIFEST table is a release-specific handle to a BLOB_CONTENT record, which stores a schema whose content is only imported as a whole and is represented in Blob. It pins the BLOB_CONTENT to a RELEASE and carries the revision chain via its previous and next manifest self-references across releases."), TableOptions.table(), where);
     }
 
     /**
@@ -162,7 +163,7 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
 
         @Override
         public BlobContentManifestPath as(Table<?> alias) {
-            return new BlobContentManifestPath(alias.getQualifiedName(), this);
+            return new BlobContentManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -263,7 +264,7 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
 
     @Override
     public BlobContentManifest as(Table<?> alias) {
-        return new BlobContentManifest(alias.getQualifiedName(), this);
+        return new BlobContentManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

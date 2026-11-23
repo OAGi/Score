@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -130,7 +131,7 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
     }
 
     private DtScManifest(Name alias, Table<DtScManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A release-specific handle to a DT_SC record, pinning the supplementary component (SC) of a data type to a RELEASE and linking it to the owning DT_MANIFEST. It carries the revision chain to the corresponding DT_SC_MANIFEST in the previous and next releases (PREV_DT_SC_MANIFEST_ID/NEXT_DT_SC_MANIFEST_ID), though as noted for DT_SC the supplementary component is an intrinsic part of the DT and is re-created with each new revision of the data type."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A release-specific handle to a DT_SC record, pinning the supplementary component (SC) of a data type to a RELEASE and linking it to the owning DT_MANIFEST. It carries the revision chain to the corresponding DT_SC_MANIFEST in the previous and next releases (PREV_DT_SC_MANIFEST_ID/NEXT_DT_SC_MANIFEST_ID), though as noted for DT_SC the supplementary component is an intrinsic part of the DT and is re-created with each new revision of the data type."), TableOptions.table(), where);
     }
 
     /**
@@ -183,7 +184,7 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
 
         @Override
         public DtScManifestPath as(Table<?> alias) {
-            return new DtScManifestPath(alias.getQualifiedName(), this);
+            return new DtScManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -319,7 +320,7 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
 
     @Override
     public DtScManifest as(Table<?> alias) {
-        return new DtScManifest(alias.getQualifiedName(), this);
+        return new DtScManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

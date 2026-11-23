@@ -205,7 +205,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
 
     /**
      * Setter for <code>bbiep.last_updated_by</code>. A foreign key referring to
-     * the last user who has updated the BBIEP record. 
+     * the last user who has updated the BBIEP record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(10, value);
@@ -213,7 +213,7 @@ public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> {
 
     /**
      * Getter for <code>bbiep.last_updated_by</code>. A foreign key referring to
-     * the last user who has updated the BBIEP record. 
+     * the last user who has updated the BBIEP record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(10);

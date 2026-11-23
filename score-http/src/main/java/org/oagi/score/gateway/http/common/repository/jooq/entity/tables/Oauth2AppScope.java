@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -82,7 +83,7 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
     }
 
     private Oauth2AppScope(Name alias, Table<Oauth2AppScopeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the OAuth2 scopes requested for an OAUTH2_APP, storing one scope value per row."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the OAuth2 scopes requested for an OAUTH2_APP, storing one scope value per row."), TableOptions.table(), where);
     }
 
     /**
@@ -135,7 +136,7 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
 
         @Override
         public Oauth2AppScopePath as(Table<?> alias) {
-            return new Oauth2AppScopePath(alias.getQualifiedName(), this);
+            return new Oauth2AppScopePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -183,7 +184,7 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
 
     @Override
     public Oauth2AppScope as(Table<?> alias) {
-        return new Oauth2AppScope(alias.getQualifiedName(), this);
+        return new Oauth2AppScope(alias.getUnqualifiedName(), this);
     }
 
     /**

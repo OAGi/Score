@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -145,7 +146,7 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
     }
 
     private CodeListManifest(Name alias, Table<CodeListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The CODE_LIST_MANIFEST table is a release-specific handle to a CODE_LIST record, pinning that code list to a particular RELEASE and carrying the revision chain (the PREV/NEXT self-references linking the same code list across releases). When a code list is derived from another, the BASED_CODE_LIST_MANIFEST_ID self-reference records its base within the release."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The CODE_LIST_MANIFEST table is a release-specific handle to a CODE_LIST record, pinning that code list to a particular RELEASE and carrying the revision chain (the PREV/NEXT self-references linking the same code list across releases). When a code list is derived from another, the BASED_CODE_LIST_MANIFEST_ID self-reference records its base within the release."), TableOptions.table(), where);
     }
 
     /**
@@ -198,7 +199,7 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
 
         @Override
         public CodeListManifestPath as(Table<?> alias) {
-            return new CodeListManifestPath(alias.getQualifiedName(), this);
+            return new CodeListManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -434,7 +435,7 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
 
     @Override
     public CodeListManifest as(Table<?> alias) {
-        return new CodeListManifest(alias.getQualifiedName(), this);
+        return new CodeListManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

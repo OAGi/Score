@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -124,7 +125,7 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
     }
 
     private ModuleAgencyIdListManifest(Name alias, Table<ModuleAgencyIdListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table assigns an AGENCY_ID_LIST_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the agency identification list will be generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table assigns an AGENCY_ID_LIST_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the agency identification list will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -179,7 +180,7 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
 
         @Override
         public ModuleAgencyIdListManifestPath as(Table<?> alias) {
-            return new ModuleAgencyIdListManifestPath(alias.getQualifiedName(), this);
+            return new ModuleAgencyIdListManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -278,7 +279,7 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
 
     @Override
     public ModuleAgencyIdListManifest as(Table<?> alias) {
-        return new ModuleAgencyIdListManifest(alias.getQualifiedName(), this);
+        return new ModuleAgencyIdListManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

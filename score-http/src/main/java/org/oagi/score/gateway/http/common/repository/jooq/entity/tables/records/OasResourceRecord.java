@@ -57,7 +57,8 @@ public class OasResourceRecord extends UpdatableRecordImpl<OasResourceRecord> {
 
     /**
      * Setter for <code>oas_resource.path</code>. The OpenAPI path (resource
-     * name) for this resource; defaults to the BIE name.
+     * name) for this resource; by default made from the business context and
+     * the BIE name. Case-sensitive: /Pets and /pets are two paths.
      */
     public void setPath(String value) {
         set(2, value);
@@ -65,7 +66,8 @@ public class OasResourceRecord extends UpdatableRecordImpl<OasResourceRecord> {
 
     /**
      * Getter for <code>oas_resource.path</code>. The OpenAPI path (resource
-     * name) for this resource; defaults to the BIE name.
+     * name) for this resource; by default made from the business context and
+     * the BIE name. Case-sensitive: /Pets and /pets are two paths.
      */
     public String getPath() {
         return (String) get(2);

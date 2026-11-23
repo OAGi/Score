@@ -55,7 +55,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Setter for <code>oas_http_header.header</code>. REQUIRED. The name of the
-     * header. Header names are case sensitive. 
+     * header. Header names are case sensitive.
      */
     public void setHeader(String value) {
         set(2, value);
@@ -63,7 +63,7 @@ public class OasHttpHeaderRecord extends UpdatableRecordImpl<OasHttpHeaderRecord
 
     /**
      * Getter for <code>oas_http_header.header</code>. REQUIRED. The name of the
-     * header. Header names are case sensitive. 
+     * header. Header names are case sensitive.
      */
     public String getHeader() {
         return (String) get(2);

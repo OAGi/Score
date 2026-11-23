@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -91,7 +92,7 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
     }
 
     private AsccpManifestTag(Name alias, Table<AsccpManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table that assigns TAG rows to ASCCP_MANIFEST rows, allowing a release-specific ASCCP handle to be tagged with one or more TAGs in a many-to-many relationship."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table that assigns TAG rows to ASCCP_MANIFEST rows, allowing a release-specific ASCCP handle to be tagged with one or more TAGs in a many-to-many relationship."), TableOptions.table(), where);
     }
 
     /**
@@ -144,7 +145,7 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
 
         @Override
         public AsccpManifestTagPath as(Table<?> alias) {
-            return new AsccpManifestTagPath(alias.getQualifiedName(), this);
+            return new AsccpManifestTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -211,7 +212,7 @@ public class AsccpManifestTag extends TableImpl<AsccpManifestTagRecord> {
 
     @Override
     public AsccpManifestTag as(Table<?> alias) {
-        return new AsccpManifestTag(alias.getQualifiedName(), this);
+        return new AsccpManifestTag(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -117,7 +118,7 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
     }
 
     private ModuleBccpManifest(Name alias, Table<ModuleBccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table that assigns a BCCP_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the BCCP will be generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table that assigns a BCCP_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the BCCP will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -170,7 +171,7 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
 
         @Override
         public ModuleBccpManifestPath as(Table<?> alias) {
-            return new ModuleBccpManifestPath(alias.getQualifiedName(), this);
+            return new ModuleBccpManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -268,7 +269,7 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
 
     @Override
     public ModuleBccpManifest as(Table<?> alias) {
-        return new ModuleBccpManifest(alias.getQualifiedName(), this);
+        return new ModuleBccpManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

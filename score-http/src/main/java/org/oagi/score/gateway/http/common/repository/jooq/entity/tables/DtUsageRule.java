@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -95,7 +96,7 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
     }
 
     private DtUsageRule(Name alias, Table<DtUsageRuleRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both."), TableOptions.table(), where);
     }
 
     /**
@@ -148,7 +149,7 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
 
         @Override
         public DtUsageRulePath as(Table<?> alias) {
-            return new DtUsageRulePath(alias.getQualifiedName(), this);
+            return new DtUsageRulePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -220,7 +221,7 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
 
     @Override
     public DtUsageRule as(Table<?> alias) {
-        return new DtUsageRule(alias.getQualifiedName(), this);
+        return new DtUsageRule(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -125,7 +126,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
     }
 
     private OasOperationSecurity(Name alias, Table<OasOperationSecurityRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Operation-level Security Requirement entry (overrides document-level)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Operation-level Security Requirement entry (overrides document-level)."), TableOptions.table(), where);
     }
 
     /**
@@ -178,7 +179,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
 
         @Override
         public OasOperationSecurityPath as(Table<?> alias) {
-            return new OasOperationSecurityPath(alias.getQualifiedName(), this);
+            return new OasOperationSecurityPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -282,7 +283,7 @@ public class OasOperationSecurity extends TableImpl<OasOperationSecurityRecord> 
 
     @Override
     public OasOperationSecurity as(Table<?> alias) {
-        return new OasOperationSecurity(alias.getQualifiedName(), this);
+        return new OasOperationSecurity(alias.getUnqualifiedName(), this);
     }
 
     /**

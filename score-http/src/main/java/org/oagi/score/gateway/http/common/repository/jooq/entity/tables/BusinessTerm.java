@@ -27,6 +27,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -132,7 +133,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
     }
 
     private BusinessTerm(Name alias, Table<BusinessTermRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The Business Term table stores information about the business term, which is usually associated to BIE or CC. TODO: Placeeholder, definition is missing."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The Business Term table stores information about the business term, which is usually associated to BIE or CC. TODO: Placeeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -185,7 +186,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
 
         @Override
         public BusinessTermPath as(Table<?> alias) {
-            return new BusinessTermPath(alias.getQualifiedName(), this);
+            return new BusinessTermPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -240,7 +241,7 @@ public class BusinessTerm extends TableImpl<BusinessTermRecord> {
 
     @Override
     public BusinessTerm as(Table<?> alias) {
-        return new BusinessTerm(alias.getQualifiedName(), this);
+        return new BusinessTerm(alias.getUnqualifiedName(), this);
     }
 
     /**

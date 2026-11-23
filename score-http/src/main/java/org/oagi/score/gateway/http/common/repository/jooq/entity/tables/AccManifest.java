@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -145,7 +146,7 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
     }
 
     private AccManifest(Name alias, Table<AccManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The ACC_MANIFEST table is a release-specific handle to an ACC record, pinning a particular ACC (a complex data structured concept such as OAGIS's Components, Nouns, and BODs) to a RELEASE. It carries the revision chain via the PREV_ACC_MANIFEST_ID and NEXT_ACC_MANIFEST_ID self-references across releases, and also records the based (supertype) and replacement manifests for the ACC in that release."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The ACC_MANIFEST table is a release-specific handle to an ACC record, pinning a particular ACC (a complex data structured concept such as OAGIS's Components, Nouns, and BODs) to a RELEASE. It carries the revision chain via the PREV_ACC_MANIFEST_ID and NEXT_ACC_MANIFEST_ID self-references across releases, and also records the based (supertype) and replacement manifests for the ACC in that release."), TableOptions.table(), where);
     }
 
     /**
@@ -198,7 +199,7 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
 
         @Override
         public AccManifestPath as(Table<?> alias) {
-            return new AccManifestPath(alias.getQualifiedName(), this);
+            return new AccManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -451,7 +452,7 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
 
     @Override
     public AccManifest as(Table<?> alias) {
-        return new AccManifest(alias.getQualifiedName(), this);
+        return new AccManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -169,7 +170,7 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
     }
 
     private OasOperation(Name alias, Table<OasOperationRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Operation Object; a single HTTP verb (get, put, post, delete, etc.) exposed on an OAS_RESOURCE path item, carrying its operationId, summary, description, deprecation flag, and defaulted error-response body settings, with any per-operation security overrides captured in OAS_OPERATION_SECURITY."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Operation Object; a single HTTP verb (get, put, post, delete, etc.) exposed on an OAS_RESOURCE path item, carrying its operationId, summary, description, deprecation flag, and defaulted error-response body settings, with any per-operation security overrides captured in OAS_OPERATION_SECURITY."), TableOptions.table(), where);
     }
 
     /**
@@ -222,7 +223,7 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
 
         @Override
         public OasOperationPath as(Table<?> alias) {
-            return new OasOperationPath(alias.getQualifiedName(), this);
+            return new OasOperationPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -391,7 +392,7 @@ public class OasOperation extends TableImpl<OasOperationRecord> {
 
     @Override
     public OasOperation as(Table<?> alias) {
-        return new OasOperation(alias.getQualifiedName(), this);
+        return new OasOperation(alias.getUnqualifiedName(), this);
     }
 
     /**

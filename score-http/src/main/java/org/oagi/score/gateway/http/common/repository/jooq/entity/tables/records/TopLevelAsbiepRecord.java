@@ -74,7 +74,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * Setter for <code>top_level_asbiep.owner_user_id</code>. Foreign key to
      * the APP_USER table. This is the user who owns the entity, is allowed to
      * edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -86,7 +86,7 @@ public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepReco
      * Getter for <code>top_level_asbiep.owner_user_id</code>. Foreign key to
      * the APP_USER table. This is the user who owns the entity, is allowed to
      * edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */

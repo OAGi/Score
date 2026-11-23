@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -109,7 +110,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
     }
 
     private GithubIssueDtManifest(Name alias, Table<GithubIssueDtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Links a DT manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Links a DT manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
     }
 
     /**
@@ -162,7 +163,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
 
         @Override
         public GithubIssueDtManifestPath as(Table<?> alias) {
-            return new GithubIssueDtManifestPath(alias.getQualifiedName(), this);
+            return new GithubIssueDtManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -253,7 +254,7 @@ public class GithubIssueDtManifest extends TableImpl<GithubIssueDtManifestRecord
 
     @Override
     public GithubIssueDtManifest as(Table<?> alias) {
-        return new GithubIssueDtManifest(alias.getQualifiedName(), this);
+        return new GithubIssueDtManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

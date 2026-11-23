@@ -55,7 +55,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
 
     /**
      * Setter for <code>ctx_scheme.scheme_id</code>. External identification of
-     * the scheme. 
+     * the scheme.
      */
     public void setSchemeId(String value) {
         set(2, value);
@@ -63,7 +63,7 @@ public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> {
 
     /**
      * Getter for <code>ctx_scheme.scheme_id</code>. External identification of
-     * the scheme. 
+     * the scheme.
      */
     public String getSchemeId() {
         return (String) get(2);

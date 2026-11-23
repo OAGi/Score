@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -167,7 +168,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * The column <code>code_list.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -195,7 +196,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
      * The column <code>code_list.state</code>. Deleted, WIP, Draft, QA,
      * Candidate, Production, Release Draft, Published. This the revision life
      * cycle state of the code list.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -218,7 +219,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
     }
 
     private CodeList(Name alias, Table<CodeListRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied."), TableOptions.table(), where);
     }
 
     /**
@@ -271,7 +272,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
 
         @Override
         public CodeListPath as(Table<?> alias) {
-            return new CodeListPath(alias.getQualifiedName(), this);
+            return new CodeListPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -448,7 +449,7 @@ public class CodeList extends TableImpl<CodeListRecord> {
 
     @Override
     public CodeList as(Table<?> alias) {
-        return new CodeList(alias.getQualifiedName(), this);
+        return new CodeList(alias.getUnqualifiedName(), this);
     }
 
     /**

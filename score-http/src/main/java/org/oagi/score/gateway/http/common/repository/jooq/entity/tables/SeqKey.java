@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -112,7 +113,7 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
     }
 
     private SeqKey(Name alias, Table<SeqKeyRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores the ordering of the associations (ASCC and BCC) that belong to an ACC. Each record points, through FROM_ACC_MANIFEST_ID, to the owning ACC via ACC_MANIFEST and, through exactly one of ASCC_MANIFEST_ID or BCC_MANIFEST_ID, to the ordered association; the PREV_SEQ_KEY_ID and NEXT_SEQ_KEY_ID columns form a doubly-linked chain that defines the sequence of these associations within the ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores the ordering of the associations (ASCC and BCC) that belong to an ACC. Each record points, through FROM_ACC_MANIFEST_ID, to the owning ACC via ACC_MANIFEST and, through exactly one of ASCC_MANIFEST_ID or BCC_MANIFEST_ID, to the ordered association; the PREV_SEQ_KEY_ID and NEXT_SEQ_KEY_ID columns form a doubly-linked chain that defines the sequence of these associations within the ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -165,7 +166,7 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
 
         @Override
         public SeqKeyPath as(Table<?> alias) {
-            return new SeqKeyPath(alias.getQualifiedName(), this);
+            return new SeqKeyPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -268,7 +269,7 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
 
     @Override
     public SeqKey as(Table<?> alias) {
-        return new SeqKey(alias.getQualifiedName(), this);
+        return new SeqKey(alias.getUnqualifiedName(), this);
     }
 
     /**

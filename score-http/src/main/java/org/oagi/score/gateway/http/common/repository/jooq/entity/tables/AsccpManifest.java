@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -139,7 +140,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
     }
 
     private AsccpManifest(Name alias, Table<AsccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A release-specific handle to an ASCCP, which specifies a role (or property) an ACC may play under another ACC; it pins the ASCCP to a RELEASE and carries the revision chain to the corresponding ASCCP_MANIFEST records in the previous and next releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A release-specific handle to an ASCCP, which specifies a role (or property) an ACC may play under another ACC; it pins the ASCCP to a RELEASE and carries the revision chain to the corresponding ASCCP_MANIFEST records in the previous and next releases."), TableOptions.table(), where);
     }
 
     /**
@@ -192,7 +193,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
 
         @Override
         public AsccpManifestPath as(Table<?> alias) {
-            return new AsccpManifestPath(alias.getQualifiedName(), this);
+            return new AsccpManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -394,7 +395,7 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
 
     @Override
     public AsccpManifest as(Table<?> alias) {
-        return new AsccpManifest(alias.getQualifiedName(), this);
+        return new AsccpManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

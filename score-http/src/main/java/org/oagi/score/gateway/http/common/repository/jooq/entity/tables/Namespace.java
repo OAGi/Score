@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -143,7 +144,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
     }
 
     private Namespace(Name alias, Table<NamespaceRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores information about a namespace. Namespace is the namespace as in the XML schema specification."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores information about a namespace. Namespace is the namespace as in the XML schema specification."), TableOptions.table(), where);
     }
 
     /**
@@ -196,7 +197,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
 
         @Override
         public NamespacePath as(Table<?> alias) {
-            return new NamespacePath(alias.getQualifiedName(), this);
+            return new NamespacePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -385,7 +386,7 @@ public class Namespace extends TableImpl<NamespaceRecord> {
 
     @Override
     public Namespace as(Table<?> alias) {
-        return new Namespace(alias.getQualifiedName(), this);
+        return new Namespace(alias.getUnqualifiedName(), this);
     }
 
     /**

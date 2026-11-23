@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -133,7 +134,7 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
     }
 
     private OasServerVariable(Name alias, Table<OasServerVariableRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Server Variable Object; one named entry of an OAS_SERVER's variables map, holding the default value, optional enum, and description used for server URL template substitution."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Server Variable Object; one named entry of an OAS_SERVER's variables map, holding the default value, optional enum, and description used for server URL template substitution."), TableOptions.table(), where);
     }
 
     /**
@@ -186,7 +187,7 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
 
         @Override
         public OasServerVariablePath as(Table<?> alias) {
-            return new OasServerVariablePath(alias.getQualifiedName(), this);
+            return new OasServerVariablePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -260,7 +261,7 @@ public class OasServerVariable extends TableImpl<OasServerVariableRecord> {
 
     @Override
     public OasServerVariable as(Table<?> alias) {
-        return new OasServerVariable(alias.getQualifiedName(), this);
+        return new OasServerVariable(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -86,7 +87,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     /**
      * The column <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
+     * table referring to the user who creates the entity.
      */
     public final TableField<BizCtxRecord, ULong> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table referring to the user who creates the entity. ");
 
@@ -99,7 +100,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     /**
      * The column <code>biz_ctx.creation_timestamp</code>. Timestamp when the
-     * business context record was first created. 
+     * business context record was first created.
      */
     public final TableField<BizCtxRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the business context record was first created. ");
 
@@ -114,7 +115,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
     }
 
     private BizCtx(Name alias, Table<BizCtxRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents a business context. A business context is a combination of one or more business context values."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table represents a business context. A business context is a combination of one or more business context values."), TableOptions.table(), where);
     }
 
     /**
@@ -167,7 +168,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
         @Override
         public BizCtxPath as(Table<?> alias) {
-            return new BizCtxPath(alias.getQualifiedName(), this);
+            return new BizCtxPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -300,7 +301,7 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
 
     @Override
     public BizCtx as(Table<?> alias) {
-        return new BizCtx(alias.getQualifiedName(), this);
+        return new BizCtx(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -78,9 +79,10 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
     /**
      * The column <code>oas_resource.path</code>. The OpenAPI path (resource
-     * name) for this resource; defaults to the BIE name.
+     * name) for this resource; by default made from the business context and
+     * the BIE name. Case-sensitive: /Pets and /pets are two paths.
      */
-    public final TableField<OasResourceRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).nullable(false), this, "The OpenAPI path (resource name) for this resource; defaults to the BIE name.");
+    public final TableField<OasResourceRecord, String> PATH = createField(DSL.name("path"), SQLDataType.CLOB(65535).nullable(false), this, "The OpenAPI path (resource name) for this resource; by default made from the business context and the BIE name. Case-sensitive: /Pets and /pets are two paths.");
 
     /**
      * The column <code>oas_resource.ref</code>. An optional reference ($ref) to
@@ -117,7 +119,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
     }
 
     private OasResource(Name alias, Table<OasResourceRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A resource (path) belonging to an OpenAPI document; each row is an entry of the OAS_DOC Paths Object, keyed by PATH (the OpenAPI path, defaulting to the BIE name) and optionally pointing to an externally defined Path Item Object via the REF ($ref) column."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A resource (path) belonging to an OpenAPI document; each row is an entry of the OAS_DOC Paths Object, keyed by PATH (the OpenAPI path, defaulting to the BIE name) and optionally pointing to an externally defined Path Item Object via the REF ($ref) column."), TableOptions.table(), where);
     }
 
     /**
@@ -170,7 +172,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
         @Override
         public OasResourcePath as(Table<?> alias) {
-            return new OasResourcePath(alias.getQualifiedName(), this);
+            return new OasResourcePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -257,7 +259,7 @@ public class OasResource extends TableImpl<OasResourceRecord> {
 
     @Override
     public OasResource as(Table<?> alias) {
-        return new OasResource(alias.getQualifiedName(), this);
+        return new OasResource(alias.getUnqualifiedName(), this);
     }
 
     /**

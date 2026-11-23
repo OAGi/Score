@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -35,7 +36,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bbie.BbiePath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BbieSc.BbieScPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.CdtPri.CdtPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log.LogPath;
@@ -88,13 +88,6 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     public final TableField<XbtManifestRecord, ULong> XBT_ID = createField(DSL.name("xbt_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the XBT table.");
 
     /**
-     * The column <code>xbt_manifest.cdt_pri_id</code>. Foreign key referencing
-     * the CDT_PRI table. Specifies how the current record maps to allowed
-     * primitives in CDT.
-     */
-    public final TableField<XbtManifestRecord, ULong> CDT_PRI_ID = createField(DSL.name("cdt_pri_id"), SQLDataType.BIGINTUNSIGNED.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINTUNSIGNED)), this, "Foreign key referencing the CDT_PRI table. Specifies how the current record maps to allowed primitives in CDT.");
-
-    /**
      * The column <code>xbt_manifest.conflict</code>. This indicates that there
      * is a conflict between self and relationship.
      */
@@ -125,7 +118,7 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
     }
 
     private XbtManifest(Name alias, Table<XbtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A release-specific handle to an XBT record, pinning an XML schema built-in type or OAGIS built-in type to a RELEASE and carrying the revision chain (PREV_XBT_MANIFEST_ID and NEXT_XBT_MANIFEST_ID) across releases. It also records how the built-in type maps to an allowed CDT primitive via CDT_PRI."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A release-specific handle to an XBT record, pinning an XML schema built-in type or OAGIS built-in type to a RELEASE and carrying the revision chain (PREV_XBT_MANIFEST_ID and NEXT_XBT_MANIFEST_ID) across releases. It also records how the built-in type maps to an allowed CDT primitive via CDT_PRI."), TableOptions.table(), where);
     }
 
     /**
@@ -178,7 +171,7 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
         @Override
         public XbtManifestPath as(Table<?> alias) {
-            return new XbtManifestPath(alias.getQualifiedName(), this);
+            return new XbtManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -199,19 +192,7 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
     @Override
     public List<ForeignKey<XbtManifestRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.XBT_MANIFEST_CDT_PRI_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK);
-    }
-
-    private transient CdtPriPath _cdtPri;
-
-    /**
-     * Get the implicit join path to the <code>cdt_pri</code> table.
-     */
-    public CdtPriPath cdtPri() {
-        if (_cdtPri == null)
-            _cdtPri = new CdtPriPath(this, Keys.XBT_MANIFEST_CDT_PRI_ID_FK, null);
-
-        return _cdtPri;
+        return Arrays.asList(Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK);
     }
 
     private transient LogPath _log;
@@ -350,7 +331,7 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
 
     @Override
     public XbtManifest as(Table<?> alias) {
-        return new XbtManifest(alias.getQualifiedName(), this);
+        return new XbtManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -35,7 +36,6 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.DefaultSchema;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.Keys;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtAwdPri.DtAwdPriPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtScAwdPri.DtScAwdPriPath;
-import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.XbtManifest.XbtManifestPath;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.CdtPriRecord;
 
 
@@ -77,7 +77,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
     }
 
     private CdtPri(Name alias, Table<CdtPriRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores the CDT primitives."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores the CDT primitives."), TableOptions.table(), where);
     }
 
     /**
@@ -130,7 +130,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
 
         @Override
         public CdtPriPath as(Table<?> alias) {
-            return new CdtPriPath(alias.getQualifiedName(), this);
+            return new CdtPriPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -179,18 +179,6 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
         return _dtScAwdPri;
     }
 
-    private transient XbtManifestPath _xbtManifest;
-
-    /**
-     * Get the implicit to-many join path to the <code>xbt_manifest</code> table
-     */
-    public XbtManifestPath xbtManifest() {
-        if (_xbtManifest == null)
-            _xbtManifest = new XbtManifestPath(this, null, Keys.XBT_MANIFEST_CDT_PRI_ID_FK.getInverseKey());
-
-        return _xbtManifest;
-    }
-
     @Override
     public CdtPri as(String alias) {
         return new CdtPri(DSL.name(alias), this);
@@ -203,7 +191,7 @@ public class CdtPri extends TableImpl<CdtPriRecord> {
 
     @Override
     public CdtPri as(Table<?> alias) {
-        return new CdtPri(alias.getQualifiedName(), this);
+        return new CdtPri(alias.getUnqualifiedName(), this);
     }
 
     /**

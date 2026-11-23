@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -78,7 +79,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
     /**
      * The column <code>asccp.type</code>. The Type of the ASCCP. List: Default,
-     * Extension 
+     * Extension
      */
     public final TableField<AsccpRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("'Default'"), SQLDataType.VARCHAR)), this, "The Type of the ASCCP. List: Default, Extension ");
 
@@ -109,8 +110,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
     /**
      * The column <code>asccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -121,16 +122,16 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * The column <code>asccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public final TableField<AsccpRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
      * The column <code>asccp.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who has updated the record. 
-     * 
+     * APP_USER table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -138,8 +139,8 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
     /**
      * The column <code>asccp.creation_timestamp</code>. Timestamp when the
-     * revision of the ASCCP was created. 
-     * 
+     * revision of the ASCCP was created.
+     *
      * This never change for a revision.
      */
     public final TableField<AsccpRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the ASCCP was created. \n\nThis never change for a revision.");
@@ -147,7 +148,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     /**
      * The column <code>asccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -158,7 +159,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
      * The column <code>asccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ASCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -217,7 +218,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
     }
 
     private Asccp(Name alias, Table<AsccpRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("An ASCCP specifies a role (or property) an ACC may play under another ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("An ASCCP specifies a role (or property) an ACC may play under another ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -270,7 +271,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
         @Override
         public AsccpPath as(Table<?> alias) {
-            return new AsccpPath(alias.getQualifiedName(), this);
+            return new AsccpPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -438,7 +439,7 @@ public class Asccp extends TableImpl<AsccpRecord> {
 
     @Override
     public Asccp as(Table<?> alias) {
-        return new Asccp(alias.getQualifiedName(), this);
+        return new Asccp(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -31,6 +31,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -298,7 +299,7 @@ public class Bbie extends TableImpl<BbieRecord> {
     }
 
     private Bbie(Name alias, Table<BbieRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A BBIE represents a relationship/association between an ABIE and a BBIEP. It is a contextualization of a BCC. The BBIE table also stores some information about the specific constraints related to the BDT associated with the BBIEP. In particular, the three columns including the BDT_PRI_RESTRI_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID allows for capturing of the specific primitive to be used in the context. Only one column among the three can have a value in a particular record."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A BBIE represents a relationship/association between an ABIE and a BBIEP. It is a contextualization of a BCC. The BBIE table also stores some information about the specific constraints related to the BDT associated with the BBIEP. In particular, the three columns including the BDT_PRI_RESTRI_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID allows for capturing of the specific primitive to be used in the context. Only one column among the three can have a value in a particular record."), TableOptions.table(), where);
     }
 
     /**
@@ -351,7 +352,7 @@ public class Bbie extends TableImpl<BbieRecord> {
 
         @Override
         public BbiePath as(Table<?> alias) {
-            return new BbiePath(alias.getQualifiedName(), this);
+            return new BbiePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -540,7 +541,7 @@ public class Bbie extends TableImpl<BbieRecord> {
 
     @Override
     public Bbie as(Table<?> alias) {
-        return new Bbie(alias.getQualifiedName(), this);
+        return new Bbie(alias.getUnqualifiedName(), this);
     }
 
     /**

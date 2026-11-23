@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -80,7 +81,7 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
 
     /**
      * The column <code>oas_http_header.header</code>. REQUIRED. The name of the
-     * header. Header names are case sensitive. 
+     * header. Header names are case sensitive.
      */
     public final TableField<OasHttpHeaderRecord, String> HEADER = createField(DSL.name("header"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "REQUIRED. The name of the header. Header names are case sensitive. ");
 
@@ -177,7 +178,7 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
     }
 
     private OasHttpHeader(Name alias, Table<OasHttpHeaderRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Header Object, defining an HTTP header by its name, description, and schema type reference ($ref); attached to an OAS_RESPONSE through the OAS_RESPONSE_HEADERS join and referenced by an OAS_PARAMETER when the parameter location is header."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Header Object, defining an HTTP header by its name, description, and schema type reference ($ref); attached to an OAS_RESPONSE through the OAS_RESPONSE_HEADERS join and referenced by an OAS_PARAMETER when the parameter location is header."), TableOptions.table(), where);
     }
 
     /**
@@ -230,7 +231,7 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
 
         @Override
         public OasHttpHeaderPath as(Table<?> alias) {
-            return new OasHttpHeaderPath(alias.getQualifiedName(), this);
+            return new OasHttpHeaderPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -365,7 +366,7 @@ public class OasHttpHeader extends TableImpl<OasHttpHeaderRecord> {
 
     @Override
     public OasHttpHeader as(Table<?> alias) {
-        return new OasHttpHeader(alias.getQualifiedName(), this);
+        return new OasHttpHeader(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -26,6 +26,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -74,7 +75,7 @@ public class Tenant extends TableImpl<TenantRecord> {
     }
 
     private Tenant(Name alias, Table<TenantRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table about the user tenant role."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table about the user tenant role."), TableOptions.table(), where);
     }
 
     /**
@@ -127,7 +128,7 @@ public class Tenant extends TableImpl<TenantRecord> {
 
         @Override
         public TenantPath as(Table<?> alias) {
-            return new TenantPath(alias.getQualifiedName(), this);
+            return new TenantPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -198,7 +199,7 @@ public class Tenant extends TableImpl<TenantRecord> {
 
     @Override
     public Tenant as(Table<?> alias) {
-        return new Tenant(alias.getQualifiedName(), this);
+        return new Tenant(alias.getUnqualifiedName(), this);
     }
 
     /**

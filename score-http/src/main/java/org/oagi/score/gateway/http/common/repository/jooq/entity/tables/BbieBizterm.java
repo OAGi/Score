@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -124,7 +125,7 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
     }
 
     private BbieBizterm(Name alias, Table<BbieBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The bbie_bizterm table stores information about the aggregation between the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The bbie_bizterm table stores information about the aggregation between the bbie_bizterm and BBIE. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -177,7 +178,7 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
 
         @Override
         public BbieBiztermPath as(Table<?> alias) {
-            return new BbieBiztermPath(alias.getQualifiedName(), this);
+            return new BbieBiztermPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -242,7 +243,7 @@ public class BbieBizterm extends TableImpl<BbieBiztermRecord> {
 
     @Override
     public BbieBizterm as(Table<?> alias) {
-        return new BbieBizterm(alias.getQualifiedName(), this);
+        return new BbieBizterm(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -84,7 +85,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
     }
 
     private BizCtxValue(Name alias, Table<BizCtxValueRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value."), TableOptions.table(), where);
     }
 
     /**
@@ -137,7 +138,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
         @Override
         public BizCtxValuePath as(Table<?> alias) {
-            return new BizCtxValuePath(alias.getQualifiedName(), this);
+            return new BizCtxValuePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -197,7 +198,7 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
     @Override
     public BizCtxValue as(Table<?> alias) {
-        return new BizCtxValue(alias.getQualifiedName(), this);
+        return new BizCtxValue(alias.getUnqualifiedName(), this);
     }
 
     /**

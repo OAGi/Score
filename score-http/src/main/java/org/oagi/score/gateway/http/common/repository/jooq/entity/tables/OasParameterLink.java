@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -131,7 +132,7 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
     }
 
     private OasParameterLink(Name alias, Table<OasParameterLinkRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Link Object parameter binding declared on an OAS_RESPONSE; each row ties an OAS_PARAMETER to a runtime EXPRESSION that supplies its value, optionally targeting the linked OAS_OPERATION."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Link Object parameter binding declared on an OAS_RESPONSE; each row ties an OAS_PARAMETER to a runtime EXPRESSION that supplies its value, optionally targeting the linked OAS_OPERATION."), TableOptions.table(), where);
     }
 
     /**
@@ -184,7 +185,7 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
 
         @Override
         public OasParameterLinkPath as(Table<?> alias) {
-            return new OasParameterLinkPath(alias.getQualifiedName(), this);
+            return new OasParameterLinkPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -282,7 +283,7 @@ public class OasParameterLink extends TableImpl<OasParameterLinkRecord> {
 
     @Override
     public OasParameterLink as(Table<?> alias) {
-        return new OasParameterLink(alias.getQualifiedName(), this);
+        return new OasParameterLink(alias.getUnqualifiedName(), this);
     }
 
     /**

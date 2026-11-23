@@ -68,7 +68,9 @@ public class OasOauthScopeRecord extends UpdatableRecordImpl<OasOauthScopeRecord
 
     /**
      * Setter for <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
-     * name (the scopes map key). Unique within a flow.
+     * name (the scopes map key). Unique within a flow; case-sensitive. An OAuth
+     * 2.0 scope token: printable ASCII without a space, a double quote and a
+     * backslash (RFC 6749, 3.3).
      */
     public void setScopeName(String value) {
         set(3, value);
@@ -76,7 +78,9 @@ public class OasOauthScopeRecord extends UpdatableRecordImpl<OasOauthScopeRecord
 
     /**
      * Getter for <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
-     * name (the scopes map key). Unique within a flow.
+     * name (the scopes map key). Unique within a flow; case-sensitive. An OAuth
+     * 2.0 scope token: printable ASCII without a space, a double quote and a
+     * backslash (RFC 6749, 3.3).
      */
     public String getScopeName() {
         return (String) get(3);

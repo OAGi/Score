@@ -189,8 +189,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Setter for <code>bccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -201,8 +201,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Getter for <code>bccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -215,7 +215,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Setter for <code>bccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -227,7 +227,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Getter for <code>bccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -237,8 +237,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Setter for <code>bccp.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -248,8 +248,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Getter for <code>bccp.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -259,8 +259,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Setter for <code>bccp.creation_timestamp</code>. Timestamp when the
-     * revision of the BCCP was created. 
-     * 
+     * revision of the BCCP was created.
+     *
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -269,8 +269,8 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
     /**
      * Getter for <code>bccp.creation_timestamp</code>. Timestamp when the
-     * revision of the BCCP was created. 
-     * 
+     * revision of the BCCP was created.
+     *
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -280,7 +280,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
     /**
      * Setter for <code>bccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -292,7 +292,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
     /**
      * Getter for <code>bccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -305,7 +305,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Setter for <code>bccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -317,7 +317,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Getter for <code>bccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -329,7 +329,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Setter for <code>bccp.is_nillable</code>. This is corresponding to the
      * XML Schema nillable flag. Although the nillable may not apply to certain
      * cases of the BCCP (e.g., when it is only used as XSD attribute), the
-     * value is default to false for simplification. 
+     * value is default to false for simplification.
      */
     public void setIsNillable(Byte value) {
         set(16, value);
@@ -339,7 +339,7 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
      * Getter for <code>bccp.is_nillable</code>. This is corresponding to the
      * XML Schema nillable flag. Although the nillable may not apply to certain
      * cases of the BCCP (e.g., when it is only used as XSD attribute), the
-     * value is default to false for simplification. 
+     * value is default to false for simplification.
      */
     public Byte getIsNillable() {
         return (Byte) get(16);

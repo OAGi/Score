@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -123,7 +124,7 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
     }
 
     private ModuleSet(Name alias, Table<ModuleSetRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores information about a module set, which is a named, library-scoped collection of MODULE records that organizes CC components into physical schema files. A module set is pinned to a RELEASE through the MODULE_SET_RELEASE table for use in expression/schema generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores information about a module set, which is a named, library-scoped collection of MODULE records that organizes CC components into physical schema files. A module set is pinned to a RELEASE through the MODULE_SET_RELEASE table for use in expression/schema generation."), TableOptions.table(), where);
     }
 
     /**
@@ -176,7 +177,7 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
 
         @Override
         public ModuleSetPath as(Table<?> alias) {
-            return new ModuleSetPath(alias.getQualifiedName(), this);
+            return new ModuleSetPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -275,7 +276,7 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
 
     @Override
     public ModuleSet as(Table<?> alias) {
-        return new ModuleSet(alias.getQualifiedName(), this);
+        return new ModuleSet(alias.getUnqualifiedName(), this);
     }
 
     /**

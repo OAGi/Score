@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -46,7 +47,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 
 /**
  * A BCC represents a relationship/association between an ACC and a BCCP. It
- * creates a data element for an ACC. 
+ * creates a data element for an ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Bcc extends TableImpl<BccRecord> {
@@ -93,8 +94,8 @@ public class Bcc extends TableImpl<BccRecord> {
     /**
      * The column <code>bcc.to_bccp_id</code>. TO_BCCP_ID is a foreign key to an
      * BCCP table record. It is basically pointing to a child data element of
-     * the FROM_ACC_ID. 
-     * 
+     * the FROM_ACC_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * BCCP_ID of the current record of a BCCP.
      */
@@ -103,8 +104,8 @@ public class Bcc extends TableImpl<BccRecord> {
     /**
      * The column <code>bcc.from_acc_id</code>. FROM_ACC_ID is a foreign key
      * pointing to an ACC record. It is basically pointing to a parent data
-     * element (type) of the TO_BCCP_ID. 
-     * 
+     * element (type) of the TO_BCCP_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * ACC_ID of the current record of an ACC.
      */
@@ -123,7 +124,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * The column <code>bcc.entity_type</code>. This is a code list: 0 =
      * ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use
      * this information. This column is necessary because some of the BCCs are
-     * xsd:attribute and some are xsd:element in the OAGIS 10.x. 
+     * xsd:attribute and some are xsd:element in the OAGIS 10.x.
      */
     public final TableField<BccRecord, Integer> ENTITY_TYPE = createField(DSL.name("entity_type"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. ");
 
@@ -146,7 +147,7 @@ public class Bcc extends TableImpl<BccRecord> {
     /**
      * The column <code>bcc.created_by</code>. Foreign key to the APP_USER table
      * referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record. The
      * history record should have the same value as that of its current record.
      */
@@ -156,7 +157,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * The column <code>bcc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -164,8 +165,8 @@ public class Bcc extends TableImpl<BccRecord> {
 
     /**
      * The column <code>bcc.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -173,8 +174,8 @@ public class Bcc extends TableImpl<BccRecord> {
 
     /**
      * The column <code>bcc.creation_timestamp</code>. Timestamp when the
-     * revision of the BCC was created. 
-     * 
+     * revision of the BCC was created.
+     *
      * This never change for a revision.
      */
     public final TableField<BccRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the BCC was created. \n\nThis never change for a revision.");
@@ -182,7 +183,7 @@ public class Bcc extends TableImpl<BccRecord> {
     /**
      * The column <code>bcc.last_update_timestamp</code>. The timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -193,7 +194,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * The column <code>bcc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -216,7 +217,7 @@ public class Bcc extends TableImpl<BccRecord> {
      * The column <code>bcc.is_nillable</code>. @deprecated since 2.0.0 in favor
      * of impossibility of nillable association (element reference) in XML
      * schema.
-     * 
+     *
      * Indicate whether the field can have a NULL This is corresponding to the
      * nillable flag in the XML schema.
      */
@@ -224,7 +225,7 @@ public class Bcc extends TableImpl<BccRecord> {
 
     /**
      * The column <code>bcc.default_value</code>. This set the default value at
-     * the association level. 
+     * the association level.
      */
     public final TableField<BccRecord, String> DEFAULT_VALUE = createField(DSL.name("default_value"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "This set the default value at the association level. ");
 
@@ -252,7 +253,7 @@ public class Bcc extends TableImpl<BccRecord> {
     }
 
     private Bcc(Name alias, Table<BccRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. "), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. "), TableOptions.table(), where);
     }
 
     /**
@@ -305,7 +306,7 @@ public class Bcc extends TableImpl<BccRecord> {
 
         @Override
         public BccPath as(Table<?> alias) {
-            return new BccPath(alias.getQualifiedName(), this);
+            return new BccPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -472,7 +473,7 @@ public class Bcc extends TableImpl<BccRecord> {
 
     @Override
     public Bcc as(Table<?> alias) {
-        return new Bcc(alias.getQualifiedName(), this);
+        return new Bcc(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -153,7 +154,7 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
      * The column <code>agency_id_list_value.owner_user_id</code>. Foreign key
      * to the APP_USER table. This is the user who owns the entity, is allowed
      * to edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -197,7 +198,7 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
     }
 
     private AgencyIdListValue(Name alias, Table<AgencyIdListValueRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the values within an agency identification list."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the values within an agency identification list."), TableOptions.table(), where);
     }
 
     /**
@@ -250,7 +251,7 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
 
         @Override
         public AgencyIdListValuePath as(Table<?> alias) {
-            return new AgencyIdListValuePath(alias.getQualifiedName(), this);
+            return new AgencyIdListValuePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -420,7 +421,7 @@ public class AgencyIdListValue extends TableImpl<AgencyIdListValueRecord> {
 
     @Override
     public AgencyIdListValue as(Table<?> alias) {
-        return new AgencyIdListValue(alias.getQualifiedName(), this);
+        return new AgencyIdListValue(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -77,7 +78,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
 
     /**
      * The column <code>ctx_scheme.scheme_id</code>. External identification of
-     * the scheme. 
+     * the scheme.
      */
     public final TableField<CtxSchemeRecord, String> SCHEME_ID = createField(DSL.name("scheme_id"), SQLDataType.VARCHAR(45).nullable(false), this, "External identification of the scheme. ");
 
@@ -150,7 +151,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
     }
 
     private CtxScheme(Name alias, Table<CtxSchemeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents a context scheme (a classification scheme) for a context category."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table represents a context scheme (a classification scheme) for a context category."), TableOptions.table(), where);
     }
 
     /**
@@ -203,7 +204,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
 
         @Override
         public CtxSchemePath as(Table<?> alias) {
-            return new CtxSchemePath(alias.getQualifiedName(), this);
+            return new CtxSchemePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -307,7 +308,7 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
 
     @Override
     public CtxScheme as(Table<?> alias) {
-        return new CtxScheme(alias.getQualifiedName(), this);
+        return new CtxScheme(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -128,7 +129,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
     }
 
     private BieViewOrder(Name alias, Table<BieViewOrderRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Instance-level, release-decoupled sibling sort weights for model browsing and BIE editing (Issue #1638). NOT used for generated output."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Instance-level, release-decoupled sibling sort weights for model browsing and BIE editing (Issue #1638). NOT used for generated output."), TableOptions.table(), where);
     }
 
     /**
@@ -181,7 +182,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
 
         @Override
         public BieViewOrderPath as(Table<?> alias) {
-            return new BieViewOrderPath(alias.getQualifiedName(), this);
+            return new BieViewOrderPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -289,7 +290,7 @@ public class BieViewOrder extends TableImpl<BieViewOrderRecord> {
 
     @Override
     public BieViewOrder as(Table<?> alias) {
-        return new BieViewOrder(alias.getQualifiedName(), this);
+        return new BieViewOrder(alias.getUnqualifiedName(), this);
     }
 
     /**

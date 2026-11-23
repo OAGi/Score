@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -90,7 +91,7 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
     }
 
     private AccManifestTag(Name alias, Table<AccManifestTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is a many-to-many join table that assigns TAG rows to ACC_MANIFEST rows, associating tags with a release-specific ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is a many-to-many join table that assigns TAG rows to ACC_MANIFEST rows, associating tags with a release-specific ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -143,7 +144,7 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
 
         @Override
         public AccManifestTagPath as(Table<?> alias) {
-            return new AccManifestTagPath(alias.getQualifiedName(), this);
+            return new AccManifestTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -210,7 +211,7 @@ public class AccManifestTag extends TableImpl<AccManifestTagRecord> {
 
     @Override
     public AccManifestTag as(Table<?> alias) {
-        return new AccManifestTag(alias.getQualifiedName(), this);
+        return new AccManifestTag(alias.getUnqualifiedName(), this);
     }
 
     /**

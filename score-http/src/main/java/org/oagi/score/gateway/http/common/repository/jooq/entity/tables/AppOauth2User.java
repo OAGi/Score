@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -129,7 +130,7 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
     }
 
     private AppOauth2User(Name alias, Table<AppOauth2UserRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the OpenID Connect claims (such as the sub, name, and email) of a user authenticated through an external OAuth2 provider registered in OAUTH2_APP, linking that identity to a record in APP_USER. When the APP_USER reference is not set, the record is treated as a pending one that has not yet been associated with an application user."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the OpenID Connect claims (such as the sub, name, and email) of a user authenticated through an external OAuth2 provider registered in OAUTH2_APP, linking that identity to a record in APP_USER. When the APP_USER reference is not set, the record is treated as a pending one that has not yet been associated with an application user."), TableOptions.table(), where);
     }
 
     /**
@@ -182,7 +183,7 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
 
         @Override
         public AppOauth2UserPath as(Table<?> alias) {
-            return new AppOauth2UserPath(alias.getQualifiedName(), this);
+            return new AppOauth2UserPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -247,7 +248,7 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
 
     @Override
     public AppOauth2User as(Table<?> alias) {
-        return new AppOauth2User(alias.getQualifiedName(), this);
+        return new AppOauth2User(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -117,7 +118,7 @@ public class ModuleAccManifest extends TableImpl<ModuleAccManifestRecord> {
     }
 
     private ModuleAccManifest(Name alias, Table<ModuleAccManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This intersection table assigns ACC_MANIFEST components to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which each ACC will be generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This intersection table assigns ACC_MANIFEST components to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which each ACC will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -170,7 +171,7 @@ public class ModuleAccManifest extends TableImpl<ModuleAccManifestRecord> {
 
         @Override
         public ModuleAccManifestPath as(Table<?> alias) {
-            return new ModuleAccManifestPath(alias.getQualifiedName(), this);
+            return new ModuleAccManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -268,7 +269,7 @@ public class ModuleAccManifest extends TableImpl<ModuleAccManifestRecord> {
 
     @Override
     public ModuleAccManifest as(Table<?> alias) {
-        return new ModuleAccManifest(alias.getQualifiedName(), this);
+        return new ModuleAccManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

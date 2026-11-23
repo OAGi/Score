@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -128,7 +129,7 @@ public class Comment extends TableImpl<CommentRecord> {
     }
 
     private Comment(Name alias, Table<CommentRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores user comments associated with a component, where the associated component is identified by the REFERENCE column in the form of the component type and its manifest ID (e.g., 'CODE_LIST-123'). Replies are captured through the self-referencing PREV_COMMENT_ID chain, and a comment with replies is hidden via IS_HIDDEN instead of being deleted so the reply chain is preserved, while IS_DELETED marks a comment as soft-deleted and excluded from queries rather than physically removing it."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores user comments associated with a component, where the associated component is identified by the REFERENCE column in the form of the component type and its manifest ID (e.g., 'CODE_LIST-123'). Replies are captured through the self-referencing PREV_COMMENT_ID chain, and a comment with replies is hidden via IS_HIDDEN instead of being deleted so the reply chain is preserved, while IS_DELETED marks a comment as soft-deleted and excluded from queries rather than physically removing it."), TableOptions.table(), where);
     }
 
     /**
@@ -181,7 +182,7 @@ public class Comment extends TableImpl<CommentRecord> {
 
         @Override
         public CommentPath as(Table<?> alias) {
-            return new CommentPath(alias.getQualifiedName(), this);
+            return new CommentPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -246,7 +247,7 @@ public class Comment extends TableImpl<CommentRecord> {
 
     @Override
     public Comment as(Table<?> alias) {
-        return new Comment(alias.getQualifiedName(), this);
+        return new Comment(alias.getUnqualifiedName(), this);
     }
 
     /**

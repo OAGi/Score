@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -130,7 +131,7 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
     }
 
     private CodeListValueManifest(Name alias, Table<CodeListValueManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A release-specific handle to a CODE_LIST_VALUE record, pinning a code list value of a code list to a RELEASE (and to its owning CODE_LIST_MANIFEST) and carrying the revision chain via the PREV/NEXT self-references across releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A release-specific handle to a CODE_LIST_VALUE record, pinning a code list value of a code list to a RELEASE (and to its owning CODE_LIST_MANIFEST) and carrying the revision chain via the PREV/NEXT self-references across releases."), TableOptions.table(), where);
     }
 
     /**
@@ -183,7 +184,7 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
 
         @Override
         public CodeListValueManifestPath as(Table<?> alias) {
-            return new CodeListValueManifestPath(alias.getQualifiedName(), this);
+            return new CodeListValueManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -315,7 +316,7 @@ public class CodeListValueManifest extends TableImpl<CodeListValueManifestRecord
 
     @Override
     public CodeListValueManifest as(Table<?> alias) {
-        return new CodeListValueManifest(alias.getQualifiedName(), this);
+        return new CodeListValueManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

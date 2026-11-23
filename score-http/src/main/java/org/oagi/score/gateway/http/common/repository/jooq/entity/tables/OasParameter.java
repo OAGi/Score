@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -204,7 +205,7 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
     }
 
     private OasParameter(Name alias, Table<OasParameterRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Parameter Object describing a single operation parameter, identified by its name and location (in = query, header, path, or cookie) along with its required, schema type, and serialization settings; when in = header it may reference an OAS_HTTP_HEADER."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Parameter Object describing a single operation parameter, identified by its name and location (in = query, header, path, or cookie) along with its required, schema type, and serialization settings; when in = header it may reference an OAS_HTTP_HEADER."), TableOptions.table(), where);
     }
 
     /**
@@ -257,7 +258,7 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
 
         @Override
         public OasParameterPath as(Table<?> alias) {
-            return new OasParameterPath(alias.getQualifiedName(), this);
+            return new OasParameterPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -378,7 +379,7 @@ public class OasParameter extends TableImpl<OasParameterRecord> {
 
     @Override
     public OasParameter as(Table<?> alias) {
-        return new OasParameter(alias.getQualifiedName(), this);
+        return new OasParameter(alias.getUnqualifiedName(), this);
     }
 
     /**

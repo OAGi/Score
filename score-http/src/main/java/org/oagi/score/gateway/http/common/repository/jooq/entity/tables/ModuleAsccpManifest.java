@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -118,7 +119,7 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
     }
 
     private ModuleAsccpManifest(Name alias, Table<ModuleAsccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table assigns ASCCP_MANIFEST components to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which each ASCCP will be generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table assigns ASCCP_MANIFEST components to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which each ASCCP will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -171,7 +172,7 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
 
         @Override
         public ModuleAsccpManifestPath as(Table<?> alias) {
-            return new ModuleAsccpManifestPath(alias.getQualifiedName(), this);
+            return new ModuleAsccpManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -269,7 +270,7 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
 
     @Override
     public ModuleAsccpManifest as(Table<?> alias) {
-        return new ModuleAsccpManifest(alias.getQualifiedName(), this);
+        return new ModuleAsccpManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

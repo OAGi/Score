@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -102,7 +103,7 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
     }
 
     private OasRequestParameter(Name alias, Table<OasRequestParameterRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_PARAMETER entries (an operation's query, header, path, or cookie parameters) to an OAS_REQUEST."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_PARAMETER entries (an operation's query, header, path, or cookie parameters) to an OAS_REQUEST."), TableOptions.table(), where);
     }
 
     /**
@@ -155,7 +156,7 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
 
         @Override
         public OasRequestParameterPath as(Table<?> alias) {
-            return new OasRequestParameterPath(alias.getQualifiedName(), this);
+            return new OasRequestParameterPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -236,7 +237,7 @@ public class OasRequestParameter extends TableImpl<OasRequestParameterRecord> {
 
     @Override
     public OasRequestParameter as(Table<?> alias) {
-        return new OasRequestParameter(alias.getQualifiedName(), this);
+        return new OasRequestParameter(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -26,6 +26,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -180,7 +181,7 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
     }
 
     private Oauth2App(Name alias, Table<Oauth2AppRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores OAuth 2.0 / OpenID Connect provider registrations, including client credentials, endpoint URIs, and login-button display settings, used to authenticate end users."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores OAuth 2.0 / OpenID Connect provider registrations, including client credentials, endpoint URIs, and login-button display settings, used to authenticate end users."), TableOptions.table(), where);
     }
 
     /**
@@ -233,7 +234,7 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
 
         @Override
         public Oauth2AppPath as(Table<?> alias) {
-            return new Oauth2AppPath(alias.getQualifiedName(), this);
+            return new Oauth2AppPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -290,7 +291,7 @@ public class Oauth2App extends TableImpl<Oauth2AppRecord> {
 
     @Override
     public Oauth2App as(Table<?> alias) {
-        return new Oauth2App(alias.getQualifiedName(), this);
+        return new Oauth2App(alias.getUnqualifiedName(), this);
     }
 
     /**

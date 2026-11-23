@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -102,7 +103,7 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
     }
 
     private OasDocTag(Name alias, Table<OasDocTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_TAG rows to an OAS_DOC, populating the OpenAPI document's root-level tags array."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_TAG rows to an OAS_DOC, populating the OpenAPI document's root-level tags array."), TableOptions.table(), where);
     }
 
     /**
@@ -155,7 +156,7 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
 
         @Override
         public OasDocTagPath as(Table<?> alias) {
-            return new OasDocTagPath(alias.getQualifiedName(), this);
+            return new OasDocTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -236,7 +237,7 @@ public class OasDocTag extends TableImpl<OasDocTagRecord> {
 
     @Override
     public OasDocTag as(Table<?> alias) {
-        return new OasDocTag(alias.getQualifiedName(), this);
+        return new OasDocTag(alias.getUnqualifiedName(), this);
     }
 
     /**

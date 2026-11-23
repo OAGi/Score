@@ -15,11 +15,11 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Acc;
 /**
  * The ACC table holds information about complex data structured concepts. For
  * example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.
- * 
+ *
  * Note that only Extension is supported when deriving ACC from another ACC. (So
  * if there is a restriction needed, maybe that concept should placed higher in
  * the derivation hierarchy rather than lower.)
- * 
+ *
  * In OAGIS, all XSD extensions will be treated as a qualification of an ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
@@ -149,7 +149,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
 
     /**
      * Setter for <code>acc.object_class_qualifier</code>. This column stores
-     * the qualifier of an ACC, particularly when it has a based ACC. 
+     * the qualifier of an ACC, particularly when it has a based ACC.
      */
     public void setObjectClassQualifier(String value) {
         set(7, value);
@@ -157,7 +157,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
 
     /**
      * Getter for <code>acc.object_class_qualifier</code>. This column stores
-     * the qualifier of an ACC, particularly when it has a based ACC. 
+     * the qualifier of an ACC, particularly when it has a based ACC.
      */
     public String getObjectClassQualifier() {
         return (String) get(7);
@@ -173,7 +173,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * is a wrapper ACC (a virtual ACC) for segregating user's extension
      * content. EMBEDDED is used for an ACC whose content is not explicitly
      * defined in the database, for example, the Any Structured Content ACC that
-     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS. 
+     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS.
      */
     public void setOagisComponentType(Integer value) {
         set(8, value);
@@ -189,7 +189,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * is a wrapper ACC (a virtual ACC) for segregating user's extension
      * content. EMBEDDED is used for an ACC whose content is not explicitly
      * defined in the database, for example, the Any Structured Content ACC that
-     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS. 
+     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS.
      */
     public Integer getOagisComponentType() {
         return (Integer) get(8);
@@ -240,7 +240,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
         set(11, value);
@@ -251,7 +251,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(11);
@@ -317,7 +317,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * Setter for <code>acc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ACC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -329,7 +329,7 @@ public class AccRecord extends UpdatableRecordImpl<AccRecord> {
      * Getter for <code>acc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ACC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */

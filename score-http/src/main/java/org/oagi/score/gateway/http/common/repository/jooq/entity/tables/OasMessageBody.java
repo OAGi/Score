@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -108,7 +109,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
     }
 
     private OasMessageBody(Name alias, Table<OasMessageBodyRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The OAS_MESSAGE_BODY table holds an OpenAPI message body whose schema is defined by the referenced TOP_LEVEL_ASBIEP. The OAS_REQUEST and OAS_RESPONSE tables both reference this table to bind that BIE as the content of an operation's request or response body."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The OAS_MESSAGE_BODY table holds an OpenAPI message body whose schema is defined by the referenced TOP_LEVEL_ASBIEP. The OAS_REQUEST and OAS_RESPONSE tables both reference this table to bind that BIE as the content of an operation's request or response body."), TableOptions.table(), where);
     }
 
     /**
@@ -161,7 +162,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
         @Override
         public OasMessageBodyPath as(Table<?> alias) {
-            return new OasMessageBodyPath(alias.getQualifiedName(), this);
+            return new OasMessageBodyPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -264,7 +265,7 @@ public class OasMessageBody extends TableImpl<OasMessageBodyRecord> {
 
     @Override
     public OasMessageBody as(Table<?> alias) {
-        return new OasMessageBody(alias.getQualifiedName(), this);
+        return new OasMessageBody(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -31,6 +31,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -167,7 +168,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
 
     /**
      * The column <code>asbie.last_updated_by</code>. A foreign key referring to
-     * the user who has last updated the ASBIE record. 
+     * the user who has last updated the ASBIE record.
      */
     public final TableField<AsbieRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the user who has last updated the ASBIE record. ");
 
@@ -219,7 +220,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
     }
 
     private Asbie(Name alias, Table<AsbieRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is a contextualization of an ASCC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is a contextualization of an ASCC."), TableOptions.table(), where);
     }
 
     /**
@@ -272,7 +273,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
 
         @Override
         public AsbiePath as(Table<?> alias) {
-            return new AsbiePath(alias.getQualifiedName(), this);
+            return new AsbiePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -413,7 +414,7 @@ public class Asbie extends TableImpl<AsbieRecord> {
 
     @Override
     public Asbie as(Table<?> alias) {
-        return new Asbie(alias.getQualifiedName(), this);
+        return new Asbie(alias.getUnqualifiedName(), this);
     }
 
     /**

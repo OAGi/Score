@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -50,7 +51,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
  * Because there is no single table that is a contextualized counterpart of the
  * DT table (which stores both CDT and BDT), The context specific constraints
  * associated with the DT are stored in the BBIE table, while this table stores
- * the constraints associated with the DT's SCs. 
+ * the constraints associated with the DT's SCs.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieSc extends TableImpl<BbieScRecord> {
@@ -112,11 +113,11 @@ public class BbieSc extends TableImpl<BbieScRecord> {
      * The column <code>bbie_sc.xbt_manifest_id</code>. This must be one of the
      * allowed primitive as specified in the corresponding SC of the based BCC
      * of the BBIE (referred to by the BBIE_ID column).
-     * 
+     *
      * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
      * user who authors the BIE. The assignment would override the default from
      * the CC side.
-     * 
+     *
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
@@ -131,7 +132,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
      * DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is
      * typically used when the user wants to assign another code list different
      * from the one permissible by the CC model.
-     * 
+     *
      * This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID
      * column cannot have a value at the same time.
      */
@@ -146,7 +147,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
      * to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this
      * column is typically used only when the user wants to assign another
      * Agency ID list different from the one permissible by the CC model.
-     * 
+     *
      * This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column
      * cannot have a value at the same time.
      */
@@ -214,7 +215,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
      * specify a very context-specific usage of the BBIE SC. It is different
      * from the Definition column in that the Definition column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
-     * implementation specific instruction or others. 
+     * implementation specific instruction or others.
      */
     public final TableField<BbieScRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(225).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column allows the user to specify a very context-specific usage of the BBIE SC. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. ");
 
@@ -280,7 +281,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
     }
 
     private BbieSc(Name alias, Table<BbieScRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT's SCs. "), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT's SCs. "), TableOptions.table(), where);
     }
 
     /**
@@ -333,7 +334,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
 
         @Override
         public BbieScPath as(Table<?> alias) {
-            return new BbieScPath(alias.getQualifiedName(), this);
+            return new BbieScPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -473,7 +474,7 @@ public class BbieSc extends TableImpl<BbieScRecord> {
 
     @Override
     public BbieSc as(Table<?> alias) {
-        return new BbieSc(alias.getQualifiedName(), this);
+        return new BbieSc(alias.getUnqualifiedName(), this);
     }
 
     /**

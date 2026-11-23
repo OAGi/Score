@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -128,8 +129,8 @@ public class Module extends TableImpl<ModuleRecord> {
 
     /**
      * The column <code>module.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
-     * 
+     * APP_USER table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -158,7 +159,7 @@ public class Module extends TableImpl<ModuleRecord> {
     }
 
     private Module(Name alias, Table<ModuleRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The module table stores information about a physical file, into which CC components will be generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The module table stores information about a physical file, into which CC components will be generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -211,7 +212,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
         @Override
         public ModulePath as(Table<?> alias) {
-            return new ModulePath(alias.getQualifiedName(), this);
+            return new ModulePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -426,7 +427,7 @@ public class Module extends TableImpl<ModuleRecord> {
 
     @Override
     public Module as(Table<?> alias) {
-        return new Module(alias.getQualifiedName(), this);
+        return new Module(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -53,7 +53,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Setter for <code>dt.data_type_term</code>. This is the data type term
      * assigned to the DT. The allowed set of data type terms are defined in the
      * DTC specification. This column is derived from the Based_DT_ID when the
-     * column is not blank. 
+     * column is not blank.
      */
     public void setDataTypeTerm(String value) {
         set(2, value);
@@ -63,7 +63,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Getter for <code>dt.data_type_term</code>. This is the data type term
      * assigned to the DT. The allowed set of data type terms are defined in the
      * DTC specification. This column is derived from the Based_DT_ID when the
-     * column is not blank. 
+     * column is not blank.
      */
     public String getDataTypeTerm() {
         return (String) get(2);
@@ -80,7 +80,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Unqualified BDT is a BDT that OAGIS model schema generally used for its
      * canonical. A handful of default BDTs were selected; and each of them is
      * wrapped with another type definition that has a simpler name such as
-     * CodeType and NormalizedString type - we call these "unqualified BDTs". 
+     * CodeType and NormalizedString type - we call these "unqualified BDTs".
      */
     public void setQualifier_(String value) {
         set(3, value);
@@ -97,7 +97,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Unqualified BDT is a BDT that OAGIS model schema generally used for its
      * canonical. A handful of default BDTs were selected; and each of them is
      * wrapped with another type definition that has a simpler name such as
-     * CodeType and NormalizedString type - we call these "unqualified BDTs". 
+     * CodeType and NormalizedString type - we call these "unqualified BDTs".
      */
     public String getQualifier_() {
         return (String) get(3);
@@ -223,7 +223,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Setter for <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the DT.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -235,7 +235,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * Getter for <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the DT.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -277,8 +277,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
 
     /**
      * Setter for <code>dt.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who updated the record. 
-     * 
+     * table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -288,8 +288,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
 
     /**
      * Getter for <code>dt.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who updated the record. 
-     * 
+     * table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -302,7 +302,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public void setOwnerUserId(ULong value) {
         set(15, value);
@@ -313,7 +313,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public ULong getOwnerUserId() {
         return (ULong) get(15);
@@ -321,8 +321,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
 
     /**
      * Setter for <code>dt.creation_timestamp</code>. Timestamp when the
-     * revision of the DT was created. 
-     * 
+     * revision of the DT was created.
+     *
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -331,8 +331,8 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
 
     /**
      * Getter for <code>dt.creation_timestamp</code>. Timestamp when the
-     * revision of the DT was created. 
-     * 
+     * revision of the DT was created.
+     *
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -342,7 +342,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     /**
      * Setter for <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -354,7 +354,7 @@ public class DtRecord extends UpdatableRecordImpl<DtRecord> {
     /**
      * Getter for <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.

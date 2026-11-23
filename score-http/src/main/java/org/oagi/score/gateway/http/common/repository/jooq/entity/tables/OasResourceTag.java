@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -102,7 +103,7 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
     }
 
     private OasResourceTag(Name alias, Table<OasResourceTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_TAG entries to an OAS_OPERATION, representing the tags list of an OpenAPI Operation Object that groups the operation under those tags."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A many-to-many join assigning OAS_TAG entries to an OAS_OPERATION, representing the tags list of an OpenAPI Operation Object that groups the operation under those tags."), TableOptions.table(), where);
     }
 
     /**
@@ -155,7 +156,7 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
 
         @Override
         public OasResourceTagPath as(Table<?> alias) {
-            return new OasResourceTagPath(alias.getQualifiedName(), this);
+            return new OasResourceTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -210,7 +211,7 @@ public class OasResourceTag extends TableImpl<OasResourceTagRecord> {
 
     @Override
     public OasResourceTag as(Table<?> alias) {
-        return new OasResourceTag(alias.getQualifiedName(), this);
+        return new OasResourceTag(alias.getUnqualifiedName(), this);
     }
 
     /**

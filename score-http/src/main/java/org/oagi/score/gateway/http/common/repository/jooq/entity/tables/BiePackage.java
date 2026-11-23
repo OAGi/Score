@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -194,7 +195,7 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
     }
 
     private BiePackage(Name alias, Table<BiePackageRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The BIE_PACKAGE table stores information about a BIE package, which groups a set of top-level BIEs (TOP_LEVEL_ASBIEP records, associated through the BIE_PACKAGE_TOP_LEVEL_ASBIEP table) released together under a common package version within a LIBRARY. It carries the revision life cycle state and a chain to the previous version of the package, and may reference a source BIE_PACKAGE from which it was created by a Copy or Uplift action."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The BIE_PACKAGE table stores information about a BIE package, which groups a set of top-level BIEs (TOP_LEVEL_ASBIEP records, associated through the BIE_PACKAGE_TOP_LEVEL_ASBIEP table) released together under a common package version within a LIBRARY. It carries the revision life cycle state and a chain to the previous version of the package, and may reference a source BIE_PACKAGE from which it was created by a Copy or Uplift action."), TableOptions.table(), where);
     }
 
     /**
@@ -247,7 +248,7 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
 
         @Override
         public BiePackagePath as(Table<?> alias) {
-            return new BiePackagePath(alias.getQualifiedName(), this);
+            return new BiePackagePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -386,7 +387,7 @@ public class BiePackage extends TableImpl<BiePackageRecord> {
 
     @Override
     public BiePackage as(Table<?> alias) {
-        return new BiePackage(alias.getQualifiedName(), this);
+        return new BiePackage(alias.getUnqualifiedName(), this);
     }
 
     /**

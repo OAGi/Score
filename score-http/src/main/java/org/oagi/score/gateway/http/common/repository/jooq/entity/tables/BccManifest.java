@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -147,7 +148,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
     }
 
     private BccManifest(Name alias, Table<BccManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("BCC_MANIFEST is a release-specific handle to a BCC, which represents a relationship/association between an ACC and a BCCP that creates a data element for an ACC. It pins the BCC to a RELEASE (linking the FROM_ACC_MANIFEST and TO_BCCP_MANIFEST ends within that release) and carries the revision chain to the corresponding records in the previous and next releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("BCC_MANIFEST is a release-specific handle to a BCC, which represents a relationship/association between an ACC and a BCCP that creates a data element for an ACC. It pins the BCC to a RELEASE (linking the FROM_ACC_MANIFEST and TO_BCCP_MANIFEST ends within that release) and carries the revision chain to the corresponding records in the previous and next releases."), TableOptions.table(), where);
     }
 
     /**
@@ -200,7 +201,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
 
         @Override
         public BccManifestPath as(Table<?> alias) {
-            return new BccManifestPath(alias.getQualifiedName(), this);
+            return new BccManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -360,7 +361,7 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
 
     @Override
     public BccManifest as(Table<?> alias) {
-        return new BccManifest(alias.getQualifiedName(), this);
+        return new BccManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

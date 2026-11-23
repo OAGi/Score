@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -114,7 +115,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
     }
 
     private BieUsageRule(Name alias, Table<BieUsageRuleRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID."), TableOptions.table(), where);
     }
 
     /**
@@ -167,7 +168,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
 
         @Override
         public BieUsageRulePath as(Table<?> alias) {
-            return new BieUsageRulePath(alias.getQualifiedName(), this);
+            return new BieUsageRulePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -275,7 +276,7 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
 
     @Override
     public BieUsageRule as(Table<?> alias) {
-        return new BieUsageRule(alias.getQualifiedName(), this);
+        return new BieUsageRule(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -109,7 +110,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
     }
 
     private OasExternalDoc(Name alias, Table<OasExternalDocRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Allows referencing an external resource for extended documentation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Allows referencing an external resource for extended documentation."), TableOptions.table(), where);
     }
 
     /**
@@ -162,7 +163,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
 
         @Override
         public OasExternalDocPath as(Table<?> alias) {
-            return new OasExternalDocPath(alias.getQualifiedName(), this);
+            return new OasExternalDocPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -244,7 +245,7 @@ public class OasExternalDoc extends TableImpl<OasExternalDocRecord> {
 
     @Override
     public OasExternalDoc as(Table<?> alias) {
-        return new OasExternalDoc(alias.getQualifiedName(), this);
+        return new OasExternalDoc(alias.getUnqualifiedName(), this);
     }
 
     /**

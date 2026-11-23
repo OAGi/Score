@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -81,7 +82,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
     }
 
     private TenantBusinessCtx(Name alias, Table<TenantBusinessCtxRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the tenant role and theirs business contexts."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the tenant role and theirs business contexts."), TableOptions.table(), where);
     }
 
     /**
@@ -134,7 +135,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
         @Override
         public TenantBusinessCtxPath as(Table<?> alias) {
-            return new TenantBusinessCtxPath(alias.getQualifiedName(), this);
+            return new TenantBusinessCtxPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -199,7 +200,7 @@ public class TenantBusinessCtx extends TableImpl<TenantBusinessCtxRecord> {
 
     @Override
     public TenantBusinessCtx as(Table<?> alias) {
-        return new TenantBusinessCtx(alias.getQualifiedName(), this);
+        return new TenantBusinessCtx(alias.getUnqualifiedName(), this);
     }
 
     /**

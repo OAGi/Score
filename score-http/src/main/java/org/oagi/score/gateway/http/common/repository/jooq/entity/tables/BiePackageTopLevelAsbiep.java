@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -111,7 +112,7 @@ public class BiePackageTopLevelAsbiep extends TableImpl<BiePackageTopLevelAsbiep
     }
 
     private BiePackageTopLevelAsbiep(Name alias, Table<BiePackageTopLevelAsbiepRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table that assigns TOP_LEVEL_ASBIEP records to a BIE_PACKAGE, capturing the top-level BIEs that make up the package. The referenced TOP_LEVEL_ASBIEP must belong to the same RELEASE as the BIE_PACKAGE, and the PREV_TOP_LEVEL_ASBIEP_ID column tracks the previous version of the Top-Level ASBIEP within the package."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table that assigns TOP_LEVEL_ASBIEP records to a BIE_PACKAGE, capturing the top-level BIEs that make up the package. The referenced TOP_LEVEL_ASBIEP must belong to the same RELEASE as the BIE_PACKAGE, and the PREV_TOP_LEVEL_ASBIEP_ID column tracks the previous version of the Top-Level ASBIEP within the package."), TableOptions.table(), where);
     }
 
     /**
@@ -166,7 +167,7 @@ public class BiePackageTopLevelAsbiep extends TableImpl<BiePackageTopLevelAsbiep
 
         @Override
         public BiePackageTopLevelAsbiepPath as(Table<?> alias) {
-            return new BiePackageTopLevelAsbiepPath(alias.getQualifiedName(), this);
+            return new BiePackageTopLevelAsbiepPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -248,7 +249,7 @@ public class BiePackageTopLevelAsbiep extends TableImpl<BiePackageTopLevelAsbiep
 
     @Override
     public BiePackageTopLevelAsbiep as(Table<?> alias) {
-        return new BiePackageTopLevelAsbiep(alias.getQualifiedName(), this);
+        return new BiePackageTopLevelAsbiep(alias.getUnqualifiedName(), this);
     }
 
     /**

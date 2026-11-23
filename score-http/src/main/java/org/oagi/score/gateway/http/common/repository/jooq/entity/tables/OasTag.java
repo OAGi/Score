@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -116,7 +117,7 @@ public class OasTag extends TableImpl<OasTagRecord> {
     }
 
     private OasTag(Name alias, Table<OasTagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Tag Object; adds metadata to a single tag (a name and an optional description) that is used to group the Operation Objects of an OpenAPI document."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Tag Object; adds metadata to a single tag (a name and an optional description) that is used to group the Operation Objects of an OpenAPI document."), TableOptions.table(), where);
     }
 
     /**
@@ -169,7 +170,7 @@ public class OasTag extends TableImpl<OasTagRecord> {
 
         @Override
         public OasTagPath as(Table<?> alias) {
-            return new OasTagPath(alias.getQualifiedName(), this);
+            return new OasTagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -271,7 +272,7 @@ public class OasTag extends TableImpl<OasTagRecord> {
 
     @Override
     public OasTag as(Table<?> alias) {
-        return new OasTag(alias.getQualifiedName(), this);
+        return new OasTag(alias.getUnqualifiedName(), this);
     }
 
     /**

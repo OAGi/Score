@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -137,7 +138,7 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
     }
 
     private AgencyIdListValueManifest(Name alias, Table<AgencyIdListValueManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("A release-specific handle to an AGENCY_ID_LIST_VALUE record, pinning a value within an agency identification list to a RELEASE and to its owning AGENCY_ID_LIST_MANIFEST. It carries the revision chain, referencing the corresponding AGENCY_ID_LIST_VALUE_MANIFEST records in the previous and next releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("A release-specific handle to an AGENCY_ID_LIST_VALUE record, pinning a value within an agency identification list to a RELEASE and to its owning AGENCY_ID_LIST_MANIFEST. It carries the revision chain, referencing the corresponding AGENCY_ID_LIST_VALUE_MANIFEST records in the previous and next releases."), TableOptions.table(), where);
     }
 
     /**
@@ -192,7 +193,7 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
 
         @Override
         public AgencyIdListValueManifestPath as(Table<?> alias) {
-            return new AgencyIdListValueManifestPath(alias.getQualifiedName(), this);
+            return new AgencyIdListValueManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -339,7 +340,7 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
 
     @Override
     public AgencyIdListValueManifest as(Table<?> alias) {
-        return new AgencyIdListValueManifest(alias.getQualifiedName(), this);
+        return new AgencyIdListValueManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -165,7 +166,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
     }
 
     private OasResponse(Name alias, Table<OasResponseRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Response Object owned by an OAS_OPERATION; one entry of the operation's responses map keyed by HTTP status code, binding the response body to an OAS_MESSAGE_BODY (which references a BIE) with optional meta-header and pagination TOP_LEVEL_ASBIEP references."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Response Object owned by an OAS_OPERATION; one entry of the operation's responses map keyed by HTTP status code, binding the response body to an OAS_MESSAGE_BODY (which references a BIE) with optional meta-header and pagination TOP_LEVEL_ASBIEP references."), TableOptions.table(), where);
     }
 
     /**
@@ -218,7 +219,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
 
         @Override
         public OasResponsePath as(Table<?> alias) {
-            return new OasResponsePath(alias.getQualifiedName(), this);
+            return new OasResponsePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -364,7 +365,7 @@ public class OasResponse extends TableImpl<OasResponseRecord> {
 
     @Override
     public OasResponse as(Table<?> alias) {
-        return new OasResponse(alias.getQualifiedName(), this);
+        return new OasResponse(alias.getUnqualifiedName(), this);
     }
 
     /**

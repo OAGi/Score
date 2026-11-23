@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -119,7 +120,7 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
     }
 
     private ModuleCodeListManifest(Name alias, Table<ModuleCodeListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table assigns a CODE_LIST_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the code list is generated during the expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table assigns a CODE_LIST_MANIFEST to a MODULE within a MODULE_SET_RELEASE, indicating the physical file into which the code list is generated during the expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -172,7 +173,7 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
 
         @Override
         public ModuleCodeListManifestPath as(Table<?> alias) {
-            return new ModuleCodeListManifestPath(alias.getQualifiedName(), this);
+            return new ModuleCodeListManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -270,7 +271,7 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
 
     @Override
     public ModuleCodeListManifest as(Table<?> alias) {
-        return new ModuleCodeListManifest(alias.getQualifiedName(), this);
+        return new ModuleCodeListManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

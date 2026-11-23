@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Log;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ModuleBlobContentManifest;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.OasMessageBody;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.RecordChangeLog;
+import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.ReleasePackageLoadJob;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.SeqKey;
 import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Xbt;
 
@@ -87,6 +88,7 @@ public class Indexes {
     public static final Index RECORD_CHANGE_LOG_RECORD_CHANGE_LOG_CREATION_TIMESTAMP_IDX = Internal.createIndex(DSL.name("record_change_log_creation_timestamp_idx"), RecordChangeLog.RECORD_CHANGE_LOG, new OrderField[] { RecordChangeLog.RECORD_CHANGE_LOG.CREATION_TIMESTAMP }, false);
     public static final Index COMMENT_REFERENCE = Internal.createIndex(DSL.name("reference"), Comment.COMMENT, new OrderField[] { Comment.COMMENT.REFERENCE }, false);
     public static final Index LOG_REFERENCE = Internal.createIndex(DSL.name("reference"), Log.LOG, new OrderField[] { Log.LOG.REFERENCE }, false);
+    public static final Index RELEASE_PACKAGE_LOAD_JOB_RELEASE_PACKAGE_LOAD_JOB_STATE_IDX = Internal.createIndex(DSL.name("release_package_load_job_state_idx"), ReleasePackageLoadJob.RELEASE_PACKAGE_LOAD_JOB, new OrderField[] { ReleasePackageLoadJob.RELEASE_PACKAGE_LOAD_JOB.STATE, ReleasePackageLoadJob.RELEASE_PACKAGE_LOAD_JOB.LAST_UPDATE_TIMESTAMP }, false);
     public static final Index SEQ_KEY_SEQ_KEY_ASCC_MANIFEST_ID = Internal.createIndex(DSL.name("seq_key_ascc_manifest_id"), SeqKey.SEQ_KEY, new OrderField[] { SeqKey.SEQ_KEY.ASCC_MANIFEST_ID }, false);
     public static final Index SEQ_KEY_SEQ_KEY_BCC_MANIFEST_ID = Internal.createIndex(DSL.name("seq_key_bcc_manifest_id"), SeqKey.SEQ_KEY, new OrderField[] { SeqKey.SEQ_KEY.BCC_MANIFEST_ID }, false);
     public static final Index SEQ_KEY_SEQ_KEY_FROM_ACC_MANIFEST_ID = Internal.createIndex(DSL.name("seq_key_from_acc_manifest_id"), SeqKey.SEQ_KEY, new OrderField[] { SeqKey.SEQ_KEY.FROM_ACC_MANIFEST_ID }, false);

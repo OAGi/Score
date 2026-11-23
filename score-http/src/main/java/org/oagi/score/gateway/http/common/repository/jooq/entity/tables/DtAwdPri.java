@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -123,7 +124,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
     }
 
     private DtAwdPri(Name alias, Table<DtAwdPriRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the allowed primitives for a DT. The allowed primitives are captured by three columns the XBT_MANIFEST_ID, CODE_LIST_MANIFEST_ID, and AGENCY_ID_LIST_MANIFEST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the allowed primitives for a DT. The allowed primitives are captured by three columns the XBT_MANIFEST_ID, CODE_LIST_MANIFEST_ID, and AGENCY_ID_LIST_MANIFEST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record."), TableOptions.table(), where);
     }
 
     /**
@@ -176,7 +177,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
 
         @Override
         public DtAwdPriPath as(Table<?> alias) {
-            return new DtAwdPriPath(alias.getQualifiedName(), this);
+            return new DtAwdPriPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -290,7 +291,7 @@ public class DtAwdPri extends TableImpl<DtAwdPriRecord> {
 
     @Override
     public DtAwdPri as(Table<?> alias) {
-        return new DtAwdPri(alias.getQualifiedName(), this);
+        return new DtAwdPri(alias.getUnqualifiedName(), this);
     }
 
     /**

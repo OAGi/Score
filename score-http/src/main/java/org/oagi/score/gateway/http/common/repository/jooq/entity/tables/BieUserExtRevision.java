@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -99,7 +100,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
      * column points to the specific revision of a User Extension ACC (this is
      * an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as
      * indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of
-     * the AllExtension). 
+     * the AllExtension).
      */
     public final TableField<BieUserExtRevisionRecord, ULong> USER_EXT_ACC_ID = createField(DSL.name("user_ext_acc_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "This column points to the specific revision of a User Extension ACC (this is an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of the AllExtension). ");
 
@@ -124,7 +125,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
     }
 
     private BieUserExtRevision(Name alias, Table<BieUserExtRevisionRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -177,7 +178,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
         @Override
         public BieUserExtRevisionPath as(Table<?> alias) {
-            return new BieUserExtRevisionPath(alias.getQualifiedName(), this);
+            return new BieUserExtRevisionPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -263,7 +264,7 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
     @Override
     public BieUserExtRevision as(Table<?> alias) {
-        return new BieUserExtRevision(alias.getQualifiedName(), this);
+        return new BieUserExtRevision(alias.getUnqualifiedName(), this);
     }
 
     /**

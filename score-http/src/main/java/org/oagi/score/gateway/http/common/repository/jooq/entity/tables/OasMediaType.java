@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -114,7 +115,7 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
     }
 
     private OasMediaType(Name alias, Table<OasMediaTypeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Media Type Object, which represents a media type (such as application/json) used within the content of a request body or response in an OpenAPI document."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Media Type Object, which represents a media type (such as application/json) used within the content of a request body or response in an OpenAPI document."), TableOptions.table(), where);
     }
 
     /**
@@ -167,7 +168,7 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
 
         @Override
         public OasMediaTypePath as(Table<?> alias) {
-            return new OasMediaTypePath(alias.getQualifiedName(), this);
+            return new OasMediaTypePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -242,7 +243,7 @@ public class OasMediaType extends TableImpl<OasMediaTypeRecord> {
 
     @Override
     public OasMediaType as(Table<?> alias) {
-        return new OasMediaType(alias.getQualifiedName(), this);
+        return new OasMediaType(alias.getUnqualifiedName(), this);
     }
 
     /**

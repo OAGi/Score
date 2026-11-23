@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -111,7 +112,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
     }
 
     private AsccBizterm(Name alias, Table<AsccBiztermRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The ascc_bizterm table stores information about the aggregation between the business term and ASCC. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The ascc_bizterm table stores information about the aggregation between the business term and ASCC. TODO: Placeholder, definition is missing."), TableOptions.table(), where);
     }
 
     /**
@@ -164,7 +165,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
 
         @Override
         public AsccBiztermPath as(Table<?> alias) {
-            return new AsccBiztermPath(alias.getQualifiedName(), this);
+            return new AsccBiztermPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -237,7 +238,7 @@ public class AsccBizterm extends TableImpl<AsccBiztermRecord> {
 
     @Override
     public AsccBizterm as(Table<?> alias) {
-        return new AsccBizterm(alias.getQualifiedName(), this);
+        return new AsccBizterm(alias.getUnqualifiedName(), this);
     }
 
     /**

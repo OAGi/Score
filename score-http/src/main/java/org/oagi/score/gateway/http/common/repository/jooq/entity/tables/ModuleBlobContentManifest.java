@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -124,7 +125,7 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
     }
 
     private ModuleBlobContentManifest(Name alias, Table<ModuleBlobContentManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table assigns BLOB_CONTENT_MANIFEST records to a MODULE within a MODULE_SET_RELEASE, associating each imported whole-schema blob with the physical file into which it is emitted during schema generation and export."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table assigns BLOB_CONTENT_MANIFEST records to a MODULE within a MODULE_SET_RELEASE, associating each imported whole-schema blob with the physical file into which it is emitted during schema generation and export."), TableOptions.table(), where);
     }
 
     /**
@@ -179,7 +180,7 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
 
         @Override
         public ModuleBlobContentManifestPath as(Table<?> alias) {
-            return new ModuleBlobContentManifestPath(alias.getQualifiedName(), this);
+            return new ModuleBlobContentManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -283,7 +284,7 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
 
     @Override
     public ModuleBlobContentManifest as(Table<?> alias) {
-        return new ModuleBlobContentManifest(alias.getQualifiedName(), this);
+        return new ModuleBlobContentManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

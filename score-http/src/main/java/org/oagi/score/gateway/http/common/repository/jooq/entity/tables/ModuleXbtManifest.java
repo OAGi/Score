@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -117,7 +118,7 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
     }
 
     private ModuleXbtManifest(Name alias, Table<ModuleXbtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table assigns XBT_MANIFEST components (the XML Schema and OAGIS built-in types) to a MODULE within a MODULE_SET_RELEASE, so that they are generated into the appropriate physical schema file during expression generation."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table assigns XBT_MANIFEST components (the XML Schema and OAGIS built-in types) to a MODULE within a MODULE_SET_RELEASE, so that they are generated into the appropriate physical schema file during expression generation."), TableOptions.table(), where);
     }
 
     /**
@@ -170,7 +171,7 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
 
         @Override
         public ModuleXbtManifestPath as(Table<?> alias) {
-            return new ModuleXbtManifestPath(alias.getQualifiedName(), this);
+            return new ModuleXbtManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -268,7 +269,7 @@ public class ModuleXbtManifest extends TableImpl<ModuleXbtManifestRecord> {
 
     @Override
     public ModuleXbtManifest as(Table<?> alias) {
-        return new ModuleXbtManifest(alias.getQualifiedName(), this);
+        return new ModuleXbtManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

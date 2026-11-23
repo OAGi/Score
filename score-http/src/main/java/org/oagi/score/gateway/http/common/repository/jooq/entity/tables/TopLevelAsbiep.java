@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -99,7 +100,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
      * The column <code>top_level_asbiep.owner_user_id</code>. Foreign key to
      * the APP_USER table. This is the user who owns the entity, is allowed to
      * edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -198,7 +199,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
     }
 
     private TopLevelAsbiep(Name alias, Table<TopLevelAsbiepRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table indexes the ASBIEP which is a top-level ASBIEP. This table and the owner_top_level_asbiep_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table indexes the ASBIEP which is a top-level ASBIEP. This table and the owner_top_level_asbiep_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions."), TableOptions.table(), where);
     }
 
     /**
@@ -251,7 +252,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
 
         @Override
         public TopLevelAsbiepPath as(Table<?> alias) {
-            return new TopLevelAsbiepPath(alias.getQualifiedName(), this);
+            return new TopLevelAsbiepPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -558,7 +559,7 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
 
     @Override
     public TopLevelAsbiep as(Table<?> alias) {
-        return new TopLevelAsbiep(alias.getQualifiedName(), this);
+        return new TopLevelAsbiep(alias.getUnqualifiedName(), this);
     }
 
     /**

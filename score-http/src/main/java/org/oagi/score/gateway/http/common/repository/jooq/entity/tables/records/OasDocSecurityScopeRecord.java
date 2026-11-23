@@ -71,7 +71,8 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     /**
      * Setter for <code>oas_doc_security_scope.scope_name</code>. A scope name
      * required by this entry (oauth2: from the scheme's flows; openIdConnect:
-     * from the provider).
+     * from the provider). Case-sensitive. An OAuth 2.0 scope token: printable
+     * ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).
      */
     public void setScopeName(String value) {
         set(3, value);
@@ -80,7 +81,8 @@ public class OasDocSecurityScopeRecord extends UpdatableRecordImpl<OasDocSecurit
     /**
      * Getter for <code>oas_doc_security_scope.scope_name</code>. A scope name
      * required by this entry (oauth2: from the scheme's flows; openIdConnect:
-     * from the provider).
+     * from the provider). Case-sensitive. An OAuth 2.0 scope token: printable
+     * ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).
      */
     public String getScopeName() {
         return (String) get(3);

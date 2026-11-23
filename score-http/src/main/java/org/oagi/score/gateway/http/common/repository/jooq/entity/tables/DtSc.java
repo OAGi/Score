@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -48,7 +49,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
  * This table represents the supplementary component (SC) of a DT. Revision is
  * not tracked at the supplementary component. It is considered intrinsic part
  * of the DT. In other words, when a new revision of a DT is created a new set
- * of supplementary components is created along with it. 
+ * of supplementary components is created along with it.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtSc extends TableImpl<DtScRecord> {
@@ -172,7 +173,7 @@ public class DtSc extends TableImpl<DtScRecord> {
      * The column <code>dt_sc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -214,7 +215,7 @@ public class DtSc extends TableImpl<DtScRecord> {
     }
 
     private DtSc(Name alias, Table<DtScRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. "), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. "), TableOptions.table(), where);
     }
 
     /**
@@ -267,7 +268,7 @@ public class DtSc extends TableImpl<DtScRecord> {
 
         @Override
         public DtScPath as(Table<?> alias) {
-            return new DtScPath(alias.getQualifiedName(), this);
+            return new DtScPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -450,7 +451,7 @@ public class DtSc extends TableImpl<DtScRecord> {
 
     @Override
     public DtSc as(Table<?> alias) {
-        return new DtSc(alias.getQualifiedName(), this);
+        return new DtSc(alias.getUnqualifiedName(), this);
     }
 
     /**

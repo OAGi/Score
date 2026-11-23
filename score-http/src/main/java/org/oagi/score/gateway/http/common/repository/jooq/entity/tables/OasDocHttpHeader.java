@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -127,7 +128,7 @@ public class OasDocHttpHeader extends TableImpl<OasDocHttpHeaderRecord> {
     }
 
     private OasDocHttpHeader(Name alias, Table<OasDocHttpHeaderRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Binds an HTTP header of an OpenAPI document to the document, or to one of its operations: as a request parameter (OAS_PARAMETER) or as a header of every response (OAS_HTTP_HEADER)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Binds an HTTP header of an OpenAPI document to the document, or to one of its operations: as a request parameter (OAS_PARAMETER) or as a header of every response (OAS_HTTP_HEADER)."), TableOptions.table(), where);
     }
 
     /**
@@ -180,7 +181,7 @@ public class OasDocHttpHeader extends TableImpl<OasDocHttpHeaderRecord> {
 
         @Override
         public OasDocHttpHeaderPath as(Table<?> alias) {
-            return new OasDocHttpHeaderPath(alias.getQualifiedName(), this);
+            return new OasDocHttpHeaderPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -290,7 +291,7 @@ public class OasDocHttpHeader extends TableImpl<OasDocHttpHeaderRecord> {
 
     @Override
     public OasDocHttpHeader as(Table<?> alias) {
-        return new OasDocHttpHeader(alias.getQualifiedName(), this);
+        return new OasDocHttpHeader(alias.getUnqualifiedName(), this);
     }
 
     /**

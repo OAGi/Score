@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -139,7 +140,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
 
     /**
      * The column <code>bbiep.last_updated_by</code>. A foreign key referring to
-     * the last user who has updated the BBIEP record. 
+     * the last user who has updated the BBIEP record.
      */
     public final TableField<BbiepRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the BBIEP record. ");
 
@@ -167,7 +168,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
     }
 
     private Bbiep(Name alias, Table<BbiepRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("BBIEP represents the usage of basic property in a specific business context. It is a contextualization of a BCCP."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("BBIEP represents the usage of basic property in a specific business context. It is a contextualization of a BCCP."), TableOptions.table(), where);
     }
 
     /**
@@ -220,7 +221,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
 
         @Override
         public BbiepPath as(Table<?> alias) {
-            return new BbiepPath(alias.getQualifiedName(), this);
+            return new BbiepPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -336,7 +337,7 @@ public class Bbiep extends TableImpl<BbiepRecord> {
 
     @Override
     public Bbiep as(Table<?> alias) {
-        return new Bbiep(alias.getQualifiedName(), this);
+        return new Bbiep(alias.getUnqualifiedName(), this);
     }
 
     /**

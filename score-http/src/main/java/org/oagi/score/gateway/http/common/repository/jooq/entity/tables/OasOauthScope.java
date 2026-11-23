@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -79,9 +80,11 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
 
     /**
      * The column <code>oas_oauth_scope.scope_name</code>. REQUIRED. The scope
-     * name (the scopes map key). Unique within a flow.
+     * name (the scopes map key). Unique within a flow; case-sensitive. An OAuth
+     * 2.0 scope token: printable ASCII without a space, a double quote and a
+     * backslash (RFC 6749, 3.3).
      */
-    public final TableField<OasOauthScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "REQUIRED. The scope name (the scopes map key). Unique within a flow.");
+    public final TableField<OasOauthScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "REQUIRED. The scope name (the scopes map key). Unique within a flow; case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).");
 
     /**
      * The column <code>oas_oauth_scope.description</code>. REQUIRED. A short
@@ -118,7 +121,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
     }
 
     private OasOauthScope(Name alias, Table<OasOauthScopeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI OAuth Flow scope (name -> description) for an oauth2 flow."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI OAuth Flow scope (name -> description) for an oauth2 flow."), TableOptions.table(), where);
     }
 
     /**
@@ -171,7 +174,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
 
         @Override
         public OasOauthScopePath as(Table<?> alias) {
-            return new OasOauthScopePath(alias.getQualifiedName(), this);
+            return new OasOauthScopePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -250,7 +253,7 @@ public class OasOauthScope extends TableImpl<OasOauthScopeRecord> {
 
     @Override
     public OasOauthScope as(Table<?> alias) {
-        return new OasOauthScope(alias.getQualifiedName(), this);
+        return new OasOauthScope(alias.getUnqualifiedName(), this);
     }
 
     /**

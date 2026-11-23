@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -182,7 +183,7 @@ public class WebauthnCredential extends TableImpl<WebauthnCredentialRecord> {
     }
 
     private WebauthnCredential(Name alias, Table<WebauthnCredentialRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Registered passkeys (WebAuthn credentials) of local accounts."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Registered passkeys (WebAuthn credentials) of local accounts."), TableOptions.table(), where);
     }
 
     /**
@@ -235,7 +236,7 @@ public class WebauthnCredential extends TableImpl<WebauthnCredentialRecord> {
 
         @Override
         public WebauthnCredentialPath as(Table<?> alias) {
-            return new WebauthnCredentialPath(alias.getQualifiedName(), this);
+            return new WebauthnCredentialPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -288,7 +289,7 @@ public class WebauthnCredential extends TableImpl<WebauthnCredentialRecord> {
 
     @Override
     public WebauthnCredential as(Table<?> alias) {
-        return new WebauthnCredential(alias.getQualifiedName(), this);
+        return new WebauthnCredential(alias.getUnqualifiedName(), this);
     }
 
     /**

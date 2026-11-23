@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -198,7 +199,7 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
      * The column <code>agency_id_list.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -221,7 +222,7 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
     }
 
     private AgencyIdList(Name alias, Table<AgencyIdListRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST table stores information about agency identification lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST table stores information about agency identification lists. The list's values are however kept in the AGENCY_ID_LIST_VALUE."), TableOptions.table(), where);
     }
 
     /**
@@ -274,7 +275,7 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
 
         @Override
         public AgencyIdListPath as(Table<?> alias) {
-            return new AgencyIdListPath(alias.getQualifiedName(), this);
+            return new AgencyIdListPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -439,7 +440,7 @@ public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
 
     @Override
     public AgencyIdList as(Table<?> alias) {
-        return new AgencyIdList(alias.getQualifiedName(), this);
+        return new AgencyIdList(alias.getUnqualifiedName(), this);
     }
 
     /**

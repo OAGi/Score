@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -86,7 +87,7 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
     }
 
     private BizCtxAssignment(Name alias, Table<BizCtxAssignmentRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This is an intersection table that assigns business contexts to a top-level ASBIEP. It provides the many-to-many associations between the BIZ_CTX and TOP_LEVEL_ASBIEP tables."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This is an intersection table that assigns business contexts to a top-level ASBIEP. It provides the many-to-many associations between the BIZ_CTX and TOP_LEVEL_ASBIEP tables."), TableOptions.table(), where);
     }
 
     /**
@@ -139,7 +140,7 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
 
         @Override
         public BizCtxAssignmentPath as(Table<?> alias) {
-            return new BizCtxAssignmentPath(alias.getQualifiedName(), this);
+            return new BizCtxAssignmentPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -209,7 +210,7 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
 
     @Override
     public BizCtxAssignment as(Table<?> alias) {
-        return new BizCtxAssignment(alias.getQualifiedName(), this);
+        return new BizCtxAssignment(alias.getUnqualifiedName(), this);
     }
 
     /**

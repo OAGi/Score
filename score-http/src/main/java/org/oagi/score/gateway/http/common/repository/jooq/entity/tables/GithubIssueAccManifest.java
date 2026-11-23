@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -110,7 +111,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
     }
 
     private GithubIssueAccManifest(Name alias, Table<GithubIssueAccManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Links an ACC manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Links an ACC manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
     }
 
     /**
@@ -163,7 +164,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
 
         @Override
         public GithubIssueAccManifestPath as(Table<?> alias) {
-            return new GithubIssueAccManifestPath(alias.getQualifiedName(), this);
+            return new GithubIssueAccManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -254,7 +255,7 @@ public class GithubIssueAccManifest extends TableImpl<GithubIssueAccManifestReco
 
     @Override
     public GithubIssueAccManifest as(Table<?> alias) {
-        return new GithubIssueAccManifest(alias.getQualifiedName(), this);
+        return new GithubIssueAccManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

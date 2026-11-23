@@ -24,6 +24,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -82,7 +83,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
     }
 
     private Configuration(Name alias, Table<ConfigurationRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The table stores configuration properties of the application."), TableOptions.table(), where);
     }
 
     /**
@@ -138,7 +139,7 @@ public class Configuration extends TableImpl<ConfigurationRecord> {
 
     @Override
     public Configuration as(Table<?> alias) {
-        return new Configuration(alias.getQualifiedName(), this);
+        return new Configuration(alias.getUnqualifiedName(), this);
     }
 
     /**

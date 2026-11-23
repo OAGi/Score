@@ -171,8 +171,8 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> {
 
     /**
      * Setter for <code>module.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
-     * 
+     * APP_USER table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -182,8 +182,8 @@ public class ModuleRecord extends UpdatableRecordImpl<ModuleRecord> {
 
     /**
      * Getter for <code>module.last_updated_by</code>. Foreign key to the
-     * APP_USER table referring to the last user who updated the record. 
-     * 
+     * APP_USER table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */

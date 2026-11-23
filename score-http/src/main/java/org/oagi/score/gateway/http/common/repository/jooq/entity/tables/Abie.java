@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -52,7 +53,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
  * The ABIE table stores information about an ABIE, which is a contextualized
  * ACC. The context is represented by the BUSINESS_CTX_ID column that refers to
  * a business context. Each ABIE must have a business context and a based ACC.
- * 
+ *
  * It should be noted that, per design document, there is no corresponding ABIE
  * created for an ACC which will not show up in the instance document such as
  * ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP", "USER_EXTENSION_GROUP", etc.
@@ -189,7 +190,7 @@ public class Abie extends TableImpl<AbieRecord> {
     }
 
     private Abie(Name alias, Table<AbieRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE \"SEMANTIC_GROUP\", \"USER_EXTENSION_GROUP\", etc."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE \"SEMANTIC_GROUP\", \"USER_EXTENSION_GROUP\", etc."), TableOptions.table(), where);
     }
 
     /**
@@ -242,7 +243,7 @@ public class Abie extends TableImpl<AbieRecord> {
 
         @Override
         public AbiePath as(Table<?> alias) {
-            return new AbiePath(alias.getQualifiedName(), this);
+            return new AbiePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -407,7 +408,7 @@ public class Abie extends TableImpl<AbieRecord> {
 
     @Override
     public Abie as(Table<?> alias) {
-        return new Abie(alias.getQualifiedName(), this);
+        return new Abie(alias.getUnqualifiedName(), this);
     }
 
     /**

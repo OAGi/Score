@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -49,11 +50,11 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.records.
 /**
  * The ACC table holds information about complex data structured concepts. For
  * example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.
- * 
+ *
  * Note that only Extension is supported when deriving ACC from another ACC. (So
  * if there is a restriction needed, maybe that concept should placed higher in
  * the derivation hierarchy rather than lower.)
- * 
+ *
  * In OAGIS, all XSD extensions will be treated as a qualification of an ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
@@ -122,7 +123,7 @@ public class Acc extends TableImpl<AccRecord> {
 
     /**
      * The column <code>acc.object_class_qualifier</code>. This column stores
-     * the qualifier of an ACC, particularly when it has a based ACC. 
+     * the qualifier of an ACC, particularly when it has a based ACC.
      */
     public final TableField<AccRecord, String> OBJECT_CLASS_QUALIFIER = createField(DSL.name("object_class_qualifier"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column stores the qualifier of an ACC, particularly when it has a based ACC. ");
 
@@ -136,7 +137,7 @@ public class Acc extends TableImpl<AccRecord> {
      * is a wrapper ACC (a virtual ACC) for segregating user's extension
      * content. EMBEDDED is used for an ACC whose content is not explicitly
      * defined in the database, for example, the Any Structured Content ACC that
-     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS. 
+     * corresponds to the xsd:any.  Other cases are assigned SEMANTICS.
      */
     public final TableField<AccRecord, Integer> OAGIS_COMPONENT_TYPE = createField(DSL.name("oagis_component_type"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "The value can be 0 = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 = USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the OBJECT_CLASS_TERM contains \"Base\" at the end. EXTENSION is assigned with the OBJECT_CLASS_TERM contains \"Extension\" at the end. SEMANTIC_GROUP is assigned when an ACC is imported from an XSD Group. USER_EXTENSION_GROUP is a wrapper ACC (a virtual ACC) for segregating user's extension content. EMBEDDED is used for an ACC whose content is not explicitly defined in the database, for example, the Any Structured Content ACC that corresponds to the xsd:any.  Other cases are assigned SEMANTICS. ");
 
@@ -161,7 +162,7 @@ public class Acc extends TableImpl<AccRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public final TableField<AccRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\\n\\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
@@ -191,7 +192,7 @@ public class Acc extends TableImpl<AccRecord> {
      * The column <code>acc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the ACC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -236,7 +237,7 @@ public class Acc extends TableImpl<AccRecord> {
     }
 
     private Acc(Name alias, Table<AccRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The ACC table holds information about complex data structured concepts. For example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The ACC table holds information about complex data structured concepts. For example, OAGIS's Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -289,7 +290,7 @@ public class Acc extends TableImpl<AccRecord> {
 
         @Override
         public AccPath as(Table<?> alias) {
-            return new AccPath(alias.getQualifiedName(), this);
+            return new AccPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -509,7 +510,7 @@ public class Acc extends TableImpl<AccRecord> {
 
     @Override
     public Acc as(Table<?> alias) {
-        return new Acc(alias.getQualifiedName(), this);
+        return new Acc(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -112,7 +113,7 @@ public class Message extends TableImpl<MessageRecord> {
     }
 
     private Message(Name alias, Table<MessageRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores messages exchanged between users, referencing APP_USER for both the sender and the recipient, along with each message's subject, body, and read status."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores messages exchanged between users, referencing APP_USER for both the sender and the recipient, along with each message's subject, body, and read status."), TableOptions.table(), where);
     }
 
     /**
@@ -165,7 +166,7 @@ public class Message extends TableImpl<MessageRecord> {
 
         @Override
         public MessagePath as(Table<?> alias) {
-            return new MessagePath(alias.getQualifiedName(), this);
+            return new MessagePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -227,7 +228,7 @@ public class Message extends TableImpl<MessageRecord> {
 
     @Override
     public Message as(Table<?> alias) {
-        return new Message(alias.getQualifiedName(), this);
+        return new Message(alias.getUnqualifiedName(), this);
     }
 
     /**

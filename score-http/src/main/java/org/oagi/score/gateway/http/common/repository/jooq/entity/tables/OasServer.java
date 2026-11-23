@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -138,7 +139,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
     }
 
     private OasServer(Name alias, Table<OasServerRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Server Object; one entry of the servers array of an OAS_DOC, providing connectivity information to a target host via a URL (optionally with a description and URL-template variables)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Server Object; one entry of the servers array of an OAS_DOC, providing connectivity information to a target host via a URL (optionally with a description and URL-template variables)."), TableOptions.table(), where);
     }
 
     /**
@@ -191,7 +192,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
 
         @Override
         public OasServerPath as(Table<?> alias) {
-            return new OasServerPath(alias.getQualifiedName(), this);
+            return new OasServerPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -291,7 +292,7 @@ public class OasServer extends TableImpl<OasServerRecord> {
 
     @Override
     public OasServer as(Table<?> alias) {
-        return new OasServer(alias.getQualifiedName(), this);
+        return new OasServer(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -71,7 +71,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
 
     /**
      * Setter for <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
+     * table referring to the user who creates the entity.
      */
     public void setCreatedBy(ULong value) {
         set(3, value);
@@ -79,7 +79,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
 
     /**
      * Getter for <code>biz_ctx.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
+     * table referring to the user who creates the entity.
      */
     public ULong getCreatedBy() {
         return (ULong) get(3);
@@ -105,7 +105,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
 
     /**
      * Setter for <code>biz_ctx.creation_timestamp</code>. Timestamp when the
-     * business context record was first created. 
+     * business context record was first created.
      */
     public void setCreationTimestamp(LocalDateTime value) {
         set(5, value);
@@ -113,7 +113,7 @@ public class BizCtxRecord extends UpdatableRecordImpl<BizCtxRecord> {
 
     /**
      * Getter for <code>biz_ctx.creation_timestamp</code>. Timestamp when the
-     * business context record was first created. 
+     * business context record was first created.
      */
     public LocalDateTime getCreationTimestamp() {
         return (LocalDateTime) get(5);

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -85,9 +86,10 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
      * The column <code>oas_security_scheme.scheme_name</code>. REQUIRED. The
      * components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth);
      * also the schemeName used in Security Requirement Objects. Unique within
-     * an oas_doc.
+     * an oas_doc; case-sensitive, so Auth and auth are two names. Only letters,
+     * digits, '.', '-' and '_' (the Components Object).
      */
-    public final TableField<OasSecuritySchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(100).nullable(false), this, "REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc.");
+    public final TableField<OasSecuritySchemeRecord, String> SCHEME_NAME = createField(DSL.name("scheme_name"), SQLDataType.VARCHAR(100).nullable(false), this, "REQUIRED. The components.securitySchemes map key (e.g. OAuth2, ApiKeyAuth, BearerAuth); also the schemeName used in Security Requirement Objects. Unique within an oas_doc; case-sensitive, so Auth and auth are two names. Only letters, digits, '.', '-' and '_' (the Components Object).");
 
     /**
      * The column <code>oas_security_scheme.type</code>. REQUIRED. Security
@@ -211,7 +213,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
     }
 
     private OasSecurityScheme(Name alias, Table<OasSecuritySchemeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Security Scheme Object (OAS 3.0.3 through 3.2.0); one named entry of a document components.securitySchemes map."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Security Scheme Object (OAS 3.0.3 through 3.2.0); one named entry of a document components.securitySchemes map."), TableOptions.table(), where);
     }
 
     /**
@@ -264,7 +266,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
 
         @Override
         public OasSecuritySchemePath as(Table<?> alias) {
-            return new OasSecuritySchemePath(alias.getQualifiedName(), this);
+            return new OasSecuritySchemePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -382,7 +384,7 @@ public class OasSecurityScheme extends TableImpl<OasSecuritySchemeRecord> {
 
     @Override
     public OasSecurityScheme as(Table<?> alias) {
-        return new OasSecurityScheme(alias.getQualifiedName(), this);
+        return new OasSecurityScheme(alias.getUnqualifiedName(), this);
     }
 
     /**

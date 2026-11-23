@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -139,7 +140,7 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
     }
 
     private ModuleSetRelease(Name alias, Table<ModuleSetReleaseRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table pairs a MODULE_SET with a RELEASE, associating a set of MODULEs with a particular release for schema generation and export. Each pairing has its own name and description, and the IS_DEFAULT indicator marks the default module set to be used for a release."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table pairs a MODULE_SET with a RELEASE, associating a set of MODULEs with a particular release for schema generation and export. Each pairing has its own name and description, and the IS_DEFAULT indicator marks the default module set to be used for a release."), TableOptions.table(), where);
     }
 
     /**
@@ -192,7 +193,7 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
 
         @Override
         public ModuleSetReleasePath as(Table<?> alias) {
-            return new ModuleSetReleasePath(alias.getQualifiedName(), this);
+            return new ModuleSetReleasePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -382,7 +383,7 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
 
     @Override
     public ModuleSetRelease as(Table<?> alias) {
-        return new ModuleSetRelease(alias.getQualifiedName(), this);
+        return new ModuleSetRelease(alias.getUnqualifiedName(), this);
     }
 
     /**

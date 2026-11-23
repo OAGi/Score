@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -111,7 +112,7 @@ public class GithubIssueAsccpManifest extends TableImpl<GithubIssueAsccpManifest
     }
 
     private GithubIssueAsccpManifest(Name alias, Table<GithubIssueAsccpManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Links an ASCCP manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Links an ASCCP manifest to a GitHub issue (many-to-many)."), TableOptions.table(), where);
     }
 
     /**
@@ -166,7 +167,7 @@ public class GithubIssueAsccpManifest extends TableImpl<GithubIssueAsccpManifest
 
         @Override
         public GithubIssueAsccpManifestPath as(Table<?> alias) {
-            return new GithubIssueAsccpManifestPath(alias.getQualifiedName(), this);
+            return new GithubIssueAsccpManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -257,7 +258,7 @@ public class GithubIssueAsccpManifest extends TableImpl<GithubIssueAsccpManifest
 
     @Override
     public GithubIssueAsccpManifest as(Table<?> alias) {
-        return new GithubIssueAsccpManifest(alias.getQualifiedName(), this);
+        return new GithubIssueAsccpManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

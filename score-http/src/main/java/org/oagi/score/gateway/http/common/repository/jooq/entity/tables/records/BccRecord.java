@@ -14,7 +14,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Bcc;
 
 /**
  * A BCC represents a relationship/association between an ACC and a BCCP. It
- * creates a data element for an ACC. 
+ * creates a data element for an ACC.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BccRecord extends UpdatableRecordImpl<BccRecord> {
@@ -88,8 +88,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Setter for <code>bcc.to_bccp_id</code>. TO_BCCP_ID is a foreign key to an
      * BCCP table record. It is basically pointing to a child data element of
-     * the FROM_ACC_ID. 
-     * 
+     * the FROM_ACC_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * BCCP_ID of the current record of a BCCP.
      */
@@ -100,8 +100,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Getter for <code>bcc.to_bccp_id</code>. TO_BCCP_ID is a foreign key to an
      * BCCP table record. It is basically pointing to a child data element of
-     * the FROM_ACC_ID. 
-     * 
+     * the FROM_ACC_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * BCCP_ID of the current record of a BCCP.
      */
@@ -112,8 +112,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Setter for <code>bcc.from_acc_id</code>. FROM_ACC_ID is a foreign key
      * pointing to an ACC record. It is basically pointing to a parent data
-     * element (type) of the TO_BCCP_ID. 
-     * 
+     * element (type) of the TO_BCCP_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * ACC_ID of the current record of an ACC.
      */
@@ -124,8 +124,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Getter for <code>bcc.from_acc_id</code>. FROM_ACC_ID is a foreign key
      * pointing to an ACC record. It is basically pointing to a parent data
-     * element (type) of the TO_BCCP_ID. 
-     * 
+     * element (type) of the TO_BCCP_ID.
+     *
      * Note that for the BCC history records, this column always points to the
      * ACC_ID of the current record of an ACC.
      */
@@ -159,7 +159,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Setter for <code>bcc.entity_type</code>. This is a code list: 0 =
      * ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use
      * this information. This column is necessary because some of the BCCs are
-     * xsd:attribute and some are xsd:element in the OAGIS 10.x. 
+     * xsd:attribute and some are xsd:element in the OAGIS 10.x.
      */
     public void setEntityType(Integer value) {
         set(7, value);
@@ -169,7 +169,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Getter for <code>bcc.entity_type</code>. This is a code list: 0 =
      * ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use
      * this information. This column is necessary because some of the BCCs are
-     * xsd:attribute and some are xsd:element in the OAGIS 10.x. 
+     * xsd:attribute and some are xsd:element in the OAGIS 10.x.
      */
     public Integer getEntityType() {
         return (Integer) get(7);
@@ -218,7 +218,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Setter for <code>bcc.created_by</code>. Foreign key to the APP_USER table
      * referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record. The
      * history record should have the same value as that of its current record.
      */
@@ -229,7 +229,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Getter for <code>bcc.created_by</code>. Foreign key to the APP_USER table
      * referring to the user who creates the entity.
-     * 
+     *
      * This column never change between the history and the current record. The
      * history record should have the same value as that of its current record.
      */
@@ -241,7 +241,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Setter for <code>bcc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -253,7 +253,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Getter for <code>bcc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -263,8 +263,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Setter for <code>bcc.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -274,8 +274,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Getter for <code>bcc.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -285,8 +285,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Setter for <code>bcc.creation_timestamp</code>. Timestamp when the
-     * revision of the BCC was created. 
-     * 
+     * revision of the BCC was created.
+     *
      * This never change for a revision.
      */
     public void setCreationTimestamp(LocalDateTime value) {
@@ -295,8 +295,8 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Getter for <code>bcc.creation_timestamp</code>. Timestamp when the
-     * revision of the BCC was created. 
-     * 
+     * revision of the BCC was created.
+     *
      * This never change for a revision.
      */
     public LocalDateTime getCreationTimestamp() {
@@ -306,7 +306,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Setter for <code>bcc.last_update_timestamp</code>. The timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -318,7 +318,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
     /**
      * Getter for <code>bcc.last_update_timestamp</code>. The timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * change has occurred.
@@ -331,7 +331,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Setter for <code>bcc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -343,7 +343,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Getter for <code>bcc.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCC.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -389,7 +389,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Setter for <code>bcc.is_nillable</code>. @deprecated since 2.0.0 in favor
      * of impossibility of nillable association (element reference) in XML
      * schema.
-     * 
+     *
      * Indicate whether the field can have a NULL This is corresponding to the
      * nillable flag in the XML schema.
      */
@@ -401,7 +401,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
      * Getter for <code>bcc.is_nillable</code>. @deprecated since 2.0.0 in favor
      * of impossibility of nillable association (element reference) in XML
      * schema.
-     * 
+     *
      * Indicate whether the field can have a NULL This is corresponding to the
      * nillable flag in the XML schema.
      */
@@ -411,7 +411,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Setter for <code>bcc.default_value</code>. This set the default value at
-     * the association level. 
+     * the association level.
      */
     public void setDefaultValue(String value) {
         set(19, value);
@@ -419,7 +419,7 @@ public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
     /**
      * Getter for <code>bcc.default_value</code>. This set the default value at
-     * the association level. 
+     * the association level.
      */
     public String getDefaultValue() {
         return (String) get(19);

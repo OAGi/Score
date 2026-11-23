@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -104,7 +105,7 @@ public class Exception extends TableImpl<ExceptionRecord> {
     }
 
     private Exception(Name alias, Table<ExceptionRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table logs exceptions raised by the application, capturing the exception message, its serialized stacktrace, and a searchable tag, along with the APP_USER who was working when the exception occurred and the time it was created."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table logs exceptions raised by the application, capturing the exception message, its serialized stacktrace, and a searchable tag, along with the APP_USER who was working when the exception occurred and the time it was created."), TableOptions.table(), where);
     }
 
     /**
@@ -157,7 +158,7 @@ public class Exception extends TableImpl<ExceptionRecord> {
 
         @Override
         public ExceptionPath as(Table<?> alias) {
-            return new ExceptionPath(alias.getQualifiedName(), this);
+            return new ExceptionPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -210,7 +211,7 @@ public class Exception extends TableImpl<ExceptionRecord> {
 
     @Override
     public Exception as(Table<?> alias) {
-        return new Exception(alias.getQualifiedName(), this);
+        return new Exception(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -81,9 +82,10 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     /**
      * The column <code>oas_doc_security_scope.scope_name</code>. A scope name
      * required by this entry (oauth2: from the scheme's flows; openIdConnect:
-     * from the provider).
+     * from the provider). Case-sensitive. An OAuth 2.0 scope token: printable
+     * ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).
      */
-    public final TableField<OasDocSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider).");
+    public final TableField<OasDocSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).");
 
     /**
      * The column <code>oas_doc_security_scope.created_by</code>. The user who
@@ -114,7 +116,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
     }
 
     private OasDocSecurityScope(Name alias, Table<OasDocSecurityScopeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Scope of a root-level Security Requirement entry."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Scope of a root-level Security Requirement entry."), TableOptions.table(), where);
     }
 
     /**
@@ -167,7 +169,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
 
         @Override
         public OasDocSecurityScopePath as(Table<?> alias) {
-            return new OasDocSecurityScopePath(alias.getQualifiedName(), this);
+            return new OasDocSecurityScopePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -246,7 +248,7 @@ public class OasDocSecurityScope extends TableImpl<OasDocSecurityScopeRecord> {
 
     @Override
     public OasDocSecurityScope as(Table<?> alias) {
-        return new OasDocSecurityScope(alias.getQualifiedName(), this);
+        return new OasDocSecurityScope(alias.getUnqualifiedName(), this);
     }
 
     /**

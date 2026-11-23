@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -94,7 +95,8 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
     /**
      * The column <code>code_list_value.value</code>. The code list value used
-     * in the instance data, e.g., EA, US-EN.
+     * in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are
+     * different values.
      */
     public final TableField<CodeListValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(255).nullable(false), this, "The code list value used in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are different values.");
 
@@ -142,7 +144,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
      * The column <code>code_list_value.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -184,7 +186,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
     }
 
     private CodeListValue(Name alias, Table<CodeListValueRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed."), TableOptions.table(), where);
     }
 
     /**
@@ -237,7 +239,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
         @Override
         public CodeListValuePath as(Table<?> alias) {
-            return new CodeListValuePath(alias.getQualifiedName(), this);
+            return new CodeListValuePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -389,7 +391,7 @@ public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
     @Override
     public CodeListValue as(Table<?> alias) {
-        return new CodeListValue(alias.getQualifiedName(), this);
+        return new CodeListValue(alias.getUnqualifiedName(), this);
     }
 
     /**

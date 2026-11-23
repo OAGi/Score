@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -182,7 +183,7 @@ public class Xbt extends TableImpl<XbtRecord> {
     }
 
     private Xbt(Name alias, Table<XbtRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas."), TableOptions.table(), where);
     }
 
     /**
@@ -235,7 +236,7 @@ public class Xbt extends TableImpl<XbtRecord> {
 
         @Override
         public XbtPath as(Table<?> alias) {
-            return new XbtPath(alias.getQualifiedName(), this);
+            return new XbtPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -339,7 +340,7 @@ public class Xbt extends TableImpl<XbtRecord> {
 
     @Override
     public Xbt as(Table<?> alias) {
-        return new Xbt(alias.getQualifiedName(), this);
+        return new Xbt(alias.getUnqualifiedName(), this);
     }
 
     /**

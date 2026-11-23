@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -126,7 +127,7 @@ public class Tag extends TableImpl<TagRecord> {
     }
 
     private Tag(Name alias, Table<TagRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The TAG table stores the tags (each with a name, description, and text and background color) that can be attached to core component and data type manifests through the intersection tables ACC_MANIFEST_TAG, ASCCP_MANIFEST_TAG, BCCP_MANIFEST_TAG, and DT_MANIFEST_TAG."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The TAG table stores the tags (each with a name, description, and text and background color) that can be attached to core component and data type manifests through the intersection tables ACC_MANIFEST_TAG, ASCCP_MANIFEST_TAG, BCCP_MANIFEST_TAG, and DT_MANIFEST_TAG."), TableOptions.table(), where);
     }
 
     /**
@@ -179,7 +180,7 @@ public class Tag extends TableImpl<TagRecord> {
 
         @Override
         public TagPath as(Table<?> alias) {
-            return new TagPath(alias.getQualifiedName(), this);
+            return new TagPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -325,7 +326,7 @@ public class Tag extends TableImpl<TagRecord> {
 
     @Override
     public Tag as(Table<?> alias) {
-        return new Tag(alias.getQualifiedName(), this);
+        return new Tag(alias.getUnqualifiedName(), this);
     }
 
     /**

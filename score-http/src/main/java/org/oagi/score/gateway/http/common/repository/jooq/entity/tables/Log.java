@@ -32,6 +32,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.UInteger;
@@ -152,7 +153,7 @@ public class Log extends TableImpl<LogRecord> {
     }
 
     private Log(Name alias, Table<LogRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The LOG table records the revision history of component records, storing one entry per change with the component's serialized state SNAPSHOT, its REVISION_NUM and REVISION_TRACKING_NUM, and the LOG_ACTION taken. Because it logs many different component types, it references the target component by its GUID (the REFERENCE column) rather than a foreign key, and the PREV_LOG_ID and NEXT_LOG_ID columns chain the entries into a per-component revision history."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The LOG table records the revision history of component records, storing one entry per change with the component's serialized state SNAPSHOT, its REVISION_NUM and REVISION_TRACKING_NUM, and the LOG_ACTION taken. Because it logs many different component types, it references the target component by its GUID (the REFERENCE column) rather than a foreign key, and the PREV_LOG_ID and NEXT_LOG_ID columns chain the entries into a per-component revision history."), TableOptions.table(), where);
     }
 
     /**
@@ -205,7 +206,7 @@ public class Log extends TableImpl<LogRecord> {
 
         @Override
         public LogPath as(Table<?> alias) {
-            return new LogPath(alias.getQualifiedName(), this);
+            return new LogPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -379,7 +380,7 @@ public class Log extends TableImpl<LogRecord> {
 
     @Override
     public Log as(Table<?> alias) {
-        return new Log(alias.getQualifiedName(), this);
+        return new Log(alias.getUnqualifiedName(), this);
     }
 
     /**

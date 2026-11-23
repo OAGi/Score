@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -141,7 +142,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
     }
 
     private OasOauthFlow(Name alias, Table<OasOauthFlowRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI OAuth Flow Object for an oauth2 security scheme (one entry of components.securitySchemes.<name>.flows)."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI OAuth Flow Object for an oauth2 security scheme (one entry of components.securitySchemes.<name>.flows)."), TableOptions.table(), where);
     }
 
     /**
@@ -194,7 +195,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
 
         @Override
         public OasOauthFlowPath as(Table<?> alias) {
-            return new OasOauthFlowPath(alias.getQualifiedName(), this);
+            return new OasOauthFlowPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -286,7 +287,7 @@ public class OasOauthFlow extends TableImpl<OasOauthFlowRecord> {
 
     @Override
     public OasOauthFlow as(Table<?> alias) {
-        return new OasOauthFlow(alias.getQualifiedName(), this);
+        return new OasOauthFlow(alias.getUnqualifiedName(), this);
     }
 
     /**

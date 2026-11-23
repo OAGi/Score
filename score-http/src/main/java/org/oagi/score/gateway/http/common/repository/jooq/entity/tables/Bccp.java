@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -131,8 +132,8 @@ public class Bccp extends TableImpl<BccpRecord> {
 
     /**
      * The column <code>bccp.created_by</code>. Foreign key to the APP_USER
-     * table referring to the user who creates the entity. 
-     * 
+     * table referring to the user who creates the entity.
+     *
      * This column never change between the history and the current record for a
      * given revision. The history record should have the same value as that of
      * its current record.
@@ -143,7 +144,7 @@ public class Bccp extends TableImpl<BccpRecord> {
      * The column <code>bccp.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -151,8 +152,8 @@ public class Bccp extends TableImpl<BccpRecord> {
 
     /**
      * The column <code>bccp.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who has updated the record. 
-     * 
+     * table referring to the last user who has updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -160,8 +161,8 @@ public class Bccp extends TableImpl<BccpRecord> {
 
     /**
      * The column <code>bccp.creation_timestamp</code>. Timestamp when the
-     * revision of the BCCP was created. 
-     * 
+     * revision of the BCCP was created.
+     *
      * This never change for a revision.
      */
     public final TableField<BccpRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the BCCP was created. \n\nThis never change for a revision.");
@@ -169,7 +170,7 @@ public class Bccp extends TableImpl<BccpRecord> {
     /**
      * The column <code>bccp.last_update_timestamp</code>. The timestamp when
      * the record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -180,7 +181,7 @@ public class Bccp extends TableImpl<BccpRecord> {
      * The column <code>bccp.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the BCCP.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -190,7 +191,7 @@ public class Bccp extends TableImpl<BccpRecord> {
      * The column <code>bccp.is_nillable</code>. This is corresponding to the
      * XML Schema nillable flag. Although the nillable may not apply to certain
      * cases of the BCCP (e.g., when it is only used as XSD attribute), the
-     * value is default to false for simplification. 
+     * value is default to false for simplification.
      */
     public final TableField<BccpRecord, Byte> IS_NILLABLE = createField(DSL.name("is_nillable"), SQLDataType.TINYINT.nullable(false), this, "This is corresponding to the XML Schema nillable flag. Although the nillable may not apply to certain cases of the BCCP (e.g., when it is only used as XSD attribute), the value is default to false for simplification. ");
 
@@ -225,7 +226,7 @@ public class Bccp extends TableImpl<BccpRecord> {
     }
 
     private Bccp(Name alias, Table<BccpRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC."), TableOptions.table(), where);
     }
 
     /**
@@ -278,7 +279,7 @@ public class Bccp extends TableImpl<BccpRecord> {
 
         @Override
         public BccpPath as(Table<?> alias) {
-            return new BccpPath(alias.getQualifiedName(), this);
+            return new BccpPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -446,7 +447,7 @@ public class Bccp extends TableImpl<BccpRecord> {
 
     @Override
     public Bccp as(Table<?> alias) {
-        return new Bccp(alias.getQualifiedName(), this);
+        return new Bccp(alias.getUnqualifiedName(), this);
     }
 
     /**

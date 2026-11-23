@@ -16,7 +16,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.BbieSc;
  * Because there is no single table that is a contextualized counterpart of the
  * DT table (which stores both CDT and BDT), The context specific constraints
  * associated with the DT are stored in the BBIE table, while this table stores
- * the constraints associated with the DT's SCs. 
+ * the constraints associated with the DT's SCs.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
@@ -127,11 +127,11 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * Setter for <code>bbie_sc.xbt_manifest_id</code>. This must be one of the
      * allowed primitive as specified in the corresponding SC of the based BCC
      * of the BBIE (referred to by the BBIE_ID column).
-     * 
+     *
      * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
      * user who authors the BIE. The assignment would override the default from
      * the CC side.
-     * 
+     *
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
@@ -143,11 +143,11 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * Getter for <code>bbie_sc.xbt_manifest_id</code>. This must be one of the
      * allowed primitive as specified in the corresponding SC of the based BCC
      * of the BBIE (referred to by the BBIE_ID column).
-     * 
+     *
      * It is the foreign key to the XBT_MANIFEST table. This is assigned by the
      * user who authors the BIE. The assignment would override the default from
      * the CC side.
-     * 
+     *
      * This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot
      * have a value at the same time.
      */
@@ -164,7 +164,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is
      * typically used when the user wants to assign another code list different
      * from the one permissible by the CC model.
-     * 
+     *
      * This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID
      * column cannot have a value at the same time.
      */
@@ -181,7 +181,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is
      * typically used when the user wants to assign another code list different
      * from the one permissible by the CC model.
-     * 
+     *
      * This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID
      * column cannot have a value at the same time.
      */
@@ -198,7 +198,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this
      * column is typically used only when the user wants to assign another
      * Agency ID list different from the one permissible by the CC model.
-     * 
+     *
      * This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column
      * cannot have a value at the same time.
      */
@@ -215,7 +215,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this
      * column is typically used only when the user wants to assign another
      * Agency ID list different from the one permissible by the CC model.
-     * 
+     *
      * This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column
      * cannot have a value at the same time.
      */
@@ -378,7 +378,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * specify a very context-specific usage of the BBIE SC. It is different
      * from the Definition column in that the Definition column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
-     * implementation specific instruction or others. 
+     * implementation specific instruction or others.
      */
     public void setRemark(String value) {
         set(18, value);
@@ -389,7 +389,7 @@ public class BbieScRecord extends UpdatableRecordImpl<BbieScRecord> {
      * specify a very context-specific usage of the BBIE SC. It is different
      * from the Definition column in that the Definition column is a description
      * conveying the meaning of the associated concept. Remarks may be a very
-     * implementation specific instruction or others. 
+     * implementation specific instruction or others.
      */
     public String getRemark() {
         return (String) get(18);

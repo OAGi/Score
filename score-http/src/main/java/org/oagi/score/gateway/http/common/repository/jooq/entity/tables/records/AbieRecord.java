@@ -16,7 +16,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.Abie;
  * The ABIE table stores information about an ABIE, which is a contextualized
  * ACC. The context is represented by the BUSINESS_CTX_ID column that refers to
  * a business context. Each ABIE must have a business context and a based ACC.
- * 
+ *
  * It should be noted that, per design document, there is no corresponding ABIE
  * created for an ACC which will not show up in the instance document such as
  * ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP", "USER_EXTENSION_GROUP", etc.

@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -115,7 +116,7 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
     }
 
     private CtxCategory(Name alias, Table<CtxCategoryRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table captures the context category. Examples of context categories as described in the CCTS are business process, industry, etc."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table captures the context category. Examples of context categories as described in the CCTS are business process, industry, etc."), TableOptions.table(), where);
     }
 
     /**
@@ -168,7 +169,7 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
 
         @Override
         public CtxCategoryPath as(Table<?> alias) {
-            return new CtxCategoryPath(alias.getQualifiedName(), this);
+            return new CtxCategoryPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -247,7 +248,7 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
 
     @Override
     public CtxCategory as(Table<?> alias) {
-        return new CtxCategory(alias.getQualifiedName(), this);
+        return new CtxCategory(alias.getUnqualifiedName(), this);
     }
 
     /**

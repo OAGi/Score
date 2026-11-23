@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -100,7 +101,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     /**
      * The column <code>release.release_num</code>. Release number such as 10.0,
-     * 10.1, etc. 
+     * 10.1, etc.
      */
     public final TableField<ReleaseRecord, String> RELEASE_NUM = createField(DSL.name("release_num"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "Release number such as 10.0, 10.1, etc. ");
 
@@ -173,7 +174,7 @@ public class Release extends TableImpl<ReleaseRecord> {
     }
 
     private Release(Name alias, Table<ReleaseRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The is table store the release information."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The is table store the release information."), TableOptions.table(), where);
     }
 
     /**
@@ -226,7 +227,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
         @Override
         public ReleasePath as(Table<?> alias) {
-            return new ReleasePath(alias.getQualifiedName(), this);
+            return new ReleasePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -580,7 +581,7 @@ public class Release extends TableImpl<ReleaseRecord> {
 
     @Override
     public Release as(Table<?> alias) {
-        return new Release(alias.getQualifiedName(), this);
+        return new Release(alias.getUnqualifiedName(), this);
     }
 
     /**

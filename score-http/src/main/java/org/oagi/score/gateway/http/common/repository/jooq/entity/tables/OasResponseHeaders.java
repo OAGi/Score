@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -102,7 +103,7 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
     }
 
     private OasResponseHeaders(Name alias, Table<OasResponseHeadersRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The headers map of an OpenAPI Response Object; a many-to-many join assigning OAS_HTTP_HEADER definitions to an OAS_RESPONSE."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The headers map of an OpenAPI Response Object; a many-to-many join assigning OAS_HTTP_HEADER definitions to an OAS_RESPONSE."), TableOptions.table(), where);
     }
 
     /**
@@ -155,7 +156,7 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
 
         @Override
         public OasResponseHeadersPath as(Table<?> alias) {
-            return new OasResponseHeadersPath(alias.getQualifiedName(), this);
+            return new OasResponseHeadersPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -236,7 +237,7 @@ public class OasResponseHeaders extends TableImpl<OasResponseHeadersRecord> {
 
     @Override
     public OasResponseHeaders as(Table<?> alias) {
-        return new OasResponseHeaders(alias.getQualifiedName(), this);
+        return new OasResponseHeaders(alias.getUnqualifiedName(), this);
     }
 
     /**

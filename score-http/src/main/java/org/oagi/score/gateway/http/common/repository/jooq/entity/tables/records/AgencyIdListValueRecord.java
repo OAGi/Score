@@ -250,7 +250,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Setter for <code>agency_id_list_value.owner_user_id</code>. Foreign key
      * to the APP_USER table. This is the user who owns the entity, is allowed
      * to edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -262,7 +262,7 @@ public class AgencyIdListValueRecord extends UpdatableRecordImpl<AgencyIdListVal
      * Getter for <code>agency_id_list_value.owner_user_id</code>. Foreign key
      * to the APP_USER table. This is the user who owns the entity, is allowed
      * to edit the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */

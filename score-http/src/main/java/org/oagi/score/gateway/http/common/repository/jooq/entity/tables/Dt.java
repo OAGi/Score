@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -82,7 +83,7 @@ public class Dt extends TableImpl<DtRecord> {
      * The column <code>dt.data_type_term</code>. This is the data type term
      * assigned to the DT. The allowed set of data type terms are defined in the
      * DTC specification. This column is derived from the Based_DT_ID when the
-     * column is not blank. 
+     * column is not blank.
      */
     public final TableField<DtRecord, String> DATA_TYPE_TERM = createField(DSL.name("data_type_term"), SQLDataType.VARCHAR(45).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This is the data type term assigned to the DT. The allowed set of data type terms are defined in the DTC specification. This column is derived from the Based_DT_ID when the column is not blank. ");
 
@@ -97,7 +98,7 @@ public class Dt extends TableImpl<DtRecord> {
      * Unqualified BDT is a BDT that OAGIS model schema generally used for its
      * canonical. A handful of default BDTs were selected; and each of them is
      * wrapped with another type definition that has a simpler name such as
-     * CodeType and NormalizedString type - we call these "unqualified BDTs". 
+     * CodeType and NormalizedString type - we call these "unqualified BDTs".
      */
     public final TableField<DtRecord, String> QUALIFIER = createField(DSL.name("qualifier"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is 'Code_1E7368. Type'). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these \"unqualified BDTs\". ");
 
@@ -149,7 +150,7 @@ public class Dt extends TableImpl<DtRecord> {
      * The column <code>dt.state</code>. Deleted, WIP, Draft, QA, Candidate,
      * Production, Release Draft, Published. This the revision life cycle state
      * of the DT.
-     * 
+     *
      * State change can't be undone. But the history record can still keep the
      * records of when the state was changed.
      */
@@ -169,8 +170,8 @@ public class Dt extends TableImpl<DtRecord> {
 
     /**
      * The column <code>dt.last_updated_by</code>. Foreign key to the APP_USER
-     * table referring to the last user who updated the record. 
-     * 
+     * table referring to the last user who updated the record.
+     *
      * In the history record, this should always be the user who is editing the
      * entity (perhaps except when the ownership has just been changed).
      */
@@ -181,14 +182,14 @@ public class Dt extends TableImpl<DtRecord> {
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.\n\nThe
      * ownership can change throughout the history, but undoing shouldn't
-     * rollback the ownership. 
+     * rollback the ownership.
      */
     public final TableField<DtRecord, ULong> OWNER_USER_ID = createField(DSL.name("owner_user_id"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\\n\\nThe ownership can change throughout the history, but undoing shouldn't rollback the ownership. ");
 
     /**
      * The column <code>dt.creation_timestamp</code>. Timestamp when the
-     * revision of the DT was created. 
-     * 
+     * revision of the DT was created.
+     *
      * This never change for a revision.
      */
     public final TableField<DtRecord, LocalDateTime> CREATION_TIMESTAMP = createField(DSL.name("creation_timestamp"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "Timestamp when the revision of the DT was created. \n\nThis never change for a revision.");
@@ -196,7 +197,7 @@ public class Dt extends TableImpl<DtRecord> {
     /**
      * The column <code>dt.last_update_timestamp</code>. Timestamp when the
      * record was last updated.
-     * 
+     *
      * The value of this column in the latest history record should be the same
      * as that of the current record. This column keeps the record of when the
      * revision has occurred.
@@ -233,7 +234,7 @@ public class Dt extends TableImpl<DtRecord> {
     }
 
     private Dt(Name alias, Table<DtRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column."), TableOptions.table(), where);
     }
 
     /**
@@ -286,7 +287,7 @@ public class Dt extends TableImpl<DtRecord> {
 
         @Override
         public DtPath as(Table<?> alias) {
-            return new DtPath(alias.getQualifiedName(), this);
+            return new DtPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -491,7 +492,7 @@ public class Dt extends TableImpl<DtRecord> {
 
     @Override
     public Dt as(Table<?> alias) {
-        return new Dt(alias.getQualifiedName(), this);
+        return new Dt(alias.getUnqualifiedName(), this);
     }
 
     /**

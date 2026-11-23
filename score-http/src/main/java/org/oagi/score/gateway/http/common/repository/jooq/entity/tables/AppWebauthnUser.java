@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -98,7 +99,7 @@ public class AppWebauthnUser extends TableImpl<AppWebauthnUserRecord> {
     }
 
     private AppWebauthnUser(Name alias, Table<AppWebauthnUserRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("WebAuthn identity (user handle) of an app_user; created on the first passkey registration."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("WebAuthn identity (user handle) of an app_user; created on the first passkey registration."), TableOptions.table(), where);
     }
 
     /**
@@ -151,7 +152,7 @@ public class AppWebauthnUser extends TableImpl<AppWebauthnUserRecord> {
 
         @Override
         public AppWebauthnUserPath as(Table<?> alias) {
-            return new AppWebauthnUserPath(alias.getQualifiedName(), this);
+            return new AppWebauthnUserPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -217,7 +218,7 @@ public class AppWebauthnUser extends TableImpl<AppWebauthnUserRecord> {
 
     @Override
     public AppWebauthnUser as(Table<?> alias) {
-        return new AppWebauthnUser(alias.getQualifiedName(), this);
+        return new AppWebauthnUser(alias.getUnqualifiedName(), this);
     }
 
     /**

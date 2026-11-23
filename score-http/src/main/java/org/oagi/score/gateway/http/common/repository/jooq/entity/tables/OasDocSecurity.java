@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -123,7 +124,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
     }
 
     private OasDocSecurity(Name alias, Table<OasDocSecurityRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Root-level Security Requirement entry for an OpenAPI document."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Root-level Security Requirement entry for an OpenAPI document."), TableOptions.table(), where);
     }
 
     /**
@@ -176,7 +177,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
 
         @Override
         public OasDocSecurityPath as(Table<?> alias) {
-            return new OasDocSecurityPath(alias.getQualifiedName(), this);
+            return new OasDocSecurityPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -280,7 +281,7 @@ public class OasDocSecurity extends TableImpl<OasDocSecurityRecord> {
 
     @Override
     public OasDocSecurity as(Table<?> alias) {
-        return new OasDocSecurity(alias.getQualifiedName(), this);
+        return new OasDocSecurity(alias.getUnqualifiedName(), this);
     }
 
     /**

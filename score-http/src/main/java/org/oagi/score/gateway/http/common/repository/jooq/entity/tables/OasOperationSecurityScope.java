@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -83,9 +84,11 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     /**
      * The column <code>oas_operation_security_scope.scope_name</code>. A scope
      * name required by this entry (oauth2: from the scheme's flows;
-     * openIdConnect: from the provider).
+     * openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope
+     * token: printable ASCII without a space, a double quote and a backslash
+     * (RFC 6749, 3.3).
      */
-    public final TableField<OasOperationSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider).");
+    public final TableField<OasOperationSecurityScopeRecord, String> SCOPE_NAME = createField(DSL.name("scope_name"), SQLDataType.VARCHAR(200).nullable(false), this, "A scope name required by this entry (oauth2: from the scheme's flows; openIdConnect: from the provider). Case-sensitive. An OAuth 2.0 scope token: printable ASCII without a space, a double quote and a backslash (RFC 6749, 3.3).");
 
     /**
      * The column <code>oas_operation_security_scope.created_by</code>. The user
@@ -117,7 +120,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
     }
 
     private OasOperationSecurityScope(Name alias, Table<OasOperationSecurityScopeRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("Scope of an operation-level Security Requirement entry."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("Scope of an operation-level Security Requirement entry."), TableOptions.table(), where);
     }
 
     /**
@@ -172,7 +175,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
 
         @Override
         public OasOperationSecurityScopePath as(Table<?> alias) {
-            return new OasOperationSecurityScopePath(alias.getQualifiedName(), this);
+            return new OasOperationSecurityScopePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -252,7 +255,7 @@ public class OasOperationSecurityScope extends TableImpl<OasOperationSecuritySco
 
     @Override
     public OasOperationSecurityScope as(Table<?> alias) {
-        return new OasOperationSecurityScope(alias.getQualifiedName(), this);
+        return new OasOperationSecurityScope(alias.getUnqualifiedName(), this);
     }
 
     /**

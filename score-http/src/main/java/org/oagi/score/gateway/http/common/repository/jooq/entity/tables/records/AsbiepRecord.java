@@ -231,7 +231,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
 
     /**
      * Setter for <code>asbiep.last_updated_by</code>. A foreign key referring
-     * to the last user who has updated the ASBIEP record. 
+     * to the last user who has updated the ASBIEP record.
      */
     public void setLastUpdatedBy(ULong value) {
         set(11, value);
@@ -239,7 +239,7 @@ public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> {
 
     /**
      * Getter for <code>asbiep.last_updated_by</code>. A foreign key referring
-     * to the last user who has updated the ASBIEP record. 
+     * to the last user who has updated the ASBIEP record.
      */
     public ULong getLastUpdatedBy() {
         return (ULong) get(11);

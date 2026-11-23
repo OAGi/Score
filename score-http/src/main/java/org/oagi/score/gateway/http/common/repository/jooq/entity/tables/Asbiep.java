@@ -30,6 +30,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -152,7 +153,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
 
     /**
      * The column <code>asbiep.last_updated_by</code>. A foreign key referring
-     * to the last user who has updated the ASBIEP record. 
+     * to the last user who has updated the ASBIEP record.
      */
     public final TableField<AsbiepRecord, ULong> LAST_UPDATED_BY = createField(DSL.name("last_updated_by"), SQLDataType.BIGINTUNSIGNED.nullable(false), this, "A foreign key referring to the last user who has updated the ASBIEP record. ");
 
@@ -180,7 +181,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
     }
 
     private Asbiep(Name alias, Table<AsbiepRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP."), TableOptions.table(), where);
     }
 
     /**
@@ -233,7 +234,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
 
         @Override
         public AsbiepPath as(Table<?> alias) {
-            return new AsbiepPath(alias.getQualifiedName(), this);
+            return new AsbiepPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -374,7 +375,7 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
 
     @Override
     public Asbiep as(Table<?> alias) {
-        return new Asbiep(alias.getQualifiedName(), this);
+        return new Asbiep(alias.getUnqualifiedName(), this);
     }
 
     /**

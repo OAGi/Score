@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -138,7 +139,7 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
     }
 
     private DtManifest(Name alias, Table<DtManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The DT_MANIFEST table is a release-specific handle to a DT record (both CDT and BDT, as stored in the DT table), pinning it to a particular RELEASE. It carries the revision chain across releases through the PREV_DT_MANIFEST_ID and NEXT_DT_MANIFEST_ID self-references, and records the DT's base/supertype via BASED_DT_MANIFEST_ID."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The DT_MANIFEST table is a release-specific handle to a DT record (both CDT and BDT, as stored in the DT table), pinning it to a particular RELEASE. It carries the revision chain across releases through the PREV_DT_MANIFEST_ID and NEXT_DT_MANIFEST_ID self-references, and records the DT's base/supertype via BASED_DT_MANIFEST_ID."), TableOptions.table(), where);
     }
 
     /**
@@ -191,7 +192,7 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
 
         @Override
         public DtManifestPath as(Table<?> alias) {
-            return new DtManifestPath(alias.getQualifiedName(), this);
+            return new DtManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -395,7 +396,7 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
 
     @Override
     public DtManifest as(Table<?> alias) {
-        return new DtManifest(alias.getQualifiedName(), this);
+        return new DtManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

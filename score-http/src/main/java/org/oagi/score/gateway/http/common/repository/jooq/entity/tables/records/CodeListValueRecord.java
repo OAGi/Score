@@ -94,7 +94,8 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
 
     /**
      * Setter for <code>code_list_value.value</code>. The code list value used
-     * in the instance data, e.g., EA, US-EN.
+     * in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are
+     * different values.
      */
     public void setValue(String value) {
         set(4, value);
@@ -102,7 +103,8 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
 
     /**
      * Getter for <code>code_list_value.value</code>. The code list value used
-     * in the instance data, e.g., EA, US-EN.
+     * in the instance data, e.g., EA, US-EN. Case sensitive: EA and ea are
+     * different values.
      */
     public String getValue() {
         return (String) get(4);
@@ -216,7 +218,7 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
      * Setter for <code>code_list_value.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -228,7 +230,7 @@ public class CodeListValueRecord extends UpdatableRecordImpl<CodeListValueRecord
      * Getter for <code>code_list_value.owner_user_id</code>. Foreign key to the
      * APP_USER table. This is the user who owns the entity, is allowed to edit
      * the entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */

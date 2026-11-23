@@ -16,7 +16,7 @@ import org.oagi.score.gateway.http.common.repository.jooq.entity.tables.DtSc;
  * This table represents the supplementary component (SC) of a DT. Revision is
  * not tracked at the supplementary component. It is considered intrinsic part
  * of the DT. In other words, when a new revision of a DT is created a new set
- * of supplementary components is created along with it. 
+ * of supplementary components is created along with it.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
@@ -291,7 +291,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * Setter for <code>dt_sc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */
@@ -303,7 +303,7 @@ public class DtScRecord extends UpdatableRecordImpl<DtScRecord> {
      * Getter for <code>dt_sc.owner_user_id</code>. Foreign key to the APP_USER
      * table. This is the user who owns the entity, is allowed to edit the
      * entity, and who can transfer the ownership to another user.
-     * 
+     *
      * The ownership can change throughout the history, but undoing shouldn't
      * rollback the ownership.
      */

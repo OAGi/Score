@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -146,7 +147,7 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
     }
 
     private AgencyIdListManifest(Name alias, Table<AgencyIdListManifestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST_MANIFEST table is a release-specific handle to an AGENCY_ID_LIST record; it pins the agency identification list to a RELEASE and carries the revision chain (prev/next manifest) across releases."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("The AGENCY_ID_LIST_MANIFEST table is a release-specific handle to an AGENCY_ID_LIST record; it pins the agency identification list to a RELEASE and carries the revision chain (prev/next manifest) across releases."), TableOptions.table(), where);
     }
 
     /**
@@ -199,7 +200,7 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
 
         @Override
         public AgencyIdListManifestPath as(Table<?> alias) {
-            return new AgencyIdListManifestPath(alias.getQualifiedName(), this);
+            return new AgencyIdListManifestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -427,7 +428,7 @@ public class AgencyIdListManifest extends TableImpl<AgencyIdListManifestRecord> 
 
     @Override
     public AgencyIdListManifest as(Table<?> alias) {
-        return new AgencyIdListManifest(alias.getQualifiedName(), this);
+        return new AgencyIdListManifest(alias.getUnqualifiedName(), this);
     }
 
     /**

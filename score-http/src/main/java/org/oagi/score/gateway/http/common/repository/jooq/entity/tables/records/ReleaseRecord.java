@@ -72,7 +72,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
 
     /**
      * Setter for <code>release.release_num</code>. Release number such as 10.0,
-     * 10.1, etc. 
+     * 10.1, etc.
      */
     public void setReleaseNum(String value) {
         set(3, value);
@@ -80,7 +80,7 @@ public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> {
 
     /**
      * Getter for <code>release.release_num</code>. Release number such as 10.0,
-     * 10.1, etc. 
+     * 10.1, etc.
      */
     public String getReleaseNum() {
         return (String) get(3);

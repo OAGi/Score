@@ -26,6 +26,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -74,7 +75,7 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
     }
 
     private BlobContent(Name alias, Table<BlobContentRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores schemas whose content is only imported as a whole and is represented in Blob."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores schemas whose content is only imported as a whole and is represented in Blob."), TableOptions.table(), where);
     }
 
     /**
@@ -127,7 +128,7 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
 
         @Override
         public BlobContentPath as(Table<?> alias) {
-            return new BlobContentPath(alias.getQualifiedName(), this);
+            return new BlobContentPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -171,7 +172,7 @@ public class BlobContent extends TableImpl<BlobContentRecord> {
 
     @Override
     public BlobContent as(Table<?> alias) {
-        return new BlobContent(alias.getQualifiedName(), this);
+        return new BlobContent(alias.getUnqualifiedName(), this);
     }
 
     /**

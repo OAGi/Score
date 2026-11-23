@@ -29,6 +29,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -166,7 +167,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
     }
 
     private OasRequest(Name alias, Table<OasRequestRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("OpenAPI Request Body Object for an OAS_OPERATION; it defines the operation's request payload from a BIE-based OAS_MESSAGE_BODY, along with whether the body is required and generation options such as array wrapping, root suppression, and optional meta-header and pagination TOP_LEVEL_ASBIEP references."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("OpenAPI Request Body Object for an OAS_OPERATION; it defines the operation's request payload from a BIE-based OAS_MESSAGE_BODY, along with whether the body is required and generation options such as array wrapping, root suppression, and optional meta-header and pagination TOP_LEVEL_ASBIEP references."), TableOptions.table(), where);
     }
 
     /**
@@ -219,7 +220,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
 
         @Override
         public OasRequestPath as(Table<?> alias) {
-            return new OasRequestPath(alias.getQualifiedName(), this);
+            return new OasRequestPath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -352,7 +353,7 @@ public class OasRequest extends TableImpl<OasRequestRecord> {
 
     @Override
     public OasRequest as(Table<?> alias) {
-        return new OasRequest(alias.getQualifiedName(), this);
+        return new OasRequest(alias.getUnqualifiedName(), this);
     }
 
     /**

@@ -28,6 +28,7 @@ import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.LazySchema;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.jooq.types.ULong;
@@ -96,7 +97,7 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
     }
 
     private CtxSchemeValue(Name alias, Table<CtxSchemeValueRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment("This table stores the context scheme values for a particular context scheme in the CTX_SCHEME table."), TableOptions.table(), where);
+        super(alias, aliased == null ? new LazySchema(DSL.name(""), DSL.comment(""), () -> DefaultSchema.DEFAULT_SCHEMA) : null, aliased, parameters, DSL.comment("This table stores the context scheme values for a particular context scheme in the CTX_SCHEME table."), TableOptions.table(), where);
     }
 
     /**
@@ -149,7 +150,7 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
 
         @Override
         public CtxSchemeValuePath as(Table<?> alias) {
-            return new CtxSchemeValuePath(alias.getQualifiedName(), this);
+            return new CtxSchemeValuePath(alias.getUnqualifiedName(), this);
         }
     }
 
@@ -215,7 +216,7 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
 
     @Override
     public CtxSchemeValue as(Table<?> alias) {
-        return new CtxSchemeValue(alias.getQualifiedName(), this);
+        return new CtxSchemeValue(alias.getUnqualifiedName(), this);
     }
 
     /**
