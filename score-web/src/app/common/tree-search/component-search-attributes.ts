@@ -25,7 +25,7 @@ export function cardinalityKey(cardinality?: NodeCardinality): string {
     '#' + cardinality.min + '..' + (cardinality.max < 0 ? '*' : cardinality.max) : '';
 }
 
-/** The part of a core component (as the CC graph describes it) a search can ask about; each kind has its own columns. */
+/** The part of a core component (as the CC graph describes it) a search can ask about; each type has its own columns. */
 export interface ComponentTerms {
   objectClassTerm?: string;
   propertyTerm?: string;
@@ -55,7 +55,7 @@ export interface AssociationTerms {
 /**
  * What a search predicate may ask about a node of a tree: its `type`, the columns of the core component it shows under
  * the names the database gives them (`object_class_term` of an ACC, `property_term` of an ASCCP or BCCP, `den`,
- * `data_type_term`, `representation_term`, `component_type`, ...: a component has only its own kind's, and a test on
+ * `data_type_term`, `representation_term`, `component_type`, ...: a component has only its own type's, and a test on
  * a column it has not is false), and the `entity_type` of the BCC that ties it to its parent. `text` is what the
  * node reads in the tree, which is what `text()` answers. The texts of the definitions are held by the backend, not by
  * the tree (see `SearchAttribute.source`).

@@ -3,9 +3,9 @@ import {predicateTail} from './search-grammar';
 import {BIE_SEARCH_ATTRIBUTES, COMPONENT_SEARCH_ATTRIBUTES, MODEL_BROWSER_SEARCH_ATTRIBUTES, SearchAttribute, suggestSearch, valueLookup, withValues} from './search-suggest';
 
 const ATTRIBUTES: SearchAttribute[] = [
-  {name: 'displayName', kind: 'text', description: 'name'},
-  {name: 'type', kind: 'text', description: 'type', values: ['ABIE', 'BBIEP']},
-  {name: 'used', kind: 'flag', description: 'used'}
+  {name: 'displayName', type: 'text', description: 'name'},
+  {name: 'type', type: 'text', description: 'type', values: ['ABIE', 'BBIEP']},
+  {name: 'used', type: 'flag', description: 'used'}
 ];
 
 function labels(expression: string, caret = expression.length) {
@@ -214,7 +214,7 @@ describe('suggestSearch', () => {
   });
 
   describe('values looked up on the server', () => {
-    const term: SearchAttribute = {name: 'business_term', kind: 'text', description: 'term', valueSource: () => of([])};
+    const term: SearchAttribute = {name: 'business_term', type: 'text', description: 'term', valueSource: () => of([])};
     const attributes = [...ATTRIBUTES, term];
     const found = ['Product Disclaimer', 'Price "Net"', 'Both \' and "'];
 
@@ -240,7 +240,7 @@ describe('suggestSearch', () => {
     it('offers no values before the quote, only what the grammar lets follow', () => {
       const withFound = withValues(attributes, term, found);
       const items = suggestSearch('*[business_term = ', 18, withFound).items;
-      expect(items.some(i => i.kind === 'value')).toBe(false);
+      expect(items.some(i => i.type === 'value')).toBe(false);
       expect(items.map(i => i.label)).toContain('text()');
       // in the text of a function nothing else can follow, so the values are offered at once
       expect(suggestSearch('*[contains(business_term, ', 26, withFound).items.map(i => i.insert)).toEqual(['""', '"Product Disclaimer"', '\'Price "Net"\'']);

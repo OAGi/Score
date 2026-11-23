@@ -3,7 +3,7 @@ import {BACKEND, ENABLED, backend, lit, sql} from './integrity-env';
 
 /**
  * The text of a BIE that the backend searches (`BieSearchAttribute`) against an independent SQL count: for every
- * attribute, operator and kind of value, the places (table and hash path) the backend answers are exactly the rows whose
+ * attribute, operator and type of value, the places (table and hash path) the backend answers are exactly the rows whose
  * column satisfies the condition. `business_term` is both the `biz_term` text of the nodes that have one and the terms
  * assigned to an ASBIE or a BBIE, whoever asks.
  */

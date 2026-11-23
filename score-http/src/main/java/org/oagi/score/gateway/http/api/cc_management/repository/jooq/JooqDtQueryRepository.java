@@ -37,7 +37,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.jooq.impl.DSL.and;
@@ -672,6 +675,24 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
         return DefaultAwdPriRule.select(dt.dataTypeTerm(), getDtAwdPriSummaryList(dtManifestId));
     }
 
+    @Override
+    public Map<DtId, DtAwdPriSummaryRecord> getDefaultDtAwdPriSummaryMap(ReleaseId releaseId) {
+        Map<DtId, String> termOfDt = new HashMap<>();
+        getDtSummaryList(releaseId).forEach(dt -> termOfDt.put(dt.dtId(), dt.dataTypeTerm()));
+
+        Map<DtId, DtAwdPriSummaryRecord> defaults = new HashMap<>();
+        getDtAwdPriSummaryList(releaseId).stream()
+                .collect(Collectors.groupingBy(DtAwdPriSummaryRecord::dtId))
+                .forEach((dtId, list) -> {
+                    try {
+                        defaults.put(dtId, DefaultAwdPriRule.select(termOfDt.get(dtId), list));
+                    } catch (IllegalStateException e) {
+                        // a data type without an allowed primitive to start with has no default
+                    }
+                });
+        return defaults;
+    }
+
     private List<DtAwdPriSummaryRecord> getDtAwdPriSummaryList(ReleaseId releaseId, DtId dtId) {
         if (releaseId == null || dtId == null) {
             return Collections.emptyList();
@@ -1223,6 +1244,24 @@ public class JooqDtQueryRepository extends JooqBaseRepository implements DtQuery
     public DtScAwdPriSummaryRecord getDefaultDtScAwdPriSummary(DtScManifestId dtScManifestId) {
         DtScSummaryRecord dtSc = getDtScSummary(dtScManifestId);
         return DefaultAwdPriRule.selectForSc(dtSc.representationTerm(), getDtScAwdPriSummaryList(dtScManifestId));
+    }
+
+    @Override
+    public Map<DtScId, DtScAwdPriSummaryRecord> getDefaultDtScAwdPriSummaryMap(ReleaseId releaseId) {
+        Map<DtScId, String> termOfDtSc = new HashMap<>();
+        getDtScSummaryList(List.of(releaseId)).forEach(sc -> termOfDtSc.put(sc.dtScId(), sc.representationTerm()));
+
+        Map<DtScId, DtScAwdPriSummaryRecord> defaults = new HashMap<>();
+        getDtScAwdPriSummaryList(releaseId).stream()
+                .collect(Collectors.groupingBy(DtScAwdPriSummaryRecord::dtScId))
+                .forEach((dtScId, list) -> {
+                    try {
+                        defaults.put(dtScId, DefaultAwdPriRule.selectForSc(termOfDtSc.get(dtScId), list));
+                    } catch (IllegalStateException e) {
+                        // a supplementary component without an allowed primitive to start with has no default
+                    }
+                });
+        return defaults;
     }
 
     private List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryList(ReleaseId releaseId, DtScId dtScId) {

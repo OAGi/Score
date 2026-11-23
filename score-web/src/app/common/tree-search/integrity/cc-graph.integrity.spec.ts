@@ -5,7 +5,7 @@ import {CcRelease} from './cc-sql-oracle';
 
 /**
  * What the in-browser attributes of the component trees are made of: the CC graph the backend serves. For roots of
- * every kind, in several releases, the graph has to hold exactly the components the database says are reachable from
+ * every type, in several releases, the graph has to hold exactly the components the database says are reachable from
  * the root, and every node has to say about itself what its row says (the attributes the searches judge).
  */
 
@@ -26,9 +26,9 @@ describe.skipIf(!ENABLED)('CC graph against SQL (' + BACKEND + ')', () => {
       for (const root of roots) {
         const {graph} = await graphOf(root.type, root.id);
         const want = data.reachable(root.type, root.id);
-        const kinds: Record<string, Set<number>> = {ACC: want.accs, ASCC: want.asccs, ASCCP: want.asccps, BCC: want.bccs,
+        const types: Record<string, Set<number>> = {ACC: want.accs, ASCC: want.asccs, ASCCP: want.asccps, BCC: want.bccs,
           BCCP: want.bccps, DT: want.dts, DT_SC: want.dtScs};
-        for (const [type, ids] of Object.entries(kinds)) {
+        for (const [type, ids] of Object.entries(types)) {
           const got = Object.values(graph.nodes).filter(n => n.type === type).map(n => n.manifestId).sort((a, b) => a - b);
           check(`${root.type} ${root.id} ${type} set`, got, [...ids].sort((a, b) => a - b));
         }

@@ -2669,7 +2669,7 @@ export class BieFlatNodeDatabase<T extends BieFlatNode> {
     const keyOf = (node: T): string => {
       const key = this.searchKey(node);
       if (key === undefined) {
-        throw new Error('A node of an unknown kind cannot be searched through its graph.');
+        throw new Error('A node of an unknown type cannot be searched through its graph.');
       }
       return key;
     };
@@ -4203,7 +4203,7 @@ function isUsedInTree(node: BieFlatNode): boolean {
   return true;
 }
 
-/** The ASCC or BCC that ties a node to its parent (the other kinds have none). */
+/** The ASCC or BCC that ties a node to its parent (the other types have none). */
 function bieAssociation(node: BieFlatNode): CcGraphNode | undefined {
   return node instanceof BbiepFlatNode ? node.bccNode : node instanceof AsbiepFlatNode ? node.asccNode : undefined;
 }
@@ -4212,15 +4212,15 @@ function bieAssociation(node: BieFlatNode): CcGraphNode | undefined {
 function biePlace(node: BieFlatNode): CcPlace {
   const association = bieAssociation(node);
   const associationKey: CcKey | undefined = association ?
-    {kind: node instanceof BbiepFlatNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
-  const component: CcKey | undefined = node instanceof BbiepFlatNode ? {kind: 'bccp', manifestId: node.bccpNode.manifestId}
-    : node instanceof BbieScFlatNode ? {kind: 'dtSc', manifestId: node.bdtScNode.manifestId}
-      : node instanceof AbieFlatNode ? {kind: 'asccp', manifestId: node.asccpNode.manifestId} : undefined;
+    {type: node instanceof BbiepFlatNode ? 'bcc' : 'ascc', manifestId: association.manifestId} : undefined;
+  const component: CcKey | undefined = node instanceof BbiepFlatNode ? {type: 'bccp', manifestId: node.bccpNode.manifestId}
+    : node instanceof BbieScFlatNode ? {type: 'dtSc', manifestId: node.bdtScNode.manifestId}
+      : node instanceof AbieFlatNode ? {type: 'asccp', manifestId: node.asccpNode.manifestId} : undefined;
   return {
     own: associationKey ?? component,
     association: associationKey,
     component,
-    type: node instanceof AbieFlatNode ? {kind: 'acc', manifestId: node.accNode.manifestId} : undefined,
+    type: node instanceof AbieFlatNode ? {type: 'acc', manifestId: node.accNode.manifestId} : undefined,
     // what the edit screen shows for a BBIEP the BIE stores no value constraint for is that of its BCCP, for a BBIE_SC that of its DT_SC
     valueConstraint: node instanceof BbiepFlatNode || node instanceof BbieScFlatNode ? component : undefined
   };

@@ -17,7 +17,7 @@ export const RELEASES = [77, 10, 53];
 export const COMPONENT_TYPES = ['Base', 'Semantics', 'Extension', 'SemanticGroup', 'UserExtensionGroup', 'Embedded', 'OAGIS10Nouns',
   'OAGIS10BODs', 'BOD', 'Verb', 'Noun', 'Choice', 'AttributeGroup'];
 
-/** A reproducible sample of roots of every kind: the biggest, the smallest and some in between. */
+/** A reproducible sample of roots of every type: the biggest, the smallest and some in between. */
 export function sampleRoots(release: number): {type: 'ACC' | 'ASCCP' | 'BCCP' | 'DT', id: number}[] {
   const pick = (table: string, id: string, type: 'ACC' | 'ASCCP' | 'BCCP' | 'DT', limit: number) =>
     sql(`select ${id} from ${table} where release_id = ${release} order by md5(${id}) limit ${limit}`)

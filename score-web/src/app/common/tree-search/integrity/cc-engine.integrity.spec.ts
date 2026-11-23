@@ -9,7 +9,7 @@ import {DagPathSearch} from '../dag-path-search';
 import {PathPattern} from '../path-pattern';
 
 /**
- * The in-browser attributes of the component trees against the database: for roots of every kind, what the search
+ * The in-browser attributes of the component trees against the database: for roots of every type, what the search
  * engine counts over the tree built from the backend's graph (as a user's search does) is what an independent unfolding
  * of the tables counts, for expressions over every graph attribute and their combinations.
  */

@@ -3,33 +3,33 @@ import {BACKEND, ENABLED, backend, lit, sql} from './integrity-env';
 
 /**
  * The text of the core components that the backend searches (`CcSearchAttribute`) against an independent SQL count:
- * for every attribute, operator and kind of value (words, case, quotes, wildcards, accents, the empty text, NULL
+ * for every attribute, operator and type of value (words, case, quotes, wildcards, accents, the empty text, NULL
  * columns) the manifests the backend answers are exactly the manifests of the release whose column satisfies the
  * condition. Run it as described in `integrity-env.ts`.
  */
 
-type Kind = 'accs' | 'asccs' | 'asccps' | 'bccs' | 'bccps' | 'dts' | 'dtScs';
+type Type = 'accs' | 'asccs' | 'asccps' | 'bccs' | 'bccps' | 'dts' | 'dtScs';
 type Operator = 'EQUALS' | 'NOT_EQUALS' | 'CONTAINS' | 'STARTS_WITH' | 'ENDS_WITH';
 
 interface Table {
-  kind: Kind;
+  type: Type;
   manifest: string;
   id: string;
   table: string;
 }
 
-const TABLES: Record<Kind, Table> = {
-  accs: {kind: 'accs', manifest: 'acc_manifest', id: 'acc_manifest_id', table: 'acc'},
-  asccs: {kind: 'asccs', manifest: 'ascc_manifest', id: 'ascc_manifest_id', table: 'ascc'},
-  asccps: {kind: 'asccps', manifest: 'asccp_manifest', id: 'asccp_manifest_id', table: 'asccp'},
-  bccs: {kind: 'bccs', manifest: 'bcc_manifest', id: 'bcc_manifest_id', table: 'bcc'},
-  bccps: {kind: 'bccps', manifest: 'bccp_manifest', id: 'bccp_manifest_id', table: 'bccp'},
-  dts: {kind: 'dts', manifest: 'dt_manifest', id: 'dt_manifest_id', table: 'dt'},
-  dtScs: {kind: 'dtScs', manifest: 'dt_sc_manifest', id: 'dt_sc_manifest_id', table: 'dt_sc'}
+const TABLES: Record<Type, Table> = {
+  accs: {type: 'accs', manifest: 'acc_manifest', id: 'acc_manifest_id', table: 'acc'},
+  asccs: {type: 'asccs', manifest: 'ascc_manifest', id: 'ascc_manifest_id', table: 'ascc'},
+  asccps: {type: 'asccps', manifest: 'asccp_manifest', id: 'asccp_manifest_id', table: 'asccp'},
+  bccs: {type: 'bccs', manifest: 'bcc_manifest', id: 'bcc_manifest_id', table: 'bcc'},
+  bccps: {type: 'bccps', manifest: 'bccp_manifest', id: 'bccp_manifest_id', table: 'bccp'},
+  dts: {type: 'dts', manifest: 'dt_manifest', id: 'dt_manifest_id', table: 'dt'},
+  dtScs: {type: 'dtScs', manifest: 'dt_sc_manifest', id: 'dt_sc_manifest_id', table: 'dt_sc'}
 };
 
-/** What each attribute reads, per kind of component: written down independently of the repository, from the data model. */
-const COLUMNS: Record<string, Partial<Record<Kind, string>>> = {
+/** What each attribute reads, per type of component: written down independently of the repository, from the data model. */
+const COLUMNS: Record<string, Partial<Record<Type, string>>> = {
   definition: {accs: 'definition', asccs: 'definition', asccps: 'definition', bccs: 'definition', bccps: 'definition', dts: 'definition', dtScs: 'definition'},
   definition_source: {accs: 'definition_source', asccs: 'definition_source', asccps: 'definition_source', bccs: 'definition_source', bccps: 'definition_source', dts: 'definition_source', dtScs: 'definition_source'},
   association_definition: {asccs: 'definition', bccs: 'definition'},
@@ -59,18 +59,18 @@ function condition(column: string, operator: Operator, value: string, caseSensit
   }
 }
 
-function expected(release: number, attribute: string, operator: Operator, value: string, caseSensitive: boolean): Record<Kind, number[]> {
-  const result = {} as Record<Kind, number[]>;
-  for (const kind of Object.keys(TABLES) as Kind[]) {
-    const column = COLUMNS[attribute][kind];
+function expected(release: number, attribute: string, operator: Operator, value: string, caseSensitive: boolean): Record<Type, number[]> {
+  const result = {} as Record<Type, number[]>;
+  for (const type of Object.keys(TABLES) as Type[]) {
+    const column = COLUMNS[attribute][type];
     if (!column) {
-      result[kind] = [];
+      result[type] = [];
       continue;
     }
-    const t = TABLES[kind];
+    const t = TABLES[type];
     const unstorable = [...value].some(c => c.codePointAt(0) > 0xFFFF);
     const key = t.id.replace('_manifest_id', '_id');
-    result[kind] = sql(`select m.${t.id} from ${t.manifest} m join ${t.table} c on c.${key} = m.${key} ` +
+    result[type] = sql(`select m.${t.id} from ${t.manifest} m join ${t.table} c on c.${key} = m.${key} ` +
       `where m.release_id = ${release} and (${unstorable ? (operator === 'NOT_EQUALS' ? `c.${column} is not null` : 'false')
         : condition('c.' + column, operator, value, caseSensitive)}) order by 1`)
       .map(row => Number(row[0]));
@@ -79,17 +79,17 @@ function expected(release: number, attribute: string, operator: Operator, value:
 }
 
 interface Answer {
-  matches: Record<string, Record<Kind, number[]>>;
+  matches: Record<string, Record<Type, number[]>>;
 }
 
-async function asked(root: number, attribute: string, operator: Operator, value: string, caseSensitive: boolean): Promise<Record<Kind, number[]>> {
+async function asked(root: number, attribute: string, operator: Operator, value: string, caseSensitive: boolean): Promise<Record<Type, number[]>> {
   const answer = await backend<Answer>('/core-components/search-nodes', {
     asccpManifestId: root,
     predicates: [{id: 'p', attribute, operator, value, caseSensitive}]
   });
-  const sorted = {} as Record<Kind, number[]>;
-  for (const kind of Object.keys(TABLES) as Kind[]) {
-    sorted[kind] = [...(answer.matches['p']?.[kind] ?? [])].sort((a, b) => a - b);
+  const sorted = {} as Record<Type, number[]>;
+  for (const type of Object.keys(TABLES) as Type[]) {
+    sorted[type] = [...(answer.matches['p']?.[type] ?? [])].sort((a, b) => a - b);
   }
   return sorted;
 }
@@ -160,10 +160,10 @@ describe.skipIf(!ENABLED)('CC server text search against SQL (' + BACKEND + ')',
               const want = expected(release, attribute, operator, value, caseSensitive);
               const got = await asked(rootManifest, attribute, operator, value, caseSensitive);
               compared++;
-              for (const kind of Object.keys(TABLES) as Kind[]) {
-                nonEmpty += want[kind].length > 0 ? 1 : 0;
-                if (JSON.stringify(want[kind]) !== JSON.stringify(got[kind])) {
-                  mismatches.push(`${operator} ${JSON.stringify(value)} cs=${caseSensitive} ${kind}: SQL ${want[kind].length} backend ${got[kind].length}`);
+              for (const type of Object.keys(TABLES) as Type[]) {
+                nonEmpty += want[type].length > 0 ? 1 : 0;
+                if (JSON.stringify(want[type]) !== JSON.stringify(got[type])) {
+                  mismatches.push(`${operator} ${JSON.stringify(value)} cs=${caseSensitive} ${type}: SQL ${want[type].length} backend ${got[type].length}`);
                 }
               }
             }
@@ -171,8 +171,8 @@ describe.skipIf(!ENABLED)('CC server text search against SQL (' + BACKEND + ')',
         }
         expect(compared).toBeGreaterThan(100);
         // an attribute that no component of the release has (the data has no fixed values) is compared on its absence only
-        const hasData = Object.entries(COLUMNS[attribute]).some(([kind, column]) => {
-          const t = TABLES[kind as Kind];
+        const hasData = Object.entries(COLUMNS[attribute]).some(([type, column]) => {
+          const t = TABLES[type as Type];
           const key = t.id.replace('_manifest_id', '_id');
           return sql(`select count(*) from ${t.manifest} m join ${t.table} c on c.${key} = m.${key} where m.release_id = ${release} and c.${column} is not null`)[0][0] !== '0';
         });

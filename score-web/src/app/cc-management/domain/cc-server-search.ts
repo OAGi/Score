@@ -10,7 +10,7 @@ export interface CcSearchRoot {
   manifestId: number;
 }
 
-/** The components of a release a predicate holds for, by kind (manifest ids). */
+/** The components of a release a predicate holds for, by type (manifest ids). */
 export interface CcSearchNodes {
   accs: number[];
   asccs: number[];
@@ -46,11 +46,11 @@ export class CcSearchService {
   }
 }
 
-export type CcKind = 'acc' | 'ascc' | 'asccp' | 'bcc' | 'bccp' | 'dt' | 'dtSc';
+export type CcType = 'acc' | 'ascc' | 'asccp' | 'bcc' | 'bccp' | 'dt' | 'dtSc';
 
 /** A component (or association) of the release, as the backend names it. */
 export interface CcKey {
-  kind: CcKind;
+  type: CcType;
   manifestId: number;
 }
 
@@ -70,7 +70,7 @@ export interface CcPlace {
   valueConstraint?: CcKey;
 }
 
-const KIND_OF_FIELD: Record<CcKind, keyof CcSearchNodes> = {
+const TYPE_OF_FIELD: Record<CcType, keyof CcSearchNodes> = {
   acc: 'accs', ascc: 'asccs', asccp: 'asccps', bcc: 'bccs', bccp: 'bccps', dt: 'dts', dtSc: 'dtScs'
 };
 
@@ -83,9 +83,9 @@ export class CcServerMarks {
     for (const predicate of predicates) {
       const keys = new Set<string>();
       const nodes = response.matches[predicate.id];
-      for (const kind of Object.keys(KIND_OF_FIELD) as CcKind[]) {
-        for (const manifestId of nodes?.[KIND_OF_FIELD[kind]] ?? []) {
-          keys.add(kind + ':' + manifestId);
+      for (const type of Object.keys(TYPE_OF_FIELD) as CcType[]) {
+        for (const manifestId of nodes?.[TYPE_OF_FIELD[type]] ?? []) {
+          keys.add(type + ':' + manifestId);
         }
       }
       this.found.set(predicate.id, keys);
@@ -105,7 +105,7 @@ export class CcServerMarks {
         continue;
       }
       const key = this.keyFor(predicate.attribute, place);
-      if (key && this.found.get(predicate.id)?.has(key.kind + ':' + key.manifestId)) {
+      if (key && this.found.get(predicate.id)?.has(key.type + ':' + key.manifestId)) {
         flags[predicate.flag] = true;
       }
     }

@@ -162,7 +162,7 @@ describe('searching with paths', () => {
     expect(count('Party/Code[1]')).toBe(2);
   });
 
-  it('judges a node by the text it shows, and by the columns of its own kind', () => {
+  it('judges a node by the text it shows, and by the columns of its own type', () => {
     expect(count('*[contains(text(), "ar")]')).toBe(2);
     expect(count('*[text() = "Party"]')).toBe(2);
     expect(count('*[starts-with(text(), "S") and type = ASBIEP]')).toBe(1);

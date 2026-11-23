@@ -23,7 +23,7 @@ const ATTRIBUTES = {
 /** The text of a BIE tree that the backend answers (and the places that have none fall back to their core component). */
 const SERVER_TEXT = ['fixed_value', 'default_value'];
 
-/** The kind of node a BIE-like tree (model browser, BIE edit) calls each kind of component. */
+/** The type of node a BIE-like tree (model browser, BIE edit) calls each type of component. */
 const BIE_TYPES: Record<string, string> = {ACC: 'ABIE', ASCCP: 'ASBIEP', BCCP: 'BBIEP', DT_SC: 'BBIE_SC'};
 const asBie = process.env['SEARCH_MATRIX_BIE_TYPES'] === '1';
 /** The screen of a data type shows the data type alone in its tree. */
@@ -107,7 +107,7 @@ describe.skipIf(!ENABLED || !process.env['SEARCH_MATRIX_OUT'])('matrix of the co
       const values: Record<string, (string | number)[]> = {};
       for (const [k, set] of Object.entries(harvest)) {
         const sorted = [...set].filter(x => typeof x === 'string').map(String).sort((a, b) => a.length - b.length);
-        // a short, a long and some in between, so that a value is not always the same kind
+        // a short, a long and some in between, so that a value is not always the same type
         values[k] = k === 'guid' ? sorted.slice(0, 1) : [sorted[0], sorted[Math.floor(sorted.length / 3)], sorted[Math.floor(sorted.length * 2 / 3)], sorted[sorted.length - 1]]
           .filter((x, i, a) => x !== undefined && a.indexOf(x) === i);
       }

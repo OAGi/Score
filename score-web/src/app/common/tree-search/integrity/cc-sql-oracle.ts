@@ -128,7 +128,7 @@ export class CcRelease {
     }
   }
 
-  /** The components reachable from a root, by kind (manifest ids): what its graph has to contain. */
+  /** The components reachable from a root, by type (manifest ids): what its graph has to contain. */
   reachable(rootType: 'ACC' | 'ASCCP' | 'BCCP' | 'DT', rootId: number): {accs: Set<number>, asccs: Set<number>, asccps: Set<number>,
     bccs: Set<number>, bccps: Set<number>, dts: Set<number>, dtScs: Set<number>} {
     const seen = {accs: new Set<number>(), asccs: new Set<number>(), asccps: new Set<number>(), bccs: new Set<number>(),

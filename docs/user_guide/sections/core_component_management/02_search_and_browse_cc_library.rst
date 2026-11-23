@@ -349,9 +349,9 @@ The attributes depend on the tree:
    * - Attribute
      - Meaning
    * - ``type``
-     - The kind of node: ``ACC``, ``ASCCP``, ``BCCP``, ``DT``, or ``DT_SC`` in the Core Component trees; ``ABIE``, ``ASBIEP``, ``BBIEP``, or ``BBIE_SC`` in the Model Browser and the BIE trees.
+     - The type of node: ``ACC``, ``ASCCP``, ``BCCP``, ``DT``, or ``DT_SC`` in the Core Component trees; ``ABIE``, ``ASBIEP``, ``BBIEP``, or ``BBIE_SC`` in the Model Browser and the BIE trees.
    * - ``object_class_term``, ``property_term``, ``den``, ``data_type_term``, ``representation_term``, ``qualifier``
-     - The terms of the component the node shows. A kind of component has only its own terms (e.g., ``object_class_term`` for an ACC), and a test on an attribute the node does not have is false.
+     - The terms of the component the node shows. A type of component has only its own terms (e.g., ``object_class_term`` for an ACC), and a test on an attribute the node does not have is false.
    * - ``component_type``, ``entity_type``, ``state``, ``guid``, ``deprecated``
      - The component type of an ACC, the entity type (Element or Attribute) of a BCC, the state, the GUID, and whether the node is deprecated. In the Core Component trees and the Model Browser a node is deprecated when the tree shows it as deprecated: its component is, or the association (ASCC or BCC) that ties it to its parent is, or (for a BCCP) its data type is.
    * - ``object_class_qualifier``, ``abstract``, ``reusable``, ``commonly_used``, ``nillable``

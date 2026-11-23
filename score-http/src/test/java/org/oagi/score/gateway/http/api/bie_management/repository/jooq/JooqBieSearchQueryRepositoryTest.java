@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.oagi.score.gateway.http.api.account_management.model.UserId;
 import org.oagi.score.gateway.http.api.bie_management.model.TopLevelAsbiepId;
 import org.oagi.score.gateway.http.common.model.TextSearchOperator;
+import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchAttribute;
 import org.oagi.score.gateway.http.api.bie_management.model.bie_search.BieSearchPredicate;
 import org.oagi.score.gateway.http.common.model.ScoreRole;
 import org.oagi.score.gateway.http.common.model.ScoreUser;
@@ -52,7 +53,7 @@ class JooqBieSearchQueryRepositoryTest {
     }
 
     private static BieSearchPredicate predicate(String attribute, TextSearchOperator operator, String value, boolean caseSensitive) {
-        return new BieSearchPredicate("p", attribute, operator, value, caseSensitive);
+        return new BieSearchPredicate("p", BieSearchAttribute.from(attribute), operator, value, caseSensitive);
     }
 
     private String from(String table) {
@@ -108,7 +109,7 @@ class JooqBieSearchQueryRepositoryTest {
     }
 
     @Test
-    void valueDomainRestrictionIsTheKindThatTheRowHolds() {
+    void valueDomainRestrictionIsTheTypeThatTheRowHolds() {
         repository().searchNodes(BIE, predicate("value_domain_restriction", TextSearchOperator.EQUALS, "Code List", false));
 
         assertEquals(6, sql.size());
@@ -120,15 +121,15 @@ class JooqBieSearchQueryRepositoryTest {
     }
 
     @Test
-    void theKindsOfValueDomainAreOfferedWithoutReadingTheBie() {
-        assertEquals(List.of("Primitive", "Code List", "Agency ID List"), repository().suggestValues(BIE, "value_domain_restriction", "", 30));
-        assertEquals(List.of("Code List"), repository().suggestValues(BIE, "value_domain_restriction", "code", 30));
+    void theTypesOfValueDomainAreOfferedWithoutReadingTheBie() {
+        assertEquals(List.of("Primitive", "Code List", "Agency ID List"), repository().suggestValues(BIE, BieSearchAttribute.from("value_domain_restriction"), "", 30));
+        assertEquals(List.of("Code List"), repository().suggestValues(BIE, BieSearchAttribute.from("value_domain_restriction"), "code", 30));
         assertTrue(sql.isEmpty());
     }
 
     @Test
     void businessTermValuesAreOfferedFromTheSamePlacesTheSearchReads() {
-        assertEquals(List.of(), repository().suggestValues(BIE, "business_term", "pro", 30));
+        assertEquals(List.of(), repository().suggestValues(BIE, BieSearchAttribute.from("business_term"), "pro", 30));
 
         assertEquals(6, sql.size());
         assertTrue(sql.stream().allMatch(s -> s.contains(" like ") && s.contains("limit")));
@@ -138,13 +139,13 @@ class JooqBieSearchQueryRepositoryTest {
 
     @Test
     void anEmptyTextOffersEveryValueAndAFourByteCharacterOffersNone() {
-        repository().suggestValues(BIE, "business_term", "", 30);
+        repository().suggestValues(BIE, BieSearchAttribute.from("business_term"), "", 30);
         assertEquals(6, sql.size());
         assertTrue(sql.stream().noneMatch(s -> s.contains(" like ")));
 
-        assertEquals(List.of(), repository().suggestValues(BIE, "business_term", "\uD83D\uDE00", 30));
+        assertEquals(List.of(), repository().suggestValues(BIE, BieSearchAttribute.from("business_term"), "\uD83D\uDE00", 30));
         assertTrue(sql.isEmpty());
-        assertThrows(IllegalArgumentException.class, () -> repository().suggestValues(BIE, "nope", "", 30));
+        assertThrows(IllegalArgumentException.class, () -> repository().suggestValues(BIE, BieSearchAttribute.from("nope"), "", 30));
     }
 
     @Test
@@ -187,7 +188,7 @@ class JooqBieSearchQueryRepositoryTest {
 
     @Test
     void theDefaultValueDomainsOfTheReleaseAreOfferedToo() {
-        repository().suggestValues(BIE, "value_domain", "", 30);
+        repository().suggestValues(BIE, BieSearchAttribute.from("value_domain"), "", 30);
         // a place the BIE stores nothing for starts with the default of its data type
         assertTrue(sql.stream().anyMatch(s -> s.contains("from `top_level_asbiep`") && s.contains("`release_id`")));
     }

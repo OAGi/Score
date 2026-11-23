@@ -13,6 +13,7 @@ import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface DtQueryRepository {
 
@@ -43,6 +44,12 @@ public interface DtQueryRepository {
 
     DtAwdPriSummaryRecord getDefaultDtAwdPriSummary(DtManifestId dtManifestId);
 
+    /**
+     * The allowed primitive each data type of the release starts with (see {@link DefaultAwdPriRule}), by data type. A
+     * data type that has no allowed primitive to start with has no entry.
+     */
+    Map<DtId, DtAwdPriSummaryRecord> getDefaultDtAwdPriSummaryMap(ReleaseId releaseId);
+
     List<DtAwdPriDetailsRecord> getDefaultPrimitiveValues(String representationTerm);
 
 
@@ -71,6 +78,9 @@ public interface DtQueryRepository {
     List<DtScAwdPriSummaryRecord> getDtScAwdPriSummaryListByDtScIds(Collection<DtScId> dtScIds);
 
     DtScAwdPriSummaryRecord getDefaultDtScAwdPriSummary(DtScManifestId dtScManifestId);
+
+    /** Like {@link #getDefaultDtAwdPriSummaryMap}, for the supplementary components of the release. */
+    Map<DtScId, DtScAwdPriSummaryRecord> getDefaultDtScAwdPriSummaryMap(ReleaseId releaseId);
 
     boolean hasRecordsByNamespaceId(NamespaceId namespaceId);
 
