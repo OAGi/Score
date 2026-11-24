@@ -194,4 +194,13 @@ public interface ViewEditBusinessTermPage extends Page, SearchBarPage {
     EditBusinessTermPage openEditBusinessTermPageByTerm(String businessTermName)
             throws NoSuchElementException;
 
+    /**
+     * Open the 'Where Used' dialog of the business term, from the menu of its row in the list.
+     *
+     * @param businessTermName business term name
+     * @return the 'Where Used' dialog
+     * @throws NoSuchElementException if the business term being requested does not exist.
+     */
+    BusinessTermWhereUsedDialog openWhereUsedDialog(String businessTermName) throws NoSuchElementException;
+
 }

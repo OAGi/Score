@@ -451,3 +451,32 @@ describe('BieEditComponent saves pending edits before a base BIE or reusable BIE
     expect(ctx.service.makeReusableBIE).toHaveBeenCalled();
   });
 });
+
+/**
+ * A developer sees the business terms assigned to a node in the BIE editor but cannot assign, edit or remove them: a node
+ * that an end user may edit is not editable for a developer, and the panel is drawn for them when the feature is on.
+ */
+describe('BieEditComponent business term editing', () => {
+  const editable = (ctx: object, node: any) => BieEditComponent.prototype.isBusinessTermEditable.call(ctx, node);
+  const usedNode: any = {used: true, locked: false, isCycle: false};
+
+  it('lets an end user edit the business terms of a used node', () => {
+    expect(editable({isDeveloper: false, isReadOnlyWipViewer: false}, usedNode)).toBe(true);
+  });
+
+  it('does not let a developer edit them, on a node that an end user may', () => {
+    expect(editable({isDeveloper: true, isReadOnlyWipViewer: false}, usedNode)).toBe(false);
+  });
+
+  it('does not let a viewer of a WIP BIE who is not its owner edit them', () => {
+    expect(editable({isDeveloper: false, isReadOnlyWipViewer: true}, usedNode)).toBe(false);
+  });
+
+  it('does not edit them on a node that is not used, locked or in a cycle', () => {
+    const ctx = {isDeveloper: false, isReadOnlyWipViewer: false};
+    expect(editable(ctx, {...usedNode, used: false})).toBe(false);
+    expect(editable(ctx, {...usedNode, locked: true})).toBe(false);
+    expect(editable(ctx, {...usedNode, isCycle: true})).toBe(false);
+    expect(editable(ctx, undefined)).toBe(false);
+  });
+});

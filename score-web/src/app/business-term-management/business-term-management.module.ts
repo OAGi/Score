@@ -16,6 +16,11 @@ import {AssignBusinessTermBtComponent} from './assign-business-term/assign-busin
 import {AssignBusinessTermBieComponent} from './assign-business-term/assign-business-term-bie.component';
 import {AssignedBusinessTermDetailComponent} from './assigned-business-term-detail/assigned-business-term-detail.component';
 import {BusinessTermImportDialogComponent} from './business-term-import-dialog/business-term-import-dialog.component';
+import {BusinessTermWhereUsedDialogComponent} from './business-term-where-used-dialog/business-term-where-used-dialog.component';
+import {TreeViewportComponent} from '../common/tree-viewport/tree-viewport.component';
+import {TreeNodeDecorationsComponent} from '../common/tree-viewport/tree-node-decorations.component';
+import {BieEditService} from '../bie-management/bie-edit/domain/bie-edit.service';
+import {CcNodeService} from '../cc-management/domain/core-component-node.service';
 import {TranslatePipe} from '@ngx-translate/core';
 import {SearchBarModule} from '../common/search-bar/search-bar.module';
 import {ColumnSelectorModule} from '../common/column-selector/column-selector.module';
@@ -103,6 +108,8 @@ const routes: Routes = [
         BieCompactRowComponent,
         RecordCompactRowComponent,
         ResponsiveButtonComponent,
+        TreeViewportComponent,
+        TreeNodeDecorationsComponent,
         ...SCORE_TABLE
     ],
   declarations: [
@@ -110,13 +117,16 @@ const routes: Routes = [
     BusinessTermCreateComponent,
     BusinessTermDetailComponent,
     BusinessTermImportDialogComponent,
+    BusinessTermWhereUsedDialogComponent,
     AssignedBusinessTermListComponent,
     AssignBusinessTermBtComponent,
     AssignBusinessTermBieComponent,
     AssignedBusinessTermDetailComponent
   ],
   providers: [
-    BusinessTermService
+    BusinessTermService,
+    BieEditService,
+    CcNodeService
   ]
 })
 export class BusinessTermManagementModule {

@@ -52,9 +52,27 @@
         </div>
       </td>
     </ng-container>
+
+    <ng-container [scoreColumnDef]="columns.column('more')">
+      <td *scoreCellDef="let element" score-cell>
+        <button mat-icon-button aria-label="More actions"
+          [matMenuTriggerFor]="contextMenu"
+          (click)="contextMenuItem = element; $event.stopPropagation();">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </td>
+    </ng-container>
     <!-- A narrow screen: the record as one block, not the columns squeezed. -->
     <ng-container *scoreCompactDef="let element">
       <score-record-compact-row [record]="compactRecord(element)"/>
     </ng-container>
   </score-table-view>
+
+  <ng-container ngProjectAs="[listExtra]">
+    <mat-menu class="context-menu" #contextMenu="matMenu">
+      <button mat-menu-item (click)="openWhereUsedDialog(contextMenuItem)">
+        <span class="context-menu-item">Where Used</span>
+      </button>
+    </mat-menu>
+  </ng-container>
 </score-list-page>

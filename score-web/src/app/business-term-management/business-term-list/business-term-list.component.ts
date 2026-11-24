@@ -6,12 +6,20 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {BusinessTermListEntry} from '../domain/business-term';
 import {BusinessTermService} from '../domain/business-term.service';
 import {BUSINESS_TERM_TABLE} from '../domain/business-term.table';
+import {defineTable} from '../../common/score-table';
+import {BusinessTermWhereUsedDialogComponent} from '../business-term-where-used-dialog/business-term-where-used-dialog.component';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
 import {createTableColumns, ScoreTableViewComponent} from '../../common/score-table';
 import {BusinessTermImportDialogComponent} from '../business-term-import-dialog/business-term-import-dialog.component';
 import {BatchImportResult} from '../business-term-import-dialog/business-term-import.model';
 import {CompactRecord, memoizeRow} from '../../common/record-compact-row';
 import {businessTermCompactRecord} from '../domain/business-term-compact';
+
+/** The list adds a row menu to the table that it shares with the dialog that assigns business terms to a BIE. */
+const BUSINESS_TERM_LIST_TABLE = defineTable({
+  ...BUSINESS_TERM_TABLE,
+  fixed: [{id: 'more', position: 'end', width: 40}],
+});
 
 @Component({
   standalone: false,
@@ -28,13 +36,25 @@ export class BusinessTermListComponent {
   /** What the compact row shows of a business term: made once for a row. */
   readonly compactRecord = memoizeRow(businessTermCompactRecord);
 
-  readonly columns = createTableColumns(BUSINESS_TERM_TABLE);
+  readonly columns = createTableColumns(BUSINESS_TERM_LIST_TABLE);
   readonly view = viewChild.required<ScoreTableViewComponent<BusinessTermListEntry>>(ScoreTableViewComponent);
   selection = new SelectionModel<number>(true, []);
+  contextMenuItem: BusinessTermListEntry;
 
   readonly load = (params: HttpParams) => this.service.getBusinessTermListPage(params);
   readonly rowKey = (row: BusinessTermListEntry) => row.businessTermId;
   readonly rowSelectable = (row: BusinessTermListEntry) => !row.used;
+
+  openWhereUsedDialog(term: BusinessTermListEntry) {
+    this.dialog.open(BusinessTermWhereUsedDialogComponent, {
+      width: '720px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      panelClass: 'score-centered-dialog-panel',
+      autoFocus: false,
+      data: {businessTermId: term.businessTermId, businessTerm: term.businessTerm}
+    });
+  }
 
   openImportDialog() {
     const ref = this.dialog.open(BusinessTermImportDialogComponent, {

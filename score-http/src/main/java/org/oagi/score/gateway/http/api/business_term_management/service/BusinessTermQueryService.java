@@ -75,6 +75,13 @@ public class BusinessTermQueryService {
         return businessTermQuery.getBusinessTermDetails(businessTermId);
     }
 
+    public List<BusinessTermUsageRecord> getBusinessTermUsageList(ScoreUser requester, BusinessTermId businessTermId) {
+
+        assertBusinessTermEnabled(requester);
+        var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
+        return businessTermQuery.getBusinessTermUsageList(businessTermId);
+    }
+
     public ResultAndCount<AssignedBusinessTermListEntryRecord> getAssignedBusinessTermList(
             ScoreUser requester, AssignedBusinessTermListFilterCriteria filterCriteria, PageRequest pageRequest) {
 

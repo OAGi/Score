@@ -340,6 +340,105 @@ public class JooqBusinessTermQueryRepository
     }
 
     @Override
+    public List<BusinessTermUsageRecord> getBusinessTermUsageList(BusinessTermId businessTermId) {
+        var topAsbiep = ASBIEP.as("top_asbiep");
+        var topAsccpManifest = ASCCP_MANIFEST.as("top_asccp_manifest");
+        var topAsccp = ASCCP.as("top_asccp");
+
+        List<Field<?>> topLevelFields = Arrays.asList(
+                TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
+                TOP_LEVEL_ASBIEP.VERSION,
+                TOP_LEVEL_ASBIEP.STATE,
+                RELEASE.RELEASE_NUM,
+                TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP.as("top_level_last_update_timestamp"),
+                topAsccp.PROPERTY_TERM.as("top_level_property_term"));
+
+        var asbieSelect = dslContext().select(concat(fields(
+                        inline("ASBIE").as("bie_type"),
+                        ASBIE_BIZTERM.ASBIE_BIZTERM_ID.as("assigned_business_term_id"),
+                        ASBIE_BIZTERM.TYPE_CODE.as("type_code"),
+                        ASBIE_BIZTERM.PRIMARY_INDICATOR.as("primary_indicator"),
+                        ASBIE.ASBIE_ID.as("bie_id"),
+                        ASBIE.PATH.as("bie_path"),
+                        ASBIE.HASH_PATH.as("bie_hash_path")
+                ), topLevelFields.stream(), ownerFields(), updaterFields()))
+                .from(ASBIE_BIZTERM)
+                .join(ASCC_BIZTERM).on(ASBIE_BIZTERM.ASCC_BIZTERM_ID.eq(ASCC_BIZTERM.ASCC_BIZTERM_ID))
+                .join(ASBIE).on(ASBIE_BIZTERM.ASBIE_ID.eq(ASBIE.ASBIE_ID))
+                .join(TOP_LEVEL_ASBIEP).on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(ownerTable()).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(ownerTablePk()))
+                .join(updaterTable()).on(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY.eq(updaterTablePk()))
+                .join(topAsbiep).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(topAsbiep.ASBIEP_ID))
+                .join(topAsccpManifest).on(topAsbiep.BASED_ASCCP_MANIFEST_ID.eq(topAsccpManifest.ASCCP_MANIFEST_ID))
+                .join(topAsccp).on(topAsccpManifest.ASCCP_ID.eq(topAsccp.ASCCP_ID))
+                .where(ASCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)));
+
+        var bbieSelect = dslContext().select(concat(fields(
+                        inline("BBIE").as("bie_type"),
+                        BBIE_BIZTERM.BBIE_BIZTERM_ID.as("assigned_business_term_id"),
+                        BBIE_BIZTERM.TYPE_CODE.as("type_code"),
+                        BBIE_BIZTERM.PRIMARY_INDICATOR.as("primary_indicator"),
+                        BBIE.BBIE_ID.as("bie_id"),
+                        BBIE.PATH.as("bie_path"),
+                        BBIE.HASH_PATH.as("bie_hash_path")
+                ), topLevelFields.stream(), ownerFields(), updaterFields()))
+                .from(BBIE_BIZTERM)
+                .join(BCC_BIZTERM).on(BBIE_BIZTERM.BCC_BIZTERM_ID.eq(BCC_BIZTERM.BCC_BIZTERM_ID))
+                .join(BBIE).on(BBIE_BIZTERM.BBIE_ID.eq(BBIE.BBIE_ID))
+                .join(TOP_LEVEL_ASBIEP).on(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                .join(RELEASE).on(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(ownerTable()).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(ownerTablePk()))
+                .join(updaterTable()).on(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY.eq(updaterTablePk()))
+                .join(topAsbiep).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(topAsbiep.ASBIEP_ID))
+                .join(topAsccpManifest).on(topAsbiep.BASED_ASCCP_MANIFEST_ID.eq(topAsccpManifest.ASCCP_MANIFEST_ID))
+                .join(topAsccp).on(topAsccpManifest.ASCCP_ID.eq(topAsccp.ASCCP_ID))
+                .where(BCC_BIZTERM.BUSINESS_TERM_ID.eq(valueOf(businessTermId)));
+
+        // The assigned nodes, grouped by the top-level BIE they belong to .
+        Map<BigInteger, List<Record>> rowsByTopLevel = new LinkedHashMap<>();
+        for (Record row : asbieSelect.unionAll(bbieSelect).fetch()) {
+            rowsByTopLevel.computeIfAbsent(
+                    row.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger(), k -> new ArrayList<>()).add(row);
+        }
+
+        List<BusinessTermUsageRecord> result = new ArrayList<>();
+        for (var entry : rowsByTopLevel.entrySet()) {
+            Record first = entry.getValue().get(0);
+
+            Map<String, BusinessTermUsageNodeRecord> nodes = new LinkedHashMap<>();
+            for (Record row : entry.getValue()) {
+                String bieType = row.get("bie_type", String.class);
+                BigInteger bieId = row.get("bie_id", BigInteger.class);
+                nodes.computeIfAbsent(bieType + "-" + bieId, k -> new BusinessTermUsageNodeRecord(
+                        bieType, bieId, row.get("bie_path", String.class), row.get("bie_hash_path", String.class),
+                        new ArrayList<>()))
+                        .assignments().add(new BusinessTermUsageNodeRecord.Assignment(
+                                new BusinessTermId(row.get("assigned_business_term_id", BigInteger.class)),
+                                row.get("type_code", String.class),
+                                (byte) 1 == row.get("primary_indicator", Byte.class)));
+            }
+
+            result.add(new BusinessTermUsageRecord(
+                    new TopLevelAsbiepId(entry.getKey()),
+                    first.get("top_level_property_term", String.class),
+                    first.get(TOP_LEVEL_ASBIEP.VERSION),
+                    BieState.valueOf(first.get(TOP_LEVEL_ASBIEP.STATE)),
+                    first.get(RELEASE.RELEASE_NUM),
+                    fetchOwnerSummary(first),
+                    new WhoAndWhen(
+                            fetchUpdaterSummary(first),
+                            toDate(first.get("top_level_last_update_timestamp", LocalDateTime.class))),
+                    new ArrayList<>(nodes.values())));
+        }
+        // The most recently updated top-level BIE first.
+        result.sort(java.util.Comparator.comparing(
+                (BusinessTermUsageRecord usage) -> usage.lastUpdated().when(),
+                java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())));
+        return result;
+    }
+
+    @Override
     public ResultAndCount<AssignedBusinessTermListEntryRecord> getAssignedBusinessTermList(
             AssignedBusinessTermListFilterCriteria filterCriteria, PageRequest pageRequest) {
 

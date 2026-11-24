@@ -1,0 +1,72 @@
+<score-dialog-page class="bt-usage-dialog" [title]="title">
+  <div class="bt-usage">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"/>
+    } @else if (items().length === 0) {
+      <p class="description">This business term is not assigned to any BIE.</p>
+    } @else {
+      @for (item of items(); track item.usage.topLevelAsbiepId) {
+        <fieldset class="bt-usage-tree">
+          <legend>{{ item.usage.releaseNum }}</legend>
+          <!-- As the BIE list shows when it was updated, by whom. -->
+          <div class="bt-usage-header">
+            <div class="bt-usage-updated">
+              <div>Updated {{ item.usage.lastUpdated.when | date: 'yyyy-MM-dd HH:mm' }}</div>
+              <div>by <b>{{ item.usage.lastUpdated.who.loginId }}</b></div>
+            </div>
+          </div>
+          @if (item.tree; as tree) {
+            <score-tree-viewport [dataSource]="tree.dataSource" [height]="height(tree)" [showCopyLink]="false"
+                                 [keyboardNavigation]="false" (nodeClick)="open(item, $event)">
+              <ng-template #prefix let-node></ng-template>
+              <ng-template #content let-node>
+                <span class="node-label"
+                      [class]="[node.type.toLowerCase()]"
+                      [class.deprecated]="node.deprecated"
+                      [matTooltip]="node.deprecated ? 'Deprecated' : ''">{{ node.displayName ? node.displayName : node.name }}</span>
+                <score-tree-decorations [node]="node" [decorators]="decorators"/>
+                @if (node.level === 0) {
+                  <ng-container [ngTemplateOutlet]="stateBadge" [ngTemplateOutletContext]="{$implicit: item.usage}"/>
+                }
+                @for (assignment of assignmentsOf(tree, node); track assignment.assignedBizTermId) {
+                  <span class="bt-badge">
+                    @if (assignment.primaryIndicator) {
+                      <mat-icon class="bt-badge-star" matTooltip="Preferred business term">star</mat-icon>
+                    }
+                    <span class="bt-badge-term">{{ data.businessTerm }}</span>
+                    @if (assignment.typeCode) {
+                      <span class="bt-badge-type">{{ assignment.typeCode }}</span>
+                    }
+                  </span>
+                }
+              </ng-template>
+            </score-tree-viewport>
+          } @else {
+            <!-- The BIE is loaded when the row is expanded; the row looks as the root row of the tree does. -->
+            <div class="score-tree-rows">
+              <div class="mat-tree-node d-flex align-items-center pointer" tabindex="0"
+                   (click)="expand(item)" (keydown.enter)="expand(item)">
+                <button mat-icon-button type="button" [attr.aria-label]="'Expand'">
+                  @if (item.loading) {
+                    <mat-spinner [diameter]="16"/>
+                  } @else {
+                    <mat-icon class="mat-icon-rtl-mirror">chevron_right</mat-icon>
+                  }
+                </button>
+                <span class="node-label asbiep">{{ item.usage.propertyTerm }}</span>
+                <ng-container [ngTemplateOutlet]="stateBadge" [ngTemplateOutletContext]="{$implicit: item.usage}"/>
+              </div>
+            </div>
+          }
+        </fieldset>
+      }
+    }
+  </div>
+</score-dialog-page>
+
+<!-- The state as the BIE list shows it, and the release. -->
+<ng-template #stateBadge let-usage>
+  <span class="bie-state bt-usage-state {{ usage.state }}"
+        [ngStyle]="{'background-color': webPageInfo.getComponentStateColorSet(usage.state).background,
+                    'color': webPageInfo.getComponentStateColorSet(usage.state).font}">{{ usage.state }}</span>
+</ng-template>

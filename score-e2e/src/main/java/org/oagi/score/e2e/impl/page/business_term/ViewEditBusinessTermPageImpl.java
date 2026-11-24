@@ -6,6 +6,7 @@ import org.oagi.score.e2e.obj.BusinessTermObject;
 import org.oagi.score.e2e.page.BasePage;
 import org.oagi.score.e2e.page.business_term.CreateBusinessTermPage;
 import org.oagi.score.e2e.page.business_term.EditBusinessTermPage;
+import org.oagi.score.e2e.page.business_term.BusinessTermWhereUsedDialog;
 import org.oagi.score.e2e.page.business_term.UploadBusinessTermsPage;
 import org.oagi.score.e2e.page.business_term.ViewEditBusinessTermPage;
 import org.openqa.selenium.*;
@@ -246,6 +247,31 @@ public class ViewEditBusinessTermPageImpl extends BaseSearchBarPageImpl implemen
                     new EditBusinessTermPageImpl(this, businessTerm);
             assert editBusinessTermPage.isOpened();
             return editBusinessTermPage;
+        });
+    }
+
+    @Override
+    public BusinessTermWhereUsedDialog openWhereUsedDialog(String businessTermName) throws NoSuchElementException {
+        setTerm(businessTermName);
+        hitSearchButton();
+
+        return retry(() -> {
+            WebElement td;
+            try {
+                td = getColumnByName(getTableRecordAtIndex(1), "businessTerm");
+            } catch (TimeoutException e) {
+                throw new NoSuchElementException("Cannot locate a business term using " + businessTermName, e);
+            }
+            if (!businessTermName.equals(getText(td.findElement(By.cssSelector("a > span"))))) {
+                throw new NoSuchElementException("Cannot locate a business term using " + businessTermName);
+            }
+            click(getColumnByName(getTableRecordAtIndex(1), "more").findElement(By.xpath(".//button[@aria-label=\"More actions\"]")));
+            click(elementToBeClickable(getDriver(),
+                    By.xpath("//button[@mat-menu-item][.//span[normalize-space(.)=\"Where Used\"]]")));
+
+            BusinessTermWhereUsedDialog dialog = new BusinessTermWhereUsedDialogImpl(this);
+            assert dialog.isOpened();
+            return dialog;
         });
     }
 

@@ -56,6 +56,8 @@ public interface BusinessTermQueryRepository {
 
     AssignedBusinessTermDetailsRecord getAssignedBusinessTermDetails(BbieBusinessTermId bbieBusinessTermId);
 
+    List<BusinessTermUsageRecord> getBusinessTermUsageList(BusinessTermId businessTermId);
+
     ResultAndCount<AsbieBbieListEntryRecord> getAsbieBbieList(
             AsbieBbieListFilterCriteria filterCriteria, PageRequest pageRequest);
 

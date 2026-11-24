@@ -170,6 +170,14 @@ public class BusinessTermQueryController {
         return businessTermDetails;
     }
 
+    @GetMapping(value = "/{businessTermId:[\\d]+}/where-used")
+    public List<BusinessTermUsageRecord> getBusinessTermUsageList(
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
+            @PathVariable("businessTermId") BusinessTermId businessTermId) {
+
+        return businessTermQueryService.getBusinessTermUsageList(sessionService.asScoreUser(user), businessTermId);
+    }
+
     @GetMapping(value = "/assign")
     public PageResponse<AssignedBusinessTermListEntryRecord> getAssignedBusinessTermList(
             @AuthenticationPrincipal AuthenticatedPrincipal user,

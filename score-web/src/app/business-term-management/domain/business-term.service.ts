@@ -10,7 +10,8 @@ import {
   BieToAssign,
   BusinessTermDetails,
   BusinessTermListEntry,
-  BusinessTermListRequest
+  BusinessTermListRequest,
+  BusinessTermUsage
 } from './business-term';
 import {BieListRequest} from '../../bie-management/bie-list/domain/bie-list';
 import {map} from 'rxjs/operators';
@@ -261,6 +262,11 @@ export class BusinessTermService {
           }
         })))
     );
+  }
+
+  /** The BIE nodes that the business term is assigned to. */
+  getBusinessTermUsages(businessTermId: number): Observable<BusinessTermUsage[]> {
+    return this.http.get<BusinessTermUsage[]>('/api/business-terms/' + businessTermId + '/where-used');
   }
 
   getBusinessTermDetails(id): Observable<BusinessTermDetails> {

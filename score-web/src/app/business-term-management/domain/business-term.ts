@@ -343,3 +343,31 @@ export class BieToAssign {
 }
 
 
+
+/** An assignment of the business term to a BIE node. */
+export class BusinessTermUsageAssignment {
+  assignedBizTermId: number;
+  typeCode: string;
+  primaryIndicator: boolean;
+}
+
+/** A BIE node (ASBIE or BBIE) that the business term is assigned to; the path and its hash tell where it is in the BIE tree. */
+export class BusinessTermUsageNode {
+  bieType: string;
+  bieId: number;
+  path: string;
+  hashPath: string;
+  assignments: BusinessTermUsageAssignment[];
+}
+
+/** A top-level BIE that the business term is assigned in, with the nodes of it that the term is assigned to. */
+export class BusinessTermUsage {
+  topLevelAsbiepId: number;
+  propertyTerm: string;
+  version: string;
+  state: string;
+  releaseNum: string;
+  owner: ScoreUser;
+  lastUpdated: WhoAndWhen;
+  nodes: BusinessTermUsageNode[];
+}

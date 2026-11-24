@@ -1,0 +1,127 @@
+/* The Business Term badge of the BIE editor, read-only; scoped under the tree so it wins over the rows' span rules. */
+.bt-usage-tree .mat-tree-node {
+  /* The text colour of the BIE editor; the dialog's own is a lighter one (it shows in the cardinality). */
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.bt-usage-tree {
+  /* One BIE: the border has the release in it, as a legend does. */
+  position: relative;
+  min-width: 0;
+  margin: 0 0 12px;
+  padding: 0 8px 4px;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+}
+
+.bt-usage-tree legend {
+  float: none;
+  width: auto;
+  margin: 0 0 0 8px;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.bt-usage {
+  /* What the layout of a BIE follows is the width of the dialog, not the one of the window. */
+  container-type: inline-size;
+  /* The body of a dialog page has no side padding of its own (a table brings it); a tree does not. */
+  padding: 0 var(--score-dialog-padding);
+}
+
+.bt-usage-tree .bt-usage-state {
+  margin-left: 12px;
+  flex: 0 0 auto;
+}
+
+.bt-usage-tree .mat-tree-node .bt-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 24px;
+  margin-left: 12px;
+  padding: 0 10px;
+  border: 1px solid #74777f;
+  border-radius: 16px;
+  color: #44474e;
+  font-size: 12px;
+  overflow: visible;
+}
+
+.bt-usage-tree .mat-tree-node .bt-badge .bt-badge-star {
+  width: 18px;
+  height: 18px;
+  margin: 0 2px 0 -4px;
+  font-size: 18px;
+  line-height: 18px;
+  color: #f9a825;
+}
+
+.bt-usage-tree .mat-tree-node .bt-badge .bt-badge-term {
+  max-width: 200px;
+}
+
+.bt-usage-tree .mat-tree-node .bt-badge .bt-badge-type {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 16px;
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.bt-usage-tree .bt-usage-header {
+  /* On the line of the root row of the tree (one row high), at the right end. */
+  position: absolute;
+  top: 0;
+  right: 8px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.bt-usage-tree .bt-usage-updated {
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* The title stays where it is; only the body of the dialog scrolls. */
+score-business-term-where-used-dialog score-dialog-page.bt-usage-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+score-business-term-where-used-dialog score-dialog-page.bt-usage-dialog .dialog-body.mat-mdc-dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* A narrow dialog: the updated time is above the root row, at the left, on one line. */
+@container (max-width: 480px) {
+  .bt-usage-tree .bt-usage-header {
+    position: static;
+    height: auto;
+    justify-content: flex-start;
+    padding: 4px 0 0;
+  }
+
+  .bt-usage-tree .bt-usage-updated {
+    text-align: left;
+  }
+
+  .bt-usage-tree .bt-usage-updated div {
+    display: inline;
+  }
+
+  .bt-usage-tree .bt-usage-updated div + div::before {
+    content: ' ';
+  }
+}

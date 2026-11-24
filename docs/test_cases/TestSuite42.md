@@ -469,3 +469,90 @@ that is not used is not listed, and it is listed once the node is used.
 22. Verify that the response is HTTP 400, that no assignment row was created, and that the same request succeeds and creates one assignment after the end user marks the BBIE used again. (Assertion [#11](#test-assertion-42511))
 23. The end user leaves the BBIE node saved but not used, and an authorized tester lists the ASBIEs and BBIEs available for assignment via the API, filtered to the BIE's business context.
 24. Verify that the BBIE is absent from the list while it is not used, and is listed once the end user marks it used again. (Assertion [#12](#test-assertion-42512))
+
+## Test Case 42.6
+**Where Used on the Business Term list**
+
+Each row of the `Business Term` list has a row menu with `Where Used`. It opens a dialog with a bordered group for each BIE
+the Business Term is assigned to. A group has the release of the BIE as its legend, the state of the BIE, and when it was last
+updated and by whom. Its tree, loaded when the group is expanded, is drawn as in the BIE editor with only the nodes that have
+the term and the way to them, and a badge on each of those nodes with the term, its `Type Code`, and a star if it is the
+`Preferred` one. Clicking a node opens the BIE at that node in a new tab. Developer-role users can view the Business Terms
+assigned in the BIE editor, but cannot assign, edit, or remove them.
+
+### Test Assertion:
+
+#### Test Assertion #42.6.1
+The dialog lists exactly the BIEs the Business Term is assigned to. A BIE that has another Business Term, or none, is not
+listed. The title reads `Where Used: N BIE(s)`, and `Nothing found` when the term is assigned to no BIE.
+
+#### Test Assertion #42.6.2
+The tree of a BIE has only the nodes that have the Business Term and the way to them, all expanded. Each node that has the term
+has a badge, and the nodes on the way have none.
+
+#### Test Assertion #42.6.3
+Clicking a node that has the Business Term opens the BIE at that node in a new tab, with the node selected. Clicking the
+top-level node opens the BIE itself.
+
+#### Test Assertion #42.6.4
+The number of BIEs in the title is right: a BIE is one group however many of its nodes have the term. The number of badges is
+right: a node has one badge for each assignment of the term.
+
+#### Test Assertion #42.6.5
+The tree is drawn as in the BIE editor: a row has the same height, font, weight, and colour.
+
+#### Test Assertion #42.6.6
+When there are many BIEs, only the body of the dialog scrolls. The title stays in place, neither the dialog nor its overlay has
+a scroll bar of its own, and the page behind does not scroll.
+
+#### Test Assertion #42.6.7
+The badge of an assignment shows a star when it is the `Preferred` one and shows its `Type Code` when it has one. Only one
+assignment of a node is the preferred one. An assignment without a `Type Code` has no code on its badge.
+
+#### Test Assertion #42.6.8
+The BIEs are listed by the time they were last updated, the most recent first, and not by when they were created.
+
+#### Test Assertion #42.6.9
+Each BIE shows its state, and when it was last updated and by whom, as the BIE has them. The time is the one the server reports,
+shown in the time zone of the browser as `yyyy-MM-dd HH:mm`, and the owner of the BIE reported by the server is the owner of
+the BIE.
+
+#### Test Assertion #42.6.10
+In a wide dialog, who updated the BIE and when is at the right end of the top row of the tree. In a narrow dialog (a phone-sized
+screen) it is above the tree, at the left, on one line.
+
+#### Test Assertion #42.6.11
+A developer-role user can read the Business Terms and where they are used, but cannot create or assign them: the server accepts
+`Where Used` for developers, and refuses the checks and lists that exist only to create or assign a Business Term. In the BIE
+editor, the assigned Business Terms of a node are shown to a developer, who cannot edit them.
+
+### Test Step Pre-condition:
+1. Business Term is enabled in Application Settings in connectCenter.
+2. The users, branches, releases, and records needed to exercise this test case are available in connectCenter.
+3. An end user has several BIEs with a used `Note` BBIE node (saved), so that Business Terms can be assigned to it.
+4. Several Business Terms are available. For the ordering and state assertions, the last update time, the last updater, and the state of the BIEs can be set.
+5. For the scroll assertion, the browser window is short enough for the BIEs not to fit in the dialog. For the narrow assertion, the window is as narrow as a phone.
+
+### Test Step:
+1. The end user assigns a Business Term to a BIE, and assigns another Business Term to a second BIE. A third BIE has no Business Term. The end user opens `Business Term`, and chooses `Where Used` from the row menu of the first term.
+2. Verify that the dialog lists only the first BIE, titled `Where Used: 1 BIE`, and that a term assigned to no BIE shows `Nothing found`. (Assertion [#1](#test-assertion-4261))
+3. The end user expands the BIE.
+4. Verify that the tree has only the top-level node and the node that has the term, and that only the latter has a badge. (Assertion [#2](#test-assertion-4262))
+5. The end user clicks the node that has the term, then the top-level node.
+6. Verify that each opens the BIE in a new tab, the first with the node selected. (Assertion [#3](#test-assertion-4263))
+7. The end user assigns the same Business Term to three BIEs, twice to one node with different Type Codes, and opens `Where Used`.
+8. Verify that the title reads `Where Used: 3 BIEs`, there are three groups, and the expanded trees have four badges. (Assertion [#4](#test-assertion-4264))
+9. The end user compares a row of the expanded tree with a row of the tree of the BIE editor.
+10. Verify that the height, font, weight, and colour are the same. (Assertion [#5](#test-assertion-4265))
+11. The end user makes the window short, assigns the term to six BIEs, opens `Where Used`, and scrolls the dialog to the end.
+12. Verify that the body of the dialog scrolls, that the title stays, that the dialog and its overlay do not scroll, and that the page does not move. (Assertion [#6](#test-assertion-4266))
+13. The end user assigns one node a preferred term with Type Code `Synonym`, the same term with Type Code `Legal`, and the same term without a Type Code, and expands the BIE.
+14. Verify that exactly one badge has a star and it shows `Synonym`, that another shows `Legal`, and that the third shows no code. (Assertion [#7](#test-assertion-4267))
+15. An authorized tester sets different last update times on three BIEs, in an order that is not the order of their creation.
+16. Verify that the groups are ordered from the most recent update to the oldest. (Assertion [#8](#test-assertion-4268))
+17. An authorized tester sets the state of a BIE to `Production` and its last update by another user.
+18. Verify that the group shows `Production` and `Updated <time> by <that user>`, that the time is the one the server reports, and that the server reports the end user as the owner. (Assertion [#9](#test-assertion-4269))
+19. The end user opens `Where Used` in a wide window, then narrows the window to the width of a phone.
+20. Verify that the update line is at the right end of the top row when wide, and above the tree, at the left, on one line when narrow. (Assertion [#10](#test-assertion-42610))
+21. A developer-role user opens the BIE editor on a node that has a Business Term, and a tester calls the `Where Used` and the creation-only endpoints as that developer.
+22. Verify that the Business Term is shown and cannot be edited, that `Where Used` is accepted, and that the creation-only endpoints are refused. (Assertion [#11](#test-assertion-42611))
