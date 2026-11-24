@@ -37,6 +37,9 @@ table.compact tr.mat-mdc-header-row {
 
 table.compact td.compact-cell {
   padding: 8px 16px 8px 0;
+  /* Takes what the other cells (the checkbox, a row menu) leave: without it the table shares the spare width among all the cells, and
+     a row menu ends up at the left of a wide cell, away from the end of the row. */
+  width: 100%;
 }
 
 /* The checkbox and the fixed columns (a row menu) of the compact row keep little room: the row needs it. The cells of the screen are
