@@ -33,6 +33,7 @@ import org.oagi.score.gateway.http.api.cc_management.repository.criteria.CcListF
 import org.oagi.score.gateway.http.api.code_list_management.model.CodeListManifestId;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCc;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExt;
+import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExtCount;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.log_management.model.LogId;
 import org.oagi.score.gateway.http.api.log_management.model.LogSummaryRecord;
@@ -1668,6 +1669,38 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                                 LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId.value())),
                                 RELEASE.RELEASE_NUM.eq("Working"),
                                 DT.STATE.in("WIP", "Draft", "Candidate"))))
+                .union(dslContext().select(CODE_LIST_MANIFEST.CODE_LIST_MANIFEST_ID.as("manifestId"),
+                                inline("CODE_LIST").as("type"),
+                                CODE_LIST.LAST_UPDATE_TIMESTAMP,
+                                CODE_LIST.STATE,
+                                CODE_LIST.OWNER_USER_ID,
+                                APP_USER.LOGIN_ID.as("ownerUsername"),
+                                CODE_LIST.NAME.as("den"))
+                        .from(CODE_LIST_MANIFEST)
+                        .join(CODE_LIST).on(CODE_LIST_MANIFEST.CODE_LIST_ID.eq(CODE_LIST.CODE_LIST_ID))
+                        .join(RELEASE).on(CODE_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                        .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                        .join(APP_USER).on(CODE_LIST.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                        .where(and(
+                                LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId.value())),
+                                RELEASE.RELEASE_NUM.eq("Working"),
+                                CODE_LIST.STATE.in("WIP", "Draft", "Candidate"))))
+                .union(dslContext().select(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_MANIFEST_ID.as("manifestId"),
+                                inline("AGENCY_ID_LIST").as("type"),
+                                AGENCY_ID_LIST.LAST_UPDATE_TIMESTAMP,
+                                AGENCY_ID_LIST.STATE,
+                                AGENCY_ID_LIST.OWNER_USER_ID,
+                                APP_USER.LOGIN_ID.as("ownerUsername"),
+                                AGENCY_ID_LIST.NAME.as("den"))
+                        .from(AGENCY_ID_LIST_MANIFEST)
+                        .join(AGENCY_ID_LIST).on(AGENCY_ID_LIST_MANIFEST.AGENCY_ID_LIST_ID.eq(AGENCY_ID_LIST.AGENCY_ID_LIST_ID))
+                        .join(RELEASE).on(AGENCY_ID_LIST_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                        .join(LIBRARY).on(RELEASE.LIBRARY_ID.eq(LIBRARY.LIBRARY_ID))
+                        .join(APP_USER).on(AGENCY_ID_LIST.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                        .where(and(
+                                LIBRARY.LIBRARY_ID.eq(ULong.valueOf(libraryId.value())),
+                                RELEASE.RELEASE_NUM.eq("Working"),
+                                AGENCY_ID_LIST.STATE.in("WIP", "Draft", "Candidate"))))
                 .fetchInto(SummaryCc.class);
 
         return unionOfSummaryCcList;
@@ -1722,6 +1755,32 @@ public class JooqCcQueryRepository extends JooqBaseRepository implements CcQuery
                     item.setOwnerUserId(new UserId(e.get(ACC.OWNER_USER_ID).toBigInteger()));
                     return item;
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SummaryCcExtCount> getSummaryCcExtCounts(LibraryId libraryId) {
+        return dslContext().select(RELEASE.RELEASE_ID,
+                        RELEASE.RELEASE_NUM,
+                        APP_USER.LOGIN_ID,
+                        ACC.STATE,
+                        count().as("cnt"))
+                .from(ACC)
+                .join(ACC_MANIFEST).on(ACC.ACC_ID.eq(ACC_MANIFEST.ACC_ID))
+                .join(RELEASE).on(ACC_MANIFEST.RELEASE_ID.eq(RELEASE.RELEASE_ID))
+                .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .where(and(
+                        ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
+                        RELEASE.LIBRARY_ID.eq(ULong.valueOf(libraryId.value())),
+                        // The Working release is not one that a User Extension is made in.
+                        RELEASE.RELEASE_NUM.ne("Working"),
+                        RELEASE.RELEASE_ID.greaterThan(ULong.valueOf(0))))
+                .groupBy(RELEASE.RELEASE_ID, RELEASE.RELEASE_NUM, APP_USER.LOGIN_ID, ACC.STATE)
+                .fetch(e -> new SummaryCcExtCount(
+                        new ReleaseId(e.get(RELEASE.RELEASE_ID).toBigInteger()),
+                        e.get(RELEASE.RELEASE_NUM),
+                        e.get(APP_USER.LOGIN_ID),
+                        CcState.valueOf(e.get(ACC.STATE)),
+                        e.get("cnt", Integer.class)));
     }
 
     /** The kinds of component a graph walks through, as the numbers {@link #GRAPH_MANIFEST_IDS_SQL} uses for them. */

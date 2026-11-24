@@ -1,0 +1,96 @@
+:host {
+  display: block;
+  --carousel-gap: 16px;
+}
+
+/* One page at a time, swiped sideways or stepped with the buttons. */
+.track {
+  display: flex;
+  gap: var(--carousel-gap);
+  /* Room for what hangs over the slides (a label on their border) and for their shadow, which the scrolling track would cut. */
+  padding: 14px 0 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.track.sliding,
+.track.dragging {
+  scroll-snap-type: none;
+}
+
+.track.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .track {
+    cursor: grab;
+  }
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+:host ::ng-deep .track > * {
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--carousel-gap)) / var(--per-view));
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.nav button[mat-icon-button] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  --mdc-icon-button-state-layer-size: 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 11px;
+}
+
+/* Material's touch target of an icon button (48px) would cover the dot beside it. */
+.nav button[mat-icon-button] ::ng-deep .mat-mdc-button-touch-target {
+  display: none;
+}
+
+/* Material sets the icon of an icon button to 24px. */
+.nav button[mat-icon-button] ::ng-deep svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  gap: 0;
+}
+
+.dot {
+  display: block;
+  /* A target of 22px around the dot of 8px: easier to hit, and the dots are 14px apart. */
+  width: 22px;
+  height: 22px;
+  padding: 7px;
+  border: 0;
+  border-radius: 50%;
+  background-color: #cfd8dc;
+  background-clip: content-box;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: #607d8b;
+}

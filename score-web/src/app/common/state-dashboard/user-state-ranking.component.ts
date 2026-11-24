@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {RouterLink} from '@angular/router';
+import {Destination, DestinationsDirective} from '../destinations/destinations';
 import {encodeListQuery} from '../state-progress-bar/state-progress-bar';
 
 export interface RankingState {
@@ -17,7 +17,7 @@ export interface RankingRow {
 @Component({
   selector: 'score-user-state-ranking',
   standalone: true,
-  imports: [RouterLink],
+  imports: [DestinationsDirective],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './user-state-ranking.component.html',
   styleUrl: './user-state-ranking.component.css'
@@ -28,6 +28,8 @@ export class UserStateRankingComponent {
   /** Filter that every link carries, such as the release. */
   @Input() baseParams: {key: string, value: any}[] = [];
   @Input() states: RankingState[] = [];
+  /** The pages that a user (and a state) opens, when they are of several kinds of items and a click asks which; `route` is the page otherwise. */
+  @Input() destinationsOf: ((username: string, state?: string) => Destination[]) | undefined;
   @Input() disabled = false;
   @Input() limit = 5;
   /** What is said when no user has an item. */
@@ -59,6 +61,10 @@ export class UserStateRankingComponent {
 
   width(row: RankingRow, state: string): number {
     return this.maxTotal > 0 ? (this.count(row, state) / this.maxTotal) * 100 : 0;
+  }
+
+  destinations(username: string, state?: string): Destination[] {
+    return this.destinationsOf?.(username, state) ?? [{label: username, route: this.route, queryParams: {q: this.query(username, state)}}];
   }
 
   query(username: string, state?: string): string {

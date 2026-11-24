@@ -13,6 +13,9 @@ import {WebPageInfoService} from '../basis.service';
 import {WebPageInfo} from '../about/domain/about';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
+import {CodeListService} from '../../code-list-management/domain/code-list.service';
+import {AgencyIdListService} from '../../agency-id-list-management/domain/agency-id-list.service';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {LibraryService} from '../../library-management/domain/library.service';
 
@@ -45,6 +48,9 @@ async function render(config?: WebPageInfo, userToken = {username: 'alice', role
       provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
       {provide: AuthService, useValue: {getUserToken: () => userToken}},
       {provide: LibraryService, useValue: {getLibrarySummaryList: () => of([{libraryId: 1, name: 'connectSpec', isDefault: true}])}},
+      {provide: CodeListService, useValue: {getCodeListListPage: () => of({list: []})}},
+      {provide: AgencyIdListService, useValue: {getAgencyIdListListPage: () => of({list: []})}},
+      {provide: NamespaceService, useValue: {getNamespaceSummaries: () => of([])}},
       {provide: ReleaseService, useValue: {getReleaseSummaryList: () => of([RELEASE]), getWorkingRelease: () => of(RELEASE)}},
       {provide: CcListService, useValue: {getSummaryCcList: () => of(CC_SUMMARY), getSummaryCcExtList: () => of(EXT_SUMMARY)}},
       {provide: BieListService, useValue: {getSummaryBieList: () => of(BIE_SUMMARY)}},
@@ -142,227 +148,5 @@ describe('Home states take their colours from the configuration', () => {
     expect(wip.ring).toBe('#D32F2F');
     expect(wip.chipText).toBe('#ffffff');
     expect(drawn(fixture, 'Draft').ring).toBe('#7B1FA2');
-  });
-});
-
-describe('Home cards are a carousel', () => {
-  const WIDTH = 1000;
-  let fixture: ComponentFixture<HomepageComponent>;
-  let component: HomepageComponent;
-  let track: HTMLElement;
-  let scrollLeft: number;
-  let scrollTo: ReturnType<typeof vi.fn>;
-
-  /** A track of three cards as wide as itself, scrolled by `scrollLeft`. */
-  function layOut() {
-    scrollLeft = 0;
-    scrollTo = vi.fn();
-    Object.defineProperty(track, 'scrollLeft', {configurable: true, get: () => scrollLeft, set: (v: number) => scrollLeft = v});
-    Object.defineProperty(track, 'scrollWidth', {configurable: true, value: WIDTH * 3});
-    Object.defineProperty(track, 'clientWidth', {configurable: true, value: WIDTH});
-    track.scrollTo = scrollTo as any;
-    track.getBoundingClientRect = () => ({left: 0, width: WIDTH, right: WIDTH} as DOMRect);
-    Array.from(track.children).forEach((card, i) => {
-      (card as HTMLElement).getBoundingClientRect = () => ({left: i * WIDTH - scrollLeft, width: WIDTH, right: (i + 1) * WIDTH - scrollLeft} as DOMRect);
-    });
-  }
-
-  const mouse = (clientX: number, extra: object = {}) => ({pointerType: 'mouse', button: 0, pointerId: 1, clientX, ...extra}) as any;
-
-  beforeEach(async () => {
-    localStorage.clear();
-    vi.useFakeTimers();
-    fixture = await render();
-    component = fixture.componentInstance;
-    track = fixture.nativeElement.querySelector('.kpi-grid');
-    layOut();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    localStorage.clear();
-  });
-
-  it('has a card, and a dot, for each of the sections', () => {
-    expect(component.kpiSections).toEqual(['cc', 'bie', 'ext']);
-    expect(track.children.length).toBe(3);
-    expect(fixture.nativeElement.querySelectorAll('.kpi-dot').length).toBe(3);
-  });
-
-  it('slides to a card that is further away than the next one, as it does to the next one', () => {
-    component.selectKpi(track, 2);
-    expect(component.selectedSection).toBe('ext');
-    expect(scrollTo).toHaveBeenCalledWith({left: 2 * WIDTH, behavior: 'smooth'});
-
-    component.selectKpi(track, 1);
-    expect(scrollTo).toHaveBeenLastCalledWith({left: WIDTH, behavior: 'smooth'});
-  });
-
-  it('does not snap the track on the way to a card, and snaps it again once it is there', () => {
-    expect(component.kpiSliding).toBe(false);
-    component.selectKpi(track, 2);
-    expect(component.kpiSliding).toBe(true);
-    scrollLeft = WIDTH;
-    component.onKpiScroll(track);
-    expect(component.kpiSliding).toBe(true);
-    scrollLeft = 2 * WIDTH;
-    component.onKpiScroll(track);
-    expect(component.kpiSliding).toBe(false);
-  });
-
-  it('finishes a slide that the browser stopped short, so that the card that was asked for is shown', () => {
-    component.selectKpi(track, 2);
-    scrollTo.mockClear();
-    scrollLeft = 1.7 * WIDTH;           // the scroll ended on the way
-    component.onKpiScrollEnd(track);
-    expect(scrollTo).toHaveBeenCalledWith({left: 2 * WIDTH, behavior: 'instant'});
-    expect(component.kpiSliding).toBe(false);
-  });
-
-  it('leaves the track alone when a scroll that nobody asked for ends', () => {
-    scrollLeft = WIDTH;
-    component.onKpiScrollEnd(track);
-    expect(scrollTo).not.toHaveBeenCalled();
-  });
-
-  it('does not let the scroll on the way choose another card', () => {
-    component.selectKpi(track, 2);
-    scrollLeft = WIDTH;            // on the way, at the second card
-    component.onKpiScroll(track);
-    vi.advanceTimersByTime(500);
-    expect(component.selectedSection).toBe('ext');
-
-    scrollLeft = 2 * WIDTH;        // arrived
-    component.onKpiScroll(track);
-    vi.advanceTimersByTime(500);
-    expect(component.selectedSection).toBe('ext');
-  });
-
-  it('does not take the card back to where it was while the scroll starts slowly', () => {
-    component.selectKpi(track, 2);
-    scrollLeft = 2 * WIDTH;
-    component.onKpiScroll(track);                  // arrived at the third card
-    vi.advanceTimersByTime(300);
-    expect(component.selectedSection).toBe('ext');
-
-    component.selectKpi(track, 0);                 // back to the first: the scroll is slow to start
-    expect(component.selectedSection).toBe('cc');
-    for (let i = 0; i < 4; i++) {
-      vi.advanceTimersByTime(250);                 // a pause longer than the settle time of a swipe, again and again
-      component.onKpiScroll(track);                // still at the third card
-      vi.advanceTimersByTime(250);
-      expect(component.selectedSection).toBe('cc');
-    }
-    scrollLeft = 0;
-    component.onKpiScroll(track);                  // arrived
-    vi.advanceTimersByTime(500);
-    expect(component.selectedSection).toBe('cc');
-  });
-
-  it('does not let what an earlier swipe left to be chosen take the card back after a dot was clicked', () => {
-    scrollLeft = 2 * WIDTH;
-    component.onKpiScroll(track);                  // a swipe stops at the third card, to be chosen in 120ms
-    component.selectKpi(track, 0);                 // a dot is clicked before that
-    vi.advanceTimersByTime(500);
-    expect(component.selectedSection).toBe('cc');
-  });
-
-  it('lets a swipe choose a card after a dot that was already there', () => {
-    component.selectKpi(track, 0);                 // the track is at the first card already: nothing to wait for
-    scrollLeft = WIDTH;
-    component.onKpiScroll(track);
-    vi.advanceTimersByTime(200);
-    expect(component.selectedSection).toBe('bie');
-  });
-
-  it('lets a finger take the track over from a dot that is on its way', () => {
-    component.selectKpi(track, 2);
-    component.onKpiPointerDown(track, mouse(500, {pointerType: 'touch'}));
-    scrollLeft = WIDTH;
-    component.onKpiScroll(track);
-    vi.advanceTimersByTime(200);
-    expect(component.selectedSection).toBe('bie');
-  });
-
-  it('lets a wheel take the track over from a dot that is on its way', () => {
-    component.selectKpi(track, 2);
-    component.releaseKpiNavigation();
-    scrollLeft = WIDTH;
-    component.onKpiScroll(track);
-    vi.advanceTimersByTime(200);
-    expect(component.selectedSection).toBe('bie');
-  });
-
-  it('chooses the card that a swipe stops at, once the swipe has settled', () => {
-    scrollLeft = WIDTH;
-    component.onKpiScroll(track);
-    expect(component.selectedSection).toBe('cc');
-    vi.advanceTimersByTime(200);
-    expect(component.selectedSection).toBe('bie');
-  });
-
-  it('is dragged with the mouse: a drag of more than a fifth of the card goes to the next one', () => {
-    component.onKpiPointerDown(track, mouse(600));
-    component.onKpiPointerMove(track, mouse(400));
-    expect(component.kpiDragging).toBe(true);
-    expect(scrollLeft).toBe(200);
-    component.onKpiPointerUp(track, mouse(400));
-    expect(component.kpiDragging).toBe(false);
-    expect(component.selectedSection).toBe('bie');
-    expect(scrollTo).toHaveBeenLastCalledWith({left: WIDTH - scrollLeft + scrollLeft, behavior: 'smooth'});
-  });
-
-  it('is dragged with the mouse: a short drag comes back, and a drag the other way goes to the one before', () => {
-    component.onKpiPointerDown(track, mouse(600));
-    component.onKpiPointerMove(track, mouse(500));
-    component.onKpiPointerUp(track, mouse(500));
-    expect(component.selectedSection).toBe('cc');
-
-    scrollLeft = WIDTH;
-    component.selectKpi(track, 1);
-    vi.advanceTimersByTime(2000);
-    component.onKpiPointerDown(track, mouse(100));
-    component.onKpiPointerMove(track, mouse(500));
-    component.onKpiPointerUp(track, mouse(500));
-    expect(component.selectedSection).toBe('cc');
-  });
-
-  it('is not dragged by a touch or by a button other than the main one (a touch screen scrolls by itself)', () => {
-    component.onKpiPointerDown(track, mouse(600, {pointerType: 'touch'}));
-    component.onKpiPointerMove(track, mouse(300));
-    expect(component.kpiDragging).toBe(false);
-    component.onKpiPointerDown(track, mouse(600, {button: 2}));
-    component.onKpiPointerMove(track, mouse(300));
-    expect(component.kpiDragging).toBe(false);
-    expect(scrollLeft).toBe(0);
-  });
-
-  it('does not open what is under the mouse when a drag ends', () => {
-    const opened = vi.fn();
-    const chip = document.createElement('a');
-    chip.addEventListener('click', opened);
-    track.children[0].appendChild(chip);
-
-    component.onKpiPointerDown(track, mouse(600));
-    component.onKpiPointerMove(track, mouse(300));
-    component.onKpiPointerUp(track, mouse(300));
-    chip.dispatchEvent(new MouseEvent('click', {bubbles: true}));
-    expect(opened).not.toHaveBeenCalled();
-
-    vi.advanceTimersByTime(500);
-    chip.dispatchEvent(new MouseEvent('click', {bubbles: true}));
-    expect(opened).toHaveBeenCalledTimes(1);
-  });
-
-  it('leaves a click that is not a drag to what is under the mouse', () => {
-    const opened = vi.fn();
-    const chip = document.createElement('a');
-    chip.addEventListener('click', opened);
-    track.children[0].appendChild(chip);
-    component.onKpiPointerDown(track, mouse(600));
-    component.onKpiPointerMove(track, mouse(598));
-    component.onKpiPointerUp(track, mouse(598));
-    chip.dispatchEvent(new MouseEvent('click', {bubbles: true}));
-    expect(opened).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {RouterLink} from '@angular/router';
 import {MatChipsModule} from '@angular/material/chips';
+import {Destination, DestinationsDirective} from '../destinations/destinations';
 import {StateProgressBarItem, stateProgressBarQuery} from '../state-progress-bar/state-progress-bar';
 import {StateDonutComponent} from './state-donut.component';
 
@@ -8,7 +8,7 @@ import {StateDonutComponent} from './state-donut.component';
 @Component({
   selector: 'score-state-summary',
   standalone: true,
-  imports: [RouterLink, MatChipsModule, StateDonutComponent],
+  imports: [DestinationsDirective, MatChipsModule, StateDonutComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './state-summary.component.html',
   styleUrl: './state-summary.component.css'
@@ -27,5 +27,10 @@ export class StateSummaryComponent {
 
   query(item: StateProgressBarItem): string {
     return stateProgressBarQuery(item);
+  }
+
+  /** The pages that a chip opens: the ones the item names, or the list of its `href`. */
+  destinationsOf(item: StateProgressBarItem): Destination[] {
+    return item.destinations ?? [{label: item.name, route: item.href[0], queryParams: {q: this.query(item)}}];
   }
 }

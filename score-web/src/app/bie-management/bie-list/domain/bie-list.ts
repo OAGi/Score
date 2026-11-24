@@ -188,6 +188,7 @@ export class BieListEntry {
   status: string;
   bizTerm: string;
   remark: string;
+  definition: string;
   businessContextList: BusinessContextSummary[];
   state: string;
   access: string;

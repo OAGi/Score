@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.cc_management.model.acc.AccManifestId;
 import org.oagi.score.gateway.http.api.cc_management.repository.criteria.CcListFilterCriteria;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCc;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExt;
+import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExtCount;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
 import org.oagi.score.gateway.http.api.release_management.model.ReleaseId;
 import org.oagi.score.gateway.http.common.model.PageRequest;
@@ -27,6 +28,8 @@ public interface CcQueryRepository {
     List<SummaryCc> getSummaryCcList(LibraryId libraryId);
 
     List<SummaryCcExt> getSummaryCcExtList(LibraryId libraryId, ReleaseId releaseId);
+
+    List<SummaryCcExtCount> getSummaryCcExtCounts(LibraryId libraryId);
 
     Collection<CcChangesResponse.CcChange> getCcChanges(ReleaseId releaseId);
 

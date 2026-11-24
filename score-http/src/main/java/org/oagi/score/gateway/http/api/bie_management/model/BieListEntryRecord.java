@@ -26,6 +26,7 @@ public record BieListEntryRecord(
         String status,
         String bizTerm,
         String remark,
+        String definition,
         List<BusinessContextSummaryRecord> businessContextList,
         BieState state,
         AccessPrivilege access,

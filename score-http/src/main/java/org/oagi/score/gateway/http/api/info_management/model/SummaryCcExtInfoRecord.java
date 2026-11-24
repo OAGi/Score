@@ -9,5 +9,6 @@ public record SummaryCcExtInfoRecord(
         Map<CcState, Integer> numberOfTotalCcExtByStates,
         Map<CcState, Integer> numberOfMyCcExtByStates,
         Map<String, Map<CcState, Integer>> ccExtByUsersAndStates,
-        List<SummaryCcExt> myExtensionsUnusedInBIEs) {
+        List<SummaryCcExt> myExtensionsUnusedInBIEs,
+        List<SummaryCcExtCount> ccExtCountsByReleases) {
 }

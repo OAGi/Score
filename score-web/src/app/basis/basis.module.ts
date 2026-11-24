@@ -23,9 +23,13 @@ import {AboutService} from './about/domain/about.service';
 import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
 import {CcCompactRowComponent} from '../cc-management/cc-compact-row/cc-compact-row.component';
 import {BieCompactRowComponent} from '../bie-management/bie-compact-row/bie-compact-row.component';
-import {RecordCompactRowComponent} from '../common/record-compact-row/record-compact-row.component';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {StateSummaryComponent} from '../common/state-dashboard/state-summary.component';
+import {CodeListService} from '../code-list-management/domain/code-list.service';
+import {AgencyIdListService} from '../agency-id-list-management/domain/agency-id-list.service';
+import {DestinationsDirective} from '../common/destinations/destinations';
+import {CarouselComponent} from '../common/carousel/carousel.component';
+import {WorkItemCardComponent} from '../common/state-dashboard/work-item-card.component';
 import {ViewToggleComponent} from '../common/state-dashboard/view-toggle.component';
 import {UserStateRankingComponent} from '../common/state-dashboard/user-state-ranking.component';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
@@ -59,10 +63,12 @@ const routes: Routes = [
         TranslatePipe,
         StateProgressBarModule,
         StateSummaryComponent,
+        WorkItemCardComponent,
+        CarouselComponent,
+        DestinationsDirective,
         FaIconComponent,
         CcCompactRowComponent,
         BieCompactRowComponent,
-        RecordCompactRowComponent,
         UserStateRankingComponent,
         ViewToggleComponent,
         NgxMatSelectSearchModule,
@@ -100,6 +106,8 @@ const routes: Routes = [
   ],
   providers: [
     AboutService,
+    CodeListService,
+    AgencyIdListService,
     PendingActivate,
     DisabledActivate
   ]

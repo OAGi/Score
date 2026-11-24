@@ -1,10 +1,13 @@
 import {HttpParams} from '@angular/common/http';
 import {base64Encode} from '../utility';
+import {Destination} from '../destinations/destinations';
 
 export interface StateProgressBarItem {
   name: string;
   value: number;
   href: any[];
+  /** The pages that the item can open, when it is of several kinds of items and a click asks which; `href` is the page otherwise. */
+  destinations?: Destination[];
   disabled: boolean;
   style: {
     bg_color: string,

@@ -424,6 +424,7 @@ export class SummaryCcExtInfo {
   numberOfMyCcExtByStates: Map<string, number>;
   ccExtByUsersAndStates: Map<string, Map<string, number>>;
   myExtensionsUnusedInBIEs: SummaryCcExt[];
+  ccExtCountsByReleases: {releaseId: number, releaseNum: string, ownerUsername: string, state: string, count: number}[];
 }
 
 export class CcChangeResponse {

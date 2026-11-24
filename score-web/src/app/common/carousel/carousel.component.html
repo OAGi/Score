@@ -1,0 +1,20 @@
+<div class="track" #track [class.dragging]="dragging" [class.sliding]="sliding"
+  (scroll)="onScroll()" (scrollend)="onScrollEnd()" (wheel)="releaseNavigation()"
+  (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
+  <ng-content/>
+</div>
+@if (pages > 1) {
+  <div class="nav">
+    <button type="button" mat-icon-button aria-label="Previous" [disabled]="current === 0"
+      (click)="select(current - 1)"><fa-icon [icon]="faChevronLeft"></fa-icon></button>
+    <div class="dots">
+      @for (page of pageNumbers; track page) {
+        <button type="button" class="dot" [class.active]="current === page"
+          [attr.aria-label]="'Show page ' + (page + 1)" (click)="select(page)"></button>
+      }
+    </div>
+    <button type="button" mat-icon-button aria-label="Next" [disabled]="current === pages - 1"
+      (click)="select(current + 1)"><fa-icon [icon]="faChevronRight"></fa-icon></button>
+  </div>
+}

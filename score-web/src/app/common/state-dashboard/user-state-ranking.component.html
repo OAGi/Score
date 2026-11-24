@@ -9,13 +9,12 @@
   <div class="rows" [class.scroll]="expanded">
     @for (row of shown; track row.username) {
       <div class="rank-row">
-        <a class="user" [class.disabled]="disabled" [routerLink]="route"
-           [queryParams]="{q: query(row.username)}" [title]="row.username">{{ row.username }}</a>
+        <a class="user" [class.disabled]="disabled" [scoreDestinations]="destinations(row.username)"
+           [title]="row.username">{{ row.username }}</a>
         <div class="bar">
           @for (s of states; track s.state) {
             @if (count(row, s.state) > 0) {
-              <a class="seg" [class.disabled]="disabled" [routerLink]="route"
-                 [queryParams]="{q: query(row.username, s.state)}"
+              <a class="seg" [class.disabled]="disabled" [scoreDestinations]="destinations(row.username, s.state)"
                  [style.width.%]="width(row, s.state)"
                  [style.background-color]="s.background" [style.color]="s.font"
                  [title]="s.state + ' (' + count(row, s.state) + ')'">{{ count(row, s.state) }}</a>

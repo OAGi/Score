@@ -9,7 +9,7 @@
             <mat-chip class="state-chip" [class.disabled]="item.disabled"
                       [style.--mat-chip-elevated-container-color]="item.style.bg_color"
                       [style.--mat-chip-label-text-color]="item.style.text_color"
-                      [routerLink]="item.href[0]" [queryParams]="{q: query(item)}">{{ item.name }} {{ item.value }}</mat-chip>
+                      [scoreDestinations]="destinationsOf(item)">{{ item.name }} {{ item.value }}</mat-chip>
           }
         }
       </mat-chip-set>

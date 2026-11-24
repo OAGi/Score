@@ -9,6 +9,7 @@ import org.oagi.score.gateway.http.api.cc_management.service.CcListService;
 import org.oagi.score.gateway.http.api.cc_management.service.CcQueryService;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCc;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExt;
+import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExtCount;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCcExtInfoRecord;
 import org.oagi.score.gateway.http.api.info_management.model.SummaryCcInfoRecord;
 import org.oagi.score.gateway.http.api.library_management.model.LibraryId;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -31,6 +33,8 @@ import static org.oagi.score.gateway.http.common.util.ControllerUtils.pageReques
 @Service
 @Transactional(readOnly = true)
 public class CcInfoQueryService {
+
+    private static final Set<String> LIST_TYPES = Set.of("CODE_LIST", "AGENCY_ID_LIST");
 
     @Autowired
     private RepositoryFactory repositoryFactory;
@@ -48,16 +52,20 @@ public class CcInfoQueryService {
 
         var ccQuery = repositoryFactory.ccQueryRepository(requester);
         List<SummaryCc> summaryCcList = ccQuery.getSummaryCcList(libraryId);
+        // The totals are of the components; the Code Lists and the Agency ID Lists are only in the counts by type.
+        List<SummaryCc> componentList = summaryCcList.stream()
+                .filter(e -> !LIST_TYPES.contains(e.getType()))
+                .toList();
 
         Map<CcState, Integer> numberOfTotalCcByStates =
-                summaryCcList.stream().collect(Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum));
+                componentList.stream().collect(Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum));
 
         Map<CcState, Integer> numberOfMyCcByStates =
-                summaryCcList.stream()
+                componentList.stream()
                         .filter(e -> e.getOwnerUserId().equals(requester.userId()))
                         .collect(Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum));
 
-        Map<String, Map<CcState, Integer>> ccByUsersAndStates = summaryCcList.stream()
+        Map<String, Map<CcState, Integer>> ccByUsersAndStates = componentList.stream()
                 .collect(groupingBy(SummaryCc::getOwnerUsername,
                         Collectors.toMap(SummaryCc::getState, (e) -> 1, Integer::sum)));
 
@@ -87,29 +95,26 @@ public class CcInfoQueryService {
         }
 
         var ccQuery = repositoryFactory.ccQueryRepository(requester);
-        List<SummaryCcExt> summaryCcExtList = ccQuery.getSummaryCcExtList(libraryId, releaseId);
+        // What is counted is how many User Extensions each release has, not how many are different: the same one in two releases is two.
+        List<SummaryCcExtCount> ccExtCounts = ccQuery.getSummaryCcExtCounts(libraryId).stream()
+                .filter(e -> releaseId == null || releaseId.value().longValue() <= 0 || e.releaseId().equals(releaseId))
+                .toList();
 
-        Map<CcState, Integer> numberOfTotalCcExtByStates =
-                summaryCcExtList.stream()
-                        .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
+        Map<CcState, Integer> numberOfTotalCcExtByStates = ccExtCounts.stream()
+                .collect(Collectors.toMap(SummaryCcExtCount::state, SummaryCcExtCount::count, Integer::sum));
 
-        Map<CcState, Integer> numberOfMyCcExtByStates =
-                summaryCcExtList.stream()
-                        .filter(e -> e.getOwnerUserId().equals(requester.userId()))
-                        .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
+        Map<CcState, Integer> numberOfMyCcExtByStates = ccExtCounts.stream()
+                .filter(e -> e.ownerUsername().equals(requester.username()))
+                .collect(Collectors.toMap(SummaryCcExtCount::state, SummaryCcExtCount::count, Integer::sum));
 
-//        Map<CcState, Integer> numberOfMyBieByStates =
-//                summaryCcExtList.stream()
-//                        .filter(e -> e.getOwnerUserId().equals(requester.userId()))
-//                        .collect(Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum));
-
-        Map<String, Map<CcState, Integer>> ccExtByUsersAndStates = summaryCcExtList.stream()
-                .collect(groupingBy(SummaryCcExt::getOwnerUsername,
-                        Collectors.toMap(SummaryCcExt::getState, (e) -> 1, Integer::sum)));
+        Map<String, Map<CcState, Integer>> ccExtByUsersAndStates = ccExtCounts.stream()
+                .collect(groupingBy(SummaryCcExtCount::ownerUsername,
+                        Collectors.toMap(SummaryCcExtCount::state, SummaryCcExtCount::count, Integer::sum)));
 
         List<SummaryCcExt> myExtensionsUnusedInBIEs = ccListService.getMyExtensionsUnusedInBIEs(requester, libraryId);
 
         return new SummaryCcExtInfoRecord(
-                numberOfTotalCcExtByStates, numberOfMyCcExtByStates, ccExtByUsersAndStates, myExtensionsUnusedInBIEs);
+                numberOfTotalCcExtByStates, numberOfMyCcExtByStates, ccExtByUsersAndStates, myExtensionsUnusedInBIEs,
+                ccExtCounts);
     }
 }
