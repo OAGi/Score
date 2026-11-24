@@ -684,7 +684,8 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
    * structural per-node constraints: the node must be used and not locked (inherited/reused) or cyclic.
    */
   isBusinessTermEditable(node: BieFlatNode): boolean {
-    if (!node || this.isReadOnlyWipViewer) {
+    // Developers see the assigned terms but cannot assign, edit or remove them.
+    if (!node || this.isDeveloper || this.isReadOnlyWipViewer) {
       return false;
     }
     return node.used === true && !node.locked && !node.isCycle;
@@ -1743,10 +1744,10 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
   /**
    * Refresh the Business Term panel(s) for the currently selected node — its own (current-tab) assignment and,
    * when present, its base (inherited-tab) assignment. Called on selection and after a save writes the node's
-   * id back. No-op for developers / BT-disabled tenants and node types without Business Term support.
+   * id back. No-op for BT-disabled tenants and node types without Business Term support.
    */
   private refreshBusinessTermsForSelected(): void {
-    if (!this.isBusinessTermEnabled || this.isDeveloper || !this.selectedNode) {
+    if (!this.isBusinessTermEnabled || !this.selectedNode) {
       return;
     }
     const type = this.selectedNode.bieType ? this.selectedNode.bieType.toUpperCase() : '';

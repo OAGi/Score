@@ -1058,7 +1058,7 @@
                 @if (selectedNode && !selectedNode.reused && !reusedNode) {
                   <div class="row">
                     <div class="col-md-6 col-sm-12">
-                      @if (isBusinessTermEnabled && !isDeveloper) {
+                      @if (isBusinessTermEnabled) {
                         <ng-container [ngTemplateOutlet]="businessTermBadges"
                           [ngTemplateOutletContext]="{id: asAsbiepDetail().asbie.asbieId, bieType: 'ASBIE', enabled: selectedNode.used, editable: isBusinessTermEditable(selectedNode)}"></ng-container>
                       } @else {
@@ -1344,7 +1344,7 @@
                   @if (selectedNode.inherited && !selectedNode.reused && !reusedBaseNode) {
                     <div class="row">
                       <div class="col-md-6 col-sm-12">
-                        @if (isBusinessTermEnabled && !isDeveloper) {
+                        @if (isBusinessTermEnabled) {
                           <ng-container [ngTemplateOutlet]="businessTermBadges"
                             [ngTemplateOutletContext]="{id: asAsbiepDetail().base.asbie.asbieId, bieType: 'ASBIE', enabled: false, editable: false}"></ng-container>
                         } @else {
@@ -1661,7 +1661,7 @@
                 </div>
                 <div class="row">
                   <div class="col-md-6 col-sm-12">
-                    @if (isBusinessTermEnabled && !isDeveloper) {
+                    @if (isBusinessTermEnabled) {
                       <ng-container [ngTemplateOutlet]="businessTermBadges"
                         [ngTemplateOutletContext]="{id: asBbiepDetail().bbie.bbieId, bieType: 'BBIE', enabled: selectedNode.used, editable: isBusinessTermEditable(selectedNode)}"></ng-container>
                     } @else {
@@ -2059,7 +2059,7 @@
                   </div>
                   <div class="row">
                     <div class="col-md-6 col-sm-12">
-                      @if (isBusinessTermEnabled && !isDeveloper) {
+                      @if (isBusinessTermEnabled) {
                         <ng-container [ngTemplateOutlet]="businessTermBadges"
                           [ngTemplateOutletContext]="{id: asBbiepDetail().base.bbie.bbieId, bieType: 'BBIE', enabled: false, editable: false}"></ng-container>
                       } @else {

@@ -30,17 +30,24 @@ public class BusinessTermQueryService {
     private ApplicationConfigurationQueryService applicationConfigurationQueryService;
 
     /**
-     * #1752 - H1: enforce the Business Term access policy server-side on read endpoints too. A
-     * tenant with the feature disabled, or a developer-role user, cannot read business-term data
-     * via a direct API call (the navbar + BIE-editor hide the whole BT area on
-     * {@code isBusinessTermEnabled && !isDeveloper}, so reads are out of scope for developers too).
-     * Public so endpoints that don't otherwise touch the repository (e.g. the CSV template
-     * download) can apply the same gate.
+     * #1752 - H1: enforce the Business Term access policy server-side. A tenant with the feature
+     * disabled cannot read business-term data via a direct API call. Developer-role users may still
+     * <em>view</em> terms and the assignments already made, so this read gate does not exclude them;
+     * creating and assigning is gated by {@link #assertBusinessTermManageable}.
      */
     public void assertBusinessTermEnabled(ScoreUser requester) {
         if (!applicationConfigurationQueryService.isBusinessTermEnabled(requester)) {
             throw new DataAccessForbiddenException("Business Term management is not enabled.");
         }
+    }
+
+    /**
+     * The read gate plus the developer exclusion, for endpoints that only support creating or
+     * assigning business terms (uniqueness checks, the BIE picker for assignment, the import
+     * template). Public so the controller can apply it to endpoints that do not touch the repository.
+     */
+    public void assertBusinessTermManageable(ScoreUser requester) {
+        assertBusinessTermEnabled(requester);
         if (requester.isDeveloper()) {
             throw new DataAccessForbiddenException(
                     "Business Term management is not available to developer-role users.");
@@ -63,7 +70,7 @@ public class BusinessTermQueryService {
     public boolean checkUniqueness(
             ScoreUser requester, BusinessTermId businessTermId, String businessTerm, String externalReferenceUri) {
 
-        assertBusinessTermEnabled(requester);
+        assertBusinessTermManageable(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
         return businessTermQuery.checkUniqueness(businessTermId, businessTerm, externalReferenceUri);
     }
@@ -94,7 +101,7 @@ public class BusinessTermQueryService {
             ScoreUser requester, AsbieId asbieId, BusinessTermId businessTermId,
             String typeCode, AsbieBusinessTermId exceptAsbieBusinessTermId) {
 
-        assertBusinessTermEnabled(requester);
+        assertBusinessTermManageable(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
         return businessTermQuery.checkAssignmentUniqueness(asbieId, businessTermId, typeCode, exceptAsbieBusinessTermId);
     }
@@ -103,7 +110,7 @@ public class BusinessTermQueryService {
             ScoreUser requester, BbieId bbieId, BusinessTermId businessTermId,
             String typeCode, BbieBusinessTermId exceptBbieBusinessTermId) {
 
-        assertBusinessTermEnabled(requester);
+        assertBusinessTermManageable(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
         return businessTermQuery.checkAssignmentUniqueness(bbieId, businessTermId, typeCode, exceptBbieBusinessTermId);
     }
@@ -111,7 +118,7 @@ public class BusinessTermQueryService {
     public ResultAndCount<AsbieBbieListEntryRecord> getAsbieBbieList(
             ScoreUser requester, AsbieBbieListFilterCriteria filterCriteria, PageRequest pageRequest) {
 
-        assertBusinessTermEnabled(requester);
+        assertBusinessTermManageable(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
         return businessTermQuery.getAsbieBbieList(filterCriteria, pageRequest);
     }
@@ -119,7 +126,7 @@ public class BusinessTermQueryService {
     public List<AsbieBbieListEntryRecord> getAsbieBbieList(
             ScoreUser requester, Collection<AsbieId> asbieIdList, Collection<BbieId> bbieIdList) {
 
-        assertBusinessTermEnabled(requester);
+        assertBusinessTermManageable(requester);
         var businessTermQuery = repositoryFactory.businessTermQueryRepository(requester);
         return businessTermQuery.getAsbieBbieList(asbieIdList, bbieIdList);
     }
