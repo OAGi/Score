@@ -10,6 +10,10 @@ import {BieListEntry} from '../../bie-management/bie-list/domain/bie-list';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
 import {UserExtensionGroup} from '../../cc-management/domain/core-component-node';
 import {StateProgressBarItem} from '../../common/state-progress-bar/state-progress-bar';
+import {CompactRecord} from '../../common/record-compact-row/record-compact-row.component';
+import {UsersView} from '../../common/state-dashboard/view-toggle.component';
+import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
+import {RankingState} from '../../common/state-dashboard/user-state-ranking.component';
 import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
@@ -124,6 +128,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfCcExtsByUsers_usernameModel: string[] = [];
 
   myExtensionsUnusedInBIEs = new MatTableDataSource<SummaryCcExt>();
+  /** The same extensions, as the blocks of the chart view. */
+  myExtensionsUnusedInBIEsRecords: CompactRecord[] = [];
   @ViewChild('myExtensionsUnusedInBIEsPaginator', {static: false})
   myExtensionsUnusedInBIEsPaginator: MatPaginator;
   @ViewChild('myExtensionsUnusedInBIEsSort', {static: false})
@@ -131,6 +137,215 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   /* End of User Extensions */
 
   UEGValue = UserExtensionGroup.value;
+
+  /** The sections of the cards, in the order of the cards. */
+  get kpiSections(): ('cc' | 'bie' | 'ext')[] {
+    return [...(this.isDeveloper ? ['cc' as const] : []), 'bie', ...(this.isTenantEnabled ? [] : ['ext' as const])];
+  }
+
+  private kpiScrollTimer: ReturnType<typeof setTimeout> | undefined;
+  private kpiNavigatingTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The card that a dot or an arrow is taking the track to: the scroll on the way does not choose a card. */
+  private kpiNavigatingTo: number | undefined;
+  private kpiTargetIndex = 0;
+  /** The track slides to a card that a dot or an arrow asked for: it does not snap on the way, as that cuts the slide short. */
+  kpiSliding = false;
+  private kpiDrag: {startX: number, startLeft: number, from: number, moved: boolean} | undefined;
+  /** The track is being dragged with the mouse (a touch screen scrolls it by itself). */
+  kpiDragging = false;
+
+  readonly faChevronLeft = faChevronLeft;
+  readonly faChevronRight = faChevronRight;
+
+  get kpiIndex(): number {
+    return Math.max(this.kpiSections.indexOf(this.selectedSection), 0);
+  }
+
+  /** On a narrow screen the cards are a carousel: the card that is in view is the selected one. */
+  onKpiScroll(track: HTMLElement) {
+    if (track.scrollWidth <= track.clientWidth + 1) {
+      return;
+    }
+    if (this.kpiNavigatingTo !== undefined) {
+      if (Math.abs(track.scrollLeft - this.kpiLeftOf(track, this.kpiTargetIndex)) < 2) {
+        this.finishKpiSlide();
+      }
+      return;
+    }
+    const nearest = this.nearestKpiCard(track);
+    const section = this.kpiSections[nearest];
+    // The section below is swapped once the swipe has settled: swapping it on the way makes the page flicker.
+    clearTimeout(this.kpiScrollTimer);
+    this.kpiScrollTimer = setTimeout(() => {
+      if (section && section !== this.selectedSection) {
+        this.selectedSection = section;
+      }
+    }, 120);
+  }
+
+  /** The card whose middle is the nearest to the middle of the track. */
+  private nearestKpiCard(track: HTMLElement): number {
+    const middle = track.getBoundingClientRect().left + track.clientWidth / 2;
+    let nearest = 0;
+    let distance = Number.POSITIVE_INFINITY;
+    (Array.from(track.children) as HTMLElement[]).forEach((card, index) => {
+      const box = card.getBoundingClientRect();
+      const d = Math.abs(box.left + box.width / 2 - middle);
+      if (d < distance) {
+        distance = d;
+        nearest = index;
+      }
+    });
+    return nearest;
+  }
+
+  /** Where the track is scrolled to when it shows a card. */
+  private kpiLeftOf(track: HTMLElement, index: number): number {
+    const card = track.children[index] as HTMLElement;
+    return track.scrollLeft + card.getBoundingClientRect().left - track.getBoundingClientRect().left;
+  }
+
+  /**
+   * The browser has stopped scrolling. A slide that it stopped short (the page below changes with the section, and with it the width of
+   * the track) is finished at once, so that the track shows the card that was asked for.
+   */
+  onKpiScrollEnd(track: HTMLElement) {
+    if (this.kpiNavigatingTo !== undefined) {
+      const left = this.kpiLeftOf(track, this.kpiTargetIndex);
+      if (Math.abs(track.scrollLeft - left) >= 2) {
+        track.scrollTo({left, behavior: 'instant'});
+      }
+    }
+    this.finishKpiSlide();
+  }
+
+  /** Takes the track to a card, sliding, however far it is. */
+  selectKpi(track: HTMLElement, index: number) {
+    if (index < 0 || index >= this.kpiSections.length) {
+      return;
+    }
+    this.selectedSection = this.kpiSections[index];
+    clearTimeout(this.kpiScrollTimer);
+    const card = track.children[index] as HTMLElement | undefined;
+    if (!card) {
+      return;
+    }
+    // Only the track is scrolled: `scrollIntoView` also scrolls the page, and the swap of the section below interrupts it.
+    const left = this.kpiLeftOf(track, index);
+    // What an earlier swipe left to be chosen is not chosen over the card that was asked for.
+    clearTimeout(this.kpiScrollTimer);
+    if (Math.abs(left - track.scrollLeft) < 1) {
+      this.finishKpiSlide();
+      return;
+    }
+    this.kpiNavigatingTo = index;
+    this.kpiTargetIndex = index;
+    this.kpiSliding = true;
+    clearTimeout(this.kpiNavigatingTimer);
+    // Only a safety: the slide ends when the card is reached, or when a hand or a wheel takes the track over.
+    this.kpiNavigatingTimer = setTimeout(() => this.finishKpiSlide(), 5000);
+    track.scrollTo({left, behavior: 'smooth'});
+  }
+
+  /** The mouse drags the track as a finger does. */
+  /** A hand on the track (a finger, the mouse, a wheel) takes it over from a dot or an arrow that is taking it somewhere. */
+  releaseKpiNavigation() {
+    this.finishKpiSlide();
+  }
+
+  /** The slide to a card is over (it arrived, or it was taken over): the track snaps again, and a swipe chooses a card again. */
+  finishKpiSlide() {
+    clearTimeout(this.kpiNavigatingTimer);
+    this.kpiNavigatingTo = undefined;
+    this.kpiSliding = false;
+  }
+
+  onKpiPointerDown(track: HTMLElement, event: PointerEvent) {
+    this.releaseKpiNavigation();
+    if (event.pointerType !== 'mouse' || event.button !== 0) {
+      return;
+    }
+    this.kpiDrag = {startX: event.clientX, startLeft: track.scrollLeft, from: this.nearestKpiCard(track), moved: false};
+  }
+
+  onKpiPointerMove(track: HTMLElement, event: PointerEvent) {
+    const drag = this.kpiDrag;
+    if (!drag) {
+      return;
+    }
+    const dx = event.clientX - drag.startX;
+    if (!drag.moved) {
+      if (Math.abs(dx) < 5) {
+        return;
+      }
+      drag.moved = true;
+      this.kpiDragging = true;
+      track.setPointerCapture?.(event.pointerId);
+      // The click that ends a drag is not a click on what is under the mouse (a link, a chip).
+      const swallow = (e: Event) => {
+        e.stopPropagation();
+        e.preventDefault();
+      };
+      track.addEventListener('click', swallow, {capture: true});
+      setTimeout(() => track.removeEventListener('click', swallow, {capture: true}), 400);
+    }
+    track.scrollLeft = drag.startLeft - dx;
+  }
+
+  onKpiPointerUp(track: HTMLElement, event: PointerEvent) {
+    const drag = this.kpiDrag;
+    this.kpiDrag = undefined;
+    if (!drag?.moved) {
+      return;
+    }
+    track.releasePointerCapture?.(event.pointerId);
+    this.kpiDragging = false;
+    const dx = event.clientX - drag.startX;
+    // A drag of more than a fifth of the card goes to the next one; a shorter one comes back.
+    const threshold = track.clientWidth / 5;
+    const index = dx <= -threshold ? drag.from + 1 : (dx >= threshold ? drag.from - 1 : drag.from);
+    this.selectKpi(track, Math.min(Math.max(index, 0), this.kpiSections.length - 1));
+  }
+
+  /** Each users panel shows its chart or its table. */
+  ccUsersView: UsersView = 'chart';
+  bieUsersView: UsersView = 'chart';
+  ccExtUsersView: UsersView = 'chart';
+
+  /** The section shown below the cards: the one of the card that was clicked. */
+  selectedSection: 'cc' | 'bie' | 'ext' = this.userToken.roles.includes('developer') ? 'cc' : 'bie';
+
+  /** The colours of a state, as the configuration has them now (a state that it does not name has the default of the home page). */
+  stateStyle(state: string): {bg_color: string, text_color: string} {
+    const colors = this.webPageInfo.getComponentStateColorSet(state);
+    const fallback = this.stateColorList.find(e => e.state === state)?.color;
+    return {bg_color: colors?.background || fallback, text_color: colors?.font || '#ffffff'};
+  }
+
+  /** The states that the users rankings split their bars by, with their colors. */
+  get rankingStates(): RankingState[] {
+    return this.stateColorList.map(item => {
+      const style = this.stateStyle(item.state);
+      return {state: item.state, background: style.bg_color, font: style.text_color};
+    });
+  }
+
+  /** What every link of the Core Components ranking carries: the Working release the Home page counts on. */
+  get ccBaseParams(): {key: string, value: any}[] {
+    return this.workingRelease ? [{key: 'releaseId', value: this.workingRelease.releaseId}] : [];
+  }
+
+  get bieBaseParams(): {key: string, value: any}[] {
+    return [{key: 'releaseIds', value: this.selectedRelease?.releaseId}];
+  }
+
+  get ccExtBaseParams(): {key: string, value: any}[] {
+    return [
+      {key: 'releaseId', value: this.selectedRelease?.releaseId},
+      {key: 'types', value: ['ACC']},
+      {key: 'componentTypes', value: [UserExtensionGroup.value]}
+    ];
+  }
 
   ngOnInit() {
     this.libraryService.getLibrarySummaryList().subscribe(libraries => {
@@ -219,6 +434,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryCCs(userToken) {
+    const styleOf = (state: string) => this.stateStyle(state);
     const releaseParams = this.workingRelease ?
       [{key: 'releaseId', value: this.workingRelease.releaseId}] :
       [];
@@ -233,9 +449,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: ccCountOfState(ccByUsersAndStates, item.state),
           href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams]],
           disabled: false,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
         this.numberOfMyCCByStates.push({
@@ -243,9 +459,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: ccCountOfState(ccByUsersAndStates, item.state, userToken.username),
           href: ['/core_component', [{key: 'states', value: item.state}, ...releaseParams, {key: 'ownerLoginIdList', value: userToken.username}]],
           disabled: false,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
       }
@@ -278,6 +494,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryBIEs(userToken) {
+    const styleOf = (state: string) => this.stateStyle(state);
     const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
     this.bieService.getSummaryBieList(this.library.libraryId, this.selectedRelease.releaseId).subscribe(summaryBieInfo => {
       this.numberOfTotalBieByStates = [];
@@ -288,9 +505,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: summaryBieInfo.numberOfTotalBieByStates[item.state] || 0,
           href: ['/profile_bie', [{key: 'states', value: item.state}, releaseParam]],
           disabled: false,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
         this.numberOfMyBieByStates.push({
@@ -298,9 +515,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: summaryBieInfo.numberOfMyBieByStates[item.state] || 0,
           href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIdList', value: userToken.username}, releaseParam]],
           disabled: false,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
       }
@@ -333,6 +550,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryUserExtensions(userToken) {
+    const styleOf = (state: string) => this.stateStyle(state);
     this.ccService.getSummaryCcExtList(this.library.libraryId, this.selectedRelease.releaseId).subscribe(summaryCcExtInfo => {
       const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
       const typeParam = {key: 'types', value: 'ACC'};
@@ -346,9 +564,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: summaryCcExtInfo.numberOfTotalCcExtByStates[item.state] || 0,
           href: ['/core_component', [{key: 'states', value: item.state} , releaseParam, typeParam, componentTypeParam]],
           disabled: this.selectedRelease.releaseId < 0,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
         this.numberOfMyCcExtByStates.push({
@@ -356,9 +574,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           value: summaryCcExtInfo.numberOfMyCcExtByStates[item.state] || 0,
           href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, typeParam, componentTypeParam, ownerLoginIdListParam]],
           disabled: this.selectedRelease.releaseId < 0,
-          style: {
-            bg_color: this.webPageInfo.getComponentStateColorSet(item.state).background || item.color,
-            text_color: this.webPageInfo.getComponentStateColorSet(item.state).font || '#ffffff'
+          // Read when it is drawn, not when the item is made: the colours are the configuration's, which may arrive or change later.
+          get style() {
+            return styleOf(item.state);
           }
         });
       }
@@ -388,6 +606,17 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       );
 
       this.myExtensionsUnusedInBIEs.data = summaryCcExtInfo.myExtensionsUnusedInBIEs;
+      this.myExtensionsUnusedInBIEsRecords = summaryCcExtInfo.myExtensionsUnusedInBIEs.map(e => ({
+        badges: [{text: e.state, kind: 'state', cssClass: 'cc-state'}],
+        title: e.objectClassTerm,
+        link: '/core_component/extension/' + e.accManifestId,
+        subtitle: e.guid,
+        meta: [
+          {label: 'Top-level BIE', value: e.den, link: '/profile_bie/' + e.topLevelAsbiepId},
+          {label: 'Association', value: e.associationDen, priority: 2}
+        ],
+        updated: {when: e.lastUpdateTimestamp, by: e.lastUpdateUser}
+      }));
     });
   }
 
@@ -398,15 +627,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     });
     this.numberOfCCsByUsersAndStates.sort = this.numberOfCCsByUsersAndStatesSort;
 
-    this.myRecentCCs.sort = this.myRecentCCsSort;
-
     this.numberOfBiesByUsersAndStates.paginator = this.numberOfBiesByUsersAndStatesPaginator;
     this.numberOfBiesByUsersAndStates.filterPredicate = ((data: UserStatesItem, filter: string) => {
       return Array.from(filter.split(',')).includes(data.username);
     });
     this.numberOfBiesByUsersAndStates.sort = this.numberOfBiesByUsersAndStatesSort;
-
-    this.myRecentBIEs.sort = this.myRecentBIEsSort;
 
     this.numberOfCcExtsByUsersAndStates.paginator = this.numberOfCcExtsByUsersAndStatesPaginator;
     this.numberOfCcExtsByUsersAndStates.filterPredicate = ((data: UserStatesItem, filter: string) => {
@@ -414,6 +639,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     });
     this.numberOfCcExtsByUsersAndStates.sort = this.numberOfCcExtsByUsersAndStatesSort;
 
+    this.myRecentCCs.sort = this.myRecentCCsSort;
+    this.myRecentBIEs.sort = this.myRecentBIEsSort;
     this.myExtensionsUnusedInBIEs.paginator = this.myExtensionsUnusedInBIEsPaginator;
     this.myExtensionsUnusedInBIEs.sort = this.myExtensionsUnusedInBIEsSort;
   }
@@ -436,6 +663,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       [{key: 'releaseId', value: this.workingRelease.releaseId}] :
       [];
     return this.q([...set, ...releaseParams]);
+  }
+
+  /** Where a recent Core Component (or Data Type) opens. */
+  ccLink(element: CcListEntry): string {
+    return (element.type.endsWith('DT') ? '/data_type' : '/core_component/' + element.type.toLowerCase()) + '/' + element.manifestId;
   }
 
   keys(obj) {

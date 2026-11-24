@@ -21,6 +21,13 @@ import {AboutComponent} from './about/about.component';
 import {AuthService} from '../authentication/auth.service';
 import {AboutService} from './about/domain/about.service';
 import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
+import {CcCompactRowComponent} from '../cc-management/cc-compact-row/cc-compact-row.component';
+import {BieCompactRowComponent} from '../bie-management/bie-compact-row/bie-compact-row.component';
+import {RecordCompactRowComponent} from '../common/record-compact-row/record-compact-row.component';
+import {FaIconComponent} from '@fortawesome/angular-fontawesome';
+import {StateSummaryComponent} from '../common/state-dashboard/state-summary.component';
+import {ViewToggleComponent} from '../common/state-dashboard/view-toggle.component';
+import {UserStateRankingComponent} from '../common/state-dashboard/user-state-ranking.component';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {ScoreCommonModule} from '../common/score-common.module';
 import {MessageManagementModule} from '../message-management/message-management.module';
@@ -51,6 +58,13 @@ const routes: Routes = [
         MaterialModule,
         TranslatePipe,
         StateProgressBarModule,
+        StateSummaryComponent,
+        FaIconComponent,
+        CcCompactRowComponent,
+        BieCompactRowComponent,
+        RecordCompactRowComponent,
+        UserStateRankingComponent,
+        ViewToggleComponent,
         NgxMatSelectSearchModule,
         CommonModule,
         ScoreCommonModule,

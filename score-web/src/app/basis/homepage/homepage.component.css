@@ -22,12 +22,13 @@
 }
 
 .box {
-  font-family: "Google Sans", Roboto, Helvetica, Arial, sans-serif;
+  font-family: inherit;
   position: relative;
   color: #24292e;
   background-color: #fff;
-  border: 1px solid #d1d5da;
-  border-radius: 3px;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(27, 31, 35, .04), 0 4px 12px rgba(27, 31, 35, .04);
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -36,10 +37,9 @@
   align-items: center;
   padding-right: 16px;
   padding-left: 16px;
-  color: #586069;
-  background-color: whitesmoke;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  color: #24292e;
+  background-color: #fff;
+  border-bottom: 1px solid #eef0f2;
 }
 
 .header p {
@@ -48,9 +48,205 @@
   margin-bottom: 1px;
   flex: 1 1 auto;
 
+  color: #24292e;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.panel-head {
+  display: flex;
+}
+
+.panel-body {
+  padding: 12px 16px 14px;
+}
+
+.panel-head > score-view-toggle {
+  margin: 8px 0;
+}
+
+/* The cards are a carousel at every width: one at a time, swiped sideways or stepped with the buttons. */
+.kpi-grid {
+  display: flex;
+  gap: 12px;
+  /* Room for the shadow of the boxes, which the scrolling track would cut. */
+  padding-bottom: 6px;
+  margin-bottom: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.kpi-grid.sliding,
+.kpi-grid.dragging {
+  scroll-snap-type: none;
+}
+
+.kpi-grid.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .kpi-grid {
+    cursor: grab;
+  }
+}
+
+.kpi-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.kpi-grid > .box {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
+
+.kpi-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kpi-nav button[mat-icon-button] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  --mdc-icon-button-state-layer-size: 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 11px;
+}
+
+/* Material's touch target of an icon button (48px) would cover the dot beside it. */
+.kpi-nav button[mat-icon-button] ::ng-deep .mat-mdc-button-touch-target {
+  display: none;
+}
+
+/* Material sets the icon of an icon button to 24px. */
+.kpi-nav button[mat-icon-button] ::ng-deep svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
+.kpi-dots {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  gap: 0;
+}
+
+.kpi-dot {
+  display: block;
+  /* A target of 22px around the dot of 8px: easier to hit, and the dots are 14px apart. */
+  width: 22px;
+  height: 22px;
+  padding: 7px;
+  border: 0;
+  border-radius: 50%;
+  background-color: #cfd8dc;
+  background-clip: content-box;
+  cursor: pointer;
+}
+
+.kpi-dot.active {
+  background-color: #607d8b;
+}
+
+/* Room below a section, as between the sections and the foot of the page. */
+.dash-section {
+  margin-bottom: 24px;
+}
+
+/* One card holds the users panel and, below it, the recent items. */
+.merged {
+  overflow: hidden;
+}
+
+.pane {
+  min-width: 0;
+}
+
+/* The divider is inset from the card edges and has room above and below. */
+.recent-pane {
+  position: relative;
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.recent-pane .header {
+  border-bottom: 0;
+}
+
+.recent-pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 16px;
+  left: 16px;
+  border-top: 1px solid #e1e4e8;
+}
+
+/* The filter and the table keep the same inset as the card header. */
+.users-filter {
+  padding: 12px 16px 0;
+}
+
+.users-filter mat-form-field {
+  width: 100%;
+  max-width: 240px;
+}
+
+.recent-body {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.recent-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-item {
+  display: block;
+  padding: 0 16px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.recent-item ::ng-deep a {
+  color: rgba(0, 0, 0, .87);
+  text-decoration: none;
+}
+
+.recent-item:last-child {
+  border-bottom: 0;
+}
+
+.recent-empty {
+  padding: 16px;
   color: rgba(0, 0, 0, .54);
-  font-size: 14px;
-  letter-spacing: .3px;
+}
+
+
+/* The global form-field rule forces 100% width, so the wrapper element sets the width. */
+.title-row {
+  gap: 16px;
+  /* The height of the Branch field, which comes and goes with the section: the page below does not move. */
+  min-height: 72px;
+}
+
+.title-row > score-title-with-library-selector {
+  flex: 0 0 auto;
+}
+
+.branch-field {
+  width: 100%;
+  max-width: 220px;
 }
 
 .content {

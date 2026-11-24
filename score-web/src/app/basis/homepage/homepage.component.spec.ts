@@ -46,13 +46,13 @@ describe('HomepageComponent', () => {
     const self: any = {
       numberOfBiesByUsersAndStates: new MatTableDataSource<any>(),
       myRecentBIEs: new MatTableDataSource<any>(),
-      numberOfCcExtsByUsersAndStates: new MatTableDataSource<any>(),
       myExtensionsUnusedInBIEs: new MatTableDataSource<any>(),
+      myRecentCCs: new MatTableDataSource<any>(),
+      myRecentCCsSort: recentSort,
+      numberOfCcExtsByUsersAndStates: new MatTableDataSource<any>(),
       numberOfCCsByUsersAndStates: new MatTableDataSource<any>(),
       numberOfCCsByUsersAndStatesPaginator: paginator,
       numberOfCCsByUsersAndStatesSort: sort,
-      myRecentCCs: new MatTableDataSource<any>(),
-      myRecentCCsSort: recentSort,
     };
     HomepageComponent.prototype.ngAfterViewInit.call(self);
     expect(self.numberOfCCsByUsersAndStates.paginator).toBe(paginator);

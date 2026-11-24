@@ -1,0 +1,34 @@
+@if (sorted.length === 0) {
+  <div class="empty">{{ emptyText }}</div>
+} @else {
+  <ul class="legend">
+    @for (s of usedStates; track s.state) {
+      <li><span class="dot" [style.background-color]="s.background"></span>{{ s.state }}</li>
+    }
+  </ul>
+  <div class="rows" [class.scroll]="expanded">
+    @for (row of shown; track row.username) {
+      <div class="rank-row">
+        <a class="user" [class.disabled]="disabled" [routerLink]="route"
+           [queryParams]="{q: query(row.username)}" [title]="row.username">{{ row.username }}</a>
+        <div class="bar">
+          @for (s of states; track s.state) {
+            @if (count(row, s.state) > 0) {
+              <a class="seg" [class.disabled]="disabled" [routerLink]="route"
+                 [queryParams]="{q: query(row.username, s.state)}"
+                 [style.width.%]="width(row, s.state)"
+                 [style.background-color]="s.background" [style.color]="s.font"
+                 [title]="s.state + ' (' + count(row, s.state) + ')'">{{ count(row, s.state) }}</a>
+            }
+          }
+        </div>
+        <span class="total">{{ row.total }}</span>
+      </div>
+    }
+  </div>
+  @if (sorted.length > limit) {
+    <button type="button" class="more" (click)="expanded = !expanded">
+      {{ expanded ? 'Show top ' + limit : 'Show all ' + sorted.length + ' users' }}
+    </button>
+  }
+}

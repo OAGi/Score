@@ -1,0 +1,18 @@
+<div class="summary">
+  @for (figure of figures; track figure.title) {
+    <div class="figure">
+      <div class="caption">{{ figure.title }}</div>
+      <score-state-donut [data]="figure.items" [label]="figure.title"></score-state-donut>
+      <mat-chip-set class="states" [attr.aria-label]="figure.title">
+        @for (item of figure.items; track item.name) {
+          @if (item.value > 0) {
+            <mat-chip class="state-chip" [class.disabled]="item.disabled"
+                      [style.--mat-chip-elevated-container-color]="item.style.bg_color"
+                      [style.--mat-chip-label-text-color]="item.style.text_color"
+                      [routerLink]="item.href[0]" [queryParams]="{q: query(item)}">{{ item.name }} {{ item.value }}</mat-chip>
+          }
+        }
+      </mat-chip-set>
+    </div>
+  }
+</div>

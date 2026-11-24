@@ -1,7 +1,5 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {StateProgressBarItem} from './state-progress-bar';
-import {HttpParams} from '@angular/common/http';
-import {base64Encode} from '../utility';
+import {StateProgressBarItem, stateProgressBarQuery} from './state-progress-bar';
 
 @Component({
   standalone: false,
@@ -22,14 +20,7 @@ export class StateProgressBarComponent implements OnInit {
   }
 
   getParams(item: StateProgressBarItem): string {
-    if (item.href.length === 1) {
-      return '';
-    }
-    let params = new HttpParams();
-    for (const param of item.href[1]) {
-      params = params.set(param.key, param.value);
-    }
-    return base64Encode(params.toString());
+    return stateProgressBarQuery(item);
   }
 
   getWidth(item: StateProgressBarItem): number {

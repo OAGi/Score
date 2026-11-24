@@ -1,0 +1,41 @@
+:host { display: block; }
+
+/* Two donuts share the width in halves, each centred in its half; one donut is centred in the whole. */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.caption {
+  color: rgba(0, 0, 0, .6);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* A donut without chips keeps the row as high as the others. */
+.states {
+  min-height: 32px;
+  justify-content: center;
+}
+
+.state-chip,
+.state-chip ::ng-deep .mdc-evolution-chip__action,
+.state-chip ::ng-deep .mat-mdc-chip-action-label {
+  cursor: pointer;
+}
+
+.state-chip.disabled,
+.state-chip.disabled ::ng-deep .mdc-evolution-chip__action {
+  cursor: default;
+  pointer-events: none;
+  opacity: .6;
+}
