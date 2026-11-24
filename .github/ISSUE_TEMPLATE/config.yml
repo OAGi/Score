@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://oagi.github.io/Score/
+    about: Check the user guide first; many questions are answered there.
+  - name: Questions
+    url: https://github.com/OAGi/Score/discussions
+    about: Ask questions and share ideas in Discussions.

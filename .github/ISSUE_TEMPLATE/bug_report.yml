@@ -1,0 +1,71 @@
+name: Bug report
+description: Something is not working as expected
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please describe it in your own words; screenshots are very welcome.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the existing issues and did not find the same problem.
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did the problem happen?
+      options:
+        - Core Component (library) management
+        - BIE (profiling) editing
+        - Business context / code list / agency ID list
+        - Business term
+        - Schema generation (XML Schema / JSON Schema / OpenAPI)
+        - Import / export
+        - User, account, or permission management
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. See the problem
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version shown on the About page.
+      placeholder: e.g. 3.6.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and operating system
+      placeholder: e.g. Chrome 130 on macOS 15
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots, error messages, or logs
+      description: Drag and drop images here, or paste text. Please remove anything private.
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?

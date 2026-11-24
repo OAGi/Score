@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest an improvement or a new capability
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us what you are trying to do. Describing the problem first helps us find the best solution.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the existing issues and did not find the same request.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the situation or limitation you run into today.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Workarounds you use today, or other approaches you thought about.
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: Screenshots, mock-ups, links, or examples from standards (e.g. CCTS, OpenAPI).
