@@ -436,7 +436,9 @@ export class BieEditComponent implements OnInit, DoCheck, OnDestroy, ChangeListe
     });
 
     this.onClick(curNode);
-    this.treeViewport.scrollToNode(curNode, 500);
+    // The tree takes its searcher through a binding, which is not set until the view has been checked: that is not yet
+    // so when the path of the URL is followed as soon as the BIE is loaded.
+    setTimeout(() => this.treeViewport.scrollToNode(curNode, 500));
   }
 
 
